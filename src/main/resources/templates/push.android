@@ -1,0 +1,9 @@
+{
+	"message": {
+		"token": "{to}",
+		"notification": {
+			"title": "findapp",
+			"body": "{text}"
+		}
+	}
+}

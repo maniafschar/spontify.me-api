@@ -1,0 +1,6 @@
+findapp News für <jq:pseudonym />
+<jq:time />
+
+<jq:text />
+
+<jq:link />

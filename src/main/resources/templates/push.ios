@@ -1,0 +1,10 @@
+{
+	"exec": "{exec}",
+	"aps": {
+		"badge": {badge},
+		"alert": {
+			"title": "findapp",
+			"body": "{text}"
+		}
+	}
+}

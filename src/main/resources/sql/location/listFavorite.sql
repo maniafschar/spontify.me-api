@@ -1,0 +1,10 @@
+SELECT
+	locationFavorite.id,
+	locationFavorite.favorite,
+	locationFavorite.locationId,
+	locationFavorite.contactId,
+	locationFavorite.modifiedAt
+FROM
+	LocationFavorite locationFavorite
+WHERE
+	{search}

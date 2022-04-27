@@ -1,0 +1,48 @@
+SELECT
+	contact.age,
+	contact.ageDivers,
+	contact.ageFemale,
+	contact.ageMale,
+	contact.aboutMe,
+	contact.attr,
+	contact.attrEx,
+	contact.attr0,
+	contact.attr0Ex,
+	contact.attr1,
+	contact.attr1Ex,
+	contact.attr2,
+	contact.attr2Ex,
+	contact.attr3,
+	contact.attr3Ex,
+	contact.attr4,
+	contact.attr4Ex,
+	contact.attr5,
+	contact.attr5Ex,
+	contact.attrInterest,
+	contact.attrInterestEx,
+	contact.birthday,
+	contact.birthdayDisplay,
+	contact.budget,
+	contact.createdAt,
+	contact.device,
+	contact.filter,
+	contact.gender,
+	contact.guide,
+	contact.id,
+	contact.idDisplay,
+	contact.image,
+	contact.language,
+	contact.latitude,
+	contact.longitude,
+	contact.modifiedAt,
+	contact.os,
+	contact.pseudonym,
+	contact.rating,
+	contact.verified,
+	contact.version
+FROM
+	Contact contact
+WHERE
+	{search}
+ORDER BY
+	contact.id DESC
