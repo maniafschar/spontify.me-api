@@ -333,9 +333,9 @@ public class NotificationService {
 	private void sendNotificationEmail(Contact contactFrom, Contact contactTo, StringBuilder note2, String action)
 			throws IOException, MessagingException {
 		final StringBuilder html = new StringBuilder(
-				IOUtils.toString(getClass().getResourceAsStream("/templates/email.html"), StandardCharsets.UTF_8));
+				IOUtils.toString(getClass().getResourceAsStream("/template/email.html"), StandardCharsets.UTF_8));
 		final StringBuilder text = new StringBuilder(
-				IOUtils.toString(getClass().getResourceAsStream("/templates/email.txt"), StandardCharsets.UTF_8));
+				IOUtils.toString(getClass().getResourceAsStream("/template/email.txt"), StandardCharsets.UTF_8));
 		String s2;
 		Strings.replaceString(html, "<jq:pseudonym />", contactTo.getPseudonym());
 		Strings.replaceString(text, "<jq:pseudonym />", contactTo.getPseudonym());

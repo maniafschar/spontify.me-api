@@ -35,7 +35,7 @@ public class Android {
 				.header("Authorization",
 						"Bearer " + jwtGenerator.generateToken(getHeader(), getClaims(), "RSA"))
 				.bodyValue(
-						IOUtils.toString(getClass().getResourceAsStream("/templates/push.android"),
+						IOUtils.toString(getClass().getResourceAsStream("/template/push.android"),
 								StandardCharsets.UTF_8)
 								.replace("{to}", contact.getPushToken())
 								.replace("{text}", text)

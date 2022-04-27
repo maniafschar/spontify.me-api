@@ -37,7 +37,7 @@ public class Ios {
 		final HttpRequest request = HttpRequest.newBuilder()
 				.POST(BodyPublishers.ofString(
 						IOUtils
-								.toString(getClass().getResourceAsStream("/templates/push.ios"), StandardCharsets.UTF_8)
+								.toString(getClass().getResourceAsStream("/template/push.ios"), StandardCharsets.UTF_8)
 								.replace("{text}", text)
 								.replace("{badge}", "" + badge)
 								.replace("{exec}", Strings.isEmpty(action) ? "" : action)))
