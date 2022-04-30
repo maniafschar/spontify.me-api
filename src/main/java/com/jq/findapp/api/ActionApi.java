@@ -76,6 +76,9 @@ public class ActionApi {
 	@Value("${app.google.key}")
 	private String googleKey;
 
+	@Value("${app.google.keyJS}")
+	private String googleKeyJS;
+
 	@GetMapping("unique")
 	public Map<String, Object> unique(String email) {
 		final QueryParams params = new QueryParams(Query.contact_unique);
@@ -184,34 +187,22 @@ public class ActionApi {
 	}
 
 	private String google(String param) {
+		if ("js".equals(param))
+			return "https://maps.googleapis.com/maps/api/js?key=" + googleKeyJS;
 		return WebClient
-				.create("https://maps.googleapis.com/maps/api/" + param + "&key=" + googleKey)
+				.create("https://maps.googleapis.com/maps/api/" + param + (param.contains("?") ? "&" : "?") + "key="
+						+ googleKey)
 				.get().retrieve().toEntity(String.class).block().getBody();
 	}
 
-	// remove after 0.9.5
-	@PutMapping("position")
-	public Map<String, Object> position(final float latitude, float longitude,
-			@RequestHeader(required = false) BigInteger user,
-			@RequestHeader(required = false) String password, @RequestHeader(required = false) String salt)
-			throws Exception {
-		ContactGeoLocationHistory contactGeoLocationHistory = new ContactGeoLocationHistory();
-		contactGeoLocationHistory.setLatitude(latitude);
-		contactGeoLocationHistory.setLongitude(longitude);
-		return position2(contactGeoLocationHistory, user, password, salt);
-	}
-
 	@PostMapping("position")
-	public Map<String, Object> position2(@RequestBody final ContactGeoLocationHistory contactGeoLocationHistory,
-			@RequestHeader(required = false) BigInteger user,
-			@RequestHeader(required = false) String password, @RequestHeader(required = false) String salt)
+	public Map<String, Object> position(@RequestBody final ContactGeoLocationHistory contactGeoLocationHistory,
+			@RequestHeader BigInteger user, @RequestHeader String password, @RequestHeader String salt)
 			throws Exception {
-		final Contact contact = user == null ? null : authentication.verify(user, password, salt);
-		String ss = google("geocode/json?latlng=" + contactGeoLocationHistory.getLatitude() + ','
-				+ contactGeoLocationHistory.getLongitude());
-		notify(ss);
+		final Contact contact = authentication.verify(user, password, salt);
 		JsonNode data = new ObjectMapper()
-				.readTree(ss);
+				.readTree(google("geocode/json?latlng=" + contactGeoLocationHistory.getLatitude() + ','
+						+ contactGeoLocationHistory.getLongitude()));
 		final Map<String, Object> result = new HashMap<>();
 		if ("OK".equals(data.get("status").asText()) && data.get("results") != null) {
 			data = data.get("results").get(0).get("address_components");
