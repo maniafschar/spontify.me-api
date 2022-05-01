@@ -37,13 +37,15 @@ public class GeoLocation {
 			final boolean meridian180WithinDistance = boundingCoordinates[0].getY() > boundingCoordinates[1].getY();
 			table = table + '.';
 			params.setSearchGeoLocation(
-					'(' + table + "latitude >= " + boundingCoordinates[0].getX() + " and " + table + "latitude <= "
+					"((" + table + "latitude >= " + boundingCoordinates[0].getX() + " and " + table + "latitude <= "
 							+ boundingCoordinates[1].getX() + ") and (" + table + "longitude >= "
 							+ boundingCoordinates[0].getY() + ' ' + (meridian180WithinDistance ? "or" : "and") + ' '
 							+ table + "longitude <= " + boundingCoordinates[1].getY() + ") and " + "acos(sin("
 							+ radLat + ") * sin(radians(" + table + "latitude)) + cos(" + radLat
 							+ ") * cos(radians(" + table + "latitude)) * cos(radians(" + table + "longitude) - "
-							+ radLon + ")) <= " + (params.getDistance() / radius));
+							+ radLon + ")) <= " + (params.getDistance() / radius) + ')');
+			if (params.getDistance() == null || params.getDistance() > 50000 || params.getDistance() < 1)
+				params.setSearchGeoLocation('(' + table + "latitude is null or " + params.getSearchGeoLocation() + ')');
 		} else
 			params.setSearchGeoLocation(null);
 	}
@@ -92,7 +94,7 @@ public class GeoLocation {
 						if (((Number) row[distance]).doubleValue() <= 1.5)
 							row[distance] = 1;
 						else
-							row[distance] = new Double(((Number) row[distance]).doubleValue() + 0.5).intValue();
+							row[distance] = (int) (((Number) row[distance]).doubleValue() + 0.5);
 					}
 				}
 			}

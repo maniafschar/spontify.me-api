@@ -108,7 +108,9 @@ public class RepositoryListener {
 			repository.executeUpdate(
 					"update Contact contact set contact.fbToken=null where contact.fbToken='" + contact.old("fbToken")
 							+ "' and contact.id<>" + contact.getId());
-		if (contact.old("birthday") != null) {
+		if (contact.getBirthday() == null)
+			contact.setAge(null);
+		else {
 			final GregorianCalendar now = new GregorianCalendar();
 			final GregorianCalendar birthday = new GregorianCalendar();
 			birthday.setTimeInMillis(contact.getBirthday().getTime());
