@@ -5,13 +5,14 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.mail.MessagingException;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.DBApi.WriteEntity;
 import com.jq.findapp.entity.Contact;
@@ -24,10 +25,13 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
+import com.jq.findapp.service.ExternalService;
+import com.jq.findapp.service.ExternalService.Address;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.service.NotificationService.Ping;
 import com.jq.findapp.util.EntityUtil;
+import com.jq.findapp.util.Text;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +54,36 @@ public class ActionApi {
 	private static final List<String> QUOTATION = new ArrayList<>();
 	private static final List<Integer> SENT_NOTIFICATIONS = new ArrayList<>();
 
+	private static class Marketing {
+		private String title;
+		private String text;
+		private String action;
+
+		public void setTitle(String title) {
+			this.title = title;
+		}
+
+		public void setText(String text) {
+			this.text = text;
+		}
+
+		public void setAction(String action) {
+			this.action = action;
+		}
+
+		public String getTitle() {
+			return title;
+		}
+
+		public String getText() {
+			return text;
+		}
+
+		public String getAction() {
+			return action;
+		}
+	}
+
 	static {
 		try {
 			final String[] t = IOUtils
@@ -71,7 +105,10 @@ public class ActionApi {
 	private NotificationService notificationService;
 
 	@Autowired
-	private AuthenticationService authentication;
+	private AuthenticationService authenticationService;
+
+	@Autowired
+	private ExternalService externalService;
 
 	@Value("${app.google.key}")
 	private String googleKey;
@@ -100,19 +137,47 @@ public class ActionApi {
 		}
 	}
 
-	@GetMapping("marketing")
-	public Map<String, String> marketing(@RequestHeader(required = false) Long user) {
-		final Map<String, String> map = new HashMap<>();
-		map.put("text",
-				"<b>Hol Dir das iPad 10.2</b><br>Wer bis 31.6.22 die meisten Freunde hier sammelt, bekommt ein iPad geschenkt. Mehr...");
-		map.put("action", "https://blog.findapp.online");
+	@GetMapping("marketing/{language}")
+	public Marketing marketing(@PathVariable final String language, @RequestHeader(required = false) BigInteger user) {
+		final Marketing marketing = new Marketing();
+		marketing.setText(Text.marketing_iPadText.getText(language));
+		marketing.setTitle(Text.marketing_iPadTitle.getText(language));
+		marketing.setAction("https://blog.findapp.online");
+		return marketing;
+	}
+
+	@GetMapping("marketing/result")
+	public Map<String, Object> marketingResult(@RequestHeader BigInteger user, @RequestHeader String password,
+			@RequestHeader String salt) {
+		final Contact u = authenticationService.verify(user, password, salt);
+		final Map<String, Object> map = new HashMap<>();
+		final GregorianCalendar gc = new GregorianCalendar();
+		if (gc.get(Calendar.MONTH) < 6) {
+			final QueryParams params = new QueryParams(Query.contact_marketing);
+			params.setUser(u);
+			params.setSearch("contactMarketing.createdAt>'2022-05-01' and contactMarketing.createdAt<'2022-07-01'");
+			final List<Object[]> list = repository.list(params).getList();
+			final String scoring = Text.marketing_scoring.getText(u.getLanguage());
+			int columnMessage1 = 0;
+			for (; columnMessage1 < list.get(0).length; columnMessage1++) {
+				if ("_message1".equals(list.get(0)[columnMessage1]))
+					break;
+			}
+			for (int i = 1; i < list.size(); i++)
+				list.get(i)[columnMessage1] = scoring + list.get(i)[columnMessage1];
+			map.put("text", Text.marketing_iPadText.getText(u.getLanguage()) + " "
+					+ Text.marketing_list.getText(u.getLanguage()));
+			map.put("action", "https://blog.findapp.online");
+			map.put("list", list);
+		} else
+			map.put("html", Text.marketing_noActions.getText(u.getLanguage()));
 		return map;
 	}
 
 	@GetMapping("quotation")
 	public String quotation(@RequestHeader BigInteger user, @RequestHeader String password,
 			@RequestHeader String salt) throws IllegalAccessException {
-		authentication.verify(user, password, salt);
+		authenticationService.verify(user, password, salt);
 		return QUOTATION.get((int) (Math.random() * (QUOTATION.size() - 1)));
 	}
 
@@ -121,7 +186,7 @@ public class ActionApi {
 			@PathVariable final boolean all, @RequestHeader BigInteger user, @RequestHeader String password,
 			@RequestHeader String salt) {
 		final QueryParams params = new QueryParams(Query.contact_chat);
-		params.setUser(authentication.verify(user, password, salt));
+		params.setUser(authenticationService.verify(user, password, salt));
 		if (location)
 			params.setSearch("chat.locationId=" + id);
 		else if (all)
@@ -142,7 +207,7 @@ public class ActionApi {
 			@RequestHeader(required = false) String password, @RequestHeader(required = false) String salt)
 			throws Exception {
 		if (!params.getQuery().name().contains("_anonymous"))
-			params.setUser(authentication.verify(user, password, salt));
+			params.setUser(authenticationService.verify(user, password, salt));
 		final Map<String, Object> m = repository.one(params);
 		if (params.getUser() != null) {
 			if (params.getQuery() == Query.contact_list)
@@ -154,7 +219,7 @@ public class ActionApi {
 				visit.setContactId(params.getUser().getId());
 				repository.save(visit);
 				notificationService.locationNotifyOnMatch(params.getUser(),
-						(BigInteger) m.get("location.id"), NotificationID.VisitLocation, null);
+						(BigInteger) m.get("location.id"), NotificationID.visitLocation, null);
 			}
 		}
 		return m;
@@ -164,7 +229,7 @@ public class ActionApi {
 	public String map(final String source, final String destination, @RequestHeader(required = false) BigInteger user,
 			@RequestHeader(required = false) String password, @RequestHeader(required = false) String salt)
 			throws Exception {
-		final Contact contact = authentication.verify(user, password, salt);
+		final Contact contact = authenticationService.verify(user, password, salt);
 		String url;
 		if (source == null || source.length() == 0)
 			url = "https://maps.googleapis.com/maps/api/staticmap?{destination}&markers=icon:https://findapp.online/images/mapMe{gender}.png|shadow:false|{destination}&scale=2&size=200x200&maptype=roadmap&key=";
@@ -182,67 +247,47 @@ public class ActionApi {
 	public String google(final String param, @RequestHeader(required = false) BigInteger user,
 			@RequestHeader(required = false) String password, @RequestHeader(required = false) String salt)
 			throws Exception {
-		authentication.verify(user, password, salt);
+		authenticationService.verify(user, password, salt);
 		return google(param);
 	}
 
 	private String google(String param) {
 		if ("js".equals(param))
 			return "https://maps.googleapis.com/maps/api/js?key=" + googleKeyJS;
-		return WebClient
-				.create("https://maps.googleapis.com/maps/api/" + param + (param.contains("?") ? "&" : "?") + "key="
-						+ googleKey)
-				.get().retrieve().toEntity(String.class).block().getBody();
+		return externalService.google(param);
 	}
 
 	@PostMapping("position")
 	public Map<String, Object> position(@RequestBody final ContactGeoLocationHistory contactGeoLocationHistory,
 			@RequestHeader BigInteger user, @RequestHeader String password, @RequestHeader String salt)
 			throws Exception {
-		final Contact contact = authentication.verify(user, password, salt);
-		JsonNode data = new ObjectMapper()
+		final Contact contact = authenticationService.verify(user, password, salt);
+		final Address address = externalService.convertGoogleAddress(new ObjectMapper()
 				.readTree(google("geocode/json?latlng=" + contactGeoLocationHistory.getLatitude() + ','
-						+ contactGeoLocationHistory.getLongitude()));
-		final Map<String, Object> result = new HashMap<>();
-		if ("OK".equals(data.get("status").asText()) && data.get("results") != null) {
-			data = data.get("results").get(0).get("address_components");
-			String s = "", z = "", c = "", t = "", n = "";
-			for (int i = 0; i < data.size(); i++) {
-				if ("".equals(s) && "route".equals(data.get(i).get("types").get(0).asText()))
-					s = data.get(i).get("long_name").asText();
-				else if ("".equals(n) && "street_number".equals(data.get(i).get("types").get(0).asText()))
-					n = data.get(i).get("long_name").asText();
-				else if ("".equals(t) &&
-						("locality".equals(data.get(i).get("types").get(0).asText()) ||
-								data.get(i).get("types").get(0).asText().startsWith("administrative_area_level_")))
-					t = data.get(i).get("long_name").asText();
-				else if ("".equals(z) && "postal_code".equals(data.get(i).get("types").get(0).asText()))
-					z = data.get(i).get("long_name").asText();
-				else if ("".equals(c) && "country".equals(data.get(i).get("types").get(0).asText()))
-					c = data.get(i).get("short_name").asText();
-			}
-			if (s.length() > 0 && n.length() > 0)
-				s = s + ' ' + n;
-			result.put("town", t.length() > 0 ? t : c);
-			result.put("street", s);
-			if (contact != null) {
-				contact.setLatitude(contactGeoLocationHistory.getLatitude());
-				contact.setLongitude(contactGeoLocationHistory.getLongitude());
-				repository.save(contact);
-				contactGeoLocationHistory.setCountry(c);
-				contactGeoLocationHistory.setStreet(s);
-				contactGeoLocationHistory.setTown(t);
-				contactGeoLocationHistory.setZipCode(z);
-				repository.save(contactGeoLocationHistory);
-			}
+						+ contactGeoLocationHistory.getLongitude())));
+		if (address != null) {
+			final Map<String, Object> result = new HashMap<>();
+			if (address.street != null && address.number != null)
+				address.street = address.street + ' ' + address.number;
+			result.put("town", address.town != null ? address.town : address.country);
+			result.put("street", address.street);
+			contact.setLatitude(contactGeoLocationHistory.getLatitude());
+			contact.setLongitude(contactGeoLocationHistory.getLongitude());
+			repository.save(contact);
+			contactGeoLocationHistory.setCountry(address.country);
+			contactGeoLocationHistory.setStreet(address.street);
+			contactGeoLocationHistory.setTown(address.town);
+			contactGeoLocationHistory.setZipCode(address.zipCode);
+			repository.save(contactGeoLocationHistory);
+			return result;
 		}
-		return result;
+		return null;
 	}
 
 	@GetMapping("ping")
 	public Ping ping(@RequestHeader BigInteger user, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
-		final Contact contact = authentication.verify(user, password, salt);
+		final Contact contact = authenticationService.verify(user, password, salt);
 		contact.setActive(true);
 		repository.save(contact);
 		return notificationService.getPingValues(contact);
@@ -253,7 +298,7 @@ public class ActionApi {
 			@RequestHeader(required = false) String password,
 			@RequestHeader(required = false) String salt)
 			throws Exception {
-		authentication.verify(user, password, salt);
+		authenticationService.verify(user, password, salt);
 		final Location location = repository.one(Location.class, entity.getId());
 		if (location.writeAccess(user, repository)) {
 			for (int i = 0; i < entity.getValues().size(); i++) {

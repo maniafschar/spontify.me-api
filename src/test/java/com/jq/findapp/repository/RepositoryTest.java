@@ -155,6 +155,7 @@ public class RepositoryTest {
 		// given
 		final QueryParams params = new QueryParams(Query.contact_list);
 		params.setUser(createContact());
+		params.setSearch("contact.id=" + params.getUser().getId());
 
 		// when
 		final Result result = repository.list(params);

@@ -11,6 +11,9 @@ import javax.persistence.PostUpdate;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.entity.Chat;
@@ -18,6 +21,7 @@ import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactBluetooth;
 import com.jq.findapp.entity.ContactLink;
 import com.jq.findapp.entity.ContactLink.Status;
+import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.entity.ContactRating;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.EventParticipate;
@@ -25,6 +29,8 @@ import com.jq.findapp.entity.Feedback;
 import com.jq.findapp.entity.Feedback.Type;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.LocationRating;
+import com.jq.findapp.service.ExternalService;
+import com.jq.findapp.service.ExternalService.Address;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.util.Strings;
@@ -38,6 +44,7 @@ import org.springframework.stereotype.Component;
 public class RepositoryListener {
 	private static Repository repository;
 	private static NotificationService notificationService;
+	private static ExternalService externalService;
 	private static BigInteger adminId;
 
 	@Value("${app.admin.id}")
@@ -55,16 +62,27 @@ public class RepositoryListener {
 		RepositoryListener.notificationService = notificationService;
 	}
 
+	@Autowired
+	private void setExternalService(ExternalService externalService) {
+		RepositoryListener.externalService = externalService;
+	}
+
 	@PrePersist
 	public void prePersist(final BaseEntity entity) throws Exception {
 		if (entity instanceof ContactBluetooth)
 			prePersistContactBluetooth((ContactBluetooth) entity);
+		else if (entity instanceof Location)
+			prePersistLocation((Location) entity);
+		else if (entity instanceof Feedback)
+			prePersistFeedback((Feedback) entity);
 	}
 
 	@PreUpdate
 	public void preUpdate(final BaseEntity entity) throws Exception {
 		if (entity instanceof Contact)
 			preUpdateContact((Contact) entity);
+		else if (entity instanceof Location)
+			preUpdateLocation((Location) entity);
 	}
 
 	@PostPersist
@@ -95,6 +113,67 @@ public class RepositoryListener {
 		final Contact me = repository.one(Contact.class, contactBlutooth.getContactId());
 		contactBlutooth.setLatitude(me.getLatitude());
 		contactBlutooth.setLongitude(me.getLongitude());
+	}
+
+	private void prePersistFeedback(final Feedback feedback) {
+		if (feedback.getLocalized() != null && feedback.getLocalized().length() > 50)
+			feedback.setLocalized(feedback.getLocalized().substring(0, 50));
+		if (feedback.getText() != null && feedback.getText().length() > 2000)
+			feedback.setText(feedback.getText().substring(0, 2000));
+		if (feedback.getResponse() != null && feedback.getResponse().length() > 2000)
+			feedback.setResponse(feedback.getResponse().substring(0, 2000));
+		if (feedback.getStack() != null && feedback.getStack().length() > 2000)
+			feedback.setStack(feedback.getStack().substring(0, 2000));
+	}
+
+	private void prePersistLocation(Location location)
+			throws JsonMappingException, JsonProcessingException, IllegalAccessException {
+		lookupAddress(location);
+		final QueryParams params = new QueryParams(Query.location_list);
+		location.getCategory();
+		location.getName();
+		params.setUser(repository.one(Contact.class, location.getContactId()));
+		params.setSearch(
+				"REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(location.address),'''',''),'\\n',''),'\\r',''),'\\t',''),' ','')='"
+						+ location.getAddress().toLowerCase().replaceAll("'", "").replaceAll("\n", "")
+								.replaceAll("\r", "").replaceAll("\t", "").replaceAll(" ", "")
+						+ "'");
+		if (repository.list(params).size() > 0)
+			throw new IllegalAccessException("Location exists");
+
+	}
+
+	private void lookupAddress(Location location)
+			throws JsonMappingException, JsonProcessingException, IllegalAccessException {
+		final JsonNode googleAddress = new ObjectMapper().readTree(
+				externalService.google("geocode/json?address=" + location.getAddress().replaceAll("\n", ", ")));
+		if (!"OK".equals(googleAddress.get("status").asText()))
+			throw new IllegalAccessException("Invalid address");
+		final JsonNode result = googleAddress.get("results").get(0);
+		JsonNode n = result.get("geometry").get("location");
+		location.setLatitude(n.get("lat").floatValue());
+		location.setLongitude(n.get("lng").floatValue());
+		final Address address = externalService.convertGoogleAddress(googleAddress);
+		location.setAddress(address.getFormatted());
+		location.setCountry(address.country);
+		location.setTown(address.town);
+		location.setZipCode(address.zipCode);
+		location.setStreet(address.street);
+		n = result.get("address_components");
+		String s = "";
+		for (int i = 0; i < n.size(); i++) {
+			if (!location.getAddress().contains(n.get(i).get("long_name").asText()))
+				s += '\n' + n.get(i).get("long_name").asText();
+		}
+		location.setAddress2(s.trim());
+	}
+
+	private void preUpdateLocation(Location location) throws Exception {
+		if (location.old("address") == null) {
+			location.setLatitude((Float) location.old("latitude"));
+			location.setLongitude((Float) location.old("longitude"));
+		} else
+			lookupAddress(location);
 	}
 
 	private void preUpdateContact(final Contact contact) {
@@ -132,7 +211,7 @@ public class RepositoryListener {
 			chat.setSeen(Boolean.TRUE);
 			repository.save(chat);
 			notificationService.sendNotification(repository.one(Contact.class, adminId), feedbackUser,
-					NotificationID.Feedback, null, feedback.getText());
+					NotificationID.feedback, null, feedback.getText());
 		}
 		notificationService.sendEmail(null, feedback.getType() + ": " + feedbackUser.getPseudonym(),
 				new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(feedback));
@@ -143,8 +222,8 @@ public class RepositoryListener {
 		final Contact me = repository.one(Contact.class, contactBlutooth.getContactId());
 		final Contact other = repository.one(Contact.class, contactBlutooth.getContactId2());
 		if (me.getFindMe() && other.getFindMe()) {
-			notificationService.sendNotificationOnMatch(NotificationID.FindMe, me, other);
-			notificationService.sendNotificationOnMatch(NotificationID.FindMe, other, me);
+			notificationService.sendNotificationOnMatch(NotificationID.findMe, me, other);
+			notificationService.sendNotificationOnMatch(NotificationID.findMe, other, me);
 		}
 	}
 
@@ -154,19 +233,20 @@ public class RepositoryListener {
 			final Contact contactTo = repository.one(Contact.class, chat.getContactId2());
 			String s = null;
 			if (chat.getNote() == null)
-				s = Text.mailSentImg.getText(contactTo.getLanguage());
+				s = Text.mail_sentImg.getText(contactTo.getLanguage());
 			else {
 				s = chat.getNote();
 				if (s.indexOf(" :openPos(") == 0)
-					s = Text.valueOf("mailSentPos" + contactFrom.getGender()).getText(contactTo.getLanguage());
+					s = (contactFrom.getGender() == 2 ? Text.mail_sentPos2 : Text.mail_sentPos1)
+							.getText(contactTo.getLanguage());
 				else if (s.indexOf(" :open(") == 0)
-					s = Text.valueOf("mailSentEntr" + (s.lastIndexOf(" :open(") == 0 ? "y" : "ies"))
+					s = (s.lastIndexOf(" :open(") == 0 ? Text.mail_sentEntry : Text.mail_sentEntries)
 							.getText(contactTo.getLanguage());
 			}
-			notificationService.sendNotification(contactFrom, contactTo, NotificationID.NewMsg,
+			notificationService.sendNotification(contactFrom, contactTo, NotificationID.newMsg,
 					"chat=" + contactFrom.getId(), s);
 		} else
-			notificationService.locationNotifyOnMatch(contactFrom, chat.getLocationId(), NotificationID.ChatLocation,
+			notificationService.locationNotifyOnMatch(contactFrom, chat.getLocationId(), NotificationID.chatLocation,
 					chat.getNote());
 	}
 
@@ -174,14 +254,26 @@ public class RepositoryListener {
 		if (contactLink.getStatus() == Status.Friends) {
 			notificationService.sendNotification(repository.one(Contact.class, contactLink.getContactId2()),
 					repository.one(Contact.class, contactLink.getContactId()),
-					NotificationID.FriendAppro, Strings.encodeParam("p=" + contactLink.getContactId2()));
+					NotificationID.friendAppro, Strings.encodeParam("p=" + contactLink.getContactId2()));
+			final QueryParams params = new QueryParams(Query.contact_marketing);
+			params.setUser(repository.one(Contact.class, contactLink.getContactId()));
+			params.setSearch("marketing.data='" + contactLink.getContactId2() + "' and marketing.type='"
+					+ com.jq.findapp.entity.ContactMarketing.Type.CollectFriends.name() + "' and marketing.contactId="
+					+ contactLink.getContactId());
+			if (repository.list(params).size() == 0) {
+				final ContactMarketing marketing = new ContactMarketing();
+				marketing.setContactId(contactLink.getContactId());
+				marketing.setData(contactLink.getContactId2().toString());
+				marketing.setType(com.jq.findapp.entity.ContactMarketing.Type.CollectFriends);
+				repository.save(marketing);
+			}
 		}
 	}
 
 	private void postPersistContactLink(ContactLink contactLink) throws Exception {
 		notificationService.sendNotification(repository.one(Contact.class, contactLink.getContactId()),
 				repository.one(Contact.class, contactLink.getContactId2()),
-				NotificationID.FriendReq, Strings.encodeParam("p=" + contactLink.getContactId()));
+				NotificationID.friendReq, Strings.encodeParam("p=" + contactLink.getContactId()));
 	}
 
 	private void postPersistEventParticipate(EventParticipate eventParticipate) throws Exception {
@@ -190,7 +282,7 @@ public class RepositoryListener {
 			final Contact contactTo = repository.one(Contact.class, event.getContactId());
 			final Contact contactFrom = repository.one(Contact.class, eventParticipate.getContactId());
 			notificationService.sendNotification(contactFrom, contactTo,
-					NotificationID.MarkEvent,
+					NotificationID.markEvent,
 					Strings.encodeParam("p=" + contactFrom.getId()),
 					new SimpleDateFormat("dd.MM.yyyy HH:mm").format(eventParticipate.getEventDate()),
 					event.getText(),
@@ -205,7 +297,7 @@ public class RepositoryListener {
 		notificationService.sendNotification(
 				repository.one(Contact.class, contactRating.getContactId()),
 				repository.one(Contact.class, contactRating.getContactId2()),
-				NotificationID.RatingProfile, Strings.encodeParam("p=" + contactRating.getContactId()),
+				NotificationID.ratingProfile, Strings.encodeParam("p=" + contactRating.getContactId()),
 				contactRating.getRating() + "%");
 	}
 
@@ -215,7 +307,7 @@ public class RepositoryListener {
 						+ locationRating.getLocationId());
 		notificationService.locationNotifyOnMatch(
 				repository.one(Contact.class, locationRating.getContactId()),
-				locationRating.getLocationId(), NotificationID.RatingLocMat,
+				locationRating.getLocationId(), NotificationID.ratingLocMat,
 				repository.one(Location.class, locationRating.getLocationId()).getName());
 	}
 }

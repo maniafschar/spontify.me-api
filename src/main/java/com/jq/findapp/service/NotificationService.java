@@ -59,25 +59,25 @@ public class NotificationService {
 	}
 
 	public enum NotificationID {
-		AccountDelete(NotificationIDType.EmailOrDevice, true), //
-		Birthday(NotificationIDType.EmailOrDevice, true), //
-		ChatLocation(NotificationIDType.EmailOrDevice, true),
-		Feedback(NotificationIDType.Email, false), //
-		FriendAppro(NotificationIDType.EmailOrDevice, true), //
-		FriendReq(NotificationIDType.EmailOrDevice, true), //
-		LocTransf(NotificationIDType.EmailOrDevice, true), //
-		MarkEvent(NotificationIDType.EmailOrDevice, true), //
-		NewMsg(NotificationIDType.EmailOrDevice, false), //
-		PWReset(NotificationIDType.Email, false), //
-		RatingLocMat(NotificationIDType.EmailOrDevice, true), //
-		RatingProfile(NotificationIDType.EmailOrDevice, true), //
-		VisitLocation(NotificationIDType.EmailOrDevice, true), //
-		VisitProfile(NotificationIDType.EmailOrDevice, true), //
-		WelcomeExt(NotificationIDType.Email, false), //
-		WTD(NotificationIDType.EmailOrDevice, true), //
-		FindMe(NotificationIDType.EmailOrDevice, true), //
-		LocMarketing(NotificationIDType.EmailOrDevice, true), //
-		MGMarketing(NotificationIDType.EmailOrDevice, true);
+		accountDelete(NotificationIDType.EmailOrDevice, true), //
+		birthday(NotificationIDType.EmailOrDevice, true), //
+		chatLocation(NotificationIDType.EmailOrDevice, true),
+		feedback(NotificationIDType.Email, false), //
+		friendAppro(NotificationIDType.EmailOrDevice, true), //
+		friendReq(NotificationIDType.EmailOrDevice, true), //
+		locTransf(NotificationIDType.EmailOrDevice, true), //
+		markEvent(NotificationIDType.EmailOrDevice, true), //
+		newMsg(NotificationIDType.EmailOrDevice, false), //
+		pwReset(NotificationIDType.Email, false), //
+		ratingLocMat(NotificationIDType.EmailOrDevice, true), //
+		ratingProfile(NotificationIDType.EmailOrDevice, true), //
+		visitLocation(NotificationIDType.EmailOrDevice, true), //
+		visitProfile(NotificationIDType.EmailOrDevice, true), //
+		welcomeExt(NotificationIDType.Email, false), //
+		wtd(NotificationIDType.EmailOrDevice, true), //
+		findMe(NotificationIDType.EmailOrDevice, true), //
+		locMarketing(NotificationIDType.EmailOrDevice, true), //
+		mgMarketing(NotificationIDType.EmailOrDevice, true);
 
 		private final NotificationIDType type;
 		private final boolean save;
@@ -116,7 +116,7 @@ public class NotificationService {
 				visit.setCount(visit.getCount() + 1);
 			}
 			repository.save(visit);
-			sendNotificationOnMatch(NotificationID.VisitProfile, user, repository.one(Contact.class, contactId2));
+			sendNotificationOnMatch(NotificationID.visitProfile, user, repository.one(Contact.class, contactId2));
 		}
 	}
 
@@ -173,8 +173,8 @@ public class NotificationService {
 
 	private boolean sendNotificationInternal(Contact contactFrom, Contact contactTo, NotificationID notificationID,
 			String action, String... param) throws Exception {
-		if (!contactTo.getVerified() && notificationID != NotificationID.WelcomeExt
-				&& notificationID != NotificationID.PWReset)
+		if (!contactTo.getVerified() && notificationID != NotificationID.welcomeExt
+				&& notificationID != NotificationID.pwReset)
 			return false;
 		QueryParams params = new QueryParams(Query.contact_block);
 		params.setUser(contactFrom);
@@ -184,7 +184,7 @@ public class NotificationService {
 		if (repository.list(params).size() > 0)
 			return false;
 		final StringBuilder text = new StringBuilder(
-				Text.valueOf("mail" + notificationID).getText(contactTo.getLanguage()));
+				Text.valueOf("mail_" + notificationID).getText(contactTo.getLanguage()));
 		if (param != null) {
 			for (int i = 0; i < param.length; i++)
 				Strings.replaceString(text, "<jq:EXTRA_" + (i + 1) + "/>", param[i]);
@@ -309,23 +309,23 @@ public class NotificationService {
 	}
 
 	private boolean userWantsNotification(NotificationID textID, Contact contact) {
-		if (NotificationID.PWReset == textID || NotificationID.WelcomeExt == textID)
+		if (NotificationID.pwReset == textID || NotificationID.welcomeExt == textID)
 			return true;
-		if (NotificationID.NewMsg == textID)
+		if (NotificationID.newMsg == textID)
 			return contact.getNotificationChat();
-		if (NotificationID.FriendReq == textID || NotificationID.FriendAppro == textID)
+		if (NotificationID.friendReq == textID || NotificationID.friendAppro == textID)
 			return contact.getNotificationFriendRequest();
-		if (NotificationID.VisitLocation == textID)
+		if (NotificationID.visitLocation == textID)
 			return contact.getNotificationVisitLocation();
-		if (NotificationID.VisitProfile == textID)
+		if (NotificationID.visitProfile == textID)
 			return contact.getNotificationVisitProfile();
-		if (NotificationID.RatingProfile == textID)
+		if (NotificationID.ratingProfile == textID)
 			return contact.getNotificationVisitProfile();
-		if (NotificationID.RatingLocMat == textID)
+		if (NotificationID.ratingLocMat == textID)
 			return contact.getNotificationVisitLocation();
-		if (NotificationID.MarkEvent == textID)
+		if (NotificationID.markEvent == textID)
 			return contact.getNotificationMarkEvent();
-		if (NotificationID.Birthday == textID)
+		if (NotificationID.birthday == textID)
 			return contact.getNotificationBirthday();
 		return true;
 	}

@@ -147,7 +147,7 @@ public class EngagementService {
 					chat.setNote(s);
 					repository.save(chat);
 					notificationService.sendNotification(susi, contact,
-							NotificationID.MGMarketing,
+							NotificationID.mgMarketing,
 							"DE".equals(contact.getLanguage()) ? "Susi Support hat Dir geschrieben"
 									: "Susi Support sent you a message",
 							Strings.encodeParam("chat=3"));

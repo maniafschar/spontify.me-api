@@ -16,7 +16,6 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
-import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Encryption;
 
 import org.apache.commons.io.IOUtils;
@@ -40,9 +39,6 @@ public class SupportCenterApi {
 
 	@Autowired
 	private Repository repository;
-
-	@Autowired
-	private NotificationService notificationService;
 
 	@Autowired
 	private AuthenticationService authenticationService;

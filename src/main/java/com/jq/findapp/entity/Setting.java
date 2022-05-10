@@ -3,7 +3,7 @@ package com.jq.findapp.entity;
 import javax.persistence.Entity;
 
 @Entity
-public class ServerSetting extends BaseEntity {
+public class Setting extends BaseEntity {
 	private String label;
 	private String value;
 

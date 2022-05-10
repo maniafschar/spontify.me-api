@@ -14,7 +14,6 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationExternalService;
 import com.jq.findapp.service.AuthenticationService;
-import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Encryption;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,32 +35,29 @@ public class AuthenticationApi {
 	private Repository repository;
 
 	@Autowired
-	private AuthenticationService authentication;
+	private AuthenticationService authenticationService;
 
 	@Autowired
 	private AuthenticationExternalService authenticationExternalService;
 
-	@Autowired
-	private NotificationService notificationService;
-
 	@GetMapping("logoff")
 	public void logoff(@RequestHeader BigInteger user, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
-		final Contact c = authentication.verify(user, password, salt);
+		final Contact c = authenticationService.verify(user, password, salt);
 		c.setActive(false);
 		repository.save(c);
 	}
 
 	@PostMapping("register")
 	public void register(@RequestBody final InternalRegistration registration) throws Exception {
-		authentication.register(registration);
+		authenticationService.register(registration);
 	}
 
 	@GetMapping("login")
 	public Map<String, Object> login(Contact contact, String publicKey, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
 		contact.setEmail(Encryption.decryptBrowser(contact.getEmail()));
-		final Map<String, Object> user = authentication.login(contact, password, salt);
+		final Map<String, Object> user = authenticationService.login(contact, password, salt);
 		if (user != null && publicKey != null) {
 			final ContactToken t;
 			final QueryParams params = new QueryParams(Query.contact_token);
@@ -85,7 +81,7 @@ public class AuthenticationApi {
 	@DeleteMapping("one")
 	public void one(@RequestHeader BigInteger user, @RequestHeader String password, @RequestHeader String salt)
 			throws Exception {
-		authentication.verify(user, password, salt);
+		authenticationService.verify(user, password, salt);
 		repository.deleteAccount(user);
 	}
 
@@ -94,25 +90,26 @@ public class AuthenticationApi {
 		registration.getUser().put("id", Encryption.decryptBrowser(registration.getUser().get("id")));
 		final Contact contact = authenticationExternalService.register(registration);
 		return contact == null ? null
-				: Encryption.encrypt(contact.getEmail() + "\u0015" + authentication.getPassword(contact),
+				: Encryption.encrypt(contact.getEmail() + "\u0015" + authenticationService.getPassword(contact),
 						registration.getPublicKey());
 	}
 
 	@GetMapping("loginAuto")
 	public String autoLogin(String publicKey, String token) throws IllegalAccessException {
-		return authentication.getAutoLogin(publicKey, token);
+		return authenticationService.getAutoLogin(publicKey, token);
 	}
 
 	@GetMapping("recoverSendEmail")
 	public String recoverSendEmail(String email, String name) throws Exception {
-		return authentication.recoverSendEmail(Encryption.decryptBrowser(email), Encryption.decryptBrowser(name));
+		return authenticationService.recoverSendEmail(Encryption.decryptBrowser(email),
+				Encryption.decryptBrowser(name));
 	}
 
 	@GetMapping("recoverVerifyEmail")
 	public String recoverVerifyEmail(String publicKey, String token) throws Exception {
-		final Contact contact = authentication.recoverVerifyEmail(Encryption.decryptBrowser(token));
+		final Contact contact = authenticationService.recoverVerifyEmail(Encryption.decryptBrowser(token));
 		return contact == null ? null
 				: Encryption.encrypt(
-						contact.getEmail() + "\u0015" + authentication.getPassword(contact), publicKey);
+						contact.getEmail() + "\u0015" + authenticationService.getPassword(contact), publicKey);
 	}
 }

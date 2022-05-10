@@ -13,32 +13,37 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 
 public enum Text {
-	mailAccountDelete,
-	mailBirthday,
-	mailChatLocation,
-	mailFeedback,
-	mailFeedbackResponse,
-	mailFindMe,
-	mailFriendAppro,
-	mailFriendReq,
-	mailInvite,
-	mailLocMarketing,
-	mailMarkEvent,
-	mailMGMarketing,
-	mailNewMsg,
-	mailPWReset,
-	mailSentImg,
-	mailSentPos1,
-	mailSentPos2,
-	mailSentEntries,
-	mailSentEntry,
-	mailRatingLocMat,
-	mailRatingProfile,
-	mailVisitLocation,
-	mailVisitProfile,
-	mailWelcomeExt,
-	mailWelcome,
-	mailWTD;
+	mail_accountDelete,
+	mail_birthday,
+	mail_chatLocation,
+	mail_feedback,
+	mail_feedbackResponse,
+	mail_findMe,
+	mail_friendAppro,
+	mail_friendReq,
+	mail_invite,
+	mail_locMarketing,
+	mail_markEvent,
+	mail_mgMarketing,
+	mail_newMsg,
+	mail_pwReset,
+	mail_sentImg,
+	mail_sentPos1,
+	mail_sentPos2,
+	mail_sentEntries,
+	mail_sentEntry,
+	mail_ratingLocMat,
+	mail_ratingProfile,
+	mail_visitLocation,
+	mail_visitProfile,
+	mail_welcomeExt,
+	mail_welcome,
+	mail_wtg,
+	marketing_iPadText,
+	marketing_iPadTitle,
+	marketing_list,
+	marketing_noActions,
+	marketing_scoring;
 
 	private static Map<String, JsonNode> languages = new HashMap<>();
 
@@ -60,7 +65,7 @@ public enum Text {
 			try {
 				// Test environment, only german is tested
 				languages.put("DE", new ObjectMapper().readTree(
-						IOUtils.toString(Text.class.getResourceAsStream("/lang/DE.json"), StandardCharsets.UTF_8)));
+						IOUtils.toString(Text.class.getResourceAsStream("/lang/EN.json"), StandardCharsets.UTF_8)));
 			} catch (Exception e1) {
 				new RuntimeException(e);
 			}
@@ -68,6 +73,7 @@ public enum Text {
 	}
 
 	public String getText(String language) {
-		return languages.get(language).get(name()).asText();
+		return languages.get(language).get(name().substring(0, name().indexOf('_')))
+				.get(name().substring(name().indexOf('_') + 1)).asText();
 	}
 }

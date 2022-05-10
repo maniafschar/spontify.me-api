@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jq.findapp.entity.ServerSetting;
+import com.jq.findapp.entity.Setting;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
@@ -36,22 +36,22 @@ public class JwtGenerator {
 	protected long getLastGeneration(String keyId) throws Exception {
 		final String label = "push.gen." + keyId;
 		long lastGeneration;
-		final QueryParams param = new QueryParams(Query.server_setting);
-		param.setSearch("serverSetting.label='" + label + "'");
-		final Map<String, Object> setting = repository.one(param);
-		final ServerSetting serverSetting;
-		if (setting == null) {
-			serverSetting = new ServerSetting();
-			serverSetting.setLabel(label);
+		final QueryParams param = new QueryParams(Query.misc_setting);
+		param.setSearch("setting.label='" + label + "'");
+		final Map<String, Object> settingMap = repository.one(param);
+		final Setting setting;
+		if (settingMap == null) {
+			setting = new Setting();
+			setting.setLabel(label);
 			lastGeneration = 0;
 		} else {
-			serverSetting = repository.one(ServerSetting.class, (BigInteger) setting.get("serverSetting.id"));
-			lastGeneration = Long.valueOf(serverSetting.getValue().toString());
+			setting = repository.one(Setting.class, (BigInteger) settingMap.get("setting.id"));
+			lastGeneration = Long.valueOf(setting.getValue().toString());
 		}
 		if (System.currentTimeMillis() - lastGeneration > TIMEOUT) {
 			lastGeneration = System.currentTimeMillis();
-			serverSetting.setValue("" + lastGeneration);
-			repository.save(serverSetting);
+			setting.setValue("" + lastGeneration);
+			repository.save(setting);
 			token.remove(keyId);
 		}
 		return lastGeneration;

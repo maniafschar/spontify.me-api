@@ -28,6 +28,7 @@ import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -151,7 +152,7 @@ public class AuthenticationService {
 		contact.setPseudonym(registration.getPseudonym());
 		final String loginLink = generateLoginParam(contact);
 		saveRegistration(contact, registration);
-		notificationService.sendNotification(contact, contact, NotificationID.WelcomeExt, "r=" + loginLink);
+		notificationService.sendNotification(contact, contact, NotificationID.welcomeExt, "r=" + loginLink);
 	}
 
 	public void saveRegistration(Contact contact, AbstractRegistration registration) throws Exception {
@@ -182,9 +183,9 @@ public class AuthenticationService {
 		chat.setContactId(adminId);
 		chat.setContactId2(contact.getId());
 		chat.setSeen(false);
-		chat.setNote(MessageFormat.format(Text.mailWelcome.getText(contact.getLanguage()),
-				contact.getPseudonym()));
+		chat.setNote(MessageFormat.format(Text.mail_welcome.getText(contact.getLanguage()), contact.getPseudonym()));
 		repository.save(chat);
+		LoggerFactory.getLogger(AuthenticationService.class).info(contact.getIdDisplay());
 		notificationService.sendEmailSync(null, "Reg: " + contact.getEmail(), registration.toString());
 	}
 
@@ -234,7 +235,7 @@ public class AuthenticationService {
 		String s = "";
 		int i = -1, max = 6;
 		while (s.length() < max && name.length > ++i) {
-			s += name[i];
+			s += name[i].replaceAll("[^a-zA-Z0-9]", "");
 			if (name[i].length() > 0)
 				name[i] = name[i].substring(0, Math.min(name[i].length() - 1, max - 1));
 		}
@@ -275,7 +276,7 @@ public class AuthenticationService {
 			final Contact contact = repository.one(Contact.class, new BigInteger(user.get("contact.id").toString()));
 			final String s = generateLoginParam(contact);
 			repository.save(contact);
-			notificationService.sendNotification(contact, contact, NotificationID.PWReset, "r=" + s);
+			notificationService.sendNotification(contact, contact, NotificationID.pwReset, "r=" + s);
 			return "ok";
 		}
 		return "nok";

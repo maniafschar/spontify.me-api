@@ -25,6 +25,7 @@ public enum Query {
 	contact_listNotification(true),
 	contact_listSupportCenter,
 	contact_listVisit(true),
+	contact_marketing(true),
 	contact_notification(true),
 	contact_pingChatNew(true),
 	contact_pingChatUnseen(true),
@@ -51,7 +52,7 @@ public enum Query {
 	location_rating(true),
 	location_ratingOverview(true),
 
-	server_setting;
+	misc_setting;
 
 	private final String sql;
 	private final boolean addBlock;
@@ -128,7 +129,7 @@ public enum Query {
 					|| s.indexOf("insert") > -1 || s.indexOf("delete") > -1)
 				throw new IllegalArgumentException("Invalid search expression: " + sql);
 		}
-		if (addBlock && name().startsWith("contact_") && this != contact_rating
+		if (addBlock && name().startsWith("contact_") && this != contact_rating && this != contact_marketing
 				&& !search.contains("contact.id=") && !search.contains("contact.loginLink="))
 			search += (search.length() > 0 ? " and " : "") + "contact.id<>{USERID} and contact.verified=1";
 		return search;
