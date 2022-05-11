@@ -1,13 +1,26 @@
 package com.jq.findapp.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.Query.Result;
+import com.jq.findapp.repository.QueryParams;
+import com.jq.findapp.repository.Repository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Component
 public class ExternalService {
+	@Autowired
+	private Repository repository;
+
 	@Value("${app.google.key}")
 	private String googleKey;
 
@@ -39,6 +52,24 @@ public class ExternalService {
 			return address;
 		}
 		return null;
+	}
+
+	public Address googleAddress(float latitude, float longitude) throws JsonMappingException, JsonProcessingException {
+		final QueryParams params = new QueryParams(Query.contact_geoLocation);
+		params.setSearch("contactGeoLocationHistory.latitude=" + latitude
+				+ " and contactGeoLocationHistory.longitude=" + longitude);
+		final Result persistedAddress = repository.list(params);
+		if (persistedAddress.size() > 0) {
+			final Map<String, Object> map = persistedAddress.get(0);
+			final Address address = new Address();
+			address.street = (String) map.get("street");
+			address.town = (String) map.get("town");
+			address.zipCode = (String) map.get("zipCode");
+			address.country = (String) map.get("country");
+			return address;
+		}
+		return convertGoogleAddress(new ObjectMapper()
+				.readTree(google("geocode/json?latlng=" + latitude + ',' + longitude)));
 	}
 
 	public static class Address {
