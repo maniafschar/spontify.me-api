@@ -262,9 +262,22 @@ public class ActionApi {
 			@RequestHeader BigInteger user, @RequestHeader String password, @RequestHeader String salt)
 			throws Exception {
 		final Contact contact = authenticationService.verify(user, password, salt);
-		final Address address = externalService.convertGoogleAddress(new ObjectMapper()
-				.readTree(google("geocode/json?latlng=" + contactGeoLocationHistory.getLatitude() + ','
-						+ contactGeoLocationHistory.getLongitude())));
+		final QueryParams params = new QueryParams(Query.contact_geoLocation);
+		params.setSearch("contactGeoLocationHistory.latitude=" + contactGeoLocationHistory.getLatitude()
+				+ " and contactGeoLocationHistory.longitude=" + contactGeoLocationHistory.getLongitude());
+		final Result persistedAddress = repository.list(params);
+		final Address address;
+		if (persistedAddress.size() > 0) {
+			final Map<String, Object> map = persistedAddress.get(0);
+			address = new Address();
+			address.street = (String) map.get("street");
+			address.town = (String) map.get("town");
+			address.zipCode = (String) map.get("zipCode");
+			address.country = (String) map.get("country");
+		} else
+			address = externalService.convertGoogleAddress(new ObjectMapper()
+					.readTree(google("geocode/json?latlng=" + contactGeoLocationHistory.getLatitude() + ','
+							+ contactGeoLocationHistory.getLongitude())));
 		if (address != null) {
 			final Map<String, Object> result = new HashMap<>();
 			if (address.street != null && address.number != null)
