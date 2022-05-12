@@ -136,6 +136,11 @@ public class ActionApi {
 		}
 	}
 
+	@GetMapping("marketing")
+	public Marketing old_marketing(@RequestHeader(required = false) BigInteger user) {
+		return marketing("DE", user);
+	}
+
 	@GetMapping("marketing/{language}")
 	public Marketing marketing(@PathVariable final String language, @RequestHeader(required = false) BigInteger user) {
 		final Marketing marketing = new Marketing();
@@ -225,8 +230,8 @@ public class ActionApi {
 	}
 
 	@GetMapping("map")
-	public String map(final String source, final String destination, @RequestHeader(required = false) BigInteger user,
-			@RequestHeader(required = false) String password, @RequestHeader(required = false) String salt)
+	public String map(final String source, final String destination, @RequestHeader BigInteger user,
+			@RequestHeader String password, @RequestHeader String salt)
 			throws Exception {
 		final Contact contact = authenticationService.verify(user, password, salt);
 		String url;
@@ -243,14 +248,10 @@ public class ActionApi {
 	}
 
 	@GetMapping("google")
-	public String google(final String param, @RequestHeader(required = false) BigInteger user,
-			@RequestHeader(required = false) String password, @RequestHeader(required = false) String salt)
+	public String google(final String param, @RequestHeader BigInteger user,
+			@RequestHeader String password, @RequestHeader String salt)
 			throws Exception {
 		authenticationService.verify(user, password, salt);
-		return google(param);
-	}
-
-	private String google(String param) {
 		if ("js".equals(param))
 			return "https://maps.googleapis.com/maps/api/js?key=" + googleKeyJS;
 		return externalService.google(param);
@@ -292,9 +293,8 @@ public class ActionApi {
 	}
 
 	@PutMapping("one")
-	public void save(@RequestBody final WriteEntity entity, @RequestHeader(required = false) BigInteger user,
-			@RequestHeader(required = false) String password,
-			@RequestHeader(required = false) String salt)
+	public void save(@RequestBody final WriteEntity entity, @RequestHeader BigInteger user,
+			@RequestHeader String password, @RequestHeader String salt)
 			throws Exception {
 		authenticationService.verify(user, password, salt);
 		final Location location = repository.one(Location.class, entity.getId());

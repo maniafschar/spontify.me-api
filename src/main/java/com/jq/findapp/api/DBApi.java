@@ -59,9 +59,8 @@ public class DBApi {
 	}
 
 	@PutMapping("one")
-	public void save(@RequestBody final WriteEntity entity, @RequestHeader(required = false) BigInteger user,
-			@RequestHeader(required = false) String password,
-			@RequestHeader(required = false) String salt)
+	public void save(@RequestBody final WriteEntity entity, @RequestHeader BigInteger user,
+			@RequestHeader String password, @RequestHeader String salt)
 			throws Exception {
 		authenticationService.verify(user, password, salt);
 		if (entity.getValues().containsKey("contactId"))
@@ -80,9 +79,8 @@ public class DBApi {
 	}
 
 	@PostMapping("one")
-	public BigInteger create(@RequestBody final WriteEntity entity, @RequestHeader(required = false) BigInteger user,
-			@RequestHeader(required = false) String password,
-			@RequestHeader(required = false) String salt)
+	public BigInteger create(@RequestBody final WriteEntity entity, @RequestHeader BigInteger user,
+			@RequestHeader String password, @RequestHeader String salt)
 			throws Exception {
 		authenticationService.verify(user, password, salt);
 		final BaseEntity e = entity.getClazz().newInstance();
@@ -99,9 +97,8 @@ public class DBApi {
 	}
 
 	@DeleteMapping("one")
-	public void delete(@RequestBody final WriteEntity entity, @RequestHeader(required = false) BigInteger user,
-			@RequestHeader(required = false) String password,
-			@RequestHeader(required = false) String salt)
+	public void delete(@RequestBody final WriteEntity entity, @RequestHeader BigInteger user,
+			@RequestHeader String password, @RequestHeader String salt)
 			throws Exception {
 		authenticationService.verify(user, password, salt);
 		final BaseEntity e = repository.one(entity.getClazz(), entity.getId());

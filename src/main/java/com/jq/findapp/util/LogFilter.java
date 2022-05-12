@@ -37,7 +37,8 @@ public class LogFilter implements Filter {
 		final HttpServletRequest req = (HttpServletRequest) request;
 		final HttpServletResponse res = (HttpServletResponse) response;
 		final Log log = new Log();
-		if (!"/action/ping".equals(req.getRequestURI())) {
+		final boolean loggable = !"OPTIONS".equals(req.getMethod()) && !"/action/ping".equals(req.getRequestURI());
+		if (loggable) {
 			log.setUri(req.getRequestURI());
 			log.setMethod(req.getMethod());
 			log.setPort(req.getServerPort());
@@ -63,7 +64,7 @@ public class LogFilter implements Filter {
 		try {
 			chain.doFilter(new ContentCachingRequestWrapper(req), res);
 		} finally {
-			if (!"/action/ping".equals(req.getRequestURI())) {
+			if (loggable) {
 				log.setTime((int) (System.currentTimeMillis() - time));
 				log.setStatus(res.getStatus());
 				try {

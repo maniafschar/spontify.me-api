@@ -11,7 +11,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.Feedback;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
@@ -51,8 +50,7 @@ public class SupportCenterApi {
 
 	@DeleteMapping("user/{id}")
 	public void userDelete(@PathVariable final BigInteger id, @RequestHeader String password,
-			@RequestHeader String salt)
-			throws Exception {
+			@RequestHeader String salt) throws Exception {
 		authenticationService.verify(adminId, password, salt);
 		repository.deleteAccount(id);
 	}
@@ -85,6 +83,15 @@ public class SupportCenterApi {
 	public List<Object[]> feedback(@RequestHeader String password, @RequestHeader String salt) {
 		final QueryParams params = new QueryParams(Query.contact_listFeedback);
 		params.setUser(authenticationService.verify(adminId, password, salt));
+		params.setLimit(Integer.MAX_VALUE);
+		return repository.list(params).getList();
+	}
+
+	@GetMapping("log")
+	public List<Object[]> log(String search, @RequestHeader String password, @RequestHeader String salt) {
+		final QueryParams params = new QueryParams(Query.misc_listLog);
+		params.setUser(authenticationService.verify(adminId, password, salt));
+		params.setSearch(search);
 		params.setLimit(Integer.MAX_VALUE);
 		return repository.list(params).getList();
 	}
@@ -153,13 +160,6 @@ public class SupportCenterApi {
 			// BigInteger.valueOf(Long.valueOf(id)));
 			// notification.sendNotification(to, text, action, true);
 		}
-	}
-
-	@DeleteMapping("feedback/{id}")
-	public void feedbackDelete(@PathVariable final BigInteger id, @RequestHeader String password,
-			@RequestHeader String salt) throws Exception {
-		authenticationService.verify(adminId, password, salt);
-		repository.delete(repository.one(Feedback.class, id));
 	}
 
 	@PutMapping("refreshDB")

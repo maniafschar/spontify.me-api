@@ -28,7 +28,6 @@ import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -185,7 +184,6 @@ public class AuthenticationService {
 		chat.setSeen(false);
 		chat.setNote(MessageFormat.format(Text.mail_welcome.getText(contact.getLanguage()), contact.getPseudonym()));
 		repository.save(chat);
-		LoggerFactory.getLogger(AuthenticationService.class).info(contact.getIdDisplay());
 		notificationService.sendEmailSync(null, "Reg: " + contact.getEmail(), registration.toString());
 	}
 

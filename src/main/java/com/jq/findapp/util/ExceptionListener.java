@@ -19,8 +19,6 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService.AuthenticationException;
 import com.jq.findapp.service.NotificationService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -34,7 +32,6 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 
 @RestControllerAdvice
 public class ExceptionListener extends ResponseEntityExceptionHandler {
-	private static Logger LOG = LoggerFactory.getLogger(ExceptionListener.class);
 	private static final List<Integer> SENT_ERRORS = new ArrayList<>();
 	private static final String SUBSTITUTE = "\u0015";
 
@@ -114,7 +111,7 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 				msg = msg.replaceFirst(SUBSTITUTE, "" + request.getServerPort()).replaceFirst(SUBSTITUTE, s.toString());
 				notificationService.sendEmailSync(null, "ERROR " + ex.getMessage(), msg);
 			} catch (Exception e1) {
-				LOG.error("FAILED TO SEND ERROR EMAIL!\n" + msg + "\n\n\n" + Strings.stackTraceToString(e1));
+				// never happend in 22 years...
 			}
 		}
 	}

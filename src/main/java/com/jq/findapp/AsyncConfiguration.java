@@ -10,8 +10,6 @@ import java.util.concurrent.Executor;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Strings;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +18,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Configuration
 public class AsyncConfiguration implements AsyncConfigurer {
-	private static Logger LOG = LoggerFactory.getLogger(AsyncConfiguration.class);
 	private static final List<Integer> SENT_ERRORS = new ArrayList<>();
 
 	@Autowired
@@ -55,7 +52,7 @@ public class AsyncConfiguration implements AsyncConfigurer {
 					try {
 						notificationService.sendEmailSync(null, "ERROR " + ex.getMessage(), msg);
 					} catch (Exception e1) {
-						LOG.error("FAILED TO SEND ERROR EMAIL!\n" + msg + "\n\n\n" + Strings.stackTraceToString(e1));
+						// never happend in 20 years...
 					}
 				}
 			}

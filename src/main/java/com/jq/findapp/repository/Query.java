@@ -53,6 +53,7 @@ public enum Query {
 	location_rating(true),
 	location_ratingOverview(true),
 
+	misc_listLog,
 	misc_setting;
 
 	private final String sql;
