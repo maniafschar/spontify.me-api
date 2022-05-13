@@ -1,11 +1,12 @@
 package com.jq.findapp.service;
 
-import java.util.Map;
+import java.math.BigInteger;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jq.findapp.entity.ContactGeoLocationHistory;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -56,20 +57,30 @@ public class ExternalService {
 
 	public Address googleAddress(float latitude, float longitude) throws JsonMappingException, JsonProcessingException {
 		final QueryParams params = new QueryParams(Query.contact_geoLocation);
-		params.setSearch("contactGeoLocationHistory.latitude=" + latitude
-				+ " and contactGeoLocationHistory.longitude=" + longitude);
+		params.setSearch("contactGeoLocationHistory.latitude like '" + round(latitude)
+				+ "%' and contactGeoLocationHistory.longitude like '" + round(longitude) + "%'");
 		final Result persistedAddress = repository.list(params);
+		final Address address;
 		if (persistedAddress.size() > 0) {
-			final Map<String, Object> map = persistedAddress.get(0);
-			final Address address = new Address();
-			address.street = (String) map.get("street");
-			address.town = (String) map.get("town");
-			address.zipCode = (String) map.get("zipCode");
-			address.country = (String) map.get("country");
-			return address;
-		}
-		return convertGoogleAddress(new ObjectMapper()
-				.readTree(google("geocode/json?latlng=" + latitude + ',' + longitude)));
+			final ContactGeoLocationHistory contactGeoLocationHistory = repository.one(ContactGeoLocationHistory.class,
+					(BigInteger) persistedAddress.get(0).get("_id"));
+			address = new Address();
+			address.street = contactGeoLocationHistory.getStreet();
+			address.town = contactGeoLocationHistory.getTown();
+			address.zipCode = contactGeoLocationHistory.getZipCode();
+			address.country = contactGeoLocationHistory.getCountry();
+		} else
+			address = convertGoogleAddress(new ObjectMapper()
+					.readTree(google("geocode/json?latlng=" + latitude + ',' + longitude)));
+		return address;
+	}
+
+	private String round(float d) {
+		final int digits = 5 + 1;
+		String s = "" + d;
+		if (s.length() - digits >= s.indexOf('.'))
+			s = s.substring(0, s.indexOf('.') + digits);
+		return s;
 	}
 
 	public static class Address {

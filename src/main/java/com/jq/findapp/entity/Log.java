@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 @Entity
 public class Log extends BaseEntity {
 	private String method;
+	private String body;
 	private String query;
 	private String uri;
 	private BigInteger contactId;
@@ -68,5 +69,13 @@ public class Log extends BaseEntity {
 
 	public void setPort(int port) {
 		this.port = port;
+	}
+
+	public String getBody() {
+		return body;
+	}
+
+	public void setBody(String body) {
+		this.body = body;
 	}
 }

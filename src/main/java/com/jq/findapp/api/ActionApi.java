@@ -270,14 +270,15 @@ public class ActionApi {
 				address.street = address.street + ' ' + address.number;
 			result.put("town", address.town != null ? address.town : address.country);
 			result.put("street", address.street);
-			contact.setLatitude(contactGeoLocationHistory.getLatitude());
-			contact.setLongitude(contactGeoLocationHistory.getLongitude());
-			repository.save(contact);
+			contactGeoLocationHistory.setContactId(contact.getId());
 			contactGeoLocationHistory.setCountry(address.country);
 			contactGeoLocationHistory.setStreet(address.street);
 			contactGeoLocationHistory.setTown(address.town);
 			contactGeoLocationHistory.setZipCode(address.zipCode);
 			repository.save(contactGeoLocationHistory);
+			contact.setLatitude(contactGeoLocationHistory.getLatitude());
+			contact.setLongitude(contactGeoLocationHistory.getLongitude());
+			repository.save(contact);
 			return result;
 		}
 		return null;

@@ -2,6 +2,7 @@ SELECT
 	log.id,
 	log.method,
 	log.query,
+	log.body,
 	log.uri,
 	log.contactId,
 	log.time,
@@ -13,4 +14,4 @@ FROM
 WHERE
 	{search}
 ORDER BY
-	ID DESC
+	log.id DESC

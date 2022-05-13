@@ -1,15 +1,5 @@
 SELECT
-	max(contactGeoLocationHistory.id) as id,
-	contactGeoLocationHistory.latitude,
-	contactGeoLocationHistory.longitude,
-	contactGeoLocationHistory.altitude,
-	contactGeoLocationHistory.heading,
-	contactGeoLocationHistory.speed,
-	contactGeoLocationHistory.accuracy,
-	contactGeoLocationHistory.street,
-	contactGeoLocationHistory.town,
-	contactGeoLocationHistory.zipCode,
-	contactGeoLocationHistory.country
+	max(contactGeoLocationHistory.id) as id
 FROM
 	ContactGeoLocationHistory contactGeoLocationHistory
 WHERE

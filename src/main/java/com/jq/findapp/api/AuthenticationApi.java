@@ -41,11 +41,9 @@ public class AuthenticationApi {
 	private AuthenticationExternalService authenticationExternalService;
 
 	@GetMapping("logoff")
-	public void logoff(@RequestHeader BigInteger user, @RequestHeader String password,
+	public void logoff(String token, @RequestHeader BigInteger user, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
-		final Contact c = authenticationService.verify(user, password, salt);
-		c.setActive(false);
-		repository.save(c);
+		authenticationService.logoff(authenticationService.verify(user, password, salt), token);
 	}
 
 	@PostMapping("register")

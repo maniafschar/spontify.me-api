@@ -162,6 +162,7 @@ public class AuthenticationService {
 		contact.setVisitPage(new Timestamp(System.currentTimeMillis() - 1000));
 		contact.setPassword(Encryption.encryptDB(generatePin(20)));
 		contact.setPasswordReset(System.currentTimeMillis());
+		contact.setBirthdayDisplay((short) 2);
 		final String[] name = contact.getPseudonym().split(" ");
 		int i = 0, max = 100;
 		while (true) {
@@ -261,6 +262,18 @@ public class AuthenticationService {
 			return Encryption.encrypt(c.getEmail() + "\u0015" + getPassword(c), publicKey);
 		} catch (Exception ex) {
 			return null;
+		}
+	}
+
+	public void logoff(Contact contact, String token) throws Exception {
+		contact.setActive(false);
+		repository.save(contact);
+		if (token != null) {
+			final QueryParams params = new QueryParams(Query.contact_token);
+			params.setSearch("contactToken.token='" + Encryption.decryptBrowser(token) + "'");
+			final Map<String, Object> u = repository.one(params);
+			if (u != null)
+				repository.delete(repository.one(ContactToken.class, (BigInteger) u.get("contactToken.id")));
 		}
 	}
 

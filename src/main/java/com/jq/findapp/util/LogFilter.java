@@ -34,7 +34,7 @@ public class LogFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		final HttpServletRequest req = (HttpServletRequest) request;
+		final ContentCachingRequestWrapper req = new ContentCachingRequestWrapper((HttpServletRequest) request);
 		final HttpServletResponse res = (HttpServletResponse) response;
 		final Log log = new Log();
 		final boolean loggable = !"OPTIONS".equals(req.getMethod()) && !"/action/ping".equals(req.getRequestURI());
@@ -62,11 +62,17 @@ public class LogFilter implements Filter {
 		}
 		final long time = System.currentTimeMillis();
 		try {
-			chain.doFilter(new ContentCachingRequestWrapper(req), res);
+			chain.doFilter(req, res);
 		} finally {
 			if (loggable) {
 				log.setTime((int) (System.currentTimeMillis() - time));
 				log.setStatus(res.getStatus());
+				final byte[] b = req.getContentAsByteArray();
+				if (b != null && b.length > 0) {
+					log.setBody(new String(b, StandardCharsets.UTF_8));
+					if (log.getBody().length() > 255)
+						log.setBody(log.getBody().substring(0, 255));
+				}
 				try {
 					repository.save(log);
 				} catch (Exception e) {
