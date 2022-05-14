@@ -79,13 +79,14 @@ public class Repository {
 	}
 
 	public void save(final BaseEntity entity) throws Exception {
-		entity.setModifiedAt(new Timestamp(System.currentTimeMillis()));
 		Attachment.save(entity);
 		if (entity.getId() == null) {
-			entity.setCreatedAt(entity.getModifiedAt());
+			entity.setCreatedAt(new Timestamp(System.currentTimeMillis()));
 			em.persist(entity);
-		} else
+		} else {
+			entity.setModifiedAt(new Timestamp(System.currentTimeMillis()));
 			em.merge(entity);
+		}
 	}
 
 	public void delete(final BaseEntity entity) throws Exception {

@@ -3,6 +3,7 @@ package com.jq.findapp.repository;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
@@ -78,7 +79,6 @@ public class RepositoryTest {
 		final Chat chat = createChat(contact);
 		final ContactRating rating = createRatingContact(contact);
 		final long created = chat.getCreatedAt().getTime();
-		final long modified = chat.getModifiedAt().getTime();
 
 		// when
 		chat.setImage("20000/15603.jpeg");
@@ -88,8 +88,9 @@ public class RepositoryTest {
 		assertEquals(created, chat.getCreatedAt().getTime());
 		assertEquals("Hi", chat.getNote());
 		assertEquals("20000/15603.jpeg", chat.getImage());
-		assertNotEquals(modified, chat.getModifiedAt().getTime());
-		assertNotNull(rating.getModifiedAt());
+		assertNotEquals(created, chat.getModifiedAt().getTime());
+		assertNotNull(rating.getCreatedAt());
+		assertNull(rating.getModifiedAt());
 	}
 
 	@Test
