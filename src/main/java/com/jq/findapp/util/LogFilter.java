@@ -41,6 +41,7 @@ public class LogFilter implements Filter {
 		if (loggable) {
 			log.setUri(req.getRequestURI());
 			log.setMethod(req.getMethod());
+			log.setIp(req.getHeader("X-Forwarded-For"));
 			log.setPort(req.getServerPort());
 			if (req.getHeader("user") != null)
 				log.setContactId(new BigInteger(req.getHeader("user")));
