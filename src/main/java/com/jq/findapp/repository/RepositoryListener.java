@@ -26,7 +26,6 @@ import com.jq.findapp.entity.ContactRating;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.Feedback;
-import com.jq.findapp.entity.Feedback.Type;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.LocationRating;
 import com.jq.findapp.service.ExternalService;
@@ -122,8 +121,6 @@ public class RepositoryListener {
 			feedback.setText(feedback.getText().substring(0, 2000));
 		if (feedback.getResponse() != null && feedback.getResponse().length() > 2000)
 			feedback.setResponse(feedback.getResponse().substring(0, 2000));
-		if (feedback.getStack() != null && feedback.getStack().length() > 2000)
-			feedback.setStack(feedback.getStack().substring(0, 2000));
 	}
 
 	private void prePersistLocation(Location location)
@@ -203,17 +200,15 @@ public class RepositoryListener {
 
 	private void postPersistFeedback(final Feedback feedback) throws Exception {
 		final Contact feedbackUser = repository.one(Contact.class, feedback.getContactId());
-		if (feedback.getType() == Type.FEEDBACK) {
-			final Chat chat = new Chat();
-			chat.setContactId(feedback.getContactId());
-			chat.setContactId2(adminId);
-			chat.setNote(feedback.getText());
-			chat.setSeen(Boolean.TRUE);
-			repository.save(chat);
-			notificationService.sendNotification(repository.one(Contact.class, adminId), feedbackUser,
-					NotificationID.feedback, null, feedback.getText());
-		}
-		notificationService.sendEmail(null, feedback.getType() + ": " + feedbackUser.getPseudonym(),
+		final Chat chat = new Chat();
+		chat.setContactId(feedback.getContactId());
+		chat.setContactId2(adminId);
+		chat.setNote(feedback.getText());
+		chat.setSeen(Boolean.TRUE);
+		repository.save(chat);
+		notificationService.sendNotification(repository.one(Contact.class, adminId), feedbackUser,
+				NotificationID.feedback, null, feedback.getText());
+		notificationService.sendEmail(null, "Feedback: " + feedbackUser.getPseudonym(),
 				new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(feedback));
 	}
 

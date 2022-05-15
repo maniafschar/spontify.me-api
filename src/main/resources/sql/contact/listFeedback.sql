@@ -12,10 +12,8 @@ SELECT
 	feedback.platform,
 	feedback.pseudonym,
 	feedback.response,
-	feedback.stack,
 	feedback.status,
 	feedback.text,
-	feedback.type,
 	feedback.useragent,
 	feedback.version
 FROM

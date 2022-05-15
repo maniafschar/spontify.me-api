@@ -24,7 +24,6 @@ public class Feedback extends BaseEntity {
 	private String platform;
 	private String pseudonym;
 	private String response;
-	private String stack;
 	private String status;
 	private String text;
 	private String version;
@@ -33,12 +32,6 @@ public class Feedback extends BaseEntity {
 	private Device device;
 	@Enumerated(EnumType.STRING)
 	private OS os;
-	@Enumerated(EnumType.STRING)
-	private Type type;
-
-	public enum Type {
-		BUG, FEEDBACK
-	}
 
 	public BigInteger getContactId() {
 		return contactId;
@@ -144,14 +137,6 @@ public class Feedback extends BaseEntity {
 		this.response = response;
 	}
 
-	public Type getType() {
-		return type;
-	}
-
-	public void setType(Type type) {
-		this.type = type;
-	}
-
 	public String getLang() {
 		return lang;
 	}
@@ -174,13 +159,5 @@ public class Feedback extends BaseEntity {
 
 	public void setOs(OS os) {
 		this.os = os;
-	}
-
-	public String getStack() {
-		return stack;
-	}
-
-	public void setStack(String stack) {
-		this.stack = stack;
 	}
 }
