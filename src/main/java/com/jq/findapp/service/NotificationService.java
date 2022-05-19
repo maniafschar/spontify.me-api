@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.ws.rs.NotFoundException;
 
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification;
@@ -33,6 +34,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClientResponseException.NotFound;
 
 @Service
 public class NotificationService {
@@ -278,11 +280,18 @@ public class NotificationService {
 				text.delete(text.lastIndexOf(" "), text.length());
 			text.append("...");
 		}
-		if ("ios".equals(contactTo.getPushSystem()))
-			ios.send(contactTo, text.toString(), action, getPingValues(contactTo).totalNew);
-		else if ("android".equals(contactTo.getPushSystem()))
-			android.send(contactTo, text.toString(), action);
-		return true;
+		try {
+			if ("ios".equals(contactTo.getPushSystem()))
+				ios.send(contactTo, text.toString(), action, getPingValues(contactTo).totalNew);
+			else if ("android".equals(contactTo.getPushSystem()))
+				android.send(contactTo, text.toString(), action);
+			return true;
+		} catch (NotFound | NotFoundException ex) {
+			return false;
+		} catch (Exception ex) {
+			sendEmailSync(null, "ERROR", Strings.stackTraceToString(ex));
+			return false;
+		}
 	}
 
 	private List<String> compareAttributes(String attributes, String compareTo) {

@@ -3,7 +3,6 @@ package com.jq.findapp.service;
 import java.math.BigInteger;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
@@ -55,7 +54,7 @@ public class ExternalService {
 		return null;
 	}
 
-	public Address googleAddress(float latitude, float longitude) throws JsonMappingException, JsonProcessingException {
+	public Address googleAddress(float latitude, float longitude) throws JsonProcessingException {
 		final QueryParams params = new QueryParams(Query.contact_geoLocation);
 		params.setSearch("contactGeoLocationHistory.latitude like '" + round(latitude)
 				+ "%' and contactGeoLocationHistory.longitude like '" + round(longitude) + "%'");

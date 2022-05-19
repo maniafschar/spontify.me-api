@@ -21,6 +21,8 @@ import com.jq.findapp.JpaTestConfiguration;
 import com.jq.findapp.api.model.InternalRegistration;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactToken;
+import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.push.Android;
 import com.jq.findapp.service.push.Ios;
@@ -107,11 +109,13 @@ public class AuthenticationTest {
 	public void register() throws Exception {
 		// given
 		createContact();
+		final QueryParams params = new QueryParams(Query.contact_listId);
+		params.setSearch("contact.email='test@jq-consulting.de'");
 		final InternalRegistration registration = new InternalRegistration();
 		registration.setAgb(true);
 		registration.setBirthday(new Date(3000000000L));
 		registration.setEmail("test@jq-consulting.de");
-		registration.setPseudonym("testTEST");
+		registration.setPseudonym("İrem Fettahoğlu");
 		registration.setLanguage("DE");
 		registration.setTime(5000);
 
@@ -119,6 +123,8 @@ public class AuthenticationTest {
 		authenticationService.register(registration);
 
 		// then no exception
+		assertEquals("rem Fettaholu",
+				repository.one(Contact.class, (BigInteger) repository.one(params).get("contact.id")).getPseudonym());
 	}
 
 	@Test

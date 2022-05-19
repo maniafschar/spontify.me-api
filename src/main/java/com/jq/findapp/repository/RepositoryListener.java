@@ -2,9 +2,12 @@ package com.jq.findapp.repository;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
@@ -68,12 +71,18 @@ public class RepositoryListener {
 
 	@PrePersist
 	public void prePersist(final BaseEntity entity) throws Exception {
-		if (entity instanceof ContactBluetooth)
+		if (entity instanceof Contact)
+			prePersistContact((Contact) entity);
+		else if (entity instanceof ContactBluetooth)
 			prePersistContactBluetooth((ContactBluetooth) entity);
 		else if (entity instanceof Location)
 			prePersistLocation((Location) entity);
 		else if (entity instanceof Feedback)
 			prePersistFeedback((Feedback) entity);
+	}
+
+	private void prePersistContact(final Contact contact) {
+		contact.setPseudonym(sanitizePseudonym(contact.getPseudonym()));
 	}
 
 	@PreUpdate
@@ -173,7 +182,15 @@ public class RepositoryListener {
 			lookupAddress(location);
 	}
 
-	private void preUpdateContact(final Contact contact) {
+	private String sanitizePseudonym(String pseudonym) {
+		pseudonym = pseudonym.replaceAll("[^a-zA-ZÀ-ÿ0-9-_.+*#§$%&/(){}\\[\\]\\^=?! \\\\]", "");
+		int i = 0;
+		while (pseudonym.length() < 8)
+			pseudonym += ++i;
+		return pseudonym;
+	}
+
+	private void preUpdateContact(final Contact contact) throws Exception {
 		if (contact.old("visitPage") != null)
 			contact.setVisitPage(new Timestamp(System.currentTimeMillis()));
 		if (contact.old("pushToken") != null)
@@ -184,6 +201,8 @@ public class RepositoryListener {
 			repository.executeUpdate(
 					"update Contact contact set contact.fbToken=null where contact.fbToken='" + contact.old("fbToken")
 							+ "' and contact.id<>" + contact.getId());
+		if (contact.old("pseudonym") != null)
+			contact.setPseudonym(sanitizePseudonym(contact.getPseudonym()));
 		if (contact.getBirthday() == null)
 			contact.setAge(null);
 		else {
@@ -196,20 +215,39 @@ public class RepositoryListener {
 				age--;
 			contact.setAge(age);
 		}
+		if (contact.getModifiedAt() == null) {
+			new Timer().schedule(
+					new TimerTask() {
+						@Override
+						public void run() {
+							final Chat chat = new Chat();
+							chat.setContactId(adminId);
+							chat.setContactId2(contact.getId());
+							chat.setSeen(false);
+							chat.setNote(
+									MessageFormat.format(Text.mail_welcome.getText(contact.getLanguage()),
+											contact.getPseudonym()));
+							try {
+								repository.save(chat);
+							} catch (Exception e) {
+								throw new RuntimeException(e);
+							}
+						}
+					},
+					10000);
+		}
 	}
 
 	private void postPersistFeedback(final Feedback feedback) throws Exception {
-		final Contact feedbackUser = repository.one(Contact.class, feedback.getContactId());
 		final Chat chat = new Chat();
 		chat.setContactId(feedback.getContactId());
 		chat.setContactId2(adminId);
 		chat.setNote(feedback.getText());
 		chat.setSeen(Boolean.TRUE);
 		repository.save(chat);
-		notificationService.sendNotification(repository.one(Contact.class, adminId), feedbackUser,
-				NotificationID.feedback, null, feedback.getText());
-		notificationService.sendEmail(null, "Feedback: " + feedbackUser.getPseudonym(),
-				new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(feedback));
+		notificationService.sendNotification(repository.one(Contact.class, adminId),
+				repository.one(Contact.class, feedback.getContactId()),
+				NotificationID.feedback, null, "FEEDBACK " + feedback.getText());
 	}
 
 	private void postPersistContactBluetooth(final ContactBluetooth contactBlutooth)
@@ -252,8 +290,8 @@ public class RepositoryListener {
 					NotificationID.friendAppro, Strings.encodeParam("p=" + contactLink.getContactId2()));
 			final QueryParams params = new QueryParams(Query.contact_marketing);
 			params.setUser(repository.one(Contact.class, contactLink.getContactId()));
-			params.setSearch("marketing.data='" + contactLink.getContactId2() + "' and marketing.type='"
-					+ com.jq.findapp.entity.ContactMarketing.Type.CollectFriends.name() + "' and marketing.contactId="
+			params.setSearch("contactMarketing.data='" + contactLink.getContactId2() + "' and contactMarketing.type='"
+					+ ContactMarketing.Type.CollectFriends.name() + "' and contactMarketing.contactId="
 					+ contactLink.getContactId());
 			if (repository.list(params).size() == 0) {
 				final ContactMarketing marketing = new ContactMarketing();
@@ -298,7 +336,7 @@ public class RepositoryListener {
 
 	private void postPersistLocationRating(LocationRating locationRating) throws Exception {
 		repository.executeUpdate(
-				"update Location location set rating=(select sum(rating)/count(*) from LocationRating where locationId=location.id) where locationId="
+				"update Location location set rating=(select sum(rating)/count(*) from LocationRating where locationId=location.id) where location.id="
 						+ locationRating.getLocationId());
 		notificationService.locationNotifyOnMatch(
 				repository.one(Contact.class, locationRating.getContactId()),

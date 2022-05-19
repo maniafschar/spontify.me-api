@@ -18,10 +18,15 @@ public class EntityUtil {
 
 	public static void addImageList(WriteEntity entity) throws IOException {
 		if (entity.getValues() != null && entity.getValues().containsKey("image")) {
-			final String data = (String) entity.getValues().get("image");
-			final byte[] b = scaleImage(Base64.getDecoder().decode(
-					data.substring(data.indexOf('\u0015') + 1)), IMAGE_THUMB_SIZE);
-			entity.getValues().put("imageList", Attachment.createImage(".jpg", b));
+			try {
+				entity.getClazz().getDeclaredMethod("getImageList");
+				final String data = (String) entity.getValues().get("image");
+				final byte[] b = scaleImage(Base64.getDecoder().decode(
+						data.substring(data.indexOf('\u0015') + 1)), IMAGE_THUMB_SIZE);
+				entity.getValues().put("imageList", Attachment.createImage(".jpg", b));
+			} catch (NoSuchMethodException e) {
+				// entity does not have imageList, no need to add it
+			}
 		}
 	}
 

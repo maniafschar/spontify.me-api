@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Query;
@@ -26,6 +27,13 @@ public class EngagementService {
 
 	@Autowired
 	private NotificationService notificationService;
+
+	private static ExternalService externalService;
+
+	@Autowired
+	private void setExternalService(ExternalService externalService) {
+		EngagementService.externalService = externalService;
+	}
 
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
@@ -53,8 +61,15 @@ public class EngagementService {
 	enum REPLACMENT {
 		EMOJI_DANCING(contact -> contact.getGender() == 1 ? "🕺🏻" : "💃"),
 		EMOJI_WAVING(contact -> contact.getGender() == 1 ? "🙋🏻‍♂️" : "🙋‍♀️"),
-		CONTACT_PSEUDONYM(contact -> contact.getPseudonym());
-		// CONTACT_CURRENT_TOWN(contact -> repository. .getCurrentTown());
+		CONTACT_PSEUDONYM(contact -> contact.getPseudonym()),
+		CONTACT_CURRENT_TOWN(
+				contact -> {
+					try {
+						return externalService.googleAddress(contact.getLatitude(), contact.getLongitude()).town;
+					} catch (JsonProcessingException e) {
+						throw new RuntimeException(e);
+					}
+				});
 
 		private static interface Exec {
 			String replace(Contact contact);
@@ -76,6 +91,7 @@ public class EngagementService {
 				"Hallo " + REPLACMENT.CONTACT_PSEUDONYM
 						+ ", wie gefällt Dir findapp? 🤔\nLust mit mir drüber zu chatten? " + REPLACMENT.EMOJI_WAVING,
 				null));
+
 		chatTemplates.add(new ChatTemplate(
 				"[[pageChat.close(event,function(){ui.navigation.goTo(&quot;settings&quot;)})]]Hey "
 						+ REPLACMENT.CONTACT_PSEUDONYM + ","
@@ -83,48 +99,52 @@ public class EngagementService {
 						+ REPLACMENT.EMOJI_DANCING + "\nSetze einfach das Häckchen in den Einstellungen "
 						+ REPLACMENT.EMOJI_WAVING,
 				contact -> contact.getGuide() == null || !contact.getGuide()));
+
 		chatTemplates.add(new ChatTemplate(
 				"[[pageInfo.socialShare()]]Hey " + REPLACMENT.CONTACT_PSEUDONYM + ","
 						+ "\nDu bist Guide, möchtest Du Deine Freunde einladen, damit die Community wächst? "
 						+ REPLACMENT.EMOJI_DANCING,
 				contact -> contact.getGuide() != null && contact.getGuide()));
-		// chatTemplates.add(new ChatTemplate("[[pageInfo.socialShare()]]Hey " +
-		// REPLACMENT.CONTACT_PSEUDONYM
-		// + ",\nDu hattest schon ein paar Bluetooth Matches. Hast Du sie
-		// angesprochen?\nLade Deine Freunde ein, damit die Community wächst und mehr
-		// Matches sich ergeben. "
-		// + REPLACMENT.EMOJI_DANCING,
-		// contact -> repository
-		// .list("select id from NOTIFICATION where TEXT_ID='FindMe' and CONTACT_ID=" +
-		// contact.getId(),
-		// ContactNotification.class)
-		// .size() > 2));
-		// chatTemplates.add(new ChatTemplate("[[pageInfo.socialShare()]]Hey " +
-		// REPLACMENT.CONTACT_PSEUDONYM
-		// + ",\nDu hast noch keinen Bluetooth Match. Möchtest Du Deine Freunde
-		// einladen, damit die Community wächst und mehr Matches sich ergeben. "
-		// + REPLACMENT.EMOJI_DANCING,
-		// contact -> repository
-		// .list("select id from NOTIFICATION where TEXT_ID='FindMe' and CONTACT_ID=" +
-		// contact.getId(),
-		// ContactNotification.class)
-		// .size() == 0));
+
+		chatTemplates.add(new ChatTemplate("[[pageInfo.socialShare()]]Hey " +
+				REPLACMENT.CONTACT_PSEUDONYM
+				+ ",\nDu hattest schon ein paar Bluetooth Matches. Hast Du sie angesprochen?\nLade Deine Freunde ein, damit die Community wächst und mehr Matches sich ergeben. "
+				+ REPLACMENT.EMOJI_DANCING,
+				contact -> {
+					final QueryParams params = new QueryParams(Query.contact_notification);
+					params.setUser(contact);
+					params.setSearch(
+							"contactNotification.textId='FindMe' and contactNotification.contactId=" + contact.getId());
+					return repository.list(params).size() > 2;
+				}));
+
+		chatTemplates.add(new ChatTemplate("[[pageInfo.socialShare()]]Hey " +
+				REPLACMENT.CONTACT_PSEUDONYM
+				+ ",\nDu hast noch keinen Bluetooth Match. Möchtest Du Deine Freunde einladen, damit die Community wächst und mehr Matches sich ergeben. "
+				+ REPLACMENT.EMOJI_DANCING,
+				contact -> {
+					final QueryParams params = new QueryParams(Query.contact_notification);
+					params.setUser(contact);
+					params.setSearch(
+							"contactNotification.textId='FindMe' and contactNotification.contactId=" + contact.getId());
+					return repository.list(params).size() == 0;
+				}));
+
 		chatTemplates.add(new ChatTemplate(
 				"[[pageInfo.socialShare()]]Hey " + REPLACMENT.CONTACT_PSEUDONYM + ","
 						+ "\nLust Deine Frende hinzuzufügen? " + REPLACMENT.EMOJI_DANCING + "\nLade sie einfach ein... "
 						+ REPLACMENT.EMOJI_WAVING,
 				contact -> contact.getVersion() != null && contact.getVersion().compareTo("0.8.1") >= 0));
-		// chatTemplates.add(new ChatTemplate("[[pageInfo.socialShare()]]Hey " +
-		// REPLACMENT.CONTACT_PSEUDONYM + ","
-		// + "\nwir möchten in " + REPLACMENT.CONTACT_CURRENT_TOWN
-		// + " wachsen und sind auf der Suche nach sympathischen Kotakten. Kennst Du
-		// vielleicht ein paar, die Du hier einladen könntest? "
-		// + REPLACMENT.EMOJI_WAVING,
-		// contact -> contact.getModifiedAt().getTime() > System.currentTimeMillis() -
-		// 24 * 60 * 60 * 1000));
+
+		chatTemplates.add(new ChatTemplate("[[pageInfo.socialShare()]]Hey " +
+				REPLACMENT.CONTACT_PSEUDONYM + ","
+				+ "\nwir möchten in " + REPLACMENT.CONTACT_CURRENT_TOWN
+				+ " wachsen und sind auf der Suche nach sympathischen Kotakten. Kennst Du vielleicht ein paar, die Du hier einladen könntest? "
+				+ REPLACMENT.EMOJI_WAVING,
+				contact -> contact.getModifiedAt().getTime() > System.currentTimeMillis() - 24 * 60 * 60 * 1000));
 	}
 
-	public void sendSusiChats() throws Exception {
+	public void sendChats() throws Exception {
 		final Calendar now = new GregorianCalendar();
 		if (now.get(Calendar.HOUR_OF_DAY) < 9 || now.get(Calendar.HOUR_OF_DAY) > 19)
 			return;

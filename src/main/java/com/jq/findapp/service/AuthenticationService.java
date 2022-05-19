@@ -6,7 +6,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Timestamp;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +16,6 @@ import javax.ws.rs.BadRequestException;
 
 import com.jq.findapp.api.model.AbstractRegistration;
 import com.jq.findapp.api.model.InternalRegistration;
-import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactToken;
 import com.jq.findapp.repository.Query;
@@ -26,7 +24,6 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Strings;
-import com.jq.findapp.util.Text;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -164,7 +161,7 @@ public class AuthenticationService {
 		contact.setPasswordReset(System.currentTimeMillis());
 		contact.setBirthdayDisplay((short) 2);
 		final String[] name = contact.getPseudonym().split(" ");
-		int i = 0, max = 100;
+		int max = 100, i = 0;
 		while (true) {
 			try {
 				contact.setIdDisplay(generateIdDisplay(name));
@@ -179,12 +176,6 @@ public class AuthenticationService {
 					throw new IllegalAccessException("reg failed: " + Strings.stackTraceToString(ex));
 			}
 		}
-		final Chat chat = new Chat();
-		chat.setContactId(adminId);
-		chat.setContactId2(contact.getId());
-		chat.setSeen(false);
-		chat.setNote(MessageFormat.format(Text.mail_welcome.getText(contact.getLanguage()), contact.getPseudonym()));
-		repository.save(chat);
 		notificationService.sendEmailSync(null, "Reg: " + contact.getEmail(), registration.toString());
 	}
 

@@ -15,6 +15,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
+import com.jq.findapp.service.EngagementService;
 import com.jq.findapp.util.Encryption;
 
 import org.apache.commons.io.IOUtils;
@@ -41,6 +42,9 @@ public class SupportCenterApi {
 
 	@Autowired
 	private AuthenticationService authenticationService;
+
+	@Autowired
+	private EngagementService engagementService;
 
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
@@ -163,14 +167,9 @@ public class SupportCenterApi {
 	}
 
 	@PutMapping("refreshDB")
-	public void refreshDB(@RequestHeader String secret) {
+	public void refreshDB(@RequestHeader String secret) throws Exception {
 		if (schedulerSecret.equals(secret)) {
-			repository.executeUpdate(
-					"update Contact contact set contact.age=(TO_DAYS(NOW()) - TO_DAYS(contact.birthday))/365 where contact.birthday is not null");
-			repository.executeUpdate(
-					"update Contact contact set rating=(select sum(rating)/count(*) from ContactRating where contactId2=contact.id)");
-			repository.executeUpdate(
-					"update Location location set rating=(select sum(rating)/count(*) from LocationRating where locationId=location.id)");
+			// engagementService.sendChats();
 		}
 	}
 }

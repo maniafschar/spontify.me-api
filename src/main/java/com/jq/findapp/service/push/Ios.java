@@ -11,6 +11,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.NotFoundException;
+
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.util.Strings;
 
@@ -50,8 +52,8 @@ public class Ios {
 		final HttpClient client = HttpClient.newBuilder().version(Version.HTTP_2).build();
 		final HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 		if (response.statusCode() >= 300 || response.statusCode() < 200)
-			throw new RuntimeException("Failed to push to " + contact.getId() + ": " + text + "\n"
-					+ response.statusCode() + "\n" + response.headers());
+			throw new NotFoundException(
+					"Failed to push to " + contact.getId() + ": " + text + "\n" + response.statusCode());
 	}
 
 	private Map<String, String> getHeader() {
