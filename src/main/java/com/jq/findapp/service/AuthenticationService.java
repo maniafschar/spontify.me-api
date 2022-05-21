@@ -7,6 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.BadRequestException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.model.AbstractRegistration;
 import com.jq.findapp.api.model.InternalRegistration;
 import com.jq.findapp.entity.Contact;
@@ -34,6 +36,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @Component
 public class AuthenticationService {
 	private static final List<String> USED_SALTS = new ArrayList<>();
+	private static final List<String> BLOCKED_EMAIL_DOMAINS = new ArrayList<>();
 	private static final Map<BigInteger, Password> PW = new HashMap<>();
 	private static final Map<BigInteger, FailedAttempts> FAILED_AUTHS = new HashMap<>();
 	private static final char[] idChars = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
@@ -70,6 +73,16 @@ public class AuthenticationService {
 
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
 	public static class AuthenticationException extends RuntimeException {
+	}
+
+	static {
+		try {
+			BLOCKED_EMAIL_DOMAINS.addAll(Arrays.asList(new ObjectMapper().readValue(
+					AuthenticationService.class.getResourceAsStream("/blockedEmailDomains.json"),
+					String[].class)));
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 	public Contact verify(BigInteger user, String password, String salt) {
@@ -140,6 +153,12 @@ public class AuthenticationService {
 			notificationService.sendEmail(null, "reg denied email: " + registration.getEmail(),
 					registration.toString());
 			throw new IllegalAccessException("email");
+		}
+		if (BLOCKED_EMAIL_DOMAINS
+				.contains(registration.getEmail().substring(registration.getEmail().indexOf('@') + 1))) {
+			notificationService.sendEmail(null, "reg denied email domain blocked: " + registration.getEmail(),
+					registration.toString());
+			throw new IllegalAccessException("domain");
 		}
 		final Contact contact = new Contact();
 		contact.setBirthday(registration.getBirthday());

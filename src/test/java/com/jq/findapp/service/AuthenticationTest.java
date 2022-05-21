@@ -122,9 +122,32 @@ public class AuthenticationTest {
 		// when
 		authenticationService.register(registration);
 
-		// then no exception
+		// then
 		assertEquals("rem Fettaholu",
 				repository.one(Contact.class, (BigInteger) repository.one(params).get("contact.id")).getPseudonym());
+	}
+
+	@Test
+	public void register_blockedEmailDomain() throws Exception {
+		// given
+		createContact();
+		final InternalRegistration registration = new InternalRegistration();
+		registration.setAgb(true);
+		registration.setBirthday(new Date(3000000000L));
+		registration.setEmail("test@0815.ru");
+		registration.setPseudonym("qwertz12");
+		registration.setLanguage("DE");
+		registration.setTime(5000);
+
+		// when
+		try {
+			authenticationService.register(registration);
+			throw new RuntimeException("no exception thrown");
+		} catch (IllegalAccessException ex) {
+
+			// then
+			assertEquals("domain", ex.getMessage());
+		}
 	}
 
 	@Test
