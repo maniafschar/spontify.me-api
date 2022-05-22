@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin(origins = { "https://*.findapp.online" })
+@CrossOrigin(origins = { "https://sc.findapp.online" })
 @RequestMapping("support")
 public class SupportCenterApi {
 	private final String baseDir = "attachments/";
@@ -123,6 +123,6 @@ public class SupportCenterApi {
 	@PutMapping("refreshDB")
 	public void refreshDB(@RequestHeader String secret) throws Exception {
 		if (schedulerSecret.equals(secret))
-			engagementService.sendChats();
+			engagementService.sendWelcomeChat();
 	}
 }

@@ -1,6 +1,7 @@
 package com.jq.findapp.service;
 
 import java.math.BigInteger;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -15,6 +16,7 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.util.Strings;
+import com.jq.findapp.util.Text;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -142,6 +144,31 @@ public class EngagementService {
 				+ " wachsen und sind auf der Suche nach sympathischen Kotakten. Kennst Du vielleicht ein paar, die Du hier einladen könntest? "
 				+ REPLACMENT.EMOJI_WAVING,
 				contact -> contact.getModifiedAt().getTime() > System.currentTimeMillis() - 24 * 60 * 60 * 1000));
+	}
+
+	public void sendWelcomeChat() throws Exception {
+		QueryParams params = new QueryParams(Query.contact_listId);
+		final GregorianCalendar gc = new GregorianCalendar();
+		gc.add(Calendar.DATE, -1);
+		params.setSearch("contact.modifiedAt>'"
+				+ gc.get(Calendar.YEAR) + '-' + (gc.get(Calendar.MONTH) + 1) + '-' + gc.get(Calendar.DATE) + "'");
+		params.setLimit(0);
+		final Result list = repository.list(params);
+		params = new QueryParams(Query.contact_chat);
+		for (int i = 0; i < list.size(); i++) {
+			params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + list.get(i).get("contact.id"));
+			if (repository.list(params).size() == 0) {
+				final Contact contact = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
+				final Chat chat = new Chat();
+				chat.setContactId(adminId);
+				chat.setContactId2(contact.getId());
+				chat.setSeen(false);
+				chat.setNote(
+						MessageFormat.format(Text.mail_welcome.getText(contact.getLanguage()),
+								contact.getPseudonym()));
+				repository.save(chat);
+			}
+		}
 	}
 
 	public void sendChats() throws Exception {

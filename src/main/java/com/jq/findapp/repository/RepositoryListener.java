@@ -2,12 +2,9 @@ package com.jq.findapp.repository;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
@@ -214,27 +211,6 @@ public class RepositoryListener {
 					birthday.get(Calendar.DAY_OF_MONTH) < now.get(Calendar.DAY_OF_MONTH))
 				age--;
 			contact.setAge(age);
-		}
-		if (contact.getModifiedAt() == null) {
-			new Timer().schedule(
-					new TimerTask() {
-						@Override
-						public void run() {
-							final Chat chat = new Chat();
-							chat.setContactId(adminId);
-							chat.setContactId2(contact.getId());
-							chat.setSeen(false);
-							chat.setNote(
-									MessageFormat.format(Text.mail_welcome.getText(contact.getLanguage()),
-											contact.getPseudonym()));
-							try {
-								repository.save(chat);
-							} catch (Exception e) {
-								throw new RuntimeException(e);
-							}
-						}
-					},
-					10000);
 		}
 	}
 
