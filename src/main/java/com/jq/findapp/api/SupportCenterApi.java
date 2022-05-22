@@ -16,7 +16,6 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.EngagementService;
-import com.jq.findapp.util.Encryption;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,22 +64,6 @@ public class SupportCenterApi {
 		params.setUser(authenticationService.verify(adminId, password, salt));
 		params.setLimit(Integer.MAX_VALUE);
 		return repository.list(params).getList();
-	}
-
-	@GetMapping("decrypt/pw/{id}")
-	public void decryptPW(@PathVariable final BigInteger id, @RequestHeader String password,
-			@RequestHeader String salt) {
-		authenticationService.verify(adminId, password, salt);
-		final Contact contact = repository.one(Contact.class, id);
-		if (contact != null)
-			System.out.println(Encryption.decryptDB(contact.getPassword()));
-	}
-
-	@GetMapping("decrypt/browser")
-	public void decryptBrowser(final String text, @RequestHeader String password,
-			@RequestHeader String salt) {
-		authenticationService.verify(adminId, password, salt);
-		System.out.println(Encryption.decryptBrowser(text));
 	}
 
 	@GetMapping("feedback")
@@ -168,8 +151,7 @@ public class SupportCenterApi {
 
 	@PutMapping("refreshDB")
 	public void refreshDB(@RequestHeader String secret) throws Exception {
-		if (schedulerSecret.equals(secret)) {
-			// engagementService.sendChats();
-		}
+		if (schedulerSecret.equals(secret))
+			engagementService.sendChats();
 	}
 }

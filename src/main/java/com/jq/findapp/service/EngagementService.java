@@ -146,7 +146,7 @@ public class EngagementService {
 
 	public void sendChats() throws Exception {
 		final Calendar now = new GregorianCalendar();
-		if (now.get(Calendar.HOUR_OF_DAY) < 9 || now.get(Calendar.HOUR_OF_DAY) > 19)
+		if (now.get(Calendar.HOUR_OF_DAY) < 9 || now.get(Calendar.HOUR_OF_DAY) > 1)
 			return;
 		final Contact susi = repository.one(Contact.class, adminId);
 		final QueryParams params = new QueryParams(Query.contact_listId);
