@@ -24,6 +24,7 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
+import com.jq.findapp.service.AuthenticationService.Unique;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.ExternalService.Address;
 import com.jq.findapp.service.NotificationService;
@@ -54,32 +55,14 @@ public class ActionApi {
 	private static final List<Integer> SENT_NOTIFICATIONS = new ArrayList<>();
 
 	private static class Marketing {
-		private String title;
-		private String text;
-		private String action;
+		public final String title;
+		public final String text;
+		public final String action;
 
-		public void setTitle(String title) {
+		private Marketing(String title, String text, String action) {
 			this.title = title;
-		}
-
-		public void setText(String text) {
 			this.text = text;
-		}
-
-		public void setAction(String action) {
 			this.action = action;
-		}
-
-		public String getTitle() {
-			return title;
-		}
-
-		public String getText() {
-			return text;
-		}
-
-		public String getAction() {
-			return action;
 		}
 	}
 
@@ -116,13 +99,12 @@ public class ActionApi {
 	private String googleKeyJS;
 
 	@GetMapping("unique")
-	public Map<String, Object> unique(String email) {
-		final QueryParams params = new QueryParams(Query.contact_unique);
-		params.setSearch("LOWER(contact.email)='" + email.toLowerCase() + "'");
-		final Map<String, Object> result = new HashMap<>();
-		result.put("email", email);
-		result.put("unique", repository.one(params) == null);
-		return result;
+	public Unique unique(String email) {
+		final Unique unique = authenticationService.unique(email);
+		// TODO: remove on 0.9.9
+		if (unique.unique && unique.blocked)
+			unique.unique = false;
+		return unique;
 	}
 
 	@PostMapping("notify")
@@ -136,6 +118,7 @@ public class ActionApi {
 		}
 	}
 
+	// TODO: remove on 0.9.8
 	@GetMapping("marketing")
 	public Marketing old_marketing(@RequestHeader(required = false) BigInteger user) {
 		return marketing("DE", user);
@@ -143,11 +126,10 @@ public class ActionApi {
 
 	@GetMapping("marketing/{language}")
 	public Marketing marketing(@PathVariable final String language, @RequestHeader(required = false) BigInteger user) {
-		final Marketing marketing = new Marketing();
-		marketing.setText(Text.marketing_iPadText.getText(language));
-		marketing.setTitle(Text.marketing_iPadTitle.getText(language));
-		marketing.setAction("https://blog.findapp.online");
-		return marketing;
+		return new Marketing(
+				Text.marketing_iPadTitle.getText(language),
+				Text.marketing_iPadText.getText(language),
+				"https://blog.findapp.online");
 	}
 
 	@GetMapping("marketing/result")

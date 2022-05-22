@@ -66,6 +66,18 @@ public class AuthenticationService {
 		}
 	}
 
+	public static class Unique {
+		public final String email;
+		public boolean unique;
+		public final boolean blocked;
+
+		private Unique(String email, boolean unique, boolean blocked) {
+			this.email = email;
+			this.unique = unique;
+			this.blocked = blocked;
+		}
+	}
+
 	private static class FailedAttempts {
 		private long timestamp = System.currentTimeMillis();
 		private int attempts = 1;
@@ -154,9 +166,14 @@ public class AuthenticationService {
 					registration.toString());
 			throw new IllegalAccessException("email");
 		}
-		if (BLOCKED_EMAIL_DOMAINS
-				.contains(registration.getEmail().substring(registration.getEmail().indexOf('@') + 1))) {
-			notificationService.sendEmail(null, "reg denied email domain blocked: " + registration.getEmail(),
+		final Unique unique = unique(registration.getEmail());
+		if (!unique.unique) {
+			notificationService.sendEmail(null, "reg denied email not unique: " + registration.getEmail(),
+					registration.toString());
+			throw new IllegalAccessException("email");
+		}
+		if (unique.blocked) {
+			notificationService.sendEmail(null, "reg denied email blocked: " + registration.getEmail(),
 					registration.toString());
 			throw new IllegalAccessException("domain");
 		}
@@ -168,6 +185,13 @@ public class AuthenticationService {
 		final String loginLink = generateLoginParam(contact);
 		saveRegistration(contact, registration);
 		notificationService.sendNotification(contact, contact, NotificationID.welcomeExt, "r=" + loginLink);
+	}
+
+	public Unique unique(String email) {
+		final QueryParams params = new QueryParams(Query.contact_unique);
+		params.setSearch("LOWER(contact.email)='" + email.toLowerCase() + "'");
+		return new Unique(email, repository.one(params) == null, AuthenticationService.BLOCKED_EMAIL_DOMAINS
+				.contains(email.substring(email.indexOf('@') + 1)));
 	}
 
 	public void saveRegistration(Contact contact, AbstractRegistration registration) throws Exception {
