@@ -225,8 +225,8 @@ public class ActionApi {
 		}
 		url = url.replaceAll("\\{destination}", destination);
 		url = url.replaceAll("\\{gender}", contact.getGender() == null ? "2" : "" + contact.getGender()) + googleKey;
-		final byte[] data = WebClient.create(url).get().retrieve().toEntity(byte[].class).block().getBody();
-		return Base64.getEncoder().encodeToString(data);
+		return Base64.getEncoder().encodeToString(
+				WebClient.create(url).get().retrieve().toEntity(byte[].class).block().getBody());
 	}
 
 	@GetMapping("google")

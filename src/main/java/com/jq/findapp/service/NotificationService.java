@@ -67,7 +67,6 @@ public class NotificationService {
 		feedback(NotificationIDType.Email, false), //
 		friendAppro(NotificationIDType.EmailOrDevice, true), //
 		friendReq(NotificationIDType.EmailOrDevice, true), //
-		locTransf(NotificationIDType.EmailOrDevice, true), //
 		markEvent(NotificationIDType.EmailOrDevice, true), //
 		newMsg(NotificationIDType.EmailOrDevice, false), //
 		pwReset(NotificationIDType.Email, false), //

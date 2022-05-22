@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.Transient;
 
+import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.RepositoryListener;
 
@@ -404,6 +406,10 @@ public class Location extends BaseEntity {
 	@Transient
 	@Override
 	public boolean writeAccess(BigInteger user, Repository repository) {
-		return user.equals(getContactId());
+		if (user.equals(getContactId()))
+			return true;
+		final QueryParams params = new QueryParams(Query.location_list);
+		params.setSearch("location.contactId=" + user);
+		return repository.one(params).size() > 4;
 	}
 }

@@ -16,6 +16,8 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.EngagementService;
+import com.jq.findapp.service.NotificationService;
+import com.jq.findapp.service.NotificationService.NotificationID;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin(origins = { "https://sc.findapp.online" })
+@CrossOrigin(origins = { "https://*.findapp.online" })
 @RequestMapping("support")
 public class SupportCenterApi {
 	private final String baseDir = "attachments/";
@@ -41,6 +43,9 @@ public class SupportCenterApi {
 
 	@Autowired
 	private AuthenticationService authenticationService;
+
+	@Autowired
+	private NotificationService notificationService;
 
 	@Autowired
 	private EngagementService engagementService;
@@ -96,57 +101,23 @@ public class SupportCenterApi {
 		}
 	}
 
-	@PostMapping("chat/{id}")
-	public void chat(@PathVariable final BigInteger id, @RequestHeader String password,
-			@RequestHeader String salt) throws Exception {
-		authenticationService.verify(adminId, password, salt);
-		try (InputStream in = new FileInputStream(baseDir + "20000/" + id)) {
-			final String template = IOUtils.toString(in, StandardCharsets.UTF_8);
-			// final List<Contact> contacts = repository
-			// .list("select c.id, c.pseudonym, c.gender from CONTACT c, ACTIVITY a "
-			// + "where c.id<>3 and c.verified=1 and a.contact_id=c.id and (a.subject is
-			// null or a.subject not in ('"
-			// + id
-			// + "')) and registered < CURDATE() - INTERVAL 3 DAY group by c.id",
-			// Contact.class);
-			// for (Contact contact : contacts) {
-			// if (contact.getId().longValue() == 213L) {
-			// String s = template.replace("{{EMOJI.MISSING_FRIENDS}}", contact.getGender()
-			// == 1 ? "🕺🏻" : "💃");
-			// s = s.replace("{{CONTACT.PSEUDONYM}}", contact.getPseudonym());
-			// final Chat c = new Chat();
-			// c.setContactId(adminId);
-			// c.setContactId2(contact.getId());
-			// c.setNote(s);
-			// repository.save(c);
-			// }
-			// }
-		}
-	}
-
 	@PostMapping("{id}/resend/regmail")
 	public void resendRegMail(@PathVariable final BigInteger id, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
-		authenticationService.verify(adminId, password, salt);
-		// final Contact to = repository.one(Contact.class, id);
-		// notification.sendEmail(to, "Vielen Dank für die Registrierung auf findapp vom
-		// "
-		// + new SimpleDateFormat("d.M.yyyy HH:mm").format(to.getCreatedAt())
-		// + ". Du hast Deine Registrierung noch nicht abgeschlossen, bitte bestätige
-		// Deine Anmeldung, in dem Du auf den Link klickst.",
-		// "r=" + to.getLogonLink().substring(0, 10) + to.getLogonLink().substring(20));
+		final Contact from = authenticationService.verify(adminId, password, salt);
+		final Contact to = repository.one(Contact.class, id);
+		notificationService.sendNotification(from, to, NotificationID.welcomeExt,
+				"r=" + to.getLoginLink().substring(0, 10) + to.getLoginLink().substring(20));
 	}
 
 	@PostMapping("notify")
 	public void notify(@FormParam(value = "ids") final String[] ids, @FormParam(value = "text") final String text,
 			@FormParam(value = "action") final String action, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
-		authenticationService.verify(adminId, password, salt);
-		for (String id : ids) {
-			// final Contact to = repository.one(Contact.class,
-			// BigInteger.valueOf(Long.valueOf(id)));
-			// notification.sendNotification(to, text, action, true);
-		}
+		final Contact from = authenticationService.verify(adminId, password, salt);
+		for (String id : ids)
+			notificationService.sendNotification(from, repository.one(Contact.class,
+					BigInteger.valueOf(Long.valueOf(id))), NotificationID.mgMarketing, action, text);
 	}
 
 	@PutMapping("refreshDB")
