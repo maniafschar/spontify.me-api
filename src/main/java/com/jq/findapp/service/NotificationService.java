@@ -184,8 +184,12 @@ public class NotificationService {
 				+ contactTo.getId() + " and contactBlock.contactId2=" + contactFrom.getId());
 		if (repository.list(params).size() > 0)
 			return false;
-		final StringBuilder text = new StringBuilder(
-				Text.valueOf("mail_" + notificationID).getText(contactTo.getLanguage()));
+		StringBuilder text;
+		try {
+			text = new StringBuilder(Text.valueOf("mail_" + notificationID).getText(contactTo.getLanguage()));
+		} catch (Exception ex) {
+			text = new StringBuilder(": <jq:EXTRA_1/>");
+		}
 		if (param != null) {
 			for (int i = 0; i < param.length; i++)
 				Strings.replaceString(text, "<jq:EXTRA_" + (i + 1) + "/>", param[i]);

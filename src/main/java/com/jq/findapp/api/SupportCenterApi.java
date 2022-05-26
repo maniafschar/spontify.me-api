@@ -6,10 +6,10 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -111,18 +112,42 @@ public class SupportCenterApi {
 	}
 
 	@PostMapping("notify")
-	public void notify(@FormParam(value = "ids") final String[] ids, @FormParam(value = "text") final String text,
-			@FormParam(value = "action") final String action, @RequestHeader String password,
+	public void notify(@RequestBody Notification data, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
-		final Contact from = authenticationService.verify(adminId, password, salt);
-		for (String id : ids)
-			notificationService.sendNotification(from, repository.one(Contact.class,
-					BigInteger.valueOf(Long.valueOf(id))), NotificationID.mgMarketing, action, text);
+		for (BigInteger id : data.ids) {
+			final Chat chat = new Chat();
+			chat.setContactId(adminId);
+			chat.setContactId2(id);
+			chat.setNote(data.text);
+			chat.setSeen(Boolean.FALSE);
+			repository.save(chat);
+		}
 	}
 
 	@PutMapping("refreshDB")
 	public void refreshDB(@RequestHeader String secret) throws Exception {
 		if (schedulerSecret.equals(secret))
 			engagementService.sendWelcomeChat();
+	}
+
+	private static class Notification {
+		private List<BigInteger> ids;
+		private String text;
+
+		public List<BigInteger> getIds() {
+			return ids;
+		}
+
+		public void setIds(List<BigInteger> ids) {
+			this.ids = ids;
+		}
+
+		public String getText() {
+			return text;
+		}
+
+		public void setText(String text) {
+			this.text = text;
+		}
 	}
 }

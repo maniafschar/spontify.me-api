@@ -24,8 +24,6 @@ public enum Text {
 	mail_invite,
 	mail_locMarketing,
 	mail_markEvent,
-	mail_mgMarketing,
-	mail_newMsg,
 	mail_pwReset,
 	mail_sentImg,
 	mail_sentPos1,

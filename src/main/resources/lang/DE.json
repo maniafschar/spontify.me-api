@@ -10,8 +10,6 @@
 		"invite": "Hallo, findapp rockt! Probiert es aus, ich bin unter {0} zu finden!\nLiebe Grüße",
 		"locMarketing": "<jq:EXTRA_2/> hat folgendes Angebot: <jqEXTRA_1/>",
 		"markEvent": "nimmt am <jq:EXTRA_1/> am Event \"<jq:EXTRA_2/>\" im <jq:EXTRA_3/> teil.",
-		"mgMarketing": ": <jq:EXTRA_1/>",
-		"newMsg": ": <jq:EXTRA_1/>",
 		"pwReset": "Dein Passwort wurde zurück gesetzt. Klicke auf den Smiley, Du wirst anschließend aufgefordert, ein neues Passwort einzugeben.",
 		"ratingLocMat": "bewertete <jq:EXTRA_2/>, ihr habt <jq:EXTRA_1/> Gemeinsamkeiten.",
 		"ratingProfile": "hat Dich mit <jq:EXTRA_1/> bewertet.",

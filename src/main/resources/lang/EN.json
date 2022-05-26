@@ -10,8 +10,6 @@
 		"invite": "Hello, findapp rocks! Try it out, I can be found under {0}!\nLove and best regards",
 		"locMarketing": "<jq:EXTRA_2/> has the following offer: <jqEXTRA_1/>",
 		"markEvent": "participates in the <jq:EXTRA_1/> in the event \"<jq:EXTRA_2/>\" in the <jq:EXTRA_3/>.",
-		"mgMarketing": ": <jq:EXTRA_1/>",
-		"newMsg": ": <jq:EXTRA_1/>",
 		"pwReset": "Your password has been reset. Click on the smiley, you will then be asked to enter a new password.",
 		"ratingLocMat": "rated <jq:EXTRA_2/>, you have <jq:EXTRA_1/> common attributes.",
 		"ratingProfile": "has rated you with <jq:EXTRA_1/>.",

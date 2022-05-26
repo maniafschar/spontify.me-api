@@ -23,6 +23,7 @@ import com.jq.findapp.entity.ContactToken;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.AuthenticationService.AuthenticationException.Type;
 import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Strings;
@@ -85,6 +86,19 @@ public class AuthenticationService {
 
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
 	public static class AuthenticationException extends RuntimeException {
+		public enum Type {
+			NoInputFromClient, WrongPassword, NoPasswordInDB
+		}
+
+		private final Type type;
+
+		private AuthenticationException(Type type) {
+			this.type = type;
+		}
+
+		public Type getType() {
+			return type;
+		}
 	}
 
 	static {
@@ -99,13 +113,13 @@ public class AuthenticationService {
 
 	public Contact verify(BigInteger user, String password, String salt) {
 		if (user == null || user.compareTo(BigInteger.ONE) < 0)
-			throw new AuthenticationException();
+			throw new AuthenticationException(Type.NoInputFromClient);
 		return verify(repository.one(Contact.class, user), password, salt, false);
 	}
 
 	private Contact verify(final Contact contact, final String password, final String salt, final boolean login) {
 		if (contact == null || password == null || password.length() == 0 || salt == null || salt.length() == 0)
-			throw new AuthenticationException();
+			throw new AuthenticationException(Type.NoInputFromClient);
 		synchronized (USED_SALTS) {
 			if (USED_SALTS.contains(salt))
 				throw new BadRequestException();
@@ -145,7 +159,7 @@ public class AuthenticationService {
 				} catch (InterruptedException e) {
 				}
 			}
-			throw new AuthenticationException();
+			throw new AuthenticationException(Type.WrongPassword);
 		}
 		return contact;
 	}
@@ -362,7 +376,7 @@ public class AuthenticationService {
 
 	public String getPassword(final Contact u) {
 		if (u.getPassword() == null || u.getPassword().length() == 0)
-			throw new AuthenticationException();
+			throw new AuthenticationException(Type.NoPasswordInDB);
 		synchronized (PW) {
 			Password pw = PW.get(u.getId());
 			if (pw == null || pw.reset - u.getPasswordReset() < 0) {

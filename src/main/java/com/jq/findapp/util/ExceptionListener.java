@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService.AuthenticationException;
+import com.jq.findapp.service.AuthenticationService.AuthenticationException.Type;
 import com.jq.findapp.service.NotificationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,8 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 	}
 
 	private void report(HttpServletRequest request, Exception ex, HttpStatus status) {
+		if (ex instanceof AuthenticationException && ((AuthenticationException) ex).getType() == Type.WrongPassword)
+			return;
 		String msg = status + "\n\n" + request.getMethod() + " "
 				+ (request.getHeader("user") == null ? "" : request.getHeader("user") + "@")
 				+ SUBSTITUTE + ":" + request.getRequestURI() + getQueryString(request) + SUBSTITUTE

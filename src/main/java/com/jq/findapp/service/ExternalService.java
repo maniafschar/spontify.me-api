@@ -2,6 +2,8 @@ package com.jq.findapp.service;
 
 import java.math.BigInteger;
 
+import javax.mail.MessagingException;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,14 +23,23 @@ public class ExternalService {
 	@Autowired
 	private Repository repository;
 
+	@Autowired
+	private NotificationService notificationService;
+
 	@Value("${app.google.key}")
 	private String googleKey;
 
 	public String google(String param) {
-		return WebClient
-				.create("https://maps.googleapis.com/maps/api/" + param + (param.contains("?") ? "&" : "?") + "key="
-						+ googleKey)
+		final String result = WebClient
+				.create("https://maps.googleapis.com/maps/api/" + param + (param.contains("?") ? "&" : "?")
+						+ "key=" + googleKey)
 				.get().retrieve().toEntity(String.class).block().getBody();
+		try {
+			notificationService.sendEmail(null, "google", param + "\n\n" + result);
+		} catch (MessagingException e) {
+			throw new RuntimeException(e);
+		}
+		return result;
 	}
 
 	public Address convertGoogleAddress(JsonNode data) {
