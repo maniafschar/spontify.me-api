@@ -154,8 +154,6 @@ public class RepositoryListener {
 			throw new IllegalAccessException("Invalid address");
 		final JsonNode result = googleAddress.get("results").get(0);
 		JsonNode n = result.get("geometry").get("location");
-		location.setLatitude(n.get("lat").floatValue());
-		location.setLongitude(n.get("lng").floatValue());
 		final GeoLocation geoLocation = externalService.convertGoogleAddress(googleAddress);
 		location.setAddress(geoLocation.getFormatted());
 		location.setCountry(geoLocation.getCountry());
@@ -163,6 +161,10 @@ public class RepositoryListener {
 		location.setZipCode(geoLocation.getZipCode());
 		location.setStreet(geoLocation.getStreet());
 		location.setNumber(geoLocation.getNumber());
+		if (geoLocation.getStreet() != null && geoLocation.getStreet().trim().length() > 0) {
+			location.setLatitude(geoLocation.getLatitude());
+			location.setLongitude(geoLocation.getLongitude());
+		}
 		n = result.get("address_components");
 		String s = "";
 		for (int i = 0; i < n.size(); i++) {
