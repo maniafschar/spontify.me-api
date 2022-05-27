@@ -119,12 +119,6 @@ public class ActionApi {
 		}
 	}
 
-	// TODO: remove on 0.9.8
-	@GetMapping("marketing")
-	public Marketing old_marketing(@RequestHeader(required = false) BigInteger user) {
-		return marketing("DE", user);
-	}
-
 	@GetMapping("marketing/{language}")
 	public Marketing marketing(@PathVariable final String language, @RequestHeader(required = false) BigInteger user) {
 		return new Marketing(
