@@ -36,7 +36,7 @@ public class Repository {
 	private String accountDeleteSql;
 
 	public Result list(final QueryParams params) {
-		final GeoLocation geo = new GeoLocation(params);
+		final GeoLocationProcessor geo = new GeoLocationProcessor(params);
 		final Result result = params.getQuery().createResult();
 		final String sql = params.getQuery().prepareSql(params);
 		final List<Object> data = em.createQuery(sql).getResultList();

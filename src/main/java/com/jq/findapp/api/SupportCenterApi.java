@@ -9,6 +9,7 @@ import java.util.List;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import com.jq.findapp.api.model.Notification;
 import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Query;
@@ -114,11 +115,11 @@ public class SupportCenterApi {
 	@PostMapping("notify")
 	public void notify(@RequestBody Notification data, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
-		for (BigInteger id : data.ids) {
+		for (BigInteger id : data.getIds()) {
 			final Chat chat = new Chat();
 			chat.setContactId(adminId);
 			chat.setContactId2(id);
-			chat.setNote(data.text);
+			chat.setNote(data.getText());
 			chat.setSeen(Boolean.FALSE);
 			repository.save(chat);
 		}
@@ -128,26 +129,5 @@ public class SupportCenterApi {
 	public void refreshDB(@RequestHeader String secret) throws Exception {
 		if (schedulerSecret.equals(secret))
 			engagementService.sendWelcomeChat();
-	}
-
-	private static class Notification {
-		private List<BigInteger> ids;
-		private String text;
-
-		public List<BigInteger> getIds() {
-			return ids;
-		}
-
-		public void setIds(List<BigInteger> ids) {
-			this.ids = ids;
-		}
-
-		public String getText() {
-			return text;
-		}
-
-		public void setText(String text) {
-			this.text = text;
-		}
 	}
 }

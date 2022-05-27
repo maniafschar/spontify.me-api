@@ -13,9 +13,11 @@ import java.util.Map;
 
 import javax.mail.MessagingException;
 
-import com.jq.findapp.api.DBApi.WriteEntity;
+import com.jq.findapp.api.model.Position;
+import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
+import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.LocationOpenTime;
 import com.jq.findapp.entity.LocationVisit;
@@ -26,7 +28,6 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.AuthenticationService.Unique;
 import com.jq.findapp.service.ExternalService;
-import com.jq.findapp.service.ExternalService.Address;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.service.NotificationService.Ping;
@@ -230,36 +231,42 @@ public class ActionApi {
 	}
 
 	@GetMapping("google")
-	public String google(final String param, @RequestHeader BigInteger user,
+	public Object google(final String param, @RequestHeader BigInteger user,
 			@RequestHeader String password, @RequestHeader String salt)
 			throws Exception {
 		authenticationService.verify(user, password, salt);
 		if ("js".equals(param))
 			return "https://maps.googleapis.com/maps/api/js?key=" + googleKeyJS;
+		if (param.startsWith("latlng=")) {
+			final String[] l = param.substring(7).split(",");
+			return externalService.googleAddress(Float.parseFloat(l[0]), Float.parseFloat(l[1]));
+		}
 		return externalService.google(param);
 	}
 
 	@PostMapping("position")
-	public Map<String, Object> position(@RequestBody final ContactGeoLocationHistory contactGeoLocationHistory,
+	public Map<String, Object> position(@RequestBody final Position position,
 			@RequestHeader BigInteger user, @RequestHeader String password, @RequestHeader String salt)
 			throws Exception {
 		final Contact contact = authenticationService.verify(user, password, salt);
-		final Address address = externalService.googleAddress(contactGeoLocationHistory.getLatitude(),
-				contactGeoLocationHistory.getLongitude());
-		if (address != null) {
+		final GeoLocation geoLocation = externalService.googleAddress(position.getLatitude(), position.getLongitude());
+		if (geoLocation != null) {
 			final Map<String, Object> result = new HashMap<>();
-			if (address.street != null && address.number != null)
-				address.street = address.street + ' ' + address.number;
-			result.put("town", address.town != null ? address.town : address.country);
-			result.put("street", address.street);
+			if (geoLocation.getStreet() != null && geoLocation.getNumber() != null)
+				result.put("street", geoLocation.getStreet() + ' ' + geoLocation.getNumber());
+			else
+				result.put("street", geoLocation.getStreet());
+			result.put("town", geoLocation.getTown() != null ? geoLocation.getTown() : geoLocation.getCountry());
+			final ContactGeoLocationHistory contactGeoLocationHistory = new ContactGeoLocationHistory();
 			contactGeoLocationHistory.setContactId(contact.getId());
-			contactGeoLocationHistory.setCountry(address.country);
-			contactGeoLocationHistory.setStreet(address.street);
-			contactGeoLocationHistory.setTown(address.town);
-			contactGeoLocationHistory.setZipCode(address.zipCode);
+			contactGeoLocationHistory.setGeoLocationId(geoLocation.getId());
+			contactGeoLocationHistory.setAccuracy(position.getAccuracy());
+			contactGeoLocationHistory.setAltitude(position.getAltitude());
+			contactGeoLocationHistory.setHeading(position.getHeading());
+			contactGeoLocationHistory.setSpeed(position.getSpeed());
 			repository.save(contactGeoLocationHistory);
-			contact.setLatitude(contactGeoLocationHistory.getLatitude());
-			contact.setLongitude(contactGeoLocationHistory.getLongitude());
+			contact.setLatitude(position.getLatitude());
+			contact.setLongitude(position.getLongitude());
 			repository.save(contact);
 			return result;
 		}
@@ -277,8 +284,7 @@ public class ActionApi {
 
 	@PutMapping("one")
 	public void save(@RequestBody final WriteEntity entity, @RequestHeader BigInteger user,
-			@RequestHeader String password, @RequestHeader String salt)
-			throws Exception {
+			@RequestHeader String password, @RequestHeader String salt) throws Exception {
 		authenticationService.verify(user, password, salt);
 		final Location location = repository.one(Location.class, entity.getId());
 		if (location.writeAccess(user, repository)) {

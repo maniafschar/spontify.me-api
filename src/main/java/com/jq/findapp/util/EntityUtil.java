@@ -9,7 +9,7 @@ import java.util.Base64;
 
 import javax.imageio.ImageIO;
 
-import com.jq.findapp.api.DBApi.WriteEntity;
+import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.repository.Repository.Attachment;
 
 public class EntityUtil {

@@ -52,6 +52,7 @@ public class Location extends BaseEntity {
 	private String parkingOption;
 	private String parkingText;
 	private String street;
+	private String number;
 	private String subcategories;
 	private String telephone;
 	private String town;
@@ -185,6 +186,14 @@ public class Location extends BaseEntity {
 
 	public void setStreet(String street) {
 		this.street = street;
+	}
+
+	public String getNumber() {
+		return number;
+	}
+
+	public void setNumber(String number) {
+		this.number = number;
 	}
 
 	public String getCountry() {

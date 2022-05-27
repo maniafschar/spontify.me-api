@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.springframework.data.geo.Point;
 
-public class GeoLocation {
+public class GeoLocationProcessor {
 	private double radLat;
 	private double radLon;
 
@@ -20,7 +20,7 @@ public class GeoLocation {
 	private static final double MAX_LON = Math.toRadians(180d);
 	private static final double radius = 6371.01;
 
-	public GeoLocation(QueryParams params) {
+	public GeoLocationProcessor(QueryParams params) {
 		if (params.getLatitude() != null && params.getLongitude() != null) {
 			if (params.getDistance() == null)
 				params.setDistance(100);

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
@@ -114,48 +115,5 @@ public class DBApi {
 		notificationService.sendEmail(null, "ERROR writeAuthentication",
 				"Failed for " + user + " on " + e.getClass().getName() + ", id " + e.getId());
 		return false;
-	}
-
-	public static class WriteEntity {
-		private BigInteger id;
-		private String classname;
-		private Map<String, Object> values;
-
-		public BigInteger getId() {
-			return id;
-		}
-
-		public void setId(BigInteger id) {
-			this.id = id;
-		}
-
-		public Class<BaseEntity> getClazz() {
-			try {
-				return (Class<BaseEntity>) Class.forName(BaseEntity.class.getPackage().getName() + "." + classname);
-			} catch (ClassNotFoundException ex) {
-				throw new RuntimeException(ex);
-			}
-		}
-
-		public String getClassname() {
-			return classname;
-		}
-
-		public void setClassname(String classname) {
-			this.classname = classname;
-		}
-
-		public Map<String, Object> getValues() {
-			return values;
-		}
-
-		public void setValues(Map<String, Object> values) {
-			this.values = values;
-		}
-
-		@Override
-		public String toString() {
-			return classname + (id == null ? "" : ": " + id) + (values == null ? "" : " " + values.keySet());
-		}
 	}
 }

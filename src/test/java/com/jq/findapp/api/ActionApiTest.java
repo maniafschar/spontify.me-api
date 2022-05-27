@@ -8,8 +8,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.JpaTestConfiguration;
+import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.service.ExternalService;
-import com.jq.findapp.service.ExternalService.Address;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ public class ActionApiTest {
 
 		// when
 		final JsonNode data = new ObjectMapper().readTree(response);
-		final Address address = externalService.convertGoogleAddress(data);
+		final GeoLocation address = externalService.convertGoogleAddress(data);
 
 		// then
 		assertEquals("OK", data.get("status").asText());
@@ -42,10 +42,10 @@ public class ActionApiTest {
 		assertEquals(3, data.get("results").get(0).get("address_components").get(0).size());
 		assertEquals("route",
 				data.get("results").get(0).get("address_components").get(1).get("types").get(0).asText());
-		assertEquals("DE", address.country);
-		assertEquals("6", address.number);
-		assertEquals("Melchiorstraße", address.street);
-		assertEquals("München", address.town);
-		assertEquals("81479", address.zipCode);
+		assertEquals("DE", address.getCountry());
+		assertEquals("6", address.getNumber());
+		assertEquals("Melchiorstraße", address.getStreet());
+		assertEquals("München", address.getTown());
+		assertEquals("81479", address.getZipCode());
 	}
 }

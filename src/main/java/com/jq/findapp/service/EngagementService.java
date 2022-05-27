@@ -7,7 +7,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Query;
@@ -67,8 +66,8 @@ public class EngagementService {
 		CONTACT_CURRENT_TOWN(
 				contact -> {
 					try {
-						return externalService.googleAddress(contact.getLatitude(), contact.getLongitude()).town;
-					} catch (JsonProcessingException e) {
+						return externalService.googleAddress(contact.getLatitude(), contact.getLongitude()).getTown();
+					} catch (Exception e) {
 						throw new RuntimeException(e);
 					}
 				});

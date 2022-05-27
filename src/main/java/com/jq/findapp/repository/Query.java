@@ -14,7 +14,6 @@ import org.apache.commons.io.IOUtils;
 public enum Query {
 	contact_block,
 	contact_chat,
-	contact_geoLocation,
 	contact_list(true),
 	contact_listBlocked,
 	contact_listChat(true),
@@ -53,6 +52,7 @@ public enum Query {
 	location_rating(true),
 	location_ratingOverview(true),
 
+	misc_geoLocation,
 	misc_listLog,
 	misc_setting;
 

@@ -7,16 +7,11 @@ import javax.persistence.Entity;
 @Entity
 public class ContactGeoLocationHistory extends BaseEntity {
 	private BigInteger contactId;
-	private Float latitude;
-	private Float longitude;
+	private BigInteger geoLocationId;
 	private Float altitude;
 	private Float heading;
 	private Float speed;
 	private Float accuracy;
-	private String street;
-	private String town;
-	private String zipCode;
-	private String country;
 
 	public BigInteger getContactId() {
 		return contactId;
@@ -26,52 +21,12 @@ public class ContactGeoLocationHistory extends BaseEntity {
 		this.contactId = contactId;
 	}
 
-	public Float getLatitude() {
-		return latitude;
+	public BigInteger getGeoLocationId() {
+		return geoLocationId;
 	}
 
-	public void setLatitude(Float latitude) {
-		this.latitude = latitude;
-	}
-
-	public Float getLongitude() {
-		return longitude;
-	}
-
-	public void setLongitude(Float longitude) {
-		this.longitude = longitude;
-	}
-
-	public String getStreet() {
-		return street;
-	}
-
-	public void setStreet(String street) {
-		this.street = street;
-	}
-
-	public String getTown() {
-		return town;
-	}
-
-	public void setTown(String town) {
-		this.town = town;
-	}
-
-	public String getZipCode() {
-		return zipCode;
-	}
-
-	public void setZipCode(String zipCode) {
-		this.zipCode = zipCode;
-	}
-
-	public String getCountry() {
-		return country;
-	}
-
-	public void setCountry(String country) {
-		this.country = country;
+	public void setGeoLocationId(BigInteger geoLocationId) {
+		this.geoLocationId = geoLocationId;
 	}
 
 	public Float getAltitude() {
@@ -105,5 +60,4 @@ public class ContactGeoLocationHistory extends BaseEntity {
 	public void setAccuracy(Float accuracy) {
 		this.accuracy = accuracy;
 	}
-
 }
