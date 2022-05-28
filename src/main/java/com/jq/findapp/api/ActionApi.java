@@ -13,6 +13,7 @@ import java.util.Map;
 
 import javax.mail.MessagingException;
 
+import com.jq.findapp.api.model.Marketing;
 import com.jq.findapp.api.model.Position;
 import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.entity.Contact;
@@ -55,18 +56,6 @@ public class ActionApi {
 	private static final List<String> QUOTATION = new ArrayList<>();
 	private static final List<Integer> SENT_NOTIFICATIONS = new ArrayList<>();
 
-	private static class Marketing {
-		public final String title;
-		public final String text;
-		public final String action;
-
-		private Marketing(String title, String text, String action) {
-			this.title = title;
-			this.text = text;
-			this.action = action;
-		}
-	}
-
 	static {
 		try {
 			final String[] t = IOUtils
@@ -101,11 +90,7 @@ public class ActionApi {
 
 	@GetMapping("unique")
 	public Unique unique(String email) {
-		final Unique unique = authenticationService.unique(email);
-		// TODO: remove on 0.9.9
-		if (unique.unique && unique.blocked)
-			unique.unique = false;
-		return unique;
+		return authenticationService.unique(email);
 	}
 
 	@PostMapping("notify")
