@@ -276,7 +276,7 @@ public class RepositoryListener {
 				final ContactMarketing marketing = new ContactMarketing();
 				marketing.setContactId(contactLink.getContactId());
 				marketing.setData(contactLink.getContactId2().toString());
-				marketing.setType(com.jq.findapp.entity.ContactMarketing.Type.CollectFriends);
+				marketing.setType(ContactMarketing.Type.CollectFriends);
 				repository.save(marketing);
 			}
 		}

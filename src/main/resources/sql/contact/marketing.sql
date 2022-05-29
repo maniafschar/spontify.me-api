@@ -65,4 +65,4 @@ WHERE
 GROUP BY
 	contactMarketing.contactId
 ORDER BY
-	message1
+	message1 desc
