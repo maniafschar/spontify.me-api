@@ -41,9 +41,9 @@ public class ExternalService {
 		return result;
 	}
 
-	public GeoLocation convertGoogleAddress(JsonNode data) {
-		if ("OK".equals(data.get("status").asText()) && data.get("results") != null) {
-			data = data.get("results").get(0).get("address_components");
+	public GeoLocation convertGoogleAddress(JsonNode google) {
+		if ("OK".equals(google.get("status").asText()) && google.get("results") != null) {
+			JsonNode data = google.get("results").get(0).get("address_components");
 			final GeoLocation geoLocation = new GeoLocation();
 			for (int i = 0; i < data.size(); i++) {
 				if (geoLocation.getStreet() == null && "route".equals(data.get(i).get("types").get(0).asText()))
@@ -60,6 +60,14 @@ public class ExternalService {
 					geoLocation.setZipCode(data.get(i).get("long_name").asText());
 				else if (geoLocation.getCountry() == null && "country".equals(data.get(i).get("types").get(0).asText()))
 					geoLocation.setCountry(data.get(i).get("short_name").asText());
+			}
+			data = google.get("results").get(0).get("geometry");
+			if (data != null) {
+				data = data.get("location");
+				if (data != null) {
+					geoLocation.setLatitude((float) data.get("lat").asDouble());
+					geoLocation.setLongitude((float) data.get("lng").asDouble());
+				}
 			}
 			return geoLocation;
 		}

@@ -47,5 +47,6 @@ public class ActionApiTest {
 		assertEquals("Melchiorstraße", address.getStreet());
 		assertEquals("München", address.getTown());
 		assertEquals("81479", address.getZipCode());
+		assertEquals((float) 48.072197, address.getLatitude());
 	}
 }

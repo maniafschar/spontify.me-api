@@ -74,7 +74,7 @@ public class Repository {
 			return null;
 		if (result.size() > 1)
 			throw new RuntimeException(
-					params.getQuery() + " retuned " + result.size() + " objects for " + params.getSearch());
+					params.getQuery() + " returned " + result.size() + " objects for " + params.getSearch());
 		return result.get(0);
 	}
 

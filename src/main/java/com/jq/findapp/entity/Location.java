@@ -418,7 +418,8 @@ public class Location extends BaseEntity {
 		if (user.equals(getContactId()))
 			return true;
 		final QueryParams params = new QueryParams(Query.location_list);
+		params.setUser(repository.one(Contact.class, user));
 		params.setSearch("location.contactId=" + user);
-		return repository.one(params).size() > 4;
+		return repository.list(params).size() > 4;
 	}
 }
