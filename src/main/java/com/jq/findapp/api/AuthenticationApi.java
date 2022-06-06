@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin(origins = { "https://localhost", "https://findapp.online" })
+@CrossOrigin(origins = { "https://localhost", "https://findapp.online", "https://spontify.me", "https://spotyou.net" })
 @RequestMapping("authentication")
 public class AuthenticationApi {
 	@Autowired
@@ -56,6 +56,9 @@ public class AuthenticationApi {
 			@RequestHeader String salt) throws Exception {
 		contact.setEmail(Encryption.decryptBrowser(contact.getEmail()));
 		final Map<String, Object> user = authenticationService.login(contact, password, salt);
+		if (user != null && "0.9.9".equals(contact.getVersion()))
+			user.put("script_correction",
+					"window.localStorage.removeItem('findMeIDs');formFunc.validation.badWords=' anal | anus | arsch| ass |bdsm|blowjob| boob|bukkake|bumse|busen| cock | cum |cunnilingus|dildo|ejacul|ejakul|erection|erektion|faschis|fascis|fick|fuck|goebbels|göring|hakenkreuz|himmler|hitler|hure| möse |nazi|neger|nsdap|nutte|orgasm|penis|porn|pussy|queer|schwanz| sex |sucker|tits|titten|vagina|vibrator|vögeln|whore|wigger|wixer'.split('|');formFunc.validation.filterWords=function(t){var e=t.value;if(e){if(e=' '+e+' ',!formFunc.validation.badWordsReplacement){formFunc.validation.badWordsReplacement=[];for(var n=0;n<formFunc.validation.badWords.length;n++){for(var i='',a=0;a<formFunc.validation.badWords[n].length;a++)i+=' '==formFunc.validation.badWords[n].charAt(a)?' ':'*';formFunc.validation.badWordsReplacement.push(i)}}for(n=0;n<formFunc.validation.badWords.length;n++)e=e.replace(new RegExp(formFunc.validation.badWords[n],'ig'),formFunc.validation.badWordsReplacement[n])}(!e||e==' '+t.value+' ')?formFunc.resetError(t):(t.value=e.substring(1,e.length-1),formFunc.setError(t,'filter.offensiveWords'))};lists.openFilter=function(event, html) {var activeID = ui.navigation.getActiveID();if(!lists.data[activeID] || event.target.nodeName == 'LABEL') return;var e = ui.q(activeID + ' filters');if(!e.innerHTML){e.innerHTML = html.call();formFunc.initFields(activeID + ' filters');} if (ui.cssValue(e, 'transform').indexOf('1') < 0) ui.css(e, 'transform', 'scale(1)'); else ui.css(e, 'transform', 'scale(0)');}");
 		if (user != null && publicKey != null) {
 			final ContactToken t;
 			final QueryParams params = new QueryParams(Query.contact_token);
