@@ -19,6 +19,7 @@ SELECT
 	contact.attrInterestEx,
 	contact.birthday,
 	contact.birthdayDisplay,
+	contact.budget,
 	contact.gender,
 	contact.guide,
 	contact.id,
