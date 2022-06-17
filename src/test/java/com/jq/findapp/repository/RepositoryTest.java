@@ -12,6 +12,13 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.JpaTestConfiguration;
@@ -22,13 +29,6 @@ import com.jq.findapp.entity.ContactRating;
 import com.jq.findapp.entity.Feedback;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.util.Encryption;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith({ SpringExtension.class })
 @SpringBootTest(classes = { FindappApplication.class, JpaTestConfiguration.class })
@@ -48,7 +48,7 @@ public class RepositoryTest {
 		contact.setPseudonym("pseudonym");
 		contact.setVerified(true);
 		contact.setVisitPage(new Timestamp(System.currentTimeMillis() - 3000000L));
-		contact.setPassword(Encryption.encryptDB("test"));
+		contact.setPassword(Encryption.encryptDB("secret_password"));
 		contact.setPasswordReset(System.currentTimeMillis());
 		repository.save(contact);
 		return contact;
@@ -110,15 +110,6 @@ public class RepositoryTest {
 
 		// then
 		assertEquals(visitPage, contact.getVisitPage());
-	}
-
-	@Test
-	public void delete() throws Exception {
-		// given
-		final Contact contact = createContact();
-
-		// when
-		repository.deleteAccount(contact.getId());
 	}
 
 	@Test

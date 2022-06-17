@@ -15,9 +15,16 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.BadRequestException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.model.AbstractRegistration;
 import com.jq.findapp.api.model.InternalRegistration;
+import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactToken;
 import com.jq.findapp.repository.Query;
@@ -27,12 +34,6 @@ import com.jq.findapp.service.AuthenticationService.AuthenticationException.Type
 import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Strings;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Component
 public class AuthenticationService {
@@ -56,6 +57,9 @@ public class AuthenticationService {
 
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
+
+	@Value("${account.delete.sql}")
+	private String accountDeleteSql;
 
 	private static class Password {
 		private final String password;
@@ -234,7 +238,7 @@ public class AuthenticationService {
 					throw new IllegalAccessException("reg failed: " + Strings.stackTraceToString(ex));
 			}
 		}
-		notificationService.sendEmailSync(null, "Reg: " + contact.getEmail(), registration.toString());
+		notificationService.sendEmail(null, "Reg: " + contact.getEmail(), registration.toString());
 	}
 
 	private boolean isDuplicateIdDisplay(Throwable ex) {
@@ -389,6 +393,25 @@ public class AuthenticationService {
 			}
 			return pw.password;
 		}
+	}
+
+	public void deleteAccount(final Contact user) throws Exception {
+		final String[] sqls = accountDeleteSql.split(";");
+		for (String sql : sqls) {
+			try {
+				sql = sql.replaceAll("\\{ID}", "" + user.getId()).trim();
+				if (sql.startsWith("from ")) {
+					final List<?> list = repository.list(sql);
+					for (Object e : list)
+						repository.delete((BaseEntity) e);
+				} else
+					repository.executeUpdate(sql);
+			} catch (Exception ex) {
+				throw new RuntimeException("ERROR SQL on account delete: " + ex.getMessage() + "\n" + sql);
+			}
+		}
+		notificationService.sendEmail(null, "Deleted: " + user.getEmail(),
+				new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(user));
 	}
 
 	private String generatePin(final int length) {

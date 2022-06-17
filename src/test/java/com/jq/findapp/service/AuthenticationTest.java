@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
@@ -15,6 +14,15 @@ import java.sql.Date;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.JpaTestConfiguration;
@@ -28,15 +36,6 @@ import com.jq.findapp.service.push.Android;
 import com.jq.findapp.service.push.Ios;
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.EncryptionTest;
-
-import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith({ SpringExtension.class })
 @SpringBootTest(classes = { FindappApplication.class, JpaTestConfiguration.class })
@@ -74,10 +73,7 @@ public class AuthenticationTest {
 				contact.setPassword(Encryption.encryptDB("secret_password"));
 				contact.setPasswordReset(System.currentTimeMillis());
 				repository.save(contact);
-			} while (contact.getId().intValue() < 3);
-		} else {
-			contact.setPassword(Encryption.encryptDB("secret_password"));
-			repository.save(contact);
+			} while (contact.getId().intValue() < adminId.intValue());
 		}
 		return contact;
 	}
@@ -98,6 +94,7 @@ public class AuthenticationTest {
 		final String t = EncryptionTest.encryptBrowser(token.getToken());
 		final String publicKey = IOUtils.toString(Encryption.class.getResourceAsStream("/keys/publicDB.key"),
 				StandardCharsets.UTF_8);
+
 		// when
 		final String s = authenticationService.getAutoLogin(publicKey, t);
 
@@ -217,9 +214,6 @@ public class AuthenticationTest {
 	public void verify() throws Exception {
 		// given
 		final Contact contact = createContact();
-		final Field f = authenticationService.getClass().getDeclaredField("TIMEOUT");
-		f.setAccessible(true);
-		f.setLong(null, System.currentTimeMillis());
 
 		// when
 		authenticationService.verify(contact.getId(),
@@ -230,6 +224,7 @@ public class AuthenticationTest {
 
 	@Test
 	public void key() throws Exception {
+		// given
 		final StringBuilder privateKeyBuilder = new StringBuilder();
 		final BufferedReader reader = new BufferedReader(
 				new InputStreamReader(
@@ -245,7 +240,11 @@ public class AuthenticationTest {
 		final KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 		final Signature signature = Signature.getInstance("SHA256withRSA");
 		signature.initSign(keyFactory.generatePrivate(keySpec));
+
+		// when
 		signature.update("1234567890abcdefghijklmnopqrstxyz".getBytes(StandardCharsets.UTF_8));
+
+		// then no exception
 	}
 
 	public void ios() throws Exception {
@@ -288,6 +287,17 @@ public class AuthenticationTest {
 			if (FAILED_AUTHS.get(k) < 5)
 				FAILED_AUTHS.remove(k);
 		}
+
+		// then no exception
+	}
+
+	@Test
+	public void deleteAccount() throws Exception {
+		// given
+		createContact();
+
+		// when
+		authenticationService.deleteAccount(repository.one(Contact.class, BigInteger.ONE));
 
 		// then no exception
 	}

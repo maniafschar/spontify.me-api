@@ -20,7 +20,6 @@ import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.repository.Query.Result;
 
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,9 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class Repository {
 	@PersistenceContext
 	private EntityManager em;
-
-	@Value("${account.delete.sql}")
-	private String accountDeleteSql;
 
 	public Result list(final QueryParams params) {
 		final GeoLocationProcessor geo = new GeoLocationProcessor(params);
@@ -64,6 +60,12 @@ public class Repository {
 		return result;
 	}
 
+	public List<BaseEntity> list(String hql) throws ClassNotFoundException {
+		return (List<BaseEntity>) em.createQuery(hql,
+				Class.forName(BaseEntity.class.getPackage().getName() + "." + hql.split(" ")[1]))
+				.getResultList();
+	}
+
 	public <T extends BaseEntity> T one(final Class<T> clazz, final BigInteger id) {
 		return em.find(clazz, id);
 	}
@@ -90,27 +92,8 @@ public class Repository {
 	}
 
 	public void delete(final BaseEntity entity) throws Exception {
-		em.remove(entity);
+		em.remove(em.contains(entity) ? entity : em.merge(entity));
 		Attachment.delete(entity);
-	}
-
-	public void deleteAccount(final BigInteger user) throws Exception {
-		final String[] sqls = accountDeleteSql.split(";");
-		for (String sql : sqls) {
-			try {
-				sql = sql.replaceAll("\\{ID}", "" + user).trim();
-				if (sql.startsWith("from ")) {
-					final List<?> list = em.createQuery(sql,
-							Class.forName(BaseEntity.class.getPackage().getName() + "." + sql.split(" ")[1]))
-							.getResultList();
-					for (Object e : list)
-						delete((BaseEntity) e);
-				} else
-					executeUpdate(sql);
-			} catch (Exception ex) {
-				throw new RuntimeException("ERROR SQL on account delete: " + ex.getMessage() + "\n" + sql);
-			}
-		}
 	}
 
 	public void executeUpdate(String sql) {

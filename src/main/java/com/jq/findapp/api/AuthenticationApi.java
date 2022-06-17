@@ -82,8 +82,7 @@ public class AuthenticationApi {
 	@DeleteMapping("one")
 	public void one(@RequestHeader BigInteger user, @RequestHeader String password, @RequestHeader String salt)
 			throws Exception {
-		authenticationService.verify(user, password, salt);
-		repository.deleteAccount(user);
+		authenticationService.deleteAccount(authenticationService.verify(user, password, salt));
 	}
 
 	@PutMapping("loginExternal")

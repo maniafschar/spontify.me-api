@@ -61,8 +61,7 @@ public class SupportCenterApi {
 	@DeleteMapping("user/{id}")
 	public void userDelete(@PathVariable final BigInteger id, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
-		authenticationService.verify(adminId, password, salt);
-		repository.deleteAccount(id);
+		authenticationService.deleteAccount(authenticationService.verify(adminId, password, salt));
 	}
 
 	@GetMapping("user")
