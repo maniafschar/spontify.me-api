@@ -396,6 +396,8 @@ public class AuthenticationService {
 	}
 
 	public void deleteAccount(final Contact user) throws Exception {
+		if (user.getId() == adminId)
+			return;
 		final String[] sqls = accountDeleteSql.split(";");
 		for (String sql : sqls) {
 			try {

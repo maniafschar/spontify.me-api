@@ -9,17 +9,6 @@ import java.util.List;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import com.jq.findapp.api.model.Notification;
-import com.jq.findapp.entity.Chat;
-import com.jq.findapp.entity.Contact;
-import com.jq.findapp.repository.Query;
-import com.jq.findapp.repository.QueryParams;
-import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.AuthenticationService;
-import com.jq.findapp.service.EngagementService;
-import com.jq.findapp.service.NotificationService;
-import com.jq.findapp.service.NotificationService.NotificationID;
-
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +22,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.jq.findapp.api.model.Notification;
+import com.jq.findapp.entity.Chat;
+import com.jq.findapp.entity.Contact;
+import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.QueryParams;
+import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.AuthenticationService;
+import com.jq.findapp.service.EngagementService;
+import com.jq.findapp.service.NotificationService;
+import com.jq.findapp.service.NotificationService.NotificationID;
 
 @RestController
 @CrossOrigin(origins = { "https://sc.findapp.online" })
@@ -61,7 +61,8 @@ public class SupportCenterApi {
 	@DeleteMapping("user/{id}")
 	public void userDelete(@PathVariable final BigInteger id, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
-		authenticationService.deleteAccount(authenticationService.verify(adminId, password, salt));
+		authenticationService.verify(adminId, password, salt);
+		authenticationService.deleteAccount(repository.one(Contact.class, id));
 	}
 
 	@GetMapping("user")
