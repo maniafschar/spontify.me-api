@@ -77,6 +77,8 @@ public class RepositoryListener {
 			prePersistFeedback((Feedback) entity);
 		else if (entity instanceof Location)
 			prePersistLocation((Location) entity);
+		else if (entity instanceof LocationFavorite)
+			prePersistLocationFavorite((LocationFavorite) entity);
 	}
 
 	private void prePersistContact(final Contact contact) {
@@ -130,6 +132,11 @@ public class RepositoryListener {
 			feedback.setText(feedback.getText().substring(0, 2000));
 		if (feedback.getResponse() != null && feedback.getResponse().length() > 2000)
 			feedback.setResponse(feedback.getResponse().substring(0, 2000));
+	}
+
+	private void prePersistLocationFavorite(LocationFavorite locationFavorite)
+			throws JsonMappingException, JsonProcessingException, IllegalAccessException {
+		locationFavorite.setFavorite(Boolean.TRUE);
 	}
 
 	private void prePersistLocation(Location location)

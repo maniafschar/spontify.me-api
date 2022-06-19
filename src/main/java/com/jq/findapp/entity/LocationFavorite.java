@@ -3,11 +3,14 @@ package com.jq.findapp.entity;
 import java.math.BigInteger;
 
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.Transient;
 
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.repository.RepositoryListener;
 
 @Entity
+@EntityListeners(RepositoryListener.class)
 public class LocationFavorite extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger locationId;
