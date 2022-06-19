@@ -1,6 +1,7 @@
 SELECT
 	locationRating.id,
 	locationRating.contactId,
+	locationRating.createdAt,
 	locationRating.locationId,
 	locationRating.rating,
 	locationRating.text,

@@ -2,6 +2,7 @@ select
 	contact.pseudonym,
 	contactRating.id,
 	contactRating.contactId,
+	contactRating.createdAt,
 	contactRating.rating,
 	contactRating.text,
 	contactRating.modifiedAt

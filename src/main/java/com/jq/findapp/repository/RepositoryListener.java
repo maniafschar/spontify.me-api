@@ -32,6 +32,7 @@ import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.Feedback;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Location;
+import com.jq.findapp.entity.LocationFavorite;
 import com.jq.findapp.entity.LocationRating;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
@@ -72,10 +73,10 @@ public class RepositoryListener {
 			prePersistContact((Contact) entity);
 		else if (entity instanceof ContactBluetooth)
 			prePersistContactBluetooth((ContactBluetooth) entity);
-		else if (entity instanceof Location)
-			prePersistLocation((Location) entity);
 		else if (entity instanceof Feedback)
 			prePersistFeedback((Feedback) entity);
+		else if (entity instanceof Location)
+			prePersistLocation((Location) entity);
 	}
 
 	private void prePersistContact(final Contact contact) {
@@ -92,18 +93,20 @@ public class RepositoryListener {
 
 	@PostPersist
 	public void postPersist(final BaseEntity entity) throws Exception {
-		if (entity instanceof Feedback)
-			postPersistFeedback((Feedback) entity);
+		if (entity instanceof Chat)
+			postPersistChat((Chat) entity);
 		else if (entity instanceof ContactBluetooth)
 			postPersistContactBluetooth((ContactBluetooth) entity);
-		else if (entity instanceof Chat)
-			postPersistChat((Chat) entity);
 		else if (entity instanceof ContactLink)
 			postPersistContactLink((ContactLink) entity);
-		else if (entity instanceof EventParticipate)
-			postPersistEventParticipate((EventParticipate) entity);
 		else if (entity instanceof ContactRating)
 			postPersistContactRating((ContactRating) entity);
+		else if (entity instanceof EventParticipate)
+			postPersistEventParticipate((EventParticipate) entity);
+		else if (entity instanceof Feedback)
+			postPersistFeedback((Feedback) entity);
+		else if (entity instanceof Location)
+			postPersistLocation((Location) entity);
 		else if (entity instanceof LocationRating)
 			postPersistLocationRating((LocationRating) entity);
 	}
@@ -313,6 +316,14 @@ public class RepositoryListener {
 				repository.one(Contact.class, contactRating.getContactId2()),
 				NotificationID.ratingProfile, Strings.encodeParam("p=" + contactRating.getContactId()),
 				contactRating.getRating() + "%");
+	}
+
+	private void postPersistLocation(Location location) throws Exception {
+		final LocationFavorite locationFavorite = new LocationFavorite();
+		locationFavorite.setContactId(location.getContactId());
+		locationFavorite.setLocationId(location.getId());
+		locationFavorite.setFavorite(true);
+		repository.save(locationFavorite);
 	}
 
 	private void postPersistLocationRating(LocationRating locationRating) throws Exception {

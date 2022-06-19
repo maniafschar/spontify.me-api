@@ -5,13 +5,13 @@ SELECT
 	sum(case when contactRating.rating>75 then 1 else 0 end) as four,
 	(
 		select
-			concat(cr.modifiedAt,' ',cr.rating,' ',cr.id)
+			concat(cr.createdAt,' ',cr.rating,' ',cr.id)
 		from
 			ContactRating cr
 		where
 			cr.contactId2={ID} and
 			cr.contactId={USERID} and
-			cr.modifiedAt=(select max(cr2.modifiedAt) from ContactRating cr2 where cr2.contactId2={ID} and cr2.contactId={USERID})
+			cr.createdAt=(select max(cr2.createdAt) from ContactRating cr2 where cr2.contactId2={ID} and cr2.contactId={USERID})
 	) as lastRating,
 	(
 		select
