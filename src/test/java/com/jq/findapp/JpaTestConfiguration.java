@@ -1,8 +1,11 @@
 package com.jq.findapp;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -11,6 +14,7 @@ import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 import javax.sql.DataSource;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -43,6 +47,11 @@ public class JpaTestConfiguration {
 	public JavaMailSender javaMailSender() {
 		final JavaMailSender javaMailSender = mock(JavaMailSender.class);
 		when(javaMailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
+		doAnswer(e -> {
+			System.out.println(
+					IOUtils.toString(((MimeMessage) e.getArgument(0)).getInputStream(), StandardCharsets.UTF_8));
+			return null;
+		}).when(javaMailSender).send(any(MimeMessage.class));
 		return javaMailSender;
 	}
 

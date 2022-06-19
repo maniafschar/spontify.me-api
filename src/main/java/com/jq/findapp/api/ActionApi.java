@@ -11,7 +11,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.mail.MessagingException;
+import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.jq.findapp.api.model.Marketing;
 import com.jq.findapp.api.model.Position;
@@ -34,20 +46,6 @@ import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.service.NotificationService.Ping;
 import com.jq.findapp.util.EntityUtil;
 import com.jq.findapp.util.Text;
-
-import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.client.WebClient;
 
 @RestController
 @CrossOrigin(origins = { "https://localhost", "https://findapp.online", "https://spontify.me", "https://spotyou.net" })
@@ -94,7 +92,7 @@ public class ActionApi {
 	}
 
 	@PostMapping("notify")
-	public void notify(String text) throws MessagingException {
+	public void notify(String text) {
 		if (text != null) {
 			final Integer hash = text.hashCode();
 			if (!SENT_NOTIFICATIONS.contains(hash)) {

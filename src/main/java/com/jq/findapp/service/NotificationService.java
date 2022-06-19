@@ -14,6 +14,15 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.ws.rs.NotFoundException;
 
+import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClientResponseException.NotFound;
+
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification;
 import com.jq.findapp.entity.ContactVisit;
@@ -26,15 +35,6 @@ import com.jq.findapp.service.push.Android;
 import com.jq.findapp.service.push.Ios;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
-
-import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClientResponseException.NotFound;
 
 @Service
 public class NotificationService {
@@ -139,7 +139,8 @@ public class NotificationService {
 	public String[] sendNotificationOnMatch(NotificationID textID, final Contact me, final Contact other,
 			String... param)
 			throws Exception {
-		if (!me.getId().equals(other.getId()) && me.getAge() != null && me.getGender() != null) {
+		if (me != null && other != null && !me.getId().equals(other.getId()) && me.getAge() != null
+				&& me.getGender() != null) {
 			final String s2 = me.getGender().intValue() == 1 ? other.getAgeMale()
 					: me.getGender().intValue() == 2 ? other.getAgeFemale()
 							: other.getAgeDivers();
@@ -343,7 +344,7 @@ public class NotificationService {
 	}
 
 	private void sendNotificationEmail(Contact contactFrom, Contact contactTo, StringBuilder note2, String action)
-			throws IOException, MessagingException {
+			throws IOException {
 		final StringBuilder html = new StringBuilder(
 				IOUtils.toString(getClass().getResourceAsStream("/template/email.html"), StandardCharsets.UTF_8));
 		final StringBuilder text = new StringBuilder(
@@ -387,8 +388,12 @@ public class NotificationService {
 	}
 
 	@Async
-	public void sendEmail(final String to, final String subject, final String... text) throws MessagingException {
-		sendEmailSync(to, subject, text);
+	public void sendEmail(final String to, final String subject, final String... text) {
+		try {
+			sendEmailSync(to, subject, text);
+		} catch (MessagingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public static class Ping {

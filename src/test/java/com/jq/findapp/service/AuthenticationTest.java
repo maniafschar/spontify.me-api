@@ -19,7 +19,6 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -36,9 +35,10 @@ import com.jq.findapp.service.push.Android;
 import com.jq.findapp.service.push.Ios;
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.EncryptionTest;
+import com.jq.findapp.util.Utils;
 
 @ExtendWith({ SpringExtension.class })
-@SpringBootTest(classes = { FindappApplication.class, JpaTestConfiguration.class })
+@SpringBootTest(classes = { FindappApplication.class, JpaTestConfiguration.class }, properties = { "app.admin.id=3" })
 @ActiveProfiles("test")
 public class AuthenticationTest {
 	@Autowired
@@ -53,30 +53,8 @@ public class AuthenticationTest {
 	@Autowired
 	private Android android;
 
-	@Value("${app.admin.id}")
-	private BigInteger adminId;
-
-	private Contact createContact() throws Exception {
-		Contact contact = repository.one(Contact.class, adminId);
-		if (contact == null) {
-			int i = 1;
-			do {
-				contact = new Contact();
-				contact.setEmail("test" + i + "@jq-consulting.de");
-				contact.setLanguage("DE");
-				contact.setIdDisplay("123456" + i++);
-				contact.setFacebookId("1234567890");
-				contact.setBirthday(new Date(3000000000L));
-				contact.setGender((short) 1);
-				contact.setPseudonym("pseudonym");
-				contact.setVerified(true);
-				contact.setPassword(Encryption.encryptDB("secret_password"));
-				contact.setPasswordReset(System.currentTimeMillis());
-				repository.save(contact);
-			} while (contact.getId().intValue() < adminId.intValue());
-		}
-		return contact;
-	}
+	@Autowired
+	private Utils utils;
 
 	private ContactToken createToken(final Contact contact) throws Exception {
 		final ContactToken token = new ContactToken();
@@ -89,7 +67,7 @@ public class AuthenticationTest {
 	@Test
 	public void getAutoLogin() throws Exception {
 		// given
-		final Contact contact = createContact();
+		final Contact contact = utils.createContact();
 		final ContactToken token = createToken(contact);
 		final String t = EncryptionTest.encryptBrowser(token.getToken());
 		final String publicKey = IOUtils.toString(Encryption.class.getResourceAsStream("/keys/publicDB.key"),
@@ -105,7 +83,7 @@ public class AuthenticationTest {
 	@Test
 	public void register() throws Exception {
 		// given
-		createContact();
+		utils.createContact();
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.email='test@jq-consulting.de'");
 		final InternalRegistration registration = new InternalRegistration();
@@ -127,7 +105,7 @@ public class AuthenticationTest {
 	@Test
 	public void register_blockedEmailDomain() throws Exception {
 		// given
-		createContact();
+		utils.createContact();
 		final InternalRegistration registration = new InternalRegistration();
 		registration.setAgb(true);
 		registration.setBirthday(new Date(3000000000L));
@@ -213,7 +191,7 @@ public class AuthenticationTest {
 	@Test
 	public void verify() throws Exception {
 		// given
-		final Contact contact = createContact();
+		final Contact contact = utils.createContact();
 
 		// when
 		authenticationService.verify(contact.getId(),
@@ -249,7 +227,7 @@ public class AuthenticationTest {
 
 	public void ios() throws Exception {
 		// given
-		final Contact contact = createContact();
+		final Contact contact = utils.createContact();
 		contact.setPushToken("e8206cb2d430ff4c84b97f0906eb8c41b201df7e2075192c7aba0fe2d2d2dc8c");
 		// System.setProperty("javax.net.debug", "all");
 
@@ -262,7 +240,7 @@ public class AuthenticationTest {
 	@Test
 	public void android() throws Exception {
 		// given
-		final Contact contact = createContact();
+		final Contact contact = utils.createContact();
 		contact.setPushToken(
 				"dHFZR7_iWnc:APA91bF7Z9NsdMRN0nX5C2il8dOqbmJ8DFtAdqb4_2thbOGB0LJK_2m1zjtyXyHD1tmdog6TQsTXbHvKPyv-EuqNik4vM1VlGSY-h6wG6JdM4k9h8es7duf08pfSEYezwuUyGcDkWkQd");
 
@@ -294,7 +272,7 @@ public class AuthenticationTest {
 	@Test
 	public void deleteAccount() throws Exception {
 		// given
-		createContact();
+		utils.createContact();
 
 		// when
 		authenticationService.deleteAccount(repository.one(Contact.class, BigInteger.ONE));

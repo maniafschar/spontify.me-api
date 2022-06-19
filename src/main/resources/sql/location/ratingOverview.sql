@@ -5,13 +5,13 @@ SELECT
 	sum(case when locationRating.rating>75 then 1 else 0 end) as four,
 	(
 		select
-			concat(lr.modifiedAt,' ',lr.rating,' ',lr.id)
+			concat(lr.createdAt,' ',lr.rating,' ',lr.id)
 		from
 			LocationRating lr
 		where
 			lr.locationId={ID} and
 			lr.contactId={USERID} and
-			lr.modifiedAt=(select max(lr2.modifiedAt) from LocationRating lr2 where lr2.locationId={ID} and lr2.contactId={USERID})
+			lr.createdAt=(select max(lr2.createdAt) from LocationRating lr2 where lr2.locationId={ID} and lr2.contactId={USERID})
 	) as lastRating,
 	(
 		select

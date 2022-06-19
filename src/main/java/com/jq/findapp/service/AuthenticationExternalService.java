@@ -10,6 +10,10 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.jq.findapp.api.model.ExternalRegistration;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Query;
@@ -18,11 +22,7 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.EntityUtil;
 
-import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-@Component
+@Service
 public class AuthenticationExternalService {
 	@Autowired
 	private Repository repository;

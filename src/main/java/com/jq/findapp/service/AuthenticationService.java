@@ -18,7 +18,7 @@ import javax.ws.rs.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,7 +35,7 @@ import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Strings;
 
-@Component
+@Service
 public class AuthenticationService {
 	private static final List<String> USED_SALTS = new ArrayList<>();
 	private static final List<String> BLOCKED_EMAIL_DOMAINS = new ArrayList<>();
@@ -126,7 +126,7 @@ public class AuthenticationService {
 			throw new AuthenticationException(Type.NoInputFromClient);
 		synchronized (USED_SALTS) {
 			if (USED_SALTS.contains(salt))
-				throw new BadRequestException();
+				throw new BadRequestException("used salt");
 			USED_SALTS.add(salt);
 			if (USED_SALTS.size() > 1000) {
 				final long timeout = System.currentTimeMillis() - TIMEOUT;

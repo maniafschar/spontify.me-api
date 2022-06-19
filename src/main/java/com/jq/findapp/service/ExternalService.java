@@ -2,7 +2,10 @@ package com.jq.findapp.service;
 
 import java.math.BigInteger;
 
-import javax.mail.MessagingException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,12 +15,7 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
-
-@Component
+@Service
 public class ExternalService {
 	@Autowired
 	private Repository repository;
@@ -34,9 +32,12 @@ public class ExternalService {
 						+ "key=" + googleKey)
 				.get().retrieve().toEntity(String.class).block().getBody();
 		try {
-			notificationService.sendEmail(null, "google", param + "\n\n" + result);
-		} catch (MessagingException e) {
-			throw new RuntimeException(e);
+			final ObjectMapper om = new ObjectMapper();
+			notificationService.sendEmail(null, "google",
+					param + "\n\n" + om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(result)));
+		} catch (Exception e) {
+			notificationService.sendEmail(null, "google",
+					param + "\n\n" + result);
 		}
 		return result;
 	}

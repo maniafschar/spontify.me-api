@@ -1,10 +1,14 @@
 package com.jq.findapp.api;
 
-import com.jq.findapp.FindappApplication;
-import com.jq.findapp.JpaTestConfiguration;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.math.BigInteger;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -13,6 +17,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.jq.findapp.FindappApplication;
+import com.jq.findapp.JpaTestConfiguration;
+import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.Location;
+import com.jq.findapp.repository.Repository;
+import com.jq.findapp.util.Utils;
+
 @ExtendWith({ SpringExtension.class })
 @SpringBootTest(classes = { FindappApplication.class,
 		JpaTestConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT, properties = { "app.admin.id=1" })
@@ -20,6 +31,15 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class ApiTest {
 	@LocalServerPort
 	private int port;
+
+	@Autowired
+	private Repository repository;
+
+	@Autowired
+	private Utils utils;
+
+	private String password = "79e38de3be6b328a857a02ef24ffa766f38b6c067d953032c70ea9caeaedaf4d";
+	private String salt = "1645254161315.7888940363091782";
 
 	@Test
 	public void test() throws Exception {
@@ -33,6 +53,33 @@ public class ApiTest {
 				.getBody();
 
 		// then
-		System.out.println(response);
+		assertNotNull(response);
+		assertTrue(response.length() > 10);
+	}
+
+	@Test
+	public void createLocation() throws Exception {
+		// given
+		String body = "{\"classname\":\"Location\",\"values\":{\"name\":\"test\",\"address\":\"83700 Rottach-Egern\",\"category\":\"1\",\"latitude\":47.666,\"longitude\":11.777}}";
+		String path = "db/one";
+		final Contact contact = utils.createContact();
+
+		// when
+		String response = WebClient.create("http://localhost:" + port + "/" + path)
+				.post().header("user", contact.getId().toString()).header("password", password).header("salt", salt)
+				.contentType(MediaType.APPLICATION_JSON).bodyValue(body).retrieve().toEntity(String.class)
+				.block().getBody();
+
+		// then
+		assertNotNull(response);
+		final Location location = repository.one(Location.class, new BigInteger(response));
+		assertEquals(47.666f, location.getLatitude());
+		assertEquals(11.777f, location.getLongitude());
+		assertEquals("1", location.getCategory());
+		assertEquals("test", location.getName());
+		assertEquals("Rottach-Egern", location.getTown());
+		assertEquals("83700", location.getZipCode());
+		assertEquals("DE", location.getCountry());
+		assertEquals("Miesbach\nUpper Bavaria\nBavaria\nGermany", location.getAddress2());
 	}
 }

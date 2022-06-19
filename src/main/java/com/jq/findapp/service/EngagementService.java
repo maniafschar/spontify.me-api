@@ -7,6 +7,10 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Query;
@@ -17,11 +21,7 @@ import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-@Component
+@Service
 public class EngagementService {
 	@Autowired
 	private Repository repository;

@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +27,7 @@ import com.jq.findapp.entity.ContactBluetooth;
 import com.jq.findapp.entity.ContactRating;
 import com.jq.findapp.entity.Feedback;
 import com.jq.findapp.repository.Query.Result;
-import com.jq.findapp.util.Encryption;
+import com.jq.findapp.util.Utils;
 
 @ExtendWith({ SpringExtension.class })
 @SpringBootTest(classes = { FindappApplication.class, JpaTestConfiguration.class })
@@ -37,22 +36,8 @@ public class RepositoryTest {
 	@Autowired
 	private Repository repository;
 
-	private Contact createContact() throws Exception {
-		final Contact contact = new Contact();
-		contact.setEmail("test@jq-consulting.de");
-		contact.setLanguage("DE");
-		contact.setIdDisplay("123456");
-		contact.setFacebookId("1234567890");
-		contact.setGender((short) 1);
-		contact.setBirthday(new Date(3000000000L));
-		contact.setPseudonym("pseudonym");
-		contact.setVerified(true);
-		contact.setVisitPage(new Timestamp(System.currentTimeMillis() - 3000000L));
-		contact.setPassword(Encryption.encryptDB("secret_password"));
-		contact.setPasswordReset(System.currentTimeMillis());
-		repository.save(contact);
-		return contact;
-	}
+	@Autowired
+	private Utils utils;
 
 	private Chat createChat(final Contact contact) throws Exception {
 		final Chat chat = new Chat();
@@ -75,7 +60,7 @@ public class RepositoryTest {
 	@Test
 	public void saveChat() throws Exception {
 		// given
-		final Contact contact = createContact();
+		final Contact contact = utils.createContact();
 		final Chat chat = createChat(contact);
 		final ContactRating rating = createRatingContact(contact);
 		final long created = chat.getCreatedAt().getTime();
@@ -96,7 +81,7 @@ public class RepositoryTest {
 	@Test
 	public void saveContact() throws Exception {
 		// given
-		final Contact contact = createContact();
+		final Contact contact = utils.createContact();
 		final Timestamp visitPage = contact.getVisitPage();
 
 		// when
@@ -129,7 +114,7 @@ public class RepositoryTest {
 	public void queries() throws Exception {
 		// given
 		final QueryParams params = new QueryParams(null);
-		params.setUser(createContact());
+		params.setUser(utils.createContact());
 
 		// when
 		for (Query query : Query.values()) {
@@ -146,7 +131,7 @@ public class RepositoryTest {
 	public void list() throws Exception {
 		// given
 		final QueryParams params = new QueryParams(Query.contact_list);
-		params.setUser(createContact());
+		params.setUser(utils.createContact());
 		params.setSearch("contact.id=" + params.getUser().getId());
 
 		// when
@@ -164,7 +149,7 @@ public class RepositoryTest {
 		params.setDistance(100);
 		params.setLatitude(12.0);
 		params.setLongitude(49.8);
-		params.setUser(createContact());
+		params.setUser(utils.createContact());
 
 		// when
 		final Result result = repository.list(params);
@@ -177,9 +162,9 @@ public class RepositoryTest {
 	@Test
 	public void repositoryListener() throws Exception {
 		// given
-		final Contact contact = createContact();
-		createContact();
-		createContact();
+		final Contact contact = utils.createContact();
+		utils.createContact();
+		utils.createContact();
 		final Feedback feedback = new Feedback();
 		feedback.setText("abc");
 		feedback.setContactId(contact.getId());

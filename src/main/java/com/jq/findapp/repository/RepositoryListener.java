@@ -11,6 +11,10 @@ import javax.persistence.PostUpdate;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -34,10 +38,6 @@ import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 @Component
 public class RepositoryListener {
@@ -152,7 +152,8 @@ public class RepositoryListener {
 				externalService.google("geocode/json?address="
 						+ location.getName() + ", " + location.getAddress().replaceAll("\n", ", ")));
 		if (!"OK".equals(googleAddress.get("status").asText()))
-			throw new IllegalAccessException("Invalid address");
+			throw new IllegalAccessException("Invalid address:\n"
+					+ new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(googleAddress));
 		final JsonNode result = googleAddress.get("results").get(0);
 		JsonNode n = result.get("geometry").get("location");
 		final GeoLocation geoLocation = externalService.convertGoogleAddress(googleAddress);
