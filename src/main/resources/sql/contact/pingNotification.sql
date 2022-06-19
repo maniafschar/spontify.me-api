@@ -6,6 +6,6 @@ FROM
 WHERE
 	contactNotification.contactId=contact.id and
 	contactNotification.textId<>'FriendshipRequest' and
-	contactNotification.createdAt>contact.notification and
+	contactNotification.seen=false and
 	contact.id={USERID} and
 	{search}

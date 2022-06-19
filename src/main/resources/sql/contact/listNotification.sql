@@ -33,6 +33,7 @@ SELECT
 	contactNotification.id,
 	contactNotification.text,
 	contactNotification.action,
+	contactNotification.seen,
 	contactNotification.createdAt,
 	contactLink.contactId,
 	contactLink.contactId2,

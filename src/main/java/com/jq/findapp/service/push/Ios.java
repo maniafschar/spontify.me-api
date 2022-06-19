@@ -1,5 +1,6 @@
 package com.jq.findapp.service.push;
 
+import java.math.BigInteger;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Version;
@@ -13,13 +14,13 @@ import java.util.Map;
 
 import javax.ws.rs.NotFoundException;
 
-import com.jq.findapp.entity.Contact;
-import com.jq.findapp.util.Strings;
-
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import com.jq.findapp.entity.Contact;
+import com.jq.findapp.util.Strings;
 
 @Component
 public class Ios {
@@ -35,13 +36,15 @@ public class Ios {
 	@Value("${push.apns.url}")
 	private String url;
 
-	public void send(Contact contact, String text, String action, int badge) throws Exception {
+	public void send(Contact contact, String text, String action, int badge, BigInteger notificationId)
+			throws Exception {
 		final HttpRequest request = HttpRequest.newBuilder()
 				.POST(BodyPublishers.ofString(
 						IOUtils
 								.toString(getClass().getResourceAsStream("/template/push.ios"), StandardCharsets.UTF_8)
 								.replace("{text}", text)
 								.replace("{badge}", "" + badge)
+								.replace("{notificationId}", "" + notificationId)
 								.replace("{exec}", Strings.isEmpty(action) ? "" : action)))
 				.header("apns-push-type", "alert")
 				.header("apns-topic", "com.jq.findapp")

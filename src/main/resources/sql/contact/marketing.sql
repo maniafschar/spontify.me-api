@@ -36,7 +36,6 @@ SELECT
 	contact.language,
 	contact.latitude,
 	contact.longitude,
-	contact.notification,
 	contact.notificationBirthday,
 	contact.notificationChat,
 	contact.notificationFriendRequest,

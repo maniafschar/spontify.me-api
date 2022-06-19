@@ -201,7 +201,7 @@ public class NotificationService {
 				text.delete(text.lastIndexOf(" "), text.length());
 			text.append("...");
 		}
-		Object notID = null;
+		BigInteger notID = null;
 		if (notificationID.isSave()) {
 			String s = text.toString();
 			if (s.charAt(1) == ' ' && (s.charAt(0) == ',' || s.charAt(0) == ':'))
@@ -231,13 +231,26 @@ public class NotificationService {
 					&& !Strings.isEmpty(contactTo.getPushSystem()) &&
 					!Strings.isEmpty(contactTo.getPushToken());
 			if (b)
-				b = sendNotificationDevice(text, contactTo, action);
+				b = sendNotificationDevice(text, contactTo, action, notID);
 			if (!b || notificationID.getType() == NotificationIDType.EmailAndDevice)
-				sendNotificationEmail(contactFrom, contactTo, text,
-						action == null ? (notID == null ? null : "n=" + notID) : action);
+				sendNotificationEmail(contactFrom, contactTo, text, action);
 			return true;
 		}
 		return false;
+	}
+
+	public Result getUnreadNotifications(Contact contact) throws Exception {
+		final QueryParams params = new QueryParams(Query.contact_listNotification);
+		params.setUser(contact);
+		params.setSearch("contactNotification.seen=false");
+		final Result result = repository.list(params);
+		for (int i = 0; i < result.size(); i++) {
+			final ContactNotification contactNotification = repository.one(ContactNotification.class,
+					(BigInteger) result.get(i).get("contactNotification.id"));
+			contactNotification.setSeen(true);
+			repository.save(contactNotification);
+		}
+		return result;
 	}
 
 	public Ping getPingValues(Contact contact) {
@@ -270,7 +283,8 @@ public class NotificationService {
 		return values;
 	}
 
-	private boolean sendNotificationDevice(final StringBuilder text, final Contact contactTo, String action)
+	private boolean sendNotificationDevice(final StringBuilder text, final Contact contactTo, String action,
+			BigInteger notificationId)
 			throws Exception {
 		if (Strings.isEmpty(text) || Strings.isEmpty(contactTo.getPushSystem())
 				|| Strings.isEmpty(contactTo.getPushToken()))
@@ -286,9 +300,9 @@ public class NotificationService {
 		}
 		try {
 			if ("ios".equals(contactTo.getPushSystem()))
-				ios.send(contactTo, text.toString(), action, getPingValues(contactTo).totalNew);
+				ios.send(contactTo, text.toString(), action, getPingValues(contactTo).totalNew, notificationId);
 			else if ("android".equals(contactTo.getPushSystem()))
-				android.send(contactTo, text.toString(), action);
+				android.send(contactTo, text.toString(), action, notificationId);
 			return true;
 		} catch (NotFound | NotFoundException ex) {
 			return false;

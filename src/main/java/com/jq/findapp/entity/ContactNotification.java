@@ -12,6 +12,7 @@ public class ContactNotification extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger contactId2;
 	private BigInteger sentStatus;
+	private Boolean seen = false;
 
 	public String getText() {
 		return text;
@@ -59,5 +60,13 @@ public class ContactNotification extends BaseEntity {
 
 	public void setSentStatus(BigInteger sentStatus) {
 		this.sentStatus = sentStatus;
+	}
+
+	public Boolean getSeen() {
+		return seen;
+	}
+
+	public void setSeen(Boolean seen) {
+		this.seen = seen;
 	}
 }

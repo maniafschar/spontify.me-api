@@ -250,6 +250,12 @@ public class ActionApi {
 		return null;
 	}
 
+	@GetMapping("notifications")
+	public List<Object[]> notifications(@RequestHeader BigInteger user, @RequestHeader String password,
+			@RequestHeader String salt) throws Exception {
+		return notificationService.getUnreadNotifications(authenticationService.verify(user, password, salt)).getList();
+	}
+
 	@GetMapping("ping")
 	public Ping ping(@RequestHeader BigInteger user, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {

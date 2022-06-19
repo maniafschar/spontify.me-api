@@ -33,7 +33,6 @@ public class Contact extends BaseEntity {
 	private Device device;
 	@Enumerated(EnumType.STRING)
 	private OS os;
-	private Timestamp notification;
 	private Timestamp visitPage;
 	private Float latitude;
 	private Float longitude;
@@ -345,14 +344,6 @@ public class Contact extends BaseEntity {
 
 	public void setSearch(Boolean search) {
 		this.search = search;
-	}
-
-	public Timestamp getNotification() {
-		return notification;
-	}
-
-	public void setNotification(Timestamp notification) {
-		this.notification = notification;
 	}
 
 	public String getStorage() {

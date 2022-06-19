@@ -232,7 +232,7 @@ public class AuthenticationTest {
 		// System.setProperty("javax.net.debug", "all");
 
 		// when
-		ios.send(contact, "text", "action", 12);
+		ios.send(contact, "text", "action", 12, BigInteger.ONE);
 
 		// then no exception
 	}
@@ -245,7 +245,7 @@ public class AuthenticationTest {
 				"dHFZR7_iWnc:APA91bF7Z9NsdMRN0nX5C2il8dOqbmJ8DFtAdqb4_2thbOGB0LJK_2m1zjtyXyHD1tmdog6TQsTXbHvKPyv-EuqNik4vM1VlGSY-h6wG6JdM4k9h8es7duf08pfSEYezwuUyGcDkWkQd");
 
 		// when
-		android.send(contact, "text", "action");
+		android.send(contact, "text", "action", BigInteger.ONE);
 
 		// then no exception
 	}
