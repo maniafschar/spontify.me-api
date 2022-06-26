@@ -1,8 +1,8 @@
-findapp &middot; api
+spontify.me &middot; api
 ==============================================================================
 
 By [**Mani Afschar Yazdi**](https://afschar-yazdi.de)
 
 ------------------------------------------------------------------------------
 
-findapp api is the **REST/JSON** backend implemented in SpringBoot/Java.
+spontify.me api is the **REST/JSON** backend implemented in SpringBoot/Java.

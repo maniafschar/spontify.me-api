@@ -38,6 +38,7 @@ SELECT
 	contact.os,
 	contact.pseudonym,
 	contact.rating,
+	contact.search,
 	contact.verified,
 	contact.version
 FROM

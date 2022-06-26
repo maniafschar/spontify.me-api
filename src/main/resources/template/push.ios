@@ -4,7 +4,7 @@
 	"aps": {
 		"badge": {badge},
 		"alert": {
-			"title": "findapp",
+			"title": "spontify.me",
 			"body": "{text}"
 		}
 	}

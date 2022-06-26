@@ -1,4 +1,4 @@
-findapp News für <jq:pseudonym />
+spontify.me News für <jq:pseudonym />
 <jq:time />
 
 <jq:text />

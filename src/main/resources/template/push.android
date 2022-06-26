@@ -2,7 +2,7 @@
 	"message": {
 		"token": "{to}",
 		"notification": {
-			"title": "findapp",
+			"title": "spontify.me",
 			"body": "{text}"
 		}
 	}

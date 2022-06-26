@@ -107,7 +107,7 @@ public class ActionApi {
 		return new Marketing(
 				Text.marketing_iPadTitle.getText(language),
 				Text.marketing_iPadText.getText(language),
-				"https://blog.findapp.online");
+				"https://blog.spontify.me");
 	}
 
 	@GetMapping("marketing/result")
@@ -131,7 +131,7 @@ public class ActionApi {
 				list.get(i)[columnMessage1] = scoring + list.get(i)[columnMessage1];
 			map.put("text", Text.marketing_iPadText.getText(u.getLanguage()) + " "
 					+ Text.marketing_list.getText(u.getLanguage()));
-			map.put("action", "https://blog.findapp.online");
+			map.put("action", "https://blog.spontify.me");
 			map.put("list", list);
 		} else
 			map.put("html", Text.marketing_noActions.getText(u.getLanguage()));
@@ -196,9 +196,9 @@ public class ActionApi {
 		final Contact contact = authenticationService.verify(user, password, salt);
 		String url;
 		if (source == null || source.length() == 0)
-			url = "https://maps.googleapis.com/maps/api/staticmap?{destination}&markers=icon:https://findapp.online/images/mapMe{gender}.png|shadow:false|{destination}&scale=2&size=200x200&maptype=roadmap&key=";
+			url = "https://maps.googleapis.com/maps/api/staticmap?{destination}&markers=icon:https://spontify.me/images/mapMe{gender}.png|shadow:false|{destination}&scale=2&size=200x200&maptype=roadmap&key=";
 		else {
-			url = "https://maps.googleapis.com/maps/api/staticmap?{source}|{destination}&markers=icon:https://findapp.online/images/mapMe{gender}.png|shadow:false|{source}&markers=icon:https://findapp.online/images/mapLoc.png|shadow:false|{destination}&scale=2&size=600x200&maptype=roadmap&sensor=true&key=";
+			url = "https://maps.googleapis.com/maps/api/staticmap?{source}|{destination}&markers=icon:https://spontify.me/images/mapMe{gender}.png|shadow:false|{source}&markers=icon:https://spontify.me/images/mapLoc.png|shadow:false|{destination}&scale=2&size=600x200&maptype=roadmap&sensor=true&key=";
 			url = url.replaceAll("\\{source}", source);
 		}
 		url = url.replaceAll("\\{destination}", destination);

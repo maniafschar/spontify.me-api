@@ -35,7 +35,7 @@ import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.NotificationService.NotificationID;
 
 @RestController
-@CrossOrigin(origins = { "https://sc.findapp.online" })
+@CrossOrigin(origins = { "https://sc.spontify.me" })
 @RequestMapping("support")
 public class SupportCenterApi {
 	private final String baseDir = "attachments/";
