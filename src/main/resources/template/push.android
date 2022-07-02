@@ -1,9 +1,14 @@
 {
 	"message": {
-		"token": "{to}",
+		"data": {
+			"content-available": "1",
+			"exec": "{exec}",
+			"notificationId": "{notificationId}"
+		},
 		"notification": {
 			"title": "spontify.me",
 			"body": "{text}"
-		}
+		},
+		"token": "{to}"
 	}
 }

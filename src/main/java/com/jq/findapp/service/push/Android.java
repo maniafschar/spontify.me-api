@@ -29,7 +29,7 @@ public class Android {
 	@Value("${push.fcm.url}")
 	private String url;
 
-	public void send(Contact contact, String text, String action, BigInteger notificationId) throws Exception {
+	public String send(Contact contact, String text, String action, BigInteger notificationId) throws Exception {
 		WebClient.create(url)
 				.post()
 				.contentType(MediaType.APPLICATION_JSON)
@@ -44,6 +44,7 @@ public class Android {
 								.replace("{exec}", Strings.isEmpty(action) ? "" : action))
 				.retrieve()
 				.toEntity(String.class).block().getBody();
+		return "production";
 	}
 
 	private Map<String, String> getHeader() {

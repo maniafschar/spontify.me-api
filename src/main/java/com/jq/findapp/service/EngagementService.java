@@ -90,7 +90,8 @@ public class EngagementService {
 	public EngagementService() {
 		chatTemplates.add(new ChatTemplate(
 				"Hallo " + REPLACMENT.CONTACT_PSEUDONYM
-						+ ", wie gefällt Dir findapp? 🤔\nLust mit mir drüber zu chatten? " + REPLACMENT.EMOJI_WAVING,
+						+ ", wie gefällt Dir sonptify.me? 🤔\nLust mit mir drüber zu chatten? "
+						+ REPLACMENT.EMOJI_WAVING,
 				null));
 
 		chatTemplates.add(new ChatTemplate(

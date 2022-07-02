@@ -33,10 +33,33 @@ public class Ios {
 	@Value("${push.apns.teamId}")
 	private String teamId;
 
+	@Value("${push.apns.topic}")
+	private String topic;
+
 	@Value("${push.apns.url}")
 	private String url;
 
-	public void send(Contact contact, String text, String action, int badge, BigInteger notificationId)
+	@Value("${push.apns.url.test}")
+	private String urlTest;
+
+	@Value("${app.admin.id}")
+	private BigInteger adminId;
+
+	public String send(Contact contact, String text, String action, int badge, BigInteger notificationId)
+			throws Exception {
+		try {
+			send(url, contact, text, action, badge, notificationId);
+			return "production";
+		} catch (NotFoundException ex) {
+			if (adminId.equals(contact.getId())) {
+				send(urlTest, contact, text, action, badge, notificationId);
+				return "development";
+			}
+			throw ex;
+		}
+	}
+
+	private void send(String url, Contact contact, String text, String action, int badge, BigInteger notificationId)
 			throws Exception {
 		final HttpRequest request = HttpRequest.newBuilder()
 				.POST(BodyPublishers.ofString(
@@ -47,7 +70,7 @@ public class Ios {
 								.replace("{notificationId}", "" + notificationId)
 								.replace("{exec}", Strings.isEmpty(action) ? "" : action)))
 				.header("apns-push-type", "alert")
-				.header("apns-topic", "com.jq.findapp")
+				.header("apns-topic", topic)
 				.header("authorization", "bearer " + jwtGenerator.generateToken(getHeader(), getClaims(), "EC"))
 				.header("Content-Type", "application/json")
 				.uri(new URI(url + contact.getPushToken()))
@@ -56,7 +79,8 @@ public class Ios {
 		final HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 		if (response.statusCode() >= 300 || response.statusCode() < 200)
 			throw new NotFoundException(
-					"Failed to push to " + contact.getId() + ": " + text + "\n" + response.statusCode());
+					"Failed to push to " + contact.getId() + ": " + text + "\n" + response.statusCode() + " "
+							+ response.body());
 	}
 
 	private Map<String, String> getHeader() {

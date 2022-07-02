@@ -1,11 +1,12 @@
 {
 	"exec": "{exec}",
-	"notificationId": {notificationId}
+	"notificationId": {notificationId},
 	"aps": {
-		"badge": {badge},
 		"alert": {
-			"title": "spontify.me",
-			"body": "{text}"
-		}
+			"body": "{text}",
+			"title": "spontify.me"
+		},
+		"badge": {badge},
+		"content-available": "1"
 	}
 }

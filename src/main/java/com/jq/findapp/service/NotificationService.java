@@ -383,7 +383,7 @@ public class NotificationService {
 			note2.delete(77, note2.length());
 			note2.append("...");
 		}
-		sendEmail(contactTo.getEmail(), note2.toString(), text.toString(), html.toString());
+		sendEmail(contactTo.getEmail(), note2.toString(), text.toString());
 	}
 
 	public void sendEmailSync(final String to, final String subject, final String... text) throws MessagingException {
