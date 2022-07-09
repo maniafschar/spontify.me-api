@@ -10,7 +10,7 @@
 		"invite": "Hallo, spontify.me rockt! Probiert es aus, ich bin unter {0} zu finden!\nLiebe Grüße",
 		"locMarketing": "<jq:EXTRA_2/> hat folgendes Angebot: <jqEXTRA_1/>",
 		"markEvent": "nimmt am <jq:EXTRA_1/> am Event \"<jq:EXTRA_2/>\" im <jq:EXTRA_3/> teil.",
-		"pwReset": "Dein Passwort wurde zurück gesetzt. Klicke auf den Smiley, Du wirst anschließend aufgefordert, ein neues Passwort einzugeben.",
+		"pwReset": "Dein Passwort wurde zurück gesetzt. Klicke auf den Link, Du wirst anschließend aufgefordert, ein neues Passwort einzugeben.",
 		"ratingLocMat": "bewertete <jq:EXTRA_2/>, ihr habt <jq:EXTRA_1/> Gemeinsamkeiten.",
 		"ratingProfile": "hat Dich mit <jq:EXTRA_1/> bewertet.",
 		"sentEntry": "hat Dir einen spontify.me Link gesendet.",
@@ -21,7 +21,7 @@
 		"visitLocation": "besuchte <jq:EXTRA_2/>, ihr habt <jq:EXTRA_1/> Gemeinsamkeiten.",
 		"visitProfile": "besuchte Dein Profil, ihr habt <jq:EXTRA_1/> Gemeinsamkeiten.",
 		"welcome": "Hallo {0},\n\nschön, dass Du da bist. Schau Dich um und kontaktiere mich, wenn Du Fragen hast.\n\nViel Spaß\nDein spontify.me Team",
-		"welcomeExt": "Vielen Dank für die Registrierung auf spontify.me. Bitte bestätige Deine Anmeldung, in dem Du auf den Smiley klickst.",
+		"welcomeExt": "Vielen Dank für die Registrierung auf spontify.me. Bitte bestätige Deine Anmeldung, in dem Du auf den Link klickst.",
 		"wtd": "möchte um <jq:EXTRA_1/> Uhr <jq:EXTRA_2/>."
 	},
 	"marketing": {

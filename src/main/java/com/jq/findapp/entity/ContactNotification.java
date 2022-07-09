@@ -3,6 +3,9 @@ package com.jq.findapp.entity;
 import java.math.BigInteger;
 
 import javax.persistence.Entity;
+import javax.persistence.Transient;
+
+import com.jq.findapp.repository.Repository;
 
 @Entity
 public class ContactNotification extends BaseEntity {
@@ -68,5 +71,11 @@ public class ContactNotification extends BaseEntity {
 
 	public void setSeen(Boolean seen) {
 		this.seen = seen;
+	}
+
+	@Transient
+	@Override
+	public boolean writeAccess(BigInteger user, Repository repository) {
+		return user.equals(getId());
 	}
 }

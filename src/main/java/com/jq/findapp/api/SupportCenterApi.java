@@ -1,15 +1,11 @@
 package com.jq.findapp.api;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -90,17 +86,13 @@ public class SupportCenterApi {
 		return repository.list(params).getList();
 	}
 
-	@GetMapping("chat/{id}/testrun")
+	@PostMapping("email")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String chatTestrun(@PathVariable final BigInteger id, @RequestHeader String password,
-			@RequestHeader String salt) throws Exception {
-		authenticationService.verify(adminId, password, salt);
-		try (InputStream in = new FileInputStream(baseDir + "20000/" + id)) {
-			final String template = IOUtils.toString(in, StandardCharsets.UTF_8);
-			final Contact contact = repository.one(Contact.class, adminId);
-			String s = template.replace("{{EMOJI.MISSING_FRIENDS}}", contact.getGender() == 1 ? "🕺🏻" : "💃");
-			return s.replace("{{CONTACT.PSEUDONYM}}", contact.getPseudonym());
-		}
+	public void email(final BigInteger id, final String text, final String action,
+			@RequestHeader String password, @RequestHeader String salt) throws Exception {
+		final Contact contact = authenticationService.verify(adminId, password, salt);
+		notificationService.sendNotificationEmail(contact, repository.one(Contact.class, id),
+				new StringBuilder(text), action);
 	}
 
 	@PostMapping("{id}/resend/regmail")

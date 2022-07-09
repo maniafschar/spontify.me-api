@@ -357,7 +357,7 @@ public class NotificationService {
 		return true;
 	}
 
-	private void sendNotificationEmail(Contact contactFrom, Contact contactTo, StringBuilder note2, String action)
+	public void sendNotificationEmail(Contact contactFrom, Contact contactTo, StringBuilder note2, String action)
 			throws IOException {
 		final StringBuilder html = new StringBuilder(
 				IOUtils.toString(getClass().getResourceAsStream("/template/email.html"), StandardCharsets.UTF_8));
@@ -383,7 +383,7 @@ public class NotificationService {
 			note2.delete(77, note2.length());
 			note2.append("...");
 		}
-		sendEmail(contactTo.getEmail(), note2.toString(), text.toString());
+		sendEmail(contactTo.getEmail(), note2.toString(), text.toString(), html.toString());
 	}
 
 	public void sendEmailSync(final String to, final String subject, final String... text) throws MessagingException {
