@@ -372,7 +372,12 @@ public class NotificationService {
 		s2 = note2.toString();
 		Strings.replaceString(html, "<jq:text />", s2.replaceAll("\n", "<br />"));
 		Strings.replaceString(text, "<jq:text />", s2);
-		s2 = server + (Strings.isEmpty(action) ? "" : "?" + action);
+		if (Strings.isEmpty(action))
+			s2 = server;
+		else if (action.startsWith("https://"))
+			s2 = action;
+		else
+			s2 = server + "?" + action;
 		Strings.replaceString(html, "<jq:link />", s2);
 		Strings.replaceString(text, "<jq:link />", s2);
 		if (note2.indexOf("\n") > 0)

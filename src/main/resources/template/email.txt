@@ -1,7 +1,7 @@
 spontify.me
 
-News für <jq:pseudonym />
-<jq:time />
+News für
+<jq:pseudonym />
 
 <jq:text />
 
