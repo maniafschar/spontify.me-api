@@ -6,6 +6,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import com.jq.findapp.service.AuthenticationService.AuthenticationException.Type
 import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Strings;
+import com.jq.findapp.util.Text;
 
 @Service
 public class AuthenticationService {
@@ -328,6 +330,16 @@ public class AuthenticationService {
 			if (u != null)
 				repository.delete(repository.one(ContactToken.class, (BigInteger) u.get("contactToken.id")));
 		}
+	}
+
+	public void recoverSendReminder(Contact contact) throws Exception {
+		final String s = generateLoginParam(contact);
+		repository.save(contact);
+		notificationService.sendNotificationEmail(repository.one(Contact.class, adminId),
+				contact,
+				Text.mail_registrationReminder.getText(contact.getLanguage()).replace("<jq:EXTRA_1/>",
+						new SimpleDateFormat("dd.MM.yyyy HH:mm").format(contact.getCreatedAt())),
+				"r=" + s);
 	}
 
 	public String recoverSendEmail(String email, String name) throws Exception {

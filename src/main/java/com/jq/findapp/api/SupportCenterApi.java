@@ -28,14 +28,11 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.EngagementService;
 import com.jq.findapp.service.NotificationService;
-import com.jq.findapp.service.NotificationService.NotificationID;
 
 @RestController
 @CrossOrigin(origins = { "https://sc.spontify.me" })
 @RequestMapping("support")
 public class SupportCenterApi {
-	private final String baseDir = "attachments/";
-
 	@Autowired
 	private Repository repository;
 
@@ -91,21 +88,11 @@ public class SupportCenterApi {
 	public void email(final BigInteger id, final String text, final String action,
 			@RequestHeader String password, @RequestHeader String salt) throws Exception {
 		final Contact contact = authenticationService.verify(adminId, password, salt);
-		notificationService.sendNotificationEmail(contact, repository.one(Contact.class, id),
-				new StringBuilder(text), action);
+		notificationService.sendNotificationEmail(contact, repository.one(Contact.class, id), text, action);
 	}
 
-	@PostMapping("{id}/resend/regmail")
-	public void resendRegMail(@PathVariable final BigInteger id, @RequestHeader String password,
-			@RequestHeader String salt) throws Exception {
-		final Contact from = authenticationService.verify(adminId, password, salt);
-		final Contact to = repository.one(Contact.class, id);
-		notificationService.sendNotification(from, to, NotificationID.welcomeExt,
-				"r=" + to.getLoginLink().substring(0, 10) + to.getLoginLink().substring(20));
-	}
-
-	@PostMapping("notify")
-	public void notify(@RequestBody Notification data, @RequestHeader String password,
+	@PostMapping("chat")
+	public void chat(@RequestBody Notification data, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
 		for (BigInteger id : data.getIds()) {
 			final Chat chat = new Chat();
@@ -119,7 +106,10 @@ public class SupportCenterApi {
 
 	@PutMapping("refreshDB")
 	public void refreshDB(@RequestHeader String secret) throws Exception {
-		if (schedulerSecret.equals(secret))
+		if (schedulerSecret.equals(secret)) {
 			engagementService.sendWelcomeChat();
+			engagementService.sendSpontifyEmail();
+			engagementService.sendVerifyEmail();
+		}
 	}
 }

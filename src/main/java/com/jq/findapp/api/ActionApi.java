@@ -45,10 +45,11 @@ import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.service.NotificationService.Ping;
 import com.jq.findapp.util.EntityUtil;
+import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
 
 @RestController
-@CrossOrigin(origins = { "https://localhost", "https://findapp.online", "https://spontify.me", "https://spotyou.net" })
+@CrossOrigin(origins = { "https://localhost", "https://findapp.online", Strings.URL })
 @RequestMapping("action")
 public class ActionApi {
 	private static final List<String> QUOTATION = new ArrayList<>();
@@ -104,10 +105,7 @@ public class ActionApi {
 
 	@GetMapping("marketing/{language}")
 	public Marketing marketing(@PathVariable final String language, @RequestHeader(required = false) BigInteger user) {
-		return new Marketing(
-				Text.marketing_iPadTitle.getText(language),
-				Text.marketing_iPadText.getText(language),
-				"https://blog.spontify.me");
+		return null;
 	}
 
 	@GetMapping("marketing/result")
@@ -196,9 +194,12 @@ public class ActionApi {
 		final Contact contact = authenticationService.verify(user, password, salt);
 		String url;
 		if (source == null || source.length() == 0)
-			url = "https://maps.googleapis.com/maps/api/staticmap?{destination}&markers=icon:https://spontify.me/images/mapMe.png|shadow:false|{destination}&scale=2&size=200x200&maptype=roadmap&key=";
+			url = "https://maps.googleapis.com/maps/api/staticmap?{destination}&markers=icon:" + Strings.URL
+					+ "/images/mapMe.png|shadow:false|{destination}&scale=2&size=200x200&maptype=roadmap&key=";
 		else {
-			url = "https://maps.googleapis.com/maps/api/staticmap?{source}|{destination}&markers=icon:https://spontify.me/images/mapMe.png|shadow:false|{source}&markers=icon:https://spontify.me/images/mapLoc.png|shadow:false|{destination}&scale=2&size=600x200&maptype=roadmap&sensor=true&key=";
+			url = "https://maps.googleapis.com/maps/api/staticmap?{source}|{destination}&markers=icon:" + Strings.URL
+					+ "/images/mapMe.png|shadow:false|{source}&markers=icon:" + Strings.URL
+					+ "/images/mapLoc.png|shadow:false|{destination}&scale=2&size=600x200&maptype=roadmap&sensor=true&key=";
 			url = url.replaceAll("\\{source}", source);
 		}
 		url = url.replaceAll("\\{destination}", destination);

@@ -26,9 +26,10 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationExternalService;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.util.Encryption;
+import com.jq.findapp.util.Strings;
 
 @RestController
-@CrossOrigin(origins = { "https://localhost", "https://findapp.online", "https://spontify.me", "https://spotyou.net" })
+@CrossOrigin(origins = { "https://localhost", "https://findapp.online", Strings.URL })
 @RequestMapping("authentication")
 public class AuthenticationApi {
 	@Autowired

@@ -6,6 +6,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class Strings {
+	public static final String URL = "https://spontify.me";
+
 	public static String encodeParam(final String param) {
 		int x = 0;
 		for (int i = 2; i < param.length(); i++) {

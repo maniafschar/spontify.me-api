@@ -31,6 +31,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.push.Android;
 import com.jq.findapp.service.push.Ios;
 import com.jq.findapp.util.Strings;
@@ -61,23 +62,23 @@ public class NotificationService {
 	}
 
 	public enum NotificationID {
-		accountDelete(NotificationIDType.EmailOrDevice, true), //
-		birthday(NotificationIDType.EmailOrDevice, true), //
+		accountDelete(NotificationIDType.EmailOrDevice, true),
+		birthday(NotificationIDType.EmailOrDevice, true),
 		chatLocation(NotificationIDType.EmailOrDevice, true),
-		feedback(NotificationIDType.Email, false), //
-		friendAppro(NotificationIDType.EmailOrDevice, true), //
-		friendReq(NotificationIDType.EmailOrDevice, true), //
-		markEvent(NotificationIDType.EmailOrDevice, true), //
-		newMsg(NotificationIDType.EmailOrDevice, false), //
-		pwReset(NotificationIDType.Email, false), //
-		ratingLocMat(NotificationIDType.EmailOrDevice, true), //
-		ratingProfile(NotificationIDType.EmailOrDevice, true), //
-		visitLocation(NotificationIDType.EmailOrDevice, true), //
-		visitProfile(NotificationIDType.EmailOrDevice, true), //
-		welcomeExt(NotificationIDType.Email, false), //
-		wtd(NotificationIDType.EmailOrDevice, true), //
-		findMe(NotificationIDType.EmailOrDevice, true), //
-		locMarketing(NotificationIDType.EmailOrDevice, true), //
+		feedback(NotificationIDType.Email, false),
+		friendAppro(NotificationIDType.EmailOrDevice, true),
+		friendReq(NotificationIDType.EmailOrDevice, true),
+		markEvent(NotificationIDType.EmailOrDevice, true),
+		newMsg(NotificationIDType.EmailOrDevice, false),
+		pwReset(NotificationIDType.Email, false),
+		registrationReminder(NotificationIDType.Email, false),
+		ratingLocMat(NotificationIDType.EmailOrDevice, true),
+		visitLocation(NotificationIDType.EmailOrDevice, true),
+		visitProfile(NotificationIDType.EmailOrDevice, true),
+		welcomeExt(NotificationIDType.Email, false),
+		wtd(NotificationIDType.EmailOrDevice, true),
+		findMe(NotificationIDType.EmailOrDevice, true),
+		locMarketing(NotificationIDType.EmailOrDevice, true),
 		mgMarketing(NotificationIDType.EmailOrDevice, true);
 
 		private final NotificationIDType type;
@@ -233,7 +234,7 @@ public class NotificationService {
 			if (b)
 				b = sendNotificationDevice(text, contactTo, action, notID);
 			if (!b || notificationID.getType() == NotificationIDType.EmailAndDevice)
-				sendNotificationEmail(contactFrom, contactTo, text, action);
+				sendNotificationEmail(contactFrom, contactTo, text.toString(), action);
 			return true;
 		}
 		return false;
@@ -346,8 +347,6 @@ public class NotificationService {
 			return contact.getNotificationVisitLocation();
 		if (NotificationID.visitProfile == textID)
 			return contact.getNotificationVisitProfile();
-		if (NotificationID.ratingProfile == textID)
-			return contact.getNotificationVisitProfile();
 		if (NotificationID.ratingLocMat == textID)
 			return contact.getNotificationVisitLocation();
 		if (NotificationID.markEvent == textID)
@@ -357,7 +356,7 @@ public class NotificationService {
 		return true;
 	}
 
-	public void sendNotificationEmail(Contact contactFrom, Contact contactTo, StringBuilder note2, String action)
+	public void sendNotificationEmail(Contact contactFrom, Contact contactTo, String message, String action)
 			throws IOException {
 		final StringBuilder html = new StringBuilder(
 				IOUtils.toString(getClass().getResourceAsStream("/template/email.html"), StandardCharsets.UTF_8));
@@ -369,8 +368,9 @@ public class NotificationService {
 		s2 = new SimpleDateFormat("dd.MM.yy HH:mm").format(new Date());
 		Strings.replaceString(html, "<jq:time />", s2);
 		Strings.replaceString(text, "<jq:time />", s2);
-		s2 = note2.toString();
-		Strings.replaceString(html, "<jq:text />", s2.replaceAll("\n", "<br />"));
+		s2 = message;
+		Strings.replaceString(html, "<jq:text />", s2.replaceAll("\n", "<br />").replaceAll("spontify.me",
+				"<a href=\"https://spontify.me\" style=\"color:rgb(246,255,187);text-decoration:none;\">spontify.me</a>"));
 		Strings.replaceString(text, "<jq:text />", s2);
 		if (Strings.isEmpty(action))
 			s2 = server;
@@ -380,15 +380,30 @@ public class NotificationService {
 			s2 = server + "?" + action;
 		Strings.replaceString(html, "<jq:link />", s2);
 		Strings.replaceString(text, "<jq:link />", s2);
-		if (note2.indexOf("\n") > 0)
-			note2.delete(note2.indexOf("\n"), note2.length());
-		if (note2.indexOf("\r") > 0)
-			note2.delete(note2.indexOf("\r"), note2.length());
-		if (note2.length() > 80) {
-			note2.delete(77, note2.length());
-			note2.append("...");
+		Strings.replaceString(html, "<jq:url />", Strings.URL);
+		Strings.replaceString(text, "<jq:url />", Strings.URL);
+		if (contactFrom == null || contactFrom.getId().equals(contactTo.getId()))
+			s2 = Text.mail_newsTitle.getText(contactTo.getLanguage());
+		else
+			s2 = Text.mail_newsTitleFrom.getText(contactTo.getLanguage()).replaceAll("<jq:pseudonymFrom />",
+					contactFrom.getPseudonym());
+		Strings.replaceString(html, "<jq:newsTitle />", s2);
+		Strings.replaceString(text, "<jq:newsTitle />", s2);
+		if (contactFrom == null || contactFrom.getImage() != null) {
+			Strings.replaceString(html, "<jq:image />",
+					"<br /><br /><img style=\"width:10em;border-radius:5em;\" src=\"" + Strings.URL + "/med/"
+							+ Attachment.getFilename(contactFrom.getImage())
+							+ "\" />");
+		} else
+			Strings.replaceString(html, "<jq:image />", "");
+		if (message.indexOf("\n") > 0)
+			message = message.substring(0, message.indexOf("\n"));
+		if (message.indexOf("\r") > 0)
+			message = message.substring(0, message.indexOf("\r"));
+		if (message.length() > 80) {
+			message = message.substring(0, 77) + "...";
 		}
-		sendEmail(contactTo.getEmail(), note2.toString(), text.toString(), html.toString());
+		sendEmail(contactTo.getEmail(), message, text.toString(), html.toString());
 	}
 
 	public void sendEmailSync(final String to, final String subject, final String... text) throws MessagingException {

@@ -12,58 +12,30 @@
 			font-family: 'Comfortaa';
 			font-style: regular;
 			font-weight: 400;
-			src: url(https://spontify.me/font/Comfortaa-Regular.ttf) format('truetype');
-		}
-
-		body {
-			margin: 0;
-			padding: 0;
-		}
-
-		body>table {
-			text-align: center;
-			margin: 0;
-			line-height: 1.7;
-			font-size: 16px;
-			font-family: Comfortaa, Verdana, "Helvetica Neue", Helvetica, Arial, sans-serif;
-			padding: 1.5em;
-			position: relative;
-			display: block;
-			width: 100%;
-			height: 100%;
-			background: linear-gradient(120deg, rgb(203, 186, 204) 0%, rgb(60, 90, 110) 100%);
-			background-size: 100% 100%;
-		}
-
-		img {
-			width: 50%;
-			min-width: 250px;
-		}
-
-		a {
-			color: black;
-			padding: 0;
-			text-decoration: none;
-			position: relative;
-			display: block;
+			src: url(<jq:url />/font/Comfortaa-Regular.ttf) format('truetype');
 		}
 	</style>
 </head>
 
-<body>
-	<table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%">
+<body style="margin:0;padding:0;">
+	<table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%"
+		style="text-align:center;margin:0;line-height:1.7;font-size:16px;font-family:Comfortaa,Verdana,Helvetica,Arial,sans-serif;padding:1.5em;position:relative;display:block;width:100%;height:100%;color:white;background:linear-gradient(120deg, rgb(203, 186, 204) 0%, rgb(60, 90, 110) 100%);background-size:100% 100%;">
 		<tr>
 			<td>
-				<a href="https://spontify.me">
-					<img src="https://spontify.me/images/logoEmail.png" />
-				</a><br />News für<br />
+				<a href="<jq:url />" style="display:block;">
+					<img src="<jq:url />/images/logoEmail.png" style="max-height:10em;min-width:250px;" />
+					<jq:image />
+				</a>
+				<jq:newsTitle />
+				<br />
 				<b>
 					<jq:pseudonym />
 				</b>
 				<br /><br />
 				<jq:text />
 				<br /><br />
-				<a href="<jq:link />">
+				<a href="<jq:link />"
+					style="display:block;padding-bottom:6em;color:rgb(246,255,187);text-decoration:none;">
 					<jq:link />
 				</a>
 			</td>

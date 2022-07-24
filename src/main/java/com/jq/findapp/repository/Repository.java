@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -16,13 +17,13 @@ import java.util.regex.Pattern;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import com.jq.findapp.entity.BaseEntity;
-import com.jq.findapp.repository.Query.Result;
-
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.jq.findapp.entity.BaseEntity;
+import com.jq.findapp.repository.Query.Result;
 
 @org.springframework.stereotype.Repository
 @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -83,10 +84,10 @@ public class Repository {
 	public void save(final BaseEntity entity) throws Exception {
 		Attachment.save(entity);
 		if (entity.getId() == null) {
-			entity.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+			entity.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
 			em.persist(entity);
 		} else {
-			entity.setModifiedAt(new Timestamp(System.currentTimeMillis()));
+			entity.setModifiedAt(new Timestamp(Instant.now().toEpochMilli()));
 			em.merge(entity);
 		}
 	}
@@ -172,7 +173,7 @@ public class Repository {
 			return max;
 		}
 
-		private static String getFilename(String id) {
+		public static String getFilename(String id) {
 			final String[] ids = id.split(SEPARATOR);
 			final long i = Long.valueOf(ids[1]), diff = 10000;
 			long d = 0;

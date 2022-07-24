@@ -5,7 +5,9 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.Setting;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -28,6 +31,9 @@ public class EngagementService {
 
 	@Autowired
 	private NotificationService notificationService;
+
+	@Autowired
+	private AuthenticationService authenticationService;
 
 	private static ExternalService externalService;
 
@@ -168,6 +174,78 @@ public class EngagementService {
 								contact.getPseudonym()));
 				repository.save(chat);
 			}
+		}
+	}
+
+	public void sendSpontifyEmail() throws Exception {
+		final GregorianCalendar gc = new GregorianCalendar();
+		if (gc.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY || gc.get(Calendar.HOUR_OF_DAY) != 17)
+			return;
+		gc.add(Calendar.DATE, -7);
+		final QueryParams params = new QueryParams(Query.contact_listId);
+		params.setUser(repository.one(Contact.class, adminId));
+		params.setSearch(
+				"contact.verified=true and (contact.version is null or contact.version not like '0.1.%') and (contact.modifiedAt is null or contact.modifiedAt<'"
+						+ gc.get(Calendar.YEAR) + '-' + (gc.get(Calendar.MONTH) + 1) + '-' + gc.get(Calendar.DATE)
+						+ "')");
+		params.setLimit(0);
+		final Result list = repository.list(params);
+		final Contact admin = repository.one(Contact.class, adminId);
+		final Map<String, String> text = new HashMap<>();
+		String value = "";
+		text.put("DE", "Die schönsten Ereignisse des Lebens passieren spontan.\n\n"
+				+ "findapp war schon immer auf Spontanität aus, nun tragen wir dem auch im Namen Rechnung. Aus findapp wird\n\n"
+				+ "spontify.me\n\n"
+				+ "nicht nur eine Umbenennung, sondern ein komplettes Redesign, einfachste Bedienung und ein modernes Look & Feel.\n\n"
+				+ "Schau rein, überzeuge Dich und wenn Dir die App gefällt, empfehle uns weiter. "
+				+ "Je großer die Community, desto mehr spontane Events und Begegnungen werden hier möglich.\n\n"
+				+ "Wir freuen uns auf Feedback. Einfach hier antworten oder in der App mir schreiben.\n\n"
+				+ "Liebe Grüße und bleib gesund!\n"
+				+ "Susi Support");
+		text.put("EN", "The most beautiful events in life happen spontaneously.\n\n"
+				+ "findapp has always been about spontaneity, now we take that into account in the name. findapp becommes\n\n"
+				+ "spontify.me\n\n"
+				+ "not only a renaming, but a complete redesign, simple operation and a modern look & feel.\n\n"
+				+ "Take a look, convince yourself and if you like the app, recommend us. "
+				+ "The larger the community, the more spontaneous events and encounters are possible here.\n\n"
+				+ "We look forward to feedback. Just reply here or write to me in the app.\n\n"
+				+ "Greetings and stay healthy!\n"
+				+ "Susi Support");
+		for (int i = 0; i < list.size(); i++) {
+			final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
+			notificationService.sendNotificationEmail(admin, to, text.get(to.getLanguage()),
+					"https://blog.spontify.me");
+			value += "\u0015" + to.getId();
+		}
+		if (value.length() > 0) {
+			Setting s = new Setting();
+			s.setLabel("findapp-spontify-email");
+			s.setValue(value.substring(1));
+			repository.save(s);
+		}
+	}
+
+	public void sendVerifyEmail() throws Exception {
+		final GregorianCalendar gc = new GregorianCalendar();
+		if (gc.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY || gc.get(Calendar.HOUR_OF_DAY) != 19)
+			return;
+		gc.add(Calendar.DATE, -7);
+		final QueryParams params = new QueryParams(Query.contact_listId);
+		params.setUser(repository.one(Contact.class, adminId));
+		params.setSearch("contact.verified=false");
+		params.setLimit(0);
+		final Result list = repository.list(params);
+		String value = "";
+		for (int i = 0; i < list.size(); i++) {
+			final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
+			authenticationService.recoverSendReminder(to);
+			value += "\u0015" + to.getId();
+		}
+		if (value.length() > 0) {
+			final Setting s = new Setting();
+			s.setLabel("verify-email");
+			s.setValue(value.substring(1));
+			repository.save(s);
 		}
 	}
 

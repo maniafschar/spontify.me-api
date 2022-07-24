@@ -2,6 +2,7 @@ package com.jq.findapp.repository;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -26,7 +27,6 @@ import com.jq.findapp.entity.ContactBluetooth;
 import com.jq.findapp.entity.ContactLink;
 import com.jq.findapp.entity.ContactLink.Status;
 import com.jq.findapp.entity.ContactMarketing;
-import com.jq.findapp.entity.ContactRating;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.Feedback;
@@ -101,8 +101,6 @@ public class RepositoryListener {
 			postPersistContactBluetooth((ContactBluetooth) entity);
 		else if (entity instanceof ContactLink)
 			postPersistContactLink((ContactLink) entity);
-		else if (entity instanceof ContactRating)
-			postPersistContactRating((ContactRating) entity);
 		else if (entity instanceof EventParticipate)
 			postPersistEventParticipate((EventParticipate) entity);
 		else if (entity instanceof Feedback)
@@ -227,6 +225,16 @@ public class RepositoryListener {
 				age--;
 			contact.setAge(age);
 		}
+		if (contact.getModifiedAt() == null && contact.getVerified()) {
+			final Chat chat = new Chat();
+			chat.setContactId(adminId);
+			chat.setContactId2(contact.getId());
+			chat.setSeen(false);
+			chat.setNote(
+					MessageFormat.format(Text.mail_welcome.getText(contact.getLanguage()),
+							contact.getPseudonym()));
+			repository.save(chat);
+		}
 	}
 
 	private void postPersistFeedback(final Feedback feedback) throws Exception {
@@ -312,17 +320,6 @@ public class RepositoryListener {
 					event.getText(),
 					repository.one(Location.class, event.getLocationId()).getName());
 		}
-	}
-
-	private void postPersistContactRating(ContactRating contactRating) throws Exception {
-		repository.executeUpdate(
-				"update Contact contact set rating=(select sum(rating)/count(*) from ContactRating where contactId2=contact.id) where contact.id="
-						+ contactRating.getContactId2());
-		notificationService.sendNotification(
-				repository.one(Contact.class, contactRating.getContactId()),
-				repository.one(Contact.class, contactRating.getContactId2()),
-				NotificationID.ratingProfile, Strings.encodeParam("p=" + contactRating.getContactId()),
-				contactRating.getRating() + "%");
 	}
 
 	private void postPersistLocation(Location location) throws Exception {

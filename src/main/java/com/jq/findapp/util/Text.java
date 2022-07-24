@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.io.IOUtils;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.apache.commons.io.IOUtils;
 
 public enum Text {
 	mail_accountDelete,
@@ -24,6 +24,8 @@ public enum Text {
 	mail_invite,
 	mail_locMarketing,
 	mail_markEvent,
+	mail_newsTitle,
+	mail_newsTitleFrom,
 	mail_pwReset,
 	mail_sentImg,
 	mail_sentPos1,
@@ -32,6 +34,7 @@ public enum Text {
 	mail_sentEntry,
 	mail_ratingLocMat,
 	mail_ratingProfile,
+	mail_registrationReminder,
 	mail_visitLocation,
 	mail_visitProfile,
 	mail_welcomeExt,

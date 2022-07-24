@@ -4,17 +4,6 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.jq.findapp.api.model.WriteEntity;
-import com.jq.findapp.entity.BaseEntity;
-import com.jq.findapp.repository.QueryParams;
-import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.AuthenticationService;
-import com.jq.findapp.service.NotificationService;
-import com.jq.findapp.util.Encryption;
-import com.jq.findapp.util.EntityUtil;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,8 +15,20 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.jq.findapp.api.model.WriteEntity;
+import com.jq.findapp.entity.BaseEntity;
+import com.jq.findapp.repository.QueryParams;
+import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.AuthenticationService;
+import com.jq.findapp.service.NotificationService;
+import com.jq.findapp.util.Encryption;
+import com.jq.findapp.util.EntityUtil;
+import com.jq.findapp.util.Strings;
+
 @RestController
-@CrossOrigin(origins = { "https://localhost", "https://findapp.online", "https://spontify.me", "https://spotyou.net" })
+@CrossOrigin(origins = { "https://localhost", "https://findapp.online", Strings.URL })
 @RequestMapping("db")
 public class DBApi {
 	@Autowired
