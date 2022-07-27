@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.ContactBlock;
 import com.jq.findapp.entity.ContactBluetooth;
 import com.jq.findapp.entity.ContactLink;
 import com.jq.findapp.entity.ContactLink.Status;
@@ -97,6 +98,8 @@ public class RepositoryListener {
 	public void postPersist(final BaseEntity entity) throws Exception {
 		if (entity instanceof Chat)
 			postPersistChat((Chat) entity);
+		else if (entity instanceof ContactBlock)
+			postPersistContactBlock((ContactBlock) entity);
 		else if (entity instanceof ContactBluetooth)
 			postPersistContactBluetooth((ContactBluetooth) entity);
 		else if (entity instanceof ContactLink)
@@ -257,6 +260,16 @@ public class RepositoryListener {
 			notificationService.sendNotificationOnMatch(NotificationID.findMe, me, other);
 			notificationService.sendNotificationOnMatch(NotificationID.findMe, other, me);
 		}
+	}
+
+	private void postPersistContactBlock(final ContactBlock contactBlock)
+			throws Exception {
+		notificationService.sendEmail(null, "BLOCK " + contactBlock.getContactId2(),
+				"id: " + contactBlock.getId() +
+						"\ncontactId: " + contactBlock.getContactId() +
+						"\ncontactId2: " + contactBlock.getContactId2() +
+						"\nreason: " + contactBlock.getReason() +
+						"\nnote: " + contactBlock.getNote());
 	}
 
 	private void postPersistChat(final Chat chat) throws Exception {
