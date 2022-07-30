@@ -193,7 +193,7 @@ public class EngagementService {
 		final Contact admin = repository.one(Contact.class, adminId);
 		final Map<String, String> text = new HashMap<>();
 		String value = "";
-		text.put("DE", "Die schönsten Ereignisse des Lebens passieren spontan.\n\n"
+		text.put("DE", "Das Beste kommt spontan!\n\n"
 				+ "findapp war schon immer auf Spontanität aus, nun tragen wir dem auch im Namen Rechnung. Aus findapp wird\n\n"
 				+ "spontify.me\n\n"
 				+ "nicht nur eine Umbenennung, sondern ein komplettes Redesign, einfachste Bedienung und ein modernes Look & Feel.\n\n"
@@ -202,7 +202,7 @@ public class EngagementService {
 				+ "Wir freuen uns auf Feedback. Einfach hier antworten oder in der App mir schreiben.\n\n"
 				+ "Liebe Grüße und bleib gesund!\n"
 				+ "Susi Support");
-		text.put("EN", "The most beautiful events in life happen spontaneously.\n\n"
+		text.put("EN", "The best comes spontaneously!\n\n"
 				+ "findapp has always been about spontaneity, now we take that into account in the name. findapp becommes\n\n"
 				+ "spontify.me\n\n"
 				+ "not only a renaming, but a complete redesign, simple operation and a modern look & feel.\n\n"

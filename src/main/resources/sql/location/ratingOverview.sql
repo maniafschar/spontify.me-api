@@ -28,3 +28,7 @@ WHERE
 	locationRating.locationId={ID} and
 	locationRating.contactId=contact.id and
 	{search}
+GROUP BY
+	locationRating.id
+ORDER BY
+	locationRating.id DESC
