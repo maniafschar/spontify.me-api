@@ -201,7 +201,7 @@ public class EngagementService {
 				+ "Je großer die Community, desto mehr spontane Events und Begegnungen werden hier möglich.\n\n"
 				+ "Wir freuen uns auf Feedback. Einfach hier antworten oder in der App mir schreiben.\n\n"
 				+ "Liebe Grüße und bleib gesund!\n"
-				+ "Susi Support");
+				+ "Sponti Support");
 		text.put("EN", "The best comes spontaneously!\n\n"
 				+ "findapp has always been about spontaneity, now we take that into account in the name. findapp becommes\n\n"
 				+ "spontify.me\n\n"
@@ -210,7 +210,7 @@ public class EngagementService {
 				+ "The larger the community, the more spontaneous events and encounters are possible here.\n\n"
 				+ "We look forward to feedback. Just reply here or write to me in the app.\n\n"
 				+ "Greetings and stay healthy!\n"
-				+ "Susi Support");
+				+ "Sponti Support");
 		for (int i = 0; i < list.size(); i++) {
 			final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
 			notificationService.sendNotificationEmail(admin, to, text.get(to.getLanguage()),
@@ -225,7 +225,7 @@ public class EngagementService {
 		}
 	}
 
-	public void sendVerifyEmail() throws Exception {
+	public void sendRegistrationReminder() throws Exception {
 		final GregorianCalendar gc = new GregorianCalendar();
 		if (gc.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY || gc.get(Calendar.HOUR_OF_DAY) != 19)
 			return;
@@ -238,12 +238,12 @@ public class EngagementService {
 		String value = "";
 		for (int i = 0; i < list.size(); i++) {
 			final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
-			authenticationService.recoverSendReminder(to);
+			authenticationService.recoverSendEmailReminder(to);
 			value += "\u0015" + to.getId();
 		}
 		if (value.length() > 0) {
 			final Setting s = new Setting();
-			s.setLabel("verify-email");
+			s.setLabel("registration-reminder");
 			s.setValue(value.substring(1));
 			repository.save(s);
 		}
@@ -273,8 +273,8 @@ public class EngagementService {
 					repository.save(chat);
 					notificationService.sendNotification(susi, contact,
 							NotificationID.mgMarketing,
-							"DE".equals(contact.getLanguage()) ? "Susi Support hat Dir geschrieben"
-									: "Susi Support sent you a message",
+							"DE".equals(contact.getLanguage()) ? "Sponti Support hat Dir geschrieben"
+									: "Sponti Support sent you a message",
 							Strings.encodeParam("chat=3"));
 					return;
 				}

@@ -332,7 +332,7 @@ public class AuthenticationService {
 		}
 	}
 
-	public void recoverSendReminder(Contact contact) throws Exception {
+	public void recoverSendEmailReminder(Contact contact) throws Exception {
 		final String s = generateLoginParam(contact);
 		repository.save(contact);
 		notificationService.sendNotificationEmail(repository.one(Contact.class, adminId),

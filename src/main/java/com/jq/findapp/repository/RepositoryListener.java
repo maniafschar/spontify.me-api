@@ -228,15 +228,19 @@ public class RepositoryListener {
 				age--;
 			contact.setAge(age);
 		}
-		if (contact.getModifiedAt() == null && contact.getVerified()) {
-			final Chat chat = new Chat();
-			chat.setContactId(adminId);
-			chat.setContactId2(contact.getId());
-			chat.setSeen(false);
-			chat.setNote(
-					MessageFormat.format(Text.mail_welcome.getText(contact.getLanguage()),
-							contact.getPseudonym()));
-			repository.save(chat);
+		if (contact.getVerified()) {
+			final QueryParams params = new QueryParams(Query.contact_chat);
+			params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId());
+			if (repository.list(params).size() == 0) {
+				final Chat chat = new Chat();
+				chat.setContactId(adminId);
+				chat.setContactId2(contact.getId());
+				chat.setSeen(false);
+				chat.setNote(
+						MessageFormat.format(Text.mail_welcome.getText(contact.getLanguage()),
+								contact.getPseudonym()));
+				repository.save(chat);
+			}
 		}
 	}
 

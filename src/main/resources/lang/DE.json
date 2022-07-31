@@ -15,7 +15,7 @@
 		"pwReset": "Dein Passwort wurde zurück gesetzt. Klicke auf den Link, Du wirst anschließend aufgefordert, ein neues Passwort einzugeben.",
 		"ratingLocMat": "bewertete <jq:EXTRA_2/>, ihr habt <jq:EXTRA_1/> Gemeinsamkeiten.",
 		"ratingProfile": "hat Dich mit <jq:EXTRA_1/> bewertet.",
-		"registrationReminder": "Die schönsten Ereignisse des Lebens passieren spontan.\n\nDazu zählt vielleicht nicht diese spontane Email. Trotzdem würden wir uns freuen, wenn Du Deine Registrierung vom <jq:EXTRA_1/> auf spontify.me (früher findapp) abschließt.\n\nWar die Registrierung ein Versehen und möchtest Du sie rückgängig machen, so antworte einfach auf diese Email. Wir löschen dann Deine Registrierung für Dich.\n\nLiebe Grüße und bleib gesund!\nSusi Support",
+		"registrationReminder": "Das Beste kommt spontan!\n\nDazu zählt vielleicht nicht diese spontane Email. Trotzdem würden wir uns freuen, wenn Du Deine Registrierung vom <jq:EXTRA_1/> auf spontify.me (früher findapp) abschließt.\n\nWar die Registrierung ein Versehen und möchtest Du sie rückgängig machen, so antworte einfach auf diese Email. Wir löschen dann Deine Registrierung für Dich.\n\nLiebe Grüße und bleib gesund!\nSponti Support",
 		"sentEntry": "hat Dir einen spontify.me Link gesendet.",
 		"sentEntries": "hat Dir mehrere spontify.me Links gesendet.",
 		"sentImg": "hat Dir ein Bild geschickt.",
