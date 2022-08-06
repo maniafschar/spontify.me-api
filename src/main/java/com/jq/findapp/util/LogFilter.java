@@ -13,23 +13,19 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.jq.findapp.entity.Log;
-import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.NotificationService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.ContentCachingRequestWrapper;
+
+import com.jq.findapp.entity.Log;
+import com.jq.findapp.repository.Repository;
 
 @Component
 @Order(1)
 public class LogFilter implements Filter {
 	@Autowired
 	private Repository repository;
-
-	@Autowired
-	private NotificationService notificationService;
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)

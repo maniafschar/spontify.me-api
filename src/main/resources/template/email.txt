@@ -1,6 +1,6 @@
 spontify.me
 
-News für
+<jq:newsTitle />
 <jq:pseudonym />
 
 <jq:text />

@@ -79,7 +79,6 @@ public class Contact extends BaseEntity {
 	private String pushSystem;
 	private String pushToken;
 	private String storage;
-	private String userAgent;
 	private String version;
 
 	public enum OS {
@@ -312,14 +311,6 @@ public class Contact extends BaseEntity {
 
 	public void setAgeFemale(String ageFemale) {
 		this.ageFemale = ageFemale;
-	}
-
-	public String getUserAgent() {
-		return userAgent;
-	}
-
-	public void setUserAgent(String userAgent) {
-		this.userAgent = userAgent;
 	}
 
 	public String getPseudonym() {

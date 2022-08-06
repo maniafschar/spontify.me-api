@@ -173,7 +173,11 @@ public class Repository {
 			return max;
 		}
 
-		public static String getFilename(String id) {
+		public static byte[] getFile(String id) throws Exception {
+			return IOUtils.toByteArray(new FileInputStream(PATH + PUBLIC + getFilename(id)));
+		}
+
+		private static String getFilename(String id) {
 			final String[] ids = id.split(SEPARATOR);
 			final long i = Long.valueOf(ids[1]), diff = 10000;
 			long d = 0;

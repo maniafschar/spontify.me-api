@@ -36,8 +36,7 @@ public class ExternalService {
 			notificationService.sendEmail(null, "google",
 					param + "\n\n" + om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(result)));
 		} catch (Exception e) {
-			notificationService.sendEmail(null, "google",
-					param + "\n\n" + result);
+			notificationService.sendEmail(null, "google", param + "\n\n" + result);
 		}
 		return result;
 	}

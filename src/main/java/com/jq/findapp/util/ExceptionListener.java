@@ -14,12 +14,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.jq.findapp.entity.Contact;
-import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.AuthenticationService.AuthenticationException;
-import com.jq.findapp.service.AuthenticationService.AuthenticationException.Type;
-import com.jq.findapp.service.NotificationService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -30,6 +24,12 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.util.ContentCachingRequestWrapper;
+
+import com.jq.findapp.entity.Contact;
+import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.AuthenticationService.AuthenticationException;
+import com.jq.findapp.service.AuthenticationService.AuthenticationException.Type;
+import com.jq.findapp.service.NotificationService;
 
 @RestControllerAdvice
 public class ExceptionListener extends ResponseEntityExceptionHandler {
@@ -45,8 +45,7 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Object> handle(Exception ex, WebRequest request) {
 		final Map<String, Object> body = new HashMap<>();
-		body.put("message", ex.getMessage());
-		body.put("exception", ex.getClass().getName());
+		body.put("exception", Strings.stackTraceToString(ex));
 		body.put("time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 		return handleExceptionInternal(ex, body, null,
 				ex instanceof AuthenticationException ? HttpStatus.FORBIDDEN : HttpStatus.INTERNAL_SERVER_ERROR,
@@ -112,7 +111,7 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 			}
 			try {
 				msg = msg.replaceFirst(SUBSTITUTE, "" + request.getServerPort()).replaceFirst(SUBSTITUTE, s.toString());
-				notificationService.sendEmailSync(null, "ERROR " + ex.getMessage(), msg);
+				notificationService.sendEmail(null, "ERROR " + ex.getMessage(), msg);
 			} catch (Exception e1) {
 				// never happend in 22 years...
 			}

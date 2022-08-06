@@ -17,7 +17,6 @@ public class Feedback extends BaseEntity {
 	private BigInteger contactId;
 	private String appname;
 	private String appversion;
-	private String cookies;
 	private String lang;
 	private String language;
 	private String localized;
@@ -27,7 +26,6 @@ public class Feedback extends BaseEntity {
 	private String status;
 	private String text;
 	private String version;
-	private String useragent;
 	@Enumerated(EnumType.STRING)
 	private Device device;
 	@Enumerated(EnumType.STRING)
@@ -65,14 +63,6 @@ public class Feedback extends BaseEntity {
 		this.appversion = appversion;
 	}
 
-	public String getCookies() {
-		return cookies;
-	}
-
-	public void setCookies(String cookies) {
-		this.cookies = cookies;
-	}
-
 	public String getLanguage() {
 		return language;
 	}
@@ -87,14 +77,6 @@ public class Feedback extends BaseEntity {
 
 	public void setPlatform(String platform) {
 		this.platform = platform;
-	}
-
-	public String getUseragent() {
-		return useragent;
-	}
-
-	public void setUseragent(String useragent) {
-		this.useragent = useragent;
 	}
 
 	public Device getDevice() {

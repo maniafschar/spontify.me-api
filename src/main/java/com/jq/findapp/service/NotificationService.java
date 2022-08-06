@@ -1,7 +1,18 @@
 package com.jq.findapp.service;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.activation.DataSource;
+import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.ws.rs.NotFoundException;
@@ -56,6 +69,16 @@ public class NotificationService {
 
 	@Value("${app.email.address}")
 	private String from;
+
+	private static final byte[] LOGO;
+
+	static {
+		try {
+			LOGO = IOUtils.toByteArray(NotificationService.class.getResourceAsStream("/template/logoEmail.png"));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	enum NotificationIDType {
 		Email, Device, EmailOrDevice, EmailAndDevice
@@ -308,7 +331,7 @@ public class NotificationService {
 		} catch (NotFound | NotFoundException ex) {
 			return false;
 		} catch (Exception ex) {
-			sendEmailSync(null, "ERROR", Strings.stackTraceToString(ex));
+			sendEmail(null, "ERROR", Strings.stackTraceToString(ex));
 			return false;
 		}
 	}
@@ -357,7 +380,7 @@ public class NotificationService {
 	}
 
 	public void sendNotificationEmail(Contact contactFrom, Contact contactTo, String message, String action)
-			throws IOException {
+			throws Exception {
 		final StringBuilder html = new StringBuilder(
 				IOUtils.toString(getClass().getResourceAsStream("/template/email.html"), StandardCharsets.UTF_8));
 		final StringBuilder text = new StringBuilder(
@@ -369,6 +392,8 @@ public class NotificationService {
 		Strings.replaceString(html, "<jq:time />", s2);
 		Strings.replaceString(text, "<jq:time />", s2);
 		s2 = message;
+		if (s2.startsWith(contactFrom.getPseudonym() + ": "))
+			s2 = s2.substring(contactFrom.getPseudonym().length() + 2).trim();
 		Strings.replaceString(html, "<jq:text />", s2.replaceAll("\n", "<br />").replaceAll("spontify.me",
 				"<a href=\"https://spontify.me\" style=\"color:rgb(246,255,187);text-decoration:none;\">spontify.me</a>"));
 		Strings.replaceString(text, "<jq:text />", s2);
@@ -389,11 +414,11 @@ public class NotificationService {
 					contactFrom.getPseudonym());
 		Strings.replaceString(html, "<jq:newsTitle />", s2);
 		Strings.replaceString(text, "<jq:newsTitle />", s2);
+		byte[] imgProfile = null;
 		if (contactFrom == null || contactFrom.getImage() != null) {
+			imgProfile = Attachment.getFile(contactFrom.getImage());
 			Strings.replaceString(html, "<jq:image />",
-					"<br /><br /><img style=\"width:10em;border-radius:5em;\" src=\"" + Strings.URL + "/med/"
-							+ Attachment.getFilename(contactFrom.getImage())
-							+ "\" />");
+					"<br /><img style=\"width:10em;\" src=\"cid:img_profile\" width=\"150\" height=\"150\" />");
 		} else
 			Strings.replaceString(html, "<jq:image />", "");
 		if (message.indexOf("\n") > 0)
@@ -403,29 +428,50 @@ public class NotificationService {
 		if (message.length() > 80) {
 			message = message.substring(0, 77) + "...";
 		}
-		sendEmail(contactTo.getEmail(), message, text.toString(), html.toString());
+		sendEmail(contactTo.getEmail(), message, imgProfile, text.toString(), html.toString());
 	}
 
-	public void sendEmailSync(final String to, final String subject, final String... text) throws MessagingException {
+	private void sendEmail(final String to, final String subject, final byte[] imgProfile, final String... text)
+			throws MessagingException, MalformedURLException, IOException {
 		final MimeMessage msg = email.createMimeMessage();
 		final MimeMessageHelper helper = new MimeMessageHelper(msg, text != null && text.length > 1);
 		helper.setFrom(from);
 		helper.setTo(to == null ? from : to);
 		helper.setSubject(subject);
 		if (text != null) {
-			if (text.length > 1)
+			if (text.length > 1) {
 				helper.setText(text[0], text[1]);
-			else if (text.length > 0)
+				helper.addInline("img_logo", new MyDataSource(LOGO, "logoEmail.png"));
+				if (imgProfile != null)
+					helper.addInline("img_profile", new MyDataSource(imageRound(imgProfile), "image.jpg"));
+			} else if (text.length > 0)
 				helper.setText(text[0]);
 		}
 		email.send(msg);
 	}
 
-	@Async
+	private byte[] imageRound(byte[] img) throws IOException {
+		final BufferedImage image = ImageIO.read(new ByteArrayInputStream(img));
+		final int w = image.getWidth();
+		final int h = image.getHeight();
+		final BufferedImage output = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+		final Graphics2D g2 = output.createGraphics();
+		g2.setComposite(AlphaComposite.Src);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2.setColor(Color.WHITE);
+		g2.fill(new RoundRectangle2D.Float(0, 0, w, h, w, h));
+		g2.setComposite(AlphaComposite.SrcAtop);
+		g2.drawImage(image, 0, 0, null);
+		g2.dispose();
+		final ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ImageIO.write(output, "png", out);
+		return out.toByteArray();
+	}
+
 	public void sendEmail(final String to, final String subject, final String... text) {
 		try {
-			sendEmailSync(to, subject, text);
-		} catch (MessagingException e) {
+			sendEmail(to, subject, null, text);
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -465,6 +511,36 @@ public class NotificationService {
 
 		public int getTotalNew() {
 			return totalNew;
+		}
+	}
+
+	private class MyDataSource implements DataSource {
+		private final byte[] data;
+		private final String name;
+
+		private MyDataSource(byte[] data, String name) {
+			this.data = data;
+			this.name = name;
+		}
+
+		@Override
+		public OutputStream getOutputStream() throws IOException {
+			return null;
+		}
+
+		@Override
+		public String getName() {
+			return name;
+		}
+
+		@Override
+		public String getContentType() {
+			return "image/" + name.substring(name.lastIndexOf('.') + 1).toLowerCase();
+		}
+
+		@Override
+		public InputStream getInputStream() throws IOException {
+			return new ByteArrayInputStream(data);
 		}
 	}
 }
