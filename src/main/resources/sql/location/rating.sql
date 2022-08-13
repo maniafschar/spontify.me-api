@@ -21,4 +21,4 @@ WHERE
 	locationRating.locationId=location.id and
 	{search}
 ORDER BY
-	locationRating.modifiedAt asc
+	locationRating.id asc

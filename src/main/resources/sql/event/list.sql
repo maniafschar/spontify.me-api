@@ -11,6 +11,7 @@ SELECT
 	event.startDate,
 	event.text,
 	event.type,
+	event.visibility,
 	contact.id,
 	contact.imageList,
 	contact.pseudonym,

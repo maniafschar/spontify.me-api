@@ -9,6 +9,7 @@ select
 	event.confirm,
 	event.price,
 	event.maxParticipants,
+	event.visibility,
 	contact.id,
 	contact.pseudonym,
 	contact.imageList,
@@ -42,7 +43,7 @@ FROM
 	Contact contact
 WHERE
 	TO_DAYS(event.startDate)-14<TO_DAYS(current_timestamp) and
-	event.endDate>current_timestamp and
+	TO_DAYS(event.endDate)>=TO_DAYS(current_timestamp) and
 	(
 		event.visibility=3 or 
 		event.contactId={USERID} or

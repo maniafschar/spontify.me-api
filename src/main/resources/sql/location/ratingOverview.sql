@@ -29,6 +29,6 @@ WHERE
 	locationRating.contactId=contact.id and
 	{search}
 GROUP BY
-	locationRating.id
+	locationRating.locationId
 ORDER BY
 	locationRating.id DESC
