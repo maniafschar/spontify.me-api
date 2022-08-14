@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import javax.ws.rs.BadRequestException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -93,7 +91,7 @@ public class AuthenticationService {
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
 	public static class AuthenticationException extends RuntimeException {
 		public enum Type {
-			NoInputFromClient, WrongPassword, NoPasswordInDB
+			NoInputFromClient, WrongPassword, NoPasswordInDB, UsedSalt
 		}
 
 		private final Type type;
@@ -128,7 +126,7 @@ public class AuthenticationService {
 			throw new AuthenticationException(Type.NoInputFromClient);
 		synchronized (USED_SALTS) {
 			if (USED_SALTS.contains(salt))
-				throw new BadRequestException("used salt");
+				throw new AuthenticationException(Type.UsedSalt);
 			USED_SALTS.add(salt);
 			if (USED_SALTS.size() > 1000) {
 				final long timeout = System.currentTimeMillis() - TIMEOUT;
