@@ -4,7 +4,6 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.sql.Time;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import com.jq.findapp.api.model.Marketing;
 import com.jq.findapp.api.model.Position;
@@ -49,7 +47,7 @@ import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
 
 @RestController
-@CrossOrigin(origins = { "https://localhost", "https://findapp.online", Strings.URL })
+@CrossOrigin(origins = { "http://localhost:9000", Strings.URL })
 @RequestMapping("action")
 public class ActionApi {
 	private static final List<String> QUOTATION = new ArrayList<>();
@@ -191,21 +189,7 @@ public class ActionApi {
 	public String map(final String source, final String destination, @RequestHeader BigInteger user,
 			@RequestHeader String password, @RequestHeader String salt)
 			throws Exception {
-		final Contact contact = authenticationService.verify(user, password, salt);
-		String url;
-		if (source == null || source.length() == 0)
-			url = "https://maps.googleapis.com/maps/api/staticmap?{destination}&markers=icon:" + Strings.URL
-					+ "/images/mapMe.png|shadow:false|{destination}&scale=2&size=200x200&maptype=roadmap&key=";
-		else {
-			url = "https://maps.googleapis.com/maps/api/staticmap?{source}|{destination}&markers=icon:" + Strings.URL
-					+ "/images/mapMe.png|shadow:false|{source}&markers=icon:" + Strings.URL
-					+ "/images/mapLoc.png|shadow:false|{destination}&scale=2&size=600x200&maptype=roadmap&sensor=true&key=";
-			url = url.replaceAll("\\{source}", source);
-		}
-		url = url.replaceAll("\\{destination}", destination);
-		url = url.replaceAll("\\{gender}", contact.getGender() == null ? "2" : "" + contact.getGender()) + googleKey;
-		return Base64.getEncoder().encodeToString(
-				WebClient.create(url).get().retrieve().toEntity(byte[].class).block().getBody());
+		return externalService.map(source, destination, authenticationService.verify(user, password, salt));
 	}
 
 	@GetMapping("google")

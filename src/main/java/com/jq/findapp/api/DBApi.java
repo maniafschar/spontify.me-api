@@ -28,7 +28,7 @@ import com.jq.findapp.util.EntityUtil;
 import com.jq.findapp.util.Strings;
 
 @RestController
-@CrossOrigin(origins = { "https://localhost", "https://findapp.online", Strings.URL })
+@CrossOrigin(origins = { "http://localhost:9000", Strings.URL })
 @RequestMapping("db")
 public class DBApi {
 	@Autowired

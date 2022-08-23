@@ -29,7 +29,7 @@ import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Strings;
 
 @RestController
-@CrossOrigin(origins = { "https://localhost", "https://findapp.online", Strings.URL })
+@CrossOrigin(origins = { "http://localhost:9000", Strings.URL })
 @RequestMapping("authentication")
 public class AuthenticationApi {
 	@Autowired
