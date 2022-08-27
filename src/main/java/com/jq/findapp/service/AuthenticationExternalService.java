@@ -49,22 +49,25 @@ public class AuthenticationExternalService {
 		Contact c = null;
 		Map<String, Object> contact = repository.one(params);
 		if (contact == null) {
-			registration.getUser().put("email", Encryption.decryptBrowser(registration.getUser().get("email")));
-			if (registration.getUser().get("email").contains("@")) {
-				params.setSearch("contact.email='" + registration.getUser().get("email") + '\'');
-				contact = repository.one(params);
-				if (contact == null) {
-					c = new Contact();
-					c.setAppleId(registration.getUser().get("id"));
-					c.setVerified(true);
-					c.setEmail(registration.getUser().get("email").trim());
-					c.setPseudonym(registration.getUser().get("name"));
-					authenticationService.saveRegistration(c, registration);
-				} else {
-					c = repository.one(Contact.class, new BigInteger(contact.get("contact.id").toString()));
-					c.setAppleId(registration.getUser().get("id"));
-					repository.save(c);
-				}
+			if (registration.getUser().get("email") != null)
+				registration.getUser().put("email", Encryption.decryptBrowser(registration.getUser().get("email")));
+			if (registration.getUser().get("email") == null || !registration.getUser().get("email").contains("@"))
+				registration.getUser().put("email", registration.getUser().get("id") + ".apple@jq-consulting.de");
+			params.setSearch("contact.email='" + registration.getUser().get("email") + '\'');
+			contact = repository.one(params);
+			if (contact == null) {
+				c = new Contact();
+				c.setAppleId(registration.getUser().get("id"));
+				c.setVerified(true);
+				c.setEmail(registration.getUser().get("email").trim());
+				c.setPseudonym(registration.getUser().get("name").trim());
+				if ("".equals(c.getPseudonym()))
+					c.setPseudonym("Lucky Luke");
+				authenticationService.saveRegistration(c, registration);
+			} else {
+				c = repository.one(Contact.class, new BigInteger(contact.get("contact.id").toString()));
+				c.setAppleId(registration.getUser().get("id"));
+				repository.save(c);
 			}
 		} else if (registration.getUser().containsKey("email"))
 			c = repository.one(Contact.class, new BigInteger(contact.get("contact.id").toString()));
