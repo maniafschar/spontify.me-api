@@ -47,7 +47,7 @@ import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
 
 @RestController
-@CrossOrigin(origins = { "http://localhost:9000", Strings.URL })
+@CrossOrigin(origins = { Strings.URL_APP, Strings.URL_LOCALHOST, Strings.URL_LOCALHOST_TEST })
 @RequestMapping("action")
 public class ActionApi {
 	private static final List<String> QUOTATION = new ArrayList<>();

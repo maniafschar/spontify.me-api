@@ -95,11 +95,12 @@ public class ExternalService {
 	public String map(String source, String destination, Contact contact) {
 		String url;
 		if (source == null || source.length() == 0)
-			url = "https://maps.googleapis.com/maps/api/staticmap?{destination}&markers=icon:" + Strings.URL
+			url = "https://maps.googleapis.com/maps/api/staticmap?{destination}&markers=icon:" + Strings.URL_APP
 					+ "/images/mapMe.png|shadow:false|{destination}&scale=2&size=200x200&maptype=roadmap&key=";
 		else {
-			url = "https://maps.googleapis.com/maps/api/staticmap?{source}|{destination}&markers=icon:" + Strings.URL
-					+ "/images/mapMe.png|shadow:false|{source}&markers=icon:" + Strings.URL
+			url = "https://maps.googleapis.com/maps/api/staticmap?{source}|{destination}&markers=icon:"
+					+ Strings.URL_APP
+					+ "/images/mapMe.png|shadow:false|{source}&markers=icon:" + Strings.URL_APP
 					+ "/images/mapLoc.png|shadow:false|{destination}&scale=2&size=600x200&maptype=roadmap&sensor=true&key=";
 			url = url.replaceAll("\\{source}", source);
 		}

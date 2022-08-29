@@ -6,7 +6,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class Strings {
-	public static final String URL = "https://spontify.me";
+	public static final String URL_APP = "https://spontify.me";
+	public static final String URL_LOCALHOST = "https://localhost";
+	public static final String URL_LOCALHOST_TEST = "http://localhost:9000";
 
 	public static String encodeParam(final String param) {
 		int x = 0;

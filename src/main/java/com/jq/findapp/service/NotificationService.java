@@ -405,8 +405,8 @@ public class NotificationService {
 			s2 = server + "?" + action;
 		Strings.replaceString(html, "<jq:link />", s2);
 		Strings.replaceString(text, "<jq:link />", s2);
-		Strings.replaceString(html, "<jq:url />", Strings.URL);
-		Strings.replaceString(text, "<jq:url />", Strings.URL);
+		Strings.replaceString(html, "<jq:url />", Strings.URL_APP);
+		Strings.replaceString(text, "<jq:url />", Strings.URL_APP);
 		if (contactFrom == null || contactFrom.getId().equals(contactTo.getId()))
 			s2 = Text.mail_newsTitle.getText(contactTo.getLanguage());
 		else
