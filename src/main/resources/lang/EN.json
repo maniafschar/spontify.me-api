@@ -21,6 +21,7 @@
 		"sentImg": "sent you a picture.",
 		"sentPos1": "has sent you his current position.",
 		"sentPos2": "has sent you her current position.",
+		"uploadProfileImage": "You get 81% more interactions with an attractive picture in your profile. It's worth trying it out. Ask me if you have problems using the app.",
 		"visitLocation": "visited <jq:EXTRA_2/>, you have <jq:EXTRA_1/> common attributes.",
 		"visitProfile": "visited your profile, you have <jq:EXTRA_1/> common attributes.",
 		"welcome": "Hello {0},\n\nit's nice to have you here. Take a look around and contact me if you have any questions.\n\nHave fun\nYour spontify.me team",

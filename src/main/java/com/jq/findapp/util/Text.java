@@ -35,6 +35,7 @@ public enum Text {
 	mail_ratingLocMat,
 	mail_ratingProfile,
 	mail_registrationReminder,
+	mail_uploadProfileImage,
 	mail_visitLocation,
 	mail_visitProfile,
 	mail_welcomeExt,

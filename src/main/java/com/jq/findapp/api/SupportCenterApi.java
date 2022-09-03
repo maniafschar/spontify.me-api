@@ -109,7 +109,7 @@ public class SupportCenterApi {
 		if (schedulerSecret.equals(secret)) {
 			engagementService.sendSpontifyEmail();
 			engagementService.sendRegistrationReminder();
-			engagementService.sendRegistrationReminder();
+			engagementService.sendUploadProfileImage();
 		}
 	}
 }

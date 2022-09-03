@@ -2,6 +2,8 @@ package com.jq.findapp.service;
 
 import java.math.BigInteger;
 import java.text.MessageFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -182,9 +184,7 @@ public class EngagementService {
 		if (gc.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY || gc.get(Calendar.HOUR_OF_DAY) != 17)
 			return;
 		final QueryParams params = new QueryParams(Query.contact_listId);
-		params.setUser(repository.one(Contact.class, adminId));
-		params.setSearch(
-				"contact.verified=true and contact.version is null");
+		params.setSearch("contact.verified=true and contact.version is null");
 		params.setLimit(0);
 		final Result list = repository.list(params);
 		final Contact admin = repository.one(Contact.class, adminId);
@@ -226,9 +226,7 @@ public class EngagementService {
 		final GregorianCalendar gc = new GregorianCalendar();
 		if (gc.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY || gc.get(Calendar.HOUR_OF_DAY) != 19)
 			return;
-		gc.add(Calendar.DATE, -7);
 		final QueryParams params = new QueryParams(Query.contact_listId);
-		params.setUser(repository.one(Contact.class, adminId));
 		params.setSearch("contact.verified=false");
 		params.setLimit(0);
 		final Result list = repository.list(params);
@@ -243,6 +241,29 @@ public class EngagementService {
 			s.setLabel("registration-reminder");
 			s.setValue(value.substring(1));
 			repository.save(s);
+		}
+	}
+
+	public void sendUploadProfileImage() throws Exception {
+		QueryParams params = new QueryParams(Query.contact_listId);
+		params.setSearch("contact.verified=true and contact.image is null and contact.modifiedAt<'"
+				+ Instant.now().minus(Duration.ofDays(7)).toString() + '\'');
+		params.setLimit(0);
+		final Result list = repository.list(params);
+		params = new QueryParams(Query.contact_chat);
+		for (int i = 0; i < list.size(); i++) {
+			final Contact contact = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
+			String text = Text.mail_welcome.getText(contact.getLanguage());
+			params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId()
+					+ " and contact.note='" + text + '\'');
+			if (repository.list(params).size() == 0) {
+				final Chat chat = new Chat();
+				chat.setContactId(adminId);
+				chat.setContactId2(contact.getId());
+				chat.setSeen(false);
+				chat.setNote(text);
+				repository.save(chat);
+			}
 		}
 	}
 
