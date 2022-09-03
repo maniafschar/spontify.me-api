@@ -36,71 +36,62 @@ public class AuthenticationExternalService {
 	}
 
 	public Contact register(ExternalRegistration registration) throws Exception {
-		if (registration.getFrom() == From.Apple)
-			return registerApple(registration);
-		return registerFacebook(registration);
+		Contact contact = findById(registration);
+		if (contact == null)
+			contact = findByEmail(registration);
+		return contact == null ? registerInternal(registration) : contact;
 	}
 
-	private Contact registerApple(ExternalRegistration registration) throws Exception {
-		final QueryParams params = new QueryParams(Query.contact_list);
-		params.setUser(new Contact());
-		params.getUser().setId(BigInteger.valueOf(0L));
-		params.setSearch("contact.appleId='" + registration.getUser().get("id") + '\'');
-		Contact c = null;
-		Map<String, Object> contact = repository.one(params);
-		if (contact == null) {
-			if (registration.getUser().get("email") != null)
-				registration.getUser().put("email", Encryption.decryptBrowser(registration.getUser().get("email")));
-			if (registration.getUser().get("email") == null || !registration.getUser().get("email").contains("@"))
-				registration.getUser().put("email", registration.getUser().get("id") + ".apple@jq-consulting.de");
-			params.setSearch("contact.email='" + registration.getUser().get("email") + '\'');
-			contact = repository.one(params);
-			if (contact == null) {
-				c = new Contact();
-				c.setAppleId(registration.getUser().get("id"));
-				c.setVerified(true);
-				c.setEmail(registration.getUser().get("email").trim());
-				c.setPseudonym(registration.getUser().get("name").trim());
-				if ("".equals(c.getPseudonym()))
-					c.setPseudonym("Lucky Luke");
-				authenticationService.saveRegistration(c, registration);
-			} else {
-				c = repository.one(Contact.class, new BigInteger(contact.get("contact.id").toString()));
-				c.setAppleId(registration.getUser().get("id"));
+	private Contact findById(ExternalRegistration registration) throws Exception {
+		final QueryParams params = new QueryParams(Query.contact_listId);
+		params.setSearch("contact." + registration.getFrom().name().toLowerCase() + "Id='"
+				+ registration.getUser().get("id") + '\'');
+		final Map<String, Object> contact = repository.one(params);
+		if (contact != null) {
+			final Contact c = repository.one(Contact.class, new BigInteger(contact.get("contact.id").toString()));
+			if (registration.getFrom() == From.Facebook) {
+				fillFacebookData(registration.getUser(), c);
 				repository.save(c);
 			}
-		} else if (registration.getUser().containsKey("email"))
-			c = repository.one(Contact.class, new BigInteger(contact.get("contact.id").toString()));
-		return c;
+			return c;
+		}
+		return null;
 	}
 
-	private Contact registerFacebook(ExternalRegistration registration) throws Exception {
-		final QueryParams params = new QueryParams(Query.contact_list);
-		params.setUser(new Contact());
-		params.getUser().setId(BigInteger.valueOf(0L));
-		params.setSearch("contact.facebookId='" + registration.getUser().get("id") + '\'');
-		Map<String, Object> contact = repository.one(params);
-		if (contact == null) {
-			if (registration.getUser().get("email") != null)
-				registration.getUser().put("email", Encryption.decryptBrowser(registration.getUser().get("email")));
-			if (registration.getUser().get("email") == null || !registration.getUser().get("email").contains("@"))
-				registration.getUser().put("email", registration.getUser().get("id") + ".facebook@jq-consulting.de");
-			params.setSearch("contact.email='" + registration.getUser().get("email") + '\'');
-			contact = repository.one(params);
-		}
-		final Contact c;
-		if (contact == null) {
-			c = new Contact();
-			c.setVerified(true);
-			c.setEmail(registration.getUser().get("email"));
-			c.setPseudonym(registration.getUser().get("name"));
-			fillFacebookData(registration.getUser(), c);
-			authenticationService.saveRegistration(c, registration);
-		} else {
-			c = repository.one(Contact.class, new BigInteger(contact.get("contact.id").toString()));
-			fillFacebookData(registration.getUser(), c);
+	private Contact findByEmail(ExternalRegistration registration) throws Exception {
+		if (registration.getUser().get("email") != null)
+			registration.getUser().put("email", Encryption.decryptBrowser(registration.getUser().get("email")));
+		if (registration.getUser().get("email") == null || !registration.getUser().get("email").contains("@"))
+			registration.getUser().put("email",
+					registration.getUser().get("id") + '.' + registration.getFrom().name().toLowerCase()
+							+ "@jq-consulting.de");
+		final QueryParams params = new QueryParams(Query.contact_listId);
+		params.setSearch("contact.email='" + registration.getUser().get("email") + '\'');
+		final Map<String, Object> contact = repository.one(params);
+		if (contact != null) {
+			final Contact c = repository.one(Contact.class, new BigInteger(contact.get("contact.id").toString()));
+			if (registration.getFrom() == From.Facebook)
+				fillFacebookData(registration.getUser(), c);
+			else
+				c.setAppleId(registration.getUser().get("id"));
 			repository.save(c);
+			return c;
 		}
+		return null;
+	}
+
+	private Contact registerInternal(ExternalRegistration registration) throws Exception {
+		final Contact c = new Contact();
+		c.setVerified(true);
+		c.setEmail(registration.getUser().get("email"));
+		c.setPseudonym(registration.getUser().get("name").trim());
+		if ("".equals(c.getPseudonym()))
+			c.setPseudonym("Lucky Luke");
+		if (registration.getFrom() == From.Facebook)
+			fillFacebookData(registration.getUser(), c);
+		else
+			c.setAppleId(registration.getUser().get("id"));
+		authenticationService.saveRegistration(c, registration);
 		return c;
 	}
 
@@ -119,9 +110,10 @@ public class AuthenticationExternalService {
 						EntityUtil.scaleImage(data, EntityUtil.IMAGE_THUMB_SIZE)));
 			}
 		}
-		if (facebookData.get("gender") != null)
+		if (contact.getGender() == null && facebookData.get("gender") != null)
 			contact.setGender("male".equalsIgnoreCase(facebookData.get("gender")) ? (short) 1 : 2);
-		if (facebookData.get("birthday") != null && facebookData.get("birthday").length() > 0)
+		if (contact.getBirthday() == null && facebookData.get("birthday") != null
+				&& facebookData.get("birthday").length() > 0)
 			contact.setBirthday(new Date(
 					new SimpleDateFormat("MM/dd/yyyy").parse(facebookData.get("birthday").trim())
 							.getTime()));

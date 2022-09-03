@@ -73,7 +73,7 @@ public class AuthenticationService {
 
 	public static class Unique {
 		public final String email;
-		public boolean unique;
+		public final boolean unique;
 		public final boolean blocked;
 
 		private Unique(String email, boolean unique, boolean blocked) {
@@ -195,7 +195,11 @@ public class AuthenticationService {
 					registration.toString());
 			throw new IllegalAccessException("domain");
 		}
-		final Contact contact = new Contact();
+		final QueryParams params = new QueryParams(Query.contact_listId);
+		params.setSearch("contact.email='" + registration.getEmail().toLowerCase().trim() + '\'');
+		final Map<String, Object> user = repository.one(params);
+		final Contact contact = user == null ? new Contact()
+				: repository.one(Contact.class, (BigInteger) user.get("contact.id"));
 		contact.setBirthday(registration.getBirthday());
 		contact.setEmail(registration.getEmail());
 		contact.setGender(registration.getGender());
@@ -222,20 +226,23 @@ public class AuthenticationService {
 		contact.setPassword(Encryption.encryptDB(generatePin(20)));
 		contact.setPasswordReset(System.currentTimeMillis());
 		contact.setBirthdayDisplay((short) 2);
-		final String[] name = contact.getPseudonym().split(" ");
-		int max = 100, i = 0;
-		while (true) {
-			try {
-				contact.setIdDisplay(generateIdDisplay(name));
-				repository.save(contact);
-				break;
-			} catch (Throwable ex) {
-				if (isDuplicateIdDisplay(ex)) {
-					if (i++ > max)
-						throw new IllegalAccessException(
-								"reg failed: " + i + " tries to find id_display | " + ex.getMessage());
-				} else
-					throw new IllegalAccessException("reg failed: " + Strings.stackTraceToString(ex));
+		contact.setEmail(contact.getEmail().toLowerCase().trim());
+		if (contact.getIdDisplay() == null) {
+			final String[] name = contact.getPseudonym().split(" ");
+			int max = 100, i = 0;
+			while (true) {
+				try {
+					contact.setIdDisplay(generateIdDisplay(name));
+					repository.save(contact);
+					break;
+				} catch (Throwable ex) {
+					if (isDuplicateIdDisplay(ex)) {
+						if (i++ > max)
+							throw new IllegalAccessException(
+									"reg failed: " + i + " tries to find id_display | " + ex.getMessage());
+					} else
+						throw new IllegalAccessException("reg failed: " + Strings.stackTraceToString(ex));
+				}
 			}
 		}
 		notificationService.sendEmail(null, "Reg: " + contact.getEmail(), registration.toString());
@@ -340,20 +347,23 @@ public class AuthenticationService {
 				"r=" + s);
 	}
 
-	public String recoverSendEmail(String email, String name) throws Exception {
-		final QueryParams params = new QueryParams(Query.contact_list);
-		params.setUser(new Contact());
-		params.getUser().setId(BigInteger.valueOf(0L));
-		params.setSearch("contact.pseudonym='" + name + "' and contact.email='" + email + '\'');
+	public String recoverSendEmail(String email) throws Exception {
+		final QueryParams params = new QueryParams(Query.contact_listId);
+		params.setSearch("contact.email='" + email + '\'');
 		Map<String, Object> user = repository.one(params);
 		if (user != null) {
-			final Contact contact = repository.one(Contact.class, new BigInteger(user.get("contact.id").toString()));
-			final String s = generateLoginParam(contact);
-			repository.save(contact);
-			notificationService.sendNotification(contact, contact, NotificationID.pwReset, "r=" + s);
-			return "ok";
+			final Contact contact = repository.one(Contact.class, (BigInteger) user.get("contact.id"));
+			if (contact.getLoginLink() == null
+					|| contact.getModifiedAt() == null
+					|| contact.getModifiedAt().getTime() < System.currentTimeMillis() - 86400000) {
+				final String s = generateLoginParam(contact);
+				repository.save(contact);
+				notificationService.sendNotification(contact, contact, NotificationID.pwReset, "r=" + s);
+				return "ok";
+			}
+			return "nok:Time";
 		}
-		return "nok";
+		return "nok:Email";
 	}
 
 	public Contact recoverVerifyEmail(String token) throws Exception {

@@ -1,10 +1,15 @@
 package com.jq.findapp.api;
 
 import java.math.BigInteger;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.ws.rs.core.Context;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -98,9 +103,14 @@ public class AuthenticationApi {
 	}
 
 	@GetMapping("recoverSendEmail")
-	public String recoverSendEmail(String email, String name) throws Exception {
-		return authenticationService.recoverSendEmail(Encryption.decryptBrowser(email),
-				Encryption.decryptBrowser(name));
+	public String recoverSendEmail(String email, @Context HttpHeaders httpHeaders) throws Exception {
+		final QueryParams params = new QueryParams(Query.misc_listLog);
+		params.setSearch("log.ip='" + httpHeaders.get("X-Forwarded-For")
+				+ "' and log.createdAt>'" + Instant.now().minus(Duration.ofDays(1)).toString()
+				+ "' and log.uri like '%recoverSendEmail'");
+		if (repository.list(params).size() > 10)
+			return "nok:Spam";
+		return authenticationService.recoverSendEmail(Encryption.decryptBrowser(email));
 	}
 
 	@GetMapping("recoverVerifyEmail")

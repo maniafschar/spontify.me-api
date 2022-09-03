@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -159,17 +160,21 @@ public class ActionApi {
 			repository.executeUpdate(
 					"update Chat chat set chat.seen=true where (chat.seen is null or chat.seen=false) and chat.contactId="
 							+ id + " and chat.contactId2=" + user);
-		return result.getList();
+		// TODO rm List
+		final List<Object[]> l = new ArrayList<>();
+		l.addAll(result.getList());
+		if (l.size() < 2)
+			l.add(new Object[] {});
+		return l;
 	}
 
 	@GetMapping("one")
 	public Map<String, Object> one(final QueryParams params, @RequestHeader(required = false) BigInteger user,
 			@RequestHeader(required = false) String password, @RequestHeader(required = false) String salt)
 			throws Exception {
-		if (!params.getQuery().name().contains("_anonymous"))
-			params.setUser(authenticationService.verify(user, password, salt));
+		params.setUser(authenticationService.verify(user, password, salt));
 		final Map<String, Object> m = repository.one(params);
-		if (params.getUser() != null) {
+		if (m != null) {
 			if (params.getQuery() == Query.contact_list)
 				notificationService.contactSaveVisitAndNotifyOnMatch(params.getUser(),
 						(BigInteger) m.get("contact.id"));
@@ -181,8 +186,9 @@ public class ActionApi {
 				notificationService.locationNotifyOnMatch(params.getUser(),
 						(BigInteger) m.get("location.id"), NotificationID.visitLocation, null);
 			}
+			return m;
 		}
-		return m;
+		return Collections.emptyMap();
 	}
 
 	@GetMapping("map")

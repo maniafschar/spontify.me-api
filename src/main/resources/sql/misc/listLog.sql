@@ -1,16 +1,16 @@
 SELECT
-	log.id,
-	log.method,
-	log.query,
 	log.body,
-	log.uri,
-	log.ip,
 	log.contactId,
-	log.time,
-	log.status,
-	log.port,
+	log.createdAt,
+	log.id,
+	log.ip,
+	log.method,
 	log.modifiedAt,
-	log.createdAt
+	log.port,
+	log.query,
+	log.status,
+	log.time,
+	log.uri
 FROM
 	Log log
 WHERE

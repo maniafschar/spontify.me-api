@@ -288,9 +288,12 @@ public class NotificationService {
 		params.setQuery(Query.contact_pingNotification);
 		values.notification = ((Number) repository.one(params).get("_c")).intValue();
 		values.totalNew = values.notification;
-		params.setQuery(Query.contact_pingChatNew);
+		params.setQuery(Query.contact_pingChat);
 		params.setLimit(0);
 		Result list = repository.list(params);
+		values.chat = list.size();
+		params.setQuery(Query.contact_pingChatNew);
+		list = repository.list(params);
 		values.chatNew = new HashMap<>();
 		for (int i = 0; i < list.size(); i++) {
 			final Map<String, Object> row = list.get(i);
@@ -323,10 +326,11 @@ public class NotificationService {
 			text.append("...");
 		}
 		try {
+			final String nId = notificationId == null ? "" : "" + notificationId;
 			if ("ios".equals(contactTo.getPushSystem()))
-				ios.send(contactTo, text.toString(), action, getPingValues(contactTo).totalNew, notificationId);
+				ios.send(contactTo, text.toString(), action, getPingValues(contactTo).totalNew, nId);
 			else if ("android".equals(contactTo.getPushSystem()))
-				android.send(contactTo, text.toString(), action, notificationId);
+				android.send(contactTo, text.toString(), action, nId);
 			return true;
 		} catch (NotFound | NotFoundException ex) {
 			return false;
@@ -480,6 +484,7 @@ public class NotificationService {
 		private BigInteger userId;
 		private Map<String, Integer> chatNew;
 		private Map<String, Integer> chatUnseen;
+		private int chat;
 		private int visit;
 		private int friendRequest;
 		private int notification;
@@ -499,6 +504,10 @@ public class NotificationService {
 
 		public int getVisit() {
 			return visit;
+		}
+
+		public int getChat() {
+			return chat;
 		}
 
 		public int getFriendRequest() {

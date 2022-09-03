@@ -107,7 +107,8 @@ public class SupportCenterApi {
 	@PutMapping("refreshDB")
 	public void refreshDB(@RequestHeader String secret) throws Exception {
 		if (schedulerSecret.equals(secret)) {
-			// engagementService.sendSpontifyEmail();
+			engagementService.sendSpontifyEmail();
+			engagementService.sendRegistrationReminder();
 			engagementService.sendRegistrationReminder();
 		}
 	}

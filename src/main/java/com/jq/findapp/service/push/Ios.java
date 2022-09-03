@@ -45,7 +45,7 @@ public class Ios {
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
 
-	public String send(Contact contact, String text, String action, int badge, BigInteger notificationId)
+	public String send(Contact contact, String text, String action, int badge, String notificationId)
 			throws Exception {
 		try {
 			send(url, contact, text, action, badge, notificationId);
@@ -59,7 +59,7 @@ public class Ios {
 		}
 	}
 
-	private void send(String url, Contact contact, String text, String action, int badge, BigInteger notificationId)
+	private void send(String url, Contact contact, String text, String action, int badge, String notificationId)
 			throws Exception {
 		final HttpRequest request = HttpRequest.newBuilder()
 				.POST(BodyPublishers.ofString(
@@ -67,7 +67,7 @@ public class Ios {
 								.toString(getClass().getResourceAsStream("/template/push.ios"), StandardCharsets.UTF_8)
 								.replace("{text}", text)
 								.replace("{badge}", "" + badge)
-								.replace("{notificationId}", "" + notificationId)
+								.replace("{notificationId}", notificationId)
 								.replace("{exec}", Strings.isEmpty(action) ? "" : action)))
 				.header("apns-push-type", "alert")
 				.header("apns-topic", topic)

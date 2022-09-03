@@ -181,13 +181,10 @@ public class EngagementService {
 		final GregorianCalendar gc = new GregorianCalendar();
 		if (gc.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY || gc.get(Calendar.HOUR_OF_DAY) != 17)
 			return;
-		gc.add(Calendar.DATE, -7);
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setUser(repository.one(Contact.class, adminId));
 		params.setSearch(
-				"contact.verified=true and (contact.version is null or contact.version not like '0.1.%') and (contact.modifiedAt is null or contact.modifiedAt<'"
-						+ gc.get(Calendar.YEAR) + '-' + (gc.get(Calendar.MONTH) + 1) + '-' + gc.get(Calendar.DATE)
-						+ "')");
+				"contact.verified=true and contact.version is null");
 		params.setLimit(0);
 		final Result list = repository.list(params);
 		final Contact admin = repository.one(Contact.class, adminId);
@@ -215,7 +212,7 @@ public class EngagementService {
 			final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
 			notificationService.sendNotificationEmail(admin, to, text.get(to.getLanguage()),
 					"https://blog.spontify.me");
-			value += "\u0015" + to.getId();
+			value += "|" + to.getId();
 		}
 		if (value.length() > 0) {
 			Setting s = new Setting();
@@ -239,7 +236,7 @@ public class EngagementService {
 		for (int i = 0; i < list.size(); i++) {
 			final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
 			authenticationService.recoverSendEmailReminder(to);
-			value += "\u0015" + to.getId();
+			value += "|" + to.getId();
 		}
 		if (value.length() > 0) {
 			final Setting s = new Setting();

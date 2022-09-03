@@ -7,9 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.jq.findapp.util.Strings;
-
 import org.apache.commons.io.IOUtils;
+
+import com.jq.findapp.util.Strings;
 
 public enum Query {
 	contact_block,
@@ -27,6 +27,7 @@ public enum Query {
 	contact_listVisit(true),
 	contact_marketing(true),
 	contact_notification(true),
+	contact_pingChat(true),
 	contact_pingChatNew(true),
 	contact_pingChatUnseen(true),
 	contact_pingFriendRequest(true),
@@ -42,9 +43,6 @@ public enum Query {
 	event_listCurrent(true),
 	event_participate,
 
-	location_anonymousList,
-	location_anonymousNextId,
-	location_anonymousPrevId,
 	location_list,
 	location_listFavorite,
 	location_listOpenTime,

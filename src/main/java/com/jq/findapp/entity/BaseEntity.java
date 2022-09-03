@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -52,27 +53,29 @@ public class BaseEntity {
 	}
 
 	@Transient
-	public void populate(Map<String, Object> values) {
+	public boolean populate(Map<String, Object> values) {
 		final BaseEntity ref = new ObjectMapper().convertValue(values, this.getClass());
 		values.forEach((name, value) -> {
 			if (!"id".equals(name) && !"createdAt".equals(name) && !"modifiedAt".equals(name)) {
-				Object v = null;
 				try {
 					final Method m = getClass()
 							.getDeclaredMethod("get" + name.substring(0, 1).toUpperCase() + name.substring(1));
-					v = m.invoke(ref);
-					if (old == null)
-						old = new HashMap<>();
-					old.put(name, m.invoke(this));
-					getClass()
-							.getDeclaredMethod("set" + name.substring(0, 1).toUpperCase() + name.substring(1),
-									m.getReturnType())
-							.invoke(this, v);
+					final Object valueOld = m.invoke(this), valueNew = m.invoke(ref);
+					if (!Objects.equals(valueOld, valueNew)) {
+						if (old == null)
+							old = new HashMap<>();
+						old.put(name, valueOld);
+						getClass()
+								.getDeclaredMethod("set" + name.substring(0, 1).toUpperCase() + name.substring(1),
+										m.getReturnType())
+								.invoke(this, valueNew);
+					}
 				} catch (Exception ex) {
-					throw new RuntimeException("Failed on " + name + ", value " + v, ex);
+					throw new RuntimeException("Failed on " + name + ", value " + value, ex);
 				}
 			}
 		});
+		return old != null && old.size() > 0;
 	}
 
 	@Transient
