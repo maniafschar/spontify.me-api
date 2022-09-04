@@ -77,15 +77,6 @@ public enum Query {
 			return list.size() - 1;
 		}
 
-		public int index(String header) {
-			final String[] headers = getHeader();
-			for (int i = 0; i < headers.length; i++) {
-				if (headers[i].equals(header))
-					return i;
-			}
-			return -1;
-		}
-
 		public Map<String, Object> get(int index) {
 			final Map<String, Object> one = new HashMap<>();
 			for (int i = 0; i < list.get(0).length; i++)
