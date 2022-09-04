@@ -244,7 +244,8 @@ public class AuthenticationService {
 						throw new IllegalAccessException("reg failed: " + Strings.stackTraceToString(ex));
 				}
 			}
-		}
+		} else
+			repository.save(contact);
 		notificationService.sendEmail(null, "Reg: " + contact.getEmail(), registration.toString());
 	}
 

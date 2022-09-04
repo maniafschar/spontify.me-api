@@ -13,6 +13,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public enum Text {
+	engagement_addFriends,
+	engagement_becomeGuide,
+	engagement_bluetoothMatch,
+	engagement_bluetoothNoMatch,
+	engagement_guide,
+	engagement_like,
+	engagement_newTown,
+	engagement_uploadProfileImage,
 	mail_accountDelete,
 	mail_birthday,
 	mail_chatLocation,
@@ -35,7 +43,6 @@ public enum Text {
 	mail_ratingLocMat,
 	mail_ratingProfile,
 	mail_registrationReminder,
-	mail_uploadProfileImage,
 	mail_visitLocation,
 	mail_visitProfile,
 	mail_welcomeExt,

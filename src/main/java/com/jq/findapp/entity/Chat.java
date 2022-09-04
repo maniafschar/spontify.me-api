@@ -15,7 +15,9 @@ public class Chat extends BaseEntity {
 	private BigInteger locationId;
 	private Boolean seen = false;
 	private String note;
+	private String action;
 	private String image;
+	private String textId;
 
 	public BigInteger getContactId() {
 		return contactId;
@@ -63,5 +65,21 @@ public class Chat extends BaseEntity {
 
 	public void setImage(String image) {
 		this.image = image;
+	}
+
+	public String getAction() {
+		return action;
+	}
+
+	public void setAction(String action) {
+		this.action = action;
+	}
+
+	public String getTextId() {
+		return textId;
+	}
+
+	public void setTextId(String textId) {
+		this.textId = textId;
 	}
 }

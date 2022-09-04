@@ -263,20 +263,6 @@ public class NotificationService {
 		return false;
 	}
 
-	public Result getUnreadNotifications(Contact contact) throws Exception {
-		final QueryParams params = new QueryParams(Query.contact_listNotification);
-		params.setUser(contact);
-		params.setSearch("contactNotification.seen=false");
-		final Result result = repository.list(params);
-		for (int i = 0; i < result.size(); i++) {
-			final ContactNotification contactNotification = repository.one(ContactNotification.class,
-					(BigInteger) result.get(i).get("contactNotification.id"));
-			contactNotification.setSeen(true);
-			repository.save(contactNotification);
-		}
-		return result;
-	}
-
 	public Ping getPingValues(Contact contact) {
 		final QueryParams params = new QueryParams(Query.contact_pingVisit);
 		params.setUser(contact);

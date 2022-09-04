@@ -50,7 +50,6 @@ FROM
 WHERE
 	contactNotification.contactId2=contact.id and
 	contactNotification.contactId={USERID} and
-	contactNotification.contactId2=contact.id and
 	{search}
 GROUP BY
 	contactNotification.id

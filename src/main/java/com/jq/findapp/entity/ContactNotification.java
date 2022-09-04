@@ -76,6 +76,6 @@ public class ContactNotification extends BaseEntity {
 	@Transient
 	@Override
 	public boolean writeAccess(BigInteger user, Repository repository) {
-		return user.equals(getId());
+		return user.equals(getContactId());
 	}
 }
