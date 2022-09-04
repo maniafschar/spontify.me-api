@@ -271,6 +271,7 @@ public class AuthenticationService {
 			c2.setOs(contact.getOs());
 			c2.setDevice(contact.getDevice());
 			c2.setVersion(contact.getVersion());
+			c2.setTimezoneOffset(contact.getTimezoneOffset());
 			repository.save(c2);
 		}
 		return user;

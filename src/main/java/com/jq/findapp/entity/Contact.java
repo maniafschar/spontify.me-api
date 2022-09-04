@@ -41,6 +41,7 @@ public class Contact extends BaseEntity {
 	private Short birthdayDisplay;
 	private Short gender;
 	private Short rating;
+	private Short timezoneOffset;
 	private String aboutMe;
 	private String ageDivers;
 	private String ageFemale;
@@ -567,6 +568,14 @@ public class Contact extends BaseEntity {
 
 	public Long getPasswordReset() {
 		return passwordReset;
+	}
+
+	public Short getTimezoneOffset() {
+		return timezoneOffset;
+	}
+
+	public void setTimezoneOffset(Short timezoneOffset) {
+		this.timezoneOffset = timezoneOffset;
 	}
 
 	@Transient
