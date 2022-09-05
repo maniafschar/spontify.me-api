@@ -17,6 +17,7 @@ public enum Query {
 	contact_list(true),
 	contact_listBlocked,
 	contact_listChat(true),
+	contact_listChatFlat,
 	contact_listFeedback,
 	contact_listFriends,
 	contact_listGroup,

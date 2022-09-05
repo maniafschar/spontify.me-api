@@ -286,7 +286,8 @@ public class RepositoryListener {
 			else {
 				s = chat.getNote();
 				if (s.indexOf(" :openPos(") == 0)
-					s = (contactFrom.getGender() == 2 ? Text.mail_sentPos2 : Text.mail_sentPos1)
+					s = (contactFrom.getGender() == null || contactFrom.getGender() == 2 ? Text.mail_sentPos2
+							: Text.mail_sentPos1)
 							.getText(contactTo.getLanguage());
 				else if (s.indexOf(" :open(") == 0)
 					s = (s.lastIndexOf(" :open(") == 0 ? Text.mail_sentEntry : Text.mail_sentEntries)

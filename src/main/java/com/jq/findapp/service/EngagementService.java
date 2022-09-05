@@ -220,19 +220,28 @@ public class EngagementService {
 	public void sendChats() throws Exception {
 		if (currentVersion == null)
 			currentVersion = (String) repository.one(new QueryParams(Query.contact_maxAppVersion)).get("c");
-		QueryParams params = new QueryParams(Query.contact_listId);
+		QueryParams params = new QueryParams(Query.contact_listChatFlat);
 		params.setLimit(0);
+		params.setSearch("chat.textId='" + Text.engagement_installCurrentVersion.name() +
+				"' and contact.version='" + currentVersion + "'");
+		Result ids = repository.list(params);
+		for (int i = 0; i < ids.size(); i++) {
+			final Chat chat = repository.one(Chat.class, (BigInteger) ids.get(i));
+			chat.setTextId(null);
+			repository.save(chat);
+		}
+		params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.id<>" + adminId + " and contact.verified=true and contact.version is not null");
-		final Result contactIds = repository.list(params);
+		ids = repository.list(params);
 		params = new QueryParams(Query.contact_chat);
-		for (int i = 0; i < contactIds.size(); i++) {
-			params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + contactIds.get(i).get("contact.id")
+		for (int i = 0; i < ids.size(); i++) {
+			params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + ids.get(i).get("contact.id")
 					+ " and chat.createdAt>'"
 					+ Instant.now().minus(Duration.ofDays(7 + (int) (Math.random() * 4)))
 							.minus(Duration.ofHours((int) (Math.random() * 12))).toString()
 					+ '\'');
 			if (repository.list(params).size() == 0) {
-				final Contact contact = repository.one(Contact.class, (BigInteger) contactIds.get(i).get("contact.id"));
+				final Contact contact = repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id"));
 				final Instant d = Instant.now();
 				d.minus(Duration.ofMinutes(
 						contact.getTimezoneOffset() == null ? -60 : contact.getTimezoneOffset().longValue()));
