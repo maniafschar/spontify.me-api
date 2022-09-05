@@ -160,12 +160,7 @@ public class ActionApi {
 			repository.executeUpdate(
 					"update Chat chat set chat.seen=true where (chat.seen is null or chat.seen=false) and chat.contactId="
 							+ id + " and chat.contactId2=" + user);
-		// TODO rm List
-		final List<Object[]> l = new ArrayList<>();
-		l.addAll(result.getList());
-		if (l.size() < 2)
-			l.add(new Object[] {});
-		return l;
+		return result.getList();
 	}
 
 	@GetMapping("one")

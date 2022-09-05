@@ -3,6 +3,7 @@ package com.jq.findapp.service;
 import java.math.BigInteger;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.Contact.OS;
 import com.jq.findapp.entity.Setting;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
@@ -36,6 +38,8 @@ public class EngagementService {
 	private AuthenticationService authenticationService;
 
 	private static ExternalService externalService;
+
+	private static String currentVersion;
 
 	@Autowired
 	private void setExternalService(ExternalService externalService) {
@@ -78,7 +82,9 @@ public class EngagementService {
 					} catch (Exception e) {
 						throw new RuntimeException(e);
 					}
-				});
+				}),
+		CONTACT_VERSION(contact -> contact.getVersion()),
+		VERSION(contact -> currentVersion);
 
 		private static interface Exec {
 			String replace(Contact contact);
@@ -131,6 +137,10 @@ public class EngagementService {
 		chatTemplates.add(new ChatTemplate(Text.engagement_addFriends,
 				"pageInfo.socialShare()",
 				null));
+
+		chatTemplates.add(new ChatTemplate(Text.engagement_installCurrentVersion,
+				"global.openStore()",
+				contact -> contact.getOs() != OS.web && currentVersion.compareTo(contact.getVersion()) > 0));
 
 		chatTemplates.add(new ChatTemplate(Text.engagement_newTown,
 				"pageInfo.socialShare()",
@@ -208,9 +218,8 @@ public class EngagementService {
 	}
 
 	public void sendChats() throws Exception {
-		final GregorianCalendar gc = new GregorianCalendar();
-		if (gc.get(Calendar.HOUR_OF_DAY) < 6 || gc.get(Calendar.HOUR_OF_DAY) > 22)
-			return;
+		if (currentVersion == null)
+			currentVersion = (String) repository.one(new QueryParams(Query.contact_maxAppVersion)).get("c");
 		QueryParams params = new QueryParams(Query.contact_listId);
 		params.setLimit(0);
 		params.setSearch("contact.id<>" + adminId + " and contact.verified=true and contact.version is not null");
@@ -224,6 +233,11 @@ public class EngagementService {
 					+ '\'');
 			if (repository.list(params).size() == 0) {
 				final Contact contact = repository.one(Contact.class, (BigInteger) contactIds.get(i).get("contact.id"));
+				final Instant d = Instant.now();
+				d.minus(Duration.ofMinutes(
+						contact.getTimezoneOffset() == null ? -60 : contact.getTimezoneOffset().longValue()));
+				if (d.get(ChronoField.HOUR_OF_DAY) < 7 || d.get(ChronoField.HOUR_OF_DAY) > 21)
+					break;
 				for (ChatTemplate chatTemplate : chatTemplates) {
 					if (chatTemplate.eligible(contact)) {
 						params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId()
@@ -239,7 +253,7 @@ public class EngagementService {
 							chat.setAction(chatTemplate.action);
 							chat.setTextId(chatTemplate.textId.name());
 							chat.setNote(s);
-							// repository.save(chat);
+							repository.save(chat);
 							break;
 						}
 					}

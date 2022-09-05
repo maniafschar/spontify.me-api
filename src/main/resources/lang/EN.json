@@ -1,12 +1,13 @@
 {
 	"engagement": {
-		"addFriends": "Hey CONTACT_PSEUDONYM,\nWould you like to add your friends? EMOJI_DANCING\nYou can find the button on the info page, just invite them... EMOJI_WAVING",
-		"becomeGuide": "Hey CONTACT_PSEUDONYM,\nare you sociable and like to organize events? As a guide, we always suggest particularly suitable Spontis to boost your events and expand your circle of acquaintances. Would you like to become a guide? EMOJI_DANCING\nJust check the settings EMOJI_WAVING",
-		"bluetoothMatch": "Hey CONTACT_PSEUDONYM,\nYou've already had a few Bluetooth Matches. Have you reached out to them?\nHow was it? If you want, tell me about it... EMOJI_DANCING",
-		"bluetoothNoMatch": "Hey CONTACT_PSEUDONYM,\nYou don't have a Bluetooth match yet. Would you like to invite your friends to grow the community and create more matches? EMOJI_DANCING",
-		"guide": "Hey CONTACT_PSEUDONYM,\nYou're a guide, would you like to invite your friends to help the community grow? EMOJI_DANCING",
+		"addFriends": "Hey CONTACT_PSEUDONYM, would you like to add your friends? EMOJI_DANCING\nYou can find the button on the info page, just invite them... EMOJI_WAVING",
+		"becomeGuide": "Hey CONTACT_PSEUDONYM, are you sociable and like to organize events? As a guide, we always suggest particularly suitable Spontis to boost your events and expand your circle of acquaintances. Would you like to become a guide? EMOJI_DANCING\nJust check the settings EMOJI_WAVING",
+		"bluetoothMatch": "Hey CONTACT_PSEUDONYM, you've already had a few Bluetooth Matches. Have you reached out to them?\nHow was it? If you want, tell me about it... EMOJI_DANCING",
+		"bluetoothNoMatch": "Hey CONTACT_PSEUDONYM, you don't have a Bluetooth match yet. Would you like to invite your friends to grow the community and create more matches? EMOJI_DANCING",
+		"guide": "Hey CONTACT_PSEUDONYM, you're a guide, would you like to invite your friends to help the community grow? EMOJI_DANCING",
+		"installCurrentVersion": "Hey CONTACT_PSEUDONYM, you are not using the current version VERSION of the app. Some new features have been added to the current version, do you want to update?",
 		"like": "Hello CONTACT_PSEUDONYM, how do you like spontify.me? 🤔\nWould you like to chat with me about it? EMOJI_WAVING",
-		"newTown": "Hey CONTACT_PSEUDONYM,\nwe would like to grow in CONTACT_CURRENT_TOWN and are looking for friendly contacts. Do you perhaps know a few that you could invite here? EMOJI_WAVING",
+		"newTown": "Hey CONTACT_PSEUDONYM, we would like to grow in CONTACT_CURRENT_TOWN and are looking for friendly contacts. Do you perhaps know a few that you could invite here? EMOJI_WAVING",
 		"uploadProfileImage": "You get 81% more interactions with an attractive picture in your profile. It's worth it, give it a try. Ask me if you have problems using the app."
 	},
 	"mail": {

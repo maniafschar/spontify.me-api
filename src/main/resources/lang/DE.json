@@ -1,12 +1,13 @@
 {
 	"engagement": {
-		"addFriends": "Hey CONTACT_PSEUDONYM,\nLust Deine Frende hinzuzufügen? EMOJI_DANCING\nAuf der Info-Seite findest Du den Button, lade sie einfach ein... EMOJI_WAVING",
-		"becomeGuide": "Hey CONTACT_PSEUDONYM,\nbist Du kontaktfreudig und organisierst gerne Events? Als Guide zeigst schlagen wir Dir immer wieder besonders passende Spontis vor, um Deine Events zu boostern und Deinen Bekanntenkreis zu erweitern. Möchtest Du ein Guide werden? EMOJI_DANCING\nSetze einfach das Häckchen in den Einstellungen EMOJI_WAVING",
-		"bluetoothMatch": "Hey CONTACT_PSEUDONYM,\nDu hattest schon ein paar Bluetooth Matches. Hast Du sie angesprochen?\nWie war's? Wenn Du möchtest, erzähl mir drüber... EMOJI_DANCING",
-		"bluetoothNoMatch": "Hey CONTACT_PSEUDONYM,\nDu hast noch keinen Bluetooth Match. Möchtest Du Deine Freunde einladen, damit die Community wächst und mehr Matches sich ergeben? EMOJI_DANCING",
-		"guide": "Hey CONTACT_PSEUDONYM,\nDu bist ein Guide, möchtest Du Deine Freunde einladen, damit die Community wächst? EMOJI_DANCING",
+		"addFriends": "Hey CONTACT_PSEUDONYM, Lust Deine Frende hinzuzufügen? EMOJI_DANCING\nAuf der Info-Seite findest Du den Button, lade sie einfach ein... EMOJI_WAVING",
+		"becomeGuide": "Hey CONTACT_PSEUDONYM, bist Du kontaktfreudig und organisierst gerne Events? Als Guide zeigst schlagen wir Dir immer wieder besonders passende Spontis vor, um Deine Events zu boostern und Deinen Bekanntenkreis zu erweitern. Möchtest Du ein Guide werden? EMOJI_DANCING\nSetze einfach das Häckchen in den Einstellungen EMOJI_WAVING",
+		"bluetoothMatch": "Hey CONTACT_PSEUDONYM, Du hattest schon ein paar Bluetooth Matches. Hast Du sie angesprochen?\nWie war's? Wenn Du möchtest, erzähl mir drüber... EMOJI_DANCING",
+		"bluetoothNoMatch": "Hey CONTACT_PSEUDONYM, Du hast noch keinen Bluetooth Match. Möchtest Du Deine Freunde einladen, damit die Community wächst und mehr Matches sich ergeben? EMOJI_DANCING",
+		"guide": "Hey CONTACT_PSEUDONYM, Du bist ein Guide, möchtest Du Deine Freunde einladen, damit die Community wächst? EMOJI_DANCING",
+		"installCurrentVersion": "Hey CONTACT_PSEUDONYM, Du benutzt nicht die aktuelle Version VERSION der App. In der aktuellen Version sind einige neue Features hinzugekommen, möchtest Du aktualisieren?",
 		"like": "Hallo CONTACT_PSEUDONYM, wie gefällt Dir spontify.me? 🤔\nLust mit mir drüber zu chatten? EMOJI_WAVING",
-		"newTown": "Hey CONTACT_PSEUDONYM,\nwir möchten in CONTACT_CURRENT_TOWN wachsen und sind auf der Suche nach sympathischen Kotakten. Kennst Du vielleicht ein paar, die Du hier einladen könntest? EMOJI_WAVING",
+		"newTown": "Hey CONTACT_PSEUDONYM, wir möchten in CONTACT_CURRENT_TOWN wachsen und sind auf der Suche nach sympathischen Kotakten. Kennst Du vielleicht ein paar, die Du hier einladen könntest? EMOJI_WAVING",
 		"uploadProfileImage": "81% mehr Interaktionen erhältst Du mit einem attraktiven Bild in Deinem Profil. Es lohnt sich, probiere es mal aus. Frag mich, wenn Du Probleme bezüglich der Benutzung der App hast."
 	},
 	"mail": {

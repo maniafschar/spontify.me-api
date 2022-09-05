@@ -233,9 +233,9 @@ public class NotificationService {
 			params.setQuery(Query.contact_notification);
 			params.setSearch("contactNotification.contactId=" + contactTo.getId() +
 					" and contactNotification.contactId2=" + contactFrom.getId() +
-					" and contactNotification.action='" + action
-					+ "' and contactNotification.textId='" + notificationID.name()
-					+ "' and TO_DAYS(contactNotification.createdAt) + 6>TO_DAYS(current_timestamp)");
+					" and TIMESTAMPDIFF(HOUR,contactNotification.createdAt,current_timestamp)<24" +
+					" and contactNotification.action='" + (action == null ? "" : action) +
+					"' and contactNotification.textId='" + notificationID.name() + "'");
 			if (repository.list(params).size() > 0)
 				return false;
 			final ContactNotification notification = new ContactNotification();

@@ -18,6 +18,7 @@ public enum Text {
 	engagement_bluetoothMatch,
 	engagement_bluetoothNoMatch,
 	engagement_guide,
+	engagement_installCurrentVersion,
 	engagement_like,
 	engagement_newTown,
 	engagement_uploadProfileImage,
