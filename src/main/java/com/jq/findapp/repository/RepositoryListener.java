@@ -1,6 +1,7 @@
 package com.jq.findapp.repository;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -35,6 +36,7 @@ import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.LocationFavorite;
 import com.jq.findapp.entity.LocationRating;
+import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.NotificationService.NotificationID;
@@ -188,10 +190,7 @@ public class RepositoryListener {
 	}
 
 	private void preUpdateLocation(Location location) throws Exception {
-		if (location.old("address") == null) {
-			location.setLatitude((Float) location.old("latitude"));
-			location.setLongitude((Float) location.old("longitude"));
-		} else
+		if (location.old("address") != null)
 			lookupAddress(location);
 	}
 
@@ -285,6 +284,8 @@ public class RepositoryListener {
 				s = Text.mail_sentImg.getText(contactTo.getLanguage());
 			else {
 				s = chat.getNote();
+				if (s.indexOf(Attachment.SEPARATOR) > -1)
+					s = new String(Repository.Attachment.getFile(s), StandardCharsets.UTF_8);
 				if (s.indexOf(" :openPos(") == 0)
 					s = (contactFrom.getGender() == null || contactFrom.getGender() == 2 ? Text.mail_sentPos2
 							: Text.mail_sentPos1)

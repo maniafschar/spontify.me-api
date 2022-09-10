@@ -60,8 +60,8 @@ public class Android {
 		map.put("iss", clientEmail);
 		map.put("sub", clientEmail);
 		map.put("aud", "https://fcm.googleapis.com/");
-		map.put("iat", "" + (int) (lastGeneration / 1000));
-		map.put("exp", "" + (int) (lastGeneration / 1000 + 3600));
+		map.put("iat", "" + lastGeneration);
+		map.put("exp", "" + (lastGeneration + 3600));
 		return map;
 	}
 }

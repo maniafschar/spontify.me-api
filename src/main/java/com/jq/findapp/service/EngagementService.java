@@ -3,7 +3,7 @@ package com.jq.findapp.service;
 import java.math.BigInteger;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoField;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -19,11 +19,14 @@ import org.springframework.stereotype.Service;
 import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.OS;
+import com.jq.findapp.entity.Event;
+import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Setting;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
 
 @Service
@@ -72,22 +75,26 @@ public class EngagementService {
 	private List<ChatTemplate> chatTemplates = new ArrayList<>();
 
 	enum REPLACMENT {
-		EMOJI_DANCING(contact -> contact.getGender() != null && contact.getGender() == 1 ? "🕺🏻" : "💃"),
-		EMOJI_WAVING(contact -> contact.getGender() != null && contact.getGender() == 1 ? "🙋🏻‍♂️" : "🙋‍♀️"),
-		CONTACT_PSEUDONYM(contact -> contact.getPseudonym()),
-		CONTACT_CURRENT_TOWN(
-				contact -> {
-					try {
-						return externalService.googleAddress(contact.getLatitude(), contact.getLongitude()).getTown();
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				}),
-		CONTACT_VERSION(contact -> contact.getVersion()),
-		VERSION(contact -> currentVersion);
+		EMOJI_DANCING((contact, location) -> contact.getGender() != null && contact.getGender() == 1 ? "🕺🏻" : "💃"),
+		EMOJI_WAVING(
+				(contact, location) -> contact.getGender() != null && contact.getGender() == 1 ? "🙋🏻‍♂️" : "🙋‍♀️"),
+		CONTACT_PSEUDONYM((contact, location) -> contact.getPseudonym()),
+		CONTACT_CURRENT_TOWN((contact, location) -> {
+			try {
+				return externalService.googleAddress(contact.getLatitude(), contact.getLongitude()).getTown();
+			} catch (
+
+		Exception e) {
+				throw new RuntimeException(e);
+			}
+		}),
+
+		CONTACT_VERSION((contact, location) -> contact.getVersion()),
+		LOCATION_NAME((contact, location) -> location.getName()),
+		VERSION((contact, location) -> currentVersion);
 
 		private static interface Exec {
-			String replace(Contact contact);
+			String replace(Contact contact, Location location);
 		}
 
 		private final Exec exec;
@@ -96,15 +103,26 @@ public class EngagementService {
 			this.exec = exec;
 		}
 
-		String replace(String s, Contact contact) {
-			return s.contains(name()) ? s.replaceAll(name(), exec.replace(contact)) : s;
+		String replace(String s, Contact contact, Location location) {
+			return s.contains(name()) ? s.replaceAll(name(), exec.replace(contact, location)) : s;
 		}
+
 	}
 
 	public EngagementService() {
 		chatTemplates.add(new ChatTemplate(Text.engagement_uploadProfileImage,
 				"ui.navigation.goTo(&quot;settings&quot;)",
 				contact -> contact.getImage() == null));
+
+		chatTemplates.add(new ChatTemplate(Text.engagement_uploadProfileAttributes,
+				"ui.navigation.goTo(&quot;settings&quot;)",
+				contact -> contact.getAttr0() == null && contact.getAttr1() == null && contact.getAttr2() == null
+						&& contact.getAttr3() == null && contact.getAttr4() == null && contact.getAttr5() == null
+						&& contact.getAttr() == null));
+
+		chatTemplates.add(new ChatTemplate(Text.engagement_patience,
+				"pageInfo.socialShare()",
+				contact -> contact.getLongitude() != null));
 
 		chatTemplates.add(new ChatTemplate(Text.engagement_becomeGuide,
 				"ui.navigation.goTo(&quot;settings&quot;)",
@@ -152,10 +170,10 @@ public class EngagementService {
 		chatTemplates.add(new ChatTemplate(Text.engagement_like, null, null));
 	}
 
-	public void sendSpontifyEmail() throws Exception {
+	public String sendSpontifyEmail() throws Exception {
 		final GregorianCalendar gc = new GregorianCalendar();
 		if (gc.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY || gc.get(Calendar.HOUR_OF_DAY) != 17)
-			return;
+			return "";
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.verified=true and contact.version is null");
 		params.setLimit(0);
@@ -192,13 +210,15 @@ public class EngagementService {
 			s.setLabel("findapp-spontify-email");
 			s.setValue(value.substring(1));
 			repository.save(s);
+			return list.size() + " spontify emails sent";
 		}
+		return "no spontify email sent\n";
 	}
 
-	public void sendRegistrationReminder() throws Exception {
+	public String sendRegistrationReminder() throws Exception {
 		final GregorianCalendar gc = new GregorianCalendar();
 		if (gc.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY || gc.get(Calendar.HOUR_OF_DAY) != 19)
-			return;
+			return "";
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.verified=false");
 		params.setLimit(0);
@@ -214,13 +234,15 @@ public class EngagementService {
 			s.setLabel("registration-reminder");
 			s.setValue(value.substring(1));
 			repository.save(s);
+			return list.size() + " registration reminder emails sent";
 		}
+		return "no registration reminder email sent\n";
 	}
 
-	public void sendChats() throws Exception {
+	public String sendChats() throws Exception {
 		if (currentVersion == null)
 			currentVersion = (String) repository.one(new QueryParams(Query.contact_maxAppVersion)).get("c");
-		QueryParams params = new QueryParams(Query.contact_listChatFlat);
+		final QueryParams params = new QueryParams(Query.contact_listChatFlat);
 		params.setLimit(0);
 		params.setSearch("chat.textId='" + Text.engagement_installCurrentVersion.name() +
 				"' and contact.version='" + currentVersion + "'");
@@ -230,10 +252,12 @@ public class EngagementService {
 			chat.setTextId(null);
 			repository.save(chat);
 		}
-		params = new QueryParams(Query.contact_listId);
+		params.setQuery(Query.contact_listId);
 		params.setSearch("contact.id<>" + adminId + " and contact.verified=true and contact.version is not null");
 		ids = repository.list(params);
-		params = new QueryParams(Query.contact_chat);
+		params.setQuery(Query.contact_chat);
+		int count = 0;
+		String temp = "";
 		for (int i = 0; i < ids.size(); i++) {
 			params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + ids.get(i).get("contact.id")
 					+ " and chat.createdAt>'"
@@ -241,33 +265,249 @@ public class EngagementService {
 							.minus(Duration.ofHours((int) (Math.random() * 12))).toString()
 					+ '\'');
 			if (repository.list(params).size() == 0) {
+				temp += "," + ids.get(i).get("contact.id");
+				if (sendChatTemplate(repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id")), params))
+					count++;
+			}
+		}
+		return count + "/" + ids.size() + " chats sent\n" + temp.replaceFirst(",", "") + "\n";
+	}
+
+	public String sendNearBy() throws Exception {
+		final QueryParams params = new QueryParams(Query.contact_listId);
+		params.setSearch(
+				"contact.verified=true and contact.version is not null and contact.longitude is not null and (" +
+						"length(contact.attrInterest)>0 or length(contact.attrInterestEx)>0 or " +
+						"length(contact.attr0)>0 or length(contact.attr0Ex)>0 or " +
+						"length(contact.attr1)>0 or length(contact.attr1Ex)>0 or " +
+						"length(contact.attr2)>0 or length(contact.attr2Ex)>0 or " +
+						"length(contact.attr3)>0 or length(contact.attr3Ex)>0 or " +
+						"length(contact.attr4)>0 or length(contact.attr4Ex)>0 or " +
+						"length(contact.attr5)>0 or length(contact.attr5Ex)>0)");
+		final Result ids = repository.list(params);
+		params.setQuery(Query.contact_chat);
+		int count = 0;
+		String temp = "";
+		for (int i = 0; i < ids.size(); i++) {
+			params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + ids.get(i).get("contact.id")
+					+ " and chat.textId like '"
+					+ Text.engagement_nearByLocation.name()
+							.substring(0, Text.engagement_nearByLocation.name().indexOf('L'))
+					+ "%' and chat.createdAt>'"
+					+ Instant.now().minus(Duration.ofDays(4))
+							.minus(Duration.ofHours((int) (Math.random() * 12))).toString()
+					+ '\'');
+			if (repository.list(params).size() == 0) {
 				final Contact contact = repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id"));
-				final Instant d = Instant.now();
-				d.minus(Duration.ofMinutes(
-						contact.getTimezoneOffset() == null ? -60 : contact.getTimezoneOffset().longValue()));
-				if (d.get(ChronoField.HOUR_OF_DAY) < 7 || d.get(ChronoField.HOUR_OF_DAY) > 21)
-					break;
-				for (ChatTemplate chatTemplate : chatTemplates) {
-					if (chatTemplate.eligible(contact)) {
-						params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId()
-								+ " and chat.textId='" + chatTemplate.textId.name() + '\'');
-						if (repository.list(params).size() == 0) {
-							String s = chatTemplate.textId.getText(contact.getLanguage());
-							for (REPLACMENT rep : REPLACMENT.values())
-								s = rep.replace(s, contact);
-							final Chat chat = new Chat();
-							chat.setContactId(adminId);
-							chat.setContactId2(contact.getId());
-							chat.setSeen(false);
-							chat.setAction(chatTemplate.action);
-							chat.setTextId(chatTemplate.textId.name());
-							chat.setNote(s);
-							repository.save(chat);
-							break;
-						}
+				temp += "," + contact.getId();
+				if (sendEvent(contact) || sendLocation(contact) || sendContact(contact))
+					count++;
+			}
+		}
+		return count + "/" + ids.size() + " near by chats sent\n" + temp.replaceFirst(",", "") + "\n";
+	}
+
+	private boolean sendChatTemplate(Contact contact, QueryParams params) throws Exception {
+		final int hour = Instant.now().minus(Duration.ofMinutes(
+				contact.getTimezoneOffset() == null ? -60 : contact.getTimezoneOffset().longValue()))
+				.atZone(ZoneOffset.UTC).getHour();
+		if (hour > 6 && hour < 22) {
+			for (ChatTemplate chatTemplate : chatTemplates) {
+				if (chatTemplate.eligible(contact)) {
+					params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId()
+							+ " and chat.textId='" + chatTemplate.textId.name() + '\'');
+					if (repository.list(params).size() == 0) {
+						sendChat(chatTemplate.textId, contact, null, chatTemplate.action);
+						return true;
 					}
 				}
 			}
 		}
+		return false;
+	}
+
+	private boolean sendEvent(Contact contact) throws Exception {
+		final QueryParams params = new QueryParams(Query.event_listCurrent);
+		params.setUser(contact);
+		params.setLatitude(contact.getLatitude());
+		params.setLongitude(contact.getLongitude());
+		final Result result = repository.list(params);
+		params.setQuery(Query.contact_chat);
+		params.setLatitude(null);
+		for (int i = 0; i < result.size(); i++) {
+			final Event event = repository.one(Event.class, (BigInteger) result.get(0).get("event.id"));
+			params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId()
+					+ " and chat.textId='" + Text.engagement_nearByLocation.name() + "' and chat.action like '%"
+					+ Strings.encodeParam("e=" + event.getId()) + "%'");
+			if (repository.list(params).size() == 0) {
+				if (getScoreContact(contact, repository.one(Contact.class, event.getContactId())) > 0.8) {
+					sendChat(Text.engagement_nearByEvent, contact,
+							repository.one(Location.class, event.getLocationId()),
+							"ui.navigation.autoOpen(&quot;" + Strings.encodeParam("e=" + event.getId())
+									+ "&quot;,event)");
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean sendLocation(Contact contact) throws Exception {
+		final QueryParams params = new QueryParams(Query.location_list);
+		params.setLatitude(contact.getLatitude());
+		params.setLongitude(contact.getLongitude());
+		params.setUser(contact);
+		String search = "";
+		for (int i = 0; i < 6; i++) {
+			String attr = (String) contact.getClass().getMethod("getAttr" + i).invoke(contact);
+			if (!Strings.isEmpty(attr))
+				search += "REGEXP_LIKE(location.attr" + i + ", '" + attr.replace('\u0015', '|') + "')=1 or ";
+			attr = (String) contact.getClass().getMethod("getAttr" + i + "Ex").invoke(contact);
+			if (!Strings.isEmpty(attr))
+				search += "REGEXP_LIKE(location.attr" + i + "Ex, '" + attr.replace(',', '|') + "')=1 or ";
+		}
+		if (search.endsWith(" or ")) {
+			params.setSearch("locationFavorite.id is null and location.image is not null and ("
+					+ search.substring(0, search.length() - 4) + ")");
+			final Result result = repository.list(params);
+			params.setQuery(Query.contact_chat);
+			params.setLatitude(null);
+			for (int i = 0; i < result.size(); i++) {
+				final Location location = repository.one(Location.class, (BigInteger) result.get(i).get("location.id"));
+				params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId()
+						+ " and chat.textId='" + Text.engagement_nearByLocation.name() + "' and chat.action like '%"
+						+ Strings.encodeParam("l=" + location.getId()) + "%'");
+				if (repository.list(params).size() == 0) {
+					if (getScoreLocation(contact, location) > 0.6) {
+						sendChat(Text.engagement_nearByLocation, contact, location,
+								"ui.navigation.autoOpen(&quot;" + Strings.encodeParam("l=" + location.getId())
+										+ "&quot;,event)");
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean sendContact(Contact contact) throws Exception {
+		final QueryParams params = new QueryParams(Query.contact_list);
+		params.setLatitude(contact.getLatitude());
+		params.setLongitude(contact.getLongitude());
+		params.setUser(contact);
+		String search = "";
+		if (!Strings.isEmpty(contact.getBudget()))
+			search += "REGEXP_LIKE(contact.budget, '" + contact.getBudget().replace('\u0015', '|') + "')=1) and (";
+		if (!Strings.isEmpty(contact.getAgeMale()))
+			search += "contact.gender=1 and contact.age>=" + contact.getAgeMale().split(",")[0] + " and contact.age<="
+					+ contact.getAgeMale().split(",")[1] + " or ";
+		if (!Strings.isEmpty(contact.getAgeFemale()))
+			search += "contact.gender=2 and contact.age>=" + contact.getAgeFemale().split(",")[0] + " and contact.age<="
+					+ contact.getAgeFemale().split(",")[1] + " or ";
+		if (!Strings.isEmpty(contact.getAgeDivers()))
+			search += "contact.gender=3 and contact.age>=" + contact.getAgeDivers().split(",")[0] + " and contact.age<="
+					+ contact.getAgeDivers().split(",")[1] + " or ";
+		if (search.contains("contact.age"))
+			search = search.substring(0, search.length() - 4) + ") and (";
+		for (int i = 0; i < 6; i++) {
+			String attr = (String) contact.getClass().getMethod("getAttr" + i).invoke(contact);
+			if (!Strings.isEmpty(attr))
+				search += "REGEXP_LIKE(contact.attr" + i + ", '" + attr.replace('\u0015', '|') + "')=1 or ";
+			attr = (String) contact.getClass().getMethod("getAttr" + i + "Ex").invoke(contact);
+			if (!Strings.isEmpty(attr))
+				search += "REGEXP_LIKE(contact.attr" + i + "Ex, '" + attr.replace(',', '|') + "')=1 or ";
+		}
+		if (!Strings.isEmpty(contact.getAttrInterest()))
+			search += "REGEXP_LIKE(contact.attr, '" + contact.getAttrInterest().replace('\u0015', '|') + "')=1 or ";
+		if (!Strings.isEmpty(contact.getAttrInterestEx()))
+			search += "REGEXP_LIKE(contact.attrEx, '" + contact.getAttrInterestEx().replace(',', '|') + "')=1 or ";
+		if (search.endsWith(" or ")) {
+			params.setSearch("contactLink.id is null and contact.image is not null and ("
+					+ search.substring(0, search.length() - 4) + ")");
+			final Result result = repository.list(params);
+			params.setQuery(Query.contact_chat);
+			params.setLatitude(null);
+			for (int i = 0; i < result.size(); i++) {
+				final Contact contact2 = repository.one(Contact.class, (BigInteger) result.get(i).get("contact.id"));
+				params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId()
+						+ " and chat.textId='" + Text.engagement_nearByContact.name() + "' and chat.action like '%"
+						+ Strings.encodeParam("l=" + contact2.getId()) + "%'");
+				if (repository.list(params).size() == 0) {
+					if (getScoreContact(contact, contact2) > 0.8) {
+						final Location location = new Location();
+						location.setName(contact2.getPseudonym());
+						sendChat(Text.engagement_nearByContact, contact, location,
+								"ui.navigation.autoOpen(&quot;" + Strings.encodeParam("p=" + contact.getId())
+										+ "&quot;,event)");
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	private double getScoreContact(Contact contact, Contact contact2) throws Exception {
+		final Score score = new Score();
+		for (int i = 0; i < 6; i++) {
+			match((String) contact.getClass().getMethod("getAttr" + i).invoke(contact),
+					(String) contact2.getClass().getMethod("getAttr" + i).invoke(contact2), score);
+			match((String) contact.getClass().getMethod("getAttr" + i + "Ex").invoke(contact),
+					(String) contact2.getClass().getMethod("getAttr" + i + "Ex").invoke(contact2), score);
+		}
+		match(contact.getAttrInterest(), contact2.getAttr(), score);
+		match(contact.getAttrInterestEx(), contact2.getAttrEx(), score);
+		match(contact.getBudget(), contact2.getBudget(), score);
+		return score.total < 8 ? 0 : score.percantage();
+	}
+
+	private double getScoreLocation(Contact contact, Location location) throws Exception {
+		final Score score = new Score();
+		match(location.getBudget(), contact.getBudget(), score);
+		if (score.match > 0) {
+			for (int i = 0; i < 6; i++) {
+				match((String) location.getClass().getMethod("getAttr" + i).invoke(location),
+						(String) contact.getClass().getMethod("getAttr" + i).invoke(contact), score);
+				match((String) location.getClass().getMethod("getAttr" + i + "Ex").invoke(location),
+						(String) contact.getClass().getMethod("getAttr" + i + "Ex").invoke(contact), score);
+			}
+		}
+		return score.total < 2 ? 0 : score.percantage();
+	}
+
+	private class Score {
+		private double total = 0;
+		private double match = 0;
+
+		private double percantage() {
+			return total == 0 ? 0 : match / total;
+		}
+	}
+
+	private void match(String attributes, String attributesCompare, Score score) {
+		if (!Strings.isEmpty(attributes)) {
+			final String[] attr = attributes.split(attributes.contains("\u0015") ? "\u0015" : ",");
+			score.total += attr.length;
+			if (attributesCompare != null) {
+				for (int i2 = 0; i2 < attr.length; i2++) {
+					if (attributesCompare.contains(attr[i2]))
+						score.match++;
+				}
+			}
+		}
+	}
+
+	private void sendChat(Text textId, Contact contact, Location location, String action) throws Exception {
+		String s = textId.getText(contact.getLanguage());
+		for (REPLACMENT rep : REPLACMENT.values())
+			s = rep.replace(s, contact, location);
+		final Chat chat = new Chat();
+		chat.setContactId(adminId);
+		chat.setContactId2(contact.getId());
+		chat.setSeen(false);
+		chat.setAction(action);
+		chat.setTextId(textId.name());
+		chat.setNote(s);
+		repository.save(chat);
 	}
 }

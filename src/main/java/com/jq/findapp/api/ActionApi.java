@@ -3,9 +3,12 @@ package com.jq.findapp.api;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.sql.Time;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -145,7 +148,7 @@ public class ActionApi {
 	@GetMapping("chat/{location}/{id}/{all}")
 	public List<Object[]> chat(@PathVariable final boolean location, @PathVariable final BigInteger id,
 			@PathVariable final boolean all, @RequestHeader BigInteger user, @RequestHeader String password,
-			@RequestHeader String salt) {
+			@RequestHeader String salt) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_chat);
 		params.setUser(authenticationService.verify(user, password, salt));
 		if (location)
@@ -156,10 +159,19 @@ public class ActionApi {
 		else
 			params.setSearch("chat.seen=false and chat.contactId=" + id + " and chat.contactId2=" + user);
 		final Result result = repository.list(params);
-		if (!location)
-			repository.executeUpdate(
-					"update Chat chat set chat.seen=true where (chat.seen is null or chat.seen=false) and chat.contactId="
-							+ id + " and chat.contactId2=" + user);
+		if (!location) {
+			params.setSearch("chat.seen=false and chat.contactId=" + id + " and chat.contactId2=" + user);
+			final Result unseen = repository.list(params);
+			if (unseen.size() > 0) {
+				repository.executeUpdate(
+						"update Chat chat set chat.seen=true, chat.modifiedAt=now() where (chat.seen is null or chat.seen=false) and chat.contactId="
+								+ id + " and chat.contactId2=" + user);
+				final Contact contact = repository.one(Contact.class, id);
+				if (contact.getModifiedAt().before(new Date(Instant.now().minus(Duration.ofDays(3)).toEpochMilli())))
+					notificationService.sendNotification(params.getUser(), contact, NotificationID.chatSeen,
+							"chat=" + user);
+			}
+		}
 		return result.getList();
 	}
 
@@ -282,6 +294,7 @@ public class ActionApi {
 			}
 			EntityUtil.addImageList(entity);
 			location.populate(entity.getValues());
+			System.out.println(location.getLatitude() + " - " + location.old("latitude") + entity.getValues());
 			repository.save(location);
 		}
 	}

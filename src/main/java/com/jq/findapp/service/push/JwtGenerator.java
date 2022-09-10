@@ -15,14 +15,14 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Setting;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 @Component
 public class JwtGenerator {
@@ -33,9 +33,9 @@ public class JwtGenerator {
 	@Autowired
 	private Repository repository;
 
-	protected long getLastGeneration(String keyId) throws Exception {
+	protected int getLastGeneration(String keyId) throws Exception {
 		final String label = "push.gen." + keyId;
-		long lastGeneration;
+		long lastGeneration = 0;
 		final QueryParams param = new QueryParams(Query.misc_setting);
 		param.setSearch("setting.label='" + label + "'");
 		final Map<String, Object> settingMap = repository.one(param);
@@ -43,7 +43,6 @@ public class JwtGenerator {
 		if (settingMap == null) {
 			setting = new Setting();
 			setting.setLabel(label);
-			lastGeneration = 0;
 		} else {
 			setting = repository.one(Setting.class, (BigInteger) settingMap.get("setting.id"));
 			lastGeneration = Long.valueOf(setting.getValue().toString());
@@ -54,7 +53,7 @@ public class JwtGenerator {
 			repository.save(setting);
 			token.remove(keyId);
 		}
-		return lastGeneration;
+		return (int) (lastGeneration / 1000);
 	}
 
 	protected String generateToken(Map<String, String> header, Map<String, String> claims, String algorithm)

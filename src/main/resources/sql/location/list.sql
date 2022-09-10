@@ -15,6 +15,7 @@ select
 	location.bonus,
 	location.budget,
 	location.category,
+	location.contactId,
 	location.description,
 	location.id,
 	location.image,

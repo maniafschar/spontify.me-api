@@ -8,8 +8,8 @@ public class QueryParams {
 	private Query query;
 	private String search;
 	private String searchGeoLocation;
-	private Double longitude;
-	private Double latitude;
+	private Float longitude;
+	private Float latitude;
 	private Integer distance;
 	private int limit = 100;
 	private Contact user;
@@ -44,19 +44,19 @@ public class QueryParams {
 		this.search = search;
 	}
 
-	public Double getLongitude() {
+	public Float getLongitude() {
 		return longitude;
 	}
 
-	public void setLongitude(Double longitude) {
+	public void setLongitude(Float longitude) {
 		this.longitude = longitude;
 	}
 
-	public Double getLatitude() {
+	public Float getLatitude() {
 		return latitude;
 	}
 
-	public void setLatitude(Double latitude) {
+	public void setLatitude(Float latitude) {
 		this.latitude = latitude;
 	}
 

@@ -8,6 +8,8 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -88,6 +90,7 @@ public class NotificationService {
 		accountDelete(NotificationIDType.EmailOrDevice, true),
 		birthday(NotificationIDType.EmailOrDevice, true),
 		chatLocation(NotificationIDType.EmailOrDevice, true),
+		chatSeen(NotificationIDType.EmailOrDevice, true),
 		feedback(NotificationIDType.Email, false),
 		friendAppro(NotificationIDType.EmailOrDevice, true),
 		friendReq(NotificationIDType.EmailOrDevice, true),
@@ -161,8 +164,7 @@ public class NotificationService {
 
 	@Async
 	public String[] sendNotificationOnMatch(NotificationID textID, final Contact me, final Contact other,
-			String... param)
-			throws Exception {
+			String... param) throws Exception {
 		if (me != null && other != null && !me.getId().equals(other.getId()) && me.getAge() != null
 				&& me.getGender() != null) {
 			final String s2 = me.getGender().intValue() == 1 ? other.getAgeMale()
@@ -213,11 +215,11 @@ public class NotificationService {
 		try {
 			text = new StringBuilder(Text.valueOf("mail_" + notificationID).getText(contactTo.getLanguage()));
 		} catch (Exception ex) {
-			text = new StringBuilder(": <jq:EXTRA_1/>");
+			text = new StringBuilder(": <jq:EXTRA_1 />");
 		}
 		if (param != null) {
 			for (int i = 0; i < param.length; i++)
-				Strings.replaceString(text, "<jq:EXTRA_" + (i + 1) + "/>", param[i]);
+				Strings.replaceString(text, "<jq:EXTRA_" + (i + 1) + " />", param[i]);
 		}
 		if (text.length() > 250) {
 			text.delete(247, text.length());
@@ -426,7 +428,7 @@ public class NotificationService {
 		final MimeMessage msg = email.createMimeMessage();
 		final MimeMessageHelper helper = new MimeMessageHelper(msg, text != null && text.length > 1);
 		helper.setFrom(from);
-		helper.setTo(to == null ? from : to);
+		helper.setTo(to == null ? "spontify@jq-consulting.de" : to);
 		helper.setSubject(subject);
 		if (text != null) {
 			if (text.length > 1) {
@@ -434,8 +436,12 @@ public class NotificationService {
 				helper.addInline("img_logo", new MyDataSource(LOGO, "logoEmail.png"));
 				if (imgProfile != null)
 					helper.addInline("img_profile", new MyDataSource(imageRound(imgProfile), "image.jpg"));
-			} else if (text.length > 0)
+			} else if (text.length > 0) {
 				helper.setText(text[0]);
+				new File("error").mkdir();
+				IOUtils.write(text[0], new FileOutputStream("error/" + System.currentTimeMillis()),
+						StandardCharsets.UTF_8);
+			}
 		}
 		email.send(msg);
 	}

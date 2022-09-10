@@ -106,11 +106,11 @@ public enum Query {
 			s = s.replaceAll("\\{USERATTRIBUTES}",
 					params.getUser().getAttr() == null
 							|| params.getUser().getAttr().trim().length() == 0 ? "-"
-									: params.getUser().getAttr());
+									: params.getUser().getAttr().replace('\u0015', '|'));
 		if (s.contains("{USERATTRIBUTESEX}"))
 			s = s.replaceAll("\\{USERATTRIBUTESEX}",
 					params.getUser().getAttrEx() == null || params.getUser().getAttrEx().trim().length() == 0 ? "-"
-							: params.getUser().getAttrEx());
+							: params.getUser().getAttrEx().replace(',', '|'));
 		if (s.contains("{USERID}"))
 			s = s.replaceAll("\\{USERID}", "" + params.getUser().getId());
 		return s;

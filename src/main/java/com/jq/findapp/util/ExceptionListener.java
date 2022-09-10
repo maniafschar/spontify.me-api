@@ -66,55 +66,56 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 				+ (request.getHeader("user") == null ? "" : request.getHeader("user") + "@")
 				+ SUBSTITUTE + ":" + request.getRequestURI() + getQueryString(request) + SUBSTITUTE
 				+ Strings.stackTraceToString(ex);
-		final Integer hash = msg.hashCode();
-		boolean send = false;
-		synchronized (SENT_ERRORS) {
-			if (!SENT_ERRORS.contains(hash))
-				send = SENT_ERRORS.add(hash);
-		}
-		if (send) {
-			final StringBuilder s = new StringBuilder(
-					new SimpleDateFormat("\n\ndd.MM.yyyy HH:mm:ss\n").format(new Date()));
-			if (request.getHeader("user") != null && !"0".equals(request.getHeader("user"))) {
-				final Contact user = repository.one(Contact.class, new BigInteger(request.getHeader("user")));
-				if (user == null)
-					s.append("\nUSER\nid: " + request.getHeader("user") + " NOT FOUND");
-				else {
-					s.append("\nUSER\nid: " + user.getId());
-					s.append("\nversion: " + user.getVersion());
-					s.append("\ndevice: " + user.getDevice());
-					s.append("\nos: " + user.getOs());
-				}
-				s.append("\n");
+		try {
+			final Integer hash = msg.hashCode();
+			boolean send = false;
+			synchronized (SENT_ERRORS) {
+				if (!SENT_ERRORS.contains(hash))
+					send = SENT_ERRORS.add(hash);
 			}
-			s.append("\nHEADER\n");
-			List<String> list = Collections.list(request.getHeaderNames());
-			Collections.sort(list);
-			for (String n : list)
-				s.append(n + ": " + request.getHeader(n) + "\n");
-			s.append("\n");
-			if (request.getParameterMap().size() > 0) {
-				s.append("\nPARAM\n");
-				list = Collections.list(request.getParameterNames());
+			if (send) {
+				final StringBuilder s = new StringBuilder(
+						new SimpleDateFormat("\n\ndd.MM.yyyy HH:mm:ss\n").format(new Date()));
+				if (request.getHeader("user") != null && !"0".equals(request.getHeader("user"))) {
+					final Contact user = repository.one(Contact.class, new BigInteger(request.getHeader("user")));
+					if (user == null)
+						s.append("\nUSER\nid: " + request.getHeader("user") + " NOT FOUND");
+					else {
+						s.append("\nUSER\nid: " + user.getId());
+						s.append("\nversion: " + user.getVersion());
+						s.append("\ndevice: " + user.getDevice());
+						s.append("\nos: " + user.getOs());
+					}
+					s.append("\n");
+				}
+				s.append("\nHEADER\n");
+				List<String> list = Collections.list(request.getHeaderNames());
 				Collections.sort(list);
 				for (String n : list)
-					s.append(n + ": " + request.getParameter(n) + "\n");
+					s.append(n + ": " + request.getHeader(n) + "\n");
 				s.append("\n");
-			}
-			if (request instanceof ContentCachingRequestWrapper) {
-				final byte[] b = ((ContentCachingRequestWrapper) request).getContentAsByteArray();
-				if (b != null && b.length > 0) {
-					s.append("\nREQUEST BODY\n");
-					s.append(new String(b, StandardCharsets.UTF_8));
-					s.append("\n\n");
+				if (request.getParameterMap().size() > 0) {
+					s.append("\nPARAM\n");
+					list = Collections.list(request.getParameterNames());
+					Collections.sort(list);
+					for (String n : list)
+						s.append(n + ": " + request.getParameter(n) + "\n");
+					s.append("\n");
 				}
-			}
-			try {
+				if (request instanceof ContentCachingRequestWrapper) {
+					final byte[] b = ((ContentCachingRequestWrapper) request).getContentAsByteArray();
+					if (b != null && b.length > 0) {
+						s.append("\nREQUEST BODY\n");
+						s.append(new String(b, StandardCharsets.UTF_8));
+						s.append("\n\n");
+					}
+				}
 				msg = msg.replaceFirst(SUBSTITUTE, "" + request.getServerPort()).replaceFirst(SUBSTITUTE, s.toString());
 				notificationService.sendEmail(null, "ERROR " + ex.getMessage(), msg);
-			} catch (Exception e1) {
-				// never happend in 22 years...
 			}
+		} catch (Exception e1) {
+			notificationService.sendEmail(null, "ERROR in chatch block!",
+					Strings.stackTraceToString(e1) + "\n\n\n" + msg);
 		}
 	}
 
@@ -126,7 +127,7 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 				if (query.contains("&_="))
 					return "?" + URLDecoder.decode(query.substring(0, query.indexOf("&_=")),
 							StandardCharsets.UTF_8.name());
-				else if (!query.startsWith("_="))
+				if (!query.startsWith("_="))
 					return "?" + URLDecoder.decode(query, StandardCharsets.UTF_8.name());
 			} catch (UnsupportedEncodingException e) {
 				throw new RuntimeException(e);

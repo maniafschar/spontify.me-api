@@ -344,7 +344,7 @@ public class AuthenticationService {
 		repository.save(contact);
 		notificationService.sendNotificationEmail(repository.one(Contact.class, adminId),
 				contact,
-				Text.mail_registrationReminder.getText(contact.getLanguage()).replace("<jq:EXTRA_1/>",
+				Text.mail_registrationReminder.getText(contact.getLanguage()).replace("<jq:EXTRA_1 />",
 						new SimpleDateFormat("dd.MM.yyyy HH:mm").format(contact.getCreatedAt())),
 				"r=" + s);
 	}

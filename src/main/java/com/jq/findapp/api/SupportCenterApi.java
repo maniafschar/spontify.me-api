@@ -105,11 +105,14 @@ public class SupportCenterApi {
 	}
 
 	@PutMapping("refreshDB")
-	public void refreshDB(@RequestHeader String secret) throws Exception {
+	public String refreshDB(@RequestHeader String secret) throws Exception {
+		String s = null;
 		if (schedulerSecret.equals(secret)) {
-			engagementService.sendSpontifyEmail();
-			engagementService.sendRegistrationReminder();
-			engagementService.sendChats();
+			s = engagementService.sendSpontifyEmail();
+			s += engagementService.sendRegistrationReminder();
+			s += engagementService.sendChats();
+			s += engagementService.sendNearBy();
 		}
+		return s;
 	}
 }

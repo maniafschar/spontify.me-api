@@ -10,6 +10,7 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -147,8 +148,8 @@ public class RepositoryTest {
 		// given
 		final QueryParams params = new QueryParams(Query.contact_list);
 		params.setDistance(100);
-		params.setLatitude(12.0);
-		params.setLongitude(49.8);
+		params.setLatitude(12.0f);
+		params.setLongitude(49.8f);
 		params.setUser(utils.createContact());
 
 		// when
@@ -174,5 +175,18 @@ public class RepositoryTest {
 
 		// then
 		assertNotNull(feedback.getId());
+	}
+
+	@Test
+	public void attachment_columns() {
+		// given
+		final Pattern pattern = Pattern.compile(
+				".*(image|note|storage|description|aboutMe).*");
+
+		// when
+		final boolean matches = pattern.matcher("xyzaboutMeabc").matches();
+
+		// then
+		assertTrue(matches);
 	}
 }

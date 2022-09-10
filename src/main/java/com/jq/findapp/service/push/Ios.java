@@ -45,8 +45,7 @@ public class Ios {
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
 
-	public String send(Contact contact, String text, String action, int badge, String notificationId)
-			throws Exception {
+	public String send(Contact contact, String text, String action, int badge, String notificationId) throws Exception {
 		try {
 			send(url, contact, text, action, badge, notificationId);
 			return "production";
@@ -93,7 +92,7 @@ public class Ios {
 	private Map<String, String> getClaims() throws Exception {
 		final Map<String, String> map = new HashMap<>(2);
 		map.put("iss", teamId);
-		map.put("iat", "" + (int) (jwtGenerator.getLastGeneration(keyId) / 1000));
+		map.put("iat", "" + jwtGenerator.getLastGeneration(keyId));
 		return map;
 	}
 }
