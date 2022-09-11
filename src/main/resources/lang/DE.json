@@ -1,6 +1,7 @@
 {
 	"engagement": {
 		"addFriends": "Hey CONTACT_PSEUDONYM, Lust Deine Frende hinzuzufügen? EMOJI_DANCING\nAuf der Info-Seite findest Du den Button, lade sie einfach ein... EMOJI_WAVING",
+		"allowLocation": "Hey CONTACT_PSEUDONYM, Du hast Deinen Standort nicht freigegeben. 🤔\nDamit können wir Dir keine Spontis, Events und Locations in Deiner Umgebung anzeigen. 😢\nWir sind Open Source und verkaufen Deine Daten nicht. Du kannst den Standort über die App Einstellungen freischalten. 👍",
 		"becomeGuide": "Hey CONTACT_PSEUDONYM, bist Du kontaktfreudig und organisierst gerne Events? Als Guide zeigst schlagen wir Dir immer wieder besonders passende Spontis vor, um Deine Events zu boostern und Deinen Bekanntenkreis zu erweitern. Möchtest Du ein Guide werden? EMOJI_DANCING\nSetze einfach das Häckchen in den Einstellungen EMOJI_WAVING",
 		"bluetoothMatch": "Hey CONTACT_PSEUDONYM, Du hattest schon ein paar Bluetooth Matches. Hast Du sie angesprochen?\nWie war's? Wenn Du möchtest, erzähl mir drüber... EMOJI_DANCING",
 		"bluetoothNoMatch": "Hey CONTACT_PSEUDONYM, Du hast noch keinen Bluetooth Match. Möchtest Du Deine Freunde einladen, damit die Community wächst und mehr Matches sich ergeben? EMOJI_DANCING",

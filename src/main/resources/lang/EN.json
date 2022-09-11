@@ -1,6 +1,7 @@
 {
 	"engagement": {
 		"addFriends": "Hey CONTACT_PSEUDONYM, would you like to add your friends? EMOJI_DANCING\nYou can find the button on the info page, just invite them... EMOJI_WAVING",
+		"allowLocation": "Hey CONTACT_PSEUDONYM, you have not shared your location. 🤔\nThis means that we cannot show you Spontis, Events and Locations in your area. 😢\nWe are Open Source and do not sell your data. You can unlock the location in your app settings. 👍",
 		"becomeGuide": "Hey CONTACT_PSEUDONYM, are you sociable and like to organize events? As a guide, we always suggest particularly suitable Spontis to boost your events and expand your circle of acquaintances. Would you like to become a guide? EMOJI_DANCING\nJust check the settings EMOJI_WAVING",
 		"bluetoothMatch": "Hey CONTACT_PSEUDONYM, you've already had a few Bluetooth Matches. Have you reached out to them?\nHow was it? If you want, tell me about it... EMOJI_DANCING",
 		"bluetoothNoMatch": "Hey CONTACT_PSEUDONYM, you don't have a Bluetooth match yet. Would you like to invite your friends to grow the community and create more matches? EMOJI_DANCING",

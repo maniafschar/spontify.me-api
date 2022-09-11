@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public enum Text {
 	engagement_addFriends,
+	engagement_allowLocation,
 	engagement_becomeGuide,
 	engagement_bluetoothMatch,
 	engagement_bluetoothNoMatch,

@@ -73,6 +73,7 @@ public class EngagementService {
 	}
 
 	private List<ChatTemplate> chatTemplates = new ArrayList<>();
+	private final QueryParams paramsAdminBlocked = new QueryParams(Query.contact_block);
 
 	enum REPLACMENT {
 		EMOJI_DANCING((contact, location) -> contact.getGender() != null && contact.getGender() == 1 ? "🕺🏻" : "💃"),
@@ -119,6 +120,10 @@ public class EngagementService {
 				contact -> contact.getAttr0() == null && contact.getAttr1() == null && contact.getAttr2() == null
 						&& contact.getAttr3() == null && contact.getAttr4() == null && contact.getAttr5() == null
 						&& contact.getAttr() == null));
+
+		chatTemplates.add(new ChatTemplate(Text.engagement_allowLocation,
+				"",
+				contact -> contact.getLongitude() == null && contact.getOs() != OS.web));
 
 		chatTemplates.add(new ChatTemplate(Text.engagement_patience,
 				"pageInfo.socialShare()",
@@ -240,37 +245,50 @@ public class EngagementService {
 	}
 
 	public String sendChats() throws Exception {
+		resetChatInstallCurrentVersion();
+		final QueryParams params = new QueryParams(Query.contact_listId);
+		params.setSearch("contact.id<>" + adminId + " and contact.verified=true and contact.version is not null");
+		final Result ids = repository.list(params);
+		params.setQuery(Query.contact_chat);
+		int count = 0;
+		String temp = "";
+		for (int i = 0; i < ids.size(); i++) {
+			if (!adminBlocked(ids.get(i).get("contact.id"))) {
+				params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + ids.get(i).get("contact.id")
+						+ " and chat.createdAt>'"
+						+ Instant.now().minus(Duration.ofDays(7 + (int) (Math.random() * 4)))
+								.minus(Duration.ofHours((int) (Math.random() * 12))).toString()
+						+ '\'');
+				if (repository.list(params).size() == 0) {
+					temp += "," + ids.get(i).get("contact.id");
+					if (sendChatTemplate(repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id")),
+							params))
+						count++;
+				}
+			}
+		}
+		return count + "/" + ids.size() + " chats sent\n" + temp.replaceFirst(",", "") + "\n";
+	}
+
+	private boolean adminBlocked(Object id) {
+		paramsAdminBlocked.setSearch("contactBlock.contactId=" + adminId + " and contactBlock.contactId2=" + id
+				+ " or contactBlock.contactId=" + id + " and contactBlock.contactId2=" + id);
+		return repository.list(paramsAdminBlocked).size() > 0;
+	}
+
+	private void resetChatInstallCurrentVersion() throws Exception {
 		if (currentVersion == null)
 			currentVersion = (String) repository.one(new QueryParams(Query.contact_maxAppVersion)).get("c");
 		final QueryParams params = new QueryParams(Query.contact_listChatFlat);
 		params.setLimit(0);
 		params.setSearch("chat.textId='" + Text.engagement_installCurrentVersion.name() +
 				"' and contact.version='" + currentVersion + "'");
-		Result ids = repository.list(params);
+		final Result ids = repository.list(params);
 		for (int i = 0; i < ids.size(); i++) {
 			final Chat chat = repository.one(Chat.class, (BigInteger) ids.get(i));
 			chat.setTextId(null);
 			repository.save(chat);
 		}
-		params.setQuery(Query.contact_listId);
-		params.setSearch("contact.id<>" + adminId + " and contact.verified=true and contact.version is not null");
-		ids = repository.list(params);
-		params.setQuery(Query.contact_chat);
-		int count = 0;
-		String temp = "";
-		for (int i = 0; i < ids.size(); i++) {
-			params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + ids.get(i).get("contact.id")
-					+ " and chat.createdAt>'"
-					+ Instant.now().minus(Duration.ofDays(7 + (int) (Math.random() * 4)))
-							.minus(Duration.ofHours((int) (Math.random() * 12))).toString()
-					+ '\'');
-			if (repository.list(params).size() == 0) {
-				temp += "," + ids.get(i).get("contact.id");
-				if (sendChatTemplate(repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id")), params))
-					count++;
-			}
-		}
-		return count + "/" + ids.size() + " chats sent\n" + temp.replaceFirst(",", "") + "\n";
 	}
 
 	public String sendNearBy() throws Exception {
@@ -289,19 +307,21 @@ public class EngagementService {
 		int count = 0;
 		String temp = "";
 		for (int i = 0; i < ids.size(); i++) {
-			params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + ids.get(i).get("contact.id")
-					+ " and chat.textId like '"
-					+ Text.engagement_nearByLocation.name()
-							.substring(0, Text.engagement_nearByLocation.name().indexOf('L'))
-					+ "%' and chat.createdAt>'"
-					+ Instant.now().minus(Duration.ofDays(4))
-							.minus(Duration.ofHours((int) (Math.random() * 12))).toString()
-					+ '\'');
-			if (repository.list(params).size() == 0) {
-				final Contact contact = repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id"));
-				temp += "," + contact.getId();
-				if (sendEvent(contact) || sendLocation(contact) || sendContact(contact))
-					count++;
+			if (!adminBlocked(ids.get(i).get("contact.id"))) {
+				params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + ids.get(i).get("contact.id")
+						+ " and chat.textId like '"
+						+ Text.engagement_nearByLocation.name()
+								.substring(0, Text.engagement_nearByLocation.name().indexOf('L'))
+						+ "%' and chat.createdAt>'"
+						+ Instant.now().minus(Duration.ofDays(4))
+								.minus(Duration.ofHours((int) (Math.random() * 12))).toString()
+						+ '\'');
+				if (repository.list(params).size() == 0) {
+					final Contact contact = repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id"));
+					temp += "," + contact.getId();
+					if (sendEvent(contact) || sendLocation(contact) || sendContact(contact))
+						count++;
+				}
 			}
 		}
 		return count + "/" + ids.size() + " near by chats sent\n" + temp.replaceFirst(",", "") + "\n";
@@ -372,19 +392,26 @@ public class EngagementService {
 			final Result result = repository.list(params);
 			params.setQuery(Query.contact_chat);
 			params.setLatitude(null);
+			double score = 0;
+			Location location = null;
 			for (int i = 0; i < result.size(); i++) {
-				final Location location = repository.one(Location.class, (BigInteger) result.get(i).get("location.id"));
+				final Location l = repository.one(Location.class, (BigInteger) result.get(i).get("location.id"));
 				params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId()
 						+ " and chat.textId='" + Text.engagement_nearByLocation.name() + "' and chat.action like '%"
-						+ Strings.encodeParam("l=" + location.getId()) + "%'");
+						+ Strings.encodeParam("l=" + l.getId()) + "%'");
 				if (repository.list(params).size() == 0) {
-					if (getScoreLocation(contact, location) > 0.6) {
-						sendChat(Text.engagement_nearByLocation, contact, location,
-								"ui.navigation.autoOpen(&quot;" + Strings.encodeParam("l=" + location.getId())
-										+ "&quot;,event)");
-						return true;
+					double s = getScoreLocation(contact, l);
+					if (s > score) {
+						score = s;
+						location = l;
 					}
 				}
+			}
+			if (location != null) {
+				sendChat(Text.engagement_nearByLocation, contact, location,
+						"ui.navigation.autoOpen(&quot;" + Strings.encodeParam("l=" + location.getId())
+								+ "&quot;,event)");
+				return true;
 			}
 		}
 		return false;
