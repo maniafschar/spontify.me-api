@@ -29,6 +29,7 @@ import com.jq.findapp.entity.ContactBluetooth;
 import com.jq.findapp.entity.ContactLink;
 import com.jq.findapp.entity.ContactLink.Status;
 import com.jq.findapp.entity.ContactMarketing;
+import com.jq.findapp.entity.ContactWhatToDo;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.Feedback;
@@ -40,6 +41,7 @@ import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.NotificationService.NotificationID;
+import com.jq.findapp.service.WhatToDoService;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
 
@@ -48,6 +50,7 @@ public class RepositoryListener {
 	private static Repository repository;
 	private static NotificationService notificationService;
 	private static ExternalService externalService;
+	private static WhatToDoService whatToDoService;
 	private static BigInteger adminId;
 
 	@Value("${app.admin.id}")
@@ -70,6 +73,11 @@ public class RepositoryListener {
 		RepositoryListener.externalService = externalService;
 	}
 
+	@Autowired
+	private void setWhatToDoService(WhatToDoService whatToDoService) {
+		RepositoryListener.whatToDoService = whatToDoService;
+	}
+
 	@PrePersist
 	public void prePersist(final BaseEntity entity) throws Exception {
 		if (entity instanceof Contact)
@@ -82,10 +90,6 @@ public class RepositoryListener {
 			prePersistLocation((Location) entity);
 		else if (entity instanceof LocationFavorite)
 			prePersistLocationFavorite((LocationFavorite) entity);
-	}
-
-	private void prePersistContact(final Contact contact) {
-		contact.setPseudonym(sanitizePseudonym(contact.getPseudonym()));
 	}
 
 	@PreUpdate
@@ -106,6 +110,8 @@ public class RepositoryListener {
 			postPersistContactBluetooth((ContactBluetooth) entity);
 		else if (entity instanceof ContactLink)
 			postPersistContactLink((ContactLink) entity);
+		else if (entity instanceof ContactWhatToDo)
+			postPersistContactWhatToDo((ContactWhatToDo) entity);
 		else if (entity instanceof EventParticipate)
 			postPersistEventParticipate((EventParticipate) entity);
 		else if (entity instanceof Feedback)
@@ -120,6 +126,12 @@ public class RepositoryListener {
 	public void postUpdate(final BaseEntity entity) throws Exception {
 		if (entity instanceof ContactLink)
 			postUpdateContactLink((ContactLink) entity);
+		else if (entity instanceof ContactWhatToDo)
+			postUpdateContactWhatToDo((ContactWhatToDo) entity);
+	}
+
+	private void prePersistContact(final Contact contact) {
+		contact.setPseudonym(sanitizePseudonym(contact.getPseudonym()));
 	}
 
 	private void prePersistContactBluetooth(final ContactBluetooth contactBlutooth) {
@@ -325,6 +337,14 @@ public class RepositoryListener {
 		notificationService.sendNotification(repository.one(Contact.class, contactLink.getContactId()),
 				repository.one(Contact.class, contactLink.getContactId2()),
 				NotificationID.friendReq, Strings.encodeParam("p=" + contactLink.getContactId()));
+	}
+
+	private void postPersistContactWhatToDo(ContactWhatToDo contactWhatToDo) throws Exception {
+		whatToDoService.findAndNotify();
+	}
+
+	private void postUpdateContactWhatToDo(ContactWhatToDo contactWhatToDo) throws Exception {
+		whatToDoService.findAndNotify();
 	}
 
 	private void postPersistEventParticipate(EventParticipate eventParticipate) throws Exception {

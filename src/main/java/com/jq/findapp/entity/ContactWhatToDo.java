@@ -4,11 +4,14 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.Transient;
 
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.repository.RepositoryListener;
 
 @Entity
+@EntityListeners(RepositoryListener.class)
 public class ContactWhatToDo extends BaseEntity {
 	private Boolean active = true;
 	private BigInteger contactId;

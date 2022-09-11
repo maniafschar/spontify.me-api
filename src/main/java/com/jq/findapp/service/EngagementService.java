@@ -118,9 +118,13 @@ public class EngagementService {
 
 		chatTemplates.add(new ChatTemplate(Text.engagement_uploadProfileAttributes,
 				"ui.navigation.goTo(&quot;settings&quot;)",
-				contact -> contact.getAttr0() == null && contact.getAttr1() == null && contact.getAttr2() == null
+				contact -> (contact.getAttr0() == null && contact.getAttr1() == null && contact.getAttr2() == null
 						&& contact.getAttr3() == null && contact.getAttr4() == null && contact.getAttr5() == null
-						&& contact.getAttr() == null));
+						&& contact.getAttr() == null) ||
+						(contact.getAgeMale() == null && contact.getAgeFemale() == null
+								&& contact.getAgeDivers() == null)
+						|| contact.getGender() == null ||
+						contact.getBirthday() == null));
 
 		chatTemplates.add(new ChatTemplate(Text.engagement_allowLocation,
 				"",
@@ -342,20 +346,27 @@ public class EngagementService {
 		final Result result = repository.list(params);
 		params.setQuery(Query.contact_chat);
 		params.setLatitude(null);
+		double score = 0;
+		Event event = null;
 		for (int i = 0; i < result.size(); i++) {
-			final Event event = repository.one(Event.class, (BigInteger) result.get(0).get("event.id"));
+			final Event e = repository.one(Event.class, (BigInteger) result.get(0).get("event.id"));
 			params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId()
 					+ " and chat.textId='" + Text.engagement_nearByLocation.name() + "' and chat.action like '%"
-					+ Strings.encodeParam("e=" + event.getId()) + "%'");
+					+ Strings.encodeParam("e=" + e.getId()) + "%'");
 			if (repository.list(params).size() == 0) {
-				if (Score.getContact(contact, repository.one(Contact.class, event.getContactId())) > 0.8) {
-					sendChat(Text.engagement_nearByEvent, contact,
-							repository.one(Location.class, event.getLocationId()),
-							"ui.navigation.autoOpen(&quot;" + Strings.encodeParam("e=" + event.getId())
-									+ "&quot;,event)");
-					return true;
+				final double s = Score.getContact(contact, repository.one(Contact.class, e.getContactId()));
+				if (s > score) {
+					score = s;
+					event = e;
 				}
 			}
+		}
+		if (event != null) {
+			sendChat(Text.engagement_nearByEvent, contact,
+					repository.one(Location.class, event.getLocationId()),
+					"ui.navigation.autoOpen(&quot;" + Strings.encodeParam("e=" + event.getId())
+							+ "&quot;,event)");
+			return true;
 		}
 		return false;
 	}
@@ -388,7 +399,7 @@ public class EngagementService {
 						+ " and chat.textId='" + Text.engagement_nearByLocation.name() + "' and chat.action like '%"
 						+ Strings.encodeParam("l=" + l.getId()) + "%'");
 				if (repository.list(params).size() == 0) {
-					double s = Score.getLocation(contact, l);
+					final double s = Score.getLocation(contact, l);
 					if (s > score) {
 						score = s;
 						location = l;
@@ -416,21 +427,28 @@ public class EngagementService {
 			final Result result = repository.list(params);
 			params.setQuery(Query.contact_chat);
 			params.setLatitude(null);
+			double score = 0;
+			Contact contact2 = null;
 			for (int i = 0; i < result.size(); i++) {
-				final Contact contact2 = repository.one(Contact.class, (BigInteger) result.get(i).get("contact.id"));
+				final Contact c = repository.one(Contact.class, (BigInteger) result.get(i).get("contact.id"));
 				params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId()
 						+ " and chat.textId='" + Text.engagement_nearByContact.name() + "' and chat.action like '%"
-						+ Strings.encodeParam("p=" + contact2.getId()) + "%'");
+						+ Strings.encodeParam("p=" + c.getId()) + "%'");
 				if (repository.list(params).size() == 0) {
-					if (Score.getContact(contact, contact2) > 0.8) {
-						final Location location = new Location();
-						location.setName(contact2.getPseudonym());
-						sendChat(Text.engagement_nearByContact, contact, location,
-								"ui.navigation.autoOpen(&quot;" + Strings.encodeParam("p=" + contact.getId())
-										+ "&quot;,event)");
-						return true;
+					final double s = Score.getContact(contact, c);
+					if (s > score) {
+						score = s;
+						contact2 = c;
 					}
 				}
+			}
+			if (contact2 != null) {
+				final Location location = new Location();
+				location.setName(contact2.getPseudonym());
+				sendChat(Text.engagement_nearByContact, contact, location,
+						"ui.navigation.autoOpen(&quot;" + Strings.encodeParam("p=" + contact2.getId())
+								+ "&quot;,event)");
+				return true;
 			}
 		}
 		return false;

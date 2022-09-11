@@ -58,7 +58,8 @@ public class WhatToDoService {
 					for (int i2 = 0; i2 < result.size(); i2++) {
 						final Contact contact2 = repository.one(Contact.class,
 								(BigInteger) result.get(i2).get("contact.id"));
-						if (Score.getContact(contact, contact2) > 0.8) {
+						System.out.println(contact2.getId() + ": " + Score.getContact(contact, contact2));
+						if (Score.getContact(contact, contact2) > 0.5) {
 							final ZonedDateTime t = Instant.now().minus(Duration.ofMinutes(
 									contact.getTimezoneOffset().longValue()))
 									.atZone(ZoneOffset.UTC);
@@ -69,7 +70,7 @@ public class WhatToDoService {
 												.valueOf(Text.category_verb0.name().substring(0,
 														Text.category_verb0.name().length() - 1) + cats[i3])
 												.getText(contact2.getLanguage());
-							notificationService.sendNotification(contact2, contact, NotificationID.wtd,
+							notificationService.sendNotification(contact, contact2, NotificationID.wtd,
 									Strings.encodeParam("p=" + contact.getId()),
 									t.getHour() + ":" + t.getMinute(), verb);
 						}

@@ -20,7 +20,7 @@
 		"nearByLocation": "Hello CONTACT_PSEUDONYM, you are near the location LOCATION_NAME and you might like it. Maybe you visit them and rate them?",
 		"newTown": "Hey CONTACT_PSEUDONYM, we would like to grow in CONTACT_CURRENT_TOWN and are looking for friendly contacts. Do you perhaps know a few that you could invite here? EMOJI_WAVING",
 		"patience": "Be patient, we are currently building the community in CONTACT_CURRENT_TOWN. You can speed it up by inviting your friends here. EMOJI_WAVING",
-		"uploadProfileAttributes": "Hey CONTACT_PSEUDONYM, the right attributes help you to be more spontaneous when finding events and locations. Click me to specify attributes now.",
+		"uploadProfileAttributes": "Hey CONTACT_PSEUDONYM, the appropriate attributes together with your birthday and your gender help you to find suitable Spontis, Events and Locations and to use \"Any plans for today?\" or Bluetooth Matching. Click me if you want to add your details now.",
 		"uploadProfileImage": "You get 81% more interactions with an attractive picture in your profile. It's worth it, give it a try. Ask me if you have problems using the app."
 	},
 	"mail": {
