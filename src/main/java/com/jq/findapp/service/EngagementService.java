@@ -458,7 +458,7 @@ public class EngagementService {
 				final Contact contact2 = repository.one(Contact.class, (BigInteger) result.get(i).get("contact.id"));
 				params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId()
 						+ " and chat.textId='" + Text.engagement_nearByContact.name() + "' and chat.action like '%"
-						+ Strings.encodeParam("l=" + contact2.getId()) + "%'");
+						+ Strings.encodeParam("p=" + contact2.getId()) + "%'");
 				if (repository.list(params).size() == 0) {
 					if (getScoreContact(contact, contact2) > 0.8) {
 						final Location location = new Location();
