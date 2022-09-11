@@ -13,6 +13,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public enum Text {
+	category_verb0,
+	category_verb1,
+	category_verb2,
+	category_verb3,
+	category_verb4,
+	category_verb5,
 	engagement_addFriends,
 	engagement_allowLocation,
 	engagement_becomeGuide,
@@ -60,7 +66,8 @@ public enum Text {
 	marketing_iPadTitle,
 	marketing_list,
 	marketing_noActions,
-	marketing_scoring;
+	marketing_scoring,
+	or;
 
 	private static Map<String, JsonNode> languages = new HashMap<>();
 

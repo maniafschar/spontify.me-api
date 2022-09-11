@@ -26,6 +26,7 @@ public enum Query {
 	contact_listNotification(true),
 	contact_listSupportCenter,
 	contact_listVisit(true),
+	contact_listWhat2do,
 	contact_marketing(true),
 	contact_maxAppVersion,
 	contact_notification(true),

@@ -1,4 +1,12 @@
 {
+	"category": {
+		"verb0": "Shoppen gehen",
+		"verb1": "Kultur genießen",
+		"verb2": "Essen gehen",
+		"verb3": "Attraktion anschauen",
+		"verb4": "Ausgehen",
+		"verb5": "Sport/Hobby widmen"
+	},
 	"engagement": {
 		"addFriends": "Hey CONTACT_PSEUDONYM, Lust Deine Frende hinzuzufügen? EMOJI_DANCING\nAuf der Info-Seite findest Du den Button, lade sie einfach ein... EMOJI_WAVING",
 		"allowLocation": "Hey CONTACT_PSEUDONYM, Du hast Deinen Standort nicht freigegeben. 🤔\nDamit können wir Dir keine Spontis, Events und Locations in Deiner Umgebung anzeigen. 😢\nWir sind Open Source und verkaufen Deine Daten nicht. Du kannst den Standort über die App Einstellungen freischalten. 👍",
@@ -51,5 +59,6 @@
 		"list": "Hier die aktuelle Bestenliste:",
 		"noActions": "zur Zeit gibt es keine laufenden Aktionen.",
 		"scoring": "Aktuelle Punktzahl: "
-	}
+	},
+	"or": " oder "
 }

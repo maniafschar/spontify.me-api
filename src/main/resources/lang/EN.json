@@ -1,4 +1,12 @@
 {
+	"category": {
+		"verb0": "go shopping",
+		"verb1": "enjoy culture",
+		"verb2": "go for dinner",
+		"verb3": "visit attractions",
+		"verb4": "enjoy nightlife",
+		"verb5": "work out/dedicate hobby"
+	},
 	"engagement": {
 		"addFriends": "Hey CONTACT_PSEUDONYM, would you like to add your friends? EMOJI_DANCING\nYou can find the button on the info page, just invite them... EMOJI_WAVING",
 		"allowLocation": "Hey CONTACT_PSEUDONYM, you have not shared your location. 🤔\nThis means that we cannot show you Spontis, Events and Locations in your area. 😢\nWe are Open Source and do not sell your data. You can unlock the location in your app settings. 👍",
@@ -50,5 +58,6 @@
 		"list": "The current ranking list:",
 		"noActions": "currently no active campaigns.",
 		"scoring": "Scoring points: "
-	}
+	},
+	"or": " or "
 }

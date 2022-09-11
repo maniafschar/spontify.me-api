@@ -28,6 +28,7 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.EngagementService;
 import com.jq.findapp.service.NotificationService;
+import com.jq.findapp.service.WhatToDoService;
 
 @RestController
 @CrossOrigin(origins = { "https://sc.spontify.me" })
@@ -44,6 +45,9 @@ public class SupportCenterApi {
 
 	@Autowired
 	private EngagementService engagementService;
+
+	@Autowired
+	private WhatToDoService whatToDoService;
 
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
@@ -105,14 +109,13 @@ public class SupportCenterApi {
 	}
 
 	@PutMapping("refreshDB")
-	public String refreshDB(@RequestHeader String secret) throws Exception {
-		String s = null;
+	public void refreshDB(@RequestHeader String secret) throws Exception {
 		if (schedulerSecret.equals(secret)) {
-			s = engagementService.sendSpontifyEmail();
-			s += engagementService.sendRegistrationReminder();
-			s += engagementService.sendChats();
-			s += engagementService.sendNearBy();
+			engagementService.sendSpontifyEmail();
+			engagementService.sendRegistrationReminder();
+			engagementService.sendChats();
+			engagementService.sendNearBy();
+			whatToDoService.findAndNotify();
 		}
-		return s;
 	}
 }

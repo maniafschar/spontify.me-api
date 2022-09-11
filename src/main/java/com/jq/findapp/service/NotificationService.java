@@ -204,7 +204,7 @@ public class NotificationService {
 		if (!contactTo.getVerified() && notificationID != NotificationID.welcomeExt
 				&& notificationID != NotificationID.pwReset)
 			return false;
-		QueryParams params = new QueryParams(Query.contact_block);
+		final QueryParams params = new QueryParams(Query.contact_block);
 		params.setUser(contactFrom);
 		params.setSearch("contactBlock.contactId=" + contactFrom.getId() + " and contactBlock.contactId2="
 				+ contactTo.getId() + " or contactBlock.contactId="
