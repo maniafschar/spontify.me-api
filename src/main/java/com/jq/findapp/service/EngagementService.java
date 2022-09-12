@@ -442,7 +442,7 @@ public class EngagementService {
 					}
 				}
 			}
-			if (contact2 != null) {
+			if (score > 0.5) {
 				final Location location = new Location();
 				location.setName(contact2.getPseudonym());
 				sendChat(Text.engagement_nearByContact, contact, location,

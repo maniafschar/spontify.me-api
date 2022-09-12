@@ -55,14 +55,16 @@ public class WhatToDoService {
 						search += "length(contact.attr" + cats[i2] + ")>0 or ";
 					params.setSearch(search.substring(0, search.length() - 4) + ')');
 					final Result result = repository.list(params);
+					final ZonedDateTime t = Instant.ofEpochMilli(contactWhatToDo.getTime().getTime())
+							.minus(Duration.ofMinutes(
+									contact.getTimezoneOffset().longValue()))
+							.atZone(ZoneOffset.UTC);
+					final String time = t.getHour() + ":" + t.getMinute();
 					for (int i2 = 0; i2 < result.size(); i2++) {
 						final Contact contact2 = repository.one(Contact.class,
 								(BigInteger) result.get(i2).get("contact.id"));
 						System.out.println(contact2.getId() + ": " + Score.getContact(contact, contact2));
 						if (Score.getContact(contact, contact2) > 0.5) {
-							final ZonedDateTime t = Instant.now().minus(Duration.ofMinutes(
-									contact.getTimezoneOffset().longValue()))
-									.atZone(ZoneOffset.UTC);
 							String verb = "";
 							for (int i3 = 0; i3 < cats.length; i3++)
 								verb += (i3 == 0 ? ""
@@ -71,8 +73,7 @@ public class WhatToDoService {
 														Text.category_verb0.name().length() - 1) + cats[i3])
 												.getText(contact2.getLanguage());
 							notificationService.sendNotification(contact, contact2, NotificationID.wtd,
-									Strings.encodeParam("p=" + contact.getId()),
-									t.getHour() + ":" + t.getMinute(), verb);
+									Strings.encodeParam("p=" + contact.getId()), time, verb);
 						}
 					}
 				}
