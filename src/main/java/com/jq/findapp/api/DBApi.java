@@ -45,8 +45,7 @@ public class DBApi {
 			@RequestHeader(required = false) String password,
 			@RequestHeader(required = false) String salt)
 			throws JsonMappingException, JsonProcessingException, IllegalAccessException {
-		if (!params.getQuery().name().contains("_anonymous"))
-			params.setUser(authenticationService.verify(user, password, salt));
+		params.setUser(authenticationService.verify(user, password, salt));
 		return repository.one(params);
 	}
 
@@ -55,8 +54,7 @@ public class DBApi {
 			@RequestHeader(required = false) String password,
 			@RequestHeader(required = false) String salt)
 			throws JsonMappingException, JsonProcessingException, IllegalAccessException {
-		if (!params.getQuery().name().contains("_anonymous"))
-			params.setUser(authenticationService.verify(user, password, salt));
+		params.setUser(authenticationService.verify(user, password, salt));
 		return repository.list(params).getList();
 	}
 
