@@ -32,6 +32,7 @@ import com.jq.findapp.api.model.Position;
 import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
+import com.jq.findapp.entity.ContactVisit;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.LocationOpenTime;
@@ -180,20 +181,36 @@ public class ActionApi {
 			@RequestHeader(required = false) String password, @RequestHeader(required = false) String salt)
 			throws Exception {
 		params.setUser(authenticationService.verify(user, password, salt));
-		final Map<String, Object> m = repository.one(params);
-		if (m != null) {
-			if (params.getQuery() == Query.contact_list)
-				notificationService.contactSaveVisitAndNotifyOnMatch(params.getUser(),
-						(BigInteger) m.get("contact.id"));
-			else if (params.getQuery() == Query.location_list) {
+		final Map<String, Object> one = repository.one(params);
+		if (one != null) {
+			if (params.getQuery() == Query.contact_list) {
+				final BigInteger contactId2 = (BigInteger) one.get("contact.id");
+				if (!contactId2.equals(params.getUser().getId())) {
+					final QueryParams params2 = new QueryParams(Query.contact_listVisit);
+					params2.setUser(params.getUser());
+					params2.setSearch(
+							"contactVisit.contactId=" + params.getUser().getId() + " and contactVisit.contactId2="
+									+ contactId2 + " and contact.id=" + contactId2);
+					final Map<String, Object> visitMap = repository.one(params2);
+					final ContactVisit visit;
+					if (visitMap == null) {
+						visit = new ContactVisit();
+						visit.setContactId(params.getUser().getId());
+						visit.setContactId2(contactId2);
+						visit.setCount(1L);
+					} else {
+						visit = repository.one(ContactVisit.class, (BigInteger) visitMap.get("contactVisit.id"));
+						visit.setCount(visit.getCount() + 1);
+					}
+					repository.save(visit);
+				}
+			} else if (params.getQuery() == Query.location_list) {
 				final LocationVisit visit = new LocationVisit();
-				visit.setLocationId((BigInteger) m.get("location.id"));
+				visit.setLocationId((BigInteger) one.get("location.id"));
 				visit.setContactId(params.getUser().getId());
 				repository.save(visit);
-				notificationService.locationNotifyOnMatch(params.getUser(),
-						(BigInteger) m.get("location.id"), NotificationID.visitLocation, null);
 			}
-			return m;
+			return one;
 		}
 		return Collections.emptyMap();
 	}
@@ -294,7 +311,6 @@ public class ActionApi {
 			}
 			EntityUtil.addImageList(entity);
 			location.populate(entity.getValues());
-			System.out.println(location.getLatitude() + " - " + location.old("latitude") + entity.getValues());
 			repository.save(location);
 		}
 	}

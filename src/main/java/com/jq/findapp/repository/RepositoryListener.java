@@ -24,6 +24,7 @@ import com.jq.findapp.entity.ContactBluetooth;
 import com.jq.findapp.entity.ContactLink;
 import com.jq.findapp.entity.ContactLink.Status;
 import com.jq.findapp.entity.ContactMarketing;
+import com.jq.findapp.entity.ContactVisit;
 import com.jq.findapp.entity.ContactWhatToDo;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.EventParticipate;
@@ -32,6 +33,7 @@ import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.LocationFavorite;
 import com.jq.findapp.entity.LocationRating;
+import com.jq.findapp.entity.LocationVisit;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
@@ -105,6 +107,8 @@ public class RepositoryListener {
 			PostPersist.contactBluetooth((ContactBluetooth) entity);
 		else if (entity instanceof ContactLink)
 			PostPersist.contactLink((ContactLink) entity);
+		else if (entity instanceof ContactVisit)
+			PostPersist.contactVisit((ContactVisit) entity);
 		else if (entity instanceof ContactWhatToDo)
 			PostPersist.contactWhatToDo((ContactWhatToDo) entity);
 		else if (entity instanceof EventParticipate)
@@ -115,12 +119,16 @@ public class RepositoryListener {
 			PostPersist.location((Location) entity);
 		else if (entity instanceof LocationRating)
 			PostPersist.locationRating((LocationRating) entity);
+		else if (entity instanceof LocationVisit)
+			PostPersist.locationVisit((LocationVisit) entity);
 	}
 
 	@javax.persistence.PostUpdate
 	public void postUpdate(final BaseEntity entity) throws Exception {
 		if (entity instanceof ContactLink)
 			PostUpdate.contactLink((ContactLink) entity);
+		else if (entity instanceof ContactVisit)
+			PostUpdate.contactVisit((ContactVisit) entity);
 		else if (entity instanceof ContactWhatToDo)
 			PostUpdate.contactWhatToDo((ContactWhatToDo) entity);
 	}
@@ -283,6 +291,11 @@ public class RepositoryListener {
 					NotificationID.friendReq, Strings.encodeParam("p=" + contactLink.getContactId()));
 		}
 
+		private static void contactVisit(ContactVisit contactVisit) throws Exception {
+			notificationService.sendNotificationOnMatch(NotificationID.visitProfile, repository.one(Contact.class,
+					contactVisit.getContactId()), repository.one(Contact.class, contactVisit.getContactId2()));
+		}
+
 		private static void contactWhatToDo(ContactWhatToDo contactWhatToDo) throws Exception {
 			whatToDoService.findAndNotify();
 		}
@@ -318,6 +331,11 @@ public class RepositoryListener {
 					locationRating.getLocationId(), NotificationID.ratingLocMat,
 					repository.one(Location.class, locationRating.getLocationId()).getName());
 		}
+
+		private static void locationVisit(LocationVisit locationVisit) throws Exception {
+			notificationService.locationNotifyOnMatch(repository.one(Contact.class, locationVisit.getContactId()),
+					locationVisit.getLocationId(), NotificationID.visitLocation, null);
+		}
 	}
 
 	private static class PostUpdate {
@@ -340,6 +358,11 @@ public class RepositoryListener {
 					repository.save(marketing);
 				}
 			}
+		}
+
+		private static void contactVisit(ContactVisit contactVisit) throws Exception {
+			notificationService.sendNotificationOnMatch(NotificationID.visitProfile, repository.one(Contact.class,
+					contactVisit.getContactId()), repository.one(Contact.class, contactVisit.getContactId2()));
 		}
 
 		private static void contactWhatToDo(ContactWhatToDo contactWhatToDo) throws Exception {

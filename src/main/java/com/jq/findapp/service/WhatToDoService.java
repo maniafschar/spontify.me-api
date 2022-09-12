@@ -63,7 +63,6 @@ public class WhatToDoService {
 					for (int i2 = 0; i2 < result.size(); i2++) {
 						final Contact contact2 = repository.one(Contact.class,
 								(BigInteger) result.get(i2).get("contact.id"));
-						System.out.println(contact2.getId() + ": " + Score.getContact(contact, contact2));
 						if (Score.getContact(contact, contact2) > 0.5) {
 							String verb = "";
 							for (int i3 = 0; i3 < cats.length; i3++)

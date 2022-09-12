@@ -40,7 +40,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification;
-import com.jq.findapp.entity.ContactVisit;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
@@ -121,30 +120,6 @@ public class NotificationService {
 
 		public boolean isSave() {
 			return save;
-		}
-	}
-
-	@Async
-	public void contactSaveVisitAndNotifyOnMatch(final Contact user, final BigInteger contactId2)
-			throws Exception {
-		if (!contactId2.equals(user.getId())) {
-			final QueryParams params2 = new QueryParams(Query.contact_listVisit);
-			params2.setUser(user);
-			params2.setSearch("contactVisit.contactId=" + user.getId() + " and contactVisit.contactId2="
-					+ contactId2 + " and contact.id=" + contactId2);
-			final Map<String, Object> visitMap = repository.one(params2);
-			final ContactVisit visit;
-			if (visitMap == null) {
-				visit = new ContactVisit();
-				visit.setContactId(user.getId());
-				visit.setContactId2(contactId2);
-				visit.setCount(1L);
-			} else {
-				visit = repository.one(ContactVisit.class, (BigInteger) visitMap.get("contactVisit.id"));
-				visit.setCount(visit.getCount() + 1);
-			}
-			repository.save(visit);
-			sendNotificationOnMatch(NotificationID.visitProfile, user, repository.one(Contact.class, contactId2));
 		}
 	}
 
