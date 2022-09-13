@@ -228,16 +228,16 @@ public class AuthenticationTest {
 	public void ios() throws Exception {
 		// given
 		final Contact contact = utils.createContact();
-		contact.setPushToken("7fc349db70ca9ae41a3c6eb05ee89c303d01001e6ce5f513a49718d13bc68a0a");
+		contact.setPushToken("cfaad64c709275f0d04080a93f43640c9de89a4e941f0026fa2ae238eef7240d");
 		System.setProperty("javax.net.debug", "all");
 
 		// when
 		final String environmet = ios.send(contact,
 				"uzgku",
-				"chat=12", 12, "1");
+				"chat=12", 12, BigInteger.ONE);
 
 		// then
-		assertEquals("production", environmet);
+		assertEquals("development", environmet);
 	}
 
 	@Test
@@ -248,7 +248,7 @@ public class AuthenticationTest {
 				"dHFZR7_iWnc:APA91bF7Z9NsdMRN0nX5C2il8dOqbmJ8DFtAdqb4_2thbOGB0LJK_2m1zjtyXyHD1tmdog6TQsTXbHvKPyv-EuqNik4vM1VlGSY-h6wG6JdM4k9h8es7duf08pfSEYezwuUyGcDkWkQd");
 
 		// when
-		android.send(contact, "text", "action", "1");
+		android.send(contact, "text", "action", null);
 
 		// then no exception
 	}

@@ -57,9 +57,10 @@ public class WhatToDoService {
 					final Result result = repository.list(params);
 					final ZonedDateTime t = Instant.ofEpochMilli(contactWhatToDo.getTime().getTime())
 							.minus(Duration.ofMinutes(
-									contact.getTimezoneOffset().longValue()))
+									contact.getTimezoneOffset() == null ? -60
+											: contact.getTimezoneOffset().longValue()))
 							.atZone(ZoneOffset.UTC);
-					final String time = t.getHour() + ":" + t.getMinute();
+					final String time = t.getHour() + ":" + (t.getMinute() < 10 ? "0" : "") + t.getMinute();
 					for (int i2 = 0; i2 < result.size(); i2++) {
 						final Contact contact2 = repository.one(Contact.class,
 								(BigInteger) result.get(i2).get("contact.id"));

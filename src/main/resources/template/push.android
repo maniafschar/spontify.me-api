@@ -3,7 +3,7 @@
 		"data": {
 			"content-available": "1",
 			"exec": "{exec}",
-			"notificationId": "{notificationId}"
+			"notificationId": {notificationId}
 		},
 		"notification": {
 			"title": "spontify.me",

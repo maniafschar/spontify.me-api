@@ -289,13 +289,15 @@ public class NotificationService {
 			text.append("...");
 		}
 		try {
-			final String nId = notificationId == null ? "" : "" + notificationId;
 			if ("ios".equals(contactTo.getPushSystem()))
-				ios.send(contactTo, text.toString(), action, getPingValues(contactTo).totalNew, nId);
+				ios.send(contactTo, text.toString(), action, getPingValues(contactTo).totalNew, notificationId);
 			else if ("android".equals(contactTo.getPushSystem()))
-				android.send(contactTo, text.toString(), action, nId);
+				android.send(contactTo, text.toString(), action, notificationId);
 			return true;
 		} catch (NotFound | NotFoundException ex) {
+			contactTo.setPushSystem(null);
+			contactTo.setPushToken(null);
+			repository.save(contactTo);
 			return false;
 		} catch (Exception ex) {
 			sendEmail(null, "ERROR", Strings.stackTraceToString(ex));

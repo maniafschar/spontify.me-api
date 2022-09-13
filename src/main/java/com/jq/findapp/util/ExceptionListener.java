@@ -114,7 +114,7 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 				notificationService.sendEmail(null, "ERROR " + ex.getMessage(), msg);
 			}
 		} catch (Exception e1) {
-			notificationService.sendEmail(null, "ERROR in chatch block!",
+			notificationService.sendEmail(null, "ERROR on sending error report!",
 					Strings.stackTraceToString(e1) + "\n\n\n" + msg);
 		}
 	}

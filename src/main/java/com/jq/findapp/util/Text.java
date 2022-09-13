@@ -97,7 +97,9 @@ public enum Text {
 	}
 
 	public String getText(String language) {
-		return languages.get(language).get(name().substring(0, name().indexOf('_')))
-				.get(name().substring(name().indexOf('_') + 1)).asText();
+		if (name().contains("_"))
+			return languages.get(language).get(name().substring(0, name().indexOf('_')))
+					.get(name().substring(name().indexOf('_') + 1)).asText();
+		return languages.get(language).get(name()).asText();
 	}
 }

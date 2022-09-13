@@ -84,9 +84,7 @@ public class EngagementService {
 		CONTACT_CURRENT_TOWN((contact, location) -> {
 			try {
 				return externalService.googleAddress(contact.getLatitude(), contact.getLongitude()).getTown();
-			} catch (
-
-		Exception e) {
+			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 		}),

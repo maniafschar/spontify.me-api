@@ -242,10 +242,8 @@ public class RepositoryListener {
 				throws Exception {
 			final Contact me = repository.one(Contact.class, contactBlutooth.getContactId());
 			final Contact other = repository.one(Contact.class, contactBlutooth.getContactId2());
-			if (me.getFindMe() && other.getFindMe()) {
-				notificationService.sendNotificationOnMatch(NotificationID.findMe, me, other);
-				notificationService.sendNotificationOnMatch(NotificationID.findMe, other, me);
-			}
+			notificationService.sendNotificationOnMatch(NotificationID.findMe, me, other);
+			notificationService.sendNotificationOnMatch(NotificationID.findMe, other, me);
 		}
 
 		private static void contactBlock(final ContactBlock contactBlock)

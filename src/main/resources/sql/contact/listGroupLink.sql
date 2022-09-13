@@ -24,7 +24,6 @@ SELECT
 	contact.birthdayDisplay,
 	contact.budget,
 	contact.filter,
-	contact.findMe,
 	contact.gender,
 	contact.guide,
 	contact.id,
