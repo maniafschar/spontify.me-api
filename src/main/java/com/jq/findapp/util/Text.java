@@ -19,6 +19,7 @@ public enum Text {
 	category_verb3,
 	category_verb4,
 	category_verb5,
+	engagement_addEvent,
 	engagement_addFriends,
 	engagement_allowLocation,
 	engagement_becomeGuide,

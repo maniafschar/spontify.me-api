@@ -8,6 +8,7 @@
 		"verb5": "work out/dedicate hobby"
 	},
 	"engagement": {
+		"addEvent": "Hey CONTACT_PSEUDONYM, Events are straightforward, easy to create, and fun. EMOJI_DANCING\nOpen your favorite location and click Events at the bottom of the page. There you can create a new event, e.g. dinner for 4, only visible to Spontis who suit you.\n\nThis way you and your friends will get to know new Spontis in no time. EMOJI_WAVING",
 		"addFriends": "Hey CONTACT_PSEUDONYM, would you like to add your friends? EMOJI_DANCING\nYou can find the button on the info page, just invite them... EMOJI_WAVING",
 		"allowLocation": "Hey CONTACT_PSEUDONYM, you have not shared your location. 🤔\nThis means that we cannot show you Spontis, Events and Locations in your area. 😢\nWe are Open Source and do not sell your data. You can unlock the location in your app settings. 👍",
 		"becomeGuide": "Hey CONTACT_PSEUDONYM, are you sociable and like to organize events? As a guide, we always suggest particularly suitable Spontis to boost your events and expand your circle of acquaintances. Would you like to become a guide? EMOJI_DANCING\nJust check the settings EMOJI_WAVING",

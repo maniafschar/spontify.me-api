@@ -88,7 +88,6 @@ public class EngagementService {
 				throw new RuntimeException(e);
 			}
 		}),
-
 		CONTACT_VERSION((contact, location) -> contact.getVersion()),
 		LOCATION_NAME((contact, location) -> location.getName()),
 		VERSION((contact, location) -> currentVersion);
@@ -139,6 +138,20 @@ public class EngagementService {
 		chatTemplates.add(new ChatTemplate(Text.engagement_guide,
 				"pageInfo.socialShare()",
 				contact -> contact.getGuide() != null && contact.getGuide()));
+
+		chatTemplates.add(new ChatTemplate(Text.engagement_addEvent,
+				"",
+				contact -> {
+					final QueryParams params = new QueryParams(Query.event_list);
+					params.setUser(contact);
+					params.setSearch("event.contactId=" + contact.getId());
+					if (repository.list(params).size() == 0) {
+						params.setQuery(Query.location_listFavorite);
+						params.setSearch("locationFavorite.contactId=" + contact.getId());
+						return repository.list(params).size() > 0;
+					}
+					return false;
+				}));
 
 		chatTemplates.add(new ChatTemplate(Text.engagement_bluetoothMatch,
 				"pageInfo.socialShare()",
@@ -301,10 +314,10 @@ public class EngagementService {
 		for (int i = 0; i < ids.size(); i++) {
 			if (!adminBlocked(ids.get(i).get("contact.id"))) {
 				params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + ids.get(i).get("contact.id")
-						+ " and chat.textId like '"
+						+ " and (chat.textId='mail_welcome' or chat.textId like '"
 						+ Text.engagement_nearByLocation.name()
 								.substring(0, Text.engagement_nearByLocation.name().indexOf('L'))
-						+ "%' and chat.createdAt>'"
+						+ "%') and chat.createdAt>'"
 						+ Instant.now().minus(Duration.ofDays(4))
 								.minus(Duration.ofHours((int) (Math.random() * 12))).toString()
 						+ '\'');

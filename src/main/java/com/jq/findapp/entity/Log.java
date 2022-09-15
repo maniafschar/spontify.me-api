@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 public class Log extends BaseEntity {
 	private String method;
 	private String body;
+	private String referer;
 	private String query;
 	private String ip;
 	private String uri;
@@ -86,5 +87,13 @@ public class Log extends BaseEntity {
 
 	public void setIp(String ip) {
 		this.ip = ip;
+	}
+
+	public String getReferer() {
+		return referer;
+	}
+
+	public void setReferer(String referer) {
+		this.referer = referer;
 	}
 }

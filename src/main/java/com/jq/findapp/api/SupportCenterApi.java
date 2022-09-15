@@ -27,7 +27,9 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.EngagementService;
+import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
+import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.service.WhatToDoService;
 
 @RestController
@@ -45,6 +47,9 @@ public class SupportCenterApi {
 
 	@Autowired
 	private EngagementService engagementService;
+
+	@Autowired
+	private ExternalService externalService;
 
 	@Autowired
 	private WhatToDoService whatToDoService;
@@ -98,6 +103,7 @@ public class SupportCenterApi {
 	@PostMapping("chat")
 	public void chat(@RequestBody Notification data, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
+		authenticationService.verify(adminId, password, salt);
 		for (BigInteger id : data.getIds()) {
 			final Chat chat = new Chat();
 			chat.setContactId(adminId);
@@ -108,6 +114,15 @@ public class SupportCenterApi {
 		}
 	}
 
+	@PutMapping("resend/{id}")
+	public void resend(@PathVariable final BigInteger id, @RequestHeader String password,
+			@RequestHeader String salt) throws Exception {
+		authenticationService.verify(adminId, password, salt);
+		final Contact contact = repository.one(Contact.class, id);
+		notificationService.sendNotification(contact, contact, NotificationID.welcomeExt,
+				"r=" + contact.getLoginLink().substring(0, 10) + contact.getLoginLink().substring(20));
+	}
+
 	@PutMapping("refreshDB")
 	public void refreshDB(@RequestHeader String secret) throws Exception {
 		if (schedulerSecret.equals(secret)) {
@@ -116,6 +131,7 @@ public class SupportCenterApi {
 			engagementService.sendChats();
 			engagementService.sendNearBy();
 			whatToDoService.findAndNotify();
+			externalService.importLog();
 		}
 	}
 }

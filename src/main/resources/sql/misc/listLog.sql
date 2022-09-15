@@ -8,6 +8,7 @@ SELECT
 	log.modifiedAt,
 	log.port,
 	log.query,
+	log.referer,
 	log.status,
 	log.time,
 	log.uri
@@ -16,4 +17,4 @@ FROM
 WHERE
 	{search}
 ORDER BY
-	log.id DESC
+	log.createdAt DESC

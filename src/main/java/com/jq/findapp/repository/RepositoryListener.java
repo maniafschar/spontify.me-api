@@ -216,6 +216,7 @@ public class RepositoryListener {
 					chat.setContactId(adminId);
 					chat.setContactId2(contact.getId());
 					chat.setSeen(false);
+					chat.setTextId(Text.mail_welcome.name());
 					chat.setNote(
 							MessageFormat.format(Text.mail_welcome.getText(contact.getLanguage()),
 									contact.getPseudonym()));
