@@ -64,75 +64,77 @@ public class IntegrationTest {
 	}
 
 	private void register(String pseudonym, String email) {
-		click("home homeBody buttontext:nth-of-type(1)");
-		click("hint buttontext");
-		get("login input[name=\"email\"]").sendKeys(email);
-		click("login tab:nth-of-type(3)");
-		get("login input[name=\"pseudonym\"]").sendKeys(pseudonym);
-		click("login input[name=\"agb\"]");
-		sleep(5000);
-		click("login buttontext:nth-of-type(1)");
-		final String s = email().lines().reduce(
+		Util.click("home homeBody buttontext:nth-of-type(1)");
+		Util.click("hint buttontext");
+		Util.get("login input[name=\"email\"]").sendKeys(email);
+		Util.click("login tab:nth-of-type(3)");
+		Util.get("login input[name=\"pseudonym\"]").sendKeys(pseudonym);
+		Util.click("login input[name=\"agb\"]");
+		Util.sleep(5000);
+		Util.click("login buttontext:nth-of-type(1)");
+		final String s = Util.email().lines().reduce(
 				(e, e2) -> e.startsWith("https://") ? e : e2.startsWith("https://") ? e2 : "").get();
 		driver.navigate().to(url + s.substring(s.indexOf('?')));
-		get("popup input[name=\"passwd\"]").sendKeys("qwer1234");
-		click("popup buttontext");
+		Util.get("popup input[name=\"passwd\"]").sendKeys("qwer1234");
+		Util.click("popup buttontext");
 	}
 
 	private void addLocation(String name, String address) {
-		click("home homeBody buttontext:nth-of-type(2)");
-		click("menu a[onclick*=\"pageLocation.edit\"]");
-		get("popup input[name=\"name\"]").sendKeys(name);
-		get("popup textarea[name=\"address\"]").sendKeys(address);
-		click("popup input[name=\"locationbudget\"]:nth-of-type(2)");
-		click("popup input[name=\"parkingOption2\"]:nth-of-type(2)");
-		click("popup input[name=\"locationcategory\"]:nth-of-type(5)");
-		click("popup buttontext");
-		click("main>buttonIcon[class*=\"center\"]");
+		Util.click("home homeBody buttontext:nth-of-type(2)");
+		Util.click("menu a[onclick*=\"pageLocation.edit\"]");
+		Util.get("popup input[name=\"name\"]").sendKeys(name);
+		Util.get("popup textarea[name=\"address\"]").sendKeys(address);
+		Util.click("popup input[name=\"locationbudget\"]:nth-of-type(2)");
+		Util.click("popup input[name=\"parkingOption2\"]:nth-of-type(2)");
+		Util.click("popup input[name=\"locationcategory\"]:nth-of-type(5)");
+		Util.click("popup buttontext");
+		Util.click("main>buttonIcon[class*=\"center\"]");
 	}
 
 	private void addFriend() {
-		click("home buttonIcon[onclick*=\"search\"]");
-		get("search input[name=\"searchKeywords\"]").sendKeys("pseudonym");
-		click("search buttontext[onclick*=\"saveSearch\"]");
-		click("search row:nth-of-type(1)");
-		click("main>buttonIcon[onclick*=\"toggleFavorite\"]");
-		click("detail text[name=\"block\"] buttontext:nth-of-type(1)");
+		Util.click("home buttonIcon[onclick*=\"search\"]");
+		Util.get("search input[name=\"searchKeywords\"]").sendKeys("pseudonym");
+		Util.click("search buttontext[onclick*=\"saveSearch\"]");
+		Util.click("search row:nth-of-type(1)");
+		Util.click("main>buttonIcon[onclick*=\"toggleFavorite\"]");
+		Util.click("detail text[name=\"block\"] buttontext:nth-of-type(1)");
 	}
 
-	private String email() {
-		sleep(500);
-		final List<String> files = Arrays.asList(new File("target/email").list());
-		files.sort((e1, e2) -> e1.compareTo(e2));
-		try {
-			return IOUtils.toString(new FileInputStream(new File("target/email/" + files.get(files.size() - 1))),
-					StandardCharsets.UTF_8);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private static void sleep(long ms) {
-		try {
-			Thread.sleep(ms);
-		} catch (InterruptedException e2) {
-			throw new RuntimeException(e2);
-		}
-	}
-
-	private WebElement get(String id) {
-		for (int i = 0; i < 20; i++) {
+	private static class Util {
+		private static String email() {
+			sleep(500);
+			final List<String> files = Arrays.asList(new File("target/email").list());
+			files.sort((e1, e2) -> e1.compareTo(e2));
 			try {
-				sleep(500);
-				return driver.findElement(By.cssSelector(id));
-			} catch (NoSuchElementException e) {
-				// wait
+				return IOUtils.toString(new FileInputStream(new File("target/email/" + files.get(files.size() - 1))),
+						StandardCharsets.UTF_8);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
 			}
 		}
-		throw new RuntimeException(id + " not found");
-	}
 
-	private void click(String id) {
-		((JavascriptExecutor) driver).executeScript("arguments[0].click()", get(id));
+		private static void sleep(long ms) {
+			try {
+				Thread.sleep(ms);
+			} catch (InterruptedException e2) {
+				throw new RuntimeException(e2);
+			}
+		}
+
+		private static WebElement get(String id) {
+			for (int i = 0; i < 20; i++) {
+				try {
+					sleep(500);
+					return driver.findElement(By.cssSelector(id));
+				} catch (NoSuchElementException e) {
+					// wait
+				}
+			}
+			throw new RuntimeException(id + " not found");
+		}
+
+		private static void click(String id) {
+			((JavascriptExecutor) driver).executeScript("arguments[0].click()", get(id));
+		}
 	}
 }
