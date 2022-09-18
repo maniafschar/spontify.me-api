@@ -29,7 +29,7 @@
 		"birthday": "wird heute <jq:EXTRA_1 /> Jahre jung.",
 		"chatLocation": "hat zur Location <jq:EXTRA_2 /> gechattet:\n\n<jq:EXTRA_3 />\n\nIhr habt <jq:EXTRA_1 /> Gemeinsamkeiten.",
 		"chatSeen": "hat Deine Chatnachricht gelesen.",
-		"event": "Hallo CONTACT_PSEUDONYM, dieses Event in der Location <jq:EXTRA_1 /> könnte für Dich interessant sein! Du kannst es Dir ja überlegen...",
+		"event": "dieses Event in der Location <jq:EXTRA_1 /> könnte für Dich interessant sein! Du kannst es Dir ja überlegen...",
 		"feedback": "Wir danken Dir für Deinen Kommentar und melden uns bei Rückfragen.\n\n<jq:EXTRA_1 />",
 		"findMe": "ist in Deiner unmittelbarren Umgebung, ihr habt <jq:EXTRA_1 /> Gemeinsamkeiten.",
 		"friendAppro": "hat Deine Freundschaftsanfrage bestätigt.",

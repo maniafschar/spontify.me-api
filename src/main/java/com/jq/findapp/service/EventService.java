@@ -58,9 +58,9 @@ public class EventService {
 	}
 
 	private LocalDate getRealDate(Event event, LocalDate today) {
-		LocalDate realDate = Instant.ofEpochSecond(event.getStartDate().getTime())
+		LocalDate realDate = Instant.ofEpochMilli(event.getStartDate().getTime())
 				.atZone(ZoneId.systemDefault()).toLocalDate();
-		if ("o".equals(event.getType())) {
+		if (!"o".equals(event.getType())) {
 			while (realDate.isBefore(today)) {
 				if ("w".equals(event.getType()))
 					realDate = realDate.plusWeeks(1);
@@ -81,6 +81,6 @@ public class EventService {
 		final QueryParams params = new QueryParams(Query.event_participate);
 		params.setSearch("eventParticipate.eventId=" + event.getId() + " and eventParticipate.eventDate='"
 				+ date + "' and eventParticipate.state=1");
-		return repository.list(params).size() < event.getMaxParticipants();
+		return repository.list(params).size() >= event.getMaxParticipants();
 	}
 }
