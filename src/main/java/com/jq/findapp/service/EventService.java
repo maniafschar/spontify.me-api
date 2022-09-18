@@ -15,6 +15,7 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.NotificationService.NotificationID;
+import com.jq.findapp.util.Score;
 import com.jq.findapp.util.Strings;
 
 @Service
@@ -48,8 +49,10 @@ public class EventService {
 			for (int i2 = 0; i2 < events.size(); i2++) {
 				final Event event = repository.one(Event.class, (BigInteger) events.get(i2).get("event.id"));
 				final LocalDate realDate = getRealDate(event, today);
+				final Contact contactEvent = repository.one(Contact.class, event.getContactId());
 				if (realDate.minusDays(1).isBefore(today) && !isMaxParticipants(event, realDate) &&
-						notificationService.sendNotification(repository.one(Contact.class, event.getContactId()),
+						Score.getContact(contactEvent, params.getUser()) > 0.5 &&
+						notificationService.sendNotification(contactEvent,
 								params.getUser(), NotificationID.event, Strings.encodeParam("e=" + event.getId()),
 								(String) events.get(i2).get("location.name")))
 					break;
