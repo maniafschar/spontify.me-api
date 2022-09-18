@@ -36,8 +36,6 @@ public enum Query {
 	contact_pingFriendRequest(true),
 	contact_pingNotification(true),
 	contact_pingVisit(true),
-	contact_rating(true),
-	contact_ratingOverview(true),
 	contact_token,
 	contact_unique,
 	contact_what2do,
@@ -90,6 +88,9 @@ public enum Query {
 
 	public String prepareSql(QueryParams params) {
 		String search = Strings.isEmpty(params.getSearch()) ? "1=1" : sanatizeSearchToken(params.getSearch());
+		if (addBlock && (this == contact_list || this == contact_listChat || this == contact_listVisit)
+				&& !search.contains("contact.id=") && !search.contains("contact.loginLink="))
+			search += (search.length() > 0 ? " and " : "") + "contact.id<>{USERID} and contact.verified=1";
 		if (params.getSearchGeoLocation() != null)
 			search += " and " + params.getSearchGeoLocation();
 		if (addBlock && params.getUser() != null)
@@ -119,22 +120,17 @@ public enum Query {
 
 	private String sanatizeSearchToken(String search) {
 		if (search == null)
-			search = "";
-		else {
-			final StringBuilder s = new StringBuilder(search.toLowerCase());
-			int p, p2;
-			while ((p = s.indexOf("'")) > -1) {
-				if ((p2 = s.indexOf("'", p + 1)) < 0)
-					throw new IllegalArgumentException("Invalid search expression: " + sql);
-				s.delete(p, p2 + 1);
-			}
-			if (s.indexOf(";") > -1 || s.indexOf("union") > -1 || s.indexOf("select") > -1 || s.indexOf("update") > -1
-					|| s.indexOf("insert") > -1 || s.indexOf("delete") > -1)
+			return "";
+		final StringBuilder s = new StringBuilder(search.toLowerCase());
+		int p, p2;
+		while ((p = s.indexOf("'")) > -1) {
+			if ((p2 = s.indexOf("'", p + 1)) < 0)
 				throw new IllegalArgumentException("Invalid search expression: " + sql);
+			s.delete(p, p2 + 1);
 		}
-		if (addBlock && name().startsWith("contact_") && this != contact_rating && this != contact_marketing
-				&& !search.contains("contact.id=") && !search.contains("contact.loginLink="))
-			search += (search.length() > 0 ? " and " : "") + "contact.id<>{USERID} and contact.verified=1";
+		if (s.indexOf(";") > -1 || s.indexOf("union") > -1 || s.indexOf("select") > -1 || s.indexOf("update") > -1
+				|| s.indexOf("insert") > -1 || s.indexOf("delete") > -1)
+			throw new IllegalArgumentException("Invalid search expression: " + sql);
 		return search;
 
 	}
