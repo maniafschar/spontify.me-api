@@ -34,6 +34,7 @@ import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.LocationFavorite;
 import com.jq.findapp.entity.LocationRating;
 import com.jq.findapp.entity.LocationVisit;
+import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
@@ -170,10 +171,30 @@ public class RepositoryListener {
 							+ location.getAddress().toLowerCase().replaceAll("'", "").replaceAll("\n", "")
 									.replaceAll("\r", "").replaceAll("\t", "").replaceAll(" ", "")
 							+ "'");
-			if (repository.list(params).size() > 0)
-				throw new IllegalAccessException("Location exists");
-
+			final Result list = repository.list(params);
+			for (int i = 0; i < list.size(); i++) {
+				if (isNameMatch((String) list.get(i).get("location.name"), location.getName(), true))
+					throw new IllegalAccessException("Location exists");
+			}
 		}
+	}
+
+	private static boolean isNameMatch(String name1, String name2, boolean tryReverse) {
+		name1 = name1.trim().toLowerCase();
+		name2 = name2.trim().toLowerCase();
+		while (name1.contains("  "))
+			name1 = name1.replaceAll("  ", " ");
+		final String[] n = name1.split(" ");
+		int count = 0;
+		for (int i = 0; i < n.length; i++) {
+			if (name2.contains(n[i]))
+				count++;
+		}
+		if (count == n.length)
+			return true;
+		if (tryReverse)
+			return isNameMatch(name2, name1, false);
+		return false;
 	}
 
 	private static class PreUpdate {
@@ -203,8 +224,9 @@ public class RepositoryListener {
 				final GregorianCalendar birthday = new GregorianCalendar();
 				birthday.setTimeInMillis(contact.getBirthday().getTime());
 				short age = (short) (now.get(Calendar.YEAR) - birthday.get(Calendar.YEAR));
-				if (birthday.get(Calendar.MONTH) < now.get(Calendar.MONTH) ||
-						birthday.get(Calendar.DAY_OF_MONTH) < now.get(Calendar.DAY_OF_MONTH))
+				if (now.get(Calendar.MONTH) < birthday.get(Calendar.MONTH) ||
+						now.get(Calendar.MONTH) == birthday.get(Calendar.MONTH) &&
+								now.get(Calendar.DAY_OF_MONTH) < birthday.get(Calendar.DAY_OF_MONTH))
 					age--;
 				contact.setAge(age);
 			}
@@ -243,8 +265,10 @@ public class RepositoryListener {
 				throws Exception {
 			final Contact me = repository.one(Contact.class, contactBlutooth.getContactId());
 			final Contact other = repository.one(Contact.class, contactBlutooth.getContactId2());
-			notificationService.sendNotificationOnMatch(NotificationID.findMe, me, other);
-			notificationService.sendNotificationOnMatch(NotificationID.findMe, other, me);
+			if (me.getFindMe() != null && me.getFindMe() && other.getFindMe() != null && other.getFindMe()) {
+				notificationService.sendNotificationOnMatch(NotificationID.findMe, me, other);
+				notificationService.sendNotificationOnMatch(NotificationID.findMe, other, me);
+			}
 		}
 
 		private static void contactBlock(final ContactBlock contactBlock)
@@ -280,8 +304,7 @@ public class RepositoryListener {
 						"chat=" + contactFrom.getId(), s);
 			} else
 				notificationService.locationNotifyOnMatch(contactFrom, chat.getLocationId(),
-						NotificationID.chatLocation,
-						chat.getNote());
+						NotificationID.chatLocation, chat.getNote());
 		}
 
 		private static void contactLink(ContactLink contactLink) throws Exception {
@@ -400,10 +423,10 @@ public class RepositoryListener {
 	}
 
 	private static String sanitizePseudonym(String pseudonym) {
-		pseudonym = pseudonym.replaceAll("[^a-zA-ZÀ-ÿ0-9-_.+*#§$%&/(){}\\[\\]\\^=?! \\\\]", "");
+		pseudonym = pseudonym.trim().replaceAll("[^a-zA-ZÀ-ÿ0-9-_.+*#§$%&/\\\\ \\^']", "");
 		int i = 0;
-		while (pseudonym.length() < 8)
-			pseudonym += ++i;
+		while (pseudonym.length() < 9)
+			pseudonym += (char) ('a' + i++);
 		return pseudonym;
 	}
 }

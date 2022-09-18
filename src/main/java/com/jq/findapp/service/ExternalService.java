@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -129,7 +130,6 @@ public class ExternalService {
 
 	private void importLog(final String name, final String separator) throws Exception {
 		final DateFormat dateParser = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss", Locale.ENGLISH);
-		final DateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		final Pattern pattern = Pattern.compile(
 				"([\\d.]+) (\\S) (\\S) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"(\\w+) ([^ ]*) ([^\"]*)\" (\\d+) (\\d+) \"([^\"]*)\" \"([^\"]*)\"");
 		try (final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(name)))) {
@@ -148,7 +148,8 @@ public class ExternalService {
 						if (log.getReferer().length() > 255)
 							log.setReferer(log.getReferer().substring(0, 255));
 					}
-					log.setBody(dateFormater.format(dateParser.parse(m.group(4))) + separator + m.group(11));
+					final String date = Instant.ofEpochMilli(dateParser.parse(m.group(4)).getTime()).toString();
+					log.setBody(date.substring(0, 19) + separator + m.group(11));
 					if (log.getBody().length() > 255)
 						log.setBody(log.getBody().substring(0, 255));
 					log.setUri("ad");

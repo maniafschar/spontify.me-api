@@ -42,7 +42,7 @@ FROM
 	Location location left join LocationOpenTime locationOpenTime on locationOpenTime.locationId=location.id left join LocationFavorite locationFavorite on locationFavorite.locationId=location.id and locationFavorite.contactId={USERID},
 	Contact contact
 WHERE
-	TO_DAYS(event.startDate)-14<TO_DAYS(current_timestamp) and
+	TO_DAYS(event.startDate)-14<=TO_DAYS(current_timestamp) and
 	TO_DAYS(event.endDate)>=TO_DAYS(current_timestamp) and
 	(
 		event.visibility=3 or 

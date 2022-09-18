@@ -90,10 +90,14 @@ public class NotificationService {
 		birthday(NotificationIDType.EmailOrDevice, true),
 		chatLocation(NotificationIDType.EmailOrDevice, true),
 		chatSeen(NotificationIDType.EmailOrDevice, true),
+		event(NotificationIDType.EmailOrDevice, true),
 		feedback(NotificationIDType.Email, false),
+		findMe(NotificationIDType.EmailOrDevice, true),
 		friendAppro(NotificationIDType.EmailOrDevice, true),
 		friendReq(NotificationIDType.EmailOrDevice, true),
+		locMarketing(NotificationIDType.EmailOrDevice, true),
 		markEvent(NotificationIDType.EmailOrDevice, true),
+		mgMarketing(NotificationIDType.EmailOrDevice, true),
 		newMsg(NotificationIDType.EmailOrDevice, false),
 		pwReset(NotificationIDType.Email, false),
 		registrationReminder(NotificationIDType.Email, false),
@@ -101,10 +105,7 @@ public class NotificationService {
 		visitLocation(NotificationIDType.EmailOrDevice, true),
 		visitProfile(NotificationIDType.EmailOrDevice, true),
 		welcomeExt(NotificationIDType.Email, false),
-		wtd(NotificationIDType.EmailOrDevice, true),
-		findMe(NotificationIDType.EmailOrDevice, true),
-		locMarketing(NotificationIDType.EmailOrDevice, true),
-		mgMarketing(NotificationIDType.EmailOrDevice, true);
+		wtd(NotificationIDType.EmailOrDevice, true);
 
 		private final NotificationIDType type;
 		private final boolean save;
@@ -159,7 +160,7 @@ public class NotificationService {
 							for (int i = 0; i < param.length; i++)
 								param2[i + 1] = param[i];
 						}
-						if (sendNotificationInternal(me, other, textID, Strings.encodeParam("p=" + me.getId()), param2))
+						if (sendNotification(me, other, textID, Strings.encodeParam("p=" + me.getId()), param2))
 							return new String[] { attributesToString(attribs), attributesToString(attribsEx) };
 					}
 				}
@@ -168,13 +169,7 @@ public class NotificationService {
 		return null;
 	}
 
-	@Async
-	public void sendNotification(Contact contactFrom, Contact contactTo, NotificationID notificationID,
-			String action, String... param) throws Exception {
-		sendNotificationInternal(contactFrom, contactTo, notificationID, action, param);
-	}
-
-	private boolean sendNotificationInternal(Contact contactFrom, Contact contactTo, NotificationID notificationID,
+	public boolean sendNotification(Contact contactFrom, Contact contactTo, NotificationID notificationID,
 			String action, String... param) throws Exception {
 		if (!contactTo.getVerified() && notificationID != NotificationID.welcomeExt
 				&& notificationID != NotificationID.pwReset)
@@ -394,6 +389,8 @@ public class NotificationService {
 			message = message.substring(0, message.indexOf("\n"));
 		if (message.indexOf("\r") > 0)
 			message = message.substring(0, message.indexOf("\r"));
+		if (message.indexOf(".") > 0)
+			message = message.substring(0, message.indexOf("."));
 		if (message.length() > 80) {
 			message = message.substring(0, 77) + "...";
 		}
@@ -405,7 +402,7 @@ public class NotificationService {
 		final MimeMessage msg = email.createMimeMessage();
 		final MimeMessageHelper helper = new MimeMessageHelper(msg, text != null && text.length > 1);
 		helper.setFrom(from);
-		helper.setTo(to == null ? "spontify@jq-consulting.de" : to);
+		helper.setTo(to == null ? from : to);
 		helper.setSubject(subject);
 		if (text != null) {
 			if (text.length > 1) {

@@ -18,7 +18,6 @@ import com.jq.findapp.repository.RepositoryListener;
 @EntityListeners(RepositoryListener.class)
 public class Contact extends BaseEntity {
 	private Boolean active = true;
-	// TODO rm on 0.2.0
 	private Boolean findMe = true;
 	private Boolean guide = false;
 	private Boolean notificationBirthday = true;

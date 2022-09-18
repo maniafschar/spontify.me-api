@@ -2,6 +2,7 @@ package com.jq.findapp.api;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -19,14 +20,18 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.model.Notification;
 import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.Setting;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
+import com.jq.findapp.service.DbUpdateService;
 import com.jq.findapp.service.EngagementService;
+import com.jq.findapp.service.EventService;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.NotificationService.NotificationID;
@@ -52,7 +57,13 @@ public class SupportCenterApi {
 	private ExternalService externalService;
 
 	@Autowired
+	private EventService eventService;
+
+	@Autowired
 	private WhatToDoService whatToDoService;
+
+	@Autowired
+	private DbUpdateService dbUpdateService;
 
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
@@ -115,22 +126,44 @@ public class SupportCenterApi {
 	}
 
 	@PutMapping("resend/{id}")
-	public void resend(@PathVariable final BigInteger id, @RequestHeader String password,
-			@RequestHeader String salt) throws Exception {
+	public void resend(@PathVariable final BigInteger id, @RequestHeader String password, @RequestHeader String salt)
+			throws Exception {
 		authenticationService.verify(adminId, password, salt);
 		final Contact contact = repository.one(Contact.class, id);
 		notificationService.sendNotification(contact, contact, NotificationID.welcomeExt,
 				"r=" + contact.getLoginLink().substring(0, 10) + contact.getLoginLink().substring(20));
 	}
 
+	@PutMapping("log/search")
+	public void logSearch(@RequestBody List<String> searches, @RequestHeader String password,
+			@RequestHeader String salt) throws Exception {
+		authenticationService.verify(adminId, password, salt);
+		final QueryParams param = new QueryParams(Query.misc_setting);
+		param.setSearch("setting.label='sc.search'");
+		final Map<String, Object> settingMap = repository.one(param);
+		final Setting setting = repository.one(Setting.class, (BigInteger) settingMap.get("setting.id"));
+		setting.setValue(new ObjectMapper().writeValueAsString(searches));
+		repository.save(setting);
+	}
+
+	@GetMapping("log/search")
+	public String logSearch(@RequestHeader String password, @RequestHeader String salt) throws Exception {
+		authenticationService.verify(adminId, password, salt);
+		final QueryParams param = new QueryParams(Query.misc_setting);
+		param.setSearch("setting.label='sc.search'");
+		return (String) repository.one(param).get("setting.value");
+	}
+
 	@PutMapping("refreshDB")
 	public void refreshDB(@RequestHeader String secret) throws Exception {
 		if (schedulerSecret.equals(secret)) {
+			dbUpdateService.update();
 			engagementService.sendSpontifyEmail();
 			engagementService.sendRegistrationReminder();
 			engagementService.sendChats();
 			engagementService.sendNearBy();
 			whatToDoService.findAndNotify();
+			eventService.findAndNotify();
 			externalService.importLog();
 		}
 	}

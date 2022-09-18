@@ -1,11 +1,11 @@
 package com.jq.findapp.service;
 
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,7 @@ public class WhatToDoService {
 		for (int i = 0; i < ids.size(); i++) {
 			final ContactWhatToDo contactWhatToDo = repository.one(ContactWhatToDo.class,
 					(BigInteger) ids.get(i).get("contactWhatToDo.id"));
-			if (contactWhatToDo.getTime().before(new Date(Instant.now().minus(Duration.ofHours(1)).toEpochMilli()))) {
+			if (contactWhatToDo.getTime().before(new Timestamp(Instant.now().toEpochMilli()))) {
 				contactWhatToDo.setActive(false);
 				repository.save(contactWhatToDo);
 			} else {

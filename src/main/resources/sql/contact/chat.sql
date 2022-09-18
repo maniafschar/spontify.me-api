@@ -6,6 +6,7 @@ SELECT
 	chat.image,
 	chat.note,
 	chat.action,
+	chat.textId,
 	chat.seen,
 	(select pseudonym from Contact contact where chat.locationId is not null and contact.id=chat.contactId) as pseudonym
 FROM
