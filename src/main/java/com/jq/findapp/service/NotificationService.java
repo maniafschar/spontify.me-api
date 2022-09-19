@@ -403,8 +403,6 @@ public class NotificationService {
 		final MimeMessageHelper helper = new MimeMessageHelper(msg, text != null && text.length > 1);
 		helper.setFrom(from);
 		helper.setTo(to == null ? from : to);
-		if (to != null)
-			helper.setBcc(from);
 		helper.setSubject(subject);
 		if (text != null) {
 			if (text.length > 1) {

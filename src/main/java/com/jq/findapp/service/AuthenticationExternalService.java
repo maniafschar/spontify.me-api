@@ -64,7 +64,7 @@ public class AuthenticationExternalService {
 		if (registration.getUser().get("email") == null || !registration.getUser().get("email").contains("@"))
 			registration.getUser().put("email",
 					registration.getUser().get("id") + '.' + registration.getFrom().name().toLowerCase()
-							+ "@jq-consulting.de");
+							+ "@spontify.me");
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.email='" + registration.getUser().get("email") + '\'');
 		final Map<String, Object> contact = repository.one(params);
