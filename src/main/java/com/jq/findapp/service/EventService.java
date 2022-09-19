@@ -48,14 +48,16 @@ public class EventService {
 			final Result events = repository.list(params);
 			for (int i2 = 0; i2 < events.size(); i2++) {
 				final Event event = repository.one(Event.class, (BigInteger) events.get(i2).get("event.id"));
-				final LocalDate realDate = getRealDate(event, today);
-				final Contact contactEvent = repository.one(Contact.class, event.getContactId());
-				if (realDate.minusDays(1).isBefore(today) && !isMaxParticipants(event, realDate) &&
-						Score.getContact(contactEvent, params.getUser()) > 0.5 &&
-						notificationService.sendNotification(contactEvent,
-								params.getUser(), NotificationID.event, Strings.encodeParam("e=" + event.getId()),
-								(String) events.get(i2).get("location.name")))
-					break;
+				if (!params.getUser().getId().equals(event.getContactId())) {
+					final LocalDate realDate = getRealDate(event, today);
+					final Contact contactEvent = repository.one(Contact.class, event.getContactId());
+					if (realDate.minusDays(1).isBefore(today) && !isMaxParticipants(event, realDate) &&
+							Score.getContact(contactEvent, params.getUser()) > 0.5 &&
+							notificationService.sendNotification(contactEvent,
+									params.getUser(), NotificationID.event, Strings.encodeParam("e=" + event.getId()),
+									(String) events.get(i2).get("location.name")))
+						break;
+				}
 			}
 		}
 	}

@@ -5,7 +5,9 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -327,10 +329,14 @@ public class RepositoryListener {
 			if (event != null && !event.getContactId().equals(eventParticipate.getContactId())) {
 				final Contact contactTo = repository.one(Contact.class, event.getContactId());
 				final Contact contactFrom = repository.one(Contact.class, eventParticipate.getContactId());
+				final Instant time = Instant.ofEpochMilli(
+						repository.one(Event.class, eventParticipate.getEventId()).getStartDate().getTime());
+				time.plusSeconds(contactTo.getTimezoneOffset() * 60);
 				notificationService.sendNotification(contactFrom, contactTo,
 						NotificationID.markEvent,
 						Strings.encodeParam("p=" + contactFrom.getId()),
-						new SimpleDateFormat("dd.MM.yyyy HH:mm").format(eventParticipate.getEventDate()),
+						new SimpleDateFormat("dd.MM.yyyy").format(eventParticipate.getEventDate()) +
+								new SimpleDateFormat(" HH:mm").format(new Date(time.toEpochMilli())),
 						event.getText(),
 						repository.one(Location.class, event.getLocationId()).getName());
 			}

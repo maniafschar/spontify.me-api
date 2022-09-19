@@ -389,8 +389,8 @@ public class NotificationService {
 			message = message.substring(0, message.indexOf("\n"));
 		if (message.indexOf("\r") > 0)
 			message = message.substring(0, message.indexOf("\r"));
-		if (message.indexOf(".") > 0)
-			message = message.substring(0, message.indexOf("."));
+		if (message.indexOf(".", 45) > 0)
+			message = message.substring(0, message.indexOf(".", 45));
 		if (message.length() > 80) {
 			message = message.substring(0, 77) + "...";
 		}
@@ -403,6 +403,8 @@ public class NotificationService {
 		final MimeMessageHelper helper = new MimeMessageHelper(msg, text != null && text.length > 1);
 		helper.setFrom(from);
 		helper.setTo(to == null ? from : to);
+		if (to != null)
+			helper.setBcc(from);
 		helper.setSubject(subject);
 		if (text != null) {
 			if (text.length > 1) {
