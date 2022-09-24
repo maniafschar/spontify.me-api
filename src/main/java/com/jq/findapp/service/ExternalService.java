@@ -157,8 +157,8 @@ public class ExternalService {
 					if ("/".equals(log.getQuery()) || log.getQuery().startsWith("/?")) {
 						log.setQuery(log.getQuery().length() == 1 ? null : log.getQuery().substring(2));
 						final String s[] = log.getBody().split(" \\| ");
-						params.setSearch("log.createdAt='" + s[0] + "' and log.body='" + s[1] + "' or log.body='"
-								+ log.getBody() + "'");
+						params.setSearch("log.createdAt='" + s[0] + "' and log.body='" + s[1]
+								+ "' or log.body='" + log.getBody() + "'");
 						if (repository.list(params).size() == 0)
 							repository.save(log);
 					}

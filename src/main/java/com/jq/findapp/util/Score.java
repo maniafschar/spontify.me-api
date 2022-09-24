@@ -42,6 +42,8 @@ public class Score {
 			search += "REGEXP_LIKE(contact.attrEx, '" + contact.getAttrInterestEx().replace(',', '|') + "')=1 or ";
 		if (search.endsWith(" or "))
 			search = search.substring(0, search.length() - 4);
+		if (search.endsWith("("))
+			search += "1=1";
 		return search;
 	}
 

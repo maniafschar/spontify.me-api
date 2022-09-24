@@ -183,6 +183,17 @@ public class EngagementService {
 				"global.openStore()",
 				contact -> contact.getOs() != OS.web && currentVersion.compareTo(contact.getVersion()) > 0));
 
+		chatTemplates.add(new ChatTemplate(Text.engagement_praise,
+				"",
+				contact -> contact.getLongitude() != null && contact.getImage() != null
+						&& contact.getAboutMe() != null && contact.getBirthday() != null
+						&& contact.getAttr() != null && contact.getAttrInterest() != null
+						&& (contact.getAgeDivers() != null || contact.getAgeFemale() != null
+								|| contact.getAgeMale() != null)
+						|| (contact.getAttr0() != null || contact.getAttr1() == null || contact.getAttr2() != null
+								|| contact.getAttr3() != null || contact.getAttr4() != null
+								|| contact.getAttr5() != null)));
+
 		chatTemplates.add(new ChatTemplate(Text.engagement_newTown,
 				"pageInfo.socialShare()",
 				contact -> contact.getLatitude() != null
@@ -238,8 +249,9 @@ public class EngagementService {
 
 	public void sendRegistrationReminder() throws Exception {
 		final GregorianCalendar gc = new GregorianCalendar();
-		if (gc.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY || gc.get(Calendar.HOUR_OF_DAY) != 19)
-			return;
+		final boolean sendingTime = gc.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY
+				&& gc.get(Calendar.HOUR_OF_DAY) == 19 && gc.get(Calendar.MINUTE) == 0;
+		final long hour = 3600000;
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.verified=false");
 		params.setLimit(0);
@@ -247,8 +259,12 @@ public class EngagementService {
 		String value = "";
 		for (int i = 0; i < list.size(); i++) {
 			final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
-			authenticationService.recoverSendEmailReminder(to);
-			value += "|" + to.getId();
+			if (sendingTime && to.getCreatedAt().getTime() + 24 * hour > System.currentTimeMillis()
+					|| to.getCreatedAt().getTime() + 5 * hour >= System.currentTimeMillis()
+							&& to.getCreatedAt().getTime() + 6 * hour < System.currentTimeMillis()) {
+				authenticationService.recoverSendEmailReminder(to);
+				value += "|" + to.getId();
+			}
 		}
 		if (value.length() > 0) {
 			final Setting s = new Setting();
@@ -283,15 +299,15 @@ public class EngagementService {
 			if (repository.list(params).size() == 0) {
 				params.setSearch(
 						"chat.textId is not null and chat.contactId=" + adminId + " and chat.contactId2=" + id);
-				final Result list = repository.list(params);
-				if (list.size() == 0)
+				final Result lastChats = repository.list(params);
+				if (lastChats.size() == 0)
 					return true;
-				final boolean isNearBy = ((String) list.get(0).get("chat.textId")).startsWith(
+				final boolean isLastChatNearBy = ((String) lastChats.get(0).get("chat.textId")).startsWith(
 						Text.engagement_nearByLocation.name().substring(0,
 								Text.engagement_nearByLocation.name().indexOf('L')));
-				if (!nearBy && isNearBy || nearBy && !isNearBy)
+				if (!nearBy && isLastChatNearBy || nearBy && !isLastChatNearBy)
 					return true;
-				if (((Timestamp) list.get(0).get("chat.createdAt"))
+				if (((Timestamp) lastChats.get(0).get("chat.createdAt"))
 						.before(new Timestamp(Instant.now().minus(Duration.ofDays(7)).toEpochMilli())))
 					return true;
 			}
@@ -316,15 +332,15 @@ public class EngagementService {
 
 	public void sendNearBy() throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_listId);
-		params.setSearch(
-				"contact.verified=true and contact.version is not null and contact.longitude is not null and (" +
-						"length(contact.attrInterest)>0 or length(contact.attrInterestEx)>0 or " +
-						"length(contact.attr0)>0 or length(contact.attr0Ex)>0 or " +
-						"length(contact.attr1)>0 or length(contact.attr1Ex)>0 or " +
-						"length(contact.attr2)>0 or length(contact.attr2Ex)>0 or " +
-						"length(contact.attr3)>0 or length(contact.attr3Ex)>0 or " +
-						"length(contact.attr4)>0 or length(contact.attr4Ex)>0 or " +
-						"length(contact.attr5)>0 or length(contact.attr5Ex)>0)");
+		params.setSearch("contact.id<>" + adminId + " and contact.verified=true and "
+				+ "contact.version is not null and contact.longitude is not null and ("
+				+ "length(contact.attrInterest)>0 or length(contact.attrInterestEx)>0 or "
+				+ "length(contact.attr0)>0 or length(contact.attr0Ex)>0 or "
+				+ "length(contact.attr1)>0 or length(contact.attr1Ex)>0 or "
+				+ "length(contact.attr2)>0 or length(contact.attr2Ex)>0 or "
+				+ "length(contact.attr3)>0 or length(contact.attr3Ex)>0 or "
+				+ "length(contact.attr4)>0 or length(contact.attr4Ex)>0 or "
+				+ "length(contact.attr5)>0 or length(contact.attr5Ex)>0)");
 		params.setLimit(0);
 		final Result ids = repository.list(params);
 		params.setQuery(Query.contact_chat);
@@ -423,7 +439,8 @@ public class EngagementService {
 		final String search = Score.getSearchContact(contact);
 		if (search.length() > 0) {
 			final QueryParams params = new QueryParams(Query.contact_list);
-			params.setSearch("contactLink.id is null and contact.image is not null and (" + search + ")");
+			params.setSearch("contactLink.id is null and contact.id<>" + contact.getId()
+					+ " and contact.image is not null and (" + search + ")");
 			params.setLatitude(contact.getLatitude());
 			params.setLongitude(contact.getLongitude());
 			params.setUser(contact);

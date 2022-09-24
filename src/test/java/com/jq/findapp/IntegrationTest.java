@@ -72,7 +72,7 @@ public class IntegrationTest {
 		Util.click("login input[name=\"agb\"]");
 		Util.sleep(5000);
 		Util.click("login buttontext:nth-of-type(1)");
-		final String s = Util.email().lines().reduce(
+		final String s = Util.email(1).lines().reduce(
 				(e, e2) -> e.startsWith("https://") ? e : e2.startsWith("https://") ? e2 : "").get();
 		driver.navigate().to(url + s.substring(s.indexOf('?')));
 		Util.get("popup input[name=\"passwd\"]").sendKeys("qwer1234");
@@ -92,7 +92,7 @@ public class IntegrationTest {
 	}
 
 	private void addFriend() {
-		Util.click("home buttonIcon[onclick*=\"search\"]");
+		Util.click("main>buttonIcon[onclick*=\"search\"]");
 		Util.get("search input[name=\"searchKeywords\"]").sendKeys("pseudonym");
 		Util.click("search buttontext[onclick*=\"saveSearch\"]");
 		Util.click("search row:nth-of-type(1)");
@@ -101,12 +101,13 @@ public class IntegrationTest {
 	}
 
 	private static class Util {
-		private static String email() {
+		private static String email(int i) {
 			sleep(500);
 			final List<String> files = Arrays.asList(new File("target/email").list());
 			files.sort((e1, e2) -> e1.compareTo(e2));
 			try {
-				return IOUtils.toString(new FileInputStream(new File("target/email/" + files.get(files.size() - 1))),
+				return IOUtils.toString(
+						new FileInputStream(new File("target/email/" + files.get(files.size() - 1 - i))),
 						StandardCharsets.UTF_8);
 			} catch (IOException e) {
 				throw new RuntimeException(e);

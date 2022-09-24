@@ -34,7 +34,6 @@ import com.jq.findapp.service.EngagementService;
 import com.jq.findapp.service.EventService;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
-import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.service.WhatToDoService;
 
 @RestController
@@ -129,9 +128,7 @@ public class SupportCenterApi {
 	public void resend(@PathVariable final BigInteger id, @RequestHeader String password, @RequestHeader String salt)
 			throws Exception {
 		authenticationService.verify(adminId, password, salt);
-		final Contact contact = repository.one(Contact.class, id);
-		notificationService.sendNotification(contact, contact, NotificationID.welcomeExt,
-				"r=" + contact.getLoginLink().substring(0, 10) + contact.getLoginLink().substring(20));
+		authenticationService.recoverSendEmailReminder(repository.one(Contact.class, id));
 	}
 
 	@PutMapping("log/search")

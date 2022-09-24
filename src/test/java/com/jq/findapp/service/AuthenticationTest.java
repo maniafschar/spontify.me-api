@@ -2,6 +2,7 @@ package com.jq.findapp.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -14,6 +15,7 @@ import java.sql.Date;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
@@ -38,7 +40,7 @@ import com.jq.findapp.util.EncryptionTest;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith({ SpringExtension.class })
-@SpringBootTest(classes = { FindappApplication.class, JpaTestConfiguration.class }, properties = { "app.admin.id=3" })
+@SpringBootTest(classes = { FindappApplication.class, JpaTestConfiguration.class })
 @ActiveProfiles("test")
 public class AuthenticationTest {
 	@Autowired
@@ -223,6 +225,18 @@ public class AuthenticationTest {
 		signature.update("1234567890abcdefghijklmnopqrstxyz".getBytes(StandardCharsets.UTF_8));
 
 		// then no exception
+	}
+
+	@Test
+	public void referer() {
+		// given
+		final Pattern pattern = Pattern.compile("(https://([a-z]*.)?spontify.me|http[s]?://localhost).*");
+
+		// when
+		final boolean result = pattern.matcher("https://sc.spontify.me/rest/gähn").find();
+
+		// then
+		assertTrue(result);
 	}
 
 	public void ios() throws Exception {

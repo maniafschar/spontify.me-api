@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -26,10 +27,13 @@ import com.jq.findapp.repository.Repository;
 public class LogFilter implements Filter {
 	@Autowired
 	private Repository repository;
+	private Pattern referer = null;
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
+		if (referer == null)
+			referer = Pattern.compile("(https://([a-z]*.)?spontify.me|http[s]?://localhost).*");
 		final ContentCachingRequestWrapper req = new ContentCachingRequestWrapper((HttpServletRequest) request);
 		final HttpServletResponse res = (HttpServletResponse) response;
 		final Log log = new Log();
@@ -37,6 +41,11 @@ public class LogFilter implements Filter {
 		if (loggable) {
 			log.setUri(req.getRequestURI());
 			log.setMethod(req.getMethod());
+			if (req.getHeader("Referer") != null && !referer.matcher(req.getHeader("Referer")).matches()) {
+				log.setReferer(req.getHeader("Referer"));
+				if (log.getReferer().length() > 255)
+					log.setReferer(log.getReferer().substring(0, 255));
+			}
 			log.setIp(req.getHeader("X-Forwarded-For"));
 			log.setPort(req.getServerPort());
 			if (req.getHeader("user") != null)

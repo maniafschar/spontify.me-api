@@ -88,9 +88,6 @@ public enum Query {
 
 	public String prepareSql(QueryParams params) {
 		String search = Strings.isEmpty(params.getSearch()) ? "1=1" : sanatizeSearchToken(params.getSearch());
-		if (addBlock && (this == contact_list || this == contact_listChat || this == contact_listVisit)
-				&& !search.contains("contact.id=") && !search.contains("contact.loginLink="))
-			search += (search.length() > 0 ? " and " : "") + "contact.id<>{USERID} and contact.verified=1";
 		if (params.getSearchGeoLocation() != null)
 			search += " and " + params.getSearchGeoLocation();
 		if (addBlock && params.getUser() != null)

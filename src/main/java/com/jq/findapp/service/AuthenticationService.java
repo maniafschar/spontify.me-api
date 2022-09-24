@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.mail.SendFailedException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -204,9 +206,15 @@ public class AuthenticationService {
 		contact.setEmail(registration.getEmail());
 		contact.setGender(registration.getGender());
 		contact.setPseudonym(registration.getPseudonym());
-		final String loginLink = generateLoginParam(contact);
-		saveRegistration(contact, registration);
-		notificationService.sendNotification(contact, contact, NotificationID.welcomeExt, "r=" + loginLink);
+		contact.setLanguage(registration.getLanguage());
+		contact.setEmail(contact.getEmail().toLowerCase().trim());
+		try {
+			notificationService.sendNotification(repository.one(Contact.class, adminId), contact,
+					NotificationID.welcomeExt, "r=" + generateLoginParam(contact));
+			saveRegistration(contact, registration);
+		} catch (SendFailedException ex) {
+			throw new IllegalAccessException("email");
+		}
 	}
 
 	public Unique unique(String email) {
@@ -340,8 +348,12 @@ public class AuthenticationService {
 	}
 
 	public void recoverSendEmailReminder(Contact contact) throws Exception {
-		final String s = generateLoginParam(contact);
-		repository.save(contact);
+		final String s;
+		if (Strings.isEmpty(contact.getLoginLink())) {
+			s = generateLoginParam(contact);
+			repository.save(contact);
+		} else
+			s = contact.getLoginLink().substring(0, 10) + contact.getLoginLink().substring(20);
 		notificationService.sendNotificationEmail(repository.one(Contact.class, adminId),
 				contact,
 				Text.mail_registrationReminder.getText(contact.getLanguage()).replace("<jq:EXTRA_1 />",
@@ -369,7 +381,7 @@ public class AuthenticationService {
 	}
 
 	public Contact recoverVerifyEmail(String token) throws Exception {
-		final QueryParams params = new QueryParams(Query.contact_list);
+		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setUser(new Contact());
 		params.getUser().setId(BigInteger.valueOf(0L));
 		params.setSearch("contact.loginLink='" + token + '\'');

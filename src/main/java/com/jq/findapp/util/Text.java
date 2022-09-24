@@ -32,6 +32,7 @@ public enum Text {
 	engagement_nearByLocation,
 	engagement_newTown,
 	engagement_patience,
+	engagement_praise,
 	engagement_uploadProfileAttributes,
 	engagement_uploadProfileImage,
 	mail_accountDelete,

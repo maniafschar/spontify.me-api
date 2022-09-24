@@ -174,13 +174,15 @@ public class NotificationService {
 		if (!contactTo.getVerified() && notificationID != NotificationID.welcomeExt
 				&& notificationID != NotificationID.pwReset)
 			return false;
-		final QueryParams params = new QueryParams(Query.contact_block);
-		params.setUser(contactFrom);
-		params.setSearch("contactBlock.contactId=" + contactFrom.getId() + " and contactBlock.contactId2="
-				+ contactTo.getId() + " or contactBlock.contactId="
-				+ contactTo.getId() + " and contactBlock.contactId2=" + contactFrom.getId());
-		if (repository.list(params).size() > 0)
-			return false;
+		if (contactTo.getId() != null) {
+			final QueryParams params = new QueryParams(Query.contact_block);
+			params.setUser(contactFrom);
+			params.setSearch("contactBlock.contactId=" + contactFrom.getId() + " and contactBlock.contactId2="
+					+ contactTo.getId() + " or contactBlock.contactId="
+					+ contactTo.getId() + " and contactBlock.contactId2=" + contactFrom.getId());
+			if (repository.list(params).size() > 0)
+				return false;
+		}
 		StringBuilder text;
 		try {
 			text = new StringBuilder(Text.valueOf("mail_" + notificationID).getText(contactTo.getLanguage()));
@@ -202,7 +204,7 @@ public class NotificationService {
 			String s = text.toString();
 			if (s.charAt(1) == ' ' && (s.charAt(0) == ',' || s.charAt(0) == ':'))
 				s = s.substring(1);
-			params.setQuery(Query.contact_notification);
+			final QueryParams params = new QueryParams(Query.contact_notification);
 			params.setSearch("contactNotification.contactId=" + contactTo.getId() +
 					" and contactNotification.contactId2=" + contactFrom.getId() +
 					" and TIMESTAMPDIFF(HOUR,contactNotification.createdAt,current_timestamp)<24" +
@@ -220,8 +222,9 @@ public class NotificationService {
 			notID = notification.getId();
 		}
 		if (userWantsNotification(notificationID, contactTo)) {
-			if (contactFrom.getId().longValue() != contactTo.getId().longValue()
-					&& (text.charAt(0) < 'A' || text.charAt(0) > 'Z'))
+			if (contactTo.getId() != null && contactFrom.getId().longValue() != contactTo.getId().longValue()
+					&& (text.charAt(0) < 'A' || text.charAt(0) > 'Z')
+					&& text.indexOf(contactFrom.getPseudonym()) < 0)
 				text.insert(0, contactFrom.getPseudonym() + (text.charAt(0) == ':' ? "" : " "));
 			boolean b = notificationID.getType() != NotificationIDType.Email
 					&& !Strings.isEmpty(contactTo.getPushSystem()) &&
@@ -371,7 +374,7 @@ public class NotificationService {
 		Strings.replaceString(text, "<jq:link />", s2);
 		Strings.replaceString(html, "<jq:url />", Strings.URL_APP);
 		Strings.replaceString(text, "<jq:url />", Strings.URL_APP);
-		if (contactFrom == null || contactFrom.getId().equals(contactTo.getId()))
+		if (contactFrom == null || contactTo.getId() != null && contactFrom.getId().equals(contactTo.getId()))
 			s2 = Text.mail_newsTitle.getText(contactTo.getLanguage());
 		else
 			s2 = Text.mail_newsTitleFrom.getText(contactTo.getLanguage()).replaceAll("<jq:pseudonymFrom />",

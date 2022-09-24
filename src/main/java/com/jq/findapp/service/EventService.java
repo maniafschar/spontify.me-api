@@ -40,7 +40,7 @@ public class EventService {
 		params.setLimit(0);
 		final Result ids = repository.list(params);
 		params.setQuery(Query.event_listCurrent);
-		params.setDistance(20);
+		params.setDistance(50);
 		params.setSearch("TO_DAYS(event.startDate)-1<=TO_DAYS(current_timestamp)");
 		final LocalDate today = LocalDate.now(ZoneId.systemDefault());
 		for (int i = 0; i < ids.size(); i++) {
@@ -52,7 +52,7 @@ public class EventService {
 					final LocalDate realDate = getRealDate(event, today);
 					final Contact contactEvent = repository.one(Contact.class, event.getContactId());
 					if (realDate.minusDays(1).isBefore(today) && !isMaxParticipants(event, realDate) &&
-							Score.getContact(contactEvent, params.getUser()) > 0.5 &&
+							Score.getContact(contactEvent, params.getUser()) > 0.3 &&
 							notificationService.sendNotification(contactEvent,
 									params.getUser(), NotificationID.event, Strings.encodeParam("e=" + event.getId()),
 									(String) events.get(i2).get("location.name")))

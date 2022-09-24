@@ -74,4 +74,5 @@ FROM
 					cwtd2.time>current_timestamp
 		)
 WHERE
+	contact.verified=1 and
 	{search}
