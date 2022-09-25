@@ -24,10 +24,7 @@ public class GeoLocationProcessor {
 		if (params.getLatitude() != null && params.getLongitude() != null) {
 			if (params.getDistance() == null)
 				params.setDistance(100);
-			String table = params.getQuery().name();
-			table = table.substring(0, table.indexOf('_'));
-			table = "event".equals(table) ? "location" : table;
-			this.table = table;
+			this.table = params.getQuery().name().split("_")[0];
 			integer = params.getQuery().name().startsWith("contact_");
 			sort = params.isSort();
 			radLat = Math.toRadians(params.getLatitude());
@@ -35,17 +32,17 @@ public class GeoLocationProcessor {
 			checkBounds(radLat, radLon);
 			final Point[] boundingCoordinates = computeBoundingCoordinates(params.getDistance());
 			final boolean meridian180WithinDistance = boundingCoordinates[0].getY() > boundingCoordinates[1].getY();
-			table = table + '.';
 			params.setSearchGeoLocation(
-					"((" + table + "latitude >= " + boundingCoordinates[0].getX() + " and " + table + "latitude <= "
-							+ boundingCoordinates[1].getX() + ") and (" + table + "longitude >= "
+					"((" + table + ".latitude >= " + boundingCoordinates[0].getX() + " and " + table + ".latitude <= "
+							+ boundingCoordinates[1].getX() + ") and (" + table + ".longitude >= "
 							+ boundingCoordinates[0].getY() + ' ' + (meridian180WithinDistance ? "or" : "and") + ' '
-							+ table + "longitude <= " + boundingCoordinates[1].getY() + ") and " + "acos(sin("
-							+ radLat + ") * sin(radians(" + table + "latitude)) + cos(" + radLat
-							+ ") * cos(radians(" + table + "latitude)) * cos(radians(" + table + "longitude) - "
+							+ table + ".longitude <= " + boundingCoordinates[1].getY() + ") and " + "acos(sin("
+							+ radLat + ") * sin(radians(" + table + ".latitude)) + cos(" + radLat
+							+ ") * cos(radians(" + table + ".latitude)) * cos(radians(" + table + ".longitude) - "
 							+ radLon + ")) <= " + (params.getDistance() / radius) + ')');
 			if (params.getDistance() == null || params.getDistance() > 50000 || params.getDistance() < 1)
-				params.setSearchGeoLocation('(' + table + "latitude is null or " + params.getSearchGeoLocation() + ')');
+				params.setSearchGeoLocation(
+						'(' + table + ".latitude is null or " + params.getSearchGeoLocation() + ')');
 		} else
 			params.setSearchGeoLocation(null);
 	}

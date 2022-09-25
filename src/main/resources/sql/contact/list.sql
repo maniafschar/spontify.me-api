@@ -56,13 +56,13 @@ SELECT
 	contactWhatToDo.time,
 	'' as geolocationDistance
 FROM
-	Contact contact 
+	Contact contact
 	left join ContactLink contactLink on
-		contactLink.contactId={USERID} and contactLink.contactId2=contact.id 
-	or 
-		contactLink.contactId2={USERID} and contactLink.contactId=contact.id 
+		contactLink.contactId={USERID} and contactLink.contactId2=contact.id
+	or
+		contactLink.contactId2={USERID} and contactLink.contactId=contact.id
 	left join ContactWhatToDo contactWhatToDo on
-		contactWhatToDo.id = 
+		contactWhatToDo.id =
 		(
 				select
 					max(cwtd2.id)

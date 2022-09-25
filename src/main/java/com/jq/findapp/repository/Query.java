@@ -14,10 +14,12 @@ import com.jq.findapp.util.Strings;
 public enum Query {
 	contact_block,
 	contact_chat,
+	contact_eventParticipateCount,
 	contact_list(true),
 	contact_listBlocked,
 	contact_listChat(true),
 	contact_listChatFlat,
+	contact_listEventParticipate(true),
 	contact_listFeedback,
 	contact_listFriends,
 	contact_listGroup,
@@ -45,6 +47,8 @@ public enum Query {
 	event_participate,
 
 	location_list,
+	location_listEvent(true),
+	location_listEventCurrent(true),
 	location_listFavorite,
 	location_listOpenTime,
 	location_listVisit,
