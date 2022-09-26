@@ -53,7 +53,7 @@ public class WhatToDoService {
 					final String[] cats = contactWhatToDo.getKeywords().split(",");
 					for (int i2 = 0; i2 < cats.length; i2++)
 						search += "length(contact.attr" + cats[i2] + ")>0 or ";
-					params.setSearch(search.substring(0, search.length() - 4) + ')');
+					params.setSearch(search.substring(0, search.length() - 4) + ") and contact.id<>" + contact.getId());
 					final Result result = repository.list(params);
 					final ZonedDateTime t = Instant.ofEpochMilli(contactWhatToDo.getTime().getTime())
 							.minus(Duration.ofMinutes(
