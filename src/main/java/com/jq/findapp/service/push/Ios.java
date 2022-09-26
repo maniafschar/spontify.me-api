@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.service.NotificationService.Environment;
 import com.jq.findapp.util.Strings;
 
 @Component
@@ -45,15 +46,15 @@ public class Ios {
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
 
-	public String send(Contact contact, String text, String action, int badge, BigInteger notificationId)
+	public Environment send(Contact contact, String text, String action, int badge, BigInteger notificationId)
 			throws Exception {
 		try {
 			send(url, contact, text, action, badge, notificationId);
-			return "production";
+			return Environment.Production;
 		} catch (NotFoundException ex) {
 			if (adminId.equals(contact.getId())) {
 				send(urlTest, contact, text, action, badge, notificationId);
-				return "development";
+				return Environment.Development;
 			}
 			throw ex;
 		}

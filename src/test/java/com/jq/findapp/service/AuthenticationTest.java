@@ -33,6 +33,7 @@ import com.jq.findapp.entity.ContactToken;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.NotificationService.Environment;
 import com.jq.findapp.service.push.Android;
 import com.jq.findapp.service.push.Ios;
 import com.jq.findapp.util.Encryption;
@@ -246,12 +247,12 @@ public class AuthenticationTest {
 		System.setProperty("javax.net.debug", "all");
 
 		// when
-		final String environmet = ios.send(contact,
+		final Environment environmet = ios.send(contact,
 				"uzgku",
 				"chat=12", 12, BigInteger.ONE);
 
 		// then
-		assertEquals("development", environmet);
+		assertEquals(Environment.Development, environmet);
 	}
 
 	@Test

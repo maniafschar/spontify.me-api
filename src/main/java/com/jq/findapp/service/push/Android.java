@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.service.NotificationService.Environment;
 import com.jq.findapp.util.Strings;
 
 @Component
@@ -29,7 +30,7 @@ public class Android {
 	@Value("${push.fcm.url}")
 	private String url;
 
-	public String send(Contact contact, String text, String action, BigInteger notificationId) throws Exception {
+	public Environment send(Contact contact, String text, String action, BigInteger notificationId) throws Exception {
 		WebClient.create(url)
 				.post()
 				.contentType(MediaType.APPLICATION_JSON)
@@ -44,7 +45,7 @@ public class Android {
 								.replace("{exec}", Strings.isEmpty(action) ? "" : action))
 				.retrieve()
 				.toEntity(String.class).block().getBody();
-		return "production";
+		return Environment.Production;
 	}
 
 	private Map<String, String> getHeader() {

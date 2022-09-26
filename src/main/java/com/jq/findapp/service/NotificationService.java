@@ -81,6 +81,10 @@ public class NotificationService {
 		}
 	}
 
+	public enum Environment {
+		Production, Development
+	}
+
 	enum NotificationIDType {
 		Email, Device, EmailOrDevice, EmailAndDevice
 	}
