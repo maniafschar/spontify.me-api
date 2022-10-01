@@ -24,7 +24,9 @@ public class GeoLocationProcessor {
 		if (params.getLatitude() != null && params.getLongitude() != null) {
 			if (params.getDistance() == null)
 				params.setDistance(100);
-			this.table = params.getQuery().name().split("_")[0];
+			table = params.getQuery().name().split("_")[0];
+			if ("event".equals(table))
+				table = "location";
 			integer = params.getQuery().name().startsWith("contact_");
 			sort = params.isSort();
 			radLat = Math.toRadians(params.getLatitude());

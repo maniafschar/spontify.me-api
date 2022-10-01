@@ -7,10 +7,10 @@ import javax.persistence.EntityListeners;
 import javax.persistence.Transient;
 
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.repository.RepositoryListener;
+import com.jq.findapp.repository.listener.LocationFavoriteListener;
 
 @Entity
-@EntityListeners(RepositoryListener.class)
+@EntityListeners(LocationFavoriteListener.class)
 public class LocationFavorite extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger locationId;

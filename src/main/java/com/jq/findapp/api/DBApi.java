@@ -4,6 +4,8 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +21,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.entity.BaseEntity;
+import com.jq.findapp.entity.Ticket.Type;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
@@ -28,6 +31,7 @@ import com.jq.findapp.util.EntityUtil;
 import com.jq.findapp.util.Strings;
 
 @RestController
+@Transactional
 @CrossOrigin(origins = { Strings.URL_APP, Strings.URL_LOCALHOST, Strings.URL_LOCALHOST_TEST })
 @RequestMapping("db")
 public class DBApi {
@@ -111,7 +115,7 @@ public class DBApi {
 			return false;
 		if (e.writeAccess(user, repository))
 			return true;
-		notificationService.sendEmail(null, "ERROR writeAuthentication",
+		notificationService.createTicket(Type.ERROR, "writeAuthentication",
 				"Failed for " + user + " on " + e.getClass().getName() + ", id " + e.getId());
 		return false;
 	}

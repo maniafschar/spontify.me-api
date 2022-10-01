@@ -172,29 +172,30 @@ public class AuthenticationService {
 
 	public void register(InternalRegistration registration) throws Exception {
 		if (!registration.isAgb()) {
-			notificationService.sendEmail(null, "reg denied agb", registration.toString());
+			notificationService.createTicket(com.jq.findapp.entity.Ticket.Type.REGISTRATION,
+					"denied agb", registration.toString());
 			throw new IllegalAccessException("legal");
 		}
 		final int minimum = 5000;
 		if (registration.getTime() < minimum) {
-			notificationService.sendEmail(null, "reg denied time: " + registration.getTime() + "<" + minimum,
-					registration.toString());
+			notificationService.createTicket(com.jq.findapp.entity.Ticket.Type.REGISTRATION,
+					"denied time", registration.toString());
 			throw new IllegalAccessException("time");
 		}
 		if (!EMAIL.matcher(registration.getEmail()).find()) {
-			notificationService.sendEmail(null, "reg denied email: " + registration.getEmail(),
-					registration.toString());
+			notificationService.createTicket(com.jq.findapp.entity.Ticket.Type.REGISTRATION,
+					"denied email: ", registration.toString());
 			throw new IllegalAccessException("email");
 		}
 		final Unique unique = unique(registration.getEmail());
 		if (!unique.unique) {
-			notificationService.sendEmail(null, "reg denied email not unique: " + registration.getEmail(),
-					registration.toString());
+			notificationService.createTicket(com.jq.findapp.entity.Ticket.Type.REGISTRATION,
+					"denied email not unique", registration.toString());
 			throw new IllegalAccessException("email");
 		}
 		if (unique.blocked) {
-			notificationService.sendEmail(null, "reg denied email blocked: " + registration.getEmail(),
-					registration.toString());
+			notificationService.createTicket(com.jq.findapp.entity.Ticket.Type.REGISTRATION,
+					"denied email blocked", registration.toString());
 			throw new IllegalAccessException("domain");
 		}
 		final QueryParams params = new QueryParams(Query.contact_listId);
@@ -254,7 +255,8 @@ public class AuthenticationService {
 			}
 		} else
 			repository.save(contact);
-		notificationService.sendEmail(null, "Reg: " + contact.getEmail(), registration.toString());
+		notificationService.createTicket(com.jq.findapp.entity.Ticket.Type.REGISTRATION, contact.getEmail(),
+				registration.toString());
 	}
 
 	private boolean isDuplicateIdDisplay(Throwable ex) {
@@ -364,7 +366,7 @@ public class AuthenticationService {
 	public String recoverSendEmail(String email) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.email='" + email + '\'');
-		Map<String, Object> user = repository.one(params);
+		final Map<String, Object> user = repository.one(params);
 		if (user != null) {
 			final Contact contact = repository.one(Contact.class, (BigInteger) user.get("contact.id"));
 			if (contact.getLoginLink() == null
@@ -446,7 +448,7 @@ public class AuthenticationService {
 				throw new RuntimeException("ERROR SQL on account delete: " + ex.getMessage() + "\n" + sql);
 			}
 		}
-		notificationService.sendEmail(null, "Deleted: " + user.getEmail(),
+		notificationService.createTicket(com.jq.findapp.entity.Ticket.Type.REGISTRATION, "Deleted",
 				new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(user));
 	}
 

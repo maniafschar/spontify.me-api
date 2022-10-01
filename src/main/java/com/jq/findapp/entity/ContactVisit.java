@@ -5,10 +5,10 @@ import java.math.BigInteger;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 
-import com.jq.findapp.repository.RepositoryListener;
+import com.jq.findapp.repository.listener.ContactVisitListener;
 
 @Entity
-@EntityListeners(RepositoryListener.class)
+@EntityListeners(ContactVisitListener.class)
 public class ContactVisit extends BaseEntity {
 	private Long count;
 	private BigInteger contactId;

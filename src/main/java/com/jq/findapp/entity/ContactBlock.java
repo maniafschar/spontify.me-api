@@ -7,10 +7,10 @@ import javax.persistence.EntityListeners;
 import javax.persistence.Transient;
 
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.repository.RepositoryListener;
+import com.jq.findapp.repository.listener.ContactBlockListener;
 
 @Entity
-@EntityListeners(RepositoryListener.class)
+@EntityListeners(ContactBlockListener.class)
 public class ContactBlock extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger contactId2;

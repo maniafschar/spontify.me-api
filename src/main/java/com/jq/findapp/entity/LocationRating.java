@@ -5,10 +5,10 @@ import java.math.BigInteger;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 
-import com.jq.findapp.repository.RepositoryListener;
+import com.jq.findapp.repository.listener.LocationRatingListener;
 
 @Entity
-@EntityListeners(RepositoryListener.class)
+@EntityListeners(LocationRatingListener.class)
 public class LocationRating extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger locationId;

@@ -22,6 +22,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Log;
+import com.jq.findapp.entity.Ticket;
+import com.jq.findapp.entity.Ticket.Type;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -46,10 +48,10 @@ public class ExternalService {
 				.get().retrieve().toEntity(String.class).block().getBody();
 		try {
 			final ObjectMapper om = new ObjectMapper();
-			notificationService.sendEmail(null, "google",
-					param + "\n\n" + om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(result)));
+			notificationService.createTicket(Type.GOOGLE, param,
+					om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(result)));
 		} catch (Exception e) {
-			notificationService.sendEmail(null, "google", param + "\n\n" + result);
+			notificationService.createTicket(Type.GOOGLE, param, result);
 		}
 		return result;
 	}

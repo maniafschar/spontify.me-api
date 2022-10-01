@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.transaction.Transactional;
 import javax.ws.rs.core.Context;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Strings;
 
 @RestController
+@Transactional
 @CrossOrigin(origins = { Strings.URL_APP, Strings.URL_LOCALHOST, Strings.URL_LOCALHOST_TEST })
 @RequestMapping("authentication")
 public class AuthenticationApi {

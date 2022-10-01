@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.transaction.Transactional;
+
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +39,7 @@ import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.LocationOpenTime;
 import com.jq.findapp.entity.LocationVisit;
+import com.jq.findapp.entity.Ticket.Type;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -52,6 +55,7 @@ import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
 
 @RestController
+@Transactional
 @CrossOrigin(origins = { Strings.URL_APP, Strings.URL_LOCALHOST, Strings.URL_LOCALHOST_TEST })
 @RequestMapping("action")
 public class ActionApi {
@@ -100,7 +104,7 @@ public class ActionApi {
 		if (text != null) {
 			final Integer hash = text.hashCode();
 			if (!SENT_NOTIFICATIONS.contains(hash)) {
-				notificationService.sendEmail(null, "ERROR", text);
+				notificationService.createTicket(Type.ERROR, "client", text);
 				SENT_NOTIFICATIONS.add(hash);
 			}
 		}

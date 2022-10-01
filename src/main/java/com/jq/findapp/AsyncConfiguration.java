@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import com.jq.findapp.entity.Ticket.Type;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Strings;
 
@@ -47,7 +48,7 @@ public class AsyncConfiguration implements AsyncConfigurer {
 					for (int i = 0; i < params.length; i++)
 						msg += "\n\nParameter " + (i + 1) + ":\n" + params[i];
 					try {
-						notificationService.sendEmail(null, "ERROR " + ex.getMessage(), msg);
+						notificationService.createTicket(Type.ERROR, ex.getMessage(), msg);
 					} catch (Exception e1) {
 						// never happend in 20 years...
 					}

@@ -48,7 +48,7 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 		body.put("exception", Strings.stackTraceToString(ex));
 		body.put("time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 		return handleExceptionInternal(ex, body, null,
-				ex instanceof AuthenticationException ? HttpStatus.FORBIDDEN : HttpStatus.INTERNAL_SERVER_ERROR,
+				ex instanceof AuthenticationException ? HttpStatus.UNAUTHORIZED : HttpStatus.INTERNAL_SERVER_ERROR,
 				request);
 	}
 
@@ -111,10 +111,10 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 					}
 				}
 				msg = msg.replaceFirst(SUBSTITUTE, "" + request.getServerPort()).replaceFirst(SUBSTITUTE, s.toString());
-				notificationService.sendEmail(null, "ERROR " + ex.getMessage(), msg);
+				notificationService.createTicket(com.jq.findapp.entity.Ticket.Type.ERROR, ex.getMessage(), msg);
 			}
 		} catch (Exception e1) {
-			notificationService.sendEmail(null, "ERROR on sending error report!",
+			notificationService.createTicket(com.jq.findapp.entity.Ticket.Type.ERROR, "sending error report!",
 					Strings.stackTraceToString(e1) + "\n\n\n" + msg);
 		}
 	}

@@ -5,7 +5,7 @@ FROM
 	Contact contact
 WHERE
 	contactNotification.contactId=contact.id and
-	contactNotification.textId<>'FriendshipRequest' and
 	contactNotification.seen=false and
 	contact.id={USERID} and
+	(select cb.id from ContactBlock cb where cb.contactId=contactNotification.contactId2 and cb.contactId2={USERID} or cb.contactId={USERID} and cb.contactId2=contactNotification.contactId2) is null and
 	{search}

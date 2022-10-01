@@ -17,11 +17,13 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailSendException;
 import org.springframework.stereotype.Service;
 
 import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.OS;
+import com.jq.findapp.entity.Ticket.Type;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Setting;
 import com.jq.findapp.repository.Query;
@@ -248,22 +250,27 @@ public class EngagementService {
 	}
 
 	public void sendRegistrationReminder() throws Exception {
-		final GregorianCalendar gc = new GregorianCalendar();
-		final boolean sendingTime = gc.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY
-				&& gc.get(Calendar.HOUR_OF_DAY) == 19 && gc.get(Calendar.MINUTE) == 0;
-		final long hour = 3600000;
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.verified=false");
 		params.setLimit(0);
 		final Result list = repository.list(params);
-		String value = "";
+		final long DAY = 86400000;
+		String value = "", failedEmails = "";
+		params.setQuery(Query.misc_setting);
 		for (int i = 0; i < list.size(); i++) {
 			final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
-			if (sendingTime && to.getCreatedAt().getTime() + 24 * hour > System.currentTimeMillis()
-					|| to.getCreatedAt().getTime() + 5 * hour >= System.currentTimeMillis()
-							&& to.getCreatedAt().getTime() + 6 * hour < System.currentTimeMillis()) {
-				authenticationService.recoverSendEmailReminder(to);
-				value += "|" + to.getId();
+			params.setSearch("setting.label='registration-reminder' and concat('|', setting.value, '|') like '%|"
+					+ to.getId() + "|%'");
+			final Result result = repository.list(params);
+			if (result.size() == 0
+					|| ((Timestamp) result.get(0).get("setting.createdAt")).getTime() + 3 * DAY < System
+							.currentTimeMillis()) {
+				try {
+					authenticationService.recoverSendEmailReminder(to);
+					value += "|" + to.getId();
+				} catch (MailSendException ex) {
+					failedEmails += "\n" + to.getEmail();
+				}
 			}
 		}
 		if (value.length() > 0) {
@@ -272,6 +279,8 @@ public class EngagementService {
 			s.setValue(value.substring(1));
 			repository.save(s);
 		}
+		if (failedEmails.length() > 0)
+			notificationService.createTicket(Type.OTHER, "sendRegistrationReminder", "Failed Emails:" + failedEmails);
 	}
 
 	public void sendChats() throws Exception {

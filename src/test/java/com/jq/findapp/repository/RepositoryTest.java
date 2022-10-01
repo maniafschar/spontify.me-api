@@ -26,7 +26,8 @@ import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactBluetooth;
 import com.jq.findapp.entity.ContactRating;
-import com.jq.findapp.entity.Feedback;
+import com.jq.findapp.entity.Ticket;
+import com.jq.findapp.entity.Ticket.Type;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.util.Utils;
 
@@ -163,18 +164,17 @@ public class RepositoryTest {
 	@Test
 	public void repositoryListener() throws Exception {
 		// given
-		final Contact contact = utils.createContact();
 		utils.createContact();
 		utils.createContact();
-		final Feedback feedback = new Feedback();
-		feedback.setText("abc");
-		feedback.setContactId(contact.getId());
+		final Ticket ticket = new Ticket();
+		ticket.setNote("abc");
+		ticket.setType(Type.ACCOUNT_DELETE);
 
 		// when
-		repository.save(feedback);
+		repository.save(ticket);
 
 		// then
-		assertNotNull(feedback.getId());
+		assertNotNull(ticket.getNote());
 	}
 
 	@Test

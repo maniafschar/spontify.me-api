@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
+import javax.transaction.Transactional;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
@@ -25,6 +26,7 @@ import com.jq.findapp.api.model.Notification;
 import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Setting;
+import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
@@ -37,6 +39,7 @@ import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.WhatToDoService;
 
 @RestController
+@Transactional
 @CrossOrigin(origins = { "https://sc.spontify.me" })
 @RequestMapping("support")
 public class SupportCenterApi {
@@ -85,12 +88,20 @@ public class SupportCenterApi {
 		return repository.list(params).getList();
 	}
 
-	@GetMapping("feedback")
-	public List<Object[]> feedback(@RequestHeader String password, @RequestHeader String salt) {
-		final QueryParams params = new QueryParams(Query.contact_listFeedback);
+	@GetMapping("ticket")
+	public List<Object[]> ticket(String search, @RequestHeader String password, @RequestHeader String salt) {
+		final QueryParams params = new QueryParams(Query.misc_listTicket);
 		params.setUser(authenticationService.verify(adminId, password, salt));
+		params.setSearch(search);
 		params.setLimit(Integer.MAX_VALUE);
 		return repository.list(params).getList();
+	}
+
+	@DeleteMapping("ticket")
+	public void ticketDelete(List<BigInteger> ids, @RequestHeader String password, @RequestHeader String salt)
+			throws Exception {
+		for (BigInteger id : ids)
+			repository.delete(repository.one(Ticket.class, id));
 	}
 
 	@GetMapping("log")
@@ -132,7 +143,7 @@ public class SupportCenterApi {
 	}
 
 	@PutMapping("log/search")
-	public void logSearch(@RequestBody List<String> searches, @RequestHeader String password,
+	public void logSearch(@RequestBody List<Map<String, Object>> searches, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
 		authenticationService.verify(adminId, password, salt);
 		final QueryParams param = new QueryParams(Query.misc_setting);

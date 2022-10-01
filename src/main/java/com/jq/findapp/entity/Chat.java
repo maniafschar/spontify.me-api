@@ -5,10 +5,10 @@ import java.math.BigInteger;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 
-import com.jq.findapp.repository.RepositoryListener;
+import com.jq.findapp.repository.listener.ChatListener;
 
 @Entity
-@EntityListeners(RepositoryListener.class)
+@EntityListeners(ChatListener.class)
 public class Chat extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger contactId2;

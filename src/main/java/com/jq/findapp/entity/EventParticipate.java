@@ -8,10 +8,10 @@ import javax.persistence.EntityListeners;
 import javax.persistence.Transient;
 
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.repository.RepositoryListener;
+import com.jq.findapp.repository.listener.EventParticipateListener;
 
 @Entity
-@EntityListeners(RepositoryListener.class)
+@EntityListeners(EventParticipateListener.class)
 public class EventParticipate extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger eventId;

@@ -72,7 +72,7 @@ public class IntegrationTest {
 		Util.click("login input[name=\"agb\"]");
 		Util.sleep(5000);
 		Util.click("login buttontext:nth-of-type(1)");
-		final String s = Util.email(1).lines().reduce(
+		final String s = Util.email(0).lines().reduce(
 				(e, e2) -> e.startsWith("https://") ? e : e2.startsWith("https://") ? e2 : "").get();
 		driver.navigate().to(url + s.substring(s.indexOf('?')));
 		Util.get("popup input[name=\"passwd\"]").sendKeys("qwer1234");

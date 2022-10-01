@@ -41,6 +41,8 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification;
 import com.jq.findapp.entity.Location;
+import com.jq.findapp.entity.Ticket;
+import com.jq.findapp.entity.Ticket.Type;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -70,6 +72,9 @@ public class NotificationService {
 
 	@Value("${app.email.address}")
 	private String from;
+
+	@Value("${app.admin.id}")
+	private BigInteger adminId;
 
 	private static final byte[] LOGO;
 
@@ -300,7 +305,15 @@ public class NotificationService {
 			repository.save(contactTo);
 			return false;
 		} catch (Exception ex) {
-			sendEmail(null, "ERROR", Strings.stackTraceToString(ex));
+			createTicket(Type.ERROR, "Push Notification",
+					contactTo.getId() + "\n\n"
+							+ IOUtils.toString(getClass().getResourceAsStream("/template/push.android"),
+									StandardCharsets.UTF_8)
+									.replace("{to}", contactTo.getPushToken())
+									.replace("{text}", text)
+									.replace("{notificationId}", "" + notificationId)
+									.replace("{exec}", Strings.isEmpty(action) ? "" : action)
+							+ "\n\n" + Strings.stackTraceToString(ex));
 			return false;
 		}
 	}
@@ -387,7 +400,7 @@ public class NotificationService {
 		if (contactFrom == null || contactFrom.getImage() != null) {
 			imgProfile = Attachment.getFile(contactFrom.getImage());
 			Strings.replaceString(html, "<jq:image />",
-					"<br /><img style=\"width:10em;\" src=\"cid:img_profile\" width=\"150\" height=\"150\" />");
+					"<img style=\"height:150px;min-height:150px;max-height:150px;width:150px;min-width:150px;max-width:150px;\" src=\"cid:img_profile\" width=\"150\" height=\"150\" />");
 		} else
 			Strings.replaceString(html, "<jq:image />", "");
 		if (message.indexOf("\n") > 0)
@@ -403,7 +416,7 @@ public class NotificationService {
 	}
 
 	private void sendEmail(final String to, final String subject, final byte[] imgProfile, final String... text)
-			throws MessagingException, MalformedURLException, IOException {
+			throws Exception {
 		final MimeMessage msg = email.createMimeMessage();
 		final MimeMessageHelper helper = new MimeMessageHelper(msg, text != null && text.length > 1);
 		helper.setFrom(from);
@@ -415,14 +428,29 @@ public class NotificationService {
 				helper.addInline("img_logo", new MyDataSource(LOGO, "logoEmail.png"));
 				if (imgProfile != null)
 					helper.addInline("img_profile", new MyDataSource(imageRound(imgProfile), "image.jpg"));
-			} else if (text.length > 0) {
+			} else if (text.length > 0)
 				helper.setText(text[0]);
-				new File("error").mkdir();
-				IOUtils.write(text[0], new FileOutputStream("error/" + System.currentTimeMillis()),
-						StandardCharsets.UTF_8);
-			}
 		}
 		email.send(msg);
+	}
+
+	public void createTicket(Type type, String subject, String text) {
+		try {
+			final Ticket ticket = new Ticket();
+			ticket.setSubject(subject);
+			ticket.setNote(text);
+			ticket.setType(type);
+			repository.save(ticket);
+			if (type != Type.GOOGLE)
+				sendNotificationDevice(new StringBuilder("Ticket: " + subject),
+						repository.one(Contact.class, adminId), null, null);
+		} catch (Exception ex) {
+			try {
+				sendEmail(null, subject, null, text);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private byte[] imageRound(byte[] img) throws IOException {
@@ -441,14 +469,6 @@ public class NotificationService {
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		ImageIO.write(output, "png", out);
 		return out.toByteArray();
-	}
-
-	public void sendEmail(final String to, final String subject, final String... text) {
-		try {
-			sendEmail(to, subject, null, text);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	public static class Ping {

@@ -9,10 +9,10 @@ import javax.persistence.Enumerated;
 import javax.persistence.Transient;
 
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.repository.RepositoryListener;
+import com.jq.findapp.repository.listener.ContactLinkListener;
 
 @Entity
-@EntityListeners(RepositoryListener.class)
+@EntityListeners(ContactLinkListener.class)
 public class ContactLink extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger contactId2;

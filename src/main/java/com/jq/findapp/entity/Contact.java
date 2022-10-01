@@ -12,10 +12,10 @@ import javax.persistence.Enumerated;
 import javax.persistence.Transient;
 
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.repository.RepositoryListener;
+import com.jq.findapp.repository.listener.ContactListener;
 
 @Entity
-@EntityListeners(RepositoryListener.class)
+@EntityListeners(ContactListener.class)
 public class Contact extends BaseEntity {
 	private Boolean active = true;
 	private Boolean findMe = true;

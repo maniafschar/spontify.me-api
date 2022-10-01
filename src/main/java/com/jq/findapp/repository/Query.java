@@ -20,7 +20,6 @@ public enum Query {
 	contact_listChat(true),
 	contact_listChatFlat,
 	contact_listEventParticipate(true),
-	contact_listFeedback,
 	contact_listFriends,
 	contact_listGroup,
 	contact_listGroupLink,
@@ -36,7 +35,7 @@ public enum Query {
 	contact_pingChatNew(true),
 	contact_pingChatUnseen(true),
 	contact_pingFriendRequest(true),
-	contact_pingNotification(true),
+	contact_pingNotification(),
 	contact_pingVisit(true),
 	contact_token,
 	contact_unique,
@@ -57,6 +56,7 @@ public enum Query {
 
 	misc_geoLocation,
 	misc_listLog,
+	misc_listTicket,
 	misc_setting;
 
 	private final String sql;

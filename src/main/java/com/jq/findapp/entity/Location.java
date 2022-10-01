@@ -10,10 +10,10 @@ import javax.persistence.Transient;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.repository.RepositoryListener;
+import com.jq.findapp.repository.listener.LocationListener;
 
 @Entity
-@EntityListeners(RepositoryListener.class)
+@EntityListeners(LocationListener.class)
 public class Location extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger ownerId;
