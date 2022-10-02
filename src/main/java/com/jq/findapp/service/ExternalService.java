@@ -42,8 +42,8 @@ public class ExternalService {
 	@Value("${app.google.key}")
 	private String googleKey;
 
-	@Value("${app.ipinfo}")
-	private String ipinfo;
+	@Value("${app.url.lookupip}")
+	private String lookupip;
 
 	public String google(String param) {
 		final String result = WebClient
@@ -186,12 +186,12 @@ public class ExternalService {
 	private void lookupIps() throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_listLog);
 		params.setLimit(0);
-		params.setSearch("log.uri='ad' and ip.hostname is null");
+		params.setSearch("log.uri='ad' and ip.org is null");
 		final Result result = repository.list(params);
 		final Pattern loc = Pattern.compile("\"loc\": \"([^\"]*)\"");
 		for (int i = 0; i < result.size(); i++) {
 			final String json = WebClient
-					.create("https://ipinfo.io/" + result.get(i).get("log.ip") + "?token=" + ipinfo).get()
+					.create(lookupip.replace("{ip}", (String) result.get(i).get("log.ip"))).get()
 					.retrieve().toEntity(String.class).block().getBody();
 			final Ip ip = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 					.readValue(json, Ip.class);
