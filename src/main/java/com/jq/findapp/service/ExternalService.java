@@ -17,12 +17,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.GeoLocation;
+import com.jq.findapp.entity.Ip;
 import com.jq.findapp.entity.Log;
-import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.entity.Ticket.Type;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
@@ -40,6 +41,9 @@ public class ExternalService {
 
 	@Value("${app.google.key}")
 	private String googleKey;
+
+	@Value("${app.ipinfo}")
+	private String ipinfo;
 
 	public String google(String param) {
 		final String result = WebClient
@@ -176,5 +180,27 @@ public class ExternalService {
 		repository.executeUpdate("update Log set createdAt=substring_index(body,'" + separator
 				+ "', 1), body=substring_index(body, '" + separator + "', -1) where uri='ad' and body like '%"
 				+ separator + "%'");
+		lookupIps();
+	}
+
+	private void lookupIps() throws Exception {
+		final QueryParams params = new QueryParams(Query.misc_listLog);
+		params.setLimit(0);
+		params.setSearch("log.uri='ad' and ip.hostname is null");
+		final Result result = repository.list(params);
+		final Pattern loc = Pattern.compile("\"loc\": \"([^\"]*)\"");
+		for (int i = 0; i < result.size(); i++) {
+			final String json = WebClient
+					.create("https://ipinfo.io/" + result.get(i).get("log.ip") + "?token=" + ipinfo).get()
+					.retrieve().toEntity(String.class).block().getBody();
+			final Ip ip = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+					.readValue(json, Ip.class);
+			final Matcher m = loc.matcher(json);
+			m.find();
+			final String location = m.group(1);
+			ip.setLatitude(Float.parseFloat(location.split(",")[0]));
+			ip.setLongitude(Float.parseFloat(location.split(",")[1]));
+			repository.save(ip);
+		}
 	}
 }

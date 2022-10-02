@@ -11,9 +11,18 @@ SELECT
 	log.referer,
 	log.status,
 	log.time,
-	log.uri
+	log.uri,
+	ip.hostname,
+	ip.country,
+	ip.region,
+	ip.city,
+	ip.org,
+	ip.timezone,
+	ip.postal,
+	ip.latitude,
+	ip.longitude
 FROM
-	Log log
+	Log log left join Ip ip on log.ip=ip.ip
 WHERE
 	{search}
 ORDER BY

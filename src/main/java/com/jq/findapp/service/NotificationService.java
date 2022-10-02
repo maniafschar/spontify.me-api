@@ -8,13 +8,10 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,7 +22,6 @@ import java.util.Map;
 
 import javax.activation.DataSource;
 import javax.imageio.ImageIO;
-import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.ws.rs.NotFoundException;
 

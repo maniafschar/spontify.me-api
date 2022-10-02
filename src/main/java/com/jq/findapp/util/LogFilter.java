@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import com.jq.findapp.entity.Log;
-import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.repository.Repository;
 
 @Component

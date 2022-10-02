@@ -11,6 +11,10 @@ import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jq.findapp.entity.Ip;
+
 public class ExternalServiceTest {
 	@Test
 	public void importLog() throws ParseException {
@@ -37,5 +41,32 @@ public class ExternalServiceTest {
 				"Mozilla/5.0 (iPhone; CPU iPhone OS 15_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6.1 Mobile/15E148 Safari/604.1",
 				m.group(11));
 		assertEquals("Tue Sep 13 21:04:54 CEST 2022", "" + dateFormat.parse(m.group(4)));
+	}
+
+	@Test
+	public void convert() throws Exception {
+		// given
+		final String response = "{\n"
+				+ "	\"ip\": \"188.104.126.43\",\n"
+				+ "	\"hostname\": \"dslb-188-104-126-043.188.104.pools.vodafone-ip.de\",\n"
+				+ "	\"city\": \"Freilassing\",\n"
+				+ "	\"region\": \"Bavaria\",\n"
+				+ "	\"country\": \"DE\",\n"
+				+ "	\"loc\": \"47.8409,12.9811\",\n"
+				+ "	\"org\": \"AS3209 Vodafone GmbH\",\n"
+				+ "	\"postal\": \"83395\",\n"
+				+ "	\"timezone\": \"Europe/Berlin\"\n"
+				+ "}";
+		final Matcher loc = Pattern.compile("\"loc\": \"([^\"]*)\"").matcher(response);
+		loc.find();
+
+		// when
+		final Ip ip = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+				.readValue(response, Ip.class);
+		ip.setLatitude(Float.parseFloat(loc.group(1).split(",")[1]));
+
+		// then
+		assertEquals("188.104.126.43", ip.getIp());
+		assertEquals(12.9811f, ip.getLatitude());
 	}
 }
