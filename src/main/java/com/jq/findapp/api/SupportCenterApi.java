@@ -97,11 +97,10 @@ public class SupportCenterApi {
 		return repository.list(params).getList();
 	}
 
-	@DeleteMapping("ticket")
-	public void ticketDelete(List<BigInteger> ids, @RequestHeader String password, @RequestHeader String salt)
-			throws Exception {
-		for (BigInteger id : ids)
-			repository.delete(repository.one(Ticket.class, id));
+	@DeleteMapping("ticket/{id}")
+	public void ticketDelete(@PathVariable final BigInteger id, @RequestHeader String password,
+			@RequestHeader String salt) throws Exception {
+		repository.delete(repository.one(Ticket.class, id));
 	}
 
 	@GetMapping("log")
