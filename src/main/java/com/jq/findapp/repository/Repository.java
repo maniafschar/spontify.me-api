@@ -84,7 +84,8 @@ public class Repository {
 	public void save(final BaseEntity entity) throws Exception {
 		Attachment.save(entity);
 		if (entity.getId() == null) {
-			entity.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
+			if (entity.getCreatedAt() == null)
+				entity.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
 			em.persist(entity);
 		} else {
 			entity.setModifiedAt(new Timestamp(Instant.now().toEpochMilli()));

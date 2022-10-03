@@ -7,6 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -266,6 +267,7 @@ public class AuthenticationService {
 			verify(c2, password, salt, true);
 			c2.setActive(true);
 			c2.setLoginLink(null);
+			c2.setLastLogin(new Timestamp(Instant.now().toEpochMilli()));
 			c2.setOs(contact.getOs());
 			c2.setDevice(contact.getDevice());
 			c2.setVersion(contact.getVersion());

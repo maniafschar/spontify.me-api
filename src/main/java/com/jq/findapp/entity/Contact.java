@@ -33,6 +33,7 @@ public class Contact extends BaseEntity {
 	private Device device;
 	@Enumerated(EnumType.STRING)
 	private OS os;
+	private Timestamp lastLogin;
 	private Timestamp visitPage;
 	private Float latitude;
 	private Float longitude;
@@ -576,6 +577,14 @@ public class Contact extends BaseEntity {
 
 	public void setTimezoneOffset(Short timezoneOffset) {
 		this.timezoneOffset = timezoneOffset;
+	}
+
+	public Timestamp getLastLogin() {
+		return lastLogin;
+	}
+
+	public void setLastLogin(Timestamp lastLogin) {
+		this.lastLogin = lastLogin;
 	}
 
 	@Transient

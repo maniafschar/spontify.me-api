@@ -437,9 +437,6 @@ public class NotificationService {
 			ticket.setNote(text);
 			ticket.setType(type);
 			repository.save(ticket);
-			if (type != Type.GOOGLE)
-				sendNotificationDevice(new StringBuilder("Ticket: " + subject),
-						repository.one(Contact.class, adminId), null, null);
 		} catch (Exception ex) {
 			try {
 				sendEmail(null, subject, null, text);

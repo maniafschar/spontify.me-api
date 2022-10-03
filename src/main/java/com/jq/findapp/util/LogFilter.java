@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
@@ -60,19 +62,15 @@ public class LogFilter implements Filter {
 				if (log.getQuery() != null && log.getQuery().length() > 255)
 					log.setQuery(log.getQuery().substring(0, 255));
 			}
-			try {
-				repository.save(log);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 		}
 		final long time = System.currentTimeMillis();
 		try {
 			chain.doFilter(req, res);
 		} finally {
-			if (loggable) {
+			if (loggable && (!"/support/healthcheck".equals(log.getUri()) || res.getStatus() >= 400)) {
 				log.setTime((int) (System.currentTimeMillis() - time));
 				log.setStatus(res.getStatus());
+				log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
 				final byte[] b = req.getContentAsByteArray();
 				if (b != null && b.length > 0) {
 					log.setBody(new String(b, StandardCharsets.UTF_8));

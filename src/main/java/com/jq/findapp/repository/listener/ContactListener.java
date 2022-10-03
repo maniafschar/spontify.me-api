@@ -60,7 +60,13 @@ public class ContactListener extends AbstractRepositoryListener {
 				age--;
 			contact.setAge(age);
 		}
-		if (contact.getVerified()) {
+	}
+
+	@PostUpdate
+	public void postUpdate(final Contact contact) throws Exception {
+		if (contact.old("email") != null)
+			authenticationService.recoverSendEmail(contact.getEmail());
+		else if (contact.getVerified()) {
 			final QueryParams params = new QueryParams(Query.contact_chat);
 			params.setSearch(
 					"chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId());
@@ -75,12 +81,6 @@ public class ContactListener extends AbstractRepositoryListener {
 				repository.save(chat);
 			}
 		}
-	}
-
-	@PostUpdate
-	public void postUpdate(final Contact contact) throws Exception {
-		if (contact.old("email") != null)
-			authenticationService.recoverSendEmail(contact.getEmail());
 	}
 
 	private String sanitizePseudonym(String pseudonym) {

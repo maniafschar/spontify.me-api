@@ -174,4 +174,10 @@ public class SupportCenterApi {
 			externalService.importLog();
 		}
 	}
+
+	@GetMapping("healthcheck")
+	public void healthcheck(@RequestHeader String secret) throws Exception {
+		if (schedulerSecret.equals(secret))
+			repository.one(Contact.class, adminId);
+	}
 }
