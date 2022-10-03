@@ -8,7 +8,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -189,18 +191,22 @@ public class ExternalService {
 		params.setSearch("log.uri='ad' and ip.org is null");
 		final Result result = repository.list(params);
 		final Pattern loc = Pattern.compile("\"loc\": \"([^\"]*)\"");
+		final Set<Object> processed = new HashSet<>();
 		for (int i = 0; i < result.size(); i++) {
-			final String json = WebClient
-					.create(lookupip.replace("{ip}", (String) result.get(i).get("log.ip"))).get()
-					.retrieve().toEntity(String.class).block().getBody();
-			final Ip ip = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-					.readValue(json, Ip.class);
-			final Matcher m = loc.matcher(json);
-			m.find();
-			final String location = m.group(1);
-			ip.setLatitude(Float.parseFloat(location.split(",")[0]));
-			ip.setLongitude(Float.parseFloat(location.split(",")[1]));
-			repository.save(ip);
+			if (!processed.contains(result.get(i).get("log.ip"))) {
+				processed.add(result.get(i).get("log.ip"));
+				final String json = WebClient
+						.create(lookupip.replace("{ip}", (String) result.get(i).get("log.ip"))).get()
+						.retrieve().toEntity(String.class).block().getBody();
+				final Ip ip = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+						.readValue(json, Ip.class);
+				final Matcher m = loc.matcher(json);
+				m.find();
+				final String location = m.group(1);
+				ip.setLatitude(Float.parseFloat(location.split(",")[0]));
+				ip.setLongitude(Float.parseFloat(location.split(",")[1]));
+				repository.save(ip);
+			}
 		}
 	}
 }
