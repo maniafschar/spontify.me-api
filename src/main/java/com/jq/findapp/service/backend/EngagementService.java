@@ -1,4 +1,4 @@
-package com.jq.findapp.service;
+package com.jq.findapp.service.backend;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -23,13 +23,16 @@ import org.springframework.stereotype.Service;
 import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.OS;
-import com.jq.findapp.entity.Ticket.Type;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Setting;
+import com.jq.findapp.entity.Ticket.Type;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.AuthenticationService;
+import com.jq.findapp.service.ExternalService;
+import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Score;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;

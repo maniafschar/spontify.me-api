@@ -31,12 +31,12 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
-import com.jq.findapp.service.DbUpdateService;
-import com.jq.findapp.service.EngagementService;
-import com.jq.findapp.service.EventService;
-import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.WhatToDoService;
+import com.jq.findapp.service.backend.DbUpdateService;
+import com.jq.findapp.service.backend.EngagementService;
+import com.jq.findapp.service.backend.EventService;
+import com.jq.findapp.service.backend.ImportLogService;
 
 @RestController
 @Transactional
@@ -56,7 +56,7 @@ public class SupportCenterApi {
 	private EngagementService engagementService;
 
 	@Autowired
-	private ExternalService externalService;
+	private ImportLogService importLogService;
 
 	@Autowired
 	private EventService eventService;
@@ -171,7 +171,7 @@ public class SupportCenterApi {
 			engagementService.sendNearBy();
 			whatToDoService.findAndNotify();
 			eventService.findAndNotify();
-			externalService.importLog();
+			importLogService.importLog();
 		}
 	}
 

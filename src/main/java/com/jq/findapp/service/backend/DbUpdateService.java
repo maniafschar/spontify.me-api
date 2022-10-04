@@ -1,4 +1,4 @@
-package com.jq.findapp.service;
+package com.jq.findapp.service.backend;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.jq.findapp.service;
+package com.jq.findapp.service.backend;
 
 import java.math.BigInteger;
 import java.time.Instant;
@@ -14,6 +14,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.util.Score;
 import com.jq.findapp.util.Strings;
