@@ -51,7 +51,9 @@ public class JwtGenerator {
 			lastGeneration = System.currentTimeMillis();
 			setting.setValue("" + lastGeneration);
 			repository.save(setting);
-			token.remove(keyId);
+			synchronized (token) {
+				token.remove(keyId);
+			}
 		}
 		return (int) (lastGeneration / 1000);
 	}
@@ -59,21 +61,25 @@ public class JwtGenerator {
 	protected String generateToken(Map<String, String> header, Map<String, String> claims, String algorithm)
 			throws Exception {
 		final String keyId = header.get("kid");
-		if (!token.containsKey(keyId)) {
-			final StringBuilder result = new StringBuilder();
-			result.append(jwtEncoding(new ObjectMapper().writeValueAsString(header).getBytes(StandardCharsets.UTF_8)));
-			result.append('.');
-			result.append(jwtEncoding(new ObjectMapper().writeValueAsString(claims).getBytes(StandardCharsets.UTF_8)));
-			final PrivateKey key = getSigningKey(keyId, algorithm);
-			final Signature signature = Signature
-					.getInstance("RSA".equals(algorithm) ? "SHA256withRSA" : "SHA256withECDSA");
-			signature.initSign(key);
-			signature.update(result.toString().getBytes(StandardCharsets.UTF_8));
-			result.append('.');
-			result.append(jwtEncoding(signature.sign()));
-			token.put(keyId, result.toString());
+		synchronized (token) {
+			if (!token.containsKey(keyId)) {
+				final StringBuilder result = new StringBuilder();
+				result.append(
+						jwtEncoding(new ObjectMapper().writeValueAsString(header).getBytes(StandardCharsets.UTF_8)));
+				result.append('.');
+				result.append(
+						jwtEncoding(new ObjectMapper().writeValueAsString(claims).getBytes(StandardCharsets.UTF_8)));
+				final PrivateKey key = getSigningKey(keyId, algorithm);
+				final Signature signature = Signature
+						.getInstance("RSA".equals(algorithm) ? "SHA256withRSA" : "SHA256withECDSA");
+				signature.initSign(key);
+				signature.update(result.toString().getBytes(StandardCharsets.UTF_8));
+				result.append('.');
+				result.append(jwtEncoding(signature.sign()));
+				token.put(keyId, result.toString());
+			}
+			return token.get(keyId);
 		}
-		return token.get(keyId);
 	}
 
 	private String jwtEncoding(byte[] data) {
@@ -83,7 +89,7 @@ public class JwtGenerator {
 	private PrivateKey getSigningKey(String keyId, String algorithm)
 			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
 		if (!signingKey.containsKey(keyId)) {
-			synchronized (Ios.class) {
+			synchronized (JwtGenerator.class) {
 				if (!signingKey.containsKey(keyId)) {
 					final StringBuilder privateKeyBuilder = new StringBuilder();
 					final BufferedReader reader = new BufferedReader(
