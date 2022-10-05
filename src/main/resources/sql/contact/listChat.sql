@@ -3,6 +3,7 @@ SELECT
 	contact.gender,
 	contact.imageList,
 	contact.pseudonym,
+	max(chat.id) as chatId,
 	max(chat.createdAt) as maxDate,
 	sum(CASE WHEN chat.seen=true OR chat.contactId={USERID} THEN 0 ELSE 1 END) as unseen
 FROM

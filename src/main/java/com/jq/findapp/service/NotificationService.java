@@ -242,22 +242,17 @@ public class NotificationService {
 	}
 
 	public Ping getPingValues(Contact contact) {
-		final QueryParams params = new QueryParams(Query.contact_pingVisit);
+		final QueryParams params = new QueryParams(Query.contact_pingNotification);
 		params.setUser(contact);
+		params.setLimit(0);
 		final Ping values = new Ping();
 		values.userId = contact.getId();
-		values.visit = ((Number) repository.one(params).get("_c")).intValue();
-		params.setQuery(Query.contact_pingFriendRequest);
-		values.friendRequest = ((Number) repository.one(params).get("_c")).intValue();
-		params.setQuery(Query.contact_pingNotification);
 		values.notification = ((Number) repository.one(params).get("_c")).intValue();
 		values.totalNew = values.notification;
 		params.setQuery(Query.contact_pingChat);
-		params.setLimit(0);
-		Result list = repository.list(params);
-		values.chat = list.size();
+		values.firstChatId = (BigInteger) repository.one(params).get("_c");
 		params.setQuery(Query.contact_pingChatNew);
-		list = repository.list(params);
+		Result list = repository.list(params);
 		values.chatNew = new HashMap<>();
 		for (int i = 0; i < list.size(); i++) {
 			final Map<String, Object> row = list.get(i);
@@ -271,6 +266,9 @@ public class NotificationService {
 			final Map<String, Object> row = list.get(i);
 			values.chatUnseen.put("" + row.get("chat.contactId2"), ((Number) row.get("_c")).intValue());
 		}
+		// TODO rm on 0.2.3
+		params.setQuery(Query.contact_listChat);
+		values.chat = repository.list(params).size();
 		return values;
 	}
 
@@ -465,12 +463,11 @@ public class NotificationService {
 	}
 
 	public static class Ping {
+		private BigInteger firstChatId;
 		private BigInteger userId;
 		private Map<String, Integer> chatNew;
 		private Map<String, Integer> chatUnseen;
 		private int chat;
-		private int visit;
-		private int friendRequest;
 		private int notification;
 		private int totalNew;
 
@@ -486,16 +483,12 @@ public class NotificationService {
 			return chatUnseen;
 		}
 
-		public int getVisit() {
-			return visit;
-		}
-
 		public int getChat() {
 			return chat;
 		}
 
-		public int getFriendRequest() {
-			return friendRequest;
+		public BigInteger getFirstChatId() {
+			return firstChatId;
 		}
 
 		public int getNotification() {

@@ -34,6 +34,16 @@ public class ImportLogService {
 	@Value("${app.url.lookupip}")
 	private String lookupip;
 
+	public void importLog() throws Exception {
+		final String separator = " | ";
+		importLog("log1", separator);
+		importLog("log", separator);
+		repository.executeUpdate("update Log set createdAt=substring_index(body,'" + separator
+				+ "', 1), body=substring_index(body, '" + separator + "', -1) where uri='ad' and body like '%"
+				+ separator + "%'");
+		lookupIps();
+	}
+
 	private void importLog(final String name, final String separator) throws Exception {
 		final DateFormat dateParser = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss", Locale.ENGLISH);
 		final Pattern pattern = Pattern.compile(
@@ -73,22 +83,12 @@ public class ImportLogService {
 		}
 	}
 
-	public void importLog() throws Exception {
-		final String separator = " | ";
-		importLog("log1", separator);
-		importLog("log", separator);
-		repository.executeUpdate("update Log set createdAt=substring_index(body,'" + separator
-				+ "', 1), body=substring_index(body, '" + separator + "', -1) where uri='ad' and body like '%"
-				+ separator + "%'");
-		lookupIps();
-	}
-
 	private void lookupIps() throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_listLog);
 		params.setLimit(0);
 		params.setSearch("log.uri='ad' and ip.org is null");
 		final Result result = repository.list(params);
-		final Pattern loc = Pattern.compile("\"loc\": \"([^\"]*)\"");
+		final Pattern patternLoc = Pattern.compile("\"loc\": \"([^\"]*)\"");
 		final Set<Object> processed = new HashSet<>();
 		for (int i = 0; i < result.size(); i++) {
 			if (!processed.contains(result.get(i).get("log.ip"))) {
@@ -98,7 +98,7 @@ public class ImportLogService {
 						.retrieve().toEntity(String.class).block().getBody();
 				final Ip ip = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 						.readValue(json, Ip.class);
-				final Matcher m = loc.matcher(json);
+				final Matcher m = patternLoc.matcher(json);
 				m.find();
 				final String location = m.group(1);
 				ip.setLatitude(Float.parseFloat(location.split(",")[0]));
