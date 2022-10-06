@@ -18,7 +18,7 @@ public class ContactLinkListener extends AbstractRepositoryListener {
 		notificationService.sendNotification(
 				repository.one(Contact.class, contactLink.getContactId()),
 				repository.one(Contact.class, contactLink.getContactId2()),
-				NotificationID.friendReq, Strings.encodeParam("p=" + contactLink.getContactId()));
+				NotificationID.contactFriendRequest, Strings.encodeParam("p=" + contactLink.getContactId()));
 	}
 
 	@PostUpdate
@@ -27,7 +27,7 @@ public class ContactLinkListener extends AbstractRepositoryListener {
 			notificationService.sendNotification(
 					repository.one(Contact.class, contactLink.getContactId2()),
 					repository.one(Contact.class, contactLink.getContactId()),
-					NotificationID.friendAppro, Strings.encodeParam("p=" + contactLink.getContactId2()));
+					NotificationID.contactFriendApproved, Strings.encodeParam("p=" + contactLink.getContactId2()));
 			final QueryParams params = new QueryParams(Query.contact_marketing);
 			params.setUser(repository.one(Contact.class, contactLink.getContactId()));
 			params.setSearch(

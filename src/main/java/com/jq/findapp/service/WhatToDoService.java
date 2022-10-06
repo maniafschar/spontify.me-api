@@ -80,7 +80,7 @@ public class WhatToDoService {
 								.valueOf(Text.category_verb0.name().substring(0,
 										Text.category_verb0.name().length() - 1) + cats[i3])
 								.getText(contact2.getLanguage());
-			notificationService.sendNotification(contact, contact2, NotificationID.wtd,
+			notificationService.sendNotification(contact, contact2, NotificationID.contactWhatToDo,
 					Strings.encodeParam("p=" + contact.getId()), time, verb);
 		}
 	}

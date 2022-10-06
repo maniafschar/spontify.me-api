@@ -32,7 +32,7 @@ public class ChatListener extends AbstractRepositoryListener {
 					s = (s.lastIndexOf(" :open(") == 0 ? Text.mail_sentEntry : Text.mail_sentEntries)
 							.getText(contactTo.getLanguage());
 			}
-			notificationService.sendNotification(contactFrom, contactTo, NotificationID.newMsg,
+			notificationService.sendNotification(contactFrom, contactTo, NotificationID.chatNew,
 					"chat=" + contactFrom.getId(), s);
 		} else
 			notificationService.locationNotifyOnMatch(contactFrom, chat.getLocationId(),

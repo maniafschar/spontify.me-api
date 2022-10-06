@@ -12,7 +12,7 @@ public class Ticket extends BaseEntity {
 	private Type type;
 
 	public enum Type {
-		ERROR, REGISTRATION, BLOCK, GOOGLE, FEEDBACK, ACCOUNT_DELETE, OTHER
+		ERROR, REGISTRATION, BLOCK, GOOGLE
 	}
 
 	public String getSubject() {

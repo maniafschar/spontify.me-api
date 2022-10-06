@@ -15,7 +15,7 @@ public class LocationRatingListener extends AbstractRepositoryListener {
 						+ locationRating.getLocationId());
 		notificationService.locationNotifyOnMatch(
 				repository.one(Contact.class, locationRating.getContactId()),
-				locationRating.getLocationId(), NotificationID.ratingLocMat,
+				locationRating.getLocationId(), NotificationID.locationRatingMatch,
 				repository.one(Location.class, locationRating.getLocationId()).getName());
 	}
 }

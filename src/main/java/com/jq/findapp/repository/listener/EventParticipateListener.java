@@ -26,7 +26,7 @@ public class EventParticipateListener extends AbstractRepositoryListener {
 							.getTime());
 			time.plusSeconds(contactTo.getTimezoneOffset() * 60);
 			notificationService.sendNotification(contactFrom, contactTo,
-					NotificationID.markEvent,
+					NotificationID.eventParticipate,
 					Strings.encodeParam("p=" + contactFrom.getId()),
 					new SimpleDateFormat("dd.MM.yyyy").format(eventParticipate.getEventDate()) +
 							new SimpleDateFormat(" HH:mm").format(new Date(time.toEpochMilli())),

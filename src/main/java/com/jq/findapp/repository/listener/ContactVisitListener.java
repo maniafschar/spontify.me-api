@@ -10,7 +10,7 @@ import com.jq.findapp.service.NotificationService.NotificationID;
 public class ContactVisitListener extends AbstractRepositoryListener {
 	@PostPersist
 	public void postPersist(ContactVisit contactVisit) throws Exception {
-		notificationService.sendNotificationOnMatch(NotificationID.visitProfile,
+		notificationService.sendNotificationOnMatch(NotificationID.contactVisitProfile,
 				repository.one(Contact.class,
 						contactVisit.getContactId()),
 				repository.one(Contact.class, contactVisit.getContactId2()));
@@ -18,7 +18,7 @@ public class ContactVisitListener extends AbstractRepositoryListener {
 
 	@PostUpdate
 	public void postUpdate(ContactVisit contactVisit) throws Exception {
-		notificationService.sendNotificationOnMatch(NotificationID.visitProfile,
+		notificationService.sendNotificationOnMatch(NotificationID.contactVisitProfile,
 				repository.one(Contact.class,
 						contactVisit.getContactId()),
 				repository.one(Contact.class, contactVisit.getContactId2()));

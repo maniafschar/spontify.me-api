@@ -6,10 +6,13 @@ import java.sql.Date;
 import java.sql.Timestamp;
 
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.repository.listener.EventListener;
 
 @Entity
+@EntityListeners(EventListener.class)
 public class Event extends BaseEntity {
     private BigInteger contactId;
     private BigInteger locationId;

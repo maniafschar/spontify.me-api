@@ -20,6 +20,7 @@ public class Contact extends BaseEntity {
 	private Boolean active = true;
 	private Boolean findMe = true;
 	private Boolean guide = false;
+	private Boolean notificationRegistrationReminder = true;
 	private Boolean notificationBirthday = true;
 	private Boolean notificationChat = true;
 	private Boolean notificationFriendRequest = true;
@@ -591,5 +592,13 @@ public class Contact extends BaseEntity {
 	@Override
 	public boolean writeAccess(BigInteger user, Repository repository) {
 		return user.equals(getId());
+	}
+
+	public Boolean getNotificationRegistrationReminder() {
+		return notificationRegistrationReminder;
+	}
+
+	public void setNotificationRegistrationReminder(Boolean notificationRegistrationReminder) {
+		this.notificationRegistrationReminder = notificationRegistrationReminder;
 	}
 }

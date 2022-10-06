@@ -55,7 +55,8 @@ public class EventService {
 					if (realDate.minusDays(1).isBefore(today) && !isMaxParticipants(event, realDate, params.getUser())
 							&& Score.getContact(contactEvent, params.getUser()) > 0.3 &&
 							notificationService.sendNotification(contactEvent,
-									params.getUser(), NotificationID.event, Strings.encodeParam("e=" + event.getId()),
+									params.getUser(), NotificationID.eventNotify,
+									Strings.encodeParam("e=" + event.getId()),
 									(String) events.get(i2).get("location.name")))
 						break;
 				}

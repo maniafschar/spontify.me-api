@@ -32,6 +32,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.reactive.function.client.WebClientResponseException.NotFound;
 
 import com.jq.findapp.entity.Contact;
@@ -91,29 +92,31 @@ public class NotificationService {
 	}
 
 	public enum NotificationID {
-		accountDelete(NotificationIDType.EmailOrDevice, true),
-		birthday(NotificationIDType.EmailOrDevice, true),
-		chatLocation(NotificationIDType.EmailOrDevice, true),
-		chatSeen(NotificationIDType.EmailOrDevice, true),
-		event(NotificationIDType.EmailOrDevice, true),
-		feedback(NotificationIDType.Email, false),
-		findMe(NotificationIDType.EmailOrDevice, true),
-		friendAppro(NotificationIDType.EmailOrDevice, true),
-		friendReq(NotificationIDType.EmailOrDevice, true),
-		locMarketing(NotificationIDType.EmailOrDevice, true),
-		markEvent(NotificationIDType.EmailOrDevice, true),
-		mgMarketing(NotificationIDType.EmailOrDevice, true),
-		newMsg(NotificationIDType.EmailOrDevice, false),
-		pwReset(NotificationIDType.Email, false),
-		registrationReminder(NotificationIDType.Email, false),
-		ratingLocMat(NotificationIDType.EmailOrDevice, true),
-		visitLocation(NotificationIDType.EmailOrDevice, true),
-		visitProfile(NotificationIDType.EmailOrDevice, true),
-		welcomeExt(NotificationIDType.Email, false),
-		wtd(NotificationIDType.EmailOrDevice, true);
+		chatLocation,
+		chatNew(NotificationIDType.EmailOrDevice, false),
+		chatSeen,
+		contactBirthday,
+		contactDelete,
+		contactFindMe,
+		contactFriendApproved,
+		contactFriendRequest,
+		contactPasswordReset(NotificationIDType.Email, false),
+		contactRegistrationReminder(NotificationIDType.Email, false),
+		contactVisitLocation,
+		contactVisitProfile,
+		contactWelcomeEmail(NotificationIDType.Email, false),
+		contactWhatToDo,
+		eventNotify,
+		eventParticipate,
+		locationMarketing,
+		locationRatingMatch;
 
 		private final NotificationIDType type;
 		private final boolean save;
+
+		private NotificationID() {
+			this(NotificationIDType.EmailOrDevice, true);
+		}
 
 		private NotificationID(NotificationIDType type, boolean save) {
 			this.type = type;
@@ -176,8 +179,8 @@ public class NotificationService {
 
 	public boolean sendNotification(Contact contactFrom, Contact contactTo, NotificationID notificationID,
 			String action, String... param) throws Exception {
-		if (!contactTo.getVerified() && notificationID != NotificationID.welcomeExt
-				&& notificationID != NotificationID.pwReset)
+		if (!contactTo.getVerified() && notificationID != NotificationID.contactWelcomeEmail
+				&& notificationID != NotificationID.contactPasswordReset)
 			return false;
 		if (contactTo.getId() != null) {
 			final QueryParams params = new QueryParams(Query.contact_block);
@@ -188,12 +191,8 @@ public class NotificationService {
 			if (repository.list(params).size() > 0)
 				return false;
 		}
-		StringBuilder text;
-		try {
-			text = new StringBuilder(Text.valueOf("mail_" + notificationID).getText(contactTo.getLanguage()));
-		} catch (Exception ex) {
-			text = new StringBuilder(": <jq:EXTRA_1 />");
-		}
+		final StringBuilder text = new StringBuilder(
+				Text.valueOf("mail_" + notificationID).getText(contactTo.getLanguage()));
 		if (param != null) {
 			for (int i = 0; i < param.length; i++)
 				Strings.replaceString(text, "<jq:EXTRA_" + (i + 1) + " />", param[i]);
@@ -307,6 +306,9 @@ public class NotificationService {
 									.replace("{text}", text)
 									.replace("{notificationId}", "" + notificationId)
 									.replace("{exec}", Strings.isEmpty(action) ? "" : action)
+							+ (ex instanceof WebClientResponseException
+									? "\n\n" + ((WebClientResponseException) ex).getResponseBodyAsString()
+									: "")
 							+ "\n\n" + Strings.stackTraceToString(ex));
 			return false;
 		}
@@ -336,21 +338,21 @@ public class NotificationService {
 	}
 
 	private boolean userWantsNotification(NotificationID textID, Contact contact) {
-		if (NotificationID.pwReset == textID || NotificationID.welcomeExt == textID)
+		if (NotificationID.contactPasswordReset == textID || NotificationID.contactWelcomeEmail == textID)
 			return true;
-		if (NotificationID.newMsg == textID)
+		if (NotificationID.chatNew == textID)
 			return contact.getNotificationChat();
-		if (NotificationID.friendReq == textID || NotificationID.friendAppro == textID)
+		if (NotificationID.contactFriendRequest == textID || NotificationID.contactFriendApproved == textID)
 			return contact.getNotificationFriendRequest();
-		if (NotificationID.visitLocation == textID)
+		if (NotificationID.contactVisitLocation == textID)
 			return contact.getNotificationVisitLocation();
-		if (NotificationID.visitProfile == textID)
+		if (NotificationID.contactVisitProfile == textID)
 			return contact.getNotificationVisitProfile();
-		if (NotificationID.ratingLocMat == textID)
+		if (NotificationID.locationRatingMatch == textID)
 			return contact.getNotificationVisitLocation();
-		if (NotificationID.markEvent == textID)
+		if (NotificationID.eventParticipate == textID)
 			return contact.getNotificationMarkEvent();
-		if (NotificationID.birthday == textID)
+		if (NotificationID.contactBirthday == textID)
 			return contact.getNotificationBirthday();
 		return true;
 	}
@@ -435,6 +437,8 @@ public class NotificationService {
 			ticket.setNote(text);
 			ticket.setType(type);
 			repository.save(ticket);
+			if (type == Type.BLOCK)
+				sendEmail(null, "Block", null, text);
 		} catch (Exception ex) {
 			try {
 				sendEmail(null, subject, null, text);

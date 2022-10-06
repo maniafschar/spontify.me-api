@@ -11,6 +11,6 @@ public class LocationVisitListener extends AbstractRepositoryListener {
 	public void postPersist(LocationVisit locationVisit) throws Exception {
 		notificationService.locationNotifyOnMatch(
 				repository.one(Contact.class, locationVisit.getContactId()),
-				locationVisit.getLocationId(), NotificationID.visitLocation, null);
+				locationVisit.getLocationId(), NotificationID.contactVisitLocation, null);
 	}
 }

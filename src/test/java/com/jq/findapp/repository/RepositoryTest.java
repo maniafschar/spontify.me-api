@@ -168,7 +168,7 @@ public class RepositoryTest {
 		utils.createContact();
 		final Ticket ticket = new Ticket();
 		ticket.setNote("abc");
-		ticket.setType(Type.ACCOUNT_DELETE);
+		ticket.setType(Type.BLOCK);
 
 		// when
 		repository.save(ticket);

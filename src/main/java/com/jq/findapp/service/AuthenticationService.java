@@ -200,7 +200,7 @@ public class AuthenticationService {
 		contact.setEmail(contact.getEmail().toLowerCase().trim());
 		try {
 			notificationService.sendNotification(repository.one(Contact.class, adminId), contact,
-					NotificationID.welcomeExt, "r=" + generateLoginParam(contact));
+					NotificationID.contactWelcomeEmail, "r=" + generateLoginParam(contact));
 			saveRegistration(contact, registration);
 		} catch (SendFailedException ex) {
 			throw new IllegalAccessException("email");
@@ -348,7 +348,7 @@ public class AuthenticationService {
 			s = contact.getLoginLink().substring(0, 10) + contact.getLoginLink().substring(20);
 		notificationService.sendNotificationEmail(repository.one(Contact.class, adminId),
 				contact,
-				Text.mail_registrationReminder.getText(contact.getLanguage()).replace("<jq:EXTRA_1 />",
+				Text.mail_contactRegistrationReminder.getText(contact.getLanguage()).replace("<jq:EXTRA_1 />",
 						new SimpleDateFormat("dd.MM.yyyy HH:mm").format(contact.getCreatedAt())),
 				"r=" + s);
 	}
@@ -364,7 +364,7 @@ public class AuthenticationService {
 					|| contact.getModifiedAt().getTime() < System.currentTimeMillis() - 86400000) {
 				final String s = generateLoginParam(contact);
 				repository.save(contact);
-				notificationService.sendNotification(contact, contact, NotificationID.pwReset, "r=" + s);
+				notificationService.sendNotification(contact, contact, NotificationID.contactPasswordReset, "r=" + s);
 				return "ok";
 			}
 			return "nok:Time";

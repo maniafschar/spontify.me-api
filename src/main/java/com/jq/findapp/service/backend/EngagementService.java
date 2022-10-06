@@ -214,7 +214,8 @@ public class EngagementService {
 		if (gc.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY || gc.get(Calendar.HOUR_OF_DAY) != 17)
 			return;
 		final QueryParams params = new QueryParams(Query.contact_listId);
-		params.setSearch("contact.verified=true and contact.version is null");
+		params.setSearch(
+				"contact.verified=true and contact.version is null and contact.notificationRegistrationReminder=true");
 		params.setLimit(0);
 		final Result list = repository.list(params);
 		final Contact admin = repository.one(Contact.class, adminId);
@@ -254,7 +255,7 @@ public class EngagementService {
 
 	public void sendRegistrationReminder() throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_listId);
-		params.setSearch("contact.verified=false");
+		params.setSearch("contact.verified=false and contact.notificationRegistrationReminder=true");
 		params.setLimit(0);
 		final Result list = repository.list(params);
 		final long DAY = 86400000;
@@ -283,7 +284,7 @@ public class EngagementService {
 			repository.save(s);
 		}
 		if (failedEmails.length() > 0)
-			notificationService.createTicket(Type.OTHER, "sendRegistrationReminder", "Failed Emails:" + failedEmails);
+			notificationService.createTicket(Type.ERROR, "sendRegistrationReminder", "Failed Emails:" + failedEmails);
 	}
 
 	public void sendChats() throws Exception {

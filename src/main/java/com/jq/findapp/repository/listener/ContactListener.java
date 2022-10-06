@@ -1,11 +1,13 @@
 package com.jq.findapp.repository.listener;
 
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import javax.persistence.PostUpdate;
 import javax.persistence.PrePersist;
+import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +15,12 @@ import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.ContactLink;
 import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.service.AuthenticationService;
+import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.util.Text;
 
 @Component
@@ -80,6 +85,25 @@ public class ContactListener extends AbstractRepositoryListener {
 						contact.getPseudonym()));
 				repository.save(chat);
 			}
+		}
+	}
+
+	@PreRemove
+	public void preRemove(final Contact contact) throws Exception {
+		final QueryParams params = new QueryParams(Query.contact_listFriends);
+		params.setUser(contact);
+		params.setLimit(0);
+		params.setSearch("(contactLink.contactId=" + contact.getId() + " or contactLink.contactId2=" + contact.getId()
+				+ ") and contactLink.status='Friends'");
+		final Result result = repository.list(params);
+		for (int i = 0; i < result.size(); i++) {
+			final ContactLink contactLink = repository.one(ContactLink.class,
+					(BigInteger) result.get(i).get("contactLink.id"));
+			notificationService.sendNotification(contact,
+					repository.one(Contact.class,
+							contactLink.getContactId().equals(contact.getId()) ? contactLink.getContactId2()
+									: contactLink.getContactId()),
+					NotificationID.contactDelete, null);
 		}
 	}
 
