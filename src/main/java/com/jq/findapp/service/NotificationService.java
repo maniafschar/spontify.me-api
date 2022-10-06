@@ -123,9 +123,9 @@ public class NotificationService {
 	@Async
 	public void locationNotifyOnMatch(final Contact me, final BigInteger locationId,
 			final NotificationID notificationID, String param) throws Exception {
-		final QueryParams params2 = new QueryParams(Query.location_listFavorite);
-		params2.setSearch("locationFavorite.locationId=" + locationId);
-		final Result favorites = repository.list(params2);
+		final QueryParams params = new QueryParams(Query.location_listFavorite);
+		params.setSearch("locationFavorite.locationId=" + locationId);
+		final Result favorites = repository.list(params);
 		final Location location = repository.one(Location.class, locationId);
 		for (int i = 0; i < favorites.size(); i++)
 			sendNotificationOnMatch(notificationID,
@@ -191,27 +191,9 @@ public class NotificationService {
 			text.append("...");
 		}
 		BigInteger notID = null;
-		if (notificationID.isSave()) {
-			String s = text.toString();
-			if (s.charAt(1) == ' ' && (s.charAt(0) == ',' || s.charAt(0) == ':'))
-				s = s.substring(1);
-			final QueryParams params = new QueryParams(Query.contact_notification);
-			params.setSearch("contactNotification.contactId=" + contactTo.getId() +
-					" and contactNotification.contactId2=" + contactFrom.getId() +
-					" and TIMESTAMPDIFF(HOUR,contactNotification.createdAt,current_timestamp)<24" +
-					" and contactNotification.action='" + (action == null ? "" : action) +
-					"' and contactNotification.textId='" + notificationID.name() + "'");
-			if (repository.list(params).size() > 0)
-				return false;
-			final ContactNotification notification = new ContactNotification();
-			notification.setAction(action);
-			notification.setContactId(contactTo.getId());
-			notification.setContactId2(contactFrom.getId());
-			notification.setText(s);
-			notification.setTextId(notificationID.name());
-			repository.save(notification);
-			notID = notification.getId();
-		}
+		if (notificationID.isSave()
+				&& (notID = save(contactTo, contactFrom, text.toString(), action, notificationID)) == null)
+			return false;
 		if (userWantsNotification(notificationID, contactTo)) {
 			if (text.charAt(0) < 'A' || text.charAt(0) > 'Z')
 				text.insert(0, contactFrom.getPseudonym() + (text.charAt(0) == ':' ? "" : " "));
@@ -224,6 +206,28 @@ public class NotificationService {
 			return true;
 		}
 		return false;
+	}
+
+	private BigInteger save(Contact contactTo, Contact contactFrom, String text, String action,
+			NotificationID notificationID) throws Exception {
+		final QueryParams params = new QueryParams(Query.contact_notification);
+		params.setSearch("contactNotification.contactId=" + contactTo.getId() +
+				" and contactNotification.contactId2=" + contactFrom.getId() +
+				" and TIMESTAMPDIFF(HOUR,contactNotification.createdAt,current_timestamp)<24" +
+				" and contactNotification.action='" + (action == null ? "" : action) +
+				"' and contactNotification.textId='" + notificationID.name() + "'");
+		if (repository.list(params).size() > 0)
+			return null;
+		if (text.charAt(1) == ' ' && (text.charAt(0) == ',' || text.charAt(0) == ':'))
+			text = text.substring(1);
+		final ContactNotification notification = new ContactNotification();
+		notification.setAction(action);
+		notification.setContactId(contactTo.getId());
+		notification.setContactId2(contactFrom.getId());
+		notification.setText(text);
+		notification.setTextId(notificationID.name());
+		repository.save(notification);
+		return notification.getId();
 	}
 
 	public Ping getPingValues(Contact contact) {
