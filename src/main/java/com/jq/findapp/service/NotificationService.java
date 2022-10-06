@@ -99,6 +99,7 @@ public class NotificationService {
 		contactVisitLocation,
 		contactVisitProfile,
 		contactWhatToDo,
+		eventDelete,
 		eventNotify,
 		eventParticipate,
 		locationMarketing,
