@@ -89,7 +89,7 @@ public enum Text {
 			try {
 				// Test environment, only german is tested
 				languages.put("DE", new ObjectMapper().readTree(
-						IOUtils.toString(Text.class.getResourceAsStream("/lang/EN.json"), StandardCharsets.UTF_8)));
+						IOUtils.toString(Text.class.getResourceAsStream("/lang/DE.json"), StandardCharsets.UTF_8)));
 			} catch (Exception e1) {
 				new RuntimeException(e);
 			}

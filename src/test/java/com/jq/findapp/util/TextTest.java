@@ -15,4 +15,15 @@ public class TextTest {
 
 		// then no exceptions
 	}
+
+	@Test
+	public void ids() {
+		// given
+
+		// when
+		for (Text id : Text.values())
+			id.getText("DE");
+
+		// then no exceptions
+	}
 }
