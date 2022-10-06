@@ -87,44 +87,31 @@ public class NotificationService {
 		Production, Development
 	}
 
-	enum NotificationIDType {
-		Email, Device, EmailOrDevice, EmailAndDevice
-	}
-
 	public enum NotificationID {
 		chatLocation,
-		chatNew(NotificationIDType.EmailOrDevice, false),
+		chatNew(false),
 		chatSeen,
 		contactBirthday,
 		contactDelete,
 		contactFindMe,
 		contactFriendApproved,
 		contactFriendRequest,
-		contactPasswordReset(NotificationIDType.Email, false),
-		contactRegistrationReminder(NotificationIDType.Email, false),
 		contactVisitLocation,
 		contactVisitProfile,
-		contactWelcomeEmail(NotificationIDType.Email, false),
 		contactWhatToDo,
 		eventNotify,
 		eventParticipate,
 		locationMarketing,
 		locationRatingMatch;
 
-		private final NotificationIDType type;
 		private final boolean save;
 
 		private NotificationID() {
-			this(NotificationIDType.EmailOrDevice, true);
+			this(true);
 		}
 
-		private NotificationID(NotificationIDType type, boolean save) {
-			this.type = type;
+		private NotificationID(boolean save) {
 			this.save = save;
-		}
-
-		public NotificationIDType getType() {
-			return type;
 		}
 
 		public boolean isSave() {
@@ -179,8 +166,7 @@ public class NotificationService {
 
 	public boolean sendNotification(Contact contactFrom, Contact contactTo, NotificationID notificationID,
 			String action, String... param) throws Exception {
-		if (!contactTo.getVerified() && notificationID != NotificationID.contactWelcomeEmail
-				&& notificationID != NotificationID.contactPasswordReset)
+		if (!contactTo.getVerified())
 			return false;
 		if (contactTo.getId() != null) {
 			final QueryParams params = new QueryParams(Query.contact_block);
@@ -228,8 +214,7 @@ public class NotificationService {
 		if (userWantsNotification(notificationID, contactTo)) {
 			if (text.charAt(0) < 'A' || text.charAt(0) > 'Z')
 				text.insert(0, contactFrom.getPseudonym() + (text.charAt(0) == ':' ? "" : " "));
-			boolean b = notificationID.getType() != NotificationIDType.Email
-					&& !Strings.isEmpty(contactTo.getPushSystem()) &&
+			boolean b = !Strings.isEmpty(contactTo.getPushSystem()) &&
 					!Strings.isEmpty(contactTo.getPushToken());
 			if (b)
 				b = sendNotificationDevice(text, contactTo, action, notID);
@@ -338,8 +323,6 @@ public class NotificationService {
 	}
 
 	private boolean userWantsNotification(NotificationID textID, Contact contact) {
-		if (NotificationID.contactPasswordReset == textID || NotificationID.contactWelcomeEmail == textID)
-			return true;
 		if (NotificationID.chatNew == textID)
 			return contact.getNotificationChat();
 		if (NotificationID.contactFriendRequest == textID || NotificationID.contactFriendApproved == textID)

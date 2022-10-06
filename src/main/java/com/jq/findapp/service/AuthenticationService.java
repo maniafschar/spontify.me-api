@@ -33,7 +33,6 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService.AuthenticationException.Type;
-import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
@@ -199,8 +198,8 @@ public class AuthenticationService {
 		contact.setLanguage(registration.getLanguage());
 		contact.setEmail(contact.getEmail().toLowerCase().trim());
 		try {
-			notificationService.sendNotification(repository.one(Contact.class, adminId), contact,
-					NotificationID.contactWelcomeEmail, "r=" + generateLoginParam(contact));
+			notificationService.sendNotificationEmail(repository.one(Contact.class, adminId), contact,
+					Text.mail_contactWelcomeEmail.getText(contact.getLanguage()), "r=" + generateLoginParam(contact));
 			saveRegistration(contact, registration);
 		} catch (SendFailedException ex) {
 			throw new IllegalAccessException("email");
@@ -364,7 +363,8 @@ public class AuthenticationService {
 					|| contact.getModifiedAt().getTime() < System.currentTimeMillis() - 86400000) {
 				final String s = generateLoginParam(contact);
 				repository.save(contact);
-				notificationService.sendNotification(contact, contact, NotificationID.contactPasswordReset, "r=" + s);
+				notificationService.sendNotificationEmail(contact, contact,
+						Text.mail_contactPasswordReset.getText(contact.getLanguage()), "r=" + s);
 				return "ok";
 			}
 			return "nok:Time";
