@@ -331,7 +331,7 @@ public class EngagementService {
 
 	private void resetChatInstallCurrentVersion() throws Exception {
 		if (currentVersion == null)
-			currentVersion = (String) repository.one(new QueryParams(Query.contact_maxAppVersion)).get("c");
+			currentVersion = (String) repository.one(new QueryParams(Query.contact_maxAppVersion)).get("_c");
 		final QueryParams params = new QueryParams(Query.contact_listChatFlat);
 		params.setLimit(0);
 		params.setSearch("chat.textId='" + Text.engagement_installCurrentVersion.name() +

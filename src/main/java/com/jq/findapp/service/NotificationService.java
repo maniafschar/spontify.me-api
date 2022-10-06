@@ -197,8 +197,7 @@ public class NotificationService {
 		if (userWantsNotification(notificationID, contactTo)) {
 			if (text.charAt(0) < 'A' || text.charAt(0) > 'Z')
 				text.insert(0, contactFrom.getPseudonym() + (text.charAt(0) == ':' ? "" : " "));
-			boolean b = !Strings.isEmpty(contactTo.getPushSystem()) &&
-					!Strings.isEmpty(contactTo.getPushToken());
+			boolean b = !Strings.isEmpty(contactTo.getPushSystem()) && !Strings.isEmpty(contactTo.getPushToken());
 			if (b)
 				b = sendNotificationDevice(text, contactTo, action, notID);
 			if (!b)

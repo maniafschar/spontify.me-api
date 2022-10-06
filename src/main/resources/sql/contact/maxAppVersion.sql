@@ -3,4 +3,4 @@ SELECT
 FROM
 	Contact contact
 WHERE
-	contact.os <> 'web'
+	contact.os <> 'web' and contact.version is not null
