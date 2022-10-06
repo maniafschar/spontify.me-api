@@ -323,20 +323,21 @@ public class NotificationService {
 		return s.substring(1);
 	}
 
-	private boolean userWantsNotification(NotificationID textID, Contact contact) {
-		if (NotificationID.chatNew == textID)
+	private boolean userWantsNotification(NotificationID notificationID, Contact contact) {
+		if (NotificationID.chatNew == notificationID
+				|| NotificationID.chatLocation == notificationID)
 			return contact.getNotificationChat();
-		if (NotificationID.contactFriendRequest == textID || NotificationID.contactFriendApproved == textID)
+		if (NotificationID.contactFriendRequest == notificationID
+				|| NotificationID.contactFriendApproved == notificationID)
 			return contact.getNotificationFriendRequest();
-		if (NotificationID.contactVisitLocation == textID)
+		if (NotificationID.contactVisitLocation == notificationID
+				|| NotificationID.locationRatingMatch == notificationID)
 			return contact.getNotificationVisitLocation();
-		if (NotificationID.contactVisitProfile == textID)
+		if (NotificationID.contactVisitProfile == notificationID)
 			return contact.getNotificationVisitProfile();
-		if (NotificationID.locationRatingMatch == textID)
-			return contact.getNotificationVisitLocation();
-		if (NotificationID.eventParticipate == textID)
+		if (NotificationID.eventParticipate == notificationID)
 			return contact.getNotificationMarkEvent();
-		if (NotificationID.contactBirthday == textID)
+		if (NotificationID.contactBirthday == notificationID)
 			return contact.getNotificationBirthday();
 		return true;
 	}
