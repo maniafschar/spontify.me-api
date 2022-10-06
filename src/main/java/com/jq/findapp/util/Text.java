@@ -51,6 +51,7 @@ public enum Text {
 	mail_contactWhatToDo,
 	mail_eventDelete,
 	mail_eventNotify,
+	mail_eventNotification,
 	mail_eventParticipate,
 	mail_feedback,
 	mail_locationMarketing,

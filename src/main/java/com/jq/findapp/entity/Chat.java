@@ -4,8 +4,11 @@ import java.math.BigInteger;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 import com.jq.findapp.repository.listener.ChatListener;
+import com.jq.findapp.util.Text;
 
 @Entity
 @EntityListeners(ChatListener.class)
@@ -17,7 +20,8 @@ public class Chat extends BaseEntity {
 	private String note;
 	private String action;
 	private String image;
-	private String textId;
+	@Enumerated(EnumType.STRING)
+	private Text textId;
 
 	public BigInteger getContactId() {
 		return contactId;
@@ -75,11 +79,11 @@ public class Chat extends BaseEntity {
 		this.action = action;
 	}
 
-	public String getTextId() {
+	public Text getTextId() {
 		return textId;
 	}
 
-	public void setTextId(String textId) {
+	public void setTextId(Text textId) {
 		this.textId = textId;
 	}
 }

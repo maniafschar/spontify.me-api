@@ -171,6 +171,7 @@ public class SupportCenterApi {
 			engagementService.sendNearBy();
 			whatToDoService.findAndNotify();
 			eventService.findAndNotify();
+			eventService.notifyParticipation();
 			importLogService.importLog();
 		}
 	}

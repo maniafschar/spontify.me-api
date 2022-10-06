@@ -101,6 +101,7 @@ public class NotificationService {
 		contactWhatToDo,
 		eventDelete,
 		eventNotify,
+		eventNotification,
 		eventParticipate,
 		locationMarketing,
 		locationRatingMatch;

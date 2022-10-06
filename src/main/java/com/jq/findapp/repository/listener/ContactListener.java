@@ -80,7 +80,7 @@ public class ContactListener extends AbstractRepositoryListener {
 				chat.setContactId(adminId);
 				chat.setContactId2(contact.getId());
 				chat.setSeen(false);
-				chat.setTextId(Text.mail_welcome.name());
+				chat.setTextId(Text.mail_welcome);
 				chat.setNote(Text.mail_welcome.getText(contact.getLanguage()).replace("<jq:EXTRA_1 />",
 						contact.getPseudonym()));
 				repository.save(chat);

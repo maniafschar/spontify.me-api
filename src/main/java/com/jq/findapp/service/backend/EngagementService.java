@@ -122,13 +122,13 @@ public class EngagementService {
 
 		chatTemplates.add(new ChatTemplate(Text.engagement_uploadProfileAttributes,
 				"ui.navigation.goTo(&quot;settings&quot;)",
-				contact -> (contact.getAttr0() == null && contact.getAttr1() == null && contact.getAttr2() == null
-						&& contact.getAttr3() == null && contact.getAttr4() == null && contact.getAttr5() == null
-						&& contact.getAttr() == null) ||
-						(contact.getAgeMale() == null && contact.getAgeFemale() == null
-								&& contact.getAgeDivers() == null)
-						|| contact.getGender() == null ||
-						contact.getBirthday() == null));
+				contact -> (Strings.isEmpty(contact.getAttr0()) && Strings.isEmpty(contact.getAttr1())
+						&& Strings.isEmpty(contact.getAttr2()) && Strings.isEmpty(contact.getAttr3())
+						&& Strings.isEmpty(contact.getAttr4()) && Strings.isEmpty(contact.getAttr5())
+						&& Strings.isEmpty(contact.getAttr()))
+						|| (Strings.isEmpty(contact.getAgeMale()) && Strings.isEmpty(contact.getAgeFemale())
+								&& Strings.isEmpty(contact.getAgeDivers()))
+						|| contact.getGender() == null || contact.getBirthday() == null));
 
 		chatTemplates.add(new ChatTemplate(Text.engagement_allowLocation,
 				"",
@@ -186,19 +186,19 @@ public class EngagementService {
 
 		chatTemplates.add(new ChatTemplate(Text.engagement_installCurrentVersion,
 				"global.openStore()",
-				contact -> contact.getVersion() != null && contact.getOs() != OS.web
+				contact -> !Strings.isEmpty(contact.getVersion()) && contact.getOs() != OS.web
 						&& currentVersion.compareTo(contact.getVersion()) > 0));
 
 		chatTemplates.add(new ChatTemplate(Text.engagement_praise,
 				"",
 				contact -> contact.getLongitude() != null && contact.getImage() != null
-						&& contact.getAboutMe() != null && contact.getBirthday() != null
-						&& contact.getAttr() != null && contact.getAttrInterest() != null
-						&& (contact.getAgeDivers() != null || contact.getAgeFemale() != null
-								|| contact.getAgeMale() != null)
-						|| (contact.getAttr0() != null || contact.getAttr1() == null || contact.getAttr2() != null
-								|| contact.getAttr3() != null || contact.getAttr4() != null
-								|| contact.getAttr5() != null)));
+						&& contact.getBirthday() != null && !Strings.isEmpty(contact.getAboutMe())
+						&& !Strings.isEmpty(contact.getAttr()) && !Strings.isEmpty(contact.getAttrInterest())
+						&& (!Strings.isEmpty(contact.getAgeDivers()) || !Strings.isEmpty(contact.getAgeFemale())
+								|| !Strings.isEmpty(contact.getAgeMale()))
+						&& (!Strings.isEmpty(contact.getAttr0()) || !Strings.isEmpty(contact.getAttr1())
+								|| !Strings.isEmpty(contact.getAttr2()) || !Strings.isEmpty(contact.getAttr3())
+								|| !Strings.isEmpty(contact.getAttr4()) || !Strings.isEmpty(contact.getAttr5()))));
 
 		chatTemplates.add(new ChatTemplate(Text.engagement_newTown,
 				"pageInfo.socialShare()",
@@ -316,7 +316,7 @@ public class EngagementService {
 				final Result lastChats = repository.list(params);
 				if (lastChats.size() == 0)
 					return true;
-				final boolean isLastChatNearBy = ((String) lastChats.get(0).get("chat.textId")).startsWith(
+				final boolean isLastChatNearBy = ((Text) lastChats.get(0).get("chat.textId")).name().startsWith(
 						Text.engagement_nearByLocation.name().substring(0,
 								Text.engagement_nearByLocation.name().indexOf('L')));
 				if (!nearBy && isLastChatNearBy || nearBy && !isLastChatNearBy)
@@ -497,7 +497,7 @@ public class EngagementService {
 		chat.setContactId2(contact.getId());
 		chat.setSeen(false);
 		chat.setAction(action);
-		chat.setTextId(textId.name());
+		chat.setTextId(textId);
 		chat.setNote(s);
 		repository.save(chat);
 	}

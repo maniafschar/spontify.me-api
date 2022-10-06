@@ -1,15 +1,20 @@
 package com.jq.findapp.service.backend;
 
 import java.math.BigInteger;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Event;
+import com.jq.findapp.entity.EventParticipate;
+import com.jq.findapp.entity.Location;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -43,16 +48,17 @@ public class EventService {
 		params.setQuery(Query.location_listEventCurrent);
 		params.setDistance(50);
 		params.setSearch("TO_DAYS(event.startDate)-1<=TO_DAYS(current_timestamp)");
-		final LocalDate today = LocalDate.now(ZoneId.systemDefault());
+		final LocalDate now = LocalDate.now(ZoneId.systemDefault());
 		for (int i = 0; i < ids.size(); i++) {
 			params.setUser(repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id")));
 			final Result events = repository.list(params);
 			for (int i2 = 0; i2 < events.size(); i2++) {
 				final Event event = repository.one(Event.class, (BigInteger) events.get(i2).get("event.id"));
 				if (!params.getUser().getId().equals(event.getContactId())) {
-					final LocalDate realDate = getRealDate(event, today);
+					final LocalDate realDate = getRealDate(event, now);
 					final Contact contactEvent = repository.one(Contact.class, event.getContactId());
-					if (realDate.minusDays(1).isBefore(today) && !isMaxParticipants(event, realDate, params.getUser())
+					if (realDate.isAfter(now) && realDate.minusDays(1).isBefore(now)
+							&& !isMaxParticipants(event, realDate, params.getUser())
 							&& Score.getContact(contactEvent, params.getUser()) > 0.3 &&
 							notificationService.sendNotification(contactEvent,
 									params.getUser(), NotificationID.eventNotify,
@@ -64,11 +70,43 @@ public class EventService {
 		}
 	}
 
-	private LocalDate getRealDate(Event event, LocalDate today) {
+	public void notifyParticipation() throws Exception {
+		final QueryParams params = new QueryParams(Query.event_participate);
+		params.setSearch("eventParticipate.eventDate>='" + Instant.now() + "' and eventParticipate.eventDate<'"
+				+ Instant.now().plus(Duration.ofDays(1)) + "'");
+		params.setLimit(0);
+		final Result ids = repository.list(params);
+		params.setQuery(Query.location_listEvent);
+		params.setSearch("TO_DAYS(event.startDate)-1<=TO_DAYS(current_timestamp)");
+		final ZonedDateTime now = Instant.now().atZone(ZoneOffset.UTC);
+		for (int i = 0; i < ids.size(); i++) {
+			final EventParticipate eventParticipate = repository.one(EventParticipate.class,
+					(BigInteger) ids.get(i).get("eventParticipate.id"));
+			final Event event = repository.one(Event.class, eventParticipate.getEventId());
+			if (event == null)
+				repository.delete(eventParticipate);
+			else {
+				final ZonedDateTime time = Instant.ofEpochMilli(event.getStartDate().getTime()).atZone(ZoneOffset.UTC);
+				if (time.getHour() > now.getHour() && time.getHour() < now.getHour() + 2 || time.getHour() == 0) {
+					final Contact contact = repository.one(Contact.class, eventParticipate.getContactId());
+					final ZonedDateTime t = time.minus(Duration.ofMinutes(
+							contact.getTimezoneOffset() == null ? -60
+									: contact.getTimezoneOffset().longValue()));
+					notificationService.sendNotification(repository.one(Contact.class, event.getContactId()),
+							contact, NotificationID.eventNotification,
+							Strings.encodeParam("e=" + event.getId()),
+							repository.one(Location.class, event.getLocationId()).getName(),
+							t.getHour() + ":" + (t.getMinute() < 10 ? "0" : "") + t.getMinute());
+				}
+			}
+		}
+	}
+
+	private LocalDate getRealDate(Event event, LocalDate now) {
 		LocalDate realDate = Instant.ofEpochMilli(event.getStartDate().getTime())
 				.atZone(ZoneId.systemDefault()).toLocalDate();
 		if (!"o".equals(event.getType())) {
-			while (realDate.isBefore(today)) {
+			while (realDate.isBefore(now)) {
 				if ("w".equals(event.getType()))
 					realDate = realDate.plusWeeks(1);
 				else if ("w2".equals(event.getType()))
