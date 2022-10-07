@@ -80,8 +80,10 @@ public class ExternalService {
 
 	public GeoLocation googleAddress(float latitude, float longitude) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_geoLocation);
-		params.setSearch("geoLocation.latitude like '" + round(latitude)
-				+ "%' and geoLocation.longitude like '" + round(longitude) + "%'");
+		final float roundingFactor = 10000f;
+		params.setSearch("geoLocation.latitude like '" + (Math.round(latitude * roundingFactor) / roundingFactor)
+				+ "%' and geoLocation.longitude like '" + (Math.round(longitude * roundingFactor) / roundingFactor)
+				+ "%'");
 		final Result persistedAddress = repository.list(params);
 		if (persistedAddress.size() > 0)
 			return repository.one(GeoLocation.class, (BigInteger) persistedAddress.get(0).get("_id"));
@@ -109,13 +111,5 @@ public class ExternalService {
 		url = url.replaceAll("\\{gender}", contact.getGender() == null ? "2" : "" + contact.getGender()) + googleKey;
 		return Base64.getEncoder().encodeToString(
 				WebClient.create(url).get().retrieve().toEntity(byte[].class).block().getBody());
-	}
-
-	private String round(float d) {
-		final int digits = 5 + 1;
-		String s = "" + d;
-		if (s.length() - digits >= s.indexOf('.'))
-			s = s.substring(0, s.indexOf('.') + digits);
-		return s;
 	}
 }
