@@ -3,6 +3,7 @@ package com.jq.findapp.repository.listener;
 import java.nio.charset.StandardCharsets;
 
 import javax.persistence.PostPersist;
+import javax.persistence.PrePersist;
 
 import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
@@ -12,6 +13,13 @@ import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.util.Text;
 
 public class ChatListener extends AbstractRepositoryListener {
+	@PrePersist
+	public void prePersist(final Chat chat) throws Exception {
+		// Feedback
+		if (chat.getContactId2() == null)
+			chat.setContactId2(adminId);
+	}
+
 	@PostPersist
 	public void postPersist(final Chat chat) throws Exception {
 		final Contact contactFrom = repository.one(Contact.class, chat.getContactId());

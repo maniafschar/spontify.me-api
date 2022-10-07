@@ -161,8 +161,8 @@ public class SupportCenterApi {
 		return (String) repository.one(param).get("setting.value");
 	}
 
-	@PutMapping("refreshDB")
-	public void refreshDB(@RequestHeader String secret) throws Exception {
+	@PutMapping("scheduler")
+	public void scheduler(@RequestHeader String secret) throws Exception {
 		if (schedulerSecret.equals(secret)) {
 			dbUpdateService.update();
 			engagementService.sendSpontifyEmail();

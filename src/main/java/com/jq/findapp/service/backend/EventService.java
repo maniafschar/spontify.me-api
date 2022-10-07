@@ -72,12 +72,11 @@ public class EventService {
 
 	public void notifyParticipation() throws Exception {
 		final QueryParams params = new QueryParams(Query.event_participate);
-		params.setSearch("eventParticipate.eventDate>='" + Instant.now() + "' and eventParticipate.eventDate<'"
+		params.setSearch("eventParticipate.eventDate>'" + Instant.now().minus((Duration.ofDays(1)))
+				+ "' and eventParticipate.eventDate<'"
 				+ Instant.now().plus(Duration.ofDays(1)) + "'");
 		params.setLimit(0);
 		final Result ids = repository.list(params);
-		params.setQuery(Query.location_listEvent);
-		params.setSearch("TO_DAYS(event.startDate)-1<=TO_DAYS(current_timestamp)");
 		final ZonedDateTime now = Instant.now().atZone(ZoneOffset.UTC);
 		for (int i = 0; i < ids.size(); i++) {
 			final EventParticipate eventParticipate = repository.one(EventParticipate.class,
@@ -87,11 +86,10 @@ public class EventService {
 				repository.delete(eventParticipate);
 			else {
 				final ZonedDateTime time = Instant.ofEpochMilli(event.getStartDate().getTime()).atZone(ZoneOffset.UTC);
-				if (time.getHour() > now.getHour() && time.getHour() < now.getHour() + 2 || time.getHour() == 0) {
+				if (time.getHour() == 0 || time.getHour() > now.getHour() && time.getHour() < now.getHour() + 3) {
 					final Contact contact = repository.one(Contact.class, eventParticipate.getContactId());
 					final ZonedDateTime t = time.minus(Duration.ofMinutes(
-							contact.getTimezoneOffset() == null ? -60
-									: contact.getTimezoneOffset().longValue()));
+							contact.getTimezoneOffset() == null ? -60 : contact.getTimezoneOffset().longValue()));
 					notificationService.sendNotification(repository.one(Contact.class, event.getContactId()),
 							contact, NotificationID.eventNotification,
 							Strings.encodeParam("e=" + event.getId()),

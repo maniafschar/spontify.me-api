@@ -26,4 +26,5 @@ FROM
 WHERE
 	{search}
 ORDER BY
+	log.createdAt DESC,
 	log.id DESC
