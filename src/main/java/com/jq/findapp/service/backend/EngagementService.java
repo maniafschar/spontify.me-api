@@ -130,13 +130,16 @@ public class EngagementService {
 								&& Strings.isEmpty(contact.getAgeDivers()))
 						|| contact.getGender() == null || contact.getBirthday() == null));
 
+		chatTemplates.add(new ChatTemplate(Text.engagement_newTown,
+				"pageInfo.socialShare()",
+				contact -> contact.getLatitude() != null
+						&& contact.getModifiedAt() != null
+						&& contact.getModifiedAt()
+								.after(new Date(Instant.now().minus(Duration.ofDays(1)).toEpochMilli()))));
+
 		chatTemplates.add(new ChatTemplate(Text.engagement_allowLocation,
 				"",
 				contact -> contact.getLongitude() == null && contact.getOs() != OS.web));
-
-		chatTemplates.add(new ChatTemplate(Text.engagement_patience,
-				"pageInfo.socialShare()",
-				contact -> contact.getLongitude() != null));
 
 		chatTemplates.add(new ChatTemplate(Text.engagement_becomeGuide,
 				"ui.navigation.goTo(&quot;settings&quot;)",
@@ -200,12 +203,9 @@ public class EngagementService {
 								|| !Strings.isEmpty(contact.getAttr2()) || !Strings.isEmpty(contact.getAttr3())
 								|| !Strings.isEmpty(contact.getAttr4()) || !Strings.isEmpty(contact.getAttr5()))));
 
-		chatTemplates.add(new ChatTemplate(Text.engagement_newTown,
+		chatTemplates.add(new ChatTemplate(Text.engagement_patience,
 				"pageInfo.socialShare()",
-				contact -> contact.getLatitude() != null
-						&& contact.getModifiedAt() != null
-						&& contact.getModifiedAt()
-								.after(new Date(Instant.now().minus(Duration.ofDays(1)).toEpochMilli()))));
+				contact -> contact.getLongitude() != null));
 
 		chatTemplates.add(new ChatTemplate(Text.engagement_like, null, null));
 	}
@@ -386,8 +386,7 @@ public class EngagementService {
 	}
 
 	private boolean sendChatTemplate(Contact contact, QueryParams params) throws Exception {
-		final int hour = Instant.now().minus(Duration.ofMinutes(
-				contact.getTimezoneOffset() == null ? -60 : contact.getTimezoneOffset().longValue()))
+		final int hour = Instant.now().minus(Duration.ofMinutes(contact.getTimezoneOffset()))
 				.atZone(ZoneOffset.UTC).getHour();
 		if (hour > 6 && hour < 22) {
 			for (ChatTemplate chatTemplate : chatTemplates) {

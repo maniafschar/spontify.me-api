@@ -1,6 +1,7 @@
 package com.jq.findapp.repository.listener;
 
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 
@@ -24,7 +25,7 @@ public class EventParticipateListener extends AbstractRepositoryListener {
 			final Instant time = Instant.ofEpochMilli(
 					repository.one(Event.class, eventParticipate.getEventId()).getStartDate()
 							.getTime());
-			time.plusSeconds(contactTo.getTimezoneOffset() * 60);
+			time.minus(Duration.ofMinutes(contactTo.getTimezoneOffset()));
 			notificationService.sendNotification(contactFrom, contactTo,
 					NotificationID.eventParticipate,
 					Strings.encodeParam("p=" + contactFrom.getId()),

@@ -60,9 +60,7 @@ public class WhatToDoService {
 			params.setSearch(search.substring(0, search.length() - 4) + ") and contact.id<>" + contact.getId());
 			final Result result = repository.list(params);
 			final ZonedDateTime t = Instant.ofEpochMilli(contactWhatToDo.getTime().getTime())
-					.minus(Duration.ofMinutes(
-							contact.getTimezoneOffset() == null ? -60
-									: contact.getTimezoneOffset().longValue()))
+					.minus(Duration.ofMinutes(contact.getTimezoneOffset()))
 					.atZone(ZoneOffset.UTC);
 			final String time = t.getHour() + ":" + (t.getMinute() < 10 ? "0" : "") + t.getMinute();
 			for (int i2 = 0; i2 < result.size(); i2++)

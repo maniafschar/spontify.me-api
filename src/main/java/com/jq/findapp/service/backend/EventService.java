@@ -88,8 +88,7 @@ public class EventService {
 				final ZonedDateTime time = Instant.ofEpochMilli(event.getStartDate().getTime()).atZone(ZoneOffset.UTC);
 				if (time.getHour() == 0 || time.getHour() > now.getHour() && time.getHour() < now.getHour() + 3) {
 					final Contact contact = repository.one(Contact.class, eventParticipate.getContactId());
-					final ZonedDateTime t = time.minus(Duration.ofMinutes(
-							contact.getTimezoneOffset() == null ? -60 : contact.getTimezoneOffset().longValue()));
+					final ZonedDateTime t = time.minus(Duration.ofMinutes(contact.getTimezoneOffset()));
 					notificationService.sendNotification(repository.one(Contact.class, event.getContactId()),
 							contact, NotificationID.eventNotification,
 							Strings.encodeParam("e=" + event.getId()),
