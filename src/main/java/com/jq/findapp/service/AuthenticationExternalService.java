@@ -84,6 +84,8 @@ public class AuthenticationExternalService {
 		final Contact c = new Contact();
 		c.setVerified(true);
 		c.setEmail(registration.getUser().get("email"));
+		if (!c.getEmail().endsWith("@spontify.me"))
+			c.setEmailVerified(c.getEmail());
 		c.setPseudonym(registration.getUser().get("name").trim());
 		if ("".equals(c.getPseudonym()))
 			c.setPseudonym("Lucky Luke");
