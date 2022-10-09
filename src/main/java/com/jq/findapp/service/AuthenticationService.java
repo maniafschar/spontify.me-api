@@ -384,6 +384,7 @@ public class AuthenticationService {
 		final Contact contact = repository.one(Contact.class, new BigInteger(user.get("contact.id").toString()));
 		if (contact.getVerified() == null || !contact.getVerified()) {
 			contact.setVerified(true);
+			contact.setEmailVerified(contact.getEmail());
 			repository.save(contact);
 		}
 		return contact;

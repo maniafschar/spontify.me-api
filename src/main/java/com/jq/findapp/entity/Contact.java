@@ -67,6 +67,7 @@ public class Contact extends BaseEntity {
 	private String attrInterestEx;
 	private String budget;
 	private String email;
+	private String emailVerified;
 	private String facebookId;
 	private String fbToken;
 	private String filter;
@@ -106,6 +107,14 @@ public class Contact extends BaseEntity {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public String getEmailVerified() {
+		return emailVerified;
+	}
+
+	public void setEmailVerified(String emailVerified) {
+		this.emailVerified = emailVerified;
 	}
 
 	public String getImage() {
