@@ -6,7 +6,7 @@ SELECT
 	contactNotification.createdAt,
 	contactNotification.action,
 	contactNotification.seen,
-	contactNotification.textId,
+	contactNotification.textType,
 	contact.pseudonym
 FROM
 	ContactNotification contactNotification,
