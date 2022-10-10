@@ -19,4 +19,5 @@ WHERE
 GROUP BY
 	contact.id
 ORDER BY
-	maxDate desc
+	maxDate desc,
+	chatId desc
