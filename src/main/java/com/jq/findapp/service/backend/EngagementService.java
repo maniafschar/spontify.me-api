@@ -25,7 +25,7 @@ import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.OS;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Setting;
-import com.jq.findapp.entity.Ticket.Type;
+import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -285,7 +285,8 @@ public class EngagementService {
 			repository.save(s);
 		}
 		if (failedEmails.length() > 0)
-			notificationService.createTicket(Type.ERROR, "sendRegistrationReminder", "Failed Emails:" + failedEmails);
+			notificationService.createTicket(TicketType.ERROR, "sendRegistrationReminder",
+					"Failed Emails:" + failedEmails);
 	}
 
 	public void sendChats() throws Exception {

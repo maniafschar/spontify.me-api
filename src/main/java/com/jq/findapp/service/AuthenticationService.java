@@ -29,10 +29,11 @@ import com.jq.findapp.api.model.InternalRegistration;
 import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactToken;
+import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.AuthenticationService.AuthenticationException.Type;
+import com.jq.findapp.service.AuthenticationService.AuthenticationException.AuthenticationExceptionType;
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
@@ -92,17 +93,17 @@ public class AuthenticationService {
 
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
 	public static class AuthenticationException extends RuntimeException {
-		public enum Type {
+		public enum AuthenticationExceptionType {
 			NoInputFromClient, WrongPassword, NoPasswordInDB, UsedSalt
 		}
 
-		private final Type type;
+		private final AuthenticationExceptionType type;
 
-		private AuthenticationException(Type type) {
+		private AuthenticationException(AuthenticationExceptionType type) {
 			this.type = type;
 		}
 
-		public Type getType() {
+		public AuthenticationExceptionType getType() {
 			return type;
 		}
 	}
@@ -119,16 +120,16 @@ public class AuthenticationService {
 
 	public Contact verify(BigInteger user, String password, String salt) {
 		if (user == null || user.compareTo(BigInteger.ONE) < 0)
-			throw new AuthenticationException(Type.NoInputFromClient);
+			throw new AuthenticationException(AuthenticationExceptionType.NoInputFromClient);
 		return verify(repository.one(Contact.class, user), password, salt, false);
 	}
 
 	private Contact verify(final Contact contact, final String password, final String salt, final boolean login) {
 		if (contact == null || password == null || password.length() == 0 || salt == null || salt.length() == 0)
-			throw new AuthenticationException(Type.NoInputFromClient);
+			throw new AuthenticationException(AuthenticationExceptionType.NoInputFromClient);
 		synchronized (USED_SALTS) {
 			if (USED_SALTS.contains(salt))
-				throw new AuthenticationException(Type.UsedSalt);
+				throw new AuthenticationException(AuthenticationExceptionType.UsedSalt);
 			USED_SALTS.add(salt);
 			if (USED_SALTS.size() > 1000) {
 				final long timeout = System.currentTimeMillis() - TIMEOUT;
@@ -165,7 +166,7 @@ public class AuthenticationService {
 				} catch (InterruptedException e) {
 				}
 			}
-			throw new AuthenticationException(Type.WrongPassword);
+			throw new AuthenticationException(AuthenticationExceptionType.WrongPassword);
 		}
 		return contact;
 	}
@@ -182,7 +183,7 @@ public class AuthenticationService {
 		if (!unique.unique)
 			throw new IllegalAccessException("email");
 		if (unique.blocked) {
-			notificationService.createTicket(com.jq.findapp.entity.Ticket.Type.REGISTRATION,
+			notificationService.createTicket(TicketType.REGISTRATION,
 					"denied email blocked", registration.toString());
 			throw new IllegalAccessException("domain");
 		}
@@ -243,7 +244,7 @@ public class AuthenticationService {
 			}
 		} else
 			repository.save(contact);
-		notificationService.createTicket(com.jq.findapp.entity.Ticket.Type.REGISTRATION, contact.getEmail(),
+		notificationService.createTicket(TicketType.REGISTRATION, contact.getEmail(),
 				registration.toString());
 	}
 
@@ -408,7 +409,7 @@ public class AuthenticationService {
 
 	public String getPassword(final Contact u) {
 		if (u.getPassword() == null || u.getPassword().length() == 0)
-			throw new AuthenticationException(Type.NoPasswordInDB);
+			throw new AuthenticationException(AuthenticationExceptionType.NoPasswordInDB);
 		synchronized (PW) {
 			Password pw = PW.get(u.getId());
 			if (pw == null || pw.reset - u.getPasswordReset() < 0) {
@@ -440,7 +441,7 @@ public class AuthenticationService {
 				throw new RuntimeException("ERROR SQL on account delete: " + ex.getMessage() + "\n" + sql);
 			}
 		}
-		notificationService.createTicket(com.jq.findapp.entity.Ticket.Type.REGISTRATION, "Deleted",
+		notificationService.createTicket(TicketType.REGISTRATION, "Deleted",
 				new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(user));
 	}
 

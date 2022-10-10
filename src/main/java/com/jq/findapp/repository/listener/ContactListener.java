@@ -16,11 +16,11 @@ import org.springframework.stereotype.Component;
 import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactLink;
+import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.service.AuthenticationService;
-import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.util.Text;
 
 @Component
@@ -103,7 +103,7 @@ public class ContactListener extends AbstractRepositoryListener {
 					repository.one(Contact.class,
 							contactLink.getContactId().equals(contact.getId()) ? contactLink.getContactId2()
 									: contactLink.getContactId()),
-					NotificationID.contactDelete, null);
+					ContactNotificationTextType.contactDelete, null);
 		}
 	}
 

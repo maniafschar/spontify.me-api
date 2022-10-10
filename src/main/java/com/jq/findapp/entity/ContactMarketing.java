@@ -11,9 +11,9 @@ public class ContactMarketing extends BaseEntity {
 	private BigInteger contactId;
 	private String data;
 	@Enumerated(EnumType.STRING)
-	private Type type;
+	private ContactMarketingType type;
 
-	public enum Type {
+	public enum ContactMarketingType {
 		CollectFriends
 	}
 
@@ -25,11 +25,11 @@ public class ContactMarketing extends BaseEntity {
 		this.contactId = contactId;
 	}
 
-	public Type getType() {
+	public ContactMarketingType getType() {
 		return type;
 	}
 
-	public void setType(Type type) {
+	public void setType(ContactMarketingType type) {
 		this.type = type;
 	}
 

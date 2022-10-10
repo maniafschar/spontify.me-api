@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.GeoLocation;
-import com.jq.findapp.entity.Ticket.Type;
+import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -37,10 +37,10 @@ public class ExternalService {
 				.get().retrieve().toEntity(String.class).block().getBody();
 		try {
 			final ObjectMapper om = new ObjectMapper();
-			notificationService.createTicket(Type.GOOGLE, param,
+			notificationService.createTicket(TicketType.GOOGLE, param,
 					om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(result)));
 		} catch (Exception e) {
-			notificationService.createTicket(Type.GOOGLE, param, result);
+			notificationService.createTicket(TicketType.GOOGLE, param, result);
 		}
 		return result;
 	}
@@ -94,7 +94,7 @@ public class ExternalService {
 			geoLocation.setLatitude(latitude);
 			repository.save(geoLocation);
 		} else
-			notificationService.createTicket(Type.ERROR, "No google address", latitude + "\n" + longitude);
+			notificationService.createTicket(TicketType.ERROR, "No google address", latitude + "\n" + longitude);
 		return geoLocation;
 	}
 

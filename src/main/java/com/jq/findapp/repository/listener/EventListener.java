@@ -11,13 +11,13 @@ import java.util.Date;
 import javax.persistence.PostRemove;
 
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
-import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.util.Strings;
 
 public class EventListener extends AbstractRepositoryListener {
@@ -38,7 +38,7 @@ public class EventListener extends AbstractRepositoryListener {
 					final Contact contactFrom = repository.one(Contact.class, eventParticipate.getContactId());
 					time.minus(Duration.ofMinutes(contactTo.getTimezoneOffset()));
 					notificationService.sendNotification(contactFrom, contactTo,
-							NotificationID.eventDelete,
+							ContactNotificationTextType.eventDelete,
 							Strings.encodeParam("p=" + contactFrom.getId()),
 							new SimpleDateFormat("dd.MM.yyyy").format(eventParticipate.getEventDate()) +
 									new SimpleDateFormat(" HH:mm").format(new Date(time.toEpochMilli())),

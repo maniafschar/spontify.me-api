@@ -3,9 +3,9 @@ package com.jq.findapp.repository.listener;
 import javax.persistence.PostPersist;
 
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.LocationRating;
-import com.jq.findapp.service.NotificationService.NotificationID;
 
 public class LocationRatingListener extends AbstractRepositoryListener {
 	@PostPersist
@@ -15,7 +15,7 @@ public class LocationRatingListener extends AbstractRepositoryListener {
 						+ locationRating.getLocationId());
 		notificationService.locationNotifyOnMatch(
 				repository.one(Contact.class, locationRating.getContactId()),
-				locationRating.getLocationId(), NotificationID.locationRatingMatch,
+				locationRating.getLocationId(), ContactNotificationTextType.locationRatingMatch,
 				repository.one(Location.class, locationRating.getLocationId()).getName());
 	}
 }

@@ -11,12 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.ContactWhatToDo;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.util.Score;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
@@ -78,7 +78,7 @@ public class WhatToDoService {
 								.valueOf(Text.category_verb0.name().substring(0,
 										Text.category_verb0.name().length() - 1) + cats[i3])
 								.getText(contact2.getLanguage());
-			notificationService.sendNotification(contact, contact2, NotificationID.contactWhatToDo,
+			notificationService.sendNotification(contact, contact2, ContactNotificationTextType.contactWhatToDo,
 					Strings.encodeParam("p=" + contact.getId()), time, verb);
 		}
 	}

@@ -34,12 +34,13 @@ import com.jq.findapp.api.model.Position;
 import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
+import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.ContactVisit;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.LocationOpenTime;
 import com.jq.findapp.entity.LocationVisit;
-import com.jq.findapp.entity.Ticket.Type;
+import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -48,7 +49,6 @@ import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.AuthenticationService.Unique;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
-import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.service.NotificationService.Ping;
 import com.jq.findapp.util.EntityUtil;
 import com.jq.findapp.util.Strings;
@@ -104,7 +104,7 @@ public class ActionApi {
 		if (text != null) {
 			final Integer hash = text.hashCode();
 			if (!SENT_NOTIFICATIONS.contains(hash)) {
-				notificationService.createTicket(Type.ERROR, "client", text);
+				notificationService.createTicket(TicketType.ERROR, "client", text);
 				SENT_NOTIFICATIONS.add(hash);
 			}
 		}
@@ -173,7 +173,8 @@ public class ActionApi {
 								+ id + " and chat.contactId2=" + user);
 				final Contact contact = repository.one(Contact.class, id);
 				if (contact.getModifiedAt().before(new Date(Instant.now().minus(Duration.ofDays(3)).toEpochMilli())))
-					notificationService.sendNotification(params.getUser(), contact, NotificationID.chatSeen,
+					notificationService.sendNotification(params.getUser(), contact,
+							ContactNotificationTextType.chatSeen,
 							"chat=" + user);
 			}
 		}

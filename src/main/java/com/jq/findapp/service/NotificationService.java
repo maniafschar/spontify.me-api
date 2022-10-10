@@ -37,9 +37,11 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification;
+import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
+import com.jq.findapp.entity.ContactNotification.ContactNotificationType;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Ticket;
-import com.jq.findapp.entity.Ticket.Type;
+import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -87,43 +89,9 @@ public class NotificationService {
 		Production, Development
 	}
 
-	public enum NotificationID {
-		chatLocation,
-		chatNew(false),
-		chatSeen,
-		contactBirthday,
-		contactDelete,
-		contactFindMe,
-		contactFriendApproved,
-		contactFriendRequest,
-		contactVisitLocation,
-		contactVisitProfile,
-		contactWhatToDo,
-		eventDelete,
-		eventNotify,
-		eventNotification,
-		eventParticipate,
-		locationMarketing,
-		locationRatingMatch;
-
-		private final boolean save;
-
-		private NotificationID() {
-			this(true);
-		}
-
-		private NotificationID(boolean save) {
-			this.save = save;
-		}
-
-		public boolean isSave() {
-			return save;
-		}
-	}
-
 	@Async
 	public void locationNotifyOnMatch(final Contact me, final BigInteger locationId,
-			final NotificationID notificationID, String param) throws Exception {
+			final ContactNotificationTextType notificationID, String param) throws Exception {
 		final QueryParams params = new QueryParams(Query.location_listFavorite);
 		params.setSearch("locationFavorite.locationId=" + locationId);
 		final Result favorites = repository.list(params);
@@ -136,7 +104,7 @@ public class NotificationService {
 	}
 
 	@Async
-	public String[] sendNotificationOnMatch(NotificationID textID, final Contact me, final Contact other,
+	public String[] sendNotificationOnMatch(ContactNotificationTextType textID, final Contact me, final Contact other,
 			String... param) throws Exception {
 		if (me != null && other != null && !me.getId().equals(other.getId()) && me.getAge() != null
 				&& me.getGender() != null) {
@@ -166,7 +134,7 @@ public class NotificationService {
 		return null;
 	}
 
-	public boolean sendNotification(Contact contactFrom, Contact contactTo, NotificationID notificationID,
+	public boolean sendNotification(Contact contactFrom, Contact contactTo, ContactNotificationTextType notificationID,
 			String action, String... param) throws Exception {
 		if (!contactTo.getVerified())
 			return false;
@@ -191,25 +159,30 @@ public class NotificationService {
 				text.delete(text.lastIndexOf(" "), text.length());
 			text.append("...");
 		}
-		BigInteger notID = null;
-		if (notificationID.isSave()
-				&& (notID = save(contactTo, contactFrom, text.toString(), action, notificationID)) == null)
+		ContactNotification notification = null;
+		if (notificationID != ContactNotificationTextType.chatNew
+				&& (notification = save(contactTo, contactFrom, text.toString(), action, notificationID)) == null)
 			return false;
 		if (userWantsNotification(notificationID, contactTo)) {
 			if (text.charAt(0) < 'A' || text.charAt(0) > 'Z')
 				text.insert(0, contactFrom.getPseudonym() + (text.charAt(0) == ':' ? "" : " "));
 			boolean b = !Strings.isEmpty(contactTo.getPushSystem()) && !Strings.isEmpty(contactTo.getPushToken());
 			if (b)
-				b = sendNotificationDevice(text, contactTo, action, notID);
-			if (!b)
+				b = sendNotificationDevice(text, contactTo, action, notification);
+			if (!b) {
 				sendNotificationEmail(contactFrom, contactTo, text.toString(), action);
+				if (notification != null)
+					notification.setType(ContactNotificationType.email);
+			}
+			if (notification != null)
+				repository.save(notification);
 			return true;
 		}
 		return false;
 	}
 
-	private BigInteger save(Contact contactTo, Contact contactFrom, String text, String action,
-			NotificationID notificationID) throws Exception {
+	private ContactNotification save(Contact contactTo, Contact contactFrom, String text, String action,
+			ContactNotificationTextType notificationID) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_notification);
 		params.setSearch("contactNotification.contactId=" + contactTo.getId() +
 				" and contactNotification.contactId2=" + contactFrom.getId() +
@@ -225,9 +198,9 @@ public class NotificationService {
 		notification.setContactId(contactTo.getId());
 		notification.setContactId2(contactFrom.getId());
 		notification.setText(text);
-		notification.setTextId(notificationID.name());
+		notification.setTextType(notificationID);
 		repository.save(notification);
-		return notification.getId();
+		return notification;
 	}
 
 	public Ping getPingValues(Contact contact) {
@@ -262,7 +235,7 @@ public class NotificationService {
 	}
 
 	private boolean sendNotificationDevice(final StringBuilder text, final Contact contactTo, String action,
-			BigInteger notificationId)
+			ContactNotification notification)
 			throws Exception {
 		if (Strings.isEmpty(text) || Strings.isEmpty(contactTo.getPushSystem())
 				|| Strings.isEmpty(contactTo.getPushToken()))
@@ -277,10 +250,13 @@ public class NotificationService {
 			text.append("...");
 		}
 		try {
+			final BigInteger notificationId = notification == null ? null : notification.getId();
 			if ("ios".equals(contactTo.getPushSystem()))
 				ios.send(contactTo, text.toString(), action, getPingValues(contactTo).totalNew, notificationId);
 			else if ("android".equals(contactTo.getPushSystem()))
 				android.send(contactTo, text.toString(), action, notificationId);
+			if (notification != null)
+				notification.setType(ContactNotificationType.valueOf(contactTo.getPushSystem()));
 			return true;
 		} catch (NotFound | NotFoundException ex) {
 			contactTo.setPushSystem(null);
@@ -288,13 +264,14 @@ public class NotificationService {
 			repository.save(contactTo);
 			return false;
 		} catch (Exception ex) {
-			createTicket(Type.ERROR, "Push Notification",
+			createTicket(TicketType.ERROR, "Push Notification",
 					contactTo.getId() + "\n\n"
 							+ IOUtils.toString(getClass().getResourceAsStream("/template/push.android"),
 									StandardCharsets.UTF_8)
 									.replace("{to}", contactTo.getPushToken())
 									.replace("{text}", text)
-									.replace("{notificationId}", "" + notificationId)
+									.replace("{notificationId}",
+											"" + (notification == null ? null : notification.getId()))
 									.replace("{exec}", Strings.isEmpty(action) ? "" : action)
 							+ (ex instanceof WebClientResponseException
 									? "\n\n" + ((WebClientResponseException) ex).getResponseBodyAsString()
@@ -327,21 +304,21 @@ public class NotificationService {
 		return s.substring(1);
 	}
 
-	private boolean userWantsNotification(NotificationID notificationID, Contact contact) {
-		if (NotificationID.chatNew == notificationID
-				|| NotificationID.chatLocation == notificationID)
+	private boolean userWantsNotification(ContactNotificationTextType notificationID, Contact contact) {
+		if (ContactNotificationTextType.chatNew == notificationID
+				|| ContactNotificationTextType.chatLocation == notificationID)
 			return contact.getNotificationChat();
-		if (NotificationID.contactFriendRequest == notificationID
-				|| NotificationID.contactFriendApproved == notificationID)
+		if (ContactNotificationTextType.contactFriendRequest == notificationID
+				|| ContactNotificationTextType.contactFriendApproved == notificationID)
 			return contact.getNotificationFriendRequest();
-		if (NotificationID.contactVisitLocation == notificationID
-				|| NotificationID.locationRatingMatch == notificationID)
+		if (ContactNotificationTextType.contactVisitLocation == notificationID
+				|| ContactNotificationTextType.locationRatingMatch == notificationID)
 			return contact.getNotificationVisitLocation();
-		if (NotificationID.contactVisitProfile == notificationID)
+		if (ContactNotificationTextType.contactVisitProfile == notificationID)
 			return contact.getNotificationVisitProfile();
-		if (NotificationID.eventParticipate == notificationID)
+		if (ContactNotificationTextType.eventParticipate == notificationID)
 			return contact.getNotificationMarkEvent();
-		if (NotificationID.contactBirthday == notificationID)
+		if (ContactNotificationTextType.contactBirthday == notificationID)
 			return contact.getNotificationBirthday();
 		return true;
 	}
@@ -419,14 +396,14 @@ public class NotificationService {
 		email.send(msg);
 	}
 
-	public void createTicket(Type type, String subject, String text) {
+	public void createTicket(TicketType type, String subject, String text) {
 		try {
 			final Ticket ticket = new Ticket();
 			ticket.setSubject(subject);
 			ticket.setNote(text);
 			ticket.setType(type);
 			repository.save(ticket);
-			if (type == Type.BLOCK)
+			if (type == TicketType.BLOCK)
 				sendEmail(null, "Block", null, text);
 		} catch (Exception ex) {
 			try {

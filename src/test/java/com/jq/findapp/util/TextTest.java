@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jq.findapp.service.NotificationService.NotificationID;
+import com.jq.findapp.entity.Ticket.TicketType;
 
 public class TextTest {
 	@Test
@@ -17,7 +17,7 @@ public class TextTest {
 		// given
 
 		// when
-		for (NotificationID id : NotificationID.values())
+		for (TicketType id : TicketType.values())
 			Text.valueOf("mail_" + id).getText("DE");
 
 		// then no exceptions

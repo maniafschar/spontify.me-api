@@ -26,9 +26,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService.AuthenticationException;
-import com.jq.findapp.service.AuthenticationService.AuthenticationException.Type;
+import com.jq.findapp.service.AuthenticationService.AuthenticationException.AuthenticationExceptionType;
 import com.jq.findapp.service.NotificationService;
 
 @RestControllerAdvice
@@ -60,7 +61,8 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 	}
 
 	private void report(HttpServletRequest request, Exception ex, HttpStatus status) {
-		if (ex instanceof AuthenticationException && ((AuthenticationException) ex).getType() == Type.WrongPassword)
+		if (ex instanceof AuthenticationException
+				&& ((AuthenticationException) ex).getType() == AuthenticationExceptionType.WrongPassword)
 			return;
 		String msg = status + "\n\n" + request.getMethod() + " "
 				+ (request.getHeader("user") == null ? "" : request.getHeader("user") + "@")
@@ -111,10 +113,10 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 					}
 				}
 				msg = msg.replaceFirst(SUBSTITUTE, "" + request.getServerPort()).replaceFirst(SUBSTITUTE, s.toString());
-				notificationService.createTicket(com.jq.findapp.entity.Ticket.Type.ERROR, ex.getMessage(), msg);
+				notificationService.createTicket(TicketType.ERROR, ex.getMessage(), msg);
 			}
 		} catch (Exception e1) {
-			notificationService.createTicket(com.jq.findapp.entity.Ticket.Type.ERROR, "sending error report!",
+			notificationService.createTicket(TicketType.ERROR, "sending error report!",
 					Strings.stackTraceToString(e1) + "\n\n\n" + msg);
 		}
 	}

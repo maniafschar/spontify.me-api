@@ -9,9 +9,9 @@ public class Ticket extends BaseEntity {
 	private String subject;
 	private String note;
 	@Enumerated(EnumType.STRING)
-	private Type type;
+	private TicketType type;
 
-	public enum Type {
+	public enum TicketType {
 		ERROR, REGISTRATION, BLOCK, GOOGLE
 	}
 
@@ -31,11 +31,11 @@ public class Ticket extends BaseEntity {
 		this.note = note;
 	}
 
-	public Type getType() {
+	public TicketType getType() {
 		return type;
 	}
 
-	public void setType(Type type) {
+	public void setType(TicketType type) {
 		this.type = type;
 	}
 }

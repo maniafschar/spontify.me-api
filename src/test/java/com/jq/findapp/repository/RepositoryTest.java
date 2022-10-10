@@ -27,7 +27,7 @@ import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactBluetooth;
 import com.jq.findapp.entity.ContactRating;
 import com.jq.findapp.entity.Ticket;
-import com.jq.findapp.entity.Ticket.Type;
+import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.util.Utils;
 
@@ -168,7 +168,7 @@ public class RepositoryTest {
 		utils.createContact();
 		final Ticket ticket = new Ticket();
 		ticket.setNote("abc");
-		ticket.setType(Type.BLOCK);
+		ticket.setType(TicketType.BLOCK);
 
 		// when
 		repository.save(ticket);

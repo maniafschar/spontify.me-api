@@ -8,10 +8,10 @@ import java.util.Date;
 import javax.persistence.PostPersist;
 
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.Location;
-import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.util.Strings;
 
 public class EventParticipateListener extends AbstractRepositoryListener {
@@ -27,7 +27,7 @@ public class EventParticipateListener extends AbstractRepositoryListener {
 							.getTime());
 			time.minus(Duration.ofMinutes(contactTo.getTimezoneOffset()));
 			notificationService.sendNotification(contactFrom, contactTo,
-					NotificationID.eventParticipate,
+					ContactNotificationTextType.eventParticipate,
 					Strings.encodeParam("p=" + contactFrom.getId()),
 					new SimpleDateFormat("dd.MM.yyyy").format(eventParticipate.getEventDate()) +
 							new SimpleDateFormat(" HH:mm").format(new Date(time.toEpochMilli())),

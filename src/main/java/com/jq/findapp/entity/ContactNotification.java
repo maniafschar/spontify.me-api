@@ -3,6 +3,8 @@ package com.jq.findapp.entity;
 import java.math.BigInteger;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Transient;
 
 import com.jq.findapp.repository.Repository;
@@ -11,11 +13,37 @@ import com.jq.findapp.repository.Repository;
 public class ContactNotification extends BaseEntity {
 	private String text;
 	private String action;
-	private String textId;
+	private ContactNotificationTextType textType;
 	private BigInteger contactId;
 	private BigInteger contactId2;
 	private BigInteger sentStatus;
 	private Boolean seen = false;
+	@Enumerated(EnumType.STRING)
+	private ContactNotificationType type;
+
+	public enum ContactNotificationType {
+		android, ios, email
+	}
+
+	public enum ContactNotificationTextType {
+		chatLocation,
+		chatNew,
+		chatSeen,
+		contactBirthday,
+		contactDelete,
+		contactFindMe,
+		contactFriendApproved,
+		contactFriendRequest,
+		contactVisitLocation,
+		contactVisitProfile,
+		contactWhatToDo,
+		eventDelete,
+		eventNotify,
+		eventNotification,
+		eventParticipate,
+		locationMarketing,
+		locationRatingMatch;
+	}
 
 	public String getText() {
 		return text;
@@ -33,12 +61,12 @@ public class ContactNotification extends BaseEntity {
 		this.action = action;
 	}
 
-	public String getTextId() {
-		return textId;
+	public ContactNotificationTextType getTextType() {
+		return textType;
 	}
 
-	public void setTextId(String textId) {
-		this.textId = textId;
+	public void setTextType(ContactNotificationTextType textType) {
+		this.textType = textType;
 	}
 
 	public BigInteger getContactId() {
@@ -71,6 +99,14 @@ public class ContactNotification extends BaseEntity {
 
 	public void setSeen(Boolean seen) {
 		this.seen = seen;
+	}
+
+	public ContactNotificationType getType() {
+		return type;
+	}
+
+	public void setType(ContactNotificationType type) {
+		this.type = type;
 	}
 
 	@Transient

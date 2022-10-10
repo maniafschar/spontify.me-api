@@ -7,9 +7,9 @@ import javax.persistence.PrePersist;
 
 import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
-import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.util.Text;
 
 public class ChatListener extends AbstractRepositoryListener {
@@ -40,11 +40,11 @@ public class ChatListener extends AbstractRepositoryListener {
 					s = (s.lastIndexOf(" :open(") == 0 ? Text.mail_sentEntry : Text.mail_sentEntries)
 							.getText(contactTo.getLanguage());
 			}
-			notificationService.sendNotification(contactFrom, contactTo, NotificationID.chatNew,
+			notificationService.sendNotification(contactFrom, contactTo, ContactNotificationTextType.chatNew,
 					"chat=" + contactFrom.getId(), s);
 		} else
 			notificationService.locationNotifyOnMatch(contactFrom, chat.getLocationId(),
-					NotificationID.chatLocation, chat.getNote());
+					ContactNotificationTextType.chatLocation, chat.getNote());
 	}
 
 }

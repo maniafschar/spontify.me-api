@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.Location;
@@ -20,7 +21,6 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.NotificationService;
-import com.jq.findapp.service.NotificationService.NotificationID;
 import com.jq.findapp.util.Score;
 import com.jq.findapp.util.Strings;
 
@@ -61,7 +61,7 @@ public class EventService {
 							&& !isMaxParticipants(event, realDate, params.getUser())
 							&& Score.getContact(contactEvent, params.getUser()) > 0.3 &&
 							notificationService.sendNotification(contactEvent,
-									params.getUser(), NotificationID.eventNotify,
+									params.getUser(), ContactNotificationTextType.eventNotify,
 									Strings.encodeParam("e=" + event.getId()),
 									(String) events.get(i2).get("location.name")))
 						break;
@@ -90,7 +90,7 @@ public class EventService {
 					final Contact contact = repository.one(Contact.class, eventParticipate.getContactId());
 					final ZonedDateTime t = time.minus(Duration.ofMinutes(contact.getTimezoneOffset()));
 					notificationService.sendNotification(repository.one(Contact.class, event.getContactId()),
-							contact, NotificationID.eventNotification,
+							contact, ContactNotificationTextType.eventNotification,
 							Strings.encodeParam("e=" + event.getId()),
 							repository.one(Location.class, event.getLocationId()).getName(),
 							t.getHour() + ":" + (t.getMinute() < 10 ? "0" : "") + t.getMinute());

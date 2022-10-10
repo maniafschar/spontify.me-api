@@ -21,7 +21,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.entity.BaseEntity;
-import com.jq.findapp.entity.Ticket.Type;
+import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
@@ -115,7 +115,7 @@ public class DBApi {
 			return false;
 		if (e.writeAccess(user, repository))
 			return true;
-		notificationService.createTicket(Type.ERROR, "writeAuthentication",
+		notificationService.createTicket(TicketType.ERROR, "writeAuthentication",
 				"Failed for " + user + " on " + e.getClass().getName() + ", id " + e.getId());
 		return false;
 	}

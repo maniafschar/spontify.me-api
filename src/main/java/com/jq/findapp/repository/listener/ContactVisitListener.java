@@ -4,13 +4,13 @@ import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
 
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.ContactVisit;
-import com.jq.findapp.service.NotificationService.NotificationID;
 
 public class ContactVisitListener extends AbstractRepositoryListener {
 	@PostPersist
 	public void postPersist(ContactVisit contactVisit) throws Exception {
-		notificationService.sendNotificationOnMatch(NotificationID.contactVisitProfile,
+		notificationService.sendNotificationOnMatch(ContactNotificationTextType.contactVisitProfile,
 				repository.one(Contact.class,
 						contactVisit.getContactId()),
 				repository.one(Contact.class, contactVisit.getContactId2()));
@@ -18,7 +18,7 @@ public class ContactVisitListener extends AbstractRepositoryListener {
 
 	@PostUpdate
 	public void postUpdate(ContactVisit contactVisit) throws Exception {
-		notificationService.sendNotificationOnMatch(NotificationID.contactVisitProfile,
+		notificationService.sendNotificationOnMatch(ContactNotificationTextType.contactVisitProfile,
 				repository.one(Contact.class,
 						contactVisit.getContactId()),
 				repository.one(Contact.class, contactVisit.getContactId2()));
