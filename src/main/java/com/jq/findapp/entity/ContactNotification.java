@@ -13,13 +13,14 @@ import com.jq.findapp.repository.Repository;
 public class ContactNotification extends BaseEntity {
 	private String text;
 	private String action;
-	private ContactNotificationTextType textType;
 	private BigInteger contactId;
 	private BigInteger contactId2;
 	private BigInteger sentStatus;
 	private Boolean seen = false;
 	@Enumerated(EnumType.STRING)
 	private ContactNotificationType type;
+	@Enumerated(EnumType.STRING)
+	private ContactNotificationTextType textType;
 
 	public enum ContactNotificationType {
 		android, ios, email
