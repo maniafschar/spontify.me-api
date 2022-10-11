@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Base64;
@@ -223,6 +226,9 @@ public class Repository {
 			if (s[0].contains(".") && s[1].length() > 20) {
 				// new image, we need a new id because of browser caching
 				id = s[0] + SEPARATOR + getNextAttachmentID(PATH + PUBLIC);
+				final Path path = Paths.get(PATH + PUBLIC + getFilename(id));
+				if (!Files.exists(path.getParent()))
+					Files.createDirectory(path.getParent());
 				IOUtils.write(Base64.getDecoder().decode(s[1]), new FileOutputStream(PATH + PUBLIC + getFilename(id)));
 				if (old != null)
 					new File(PATH + PUBLIC + getFilename(old)).delete();
@@ -233,8 +239,12 @@ public class Repository {
 					// old = SEPARATOR + "15603"
 					new File(PATH + getFilename(old)).delete();
 					id = old;
-				} else
+				} else {
 					id = SEPARATOR + getNextAttachmentID(PATH);
+					final Path path = Paths.get(PATH + getFilename(id));
+					if (!Files.exists(path.getParent()))
+						Files.createDirectory(path.getParent());
+				}
 				IOUtils.write(s[1].getBytes(StandardCharsets.UTF_8), new FileOutputStream(PATH + getFilename(id)));
 			} else
 				id = value;

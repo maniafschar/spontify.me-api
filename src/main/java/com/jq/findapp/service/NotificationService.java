@@ -188,7 +188,7 @@ public class NotificationService {
 				" and contactNotification.contactId2=" + contactFrom.getId() +
 				" and TIMESTAMPDIFF(HOUR,contactNotification.createdAt,current_timestamp)<24" +
 				" and contactNotification.action='" + (action == null ? "" : action) +
-				"' and contactNotification.textId='" + notificationID.name() + "'");
+				"' and contactNotification.textType='" + notificationID.name() + "'");
 		if (repository.list(params).size() > 0)
 			return null;
 		if (text.charAt(1) == ' ' && (text.charAt(0) == ',' || text.charAt(0) == ':'))

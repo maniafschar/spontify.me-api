@@ -183,8 +183,7 @@ public class AuthenticationService {
 		if (!unique.unique)
 			throw new IllegalAccessException("email");
 		if (unique.blocked) {
-			notificationService.createTicket(TicketType.REGISTRATION,
-					"denied email blocked", registration.toString());
+			notificationService.createTicket(TicketType.ERROR, "denied email blocked", registration.toString());
 			throw new IllegalAccessException("domain");
 		}
 		final QueryParams params = new QueryParams(Query.contact_listId);
@@ -441,8 +440,6 @@ public class AuthenticationService {
 				throw new RuntimeException("ERROR SQL on account delete: " + ex.getMessage() + "\n" + sql);
 			}
 		}
-		notificationService.createTicket(TicketType.REGISTRATION, "Deleted",
-				new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(user));
 	}
 
 	private String generatePin(final int length) {
