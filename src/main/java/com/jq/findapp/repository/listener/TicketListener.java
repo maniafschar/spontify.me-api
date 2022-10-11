@@ -7,18 +7,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.entity.Ticket.TicketType;
-import com.jq.findapp.util.Strings;
+import com.jq.findapp.repository.Repository.Attachment;
 
 public class TicketListener extends AbstractRepositoryListener {
 	@PrePersist
-	public void prePersist(Ticket ticket) {
-		if (ticket.getType() == TicketType.REGISTRATION && !ticket.getSubject().contains("@"))
-			try {
-				ticket.setNote(ticket.getNote() + "\n\n\n"
-						+ new ObjectMapper().writerWithDefaultPrettyPrinter()
-								.writeValueAsString(repository.one(Contact.class, ticket.getContactId())));
-			} catch (JsonProcessingException e) {
-				ticket.setNote(ticket.getNote() + "\n\n\n" + Strings.stackTraceToString(e));
-			}
+	public void prePersist(Ticket ticket) throws JsonProcessingException {
+		if (ticket.getType() == TicketType.REGISTRATION && !ticket.getSubject().contains("@")) {
+			ticket.setNote(ticket.getNote() + "\n"
+					+ new ObjectMapper().writerWithDefaultPrettyPrinter()
+							.writeValueAsString(repository.one(Contact.class, ticket.getContactId())));
+			Attachment.save(ticket);
+		}
 	}
 }

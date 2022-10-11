@@ -29,6 +29,7 @@ import com.jq.findapp.entity.ContactRating;
 import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query.Result;
+import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith({ SpringExtension.class })
@@ -165,16 +166,20 @@ public class RepositoryTest {
 	public void repositoryListener() throws Exception {
 		// given
 		utils.createContact();
-		utils.createContact();
 		final Ticket ticket = new Ticket();
-		ticket.setNote("abc");
-		ticket.setType(TicketType.BLOCK);
+		ticket.setSubject("abc");
+		ticket.setNote("123");
+		ticket.setContactId(BigInteger.ONE);
+		ticket.setType(TicketType.REGISTRATION);
+		final QueryParams params = new QueryParams(Query.misc_listTicket);
+		params.setSearch("ticket.subject='" + ticket.getSubject() + "'");
 
 		// when
 		repository.save(ticket);
 
 		// then
-		assertNotNull(ticket.getNote());
+		assertTrue(ticket.getNote().contains(Attachment.SEPARATOR));
+		assertEquals(1, repository.list(params).size());
 	}
 
 	@Test

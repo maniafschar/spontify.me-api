@@ -10,6 +10,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -35,7 +37,7 @@ import com.jq.findapp.service.ExternalService;
 @EnableTransactionManagement
 public class JpaTestConfiguration {
 	@Bean
-	public DataSource getDataSource() throws SQLException {
+	public DataSource getDataSource() throws Exception {
 		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setUrl("jdbc:h2:mem:db;DB_CLOSE_DELAY=-1");
 		dataSource.getConnection()
@@ -46,6 +48,7 @@ public class JpaTestConfiguration {
 				.prepareStatement(
 						"CREATE ALIAS IF NOT EXISTS TO_DAYS FOR \"" + getClass().getName() + ".toDays\";")
 				.executeUpdate();
+		Files.createDirectories(Paths.get("attachments"));
 		return dataSource;
 	}
 

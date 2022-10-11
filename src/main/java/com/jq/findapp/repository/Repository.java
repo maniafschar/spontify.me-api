@@ -143,7 +143,7 @@ public class Repository {
 			}
 		}
 
-		private static void save(BaseEntity entity) {
+		public static void save(BaseEntity entity) {
 			final Field[] fields = entity.getClass().getDeclaredFields();
 			for (Field field : fields) {
 				if (RESOLVABLE_COLUMNS.matcher(field.getName()).matches()) {
