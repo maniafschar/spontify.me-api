@@ -154,6 +154,8 @@ public class NotificationService {
 			for (int i = 0; i < param.length; i++)
 				Strings.replaceString(text, "<jq:EXTRA_" + (i + 1) + " />", param[i]);
 		}
+		if (text.charAt(0) < 'A' || text.charAt(0) > 'Z')
+			text.insert(0, contactFrom.getPseudonym() + (text.charAt(0) == ':' ? "" : " "));
 		if (text.length() > 250) {
 			text.delete(247, text.length());
 			if (text.lastIndexOf(" ") > 180)
@@ -165,8 +167,6 @@ public class NotificationService {
 				&& (notification = save(contactTo, contactFrom, text.toString(), action, notificationTextType)) == null)
 			return false;
 		if (userWantsNotification(notificationTextType, contactTo)) {
-			if (text.charAt(0) < 'A' || text.charAt(0) > 'Z')
-				text.insert(0, contactFrom.getPseudonym() + (text.charAt(0) == ':' ? "" : " "));
 			boolean b = !Strings.isEmpty(contactTo.getPushSystem()) && !Strings.isEmpty(contactTo.getPushToken());
 			if (b)
 				b = sendNotificationDevice(text, contactTo, action, notification);
@@ -372,9 +372,18 @@ public class NotificationService {
 		if (message.indexOf("\r") > 0)
 			message = message.substring(0, message.indexOf("\r"));
 		if (message.indexOf(".", 45) > 0)
-			message = message.substring(0, message.indexOf(".", 45));
+			message = message.substring(0, message.indexOf(".", 45) + 1);
+		if (message.indexOf("?", 45) > 0)
+			message = message.substring(0, message.indexOf("?", 45) + 1);
+		if (message.indexOf("!", 45) > 0)
+			message = message.substring(0, message.indexOf("!", 45) + 1);
 		if (message.length() > 80) {
-			message = message.substring(0, 77) + "...";
+			message = message.substring(0, 81);
+			if (message.lastIndexOf(" ") > 30)
+				message = message.substring(0, message.lastIndexOf(" "));
+			else
+				message = message.substring(0, 77);
+			message += "...";
 		}
 		sendEmail(contactTo.getEmail(), message, imgProfile, text.toString(), html.toString());
 	}

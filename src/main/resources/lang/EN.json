@@ -27,7 +27,7 @@
 	},
 	"mail": {
 		"chatLocation": "chatted on location <jq:EXTRA_2 />:\n\n<jq:EXTRA_3 />\n\nYou have <jq:EXTRA_1 /> common attributes.",
-		"chatNew": "<jq:EXTRA_1 />",
+		"chatNew": ": <jq:EXTRA_1 />",
 		"chatSeen": "has seen your chat message.",
 		"contactBirthday": "will be <jq:EXTRA_1 /> years young today.",
 		"contactDelete": "has left spontify.me  😢",
