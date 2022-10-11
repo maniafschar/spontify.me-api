@@ -107,9 +107,9 @@ public class Repository {
 
 	public static class Attachment {
 		public final static String SEPARATOR = "\u0015";
+		public final static String PATH = "attachments/";
+		public final static String PUBLIC = "PUBLIC/";
 		private final static Pattern RESOLVABLE_COLUMNS = Pattern.compile(".*(image|note|storage).*");
-		private final static String PATH = "attachments/";
-		private final static String PUBLIC = "PUBLIC/";
 
 		public static String createImage(String name, byte[] data) {
 			return name + SEPARATOR + Base64.getEncoder().encodeToString(data);
@@ -177,7 +177,8 @@ public class Repository {
 		}
 
 		public static byte[] getFile(String id) throws Exception {
-			return IOUtils.toByteArray(new FileInputStream(PATH + (id.contains(".") ? PUBLIC : "") + getFilename(id)));
+			return IOUtils.toByteArray(new FileInputStream(PATH + (id.contains(".") ? PUBLIC : "")
+					+ (id.contains(SEPARATOR) ? getFilename(id) : id)));
 		}
 
 		private static String getFilename(String id) {

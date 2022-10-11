@@ -16,4 +16,5 @@ WHERE
 GROUP BY
 	chat.id
 ORDER BY
-	chat.createdAt desc
+	chat.createdAt desc,
+	chat.id desc

@@ -1,6 +1,7 @@
 package com.jq.findapp.repository.listener;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import javax.persistence.PostPersist;
 import javax.persistence.PrePersist;
@@ -8,6 +9,9 @@ import javax.persistence.PrePersist;
 import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
+import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.Query.Result;
+import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.util.Text;
@@ -15,9 +19,20 @@ import com.jq.findapp.util.Text;
 public class ChatListener extends AbstractRepositoryListener {
 	@PrePersist
 	public void prePersist(final Chat chat) throws Exception {
-		// Feedback
-		if (chat.getContactId2() == null)
-			chat.setContactId2(adminId);
+		if (chat.getContactId2() == null && chat.getLocationId() == null)
+			chat.setContactId2(adminId); // Feedback
+		final QueryParams params = new QueryParams(Query.contact_chat);
+		params.setSearch("chat.contactId=" + chat.getContactId() + " and chat.contactId2=" + chat.getContactId2()
+				+ " and chat.locationId=" + chat.getLocationId());
+		final Result result = repository.list(params);
+		if (result.size() > 0) {
+			if (chat.getNote() != null && chat.getNote().equals(result.get(0).get("chat.note")))
+				throw new IllegalArgumentException("duplicate chat");
+			if (chat.getImage() != null && result.get(0).get("chat.image") != null
+					&& Arrays.equals(Attachment.getFile(chat.getImage()),
+							Attachment.getFile((String) result.get(0).get("chat.image"))))
+				throw new IllegalArgumentException("duplicate chat");
+		}
 	}
 
 	@PostPersist

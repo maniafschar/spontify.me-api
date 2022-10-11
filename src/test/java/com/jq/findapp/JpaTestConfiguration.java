@@ -30,6 +30,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.ExternalService;
 
 @Profile("test")
@@ -48,7 +49,8 @@ public class JpaTestConfiguration {
 				.prepareStatement(
 						"CREATE ALIAS IF NOT EXISTS TO_DAYS FOR \"" + getClass().getName() + ".toDays\";")
 				.executeUpdate();
-		Files.createDirectories(Paths.get("attachments"));
+		Files.createDirectories(Paths.get(Attachment.PATH));
+		Files.createDirectories(Paths.get(Attachment.PATH + Attachment.PUBLIC));
 		return dataSource;
 	}
 

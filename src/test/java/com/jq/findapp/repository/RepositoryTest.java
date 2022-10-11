@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -15,6 +16,7 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -42,11 +44,14 @@ public class RepositoryTest {
 	@Autowired
 	private Utils utils;
 
+	@Value("${app.admin.id}")
+	private BigInteger adminId;
+
 	private Chat createChat(final Contact contact) throws Exception {
 		final Chat chat = new Chat();
 		chat.setNote("Hi");
 		chat.setContactId(contact.getId());
-		chat.setContactId2(contact.getId());
+		chat.setContactId2(adminId);
 		repository.save(chat);
 		return chat;
 	}
@@ -55,7 +60,7 @@ public class RepositoryTest {
 		final ContactRating rating = new ContactRating();
 		rating.setText("Hi");
 		rating.setContactId(contact.getId());
-		rating.setContactId2(contact.getId());
+		rating.setContactId2(adminId);
 		repository.save(rating);
 		return rating;
 	}
@@ -67,15 +72,18 @@ public class RepositoryTest {
 		final Chat chat = createChat(contact);
 		final ContactRating rating = createRatingContact(contact);
 		final long created = chat.getCreatedAt().getTime();
+		final byte[] b = new byte[500];
+		for (int i = 0; i < b.length; i++)
+			b[i] = 24;
+		chat.setImage(".jpg" + Attachment.SEPARATOR + Base64.getEncoder().encodeToString(b));
 
 		// when
-		chat.setImage("20000/15603.jpeg");
 		repository.save(chat);
 
 		// then
 		assertEquals(created, chat.getCreatedAt().getTime());
 		assertEquals("Hi", chat.getNote());
-		assertEquals("20000/15603.jpeg", chat.getImage());
+		assertTrue(chat.getImage().startsWith(".jpg" + Attachment.SEPARATOR));
 		assertNotEquals(created, chat.getModifiedAt().getTime());
 		assertNotNull(rating.getCreatedAt());
 		assertNull(rating.getModifiedAt());
@@ -180,6 +188,55 @@ public class RepositoryTest {
 		// then
 		assertTrue(ticket.getNote().contains(Attachment.SEPARATOR));
 		assertEquals(1, repository.list(params).size());
+	}
+
+	@Test
+	public void chat_duplicateNote() throws Exception {
+		// given
+		final Contact contact = utils.createContact();
+		final Chat chat = createChat(contact);
+		final Chat chat2 = new Chat();
+		chat2.setNote(chat.getNote());
+		chat2.setContactId(chat.getContactId());
+		chat2.setContactId2(chat.getContactId2());
+
+		// when
+		try {
+			repository.save(chat2);
+			throw new RuntimeException("no exception thrown");
+		} catch (IllegalArgumentException ex) {
+
+			// then
+			assertEquals("duplicate chat", ex.getMessage());
+		}
+	}
+
+	@Test
+	public void chat_duplicateImage() throws Exception {
+		// given
+		final byte[] b = new byte[500];
+		for (int i = 0; i < b.length; i++)
+			b[i] = 23;
+		final Contact contact = utils.createContact();
+		final Chat chat = new Chat();
+		chat.setImage(".jpg" + Attachment.SEPARATOR + Base64.getEncoder().encodeToString(b));
+		chat.setContactId(contact.getId());
+		chat.setContactId2(adminId);
+		final Chat chat2 = new Chat();
+		chat2.setImage(chat.getImage());
+		chat2.setContactId(chat.getContactId());
+		chat2.setContactId2(chat.getContactId2());
+		repository.save(chat);
+
+		// when
+		try {
+			repository.save(chat2);
+			throw new RuntimeException("no exception thrown");
+		} catch (IllegalArgumentException ex) {
+
+			// then
+			assertEquals("duplicate chat", ex.getMessage());
+		}
 	}
 
 	@Test
