@@ -90,7 +90,7 @@ public class EngagementService {
 		CONTACT_PSEUDONYM((contact, location) -> contact.getPseudonym()),
 		CONTACT_CURRENT_TOWN((contact, location) -> {
 			try {
-				return externalService.googleAddress(contact.getLatitude(), contact.getLongitude()).getTown();
+				return externalService.googleAddress(contact.getLatitude(), contact.getLongitude(), null).getTown();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -288,7 +288,7 @@ public class EngagementService {
 		}
 		if (failedEmails.length() > 0)
 			notificationService.createTicket(TicketType.ERROR, "sendRegistrationReminder",
-					"Failed Emails:" + failedEmails);
+					"Failed Emails:" + failedEmails, null);
 	}
 
 	public void sendChats() throws Exception {

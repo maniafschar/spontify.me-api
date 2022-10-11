@@ -66,7 +66,8 @@ public class LocationListener extends AbstractRepositoryListener {
 			throws JsonMappingException, JsonProcessingException, IllegalAccessException {
 		final JsonNode googleAddress = new ObjectMapper().readTree(
 				externalService.google("geocode/json?address="
-						+ location.getName() + ", " + location.getAddress().replaceAll("\n", ", ")));
+						+ location.getName() + ", " + location.getAddress().replaceAll("\n", ", "),
+						location.getContactId()));
 		if (!"OK".equals(googleAddress.get("status").asText()))
 			throw new IllegalAccessException("Invalid address:\n"
 					+ new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(googleAddress));

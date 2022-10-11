@@ -48,7 +48,7 @@ public class AsyncConfiguration implements AsyncConfigurer {
 					for (int i = 0; i < params.length; i++)
 						msg += "\n\nParameter " + (i + 1) + ":\n" + params[i];
 					try {
-						notificationService.createTicket(TicketType.ERROR, "async", msg);
+						notificationService.createTicket(TicketType.ERROR, "async", msg, null);
 					} catch (Exception e1) {
 						// never happend in 20 years...
 					}

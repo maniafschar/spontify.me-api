@@ -113,11 +113,11 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 					}
 				}
 				msg = msg.replaceFirst(SUBSTITUTE, "" + request.getServerPort()).replaceFirst(SUBSTITUTE, s.toString());
-				notificationService.createTicket(TicketType.ERROR, ex.getMessage(), msg);
+				notificationService.createTicket(TicketType.ERROR, ex.getMessage(), msg, null);
 			}
 		} catch (Exception e1) {
-			notificationService.createTicket(TicketType.ERROR, "sending error report!",
-					Strings.stackTraceToString(e1) + "\n\n\n" + msg);
+			notificationService.createTicket(TicketType.ERROR, "creationg error report!",
+					Strings.stackTraceToString(e1) + "\n\n\n" + msg, null);
 		}
 	}
 

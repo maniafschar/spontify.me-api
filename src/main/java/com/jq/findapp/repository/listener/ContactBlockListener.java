@@ -15,7 +15,8 @@ public class ContactBlockListener extends AbstractRepositoryListener {
 							"\ncontactId: " + contactBlock.getContactId() +
 							"\ncontactId2: " + contactBlock.getContactId2() +
 							"\nreason: " + contactBlock.getReason() +
-							"\nnote: " + contactBlock.getNote());
+							"\nnote: " + contactBlock.getNote(),
+					contactBlock.getContactId());
 		}
 	}
 }

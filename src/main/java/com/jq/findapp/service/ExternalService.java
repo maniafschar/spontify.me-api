@@ -30,7 +30,7 @@ public class ExternalService {
 	@Value("${app.google.key}")
 	private String googleKey;
 
-	public String google(String param) {
+	public String google(String param, BigInteger user) {
 		final String result = WebClient
 				.create("https://maps.googleapis.com/maps/api/" + param + (param.contains("?") ? "&" : "?")
 						+ "key=" + googleKey)
@@ -38,9 +38,9 @@ public class ExternalService {
 		try {
 			final ObjectMapper om = new ObjectMapper();
 			notificationService.createTicket(TicketType.GOOGLE, param,
-					om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(result)));
+					om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(result)), user);
 		} catch (Exception e) {
-			notificationService.createTicket(TicketType.GOOGLE, param, result);
+			notificationService.createTicket(TicketType.GOOGLE, param, result, user);
 		}
 		return result;
 	}
@@ -78,7 +78,7 @@ public class ExternalService {
 		return null;
 	}
 
-	public GeoLocation googleAddress(float latitude, float longitude) throws Exception {
+	public GeoLocation googleAddress(float latitude, float longitude, BigInteger user) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_geoLocation);
 		final float roundingFactor = 10000f;
 		params.setSearch("geoLocation.latitude like '" + (Math.round(latitude * roundingFactor) / roundingFactor)
@@ -88,13 +88,13 @@ public class ExternalService {
 		if (persistedAddress.size() > 0)
 			return repository.one(GeoLocation.class, (BigInteger) persistedAddress.get(0).get("_id"));
 		final GeoLocation geoLocation = convertGoogleAddress(
-				new ObjectMapper().readTree(google("geocode/json?latlng=" + latitude + ',' + longitude)));
+				new ObjectMapper().readTree(google("geocode/json?latlng=" + latitude + ',' + longitude, user)));
 		if (geoLocation != null) {
 			geoLocation.setLongitude(longitude);
 			geoLocation.setLatitude(latitude);
 			repository.save(geoLocation);
 		} else
-			notificationService.createTicket(TicketType.ERROR, "No google address", latitude + "\n" + longitude);
+			notificationService.createTicket(TicketType.ERROR, "No google address", latitude + "\n" + longitude, user);
 		return geoLocation;
 	}
 

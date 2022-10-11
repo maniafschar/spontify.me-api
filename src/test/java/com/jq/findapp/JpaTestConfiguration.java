@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -66,7 +67,7 @@ public class JpaTestConfiguration {
 	@Primary
 	public class ExternalServiceTest extends ExternalService {
 		@Override
-		public String google(String param) {
+		public String google(String param, BigInteger user) {
 			try {
 				return IOUtils.toString(getClass().getResourceAsStream("/googleResponse.json"), StandardCharsets.UTF_8);
 			} catch (IOException e) {

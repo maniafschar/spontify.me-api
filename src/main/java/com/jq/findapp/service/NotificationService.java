@@ -276,7 +276,8 @@ public class NotificationService {
 							+ (ex instanceof WebClientResponseException
 									? "\n\n" + ((WebClientResponseException) ex).getResponseBodyAsString()
 									: "")
-							+ "\n\n" + Strings.stackTraceToString(ex));
+							+ "\n\n" + Strings.stackTraceToString(ex),
+					notification == null ? null : notification.getContactId2());
 			return false;
 		}
 	}
@@ -396,12 +397,14 @@ public class NotificationService {
 		email.send(msg);
 	}
 
-	public void createTicket(TicketType type, String subject, String text) {
+	public void createTicket(TicketType type, String subject, String text, BigInteger user) {
 		try {
 			final Ticket ticket = new Ticket();
 			ticket.setSubject(subject);
 			ticket.setNote(text);
 			ticket.setType(type);
+			if (ticket.getContactId() == null)
+				ticket.setContactId(user);
 			repository.save(ticket);
 			if (type == TicketType.BLOCK)
 				sendEmail(null, "Block", null, text);

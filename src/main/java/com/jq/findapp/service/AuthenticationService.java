@@ -183,7 +183,7 @@ public class AuthenticationService {
 		if (!unique.unique)
 			throw new IllegalAccessException("email");
 		if (unique.blocked) {
-			notificationService.createTicket(TicketType.ERROR, "denied email blocked", registration.toString());
+			notificationService.createTicket(TicketType.ERROR, "denied email blocked", registration.toString(), null);
 			throw new IllegalAccessException("domain");
 		}
 		final QueryParams params = new QueryParams(Query.contact_listId);
@@ -244,7 +244,7 @@ public class AuthenticationService {
 		} else
 			repository.save(contact);
 		notificationService.createTicket(TicketType.REGISTRATION, contact.getEmail(),
-				registration.toString());
+				registration.toString(), contact.getId());
 	}
 
 	private boolean isDuplicateIdDisplay(Throwable ex) {

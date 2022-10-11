@@ -100,11 +100,11 @@ public class ActionApi {
 	}
 
 	@PostMapping("notify")
-	public void notify(String text) {
+	public void notify(String text, @RequestHeader(required = false) BigInteger user) {
 		if (text != null) {
 			final Integer hash = text.hashCode();
 			if (!SENT_NOTIFICATIONS.contains(hash)) {
-				notificationService.createTicket(TicketType.ERROR, "client", text);
+				notificationService.createTicket(TicketType.ERROR, "client", text, user);
 				SENT_NOTIFICATIONS.add(hash);
 			}
 		}
@@ -236,9 +236,9 @@ public class ActionApi {
 			return "https://maps.googleapis.com/maps/api/js?key=" + googleKeyJS;
 		if (param.startsWith("latlng=")) {
 			final String[] l = param.substring(7).split(",");
-			return externalService.googleAddress(Float.parseFloat(l[0]), Float.parseFloat(l[1]));
+			return externalService.googleAddress(Float.parseFloat(l[0]), Float.parseFloat(l[1]), user);
 		}
-		return externalService.google(param);
+		return externalService.google(param, user);
 	}
 
 	@PostMapping("position")
@@ -246,7 +246,8 @@ public class ActionApi {
 			@RequestHeader BigInteger user, @RequestHeader String password, @RequestHeader String salt)
 			throws Exception {
 		final Contact contact = authenticationService.verify(user, password, salt);
-		final GeoLocation geoLocation = externalService.googleAddress(position.getLatitude(), position.getLongitude());
+		final GeoLocation geoLocation = externalService.googleAddress(position.getLatitude(), position.getLongitude(),
+				user);
 		if (geoLocation != null) {
 			final Map<String, Object> result = new HashMap<>();
 			if (geoLocation.getStreet() != null && geoLocation.getNumber() != null)
