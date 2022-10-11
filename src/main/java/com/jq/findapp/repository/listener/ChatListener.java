@@ -6,6 +6,8 @@ import java.util.Arrays;
 import javax.persistence.PostPersist;
 import javax.persistence.PrePersist;
 
+import org.apache.logging.log4j.util.Strings;
+
 import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
@@ -26,7 +28,7 @@ public class ChatListener extends AbstractRepositoryListener {
 				+ " and chat.locationId=" + chat.getLocationId());
 		final Result result = repository.list(params);
 		if (result.size() > 0) {
-			if (chat.getNote() != null && chat.getNote().equals(result.get(0).get("chat.note")))
+			if (!Strings.isEmpty(chat.getNote()) && chat.getNote().equals(result.get(0).get("chat.note")))
 				throw new IllegalArgumentException("duplicate chat");
 			if (chat.getImage() != null && result.get(0).get("chat.image") != null
 					&& Arrays.equals(Attachment.getFile(chat.getImage()),
