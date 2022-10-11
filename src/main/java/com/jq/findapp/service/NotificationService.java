@@ -407,7 +407,7 @@ public class NotificationService {
 				sendEmail(null, "Block", null, text);
 		} catch (Exception ex) {
 			try {
-				sendEmail(null, subject, null, text);
+				sendEmail(null, type + ": " + subject, null, text);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
