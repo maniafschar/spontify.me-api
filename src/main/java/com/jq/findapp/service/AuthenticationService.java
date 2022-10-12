@@ -94,17 +94,22 @@ public class AuthenticationService {
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
 	public static class AuthenticationException extends RuntimeException {
 		public enum AuthenticationExceptionType {
-			NoInputFromClient, WrongPassword, NoPasswordInDB, UsedSalt
+			NoInputFromClient, WrongPassword, NoPasswordInDB, UsedSalt, Unknown
 		}
 
 		private final AuthenticationExceptionType type;
 
 		private AuthenticationException(AuthenticationExceptionType type) {
-			this.type = type;
+			this.type = type == null ? AuthenticationExceptionType.Unknown : type;
 		}
 
 		public AuthenticationExceptionType getType() {
 			return type;
+		}
+
+		@Override
+		public String getMessage() {
+			return type.name();
 		}
 	}
 

@@ -101,8 +101,8 @@ public class Repository {
 		Attachment.delete(entity);
 	}
 
-	public void executeUpdate(String sql) {
-		em.createQuery(sql).executeUpdate();
+	public void executeUpdate(String hql) {
+		em.createQuery(hql).executeUpdate();
 	}
 
 	public static class Attachment {

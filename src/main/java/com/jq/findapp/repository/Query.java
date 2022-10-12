@@ -131,7 +131,6 @@ public enum Query {
 				|| s.indexOf("insert") > -1 || s.indexOf("delete") > -1)
 			throw new IllegalArgumentException("Invalid search expression: " + sql);
 		return search;
-
 	}
 
 	public Result createResult() {
