@@ -46,7 +46,8 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Object> handle(Exception ex, WebRequest request) {
 		final Map<String, Object> body = new HashMap<>();
-		body.put("exception", Strings.stackTraceToString(ex));
+		body.put("msg", ex.getMessage());
+		body.put("class", ex.getClass().getSimpleName());
 		body.put("time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 		return handleExceptionInternal(ex, body, null,
 				ex instanceof AuthenticationException ? HttpStatus.UNAUTHORIZED : HttpStatus.INTERNAL_SERVER_ERROR,
