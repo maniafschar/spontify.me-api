@@ -1,6 +1,6 @@
 {
 	"exec": "{exec}",
-	"notificationId": {notificationId},
+	"notificationId": "{notificationId}",
 	"aps": {
 		"alert": {
 			"body": "{text}",

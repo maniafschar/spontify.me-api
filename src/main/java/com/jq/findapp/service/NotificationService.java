@@ -251,7 +251,7 @@ public class NotificationService {
 			text.append("...");
 		}
 		try {
-			final BigInteger notificationId = notification == null ? null : notification.getId();
+			final String notificationId = notification == null ? "" : notification.getId().toString();
 			if ("ios".equals(contactTo.getPushSystem()))
 				ios.send(contactTo, text.toString(), action, getPingValues(contactTo).totalNew, notificationId);
 			else if ("android".equals(contactTo.getPushSystem()))

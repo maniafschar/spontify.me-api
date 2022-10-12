@@ -1,6 +1,5 @@
 package com.jq.findapp.service.push;
 
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +29,7 @@ public class Android {
 	@Value("${push.fcm.url}")
 	private String url;
 
-	public Environment send(Contact contact, String text, String action, BigInteger notificationId) throws Exception {
+	public Environment send(Contact contact, String text, String action, String notificationId) throws Exception {
 		WebClient.create(url)
 				.post()
 				.contentType(MediaType.APPLICATION_JSON)
@@ -41,7 +40,7 @@ public class Android {
 								StandardCharsets.UTF_8)
 								.replace("{to}", contact.getPushToken())
 								.replace("{text}", text)
-								.replace("{notificationId}", "" + notificationId)
+								.replace("{notificationId}", notificationId)
 								.replace("{exec}", Strings.isEmpty(action) ? "" : action))
 				.retrieve()
 				.toEntity(String.class).block().getBody();

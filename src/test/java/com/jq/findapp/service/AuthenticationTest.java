@@ -248,8 +248,7 @@ public class AuthenticationTest {
 
 		// when
 		final Environment environmet = ios.send(contact,
-				"uzgku",
-				"chat=12", 12, BigInteger.ONE);
+				"uzgku", "chat=12", 12, "1");
 
 		// then
 		assertEquals(Environment.Development, environmet);
@@ -263,7 +262,7 @@ public class AuthenticationTest {
 				"dHFZR7_iWnc:APA91bF7Z9NsdMRN0nX5C2il8dOqbmJ8DFtAdqb4_2thbOGB0LJK_2m1zjtyXyHD1tmdog6TQsTXbHvKPyv-EuqNik4vM1VlGSY-h6wG6JdM4k9h8es7duf08pfSEYezwuUyGcDkWkQd");
 
 		// when
-		android.send(contact, "text", "action", null);
+		android.send(contact, "text", "action", "");
 
 		// then no exception
 	}
