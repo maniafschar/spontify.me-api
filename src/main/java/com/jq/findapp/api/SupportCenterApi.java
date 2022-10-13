@@ -34,6 +34,7 @@ import com.jq.findapp.service.backend.DbUpdateService;
 import com.jq.findapp.service.backend.EngagementService;
 import com.jq.findapp.service.backend.EventService;
 import com.jq.findapp.service.backend.ImportLogService;
+import com.jq.findapp.service.backend.StatisticsService;
 
 @RestController
 @Transactional
@@ -63,6 +64,9 @@ public class SupportCenterApi {
 
 	@Autowired
 	private DbUpdateService dbUpdateService;
+
+	@Autowired
+	private StatisticsService statisticsService;
 
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
@@ -177,6 +181,7 @@ public class SupportCenterApi {
 			eventService.findAndNotify();
 			eventService.notifyParticipation();
 			importLogService.importLog();
+			statisticsService.update();
 		}
 	}
 

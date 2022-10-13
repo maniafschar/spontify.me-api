@@ -55,7 +55,9 @@ public enum Query {
 	misc_geoLocation,
 	misc_listLog,
 	misc_listTicket,
-	misc_setting;
+	misc_setting,
+	misc_statsLog,
+	misc_statsUser;
 
 	private final String sql;
 	private final boolean addBlock;
