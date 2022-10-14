@@ -37,6 +37,7 @@ SELECT
 	contact.longitude,
 	contact.notificationBirthday,
 	contact.notificationChat,
+	contact.notificationEngagement,
 	contact.notificationFriendRequest,
 	contact.notificationMarkEvent,
 	contact.notificationVisitLocation,
