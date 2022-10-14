@@ -70,8 +70,14 @@ public class ImportLogService {
 						log.setBody(log.getBody().substring(0, 255));
 					log.setUri("ad");
 					log.setPort(80);
-					if ("/".equals(log.getQuery()) || log.getQuery().startsWith("/?")) {
-						log.setQuery(log.getQuery().length() == 1 ? null : log.getQuery().substring(2));
+					if ("/".equals(log.getQuery()) || "/stats.html".equals(log.getQuery())
+							|| log.getQuery().startsWith("/?")) {
+						if (log.getQuery().length() == 1)
+							log.setQuery(null);
+						else if (log.getQuery().indexOf('?') < 3)
+							log.setQuery(log.getQuery().substring(log.getQuery().indexOf('?') + 1));
+						else if (log.getQuery().startsWith("/"))
+							log.setQuery(log.getQuery().substring(1));
 						final String s[] = log.getBody().split(" \\| ");
 						params.setSearch("log.createdAt='" + s[0] + "' and log.body='" + s[1]
 								+ "' or log.body='" + log.getBody() + "'");

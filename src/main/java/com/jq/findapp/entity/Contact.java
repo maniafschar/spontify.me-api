@@ -20,7 +20,7 @@ public class Contact extends BaseEntity {
 	private Boolean active = true;
 	private Boolean findMe = true;
 	private Boolean guide = false;
-	private Boolean notificationRegistrationReminder = true;
+	private Boolean notificationEngagement = true;
 	private Boolean notificationBirthday = true;
 	private Boolean notificationChat = true;
 	private Boolean notificationFriendRequest = true;
@@ -603,11 +603,11 @@ public class Contact extends BaseEntity {
 		return user.equals(getId());
 	}
 
-	public Boolean getNotificationRegistrationReminder() {
-		return notificationRegistrationReminder;
+	public Boolean getNotificationEngagement() {
+		return notificationEngagement;
 	}
 
-	public void setNotificationRegistrationReminder(Boolean notificationRegistrationReminder) {
-		this.notificationRegistrationReminder = notificationRegistrationReminder;
+	public void setNotificationEngagement(Boolean notificationEngagement) {
+		this.notificationEngagement = notificationEngagement;
 	}
 }

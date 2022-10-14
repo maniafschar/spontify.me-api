@@ -218,7 +218,7 @@ public class EngagementService {
 			return;
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch(
-				"contact.verified=true and contact.version is null and contact.notificationRegistrationReminder=true");
+				"contact.verified=true and contact.version is null and contact.notificationEngagement=true");
 		params.setLimit(0);
 		final Result list = repository.list(params);
 		final Contact admin = repository.one(Contact.class, adminId);
@@ -258,7 +258,7 @@ public class EngagementService {
 
 	public void sendRegistrationReminder() throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_listId);
-		params.setSearch("contact.verified=false and contact.notificationRegistrationReminder=true");
+		params.setSearch("contact.verified=false and contact.notificationEngagement=true");
 		params.setLimit(0);
 		final Result list = repository.list(params);
 		final long DAY = 86400000;
@@ -295,7 +295,8 @@ public class EngagementService {
 		resetChatInstallCurrentVersion();
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setLimit(0);
-		params.setSearch("contact.id<>" + adminId + " and contact.verified=true and contact.version is not null");
+		params.setSearch("contact.id<>" + adminId
+				+ " and contact.verified=true and contact.version is not null and contact.notificationEngagement=true");
 		final Result ids = repository.list(params);
 		params.setQuery(Query.contact_chat);
 		for (int i = 0; i < ids.size(); i++) {
@@ -356,15 +357,16 @@ public class EngagementService {
 
 	public void sendNearBy() throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_listId);
-		params.setSearch("contact.id<>" + adminId + " and contact.verified=true and "
-				+ "contact.version is not null and contact.longitude is not null and ("
-				+ "length(contact.attrInterest)>0 or length(contact.attrInterestEx)>0 or "
-				+ "length(contact.attr0)>0 or length(contact.attr0Ex)>0 or "
-				+ "length(contact.attr1)>0 or length(contact.attr1Ex)>0 or "
-				+ "length(contact.attr2)>0 or length(contact.attr2Ex)>0 or "
-				+ "length(contact.attr3)>0 or length(contact.attr3Ex)>0 or "
-				+ "length(contact.attr4)>0 or length(contact.attr4Ex)>0 or "
-				+ "length(contact.attr5)>0 or length(contact.attr5Ex)>0)");
+		params.setSearch(
+				"contact.id<>" + adminId + " and contact.verified=true and contact.notificationEngagement=true and "
+						+ "contact.version is not null and contact.longitude is not null and ("
+						+ "length(contact.attrInterest)>0 or length(contact.attrInterestEx)>0 or "
+						+ "length(contact.attr0)>0 or length(contact.attr0Ex)>0 or "
+						+ "length(contact.attr1)>0 or length(contact.attr1Ex)>0 or "
+						+ "length(contact.attr2)>0 or length(contact.attr2Ex)>0 or "
+						+ "length(contact.attr3)>0 or length(contact.attr3Ex)>0 or "
+						+ "length(contact.attr4)>0 or length(contact.attr4Ex)>0 or "
+						+ "length(contact.attr5)>0 or length(contact.attr5Ex)>0)");
 		params.setLimit(0);
 		final Result ids = repository.list(params);
 		params.setQuery(Query.contact_chat);
