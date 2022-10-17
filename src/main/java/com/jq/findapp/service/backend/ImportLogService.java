@@ -72,11 +72,8 @@ public class ImportLogService {
 					log.setPort(80);
 					if ("/".equals(log.getQuery()) || "/stats.html".equals(log.getQuery())
 							|| log.getQuery().startsWith("/?")) {
-						if (log.getQuery().length() == 1)
-							log.setQuery(null);
-						else if (log.getQuery().indexOf('?') < 3)
-							log.setQuery(log.getQuery().substring(log.getQuery().indexOf('?') + 1));
-						else if (log.getQuery().startsWith("/"))
+						log.setQuery(log.getQuery().substring(1));
+						if (log.getQuery().startsWith("?"))
 							log.setQuery(log.getQuery().substring(1));
 						final String s[] = log.getBody().split(" \\| ");
 						params.setSearch("log.createdAt='" + s[0] + "' and log.body='" + s[1]
