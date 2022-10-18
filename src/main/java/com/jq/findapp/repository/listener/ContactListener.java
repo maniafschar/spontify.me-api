@@ -52,20 +52,18 @@ public class ContactListener extends AbstractRepositoryListener {
 							+ "' and contact.id<>" + contact.getId());
 		if (contact.old("pseudonym") != null)
 			contact.setPseudonym(sanitizePseudonym(contact.getPseudonym()));
-		if (contact.old("birthday") != null) {
-			if (contact.getBirthday() == null)
-				contact.setAge(null);
-			else {
-				final GregorianCalendar now = new GregorianCalendar();
-				final GregorianCalendar birthday = new GregorianCalendar();
-				birthday.setTimeInMillis(contact.getBirthday().getTime());
-				short age = (short) (now.get(Calendar.YEAR) - birthday.get(Calendar.YEAR));
-				if (now.get(Calendar.MONTH) < birthday.get(Calendar.MONTH) ||
-						now.get(Calendar.MONTH) == birthday.get(Calendar.MONTH) &&
-								now.get(Calendar.DAY_OF_MONTH) < birthday.get(Calendar.DAY_OF_MONTH))
-					age--;
-				contact.setAge(age);
-			}
+		if (contact.getBirthday() == null)
+			contact.setAge(null);
+		else {
+			final GregorianCalendar now = new GregorianCalendar();
+			final GregorianCalendar birthday = new GregorianCalendar();
+			birthday.setTimeInMillis(contact.getBirthday().getTime());
+			short age = (short) (now.get(Calendar.YEAR) - birthday.get(Calendar.YEAR));
+			if (now.get(Calendar.MONTH) < birthday.get(Calendar.MONTH) ||
+					now.get(Calendar.MONTH) == birthday.get(Calendar.MONTH) &&
+							now.get(Calendar.DAY_OF_MONTH) < birthday.get(Calendar.DAY_OF_MONTH))
+				age--;
+			contact.setAge(age);
 		}
 	}
 

@@ -57,6 +57,7 @@
 		"welcome": "Hello <jq:EXTRA_1 />,\n\nit's nice to have you here. Take a look around and contact me if you have any questions.\n\nHave fun\nYour spontify.me team"
 	},
 	"marketing": {
+		"event": "Hello CONTACT_PSEUDONYM, do you want to earn money? There is currently a cool campaign running in your town where you can earn money... curious? Then click me...",
 		"iPadTitle": "Get the iPad 10.2",
 		"iPadText": "Anyone who collects the most friends here by June 30, 2022 will receive an iPad for free. Apple is not an sponsor of this campaign.",
 		"list": "The current ranking list:",

@@ -20,11 +20,11 @@ public class ContactWhatToDoListener extends AbstractRepositoryListener {
 
 	@PostUpdate
 	public void postUpdate(ContactWhatToDo contactWhatToDo) throws Exception {
-		whatToDoService.findAndNotify();
+		whatToDoService.findAndNotify(contactWhatToDo);
 	}
 
 	@PostPersist
 	public void postPersist(ContactWhatToDo contactWhatToDo) throws Exception {
-		whatToDoService.findAndNotify();
+		whatToDoService.findAndNotify(contactWhatToDo);
 	}
 }

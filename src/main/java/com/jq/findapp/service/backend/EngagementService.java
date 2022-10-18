@@ -302,7 +302,7 @@ public class EngagementService {
 		for (int i = 0; i < ids.size(); i++) {
 			final Contact contact = repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id"));
 			if (isTimeForNewChat(contact, params, false))
-				sendChatTemplate(contact, params);
+				sendChatTemplate(contact);
 		}
 	}
 
@@ -397,16 +397,11 @@ public class EngagementService {
 		return new String(Base64.getDecoder().decode(action), StandardCharsets.UTF_8);
 	}
 
-	private boolean sendChatTemplate(Contact contact, QueryParams params) throws Exception {
+	private boolean sendChatTemplate(Contact contact) throws Exception {
 		for (ChatTemplate chatTemplate : chatTemplates) {
-			if (chatTemplate.eligible(contact)) {
-				params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId()
-						+ " and chat.textId='" + chatTemplate.textId.name() + '\'');
-				if (repository.list(params).size() == 0) {
-					sendChat(chatTemplate.textId, contact, null, chatTemplate.action);
-					return true;
-				}
-			}
+			if (chatTemplate.eligible(contact) &&
+					sendChat(chatTemplate.textId, contact, null, chatTemplate.action))
+				return true;
 		}
 		return false;
 	}
@@ -495,17 +490,24 @@ public class EngagementService {
 		return false;
 	}
 
-	private void sendChat(Text textId, Contact contact, Location location, String action) throws Exception {
-		String s = textId.getText(contact.getLanguage());
-		for (REPLACMENT rep : REPLACMENT.values())
-			s = rep.replace(s, contact, location);
-		final Chat chat = new Chat();
-		chat.setContactId(adminId);
-		chat.setContactId2(contact.getId());
-		chat.setSeen(false);
-		chat.setAction(action);
-		chat.setTextId(textId);
-		chat.setNote(s);
-		repository.save(chat);
+	public boolean sendChat(Text textId, Contact contact, Location location, String action) throws Exception {
+		final QueryParams params = new QueryParams(Query.contact_chat);
+		params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId()
+				+ " and chat.textId='" + textId.name() + '\'');
+		if (repository.list(params).size() == 0) {
+			String s = textId.getText(contact.getLanguage());
+			for (REPLACMENT rep : REPLACMENT.values())
+				s = rep.replace(s, contact, location);
+			final Chat chat = new Chat();
+			chat.setContactId(adminId);
+			chat.setContactId2(contact.getId());
+			chat.setSeen(false);
+			chat.setAction(action);
+			chat.setTextId(textId);
+			chat.setNote(s);
+			repository.save(chat);
+			return true;
+		}
+		return false;
 	}
 }

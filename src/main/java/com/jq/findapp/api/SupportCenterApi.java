@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.repository.Query;
@@ -37,6 +36,7 @@ import com.jq.findapp.service.backend.EventService;
 import com.jq.findapp.service.backend.ImportLogService;
 import com.jq.findapp.service.backend.StatisticsService;
 import com.jq.findapp.util.Strings;
+import com.jq.findapp.util.Text;
 
 @RestController
 @Transactional
@@ -145,8 +145,8 @@ public class SupportCenterApi {
 		}
 	}
 
-	@PostMapping("chat")
-	public void chat(@RequestBody Map<String, Object> data, @RequestHeader String password,
+	@PostMapping("marketing")
+	public void marketing(@RequestBody Map<String, Object> data, @RequestHeader String password,
 			@RequestHeader String salt, @RequestHeader String secret) throws Exception {
 		if (supportCenterSecret.equals(secret)) {
 			authenticationService.verify(adminId, password, salt);
@@ -162,18 +162,13 @@ public class SupportCenterApi {
 				final Result result = repository.list(params);
 				for (int i = 0; i < result.size(); i++)
 					ids.add(result.get(i).get("contact.id").toString());
-				System.out.println(ids);
-				return;
 			}
-			for (String id : ids) {
-				final Chat chat = new Chat();
-				chat.setContactId(adminId);
-				chat.setContactId2(BigInteger.valueOf(Long.parseLong(id)));
-				chat.setNote((String) data.get("text"));
-				chat.setSeen(Boolean.FALSE);
-				chat.setAction((String) data.get("action"));
-				repository.save(chat);
-			}
+			String action = (String) data.get("action");
+			if (action != null && action.startsWith("https://"))
+				action = "ui.navigation.openHTML(&quot;" + action + "&quot;)";
+			for (String id : ids)
+				engagementService.sendChat(Text.valueOf((String) data.get("text")),
+						repository.one(Contact.class, BigInteger.valueOf(Long.parseLong(id))), null, action);
 		}
 	}
 

@@ -41,11 +41,12 @@ public class WhatToDoService {
 				contactWhatToDo.setActive(false);
 				repository.save(contactWhatToDo);
 			} else
-				searchLikeMinded(repository.one(Contact.class, contactWhatToDo.getContactId()), contactWhatToDo);
+				findAndNotify(contactWhatToDo);
 		}
 	}
 
-	private void searchLikeMinded(Contact contact, ContactWhatToDo contactWhatToDo) throws Exception {
+	public void findAndNotify(ContactWhatToDo contactWhatToDo) throws Exception {
+		final Contact contact = repository.one(Contact.class, contactWhatToDo.getContactId());
 		String search = Score.getSearchContact(contact);
 		if (search.length() > 0) {
 			final QueryParams params = new QueryParams(Query.contact_listId);

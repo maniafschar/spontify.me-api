@@ -64,6 +64,7 @@ public enum Text {
 	mail_sentEntries,
 	mail_sentEntry,
 	mail_welcome,
+	marketing_event,
 	marketing_iPadText,
 	marketing_iPadTitle,
 	marketing_list,

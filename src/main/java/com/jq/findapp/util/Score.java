@@ -34,12 +34,15 @@ public class Score {
 				search += "REGEXP_LIKE(contact.attr" + i + ", '" + attr.replace('\u0015', '|') + "')=1 or ";
 			attr = (String) contact.getClass().getMethod("getAttr" + i + "Ex").invoke(contact);
 			if (!Strings.isEmpty(attr))
-				search += "REGEXP_LIKE(contact.attr" + i + "Ex, '" + attr.replace(',', '|') + "')=1 or ";
+				search += "REGEXP_LIKE(contact.attr" + i + "Ex, '"
+						+ attr.replace(',', '|').replace('(', ' ').replace(')', ' ') + "')=1 or ";
 		}
 		if (!Strings.isEmpty(contact.getAttrInterest()))
 			search += "REGEXP_LIKE(contact.attr, '" + contact.getAttrInterest().replace('\u0015', '|') + "')=1 or ";
 		if (!Strings.isEmpty(contact.getAttrInterestEx()))
-			search += "REGEXP_LIKE(contact.attrEx, '" + contact.getAttrInterestEx().replace(',', '|') + "')=1 or ";
+			search += "REGEXP_LIKE(contact.attrEx, '"
+					+ contact.getAttrInterestEx().replace(',', '|').replace('(', ' ').replace(')', ' ')
+					+ "')=1 or ";
 		if (search.endsWith(" or "))
 			search = search.substring(0, search.length() - 4);
 		if (search.endsWith("("))
