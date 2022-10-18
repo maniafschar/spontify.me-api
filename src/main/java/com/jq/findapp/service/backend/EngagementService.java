@@ -349,7 +349,7 @@ public class EngagementService {
 				"' and contact.version='" + currentVersion + "'");
 		final Result ids = repository.list(params);
 		for (int i = 0; i < ids.size(); i++) {
-			final Chat chat = repository.one(Chat.class, (BigInteger) ids.get(i));
+			final Chat chat = repository.one(Chat.class, (BigInteger) ids.get(i).get("chat.id"));
 			chat.setTextId(null);
 			repository.save(chat);
 		}

@@ -2,6 +2,7 @@ package com.jq.findapp.api;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 import javax.transaction.Transactional;
 import javax.ws.rs.Produces;
@@ -20,11 +21,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jq.findapp.api.model.Notification;
 import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
@@ -35,6 +36,7 @@ import com.jq.findapp.service.backend.EngagementService;
 import com.jq.findapp.service.backend.EventService;
 import com.jq.findapp.service.backend.ImportLogService;
 import com.jq.findapp.service.backend.StatisticsService;
+import com.jq.findapp.util.Strings;
 
 @RestController
 @Transactional
@@ -144,16 +146,32 @@ public class SupportCenterApi {
 	}
 
 	@PostMapping("chat")
-	public void chat(@RequestBody Notification data, @RequestHeader String password,
+	public void chat(@RequestBody Map<String, Object> data, @RequestHeader String password,
 			@RequestHeader String salt, @RequestHeader String secret) throws Exception {
 		if (supportCenterSecret.equals(secret)) {
 			authenticationService.verify(adminId, password, salt);
-			for (BigInteger id : data.getIds()) {
+			final List<String> ids = (List<String>) data.get("ids");
+			if (ids.size() == 0) {
+				final QueryParams params = new QueryParams(
+						Strings.isEmpty(data.get("search")) || !((String) data.get("search")).contains("geoLocation")
+								? Query.contact_listId
+								: Query.contact_listByLocation);
+				params.setLimit(0);
+				params.setSearch((Strings.isEmpty(data.get("search")) ? "" : data.get("search") + " and ") +
+						"contact.id<>" + adminId + " and contact.verified=true and contact.version is not null");
+				final Result result = repository.list(params);
+				for (int i = 0; i < result.size(); i++)
+					ids.add(result.get(i).get("contact.id").toString());
+				System.out.println(ids);
+				return;
+			}
+			for (String id : ids) {
 				final Chat chat = new Chat();
 				chat.setContactId(adminId);
-				chat.setContactId2(id);
-				chat.setNote(data.getText());
+				chat.setContactId2(BigInteger.valueOf(Long.parseLong(id)));
+				chat.setNote((String) data.get("text"));
 				chat.setSeen(Boolean.FALSE);
+				chat.setAction((String) data.get("action"));
 				repository.save(chat);
 			}
 		}

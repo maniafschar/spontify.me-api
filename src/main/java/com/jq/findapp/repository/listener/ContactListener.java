@@ -52,18 +52,20 @@ public class ContactListener extends AbstractRepositoryListener {
 							+ "' and contact.id<>" + contact.getId());
 		if (contact.old("pseudonym") != null)
 			contact.setPseudonym(sanitizePseudonym(contact.getPseudonym()));
-		if (contact.getBirthday() == null)
-			contact.setAge(null);
-		else {
-			final GregorianCalendar now = new GregorianCalendar();
-			final GregorianCalendar birthday = new GregorianCalendar();
-			birthday.setTimeInMillis(contact.getBirthday().getTime());
-			short age = (short) (now.get(Calendar.YEAR) - birthday.get(Calendar.YEAR));
-			if (now.get(Calendar.MONTH) < birthday.get(Calendar.MONTH) ||
-					now.get(Calendar.MONTH) == birthday.get(Calendar.MONTH) &&
-							now.get(Calendar.DAY_OF_MONTH) < birthday.get(Calendar.DAY_OF_MONTH))
-				age--;
-			contact.setAge(age);
+		if (contact.old("birthday") != null) {
+			if (contact.getBirthday() == null)
+				contact.setAge(null);
+			else {
+				final GregorianCalendar now = new GregorianCalendar();
+				final GregorianCalendar birthday = new GregorianCalendar();
+				birthday.setTimeInMillis(contact.getBirthday().getTime());
+				short age = (short) (now.get(Calendar.YEAR) - birthday.get(Calendar.YEAR));
+				if (now.get(Calendar.MONTH) < birthday.get(Calendar.MONTH) ||
+						now.get(Calendar.MONTH) == birthday.get(Calendar.MONTH) &&
+								now.get(Calendar.DAY_OF_MONTH) < birthday.get(Calendar.DAY_OF_MONTH))
+					age--;
+				contact.setAge(age);
+			}
 		}
 	}
 
@@ -71,7 +73,7 @@ public class ContactListener extends AbstractRepositoryListener {
 	public void postUpdate(final Contact contact) throws Exception {
 		if (contact.old("email") != null)
 			authenticationService.recoverSendEmail(contact.getEmail());
-		else if (contact.getVerified()) {
+		else if (contact.getVerified() && contact.getLoginLink() == null) {
 			final QueryParams params = new QueryParams(Query.contact_chat);
 			params.setSearch(
 					"chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId());

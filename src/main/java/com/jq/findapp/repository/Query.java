@@ -17,6 +17,7 @@ public enum Query {
 	contact_eventParticipateCount,
 	contact_list(true),
 	contact_listBlocked,
+	contact_listByLocation,
 	contact_listChat(true),
 	contact_listChatFlat,
 	contact_listEventParticipate(true),
