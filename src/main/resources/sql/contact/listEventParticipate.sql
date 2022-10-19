@@ -6,6 +6,16 @@ select
 	eventParticipate.state,
 	eventParticipate.reason,
 	eventParticipate.modifiedAt,
+	event.startDate,
+	event.endDate,
+	event.contactId,
+	event.locationId,
+	event.maxParticipants,
+	event.confirm,
+	event.price,
+	event.visibility,
+	event.text,
+	event.price,
 	contact.age,
 	contact.aboutMe,
 	contact.attr,
@@ -40,11 +50,13 @@ select
 	'' as geolocationDistance
 FROM
 	EventParticipate eventParticipate,
+	Event event,
 	Contact contact
 	left join ContactLink contactLink on
 		contactLink.contactId={USERID} and contactLink.contactId2=contact.id
 	or
 		contactLink.contactId2={USERID} and contactLink.contactId=contact.id
 WHERE
+	event.id=eventParticipate.eventId and
 	eventParticipate.contactId=contact.id and
 	{search}
