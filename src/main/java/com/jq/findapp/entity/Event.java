@@ -16,6 +16,7 @@ import com.jq.findapp.repository.listener.EventListener;
 public class Event extends BaseEntity {
     private BigInteger contactId;
     private BigInteger locationId;
+    private Boolean marketingEvent = Boolean.FALSE;
     private Date endDate;
     private Double price;
     private Short confirm;
@@ -130,6 +131,14 @@ public class Event extends BaseEntity {
 
     public Short getMaxParticipants() {
         return maxParticipants;
+    }
+
+    public Boolean getMarketingEvent() {
+        return marketingEvent;
+    }
+
+    public void setMarketingEvent(Boolean marketingEvent) {
+        this.marketingEvent = marketingEvent;
     }
 
     @Transient

@@ -3,8 +3,12 @@ package com.jq.findapp.entity;
 import java.math.BigInteger;
 
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+
+import com.jq.findapp.repository.listener.ContactGeoLocationHistoryListener;
 
 @Entity
+@EntityListeners(ContactGeoLocationHistoryListener.class)
 public class ContactGeoLocationHistory extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger geoLocationId;

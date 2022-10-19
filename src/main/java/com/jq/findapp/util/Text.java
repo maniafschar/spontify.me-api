@@ -49,6 +49,7 @@ public enum Text {
 	mail_contactVisitProfile,
 	mail_contactWelcomeEmail,
 	mail_contactWhatToDo,
+	mail_eventChanged,
 	mail_eventDelete,
 	mail_eventNotify,
 	mail_eventNotification,
