@@ -86,7 +86,8 @@ public class EventService {
 				repository.delete(eventParticipate);
 			else {
 				final ZonedDateTime time = Instant.ofEpochMilli(event.getStartDate().getTime()).atZone(ZoneOffset.UTC);
-				if (time.getHour() == 0 || time.getHour() > now.getHour() && time.getHour() < now.getHour() + 3) {
+				if (time.getDayOfMonth() == now.getDayOfMonth() &&
+						(time.getHour() == 0 || time.getHour() > now.getHour() && time.getHour() < now.getHour() + 3)) {
 					final Contact contact = repository.one(Contact.class, eventParticipate.getContactId());
 					final ZonedDateTime t = time.minus(Duration.ofMinutes(contact.getTimezoneOffset()));
 					notificationService.sendNotification(repository.one(Contact.class, event.getContactId()),
