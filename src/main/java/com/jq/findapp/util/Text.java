@@ -71,7 +71,8 @@ public enum Text {
 	marketing_list,
 	marketing_noActions,
 	marketing_scoring,
-	or;
+	or,
+	preventDelete;
 
 	private static Map<String, JsonNode> languages = new HashMap<>();
 

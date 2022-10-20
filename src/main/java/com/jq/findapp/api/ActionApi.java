@@ -6,10 +6,8 @@ import java.sql.Time;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jq.findapp.api.model.Marketing;
 import com.jq.findapp.api.model.Position;
 import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.entity.Contact;
@@ -110,37 +107,14 @@ public class ActionApi {
 		}
 	}
 
-	@GetMapping("marketing/{language}")
-	public Marketing marketing(@PathVariable final String language, @RequestHeader(required = false) BigInteger user) {
-		return null;
-	}
-
-	@GetMapping("marketing/result")
-	public Map<String, Object> marketingResult(@RequestHeader BigInteger user, @RequestHeader String password,
-			@RequestHeader String salt) {
-		final Contact u = authenticationService.verify(user, password, salt);
-		final Map<String, Object> map = new HashMap<>();
-		final GregorianCalendar gc = new GregorianCalendar();
-		if (gc.get(Calendar.MONTH) < 6) {
-			final QueryParams params = new QueryParams(Query.contact_marketing);
-			params.setUser(u);
-			params.setSearch("contactMarketing.createdAt>'2022-05-01' and contactMarketing.createdAt<'2022-07-01'");
-			final List<Object[]> list = repository.list(params).getList();
-			final String scoring = Text.marketing_scoring.getText(u.getLanguage());
-			int columnMessage1 = 0;
-			for (; columnMessage1 < list.get(0).length; columnMessage1++) {
-				if ("_message1".equals(list.get(0)[columnMessage1]))
-					break;
-			}
-			for (int i = 1; i < list.size(); i++)
-				list.get(i)[columnMessage1] = scoring + list.get(i)[columnMessage1];
-			map.put("text", Text.marketing_iPadText.getText(u.getLanguage()) + " "
-					+ Text.marketing_list.getText(u.getLanguage()));
-			map.put("action", "https://blog.spontify.me");
-			map.put("list", list);
-		} else
-			map.put("html", Text.marketing_noActions.getText(u.getLanguage()));
-		return map;
+	@GetMapping("prevent/delete")
+	public Map<String, String> preventDelete(@RequestHeader BigInteger user, @RequestHeader String password,
+			@RequestHeader String salt) throws IllegalAccessException {
+		final Contact contact = authenticationService.verify(user, password, salt);
+		final Map<String, String> result = new HashMap<>();
+		result.put("text", Text.preventDelete.getText(contact.getLanguage()));
+		result.put("url", "https://blog.spontify.me/stats.html#Marketing");
+		return result;
 	}
 
 	@GetMapping("quotation")

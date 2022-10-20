@@ -65,5 +65,6 @@
 		"noActions": "currently no active campaigns.",
 		"scoring": "Scoring points: "
 	},
-	"or": " or "
+	"or": " or ",
+	"preventDelete": "By the way, our campaign <b>50 euros</b> per event held in Munich and soon elsewhere is running.<br/><br/>Just meet up with your <b>friends</b> in a location, post this in advance as an <b>event</b> here and cash in.<br/><br/>Can that convince you to stay?"
 }

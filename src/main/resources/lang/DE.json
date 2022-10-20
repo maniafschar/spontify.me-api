@@ -65,5 +65,6 @@
 		"noActions": "zur Zeit gibt es keine laufenden Aktionen.",
 		"scoring": "Aktuelle Punktzahl: "
 	},
-	"or": " oder "
+	"or": " oder ",
+	"preventDelete": "Im übrigen läuft momentan unsere Aktion <b>50 Euro</b> pro abgehaltenes Event in München und bald auch anderswo.<br/><br/>Triff Dich einfach mit Deinen <b>Freunden</b> in einer Location, stell dies als <b>Event</b> hier ein und kassiere ab.<br/><br/>Kann das Dich überzeugen zu bleiben?"
 }
