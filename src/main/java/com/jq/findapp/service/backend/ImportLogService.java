@@ -36,15 +36,18 @@ public class ImportLogService {
 
 	public void importLog() throws Exception {
 		final String separator = " | ";
-		importLog("log1", separator);
-		importLog("log", separator);
+		importLog("logAd1", "ad", separator);
+		importLog("logAd", "ad", separator);
+		importLog("logWeb1", "web", separator);
+		importLog("logWeb", "web", separator);
 		repository.executeUpdate("update Log set createdAt=substring_index(body,'" + separator
-				+ "', 1), body=substring_index(body, '" + separator + "', -1) where uri='ad' and body like '%"
+				+ "', 1), body=substring_index(body, '" + separator
+				+ "', -1) where (uri='ad' or uri='web') and body like '%"
 				+ separator + "%'");
 		lookupIps();
 	}
 
-	private void importLog(final String name, final String separator) throws Exception {
+	private void importLog(final String name, final String uri, final String separator) throws Exception {
 		final DateFormat dateParser = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss", Locale.ENGLISH);
 		final Pattern pattern = Pattern.compile(
 				"([\\d.]+) (\\S) (\\S) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"(\\w+) ([^ ]*) ([^\"]*)\" (\\d+) (\\d+) \"([^\"]*)\" \"([^\"]*)\"");
@@ -68,7 +71,7 @@ public class ImportLogService {
 					log.setBody(date.substring(0, 19) + separator + m.group(11));
 					if (log.getBody().length() > 255)
 						log.setBody(log.getBody().substring(0, 255));
-					log.setUri("ad");
+					log.setUri(uri);
 					log.setPort(80);
 					if ("/".equals(log.getQuery()) || "/stats.html".equals(log.getQuery())
 							|| log.getQuery().startsWith("/?")) {
@@ -89,7 +92,7 @@ public class ImportLogService {
 	private void lookupIps() throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_listLog);
 		params.setLimit(0);
-		params.setSearch("log.uri='ad' and ip.org is null");
+		params.setSearch("(log.uri='ad' or log.uri='web') and ip.org is null");
 		final Result result = repository.list(params);
 		final Pattern patternLoc = Pattern.compile("\"loc\": \"([^\"]*)\"");
 		final Set<Object> processed = new HashSet<>();
