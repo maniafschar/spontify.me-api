@@ -55,7 +55,7 @@ public class ImportLogService {
 			final QueryParams params = new QueryParams(Query.misc_listLog);
 			String line;
 			while ((line = reader.readLine()) != null) {
-				Matcher m = pattern.matcher(line);
+				Matcher m = pattern.matcher(line.replaceAll("\\\"", ""));
 				if (m.find()) {
 					final Log log = new Log();
 					log.setIp(m.group(1));
