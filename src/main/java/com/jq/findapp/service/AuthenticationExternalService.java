@@ -102,14 +102,19 @@ public class AuthenticationExternalService {
 		contact.setFacebookId(facebookData.get("id"));
 		if (facebookData.get("accessToken") != null)
 			contact.setFbToken(Encryption.decryptBrowser(facebookData.get("accessToken")));
-		if (contact.getImage() == null && facebookData.containsKey("picture")) {
-			byte[] data = IOUtils.toByteArray(new URL(facebookData.get("picture")));
-			final BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
-			if (img.getWidth() > 400 && img.getHeight() > 400) {
-				data = EntityUtil.scaleImage(data, EntityUtil.IMAGE_SIZE);
-				contact.setImage(Repository.Attachment.createImage(".jpg", data));
-				contact.setImageList(Repository.Attachment.createImage(".jpg",
-						EntityUtil.scaleImage(data, EntityUtil.IMAGE_THUMB_SIZE)));
+		if (contact.getImage() == null && facebookData.containsKey("picture")
+				&& facebookData.get("picture") != null && facebookData.get("picture").startsWith("http")) {
+			try {
+				byte[] data = IOUtils.toByteArray(new URL(facebookData.get("picture")));
+				final BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
+				if (img.getWidth() > 400 && img.getHeight() > 400) {
+					data = EntityUtil.scaleImage(data, EntityUtil.IMAGE_SIZE);
+					contact.setImage(Repository.Attachment.createImage(".jpg", data));
+					contact.setImageList(Repository.Attachment.createImage(".jpg",
+							EntityUtil.scaleImage(data, EntityUtil.IMAGE_THUMB_SIZE)));
+				}
+			} catch (Exception ex) {
+				// no pic for now, continue registration/login
 			}
 		}
 		if (contact.getGender() == null && facebookData.get("gender") != null)

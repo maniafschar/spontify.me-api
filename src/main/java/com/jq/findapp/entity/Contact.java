@@ -43,7 +43,7 @@ public class Contact extends BaseEntity {
 	private Short birthdayDisplay;
 	private Short gender;
 	private Short rating;
-	private Short timezoneOffset;
+	private Short timezoneOffset = 0;
 	private String aboutMe;
 	private String ageDivers;
 	private String ageFemale;
