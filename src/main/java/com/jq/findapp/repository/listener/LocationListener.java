@@ -1,5 +1,6 @@
 package com.jq.findapp.repository.listener;
 
+import javax.persistence.PostPersist;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 
@@ -54,7 +55,8 @@ public class LocationListener extends AbstractRepositoryListener {
 			lookupAddress(location);
 	}
 
-	static void postPersist(Location location) throws Exception {
+	@PostPersist
+	public void postPersist(Location location) throws Exception {
 		final LocationFavorite locationFavorite = new LocationFavorite();
 		locationFavorite.setContactId(location.getContactId());
 		locationFavorite.setLocationId(location.getId());

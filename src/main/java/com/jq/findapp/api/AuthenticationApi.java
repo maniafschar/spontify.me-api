@@ -64,22 +64,28 @@ public class AuthenticationApi {
 			@RequestHeader String salt) throws Exception {
 		contact.setEmail(Encryption.decryptBrowser(contact.getEmail()));
 		final Map<String, Object> user = authenticationService.login(contact, password, salt);
-		if (user != null && publicKey != null) {
-			final ContactToken t;
-			final QueryParams params = new QueryParams(Query.contact_token);
-			params.setSearch("contactToken.contactId='" + user.get("contact.id") + "' and contactToken.token=''");
-			final Result u = repository.list(params);
-			if (u.size() < 1) {
-				t = new ContactToken();
-				t.setContactId((BigInteger) user.get("contact.id"));
-			} else {
-				t = repository.one(ContactToken.class, (BigInteger) u.get(0).get("contactToken.id"));
-				for (int i = 1; i < u.size(); i++)
-					repository.delete(repository.one(ContactToken.class, (BigInteger) u.get(i).get("contactToken.id")));
+		if (user != null) {
+			final QueryParams params = new QueryParams(Query.location_listId);
+			params.setSearch("location.contactId=" + user.get("contact.id"));
+			user.put("location_added", repository.list(params).size());
+			if (publicKey != null) {
+				final ContactToken t;
+				params.setQuery(Query.contact_token);
+				params.setSearch("contactToken.contactId=" + user.get("contact.id") + " and contactToken.token=''");
+				final Result u = repository.list(params);
+				if (u.size() < 1) {
+					t = new ContactToken();
+					t.setContactId((BigInteger) user.get("contact.id"));
+				} else {
+					t = repository.one(ContactToken.class, (BigInteger) u.get(0).get("contactToken.id"));
+					for (int i = 1; i < u.size(); i++)
+						repository.delete(
+								repository.one(ContactToken.class, (BigInteger) u.get(i).get("contactToken.id")));
+				}
+				t.setToken(UUID.randomUUID().toString());
+				repository.save(t);
+				user.put("auto_login_token", Encryption.encrypt(t.getToken(), publicKey));
 			}
-			t.setToken(UUID.randomUUID().toString());
-			repository.save(t);
-			user.put("auto_login_token", Encryption.encrypt(t.getToken(), publicKey));
 		}
 		return user;
 	}
