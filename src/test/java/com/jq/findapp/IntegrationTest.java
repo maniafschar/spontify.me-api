@@ -85,8 +85,8 @@ public class IntegrationTest {
 		Util.get("popup input[name=\"name\"]").sendKeys(name);
 		Util.get("popup textarea[name=\"address\"]").clear();
 		Util.get("popup textarea[name=\"address\"]").sendKeys(address);
-		Util.click("popup input[name=\"locationbudget\"]:nth-of-type(2)");
-		Util.click("popup input[name=\"parkingOption2\"]:nth-of-type(2)");
+		Util.click("popup input[name=\"budget\"]:nth-of-type(2)");
+		Util.click("popup input[name=\"parkingOption\"]:nth-of-type(2)");
 		Util.click("popup input[name=\"locationcategory\"]:nth-of-type(5)");
 		Util.click("popup buttontext");
 		Util.click("main>buttonIcon[class*=\"center\"]");

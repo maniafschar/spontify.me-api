@@ -49,6 +49,11 @@ public class JpaTestConfiguration {
 				.prepareStatement(
 						"CREATE ALIAS IF NOT EXISTS TO_DAYS FOR \"" + getClass().getName() + ".toDays\";")
 				.executeUpdate();
+		dataSource.getConnection()
+				.prepareStatement(
+						"CREATE ALIAS IF NOT EXISTS SUBSTRING_INDEX FOR \"" + getClass().getName()
+								+ ".substringIndex\";")
+				.executeUpdate();
 		Files.createDirectories(Paths.get(Attachment.PATH));
 		Files.createDirectories(Paths.get(Attachment.PATH + Attachment.PUBLIC));
 		return dataSource;
@@ -89,5 +94,9 @@ public class JpaTestConfiguration {
 	public static int weekday(Connection connection, Timestamp timestamp)
 			throws SQLException {
 		return 1;
+	}
+
+	public static String substringIndex(Connection connection, String s, String s2, int i) {
+		return s;
 	}
 }

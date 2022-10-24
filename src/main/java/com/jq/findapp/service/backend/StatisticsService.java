@@ -27,6 +27,8 @@ public class StatisticsService {
 		data.put("user", repository.list(params).getList());
 		params.setQuery(Query.misc_statsLog);
 		data.put("log", repository.list(params).getList());
+		params.setQuery(Query.misc_statsApi);
+		data.put("api", repository.list(params).getList());
 		data.put("update", Instant.now().toString());
 		IOUtils.write(new ObjectMapper().writeValueAsString(data), new FileOutputStream("statistics.json"),
 				StandardCharsets.UTF_8);

@@ -58,6 +58,7 @@ public enum Query {
 	misc_listLog,
 	misc_listTicket,
 	misc_setting,
+	misc_statsApi,
 	misc_statsLog,
 	misc_statsUser;
 

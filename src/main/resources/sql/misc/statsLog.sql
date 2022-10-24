@@ -1,11 +1,11 @@
 SELECT
-	cast((log.time-5)/10 as integer) as time,
-	count(*) as count,
-	concat(YEAR(log.createdAt),'-',MONTH(log.createdAt),'-',DAY(log.createdAt)) as date
+	case when cast((log.time-5)/10 as integer)>20 then 20 else cast((log.time-5)/10 as integer) end as time,
+	count(*)*1.0/(select count(*) from Log where uri not like '/support/%' and uri<>'web' and uri<>'ad' and createdAt>'2022-09-01') as count
 FROM
 	Log log
 WHERE
-	log.uri<>'ad' and log.uri not like '/support/%' and log.createdAt>'2022-09-01'
+	log.uri<>'ad' and log.uri<>'web' and log.uri not like '/support/%' and log.createdAt>'2022-09-01'
 GROUP BY
-	date,
+	time
+ORDER BY
 	time
