@@ -124,6 +124,14 @@ public class ActionApi {
 		return QUOTATION.get((int) (Math.random() * (QUOTATION.size() - 1)));
 	}
 
+	@GetMapping("marketing")
+	public Map<String, String> marketing() {
+		final Map<String, String> map = new HashMap<>();
+		map.put("label", "50€");
+		map.put("action", "https://blog.spontify.me/stats.html#Marketing");
+		return map;
+	}
+
 	@GetMapping("chat/{location}/{id}/{all}")
 	public List<Object[]> chat(@PathVariable final boolean location, @PathVariable final BigInteger id,
 			@PathVariable final boolean all, @RequestHeader BigInteger user, @RequestHeader String password,
