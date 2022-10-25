@@ -192,8 +192,6 @@ public class NotificationService {
 				"' and contactNotification.textType='" + notificationTextType.name() + "'");
 		if (repository.list(params).size() > 0)
 			return null;
-		if (text.charAt(1) == ' ' && (text.charAt(0) == ',' || text.charAt(0) == ':'))
-			text = text.substring(1);
 		final ContactNotification notification = new ContactNotification();
 		notification.setAction(action);
 		notification.setContactId(contactTo.getId());

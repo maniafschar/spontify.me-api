@@ -296,7 +296,7 @@ public class EngagementService {
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setLimit(0);
 		params.setSearch("contact.id<>" + adminId
-				+ " and contact.verified=true and contact.version is not null and contact.notificationEngagement=true");
+				+ " and contact.verified=true and contact.version is not null");
 		final Result ids = repository.list(params);
 		params.setQuery(Query.contact_chat);
 		for (int i = 0; i < ids.size(); i++) {

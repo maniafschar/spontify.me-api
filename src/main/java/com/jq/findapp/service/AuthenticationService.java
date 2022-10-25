@@ -390,6 +390,7 @@ public class AuthenticationService {
 		if (contact.getVerified() == null || !contact.getVerified()) {
 			contact.setVerified(true);
 			contact.setEmailVerified(contact.getEmail());
+			contact.setNotificationEngagement(Boolean.TRUE);
 			repository.save(contact);
 		}
 		return contact;

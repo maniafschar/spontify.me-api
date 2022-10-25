@@ -113,7 +113,7 @@ public class ActionApi {
 		final Contact contact = authenticationService.verify(user, password, salt);
 		final Map<String, String> result = new HashMap<>();
 		result.put("text", Text.preventDelete.getText(contact.getLanguage()));
-		result.put("url", "https://blog.spontify.me/stats.html#Marketing");
+		result.put("url", "https://blog.spontify.me/stats.html#marketing");
 		return result;
 	}
 
@@ -128,7 +128,7 @@ public class ActionApi {
 	public Map<String, String> marketing() {
 		final Map<String, String> map = new HashMap<>();
 		map.put("label", "50€");
-		map.put("action", "https://blog.spontify.me/stats.html#Marketing");
+		map.put("action", "https://blog.spontify.me/stats.html#marketing");
 		return map;
 	}
 
