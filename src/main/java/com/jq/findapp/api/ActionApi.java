@@ -223,6 +223,32 @@ public class ActionApi {
 		return externalService.google(param, user);
 	}
 
+	@GetMapping("nearByLocationAddress")
+	public List<Map<String, Object>> nearByLocationAddress(@RequestHeader BigInteger user,
+			@RequestHeader String password,
+			@RequestHeader String salt) throws Exception {
+		final Contact contact = authenticationService.verify(user, password, salt);
+		if (contact.getLongitude() == null)
+			return null;
+		final QueryParams params = new QueryParams(Query.location_listId);
+		params.setLimit(500);
+		params.setLongitude(contact.getLongitude());
+		params.setLatitude(contact.getLatitude());
+		params.setDistance(20);
+		final Result result = repository.list(params);
+		final List<Map<String, Object>> list = new ArrayList<>();
+		for (int i = 0; i < result.size(); i++) {
+			final Location location = repository.one(Location.class, (BigInteger) result.get(i).get("location.id"));
+			final Map<String, Object> m = new HashMap<>(4);
+			m.put("id", location.getId());
+			m.put("image", location.getImageList());
+			m.put("name", location.getName());
+			m.put("address", location.getAddress());
+			list.add(m);
+		}
+		return list;
+	}
+
 	@PostMapping("position")
 	public Map<String, Object> position(@RequestBody final Position position,
 			@RequestHeader BigInteger user, @RequestHeader String password, @RequestHeader String salt)
