@@ -43,7 +43,7 @@ import com.jq.findapp.util.Utils;
 @ExtendWith({ SpringExtension.class })
 @SpringBootTest(classes = { FindappApplication.class, JpaTestConfiguration.class })
 @ActiveProfiles("test")
-public class AuthenticationTest {
+public class AuthenticationServiceTest {
 	@Autowired
 	private AuthenticationService authenticationService;
 
@@ -295,5 +295,25 @@ public class AuthenticationTest {
 		authenticationService.deleteAccount(repository.one(Contact.class, BigInteger.ONE));
 
 		// then no exception
+	}
+
+	@Test
+	public void encodeToken() {
+		// given
+		String s = "CMY1hiWPWOTVuouoyjT6SPrnjrZWeNfuWTSpgRGDwe";
+
+		// when
+		long x = 0;
+		for (int i = 0; i < s.length(); i++) {
+			x += s.charAt(i);
+			if (x > 99999999)
+				break;
+		}
+		String s2 = "" + x;
+		s2 += s.substring(1, 11 - s2.length());
+
+		// then
+		assertEquals("CMY1hiWPWO3907MY1hiWTVuouoyjT6SPrnjrZWeNfuWTSpgRGDwe", s.substring(0, 10) + s2 + s.substring(10));
+
 	}
 }

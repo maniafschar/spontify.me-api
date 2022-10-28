@@ -21,6 +21,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +35,9 @@ import com.jq.findapp.repository.Query.Result;
 public class Repository {
 	@PersistenceContext
 	private EntityManager em;
+
+	@Autowired
+	private Listeners listeners;
 
 	public Result list(final QueryParams params) {
 		final GeoLocationProcessor geo = new GeoLocationProcessor(params);
@@ -89,16 +93,22 @@ public class Repository {
 		if (entity.getId() == null) {
 			if (entity.getCreatedAt() == null)
 				entity.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
+			listeners.prePersist(entity);
 			em.persist(entity);
+			listeners.postPersist(entity);
 		} else {
 			entity.setModifiedAt(new Timestamp(Instant.now().toEpochMilli()));
+			listeners.preUpdate(entity);
 			em.merge(entity);
+			listeners.postUpdate(entity);
 		}
 	}
 
 	public void delete(final BaseEntity entity) throws Exception {
+		listeners.preRemove(entity);
 		em.remove(em.contains(entity) ? entity : em.merge(entity));
 		Attachment.delete(entity);
+		listeners.postRemove(entity);
 	}
 
 	public void executeUpdate(String hql) {

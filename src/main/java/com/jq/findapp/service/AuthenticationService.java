@@ -31,6 +31,7 @@ import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactToken;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService.AuthenticationException.AuthenticationExceptionType;
@@ -197,11 +198,10 @@ public class AuthenticationService {
 		final Contact contact = user == null ? new Contact()
 				: repository.one(Contact.class, (BigInteger) user.get("contact.id"));
 		contact.setBirthday(registration.getBirthday());
-		contact.setEmail(registration.getEmail());
 		contact.setGender(registration.getGender());
 		contact.setPseudonym(registration.getPseudonym());
 		contact.setLanguage(registration.getLanguage());
-		contact.setEmail(contact.getEmail().toLowerCase().trim());
+		contact.setEmail(registration.getEmail().toLowerCase().trim());
 		try {
 			notificationService.sendNotificationEmail(repository.one(Contact.class, adminId), contact,
 					Text.mail_contactWelcomeEmail.getText(contact.getLanguage()), "r=" + generateLoginParam(contact));
@@ -224,9 +224,9 @@ public class AuthenticationService {
 		contact.setLanguage(registration.getLanguage());
 		contact.setOs(registration.getOs());
 		contact.setVersion(registration.getVersion());
-		contact.setVisitPage(new Timestamp(System.currentTimeMillis() - 1000));
+		contact.setVisitPage(new Timestamp(Instant.now().toEpochMilli() - 1000));
 		contact.setPassword(Encryption.encryptDB(generatePin(20)));
-		contact.setPasswordReset(System.currentTimeMillis());
+		contact.setPasswordReset(Instant.now().toEpochMilli());
 		contact.setBirthdayDisplay((short) 2);
 		contact.setEmail(contact.getEmail().toLowerCase().trim());
 		if (contact.getIdDisplay() == null) {
@@ -270,7 +270,6 @@ public class AuthenticationService {
 			final Contact c2 = repository.one(Contact.class, (BigInteger) user.get("contact.id"));
 			verify(c2, password, salt, true);
 			c2.setActive(true);
-			c2.setLoginLink(null);
 			c2.setLastLogin(new Timestamp(Instant.now().toEpochMilli()));
 			c2.setOs(contact.getOs());
 			c2.setDevice(contact.getDevice());
@@ -291,9 +290,13 @@ public class AuthenticationService {
 				break;
 		}
 		String s2 = "" + x;
-		for (int i = s2.length(); i < 10; i++)
-			s2 += 'y';
-		contact.setLoginLink(s.substring(0, 10) + s2 + s.substring(10));
+		s2 += s.substring(1, 11 - s2.length());
+		String old = contact.getLoginLink();
+		if (old == null)
+			old = "";
+		else if (old.length() > 207)
+			old = old.substring(52);
+		contact.setLoginLink(old + s.substring(0, 10) + s2 + s.substring(10));
 		return s;
 	}
 
@@ -364,16 +367,11 @@ public class AuthenticationService {
 		final Map<String, Object> user = repository.one(params);
 		if (user != null) {
 			final Contact contact = repository.one(Contact.class, (BigInteger) user.get("contact.id"));
-			if (contact.getLoginLink() == null
-					|| contact.getModifiedAt() == null
-					|| contact.getModifiedAt().getTime() < System.currentTimeMillis() - 86400000) {
-				final String s = generateLoginParam(contact);
-				repository.save(contact);
-				notificationService.sendNotificationEmail(contact, contact,
-						Text.mail_contactPasswordReset.getText(contact.getLanguage()), "r=" + s);
-				return "ok";
-			}
-			return "nok:Time";
+			final String s = generateLoginParam(contact);
+			repository.save(contact);
+			notificationService.sendNotificationEmail(contact, contact,
+					Text.mail_contactPasswordReset.getText(contact.getLanguage()), "r=" + s);
+			return "ok";
 		}
 		return "nok:Email";
 	}
@@ -382,17 +380,26 @@ public class AuthenticationService {
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setUser(new Contact());
 		params.getUser().setId(BigInteger.valueOf(0L));
-		params.setSearch("contact.loginLink='" + token + '\'');
+		// TODO rm .replace after 0.3.0
+		params.setSearch("contact.loginLink like '%" + token.replace('y', '_') + "%'");
 		final Map<String, Object> user = repository.one(params);
-		if (user == null)
+		if (user == null) {
+			params.setSearch("contact.loginLink is not null");
+			Result r = repository.list(params);
+			String s = "";
+			for (int i = 0; i < r.size(); i++)
+				s += r.get(i) + "\n";
+			s += "++++++++++++++++++++++\n" + token;
+			notificationService.createTicket(TicketType.ERROR, "recoverVerifyEmail failed", s, null);
 			return null;
+		}
 		final Contact contact = repository.one(Contact.class, new BigInteger(user.get("contact.id").toString()));
 		if (contact.getVerified() == null || !contact.getVerified()) {
-			contact.setVerified(true);
-			contact.setEmailVerified(contact.getEmail());
+			contact.setVerified(Boolean.TRUE);
 			contact.setNotificationEngagement(Boolean.TRUE);
-			repository.save(contact);
 		}
+		contact.setEmailVerified(contact.getEmail());
+		repository.save(contact);
 		return contact;
 	}
 

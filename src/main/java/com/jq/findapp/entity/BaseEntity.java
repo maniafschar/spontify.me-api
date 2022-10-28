@@ -26,7 +26,7 @@ public class BaseEntity {
 	private Timestamp modifiedAt;
 
 	@Transient
-	private transient Map<String, Object> old;
+	private Map<String, Object> old = null;
 
 	public BigInteger getId() {
 		return id;
@@ -75,12 +75,14 @@ public class BaseEntity {
 				}
 			}
 		});
-		return old != null && old.size() > 0;
+		return old.size() > 0;
 	}
 
 	@Transient
 	public Object old(String name) {
-		return old == null ? null : old.get(name);
+		if (old != null && old.containsKey(name))
+			return old.get(name) == null ? Void.class : old.get(name);
+		return null;
 	}
 
 	@Transient

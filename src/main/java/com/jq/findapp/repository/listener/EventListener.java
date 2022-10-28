@@ -8,8 +8,7 @@ import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.util.Date;
 
-import javax.persistence.PostRemove;
-import javax.persistence.PostUpdate;
+import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
@@ -21,9 +20,10 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.util.Strings;
 
-public class EventListener extends AbstractRepositoryListener {
-	@PostUpdate
-	public void postUpdate(Event event) throws Exception {
+@Component
+public class EventListener extends AbstractRepositoryListener<Event> {
+	@Override
+	public void postUpdate(final Event event) throws Exception {
 		if (event.old("startDate") != null || event.old("price") != null) {
 			final QueryParams params = new QueryParams(Query.event_participate);
 			params.setSearch("eventParticipate.eventId=" + event.getId() + " and eventParticipate.state=1");
@@ -52,8 +52,8 @@ public class EventListener extends AbstractRepositoryListener {
 		}
 	}
 
-	@PostRemove
-	public void postRemove(Event event) throws Exception {
+	@Override
+	public void postRemove(final Event event) throws Exception {
 		final QueryParams params = new QueryParams(Query.event_participate);
 		params.setSearch("eventParticipate.eventId=" + event.getId());
 		final Result result = repository.list(params);

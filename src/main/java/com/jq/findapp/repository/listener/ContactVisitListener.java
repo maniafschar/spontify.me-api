@@ -1,24 +1,26 @@
 package com.jq.findapp.repository.listener;
 
-import javax.persistence.PostPersist;
-import javax.persistence.PostUpdate;
+import org.springframework.stereotype.Component;
 
+import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.ContactVisit;
 
-public class ContactVisitListener extends AbstractRepositoryListener {
-	@PostPersist
-	public void postPersist(ContactVisit contactVisit) throws Exception {
+@Component
+public class ContactVisitListener extends AbstractRepositoryListener<ContactVisit> {
+	@Override
+	public void postPersist(final ContactVisit contactVisit) throws Exception {
 		sendNotification(contactVisit);
 	}
 
-	@PostUpdate
-	public void postUpdate(ContactVisit contactVisit) throws Exception {
+	@Override
+	public void postUpdate(final ContactVisit contactVisit) throws Exception {
 		sendNotification(contactVisit);
 	}
 
-	private void sendNotification(ContactVisit contactVisit) throws Exception {
+	private void sendNotification(final BaseEntity entity) throws Exception {
+		final ContactVisit contactVisit = (ContactVisit) entity;
 		notificationService.sendNotificationOnMatch(ContactNotificationTextType.contactVisitProfile,
 				repository.one(Contact.class,
 						contactVisit.getContactId()),

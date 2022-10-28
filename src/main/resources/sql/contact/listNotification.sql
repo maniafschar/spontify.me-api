@@ -1,5 +1,6 @@
 SELECT
 	contact.pseudonym,
+	contact.imageList,
 	contactNotification.id,
 	contactNotification.text,
 	contactNotification.action,
@@ -9,7 +10,7 @@ FROM
 	Contact contact,
 	ContactNotification contactNotification
 WHERE
-	contactNotification.contactId2=contact.id and
+	contact.id=contactNotification.contactId2 and
 	contactNotification.contactId={USERID} and
 	{search}
 ORDER BY

@@ -5,7 +5,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 
-import javax.persistence.PostPersist;
+import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
@@ -14,9 +14,10 @@ import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.util.Strings;
 
-public class EventParticipateListener extends AbstractRepositoryListener {
-	@PostPersist
-	public void postPersist(EventParticipate eventParticipate) throws Exception {
+@Component
+public class EventParticipateListener extends AbstractRepositoryListener<EventParticipate> {
+	@Override
+	public void postPersist(final EventParticipate eventParticipate) throws Exception {
 		final Event event = repository.one(Event.class, eventParticipate.getEventId());
 		if (event != null && !event.getContactId().equals(eventParticipate.getContactId())) {
 			final Contact contactTo = repository.one(Contact.class, event.getContactId());

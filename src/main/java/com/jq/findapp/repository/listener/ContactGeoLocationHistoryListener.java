@@ -1,12 +1,12 @@
 package com.jq.findapp.repository.listener;
 
-import javax.persistence.PostPersist;
+import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.ContactGeoLocationHistory;
 
-public class ContactGeoLocationHistoryListener extends AbstractRepositoryListener {
-	@PostPersist
+@Component
+public class ContactGeoLocationHistoryListener extends AbstractRepositoryListener<ContactGeoLocationHistory> {
+	@Override
 	public void postPersist(final ContactGeoLocationHistory contactGeoLocationHistory) throws Exception {
-
 	}
 }

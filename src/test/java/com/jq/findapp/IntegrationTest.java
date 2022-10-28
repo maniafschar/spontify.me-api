@@ -66,25 +66,25 @@ public class IntegrationTest {
 	private void register(String pseudonym, String email) {
 		Util.click("home homeBody buttontext:nth-of-type(1)");
 		Util.click("hint buttontext");
-		Util.get("login input[name=\"email\"]").sendKeys(email);
+		Util.sendKeys("login input[name=\"email\"]", email);
 		Util.click("login tab:nth-of-type(3)");
-		Util.get("login input[name=\"pseudonym\"]").sendKeys(pseudonym);
+		Util.sendKeys("login input[name=\"pseudonym\"]", pseudonym);
 		Util.click("login input[name=\"agb\"]");
 		Util.sleep(5000);
 		Util.click("login buttontext:nth-of-type(1)");
 		final String s = Util.email(0).lines().reduce(
 				(e, e2) -> e.startsWith("https://") ? e : e2.startsWith("https://") ? e2 : "").get();
 		driver.navigate().to(url + s.substring(s.indexOf('?')));
-		Util.get("popup input[name=\"passwd\"]").sendKeys("qwer1234");
+		Util.sendKeys("popup input[name=\"passwd\"]", "qwer1234");
 		Util.click("popup buttontext");
 	}
 
 	private void addLocation(String name, String address) {
 		Util.click("home homeBody buttontext:nth-of-type(2)");
 		Util.click("menu a[onclick*=\"pageLocation.edit\"]");
-		Util.get("popup input[name=\"name\"]").sendKeys(name);
+		Util.sendKeys("popup input[name=\"name\"]", name);
 		Util.get("popup textarea[name=\"address\"]").clear();
-		Util.get("popup textarea[name=\"address\"]").sendKeys(address);
+		Util.sendKeys("popup textarea[name=\"address\"]", address);
 		Util.click("popup input[name=\"budget\"]:nth-of-type(2)");
 		Util.click("popup input[name=\"parkingOption\"]:nth-of-type(2)");
 		Util.click("popup input[name=\"locationcategory\"]:nth-of-type(5)");
@@ -94,7 +94,7 @@ public class IntegrationTest {
 
 	private void addFriend() {
 		Util.click("main>buttonIcon[onclick*=\"search\"]");
-		Util.get("search input[name=\"searchKeywords\"]").sendKeys("pseudonym");
+		Util.sendKeys("search input[name=\"searchKeywords\"]", "pseudonym");
 		Util.click("search buttontext[onclick*=\"saveSearch\"]");
 		Util.click("search row:nth-of-type(1)");
 		Util.click("main>buttonIcon[onclick*=\"toggleFavorite\"]");
@@ -137,6 +137,18 @@ public class IntegrationTest {
 
 		private static void click(String id) {
 			((JavascriptExecutor) driver).executeScript("arguments[0].click()", get(id));
+		}
+
+		private static void sendKeys(String id, String keys) {
+			for (int i = 0; i < 5; i++) {
+				try {
+					get(id).sendKeys(keys);
+					return;
+				} catch (NoSuchElementException e) {
+					sleep(500);
+				}
+			}
+			throw new RuntimeException("Failed to send keys " + keys + " for id " + id);
 		}
 	}
 }

@@ -2,13 +2,9 @@ package com.jq.findapp.repository.listener;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-
-import javax.persistence.PostUpdate;
-import javax.persistence.PrePersist;
-import javax.persistence.PreRemove;
-import javax.persistence.PreUpdate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,23 +20,19 @@ import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.util.Text;
 
 @Component
-public class ContactListener extends AbstractRepositoryListener {
-	private static AuthenticationService authenticationService;
-
+public class ContactListener extends AbstractRepositoryListener<Contact> {
 	@Autowired
-	private void setExternalService(AuthenticationService authenticationService) {
-		ContactListener.authenticationService = authenticationService;
-	}
+	private AuthenticationService authenticationService;
 
-	@PrePersist
+	@Override
 	public void prePersist(final Contact contact) {
 		contact.setPseudonym(sanitizePseudonym(contact.getPseudonym()));
 	}
 
-	@PreUpdate
+	@Override
 	public void preUpdate(final Contact contact) throws Exception {
 		if (contact.old("visitPage") != null)
-			contact.setVisitPage(new Timestamp(System.currentTimeMillis()));
+			contact.setVisitPage(new Timestamp(Instant.now().toEpochMilli()));
 		if (contact.old("pushToken") != null)
 			repository.executeUpdate(
 					"update Contact contact set contact.pushToken=null, contact.pushSystem=null where contact.pushToken='"
@@ -52,6 +44,8 @@ public class ContactListener extends AbstractRepositoryListener {
 							+ "' and contact.id<>" + contact.getId());
 		if (contact.old("pseudonym") != null)
 			contact.setPseudonym(sanitizePseudonym(contact.getPseudonym()));
+		if (contact.old("password") != null)
+			contact.setLoginLink(null);
 		if (contact.getBirthday() == null)
 			contact.setAge(null);
 		else {
@@ -67,14 +61,13 @@ public class ContactListener extends AbstractRepositoryListener {
 		}
 	}
 
-	@PostUpdate
+	@Override
 	public void postUpdate(final Contact contact) throws Exception {
 		if (contact.old("email") != null)
 			authenticationService.recoverSendEmail(contact.getEmail());
-		else if (contact.getVerified() && contact.getLoginLink() == null) {
+		if (contact.getVerified() != null && contact.getVerified() && contact.getLoginLink() == null) {
 			final QueryParams params = new QueryParams(Query.contact_chat);
-			params.setSearch(
-					"chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId());
+			params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId());
 			if (repository.list(params).size() == 0) {
 				final Chat chat = new Chat();
 				chat.setContactId(adminId);
@@ -88,7 +81,7 @@ public class ContactListener extends AbstractRepositoryListener {
 		}
 	}
 
-	@PreRemove
+	@Override
 	public void preRemove(final Contact contact) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_listFriends);
 		params.setUser(contact);

@@ -1,7 +1,6 @@
 package com.jq.findapp.repository.listener;
 
-import javax.persistence.PostPersist;
-import javax.persistence.PostUpdate;
+import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactLink;
@@ -12,9 +11,10 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.util.Strings;
 
-public class ContactLinkListener extends AbstractRepositoryListener {
-	@PostPersist
-	public void postPersist(ContactLink contactLink) throws Exception {
+@Component
+public class ContactLinkListener extends AbstractRepositoryListener<ContactLink> {
+	@Override
+	public void postPersist(final ContactLink contactLink) throws Exception {
 		notificationService.sendNotification(
 				repository.one(Contact.class, contactLink.getContactId()),
 				repository.one(Contact.class, contactLink.getContactId2()),
@@ -22,8 +22,8 @@ public class ContactLinkListener extends AbstractRepositoryListener {
 				Strings.encodeParam("p=" + contactLink.getContactId()));
 	}
 
-	@PostUpdate
-	public void postUpdate(ContactLink contactLink) throws Exception {
+	@Override
+	public void postUpdate(final ContactLink contactLink) throws Exception {
 		if (contactLink.getStatus() == Status.Friends) {
 			notificationService.sendNotification(
 					repository.one(Contact.class, contactLink.getContactId2()),

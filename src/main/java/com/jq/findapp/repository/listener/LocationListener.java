@@ -1,9 +1,5 @@
 package com.jq.findapp.repository.listener;
 
-import javax.persistence.PostPersist;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,16 +17,12 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.service.ExternalService;
 
 @Component
-public class LocationListener extends AbstractRepositoryListener {
-	private static ExternalService externalService;
-
+public class LocationListener extends AbstractRepositoryListener<Location> {
 	@Autowired
-	private void setExternalService(ExternalService externalService) {
-		LocationListener.externalService = externalService;
-	}
+	private ExternalService externalService;
 
-	@PrePersist
-	public void prePersist(Location location)
+	@Override
+	public void prePersist(final Location location)
 			throws JsonMappingException, JsonProcessingException, IllegalAccessException {
 		lookupAddress(location);
 		final QueryParams params = new QueryParams(Query.location_list);
@@ -49,14 +41,14 @@ public class LocationListener extends AbstractRepositoryListener {
 		}
 	}
 
-	@PreUpdate
-	public void preUpdate(Location location) throws Exception {
+	@Override
+	public void preUpdate(final Location location) throws Exception {
 		if (location.old("address") != null)
 			lookupAddress(location);
 	}
 
-	@PostPersist
-	public void postPersist(Location location) throws Exception {
+	@Override
+	public void postPersist(final Location location) throws Exception {
 		final LocationFavorite locationFavorite = new LocationFavorite();
 		locationFavorite.setContactId(location.getContactId());
 		locationFavorite.setLocationId(location.getId());

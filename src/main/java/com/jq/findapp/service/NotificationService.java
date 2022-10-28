@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.reactive.function.client.WebClientResponseException.NotFound;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
@@ -227,7 +228,7 @@ public class NotificationService {
 			final Map<String, Object> row = list.get(i);
 			values.chatUnseen.put("" + row.get("chat.contactId2"), ((Number) row.get("_c")).intValue());
 		}
-		// TODO rm after 0.2.3
+		// TODO rm .chat after 0.2.3
 		params.setQuery(Query.contact_listChat);
 		values.chat = repository.list(params).size();
 		return values;
@@ -263,6 +264,13 @@ public class NotificationService {
 			repository.save(contactTo);
 			return false;
 		} catch (Exception ex) {
+			final QueryParams param = new QueryParams(Query.misc_setting);
+			param.setSearch("setting.label like 'push.gen.%'");
+			final Result settings = repository.list(param);
+			String setting = "\n\n";
+			for (int i = 0; i < settings.size(); i++)
+				setting += new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(settings.get(i))
+						+ "\n\n";
 			createTicket(TicketType.ERROR, "Push Notification",
 					contactTo.getId() + "\n\n"
 							+ IOUtils.toString(getClass().getResourceAsStream("/template/push.android"),
@@ -275,7 +283,7 @@ public class NotificationService {
 							+ (ex instanceof WebClientResponseException
 									? "\n\n" + ((WebClientResponseException) ex).getResponseBodyAsString()
 									: "")
-							+ "\n\n" + Strings.stackTraceToString(ex),
+							+ setting + Strings.stackTraceToString(ex),
 					notification == null ? null : notification.getContactId2());
 			return false;
 		}

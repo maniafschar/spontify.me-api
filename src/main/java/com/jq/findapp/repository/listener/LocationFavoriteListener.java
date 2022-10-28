@@ -1,14 +1,15 @@
 package com.jq.findapp.repository.listener;
 
-import javax.persistence.PrePersist;
+import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.jq.findapp.entity.LocationFavorite;
 
-public class LocationFavoriteListener extends AbstractRepositoryListener {
-	@PrePersist
-	public void prePersist(LocationFavorite locationFavorite)
+@Component
+public class LocationFavoriteListener extends AbstractRepositoryListener<LocationFavorite> {
+	@Override
+	public void prePersist(final LocationFavorite locationFavorite)
 			throws JsonMappingException, JsonProcessingException, IllegalAccessException {
 		locationFavorite.setFavorite(Boolean.TRUE);
 	}

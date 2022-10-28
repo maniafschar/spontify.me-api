@@ -1,15 +1,16 @@
 package com.jq.findapp.repository.listener;
 
-import javax.persistence.PostPersist;
+import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.LocationRating;
 
-public class LocationRatingListener extends AbstractRepositoryListener {
-	@PostPersist
-	public void postPersist(LocationRating locationRating) throws Exception {
+@Component
+public class LocationRatingListener extends AbstractRepositoryListener<LocationRating> {
+	@Override
+	public void postPersist(final LocationRating locationRating) throws Exception {
 		repository.executeUpdate(
 				"update Location location set rating=(select sum(rating)/count(*) from LocationRating where locationId=location.id) where location.id="
 						+ locationRating.getLocationId());

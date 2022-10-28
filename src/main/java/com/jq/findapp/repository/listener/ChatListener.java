@@ -3,10 +3,8 @@ package com.jq.findapp.repository.listener;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import javax.persistence.PostPersist;
-import javax.persistence.PrePersist;
-
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
@@ -18,8 +16,9 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.util.Text;
 
-public class ChatListener extends AbstractRepositoryListener {
-	@PrePersist
+@Component
+public class ChatListener extends AbstractRepositoryListener<Chat> {
+	@Override
 	public void prePersist(final Chat chat) throws Exception {
 		if (chat.getContactId2() == null && chat.getLocationId() == null)
 			chat.setContactId2(adminId); // Feedback
@@ -37,7 +36,7 @@ public class ChatListener extends AbstractRepositoryListener {
 		}
 	}
 
-	@PostPersist
+	@Override
 	public void postPersist(final Chat chat) throws Exception {
 		final Contact contactFrom = repository.one(Contact.class, chat.getContactId());
 		if (chat.getLocationId() == null) {
@@ -63,5 +62,4 @@ public class ChatListener extends AbstractRepositoryListener {
 			notificationService.locationNotifyOnMatch(contactFrom, chat.getLocationId(),
 					ContactNotificationTextType.chatLocation, chat.getNote());
 	}
-
 }
