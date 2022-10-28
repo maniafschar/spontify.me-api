@@ -62,9 +62,11 @@ public class BaseEntity {
 							.getDeclaredMethod("get" + name.substring(0, 1).toUpperCase() + name.substring(1));
 					final Object valueOld = m.invoke(this), valueNew = m.invoke(ref);
 					if (!Objects.equals(valueOld, valueNew)) {
-						if (old == null)
-							old = new HashMap<>();
-						old.put(name, valueOld);
+						if (getId() != null) {
+							if (old == null)
+								old = new HashMap<>();
+							old.put(name, valueOld);
+						}
 						getClass()
 								.getDeclaredMethod("set" + name.substring(0, 1).toUpperCase() + name.substring(1),
 										m.getReturnType())
@@ -75,14 +77,12 @@ public class BaseEntity {
 				}
 			}
 		});
-		return old.size() > 0;
+		return old != null;
 	}
 
 	@Transient
 	public Object old(String name) {
-		if (old != null && old.containsKey(name))
-			return old.get(name) == null ? Void.class : old.get(name);
-		return null;
+		return old == null ? null : old.get(name);
 	}
 
 	@Transient

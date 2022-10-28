@@ -224,17 +224,15 @@ public class ActionApi {
 	}
 
 	@GetMapping("nearByLocationAddress")
-	public List<Map<String, Object>> nearByLocationAddress(@RequestHeader BigInteger user,
-			@RequestHeader String password,
-			@RequestHeader String salt) throws Exception {
+	public List<Map<String, Object>> nearByLocationAddress(String search, @RequestHeader BigInteger user,
+			@RequestHeader String password, @RequestHeader String salt) throws Exception {
 		final Contact contact = authenticationService.verify(user, password, salt);
 		if (contact.getLongitude() == null)
 			return null;
 		final QueryParams params = new QueryParams(Query.location_listId);
-		params.setLimit(500);
 		params.setLongitude(contact.getLongitude());
 		params.setLatitude(contact.getLatitude());
-		params.setDistance(20);
+		params.setSearch(search);
 		final Result result = repository.list(params);
 		final List<Map<String, Object>> list = new ArrayList<>();
 		for (int i = 0; i < result.size(); i++) {
