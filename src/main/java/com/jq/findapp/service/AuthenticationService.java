@@ -378,8 +378,6 @@ public class AuthenticationService {
 
 	public Contact recoverVerifyEmail(String token) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_listId);
-		params.setUser(new Contact());
-		params.getUser().setId(BigInteger.valueOf(0L));
 		// TODO rm .replace after 0.3.0
 		params.setSearch("contact.loginLink like '%" + token.replace('y', '_') + "%'");
 		final Map<String, Object> user = repository.one(params);
@@ -387,8 +385,10 @@ public class AuthenticationService {
 			params.setSearch("contact.loginLink is not null");
 			Result r = repository.list(params);
 			String s = "";
-			for (int i = 0; i < r.size(); i++)
-				s += r.get(i) + "\n";
+			for (int i = 0; i < r.size(); i++) {
+				final Contact c = repository.one(Contact.class, (BigInteger) r.get(i).get("contact.id"));
+				s += c.getId() + ": " + c.getLoginLink() + "\n";
+			}
 			s += "++++++++++++++++++++++\n" + token;
 			notificationService.createTicket(TicketType.ERROR, "recoverVerifyEmail failed", s, null);
 			return null;

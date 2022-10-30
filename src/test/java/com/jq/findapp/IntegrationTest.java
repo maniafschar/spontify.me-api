@@ -81,7 +81,8 @@ public class IntegrationTest {
 
 	private void addLocation(String name, String address) {
 		Util.click("home homeBody buttontext:nth-of-type(2)");
-		Util.click("menu a[onclick*=\"pageLocation.edit\"]");
+		Util.click("menu a[onclick*=\"events.edit\"]");
+		Util.click("buttontext[onclick*=\"pageLocation.edit\"]");
 		Util.sendKeys("popup input[name=\"name\"]", name);
 		Util.get("popup textarea[name=\"address\"]").clear();
 		Util.sendKeys("popup textarea[name=\"address\"]", address);

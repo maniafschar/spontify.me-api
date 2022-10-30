@@ -65,7 +65,9 @@ public class ContactListener extends AbstractRepositoryListener<Contact> {
 	public void postUpdate(final Contact contact) throws Exception {
 		if (contact.old("email") != null)
 			authenticationService.recoverSendEmail(contact.getEmail());
-		if (contact.getVerified() != null && contact.getVerified() && contact.getLoginLink() == null) {
+		if (contact.getVerified() != null && contact.getVerified() && contact.getLoginLink() == null
+				&& contact.getLastLogin() != null
+				&& Instant.now().toEpochMilli() - contact.getLastLogin().getTime() < 2000) {
 			final QueryParams params = new QueryParams(Query.contact_chat);
 			params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId());
 			if (repository.list(params).size() == 0) {

@@ -27,7 +27,7 @@ import com.jq.findapp.repository.Repository;
 @Component
 public class JwtGenerator {
 	private static Map<String, String> token = new HashMap<>();
-	private static final long TIMEOUT = 3300000;
+	private static final long TIMEOUT = 600000;
 	private static Map<String, PrivateKey> signingKey = new HashMap<>();
 
 	@Autowired
