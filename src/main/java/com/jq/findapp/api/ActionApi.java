@@ -223,6 +223,31 @@ public class ActionApi {
 		return externalService.google(param, user);
 	}
 
+	@GetMapping("searchLocation")
+	public List<Map<String, Object>> searchLocation(String search, @RequestHeader BigInteger user,
+			@RequestHeader String password, @RequestHeader String salt) throws Exception {
+		final Contact contact = authenticationService.verify(user, password, salt);
+		if (contact.getLongitude() == null)
+			return null;
+		final QueryParams params = new QueryParams(Query.location_listId);
+		params.setLongitude(contact.getLongitude());
+		params.setLatitude(contact.getLatitude());
+		search = search.replace('\'', '_');
+		params.setSearch("location.name like '%" + search + "%' or location.address like '%" + search + "%'");
+		final Result result = repository.list(params);
+		final List<Map<String, Object>> list = new ArrayList<>();
+		for (int i = 0; i < result.size(); i++) {
+			final Location location = repository.one(Location.class, (BigInteger) result.get(i).get("location.id"));
+			final Map<String, Object> m = new HashMap<>(4);
+			m.put("id", location.getId());
+			m.put("name", location.getName());
+			m.put("address", location.getAddress());
+			list.add(m);
+		}
+		return list;
+	}
+
+	// TODO remove 0.3.0
 	@GetMapping("nearByLocationAddress")
 	public List<Map<String, Object>> nearByLocationAddress(String search, @RequestHeader BigInteger user,
 			@RequestHeader String password, @RequestHeader String salt) throws Exception {
