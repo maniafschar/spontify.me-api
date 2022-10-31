@@ -71,7 +71,7 @@ public class EventService {
 	}
 
 	public void notifyParticipation() throws Exception {
-		final QueryParams params = new QueryParams(Query.event_participate);
+		final QueryParams params = new QueryParams(Query.location_eventParticipate);
 		params.setSearch("eventParticipate.eventDate>'" + Instant.now().minus((Duration.ofDays(1)))
 				+ "' and eventParticipate.eventDate<'"
 				+ Instant.now().plus(Duration.ofDays(1)) + "'");

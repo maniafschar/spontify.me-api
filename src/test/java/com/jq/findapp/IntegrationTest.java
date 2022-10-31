@@ -98,8 +98,8 @@ public class IntegrationTest {
 		Util.sendKeys("search input[name=\"searchKeywords\"]", "pseudonym");
 		Util.click("search buttontext[onclick*=\"saveSearch\"]");
 		Util.click("search row:nth-of-type(1)");
-		Util.click("main>buttonIcon[onclick*=\"toggleFavorite\"]");
-		Util.click("detail text[name=\"block\"] buttontext:nth-of-type(1)");
+		Util.click("detail buttontext[name=\"buttonFriend\"]");
+		Util.click("detail buttontext[onclick*=\"sendRequestForFriendship\"]");
 	}
 
 	private static class Util {

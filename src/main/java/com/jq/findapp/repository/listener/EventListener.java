@@ -25,7 +25,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	@Override
 	public void postUpdate(final Event event) throws Exception {
 		if (event.old("startDate") != null || event.old("price") != null) {
-			final QueryParams params = new QueryParams(Query.event_participate);
+			final QueryParams params = new QueryParams(Query.location_eventParticipate);
 			params.setSearch("eventParticipate.eventId=" + event.getId() + " and eventParticipate.state=1");
 			final Result result = repository.list(params);
 			for (int i = 0; i < result.size(); i++) {
@@ -54,7 +54,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 
 	@Override
 	public void postRemove(final Event event) throws Exception {
-		final QueryParams params = new QueryParams(Query.event_participate);
+		final QueryParams params = new QueryParams(Query.location_eventParticipate);
 		params.setSearch("eventParticipate.eventId=" + event.getId());
 		final Result result = repository.list(params);
 		for (int i = 0; i < result.size(); i++) {

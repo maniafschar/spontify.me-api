@@ -40,10 +40,7 @@ public enum Query {
 	contact_unique,
 	contact_what2do,
 
-	event_list(true),
-	event_listCurrent(true),
-	event_participate,
-
+	location_eventParticipate,
 	location_list,
 	location_listEvent(true),
 	location_listEventCurrent(true),
