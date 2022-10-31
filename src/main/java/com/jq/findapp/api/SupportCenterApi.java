@@ -186,8 +186,6 @@ public class SupportCenterApi {
 	public void scheduler(@RequestHeader String secret) throws Exception {
 		if (schedulerSecret.equals(secret)) {
 			dbUpdateService.update();
-			engagementService.sendSpontifyEmail();
-			engagementService.sendRegistrationReminder();
 			engagementService.sendChats();
 			engagementService.sendNearBy();
 			whatToDoService.findAndNotify();
@@ -195,6 +193,8 @@ public class SupportCenterApi {
 			eventService.notifyParticipation();
 			importLogService.importLog();
 			statisticsService.update();
+			engagementService.sendSpontifyEmail();
+			engagementService.sendRegistrationReminder();
 		}
 	}
 

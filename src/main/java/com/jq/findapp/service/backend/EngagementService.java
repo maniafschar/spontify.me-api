@@ -247,6 +247,7 @@ public class EngagementService {
 			notificationService.sendNotificationEmail(admin, to, text.get(to.getLanguage()),
 					"https://blog.spontify.me");
 			value += "|" + to.getId();
+			Thread.sleep(10000);
 		}
 		if (value.length() > 0) {
 			Setting s = new Setting();
@@ -257,6 +258,9 @@ public class EngagementService {
 	}
 
 	public void sendRegistrationReminder() throws Exception {
+		final GregorianCalendar gc = new GregorianCalendar();
+		if (gc.get(Calendar.HOUR_OF_DAY) < 9 || gc.get(Calendar.HOUR_OF_DAY) > 18)
+			return;
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.verified=false and contact.notificationEngagement=true");
 		params.setLimit(0);
@@ -270,11 +274,12 @@ public class EngagementService {
 					+ to.getId() + "|%'");
 			final Result result = repository.list(params);
 			if (result.size() == 0
-					|| ((Timestamp) result.get(0).get("setting.createdAt")).getTime() + 3 * DAY < System
+					|| ((Timestamp) result.get(0).get("setting.createdAt")).getTime() + 7 * DAY < System
 							.currentTimeMillis()) {
 				try {
 					authenticationService.recoverSendEmailReminder(to);
 					value += "|" + to.getId();
+					Thread.sleep(10000);
 				} catch (MailSendException ex) {
 					failedEmails += "\n" + to.getEmail();
 				}

@@ -409,6 +409,7 @@ public class NotificationService {
 					helper.addInline("img_profile", new MyDataSource(imageRound(imgProfile), "image.jpg"));
 			} else if (text.length > 0)
 				helper.setText(text[0]);
+			createTicket(TicketType.ERROR, "EMAIL SENT", to + ": " + subject, adminId);
 		}
 		email.send(msg);
 	}
