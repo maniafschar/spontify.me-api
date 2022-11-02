@@ -20,6 +20,10 @@ public class GeoLocationProcessor {
 	private static final double MAX_LON = Math.toRadians(180d);
 	private static final double radius = 6371.01;
 
+	private GeoLocationProcessor() {
+		super();
+	}
+
 	public GeoLocationProcessor(QueryParams params) {
 		if (params.getLatitude() != null && params.getLongitude() != null) {
 			if (params.getDistance() == null)
@@ -110,6 +114,13 @@ public class GeoLocationProcessor {
 		final double d = Math.toRadians(latitude);
 		return Math.acos(Math.sin(radLat) * Math.sin(d)
 				+ Math.cos(radLat) * Math.cos(d) * Math.cos(radLon - Math.toRadians(longitude))) * radius;
+	}
+
+	public static double distance(double latitude1, double longitude1, double latitude2, double longitude2) {
+		final GeoLocationProcessor geoLocationProcessor = new GeoLocationProcessor();
+		geoLocationProcessor.radLat = Math.toRadians(latitude1);
+		geoLocationProcessor.radLon = Math.toRadians(longitude1);
+		return geoLocationProcessor.distanceTo(latitude2, longitude2);
 	}
 
 	/**

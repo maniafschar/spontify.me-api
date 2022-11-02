@@ -59,6 +59,10 @@
 	},
 	"marketing": {
 		"event": "Hello CONTACT_PSEUDONYM, do you want to earn money? There is currently a cool campaign running in your town where you can earn money... curious? Then click me...",
+		"eventCheckedIn": "Hello <jq:EXTRA_1 />, you are now checked in for your event in the location <jq:EXTRA_2 />.\nHave fun 🎉 💃 🕺",
+		"eventCheckedInFailed": "Hello <jq:EXTRA_1 />, your event at location <jq:EXTRA_2 /> has already started, but you are still <jq:EXTRA_3 /> away. We can't check you in yet, go to the location to secure your reward.",
+		"eventCheckedOut": "Hello <jq:EXTRA_1 />, congratulations, you've earned the bonus!\nHave fun with your event 🎉 💃 🕺 and also in spontify.me",
+		"eventCheckedOutFailed": "Hello <jq:EXTRA_1 />, we can't confirm the reward for your event in location <jq:EXTRA_2 /> yet, you are <jq:EXTRA_3 /> away from the location. Go back to the location to get your reward.",
 		"iPadTitle": "Get the iPad 10.2",
 		"iPadText": "Anyone who collects the most friends here by June 30, 2022 will receive an iPad for free. Apple is not an sponsor of this campaign.",
 		"list": "The current ranking list:",

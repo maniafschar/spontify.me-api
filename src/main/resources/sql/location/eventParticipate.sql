@@ -5,8 +5,16 @@ select
 	eventParticipate.eventDate,
 	eventParticipate.state,
 	eventParticipate.reason,
-	eventParticipate.modifiedAt
+	eventParticipate.modifiedAt,
+	event.endDate,
+	event.locationId,
+	event.maxParticipants,
+	event.price,
+	event.startDate,
+	event.text,
+	event.type,
+	event.visibility
 FROM
-	EventParticipate eventParticipate
+	EventParticipate eventParticipate left join Event event on event.id=eventParticipate.eventId
 WHERE
 	{search}

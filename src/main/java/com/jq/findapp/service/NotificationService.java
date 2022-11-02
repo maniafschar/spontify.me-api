@@ -416,6 +416,10 @@ public class NotificationService {
 
 	public void createTicket(TicketType type, String subject, String text, BigInteger user) {
 		try {
+			if (subject.length() > 255) {
+				text = "..." + subject.substring(252) + "\n\n" + text;
+				subject = subject.substring(0, 252) + "...";
+			}
 			final Ticket ticket = new Ticket();
 			ticket.setSubject(subject);
 			ticket.setNote(text);
