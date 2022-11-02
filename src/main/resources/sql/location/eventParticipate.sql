@@ -8,6 +8,7 @@ select
 	eventParticipate.modifiedAt,
 	event.endDate,
 	event.locationId,
+	event.marketingEvent,
 	event.maxParticipants,
 	event.price,
 	event.startDate,

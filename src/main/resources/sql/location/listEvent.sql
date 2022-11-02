@@ -6,6 +6,7 @@ SELECT
 	event.image,
 	event.imageList,
 	event.locationId,
+	event.marketingEvent,
 	event.maxParticipants,
 	event.price,
 	event.startDate,
