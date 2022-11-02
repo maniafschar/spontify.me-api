@@ -23,6 +23,16 @@ import com.jq.findapp.util.Strings;
 @Component
 public class EventListener extends AbstractRepositoryListener<Event> {
 	@Override
+	public void postPersist(Event event) throws Exception {
+		final EventParticipate eventParticipate = new EventParticipate();
+		eventParticipate.setState((short) 1);
+		eventParticipate.setContactId(event.getContactId());
+		eventParticipate.setEventId(event.getId());
+		eventParticipate.setEventDate(new java.sql.Date(event.getStartDate().getTime()));
+		repository.save(eventParticipate);
+	}
+
+	@Override
 	public void postUpdate(final Event event) throws Exception {
 		if (event.old("startDate") != null || event.old("price") != null) {
 			final QueryParams params = new QueryParams(Query.location_eventParticipate);

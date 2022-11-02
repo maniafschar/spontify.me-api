@@ -54,7 +54,8 @@ public class IntegrationTest {
 	public void run() throws Exception {
 		init();
 		register("testabcd", "test@jq-consulting.de");
-		addLocation("location 1", "Melchiorstr. 9\n81479 München");
+		addLocation("location 1", "Melchiorstr. 9\n81479 München", false);
+		addLocation("location 1", "Melchiorstr. 9\n81479 München", true);
 		addFriend();
 	}
 
@@ -75,22 +76,31 @@ public class IntegrationTest {
 		final String s = Util.email(0).lines().reduce(
 				(e, e2) -> e.startsWith("https://") ? e : e2.startsWith("https://") ? e2 : "").get();
 		driver.navigate().to(url + s.substring(s.indexOf('?')));
+		Util.sleep(500);
 		Util.sendKeys("popup input[name=\"passwd\"]", "qwer1234");
 		Util.click("popup buttontext");
 	}
 
-	private void addLocation(String name, String address) {
+	private void addLocation(String name, String address, boolean duplicate) {
 		Util.click("home homeBody buttontext:nth-of-type(2)");
 		Util.click("menu a[onclick*=\"events.edit\"]");
 		Util.click("buttontext[onclick*=\"pageLocation.edit\"]");
 		Util.sendKeys("popup input[name=\"name\"]", name);
 		Util.get("popup textarea[name=\"address\"]").clear();
+		Util.sleep(300);
 		Util.sendKeys("popup textarea[name=\"address\"]", address);
 		Util.click("popup input[name=\"budget\"]:nth-of-type(2)");
 		Util.click("popup input[name=\"parkingOption\"]:nth-of-type(2)");
 		Util.click("popup input[name=\"locationcategory\"]:nth-of-type(5)");
-		Util.click("popup buttontext");
+		Util.click("popup dialogbuttons buttontext");
+		if (duplicate) {
+			Util.get("popup popupHint").getText().toLowerCase().contains("location");
+			Util.click("popupTitle");
+		}
 		Util.click("main>buttonIcon[class*=\"center\"]");
+		Util.sleep(500);
+		Util.click("main>buttonIcon[class*=\"center\"]");
+		Util.sleep(300);
 	}
 
 	private void addFriend() {

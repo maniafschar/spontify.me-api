@@ -30,14 +30,17 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		location.getName();
 		params.setUser(repository.one(Contact.class, location.getContactId()));
 		params.setSearch(
-				"REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(location.address),'''',''),'\\n',''),'\\r',''),'\\t',''),' ','')='"
-						+ location.getAddress().toLowerCase().replaceAll("'", "").replaceAll("\n", "")
-								.replaceAll("\r", "").replaceAll("\t", "").replaceAll(" ", "")
-						+ "'");
+				"location.zipCode='" + location.getZipCode() + "' and LOWER(location.street)='"
+						+ location.getStreet().toLowerCase().replaceAll("'", "\\'") + "'");
 		final Result list = repository.list(params);
 		for (int i = 0; i < list.size(); i++) {
-			if (isNameMatch((String) list.get(i).get("location.name"), location.getName(), true))
-				throw new IllegalAccessException("Location exists");
+			if (isNameMatch((String) list.get(i).get("location.name"), location.getName(), true)) {
+				String category = (String) list.get(i).get("location.category");
+				for (int i2 = 0; i2 < location.getCategory().length(); i2++) {
+					if (category.contains(location.getCategory().substring(i2, i2 + 1)))
+						throw new IllegalAccessException("Location exists");
+				}
+			}
 		}
 	}
 
@@ -98,7 +101,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 			if (name2.contains(n[i]))
 				count++;
 		}
-		if (count == n.length)
+		if (count == n.length || n.length > 3 && count > n.length - 2)
 			return true;
 		if (tryReverse)
 			return isNameMatch(name2, name1, false);

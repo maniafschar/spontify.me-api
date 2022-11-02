@@ -8,5 +8,6 @@ import com.jq.findapp.entity.ContactGeoLocationHistory;
 public class ContactGeoLocationHistoryListener extends AbstractRepositoryListener<ContactGeoLocationHistory> {
 	@Override
 	public void postPersist(final ContactGeoLocationHistory contactGeoLocationHistory) throws Exception {
+
 	}
 }
