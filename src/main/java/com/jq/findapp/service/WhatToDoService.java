@@ -29,7 +29,7 @@ public class WhatToDoService {
 	@Autowired
 	private NotificationService notificationService;
 
-	public void findAndNotify() throws Exception {
+	public void findMatchingSpontis() throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_listWhat2do);
 		params.setSearch("contactWhatToDo.active=true");
 		params.setLimit(0);
@@ -41,11 +41,11 @@ public class WhatToDoService {
 				contactWhatToDo.setActive(false);
 				repository.save(contactWhatToDo);
 			} else
-				findAndNotify(contactWhatToDo);
+				findMatchingSpontis(contactWhatToDo);
 		}
 	}
 
-	public void findAndNotify(ContactWhatToDo contactWhatToDo) throws Exception {
+	public void findMatchingSpontis(ContactWhatToDo contactWhatToDo) throws Exception {
 		final Contact contact = repository.one(Contact.class, contactWhatToDo.getContactId());
 		String search = Score.getSearchContact(contact);
 		if (search.length() > 0) {

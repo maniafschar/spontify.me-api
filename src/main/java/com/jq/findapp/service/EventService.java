@@ -1,4 +1,4 @@
-package com.jq.findapp.service.backend;
+package com.jq.findapp.service;
 
 import java.math.BigInteger;
 import java.time.Duration;
@@ -9,20 +9,23 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.Location;
+import com.jq.findapp.repository.GeoLocationProcessor;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Score;
 import com.jq.findapp.util.Strings;
+import com.jq.findapp.util.Text;
 
 @Service
 public class EventService {
@@ -32,7 +35,10 @@ public class EventService {
 	@Autowired
 	private NotificationService notificationService;
 
-	public void findAndNotify() throws Exception {
+	@Value("${app.admin.id}")
+	private BigInteger adminId;
+
+	public void findMatchingSpontis() throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch(
 				"contact.verified=true and contact.version is not null and contact.longitude is not null and (" +
@@ -72,7 +78,8 @@ public class EventService {
 
 	public void notifyParticipation() throws Exception {
 		final QueryParams params = new QueryParams(Query.location_eventParticipate);
-		params.setSearch("eventParticipate.eventDate>'" + Instant.now().minus((Duration.ofDays(1)))
+		params.setSearch("eventParticipate.state=1 and eventParticipate.eventDate>'"
+				+ Instant.now().minus((Duration.ofDays(1)))
 				+ "' and eventParticipate.eventDate<'"
 				+ Instant.now().plus(Duration.ofDays(1)) + "'");
 		params.setLimit(0);
@@ -100,6 +107,19 @@ public class EventService {
 		}
 	}
 
+	public void notifyCheckInOut() throws Exception {
+		final QueryParams params = new QueryParams(Query.location_eventParticipate);
+		params.setSearch("event.marketingEvent=true and event.startDate>='"
+				+ Instant.now().minus(Duration.ofHours(1)) + "' and event.startDate<='"
+				+ Instant.now().plus(Duration.ofHours(2)) + "' and eventParticipate.state=1");
+		final Result result = repository.list(params);
+		for (int i = 0; i < result.size(); i++) {
+			final Contact contact = repository.one(Contact.class, (BigInteger) result.get(i).get("event.contactId"));
+			sendCheckInOut((BigInteger) result.get(i).get("event.id"),
+					contact.getLatitude(), contact.getLongitude());
+		}
+	}
+
 	private LocalDate getRealDate(Event event, LocalDate now) {
 		LocalDate realDate = Instant.ofEpochMilli(event.getStartDate().getTime())
 				.atZone(ZoneId.systemDefault()).toLocalDate();
@@ -116,6 +136,65 @@ public class EventService {
 			}
 		}
 		return realDate;
+	}
+
+	public void sendCheckInOut(BigInteger eventId, double latitude, double longitude)
+			throws Exception {
+		final Event event = repository.one(Event.class, eventId);
+		final Location location = repository.one(Location.class, event.getLocationId());
+		final double distance = GeoLocationProcessor.distance(location.getLatitude(), location.getLongitude(),
+				latitude, longitude);
+		final double maxDistance = 0.01;
+		final QueryParams params = new QueryParams(Query.contact_chat);
+		params.setSearch("chat.textId='" + Text.marketing_eventCheckedIn + "' and chat.createdAt>'"
+				+ Instant.now().minus(Duration.ofDays(1)) + "'");
+		final Instant eventTime = Instant.ofEpochMilli(event.getStartDate().getTime());
+		if (repository.list(params).size() == 0) {
+			if (Instant.now().plus(Duration.ofMinutes(10)).isAfter(eventTime)) {
+				if (distance < maxDistance)
+					sendChat(event, Text.marketing_eventCheckedIn, distance);
+				else if (Instant.now().minus(Duration.ofMinutes(10)).isAfter(eventTime)) {
+					params.setSearch("chat.textId='" + Text.marketing_eventCheckedInFailed + "' and chat.createdAt>'"
+							+ Instant.now().minus(Duration.ofHours(6)) + "'");
+					if (repository.list(params).size() == 0)
+						sendChat(event, Text.marketing_eventCheckedInFailed, distance);
+				}
+			}
+		} else {
+			if (Instant.now().minus(Duration.ofHours(1)).isAfter(eventTime)) {
+				params.setSearch("chat.textId='" + Text.marketing_eventCheckedOut + "' and chat.createdAt>'"
+						+ Instant.now().minus(Duration.ofHours(6)) + "'");
+				if (repository.list(params).size() == 0) {
+					if (distance < maxDistance)
+						sendChat(event, Text.marketing_eventCheckedOut, distance);
+					else {
+						params.setSearch(
+								"chat.textId='" + Text.marketing_eventCheckedOutFailed + "' and chat.createdAt>'"
+										+ Instant.now().minus(Duration.ofHours(6)) + "'");
+						if (repository.list(params).size() == 0)
+							sendChat(event, Text.marketing_eventCheckedOutFailed, distance);
+					}
+				}
+			}
+		}
+	}
+
+	private void sendChat(Event event, Text text, double distance) throws Exception {
+		final String d;
+		if (distance >= 1)
+			d = String.format("%.1f", distance) + "km";
+		else
+			d = ((int) (distance * 1000.0)) + "m";
+		final Contact contact = repository.one(Contact.class, event.getContactId());
+		final Chat chat = new Chat();
+		chat.setContactId(adminId);
+		chat.setContactId2(contact.getId());
+		chat.setSeen(false);
+		chat.setTextId(text);
+		chat.setNote(text.getText(contact.getLanguage()).replace("<jq:EXTRA_1 />", contact.getPseudonym())
+				.replace("<jq:EXTRA_2 />", repository.one(Location.class, event.getLocationId()).getName())
+				.replace("<jq:EXTRA_3 />", d));
+		repository.save(chat);
 	}
 
 	private boolean isMaxParticipants(Event event, LocalDate date, Contact contact) {

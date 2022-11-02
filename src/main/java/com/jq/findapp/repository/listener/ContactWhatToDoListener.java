@@ -13,11 +13,11 @@ public class ContactWhatToDoListener extends AbstractRepositoryListener<ContactW
 
 	@Override
 	public void postUpdate(final ContactWhatToDo contactWhatToDo) throws Exception {
-		whatToDoService.findAndNotify(contactWhatToDo);
+		whatToDoService.findMatchingSpontis(contactWhatToDo);
 	}
 
 	@Override
 	public void postPersist(final ContactWhatToDo contactWhatToDo) throws Exception {
-		whatToDoService.findAndNotify(contactWhatToDo);
+		whatToDoService.findMatchingSpontis(contactWhatToDo);
 	}
 }
