@@ -31,7 +31,7 @@ public class ContactGeoLocationHistoryListener extends AbstractRepositoryListene
 			final GeoLocation geoLocation = repository.one(GeoLocation.class,
 					contactGeoLocationHistory.getGeoLocationId());
 			eventService.sendCheckInOut((BigInteger) events.get(0).get("event.id"),
-					geoLocation.getLatitude(), geoLocation.getLongitude());
+					geoLocation.getLatitude(), geoLocation.getLongitude(), true);
 		}
 	}
 }

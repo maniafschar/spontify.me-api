@@ -63,6 +63,7 @@
 		"eventCheckedInFailed": "Hallo <jq:EXTRA_1 />, Dein Event in der Location <jq:EXTRA_2 /> hat bereits begonnen, Du bist aber noch <jq:EXTRA_3 /> entfernt. Wir können Dich noch nicht einchecken, gehe zur Location um Dir die Prämie zu sichern.",
 		"eventCheckedOut": "Hallo <jq:EXTRA_1 />, Glückwunsch, Du hast Dir die Prämie verdient!\nWeiterhin viel Spaß bei Deinem Event 🎉 💃 🕺 und auch in spontify.me",
 		"eventCheckedOutFailed": "Hallo <jq:EXTRA_1 />, wir können Dir die Prämie für Dein Event in der Location <jq:EXTRA_2 /> noch nicht bestätigen, Du bist <jq:EXTRA_3 /> von der Location entfernt. Gehe zur Location zurück, um Dir die Prämie zu sichern.",
+		"eventLocationFailed": "Hallo <jq:EXTRA_1 />, wir können Dir die Prämie für Dein Event in der Location <jq:EXTRA_2 /> noch nicht bestätigen, es scheint dass Du den Ortungsdienst für spontify.me nicht aktiviert hast. Aktiviere ihn in den Einstellungen, um Dir die Prämie zu sichern.",
 		"iPadTitle": "Hol Dir das iPad 10.2",
 		"iPadText": "Wer bis 30.6.22 die meisten Freunde hier sammelt, bekommt ein iPad geschenkt. Apple ist kein Sponsor dieser Kampagne.",
 		"list": "Hier die aktuelle Bestenliste:",

@@ -70,6 +70,7 @@ public enum Text {
 	marketing_eventCheckedInFailed,
 	marketing_eventCheckedOut,
 	marketing_eventCheckedOutFailed,
+	marketing_eventLocationFailed,
 	marketing_iPadText,
 	marketing_iPadTitle,
 	marketing_list,

@@ -116,7 +116,7 @@ public class EventService {
 		for (int i = 0; i < result.size(); i++) {
 			final Contact contact = repository.one(Contact.class, (BigInteger) result.get(i).get("event.contactId"));
 			sendCheckInOut((BigInteger) result.get(i).get("event.id"),
-					contact.getLatitude(), contact.getLongitude());
+					contact.getLatitude(), contact.getLongitude(), false);
 		}
 	}
 
@@ -138,20 +138,29 @@ public class EventService {
 		return realDate;
 	}
 
-	public void sendCheckInOut(BigInteger eventId, double latitude, double longitude)
+	public void sendCheckInOut(BigInteger eventId, Float latitude, Float longitude, boolean fromLocationService)
 			throws Exception {
+		final QueryParams params = new QueryParams(Query.contact_chat);
 		final Event event = repository.one(Event.class, eventId);
+		final Instant eventTime = Instant.ofEpochMilli(event.getStartDate().getTime());
+		if (latitude == null) {
+			if (Instant.now().plus(Duration.ofMinutes(10)).isAfter(eventTime)) {
+				params.setSearch("chat.textId='" + Text.marketing_eventLocationFailed + "' and chat.createdAt>'"
+						+ Instant.now().minus(Duration.ofDays(1)) + "'");
+				if (repository.list(params).size() == 0)
+					sendChat(event, Text.marketing_eventLocationFailed, 0);
+			}
+			return;
+		}
 		final Location location = repository.one(Location.class, event.getLocationId());
 		final double distance = GeoLocationProcessor.distance(location.getLatitude(), location.getLongitude(),
 				latitude, longitude);
-		final double maxDistance = 0.01;
-		final QueryParams params = new QueryParams(Query.contact_chat);
+		final double maxDistance = 0.1;
 		params.setSearch("chat.textId='" + Text.marketing_eventCheckedIn + "' and chat.createdAt>'"
 				+ Instant.now().minus(Duration.ofDays(1)) + "'");
-		final Instant eventTime = Instant.ofEpochMilli(event.getStartDate().getTime());
 		if (repository.list(params).size() == 0) {
 			if (Instant.now().plus(Duration.ofMinutes(10)).isAfter(eventTime)) {
-				if (distance < maxDistance)
+				if (fromLocationService && distance < maxDistance)
 					sendChat(event, Text.marketing_eventCheckedIn, distance);
 				else if (Instant.now().minus(Duration.ofMinutes(10)).isAfter(eventTime)) {
 					params.setSearch("chat.textId='" + Text.marketing_eventCheckedInFailed + "' and chat.createdAt>'"
@@ -165,7 +174,7 @@ public class EventService {
 				params.setSearch("chat.textId='" + Text.marketing_eventCheckedOut + "' and chat.createdAt>'"
 						+ Instant.now().minus(Duration.ofHours(6)) + "'");
 				if (repository.list(params).size() == 0) {
-					if (distance < maxDistance)
+					if (fromLocationService && distance < maxDistance)
 						sendChat(event, Text.marketing_eventCheckedOut, distance);
 					else {
 						params.setSearch(
