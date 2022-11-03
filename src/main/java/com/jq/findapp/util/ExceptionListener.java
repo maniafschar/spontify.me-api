@@ -77,6 +77,7 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 		}
 		final StringBuilder s = new StringBuilder(
 				new SimpleDateFormat("\n\ndd.MM.yyyy HH:mm:ss\n").format(new Date()));
+		BigInteger userId = null;
 		if (request.getHeader("user") != null && !"0".equals(request.getHeader("user"))) {
 			final Contact user = repository.one(Contact.class, new BigInteger(request.getHeader("user")));
 			if (user == null)
@@ -86,6 +87,7 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 				s.append("\nversion: " + user.getVersion());
 				s.append("\ndevice: " + user.getDevice());
 				s.append("\nos: " + user.getOs());
+				userId = user.getId();
 			}
 			s.append("\n");
 		}
@@ -113,10 +115,10 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 		}
 		msg = msg.replaceFirst(SUBSTITUTE, "" + request.getServerPort()).replaceFirst(SUBSTITUTE, s.toString());
 		try {
-			notificationService.createTicket(TicketType.ERROR, ex.getMessage(), msg, null);
+			notificationService.createTicket(TicketType.ERROR, ex.getMessage(), msg, userId);
 		} catch (Exception e1) {
 			notificationService.createTicket(TicketType.ERROR, "creationg error report!",
-					Strings.stackTraceToString(e1) + "\n\n\n" + msg, null);
+					Strings.stackTraceToString(e1) + "\n\n\n" + msg, userId);
 		}
 	}
 
