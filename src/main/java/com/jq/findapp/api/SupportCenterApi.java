@@ -43,6 +43,8 @@ import com.jq.findapp.util.Text;
 @CrossOrigin(origins = { "https://sc.spontify.me" })
 @RequestMapping("support")
 public class SupportCenterApi {
+	private static volatile boolean schedulerRunning = false;
+
 	@Autowired
 	private Repository repository;
 
@@ -184,18 +186,23 @@ public class SupportCenterApi {
 
 	@PutMapping("scheduler")
 	public void scheduler(@RequestHeader String secret) throws Exception {
-		if (schedulerSecret.equals(secret)) {
-			dbUpdateService.update();
-			engagementService.sendChats();
-			engagementService.sendNearBy();
-			whatToDoService.findMatchingSpontis();
-			eventService.findMatchingSpontis();
-			eventService.notifyParticipation();
-			eventService.notifyCheckInOut();
-			importLogService.importLog();
-			statisticsService.update();
-			engagementService.sendSpontifyEmail();
-			engagementService.sendRegistrationReminder();
+		if (schedulerSecret.equals(secret) && !schedulerRunning) {
+			try {
+				schedulerRunning = true;
+				dbUpdateService.update();
+				engagementService.sendChats();
+				engagementService.sendNearBy();
+				whatToDoService.findMatchingSpontis();
+				eventService.findMatchingSpontis();
+				eventService.notifyParticipation();
+				eventService.notifyCheckInOut(null);
+				importLogService.importLog();
+				statisticsService.update();
+				engagementService.sendSpontifyEmail();
+				engagementService.sendRegistrationReminder();
+			} finally {
+				schedulerRunning = false;
+			}
 		}
 	}
 

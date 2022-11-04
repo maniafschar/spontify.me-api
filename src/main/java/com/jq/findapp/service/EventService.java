@@ -107,16 +107,17 @@ public class EventService {
 		}
 	}
 
-	public void notifyCheckInOut() throws Exception {
+	public void notifyCheckInOut(BigInteger contactId) throws Exception {
 		final QueryParams params = new QueryParams(Query.location_eventParticipate);
-		params.setSearch("event.marketingEvent=true and event.startDate>='"
-				+ Instant.now().minus(Duration.ofHours(1)) + "' and event.startDate<='"
-				+ Instant.now().plus(Duration.ofHours(2)) + "' and eventParticipate.state=1");
+		params.setSearch((contactId == null ? "" : "eventParticipate.contactId=" + contactId + " and ") +
+				"event.marketingEvent=true and event.startDate>='"
+				+ Instant.now().minus(Duration.ofHours(3)) + "' and event.startDate<='"
+				+ Instant.now().plus(Duration.ofHours(1)) + "' and eventParticipate.state=1");
 		final Result result = repository.list(params);
 		for (int i = 0; i < result.size(); i++) {
 			final Contact contact = repository.one(Contact.class, (BigInteger) result.get(i).get("event.contactId"));
 			sendCheckInOut((BigInteger) result.get(i).get("event.id"),
-					contact.getLatitude(), contact.getLongitude(), false);
+					contact.getLatitude(), contact.getLongitude(), contactId != null);
 		}
 	}
 
@@ -145,7 +146,8 @@ public class EventService {
 		final Instant eventTime = Instant.ofEpochMilli(event.getStartDate().getTime());
 		if (latitude == null) {
 			if (Instant.now().plus(Duration.ofMinutes(10)).isAfter(eventTime)) {
-				params.setSearch("chat.textId='" + Text.marketing_eventLocationFailed + "' and chat.createdAt>'"
+				params.setSearch("chat.contactId2=" + event.getContactId() + " and chat.textId='"
+						+ Text.marketing_eventLocationFailed + "' and chat.createdAt>'"
 						+ Instant.now().minus(Duration.ofDays(1)) + "'");
 				if (repository.list(params).size() == 0)
 					sendChat(event, Text.marketing_eventLocationFailed, 0);
@@ -156,33 +158,35 @@ public class EventService {
 		final double distance = GeoLocationProcessor.distance(location.getLatitude(), location.getLongitude(),
 				latitude, longitude);
 		final double maxDistance = 0.1;
-		params.setSearch("chat.textId='" + Text.marketing_eventCheckedIn + "' and chat.createdAt>'"
-				+ Instant.now().minus(Duration.ofDays(1)) + "'");
+		params.setSearch("chat.contactId2=" + event.getContactId() + " and chat.textId='"
+				+ Text.marketing_eventCheckedIn + "' and chat.createdAt>'"
+				+ Instant.now().minus(Duration.ofHours(6)) + "'");
 		if (repository.list(params).size() == 0) {
 			if (Instant.now().plus(Duration.ofMinutes(10)).isAfter(eventTime)) {
 				if (fromLocationService && distance < maxDistance)
 					sendChat(event, Text.marketing_eventCheckedIn, distance);
 				else if (Instant.now().minus(Duration.ofMinutes(10)).isAfter(eventTime)) {
-					params.setSearch("chat.textId='" + Text.marketing_eventCheckedInFailed + "' and chat.createdAt>'"
+					params.setSearch("chat.contactId2=" + event.getContactId() + " and chat.textId='"
+							+ Text.marketing_eventCheckedInFailed + "' and chat.createdAt>'"
 							+ Instant.now().minus(Duration.ofHours(6)) + "'");
 					if (repository.list(params).size() == 0)
 						sendChat(event, Text.marketing_eventCheckedInFailed, distance);
 				}
 			}
-		} else {
-			if (Instant.now().minus(Duration.ofHours(1)).isAfter(eventTime)) {
-				params.setSearch("chat.textId='" + Text.marketing_eventCheckedOut + "' and chat.createdAt>'"
-						+ Instant.now().minus(Duration.ofHours(6)) + "'");
-				if (repository.list(params).size() == 0) {
-					if (fromLocationService && distance < maxDistance)
-						sendChat(event, Text.marketing_eventCheckedOut, distance);
-					else {
-						params.setSearch(
-								"chat.textId='" + Text.marketing_eventCheckedOutFailed + "' and chat.createdAt>'"
-										+ Instant.now().minus(Duration.ofHours(6)) + "'");
-						if (repository.list(params).size() == 0)
-							sendChat(event, Text.marketing_eventCheckedOutFailed, distance);
-					}
+		} else if (Instant.now().minus(Duration.ofHours(1)).isAfter(eventTime)) {
+			params.setSearch("chat.contactId2=" + event.getContactId() + " and chat.textId='"
+					+ Text.marketing_eventCheckedOut + "' and chat.createdAt>'"
+					+ Instant.now().minus(Duration.ofHours(6)) + "'");
+			if (repository.list(params).size() == 0) {
+				if (fromLocationService && distance < maxDistance)
+					sendChat(event, Text.marketing_eventCheckedOut, distance);
+				else {
+					params.setSearch("chat.contactId2=" + event.getContactId() + " and chat.contactId2="
+							+ event.getContactId() + " and chat.textId='" + Text.marketing_eventCheckedOutFailed
+							+ "' and chat.createdAt>'"
+							+ Instant.now().minus(Duration.ofHours(6)) + "'");
+					if (repository.list(params).size() == 0)
+						sendChat(event, Text.marketing_eventCheckedOutFailed, distance);
 				}
 			}
 		}
