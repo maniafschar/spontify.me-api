@@ -1,6 +1,7 @@
 package com.jq.findapp.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -21,7 +22,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.JpaTestConfiguration;
 import com.jq.findapp.entity.Chat;
@@ -250,5 +253,23 @@ public class RepositoryTest {
 
 		// then
 		assertTrue(matches);
+	}
+
+	@Test
+	public void convertObject2Json() throws Exception {
+		// given
+		final Contact contact = new Contact();
+		contact.setAttr("xyz");
+		contact.setAboutMe("about others");
+		final JsonNode node = new ObjectMapper().convertValue(contact, JsonNode.class);
+		((ObjectNode) node).put("attr", "abc");
+
+		// when
+		final String result = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(node);
+
+		// then
+		assertTrue(result.contains("abc"));
+		assertTrue(result.contains("about others"));
+		assertFalse(result.contains("xyz"));
 	}
 }

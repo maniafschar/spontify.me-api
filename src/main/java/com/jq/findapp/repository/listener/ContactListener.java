@@ -9,7 +9,6 @@ import java.util.GregorianCalendar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactLink;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
@@ -17,7 +16,6 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.service.AuthenticationService;
-import com.jq.findapp.util.Text;
 
 @Component
 public class ContactListener extends AbstractRepositoryListener<Contact> {
@@ -65,22 +63,6 @@ public class ContactListener extends AbstractRepositoryListener<Contact> {
 	public void postUpdate(final Contact contact) throws Exception {
 		if (contact.old("email") != null)
 			authenticationService.recoverSendEmail(contact.getEmail());
-		if (contact.getVerified() != null && contact.getVerified() && contact.getLoginLink() == null
-				&& contact.getLastLogin() != null
-				&& Instant.now().toEpochMilli() - contact.getLastLogin().getTime() < 2000) {
-			final QueryParams params = new QueryParams(Query.contact_chat);
-			params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId());
-			if (repository.list(params).size() == 0) {
-				final Chat chat = new Chat();
-				chat.setContactId(adminId);
-				chat.setContactId2(contact.getId());
-				chat.setSeen(false);
-				chat.setTextId(Text.mail_welcome);
-				chat.setNote(Text.mail_welcome.getText(contact.getLanguage()).replace("<jq:EXTRA_1 />",
-						contact.getPseudonym()));
-				repository.save(chat);
-			}
-		}
 	}
 
 	@Override
