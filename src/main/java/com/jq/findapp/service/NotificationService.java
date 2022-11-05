@@ -218,8 +218,8 @@ public class NotificationService {
 		values.chatNew = new HashMap<>();
 		for (int i = 0; i < list.size(); i++) {
 			final Map<String, Object> row = list.get(i);
-			values.chatNew.put("" + row.get("chat.contactId"), ((Number) row.get("_c")).intValue());
-			values.totalNew += ((Number) values.chatNew.get("" + row.get("chat.contactId"))).intValue();
+			values.chatNew.put((BigInteger) row.get("contact.id"), (String) row.get("contact.pseudonym"));
+			values.totalNew++;
 		}
 		params.setQuery(Query.contact_pingChatUnseen);
 		list = repository.list(params);
@@ -459,7 +459,7 @@ public class NotificationService {
 	public static class Ping {
 		private BigInteger firstChatId;
 		private BigInteger userId;
-		private Map<String, Integer> chatNew;
+		private Map<BigInteger, String> chatNew;
 		private Map<String, Integer> chatUnseen;
 		private int chat;
 		private int notification;
@@ -469,7 +469,7 @@ public class NotificationService {
 			return userId;
 		}
 
-		public Map<String, Integer> getChatNew() {
+		public Map<BigInteger, String> getChatNew() {
 			return chatNew;
 		}
 

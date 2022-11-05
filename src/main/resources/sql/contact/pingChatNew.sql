@@ -1,13 +1,13 @@
 SELECT
-	chat.contactId,
-	count(*) as c
+	contact.id,
+	contact.pseudonym
 FROM
-	Chat chat,
-	Contact contact
+	Contact contact,
+	Chat chat
 WHERE
-	contact.id={USERID} and
-	contact.id=chat.contactId2 and
+	contact.id=chat.contactId and
+	chat.contactId2={USERID} and
 	chat.seen=false and
 	{search}
 GROUP BY
-	chat.contactId
+	contact.id

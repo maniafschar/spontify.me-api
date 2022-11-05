@@ -16,6 +16,6 @@ public class DbUpdateService {
 		repository.executeUpdate(
 				"update Contact set version=null where (version='0.9.9' or version='0.9.3') and (id=217 or id=310)");
 		repository.executeUpdate(
-				"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and TO_DAYS(contactNotification.createdAt)+2<TO_DAYS((select lastLogin from Contact contact where contact.id=contactNotification.contactId))");
+				"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and (select lastLogin from Contact contact where contact.id=contactNotification.contactId)>contactNotification.createdAt and TIMESTAMPDIFF(HOUR,contactNotification.createdAt,current_timestamp)>24");
 	}
 }
