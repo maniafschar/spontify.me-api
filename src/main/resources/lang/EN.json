@@ -24,7 +24,7 @@
 		"praise": "Hey CONTACT_PSEUDONYM, just a compliment, nothing more. You have a great profile. Keep it up. ❤️\nIf you have anything on your mind about the app, please let me know here.",
 		"uploadProfileAttributes": "Hey CONTACT_PSEUDONYM, the appropriate attributes together with your birthday and your gender help you to find suitable Spontis, Events and Locations and to use \"Any plans for today?\" or Bluetooth Matching. Click me if you want to add your details now.",
 		"uploadProfileImage": "You get 81% more interactions with an attractive picture in your profile. It's worth it, give it a try. Ask me if you have problems using the app.",
-		"welcome": "Hello <jq:EXTRA_1 />,\n\nit's nice to have you here. Take a look around and contact me if you have any questions.\n\nHave fun\nYour spontify.me team"
+		"welcome": "Hello CONTACT_PSEUDONYM,\n\nit's nice to have you here. Take a look around and contact me if you have any questions.\n\nHave fun\nYour spontify.me team"
 	},
 	"mail": {
 		"chatLocation": "chatted on location <jq:EXTRA_2 />:\n\n<jq:EXTRA_3 />\n\nYou have <jq:EXTRA_1 /> common attributes.",

@@ -414,6 +414,7 @@ public class NotificationService {
 		email.send(msg);
 	}
 
+	@Async
 	public void createTicket(TicketType type, String subject, String text, BigInteger user) {
 		try {
 			if (subject.length() > 255) {

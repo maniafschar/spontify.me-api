@@ -18,22 +18,24 @@ import com.jq.findapp.util.Strings;
 public class EventParticipateListener extends AbstractRepositoryListener<EventParticipate> {
 	@Override
 	public void postPersist(final EventParticipate eventParticipate) throws Exception {
-		final Event event = repository.one(Event.class, eventParticipate.getEventId());
-		if (event != null && !event.getContactId().equals(eventParticipate.getContactId())) {
-			final Contact contactTo = repository.one(Contact.class, event.getContactId());
-			final Contact contactFrom = repository.one(Contact.class,
-					eventParticipate.getContactId());
-			final Instant time = Instant.ofEpochMilli(
-					repository.one(Event.class, eventParticipate.getEventId()).getStartDate()
-							.getTime());
-			time.minus(Duration.ofMinutes(contactTo.getTimezoneOffset()));
-			notificationService.sendNotification(contactFrom, contactTo,
-					ContactNotificationTextType.eventParticipate,
-					Strings.encodeParam("p=" + contactFrom.getId()),
-					new SimpleDateFormat("dd.MM.yyyy").format(eventParticipate.getEventDate()) +
-							new SimpleDateFormat(" HH:mm").format(new Date(time.toEpochMilli())),
-					event.getText(),
-					repository.one(Location.class, event.getLocationId()).getName());
+		if (eventParticipate.getModifiedAt() == null) {
+			final Event event = repository.one(Event.class, eventParticipate.getEventId());
+			if (event != null && !event.getContactId().equals(eventParticipate.getContactId())) {
+				final Contact contactTo = repository.one(Contact.class, event.getContactId());
+				final Contact contactFrom = repository.one(Contact.class,
+						eventParticipate.getContactId());
+				final Instant time = Instant.ofEpochMilli(
+						repository.one(Event.class, eventParticipate.getEventId()).getStartDate()
+								.getTime());
+				time.minus(Duration.ofMinutes(contactTo.getTimezoneOffset()));
+				notificationService.sendNotification(contactFrom, contactTo,
+						ContactNotificationTextType.eventParticipate,
+						Strings.encodeParam("p=" + contactFrom.getId()),
+						new SimpleDateFormat("dd.MM.yyyy").format(eventParticipate.getEventDate()) +
+								new SimpleDateFormat(" HH:mm").format(new Date(time.toEpochMilli())),
+						event.getText(),
+						repository.one(Location.class, event.getLocationId()).getName());
+			}
 		}
 	}
 }

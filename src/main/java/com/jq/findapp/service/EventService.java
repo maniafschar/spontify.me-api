@@ -10,6 +10,7 @@ import java.time.ZonedDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.jq.findapp.entity.Chat;
@@ -107,6 +108,7 @@ public class EventService {
 		}
 	}
 
+	@Async
 	public void notifyCheckInOut(BigInteger contactId) throws Exception {
 		final QueryParams params = new QueryParams(Query.location_eventParticipate);
 		params.setSearch((contactId == null ? "" : "eventParticipate.contactId=" + contactId + " and ") +
@@ -121,7 +123,7 @@ public class EventService {
 		}
 	}
 
-	private LocalDate getRealDate(Event event, LocalDate now) {
+	public LocalDate getRealDate(Event event, LocalDate now) {
 		LocalDate realDate = Instant.ofEpochMilli(event.getStartDate().getTime())
 				.atZone(ZoneId.systemDefault()).toLocalDate();
 		if (!"o".equals(event.getType())) {
@@ -139,7 +141,7 @@ public class EventService {
 		return realDate;
 	}
 
-	public void sendCheckInOut(BigInteger eventId, Float latitude, Float longitude, boolean fromLocationService)
+	private void sendCheckInOut(BigInteger eventId, Float latitude, Float longitude, boolean fromLocationService)
 			throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_chat);
 		final Event event = repository.one(Event.class, eventId);
@@ -158,56 +160,47 @@ public class EventService {
 		final double distance = GeoLocationProcessor.distance(location.getLatitude(), location.getLongitude(),
 				latitude, longitude);
 		final double maxDistance = 0.1;
-		params.setSearch("chat.contactId2=" + event.getContactId() + " and chat.textId='"
-				+ Text.marketing_eventCheckedIn + "' and chat.createdAt>'"
-				+ Instant.now().minus(Duration.ofHours(6)) + "'");
-		if (repository.list(params).size() == 0) {
+		if (shouldSendChat(Text.marketing_eventCheckedIn, event.getContactId())) {
 			if (Instant.now().plus(Duration.ofMinutes(10)).isAfter(eventTime)) {
 				if (fromLocationService && distance < maxDistance)
 					sendChat(event, Text.marketing_eventCheckedIn, distance);
-				else if (Instant.now().minus(Duration.ofMinutes(10)).isAfter(eventTime)) {
-					params.setSearch("chat.contactId2=" + event.getContactId() + " and chat.textId='"
-							+ Text.marketing_eventCheckedInFailed + "' and chat.createdAt>'"
-							+ Instant.now().minus(Duration.ofHours(6)) + "'");
-					if (repository.list(params).size() == 0)
-						sendChat(event, Text.marketing_eventCheckedInFailed, distance);
-				}
+				else if (Instant.now().minus(Duration.ofMinutes(10)).isAfter(eventTime))
+					sendChat(event, Text.marketing_eventCheckedInFailed, distance);
 			}
 		} else if (Instant.now().minus(Duration.ofHours(1)).isAfter(eventTime)) {
-			params.setSearch("chat.contactId2=" + event.getContactId() + " and chat.textId='"
-					+ Text.marketing_eventCheckedOut + "' and chat.createdAt>'"
-					+ Instant.now().minus(Duration.ofHours(6)) + "'");
-			if (repository.list(params).size() == 0) {
-				if (fromLocationService && distance < maxDistance)
-					sendChat(event, Text.marketing_eventCheckedOut, distance);
-				else {
-					params.setSearch("chat.contactId2=" + event.getContactId() + " and chat.contactId2="
-							+ event.getContactId() + " and chat.textId='" + Text.marketing_eventCheckedOutFailed
-							+ "' and chat.createdAt>'"
-							+ Instant.now().minus(Duration.ofHours(6)) + "'");
-					if (repository.list(params).size() == 0)
-						sendChat(event, Text.marketing_eventCheckedOutFailed, distance);
-				}
-			}
+			if (fromLocationService && distance < maxDistance)
+				sendChat(event, Text.marketing_eventCheckedOut, distance);
+			else
+				sendChat(event, Text.marketing_eventCheckedOutFailed, distance);
 		}
 	}
 
+	private boolean shouldSendChat(Text text, BigInteger contactId) {
+		final QueryParams params = new QueryParams(Query.contact_chat);
+		params.setSearch("chat.contactId2=" + contactId +
+				" and chat.textId='" + text +
+				"' and chat.createdAt>'" + Instant.now().minus(Duration.ofHours(6)) + "'");
+		return repository.list(params).size() == 0;
+	}
+
 	private void sendChat(Event event, Text text, double distance) throws Exception {
-		final String d;
-		if (distance >= 1)
-			d = String.format("%.1f", distance) + "km";
-		else
-			d = ((int) (distance * 1000.0)) + "m";
-		final Contact contact = repository.one(Contact.class, event.getContactId());
-		final Chat chat = new Chat();
-		chat.setContactId(adminId);
-		chat.setContactId2(contact.getId());
-		chat.setSeen(false);
-		chat.setTextId(text);
-		chat.setNote(text.getText(contact.getLanguage()).replace("<jq:EXTRA_1 />", contact.getPseudonym())
-				.replace("<jq:EXTRA_2 />", repository.one(Location.class, event.getLocationId()).getName())
-				.replace("<jq:EXTRA_3 />", d));
-		repository.save(chat);
+		if (shouldSendChat(text, event.getContactId())) {
+			final String d;
+			if (distance >= 1)
+				d = String.format("%.1f", distance) + "km";
+			else
+				d = ((int) (distance * 1000.0)) + "m";
+			final Contact contact = repository.one(Contact.class, event.getContactId());
+			final Chat chat = new Chat();
+			chat.setContactId(adminId);
+			chat.setContactId2(contact.getId());
+			chat.setSeen(false);
+			chat.setTextId(text);
+			chat.setNote(text.getText(contact.getLanguage()).replace("<jq:EXTRA_1 />", contact.getPseudonym())
+					.replace("<jq:EXTRA_2 />", repository.one(Location.class, event.getLocationId()).getName())
+					.replace("<jq:EXTRA_3 />", d));
+			repository.save(chat);
+		}
 	}
 
 	private boolean isMaxParticipants(Event event, LocalDate date, Contact contact) {

@@ -70,8 +70,7 @@ public class Repository {
 
 	public List<BaseEntity> list(String hql) throws ClassNotFoundException {
 		return (List<BaseEntity>) em.createQuery(hql,
-				Class.forName(BaseEntity.class.getPackage().getName() + "." + hql.split(" ")[1]))
-				.getResultList();
+				Class.forName(BaseEntity.class.getPackage().getName() + "." + hql.split(" ")[1])).getResultList();
 	}
 
 	public <T extends BaseEntity> T one(final Class<T> clazz, final BigInteger id) {
@@ -102,6 +101,7 @@ public class Repository {
 			em.merge(entity);
 			listeners.postUpdate(entity);
 		}
+		em.flush();
 	}
 
 	public void delete(final BaseEntity entity) throws Exception {

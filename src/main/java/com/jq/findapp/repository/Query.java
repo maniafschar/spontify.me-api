@@ -22,6 +22,7 @@ public enum Query {
 	contact_listChatFlat,
 	contact_listEventParticipate(true),
 	contact_listFriends,
+	contact_listGeoLocationHistory,
 	contact_listGroup,
 	contact_listGroupLink,
 	contact_listId,
