@@ -117,7 +117,7 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 		try {
 			notificationService.createTicket(TicketType.ERROR, ex.getMessage(), msg, userId);
 		} catch (Exception e1) {
-			notificationService.createTicket(TicketType.ERROR, "creationg error report!",
+			notificationService.createTicket(TicketType.ERROR, "error on creating report!",
 					Strings.stackTraceToString(e1) + "\n\n\n" + msg, userId);
 		}
 	}

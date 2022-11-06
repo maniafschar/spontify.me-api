@@ -128,7 +128,7 @@ public class EventService {
 				.atZone(ZoneId.systemDefault()).toLocalDate();
 		if (!"o".equals(event.getType())) {
 			while (realDate.isBefore(now)) {
-				if ("w".equals(event.getType()))
+				if ("w1".equals(event.getType()))
 					realDate = realDate.plusWeeks(1);
 				else if ("w2".equals(event.getType()))
 					realDate = realDate.plusWeeks(2);

@@ -414,9 +414,10 @@ public class NotificationService {
 		email.send(msg);
 	}
 
-	@Async
 	public void createTicket(TicketType type, String subject, String text, BigInteger user) {
 		try {
+			if (subject == null)
+				subject = "no subject";
 			if (subject.length() > 255) {
 				text = "..." + subject.substring(252) + "\n\n" + text;
 				subject = subject.substring(0, 252) + "...";
