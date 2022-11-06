@@ -87,7 +87,7 @@ public class ContactListener extends AbstractRepositoryListener<Contact> {
 	private String sanitizePseudonym(String pseudonym) {
 		pseudonym = pseudonym.trim().replaceAll("[^a-zA-ZÀ-ÿ0-9-_.+*#§$%&/\\\\ \\^']", "");
 		int i = 0;
-		while (pseudonym.length() < 9)
+		while (pseudonym.length() < 4)
 			pseudonym += (char) ('a' + i++);
 		return pseudonym;
 	}

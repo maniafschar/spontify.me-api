@@ -31,7 +31,7 @@ import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.EventService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.WhatToDoService;
-import com.jq.findapp.service.backend.DbUpdateService;
+import com.jq.findapp.service.backend.DbService;
 import com.jq.findapp.service.backend.EngagementService;
 import com.jq.findapp.service.backend.ImportLogService;
 import com.jq.findapp.service.backend.StatisticsService;
@@ -67,7 +67,7 @@ public class SupportCenterApi {
 	private WhatToDoService whatToDoService;
 
 	@Autowired
-	private DbUpdateService dbUpdateService;
+	private DbService dbService;
 
 	@Autowired
 	private StatisticsService statisticsService;
@@ -189,7 +189,7 @@ public class SupportCenterApi {
 		if (schedulerSecret.equals(secret) && !schedulerRunning) {
 			try {
 				schedulerRunning = true;
-				dbUpdateService.update();
+				dbService.update();
 				engagementService.sendChats();
 				engagementService.sendNearBy();
 				whatToDoService.findMatchingSpontis();
@@ -200,6 +200,7 @@ public class SupportCenterApi {
 				statisticsService.update();
 				engagementService.sendSpontifyEmail();
 				engagementService.sendRegistrationReminder();
+				dbService.backup();
 			} finally {
 				schedulerRunning = false;
 			}
