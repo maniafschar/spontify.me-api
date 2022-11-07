@@ -22,22 +22,16 @@ public class ChatListener extends AbstractRepositoryListener<Chat> {
 	public void prePersist(final Chat chat) throws Exception {
 		if (chat.getContactId2() == null && chat.getLocationId() == null)
 			chat.setContactId2(adminId); // Feedback
-		final QueryParams params = new QueryParams(Query.contact_chat);
-		params.setSearch("chat.contactId=" + chat.getContactId() + " and chat.contactId2=" + chat.getContactId2()
-				+ " and chat.locationId=" + chat.getLocationId());
-		final Result result = repository.list(params);
-		if (result.size() > 0) {
-			if (!Strings.isEmpty(chat.getNote()) && chat.getNote().equals(result.get(0).get("chat.note")))
-				throw new IllegalArgumentException("duplicate chat");
-			if (chat.getImage() != null && result.get(0).get("chat.image") != null
-					&& Arrays.equals(Attachment.getFile(chat.getImage()),
-							Attachment.getFile((String) result.get(0).get("chat.image"))))
-				throw new IllegalArgumentException("duplicate chat");
-		}
+		if (duplicateCheck(chat))
+			throw new IllegalArgumentException("duplicate chat");
 	}
 
 	@Override
 	public void postPersist(final Chat chat) throws Exception {
+		if (duplicateCheck(chat)) {
+			repository.delete(chat);
+			throw new IllegalArgumentException("duplicate chat");
+		}
 		final Contact contactFrom = repository.one(Contact.class, chat.getContactId());
 		if (chat.getLocationId() == null) {
 			final Contact contactTo = repository.one(Contact.class, chat.getContactId2());
@@ -61,5 +55,22 @@ public class ChatListener extends AbstractRepositoryListener<Chat> {
 		} else
 			notificationService.locationNotifyOnMatch(contactFrom, chat.getLocationId(),
 					ContactNotificationTextType.chatLocation, chat.getNote());
+	}
+
+	private boolean duplicateCheck(Chat chat) throws Exception {
+		final QueryParams params = new QueryParams(Query.contact_chat);
+		params.setLimit(1);
+		params.setSearch("chat.contactId=" + chat.getContactId() + " and chat.contactId2=" + chat.getContactId2()
+				+ " and chat.locationId=" + chat.getLocationId());
+		final Result result = repository.list(params);
+		if (result.size() > 0) {
+			if (!Strings.isEmpty(chat.getNote()) && chat.getNote().equals(result.get(0).get("chat.note")))
+				return true;
+			if (chat.getImage() != null && result.get(0).get("chat.image") != null
+					&& Arrays.equals(Attachment.getFile(chat.getImage()),
+							Attachment.getFile((String) result.get(0).get("chat.image"))))
+				return true;
+		}
+		return false;
 	}
 }
