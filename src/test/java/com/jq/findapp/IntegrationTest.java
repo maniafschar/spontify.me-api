@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -76,7 +77,6 @@ public class IntegrationTest {
 		final String s = Util.email(0).lines().reduce(
 				(e, e2) -> e.startsWith("https://") ? e : e2.startsWith("https://") ? e2 : "").get();
 		driver.navigate().to(url + s.substring(s.indexOf('?')));
-		Util.sleep(500);
 		Util.sendKeys("popup input[name=\"passwd\"]", "qwer1234");
 		Util.click("popup buttontext");
 	}
@@ -87,7 +87,6 @@ public class IntegrationTest {
 		Util.click("buttontext[onclick*=\"pageLocation.edit\"]");
 		Util.sendKeys("popup input[name=\"name\"]", name);
 		Util.get("popup textarea[name=\"address\"]").clear();
-		Util.sleep(300);
 		Util.sendKeys("popup textarea[name=\"address\"]", address);
 		Util.click("popup input[name=\"budget\"]:nth-of-type(2)");
 		Util.click("popup input[name=\"parkingOption\"]:nth-of-type(2)");
@@ -129,8 +128,8 @@ public class IntegrationTest {
 		private static void sleep(long ms) {
 			try {
 				Thread.sleep(ms);
-			} catch (InterruptedException e2) {
-				throw new RuntimeException(e2);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
 			}
 		}
 
@@ -155,7 +154,7 @@ public class IntegrationTest {
 				try {
 					get(id).sendKeys(keys);
 					return;
-				} catch (NoSuchElementException e) {
+				} catch (NoSuchElementException | ElementNotInteractableException e) {
 					sleep(500);
 				}
 			}

@@ -116,14 +116,6 @@ public class EngagementService {
 	}
 
 	public EngagementService() {
-		chatTemplates.add(new ChatTemplate(Text.engagement_welcome,
-				"",
-				contact -> {
-					final QueryParams params = new QueryParams(Query.contact_chat);
-					params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId());
-					return repository.list(params).size() == 0;
-				}));
-
 		chatTemplates.add(new ChatTemplate(Text.engagement_uploadProfileImage,
 				"ui.navigation.goTo(&quot;settings&quot;)",
 				contact -> contact.getImage() == null));
@@ -312,6 +304,12 @@ public class EngagementService {
 				+ " and contact.verified=true and contact.version is not null");
 		final Result ids = repository.list(params);
 		params.setQuery(Query.contact_chat);
+		for (int i = 0; i < ids.size(); i++) {
+			params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + ids.get(i).get("contact.id"));
+			if (repository.list(params).size() == 0)
+				sendChat(Text.engagement_welcome,
+						repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id")), null, null);
+		}
 		for (int i = 0; i < ids.size(); i++) {
 			final Contact contact = repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id"));
 			if (isTimeForNewChat(contact, params, false))

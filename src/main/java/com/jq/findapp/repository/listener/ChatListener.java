@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.Chat;
@@ -31,6 +32,15 @@ public class ChatListener extends AbstractRepositoryListener<Chat> {
 		if (duplicateCheck(chat)) {
 			repository.delete(chat);
 			throw new IllegalArgumentException("duplicate chat");
+		}
+		notifyContact(chat);
+	}
+
+	@Async
+	private void notifyContact(Chat chat) throws Exception {
+		if (duplicateCheck(chat)) {
+			repository.delete(chat);
+			return;
 		}
 		final Contact contactFrom = repository.one(Contact.class, chat.getContactId());
 		if (chat.getLocationId() == null) {

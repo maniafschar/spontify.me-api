@@ -58,7 +58,7 @@
 		"sentPos2": " hat Dir ihre aktuelle Position gesendet."
 	},
 	"marketing": {
-		"event": "Hallo CONTACT_PSEUDONYM, möchtest Du Geld verdienen? Momentan läuft eine coole Aktion in Deiner Stadt, bei der Du Geld verdienen kannst... neugierig? Dann klicke mich...",
+		"event": "Hallo CONTACT_PSEUDONYM, möchtest Du Geld verdienen? Momentan läuft eine coole Aktion in Deiner Stadt, bei der Du Geld verdienen kannst... neugierig? Dann klick mich...",
 		"eventCheckedIn": "Hallo <jq:EXTRA_1 />, Du bist nun zu Deinem Event in der Location <jq:EXTRA_2 /> eingecheckt.\nViel Spaß 🎉 💃 🕺",
 		"eventCheckedInFailed": "Hallo <jq:EXTRA_1 />, Dein Event in der Location <jq:EXTRA_2 /> hat bereits begonnen, Du bist aber noch <jq:EXTRA_3 /> entfernt. Wir können Dich noch nicht einchecken, gehe zur Location um Dir die Prämie zu sichern.",
 		"eventCheckedOut": "Hallo <jq:EXTRA_1 />, Glückwunsch, Du hast Dir die Prämie verdient!\nWeiterhin viel Spaß bei Deinem Event 🎉 💃 🕺 und auch in spontify.me",
