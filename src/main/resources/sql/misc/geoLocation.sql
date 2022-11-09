@@ -4,6 +4,3 @@ FROM
 	GeoLocation geoLocation
 WHERE
 	{search}
-GROUP BY
-	geoLocation.latitude,
-	geoLocation.longitude

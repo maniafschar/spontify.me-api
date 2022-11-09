@@ -2,6 +2,7 @@ package com.jq.findapp.service;
 
 import java.math.BigInteger;
 import java.util.Base64;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +15,6 @@ import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
-import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.util.Strings;
@@ -84,9 +84,9 @@ public class ExternalService {
 		params.setSearch("geoLocation.latitude like '" + (Math.round(latitude * roundingFactor) / roundingFactor)
 				+ "%' and geoLocation.longitude like '" + (Math.round(longitude * roundingFactor) / roundingFactor)
 				+ "%'");
-		final Result persistedAddress = repository.list(params);
-		if (persistedAddress.size() > 0)
-			return repository.one(GeoLocation.class, (BigInteger) persistedAddress.get(0).get("_id"));
+		final Map<String, Object> persistedAddress = repository.one(params);
+		if (persistedAddress != null)
+			return repository.one(GeoLocation.class, (BigInteger) persistedAddress.get("_id"));
 		final GeoLocation geoLocation = convertGoogleAddress(
 				new ObjectMapper().readTree(google("geocode/json?latlng=" + latitude + ',' + longitude, user)));
 		if (geoLocation != null) {

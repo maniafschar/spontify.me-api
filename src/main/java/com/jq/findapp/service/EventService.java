@@ -170,8 +170,10 @@ public class EventService {
 		} else if (Instant.now().minus(Duration.ofHours(1)).isAfter(eventTime)) {
 			if (fromLocationService && distance < maxDistance)
 				sendChat(event, Text.marketing_eventCheckedOut, distance);
+			else if (distance >= maxDistance)
+				sendChat(event, Text.marketing_eventCheckedOutFailedDistance, distance);
 			else
-				sendChat(event, Text.marketing_eventCheckedOutFailed, distance);
+				sendChat(event, Text.marketing_eventCheckedOutFailedOpenApp, distance);
 		}
 	}
 

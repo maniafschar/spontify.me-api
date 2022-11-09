@@ -31,6 +31,7 @@ import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactBluetooth;
 import com.jq.findapp.entity.ContactRating;
+import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query.Result;
@@ -157,7 +158,7 @@ public class RepositoryTest {
 	}
 
 	@Test
-	public void queryGeoLocation() throws Exception {
+	public void queryContactList() throws Exception {
 		// given
 		final QueryParams params = new QueryParams(Query.contact_list);
 		params.setDistance(100);
@@ -171,6 +172,23 @@ public class RepositoryTest {
 		// then
 		assertNotNull(result);
 		assertTrue(result.getHeader()[0] instanceof String);
+	}
+
+	@Test
+	public void queryGeoLocation() throws Exception {
+		// given
+		final GeoLocation geoLocation = new GeoLocation();
+		geoLocation.setLatitude(11f);
+		geoLocation.setLongitude(48f);
+		repository.save(geoLocation);
+		final QueryParams params = new QueryParams(Query.misc_geoLocation);
+
+		// when
+		final Map<String, Object> result = repository.one(params);
+
+		// then
+		assertNotNull(result);
+		assertTrue(result.get("_id") instanceof BigInteger);
 	}
 
 	@Test

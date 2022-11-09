@@ -283,6 +283,9 @@ public class ActionApi {
 			@RequestHeader BigInteger user, @RequestHeader String password, @RequestHeader String salt)
 			throws Exception {
 		final Contact contact = authenticationService.verify(user, password, salt);
+		contact.setLatitude(position.getLatitude());
+		contact.setLongitude(position.getLongitude());
+		repository.save(contact);
 		final QueryParams params = new QueryParams(Query.contact_listGeoLocationHistory);
 		params.setSearch("contactGeoLocationHistory.createdAt>'" + Instant.now().minus(Duration.ofSeconds(5))
 				+ "' and contactGeoLocationHistory.contactId=" + contact.getId());
@@ -304,9 +307,6 @@ public class ActionApi {
 				contactGeoLocationHistory.setHeading(position.getHeading());
 				contactGeoLocationHistory.setSpeed(position.getSpeed());
 				repository.save(contactGeoLocationHistory);
-				contact.setLatitude(position.getLatitude());
-				contact.setLongitude(position.getLongitude());
-				repository.save(contact);
 				return result;
 			}
 		}

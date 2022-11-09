@@ -161,7 +161,7 @@ public enum Query {
 			if (s[i].endsWith(",")) {
 				if (s[i].contains(" as "))
 					s[i] = '_' + s[i].substring(s[i].lastIndexOf(" as ") + 4).trim();
-				cols.add(s[i].substring(0, s[i].lastIndexOf(',')));
+				cols.add(s[i].substring(0, s[i].lastIndexOf(',')).trim());
 			}
 		}
 		header = new String[cols.size()];
