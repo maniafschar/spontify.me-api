@@ -394,23 +394,21 @@ public class NotificationService {
 		sendEmail(contactTo.getEmail(), message, imgProfile, text.toString(), html.toString());
 	}
 
-	private void sendEmail(final String to, final String subject, final byte[] imgProfile, final String... text)
-			throws Exception {
+	private void sendEmail(final String to, final String subject,
+			final byte[] imgProfile, final String text, String html) throws Exception {
 		final MimeMessage msg = email.createMimeMessage();
-		final MimeMessageHelper helper = new MimeMessageHelper(msg, text != null && text.length > 1);
+		final MimeMessageHelper helper = new MimeMessageHelper(msg, html != null);
 		helper.setFrom(from);
 		helper.setTo(to == null ? from : to);
 		helper.setSubject(subject);
-		if (text != null) {
-			if (text.length > 1) {
-				helper.setText(text[0], text[1]);
-				helper.addInline("img_logo", new MyDataSource(LOGO, "logoEmail.png"));
-				if (imgProfile != null)
-					helper.addInline("img_profile", new MyDataSource(imageRound(imgProfile), "image.jpg"));
-			} else if (text.length > 0)
-				helper.setText(text[0]);
-			createTicket(TicketType.ERROR, "EMAIL SENT", to + ": " + subject, adminId);
-		}
+		if (html != null) {
+			helper.setText(text, html);
+			helper.addInline("img_logo", new MyDataSource(LOGO, "logoEmail.png"));
+			if (imgProfile != null)
+				helper.addInline("img_profile", new MyDataSource(imageRound(imgProfile), "image.jpg"));
+		} else
+			helper.setText(text);
+		createTicket(TicketType.EMAIL, to, text, adminId);
 		email.send(msg);
 	}
 
@@ -430,10 +428,10 @@ public class NotificationService {
 				ticket.setContactId(user);
 			repository.save(ticket);
 			if (type == TicketType.BLOCK)
-				sendEmail(null, "Block", null, text);
+				sendEmail(null, "Block", null, text, null);
 		} catch (Exception ex) {
 			try {
-				sendEmail(null, type + ": " + subject, null, text);
+				sendEmail(null, type + ": " + subject, null, text, null);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

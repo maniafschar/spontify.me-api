@@ -5,6 +5,8 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Time;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -111,10 +113,10 @@ public class ActionApi {
 	public Map<String, String> preventDelete(@RequestHeader BigInteger user, @RequestHeader String password,
 			@RequestHeader String salt) throws IllegalAccessException {
 		final Contact contact = authenticationService.verify(user, password, salt);
-		final Map<String, String> result = new HashMap<>();
-		result.put("text", Text.preventDelete.getText(contact.getLanguage()));
-		result.put("url", "https://blog.spontify.me/stats.html#marketing");
-		return result;
+		final Map<String, String> m = marketing();
+		if (m != null)
+			m.put("text", Text.preventDelete.getText(contact.getLanguage()));
+		return m;
 	}
 
 	@GetMapping("quotation")
@@ -126,9 +128,13 @@ public class ActionApi {
 
 	@GetMapping("marketing")
 	public Map<String, String> marketing() {
+		if (LocalDate.now().isAfter(LocalDate.of(2022, Month.NOVEMBER, 30)))
+			return null;
 		final Map<String, String> map = new HashMap<>();
 		map.put("label", "50€");
-		map.put("action", "https://blog.spontify.me/stats.html#marketing");
+		map.put("url", "https://blog.spontify.me/stats.html#marketing");
+		// TODO rm0.3.0
+		map.put("action", map.get("url"));
 		return map;
 	}
 

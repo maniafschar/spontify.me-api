@@ -19,7 +19,7 @@ public class Ticket extends BaseEntity {
 	private TicketType type;
 
 	public enum TicketType {
-		ERROR, REGISTRATION, BLOCK, GOOGLE
+		ERROR, REGISTRATION, BLOCK, GOOGLE, EMAIL
 	}
 
 	public BigInteger getContactId() {

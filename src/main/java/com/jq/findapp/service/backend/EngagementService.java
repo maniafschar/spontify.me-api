@@ -262,7 +262,8 @@ public class EngagementService {
 		if (gc.get(Calendar.HOUR_OF_DAY) < 9 || gc.get(Calendar.HOUR_OF_DAY) > 18)
 			return;
 		final QueryParams params = new QueryParams(Query.contact_listId);
-		params.setSearch("contact.verified=false and contact.notificationEngagement=true");
+		params.setSearch("contact.createdAt>'" + Instant.now().minus(Duration.ofHours(3))
+				+ "' and contact.verified=false and contact.notificationEngagement=true");
 		params.setLimit(0);
 		final Result list = repository.list(params);
 		final long DAY = 86400000;
