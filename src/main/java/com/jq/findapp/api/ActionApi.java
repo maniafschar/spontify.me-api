@@ -224,7 +224,7 @@ public class ActionApi {
 			return "https://maps.googleapis.com/maps/api/js?key=" + googleKeyJS;
 		if (param.startsWith("latlng=")) {
 			final String[] l = param.substring(7).split(",");
-			return externalService.googleAddress(Float.parseFloat(l[0]), Float.parseFloat(l[1]), user);
+			return externalService.getAddress(Float.parseFloat(l[0]), Float.parseFloat(l[1]), user);
 		}
 		return externalService.google(param, user);
 	}
@@ -290,7 +290,7 @@ public class ActionApi {
 		params.setSearch("contactGeoLocationHistory.createdAt>'" + Instant.now().minus(Duration.ofSeconds(5))
 				+ "' and contactGeoLocationHistory.contactId=" + contact.getId());
 		if (repository.list(params).size() == 0) {
-			final GeoLocation geoLocation = externalService.googleAddress(position.getLatitude(),
+			final GeoLocation geoLocation = externalService.getAddress(position.getLatitude(),
 					position.getLongitude(), user);
 			if (geoLocation != null) {
 				final Map<String, Object> result = new HashMap<>();

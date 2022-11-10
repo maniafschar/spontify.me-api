@@ -45,9 +45,9 @@ public class ExternalService {
 		return result;
 	}
 
-	public GeoLocation convertGoogleAddress(JsonNode google) {
-		if ("OK".equals(google.get("status").asText()) && google.get("results") != null) {
-			JsonNode data = google.get("results").get(0).get("address_components");
+	public GeoLocation convertAddress(JsonNode address) {
+		if ("OK".equals(address.get("status").asText()) && address.get("results") != null) {
+			JsonNode data = address.get("results").get(0).get("address_components");
 			final GeoLocation geoLocation = new GeoLocation();
 			for (int i = 0; i < data.size(); i++) {
 				if (geoLocation.getStreet() == null && "route".equals(data.get(i).get("types").get(0).asText()))
@@ -65,7 +65,7 @@ public class ExternalService {
 				else if (geoLocation.getCountry() == null && "country".equals(data.get(i).get("types").get(0).asText()))
 					geoLocation.setCountry(data.get(i).get("short_name").asText());
 			}
-			data = google.get("results").get(0).get("geometry");
+			data = address.get("results").get(0).get("geometry");
 			if (data != null) {
 				data = data.get("location");
 				if (data != null) {
@@ -78,7 +78,7 @@ public class ExternalService {
 		return null;
 	}
 
-	public GeoLocation googleAddress(float latitude, float longitude, BigInteger user) throws Exception {
+	public GeoLocation getAddress(float latitude, float longitude, BigInteger user) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_geoLocation);
 		final float roundingFactor = 10000f;
 		params.setSearch("geoLocation.latitude like '" + ((int) (latitude * roundingFactor) / roundingFactor)
@@ -86,7 +86,7 @@ public class ExternalService {
 		final Map<String, Object> persistedAddress = repository.one(params);
 		if (persistedAddress.get("_id") != null)
 			return repository.one(GeoLocation.class, (BigInteger) persistedAddress.get("_id"));
-		final GeoLocation geoLocation = convertGoogleAddress(
+		final GeoLocation geoLocation = convertAddress(
 				new ObjectMapper().readTree(google("geocode/json?latlng=" + latitude + ',' + longitude, user)));
 		if (geoLocation != null) {
 			geoLocation.setLongitude(longitude);

@@ -4,13 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.nio.charset.StandardCharsets;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jq.findapp.FindappApplication;
-import com.jq.findapp.JpaTestConfiguration;
-import com.jq.findapp.entity.GeoLocation;
-import com.jq.findapp.service.ExternalService;
-
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jq.findapp.FindappApplication;
+import com.jq.findapp.JpaTestConfiguration;
+import com.jq.findapp.entity.GeoLocation;
+import com.jq.findapp.service.ExternalService;
 
 @ExtendWith({ SpringExtension.class })
 @SpringBootTest(classes = { FindappApplication.class, JpaTestConfiguration.class })
@@ -34,7 +34,7 @@ public class ActionApiTest {
 
 		// when
 		final JsonNode data = new ObjectMapper().readTree(response);
-		final GeoLocation address = externalService.convertGoogleAddress(data);
+		final GeoLocation address = externalService.convertAddress(data);
 
 		// then
 		assertEquals("OK", data.get("status").asText());

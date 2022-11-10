@@ -90,7 +90,7 @@ public class EngagementService {
 		CONTACT_PSEUDONYM((contact, location) -> contact.getPseudonym()),
 		CONTACT_CURRENT_TOWN((contact, location) -> {
 			try {
-				return externalService.googleAddress(contact.getLatitude(), contact.getLongitude(), null).getTown();
+				return externalService.getAddress(contact.getLatitude(), contact.getLongitude(), null).getTown();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
