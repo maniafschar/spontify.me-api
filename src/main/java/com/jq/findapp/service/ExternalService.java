@@ -81,11 +81,10 @@ public class ExternalService {
 	public GeoLocation googleAddress(float latitude, float longitude, BigInteger user) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_geoLocation);
 		final float roundingFactor = 10000f;
-		params.setSearch("geoLocation.latitude like '" + (Math.round(latitude * roundingFactor) / roundingFactor)
-				+ "%' and geoLocation.longitude like '" + (Math.round(longitude * roundingFactor) / roundingFactor)
-				+ "%'");
+		params.setSearch("geoLocation.latitude like '" + ((int) (latitude * roundingFactor) / roundingFactor)
+				+ "%' and geoLocation.longitude like '" + ((int) (longitude * roundingFactor) / roundingFactor) + "%'");
 		final Map<String, Object> persistedAddress = repository.one(params);
-		if (persistedAddress != null)
+		if (persistedAddress.get("_id") != null)
 			return repository.one(GeoLocation.class, (BigInteger) persistedAddress.get("_id"));
 		final GeoLocation geoLocation = convertGoogleAddress(
 				new ObjectMapper().readTree(google("geocode/json?latlng=" + latitude + ',' + longitude, user)));
