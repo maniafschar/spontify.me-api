@@ -235,8 +235,7 @@ public class NotificationService {
 	}
 
 	private boolean sendNotificationDevice(final StringBuilder text, final Contact contactTo, String action,
-			ContactNotification notification)
-			throws Exception {
+			ContactNotification notification) throws Exception {
 		if (Strings.isEmpty(text) || Strings.isEmpty(contactTo.getPushSystem())
 				|| Strings.isEmpty(contactTo.getPushToken()))
 			return false;

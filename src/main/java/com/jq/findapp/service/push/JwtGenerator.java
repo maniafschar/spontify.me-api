@@ -13,6 +13,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,8 @@ import com.jq.findapp.repository.Repository;
 
 @Component
 public class JwtGenerator {
-	private static Map<String, String> token = new HashMap<>();
-	private static final long TIMEOUT = 600000;
+	private static Map<String, String> token = new Hashtable<>();
+	private static final long TIMEOUT = 3000000;
 	private static Map<String, PrivateKey> signingKey = new HashMap<>();
 
 	@Autowired
@@ -51,9 +52,7 @@ public class JwtGenerator {
 			lastGeneration = System.currentTimeMillis();
 			setting.setValue("" + lastGeneration);
 			repository.save(setting);
-			synchronized (token) {
-				token.remove(keyId);
-			}
+			token.remove(keyId);
 		}
 		return (int) (lastGeneration / 1000);
 	}
@@ -61,25 +60,23 @@ public class JwtGenerator {
 	protected String generateToken(Map<String, String> header, Map<String, String> claims, String algorithm)
 			throws Exception {
 		final String keyId = header.get("kid");
-		synchronized (token) {
-			if (!token.containsKey(keyId)) {
-				final StringBuilder result = new StringBuilder();
-				result.append(
-						jwtEncoding(new ObjectMapper().writeValueAsString(header).getBytes(StandardCharsets.UTF_8)));
-				result.append('.');
-				result.append(
-						jwtEncoding(new ObjectMapper().writeValueAsString(claims).getBytes(StandardCharsets.UTF_8)));
-				final PrivateKey key = getSigningKey(keyId, algorithm);
-				final Signature signature = Signature
-						.getInstance("RSA".equals(algorithm) ? "SHA256withRSA" : "SHA256withECDSA");
-				signature.initSign(key);
-				signature.update(result.toString().getBytes(StandardCharsets.UTF_8));
-				result.append('.');
-				result.append(jwtEncoding(signature.sign()));
-				token.put(keyId, result.toString());
-			}
-			return token.get(keyId);
+		if (!token.containsKey(keyId)) {
+			final StringBuilder result = new StringBuilder();
+			result.append(
+					jwtEncoding(new ObjectMapper().writeValueAsString(header).getBytes(StandardCharsets.UTF_8)));
+			result.append('.');
+			result.append(
+					jwtEncoding(new ObjectMapper().writeValueAsString(claims).getBytes(StandardCharsets.UTF_8)));
+			final PrivateKey key = getSigningKey(keyId, algorithm);
+			final Signature signature = Signature
+					.getInstance("RSA".equals(algorithm) ? "SHA256withRSA" : "SHA256withECDSA");
+			signature.initSign(key);
+			signature.update(result.toString().getBytes(StandardCharsets.UTF_8));
+			result.append('.');
+			result.append(jwtEncoding(signature.sign()));
+			token.put(keyId, result.toString());
 		}
+		return token.get(keyId);
 	}
 
 	private String jwtEncoding(byte[] data) {
@@ -89,24 +86,20 @@ public class JwtGenerator {
 	private PrivateKey getSigningKey(String keyId, String algorithm)
 			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
 		if (!signingKey.containsKey(keyId)) {
-			synchronized (JwtGenerator.class) {
-				if (!signingKey.containsKey(keyId)) {
-					final StringBuilder privateKeyBuilder = new StringBuilder();
-					final BufferedReader reader = new BufferedReader(
-							new InputStreamReader(
-									getClass().getResourceAsStream("/keys/push_" + keyId + ".p8")));
-					for (String line; (line = reader.readLine()) != null;) {
-						if (line.contains("END PRIVATE KEY"))
-							break;
-						else if (!line.contains("BEGIN PRIVATE KEY"))
-							privateKeyBuilder.append(line);
-					}
-					final byte[] keyBytes = Base64.getDecoder().decode(privateKeyBuilder.toString().trim());
-					final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
-					final KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
-					signingKey.put(keyId, keyFactory.generatePrivate(keySpec));
-				}
+			final StringBuilder privateKeyBuilder = new StringBuilder();
+			final BufferedReader reader = new BufferedReader(
+					new InputStreamReader(
+							getClass().getResourceAsStream("/keys/push_" + keyId + ".p8")));
+			for (String line; (line = reader.readLine()) != null;) {
+				if (line.contains("END PRIVATE KEY"))
+					break;
+				else if (!line.contains("BEGIN PRIVATE KEY"))
+					privateKeyBuilder.append(line);
 			}
+			final byte[] keyBytes = Base64.getDecoder().decode(privateKeyBuilder.toString().trim());
+			final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
+			final KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+			signingKey.put(keyId, keyFactory.generatePrivate(keySpec));
 		}
 		return signingKey.get(keyId);
 	}
