@@ -12,6 +12,7 @@ import org.apache.commons.io.IOUtils;
 import com.jq.findapp.util.Strings;
 
 public enum Query {
+	// TODO rm 0.3.0
 	contact_block,
 	contact_chat,
 	contact_eventParticipateCount,
@@ -43,7 +44,9 @@ public enum Query {
 
 	location_eventParticipate,
 	location_list,
+	location_listBlocked,
 	location_listEvent(true),
+	location_listEventBlocked,
 	location_listEventCurrent(true),
 	location_listFavorite,
 	location_listId,
@@ -52,6 +55,7 @@ public enum Query {
 	location_rating(true),
 	location_ratingOverview(true),
 
+	misc_block,
 	misc_geoLocation,
 	misc_listLog,
 	misc_listTicket,
@@ -96,7 +100,7 @@ public enum Query {
 		if (params.getSearchGeoLocation() != null)
 			search += " and " + params.getSearchGeoLocation();
 		if (addBlock && params.getUser() != null)
-			search += " and (select cb.id from ContactBlock cb where cb.contactId=contact.id and cb.contactId2={USERID} or cb.contactId={USERID} and cb.contactId2=contact.id) is null";
+			search += " and (select b.id from Block b where b.contactId=contact.id and b.contactId2={USERID} or b.contactId={USERID} and b.contactId2=contact.id) is null";
 		String s = sql.replace("{search}", search);
 		if (s.contains("{ID}"))
 			s = s.replaceAll("\\{ID}", "" + params.getId());

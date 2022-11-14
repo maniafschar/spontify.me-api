@@ -13,12 +13,12 @@ SELECT
 	contact.attr,
 	contact.attrEx,
 	contact.rating,
-	contactBlock.id,
-	contactBlock.note,
-	contactBlock.reason 
+	block.id,
+	block.note,
+	block.reason
 FROM
 	Contact contact,
-	ContactBlock contactBlock
+	Block block
 WHERE
-	contactBlock.contactId2=contact.id and
-	contactBlock.contactId={USERID}
+	block.contactId2=contact.id and
+	block.contactId={USERID}

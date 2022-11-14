@@ -143,9 +143,9 @@ public class NotificationService {
 		if (contactTo.getId() != null) {
 			final QueryParams params = new QueryParams(Query.contact_block);
 			params.setUser(contactFrom);
-			params.setSearch("contactBlock.contactId=" + contactFrom.getId() + " and contactBlock.contactId2="
-					+ contactTo.getId() + " or contactBlock.contactId="
-					+ contactTo.getId() + " and contactBlock.contactId2=" + contactFrom.getId());
+			params.setSearch("block.contactId=" + contactFrom.getId() + " and block.contactId2="
+					+ contactTo.getId() + " or block.contactId="
+					+ contactTo.getId() + " and block.contactId2=" + contactFrom.getId());
 			if (repository.list(params).size() > 0)
 				return false;
 		}

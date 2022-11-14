@@ -7,13 +7,15 @@ import javax.persistence.EntityListeners;
 import javax.persistence.Transient;
 
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.repository.listener.ContactBlockListener;
+import com.jq.findapp.repository.listener.BlockListener;
 
 @Entity
-@EntityListeners(ContactBlockListener.class)
-public class ContactBlock extends BaseEntity {
+@EntityListeners(BlockListener.class)
+public class Block extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger contactId2;
+	private BigInteger locationId;
+	private BigInteger eventId;
 	private String note;
 	private Short reason;
 
@@ -47,6 +49,22 @@ public class ContactBlock extends BaseEntity {
 
 	public void setReason(Short reason) {
 		this.reason = reason;
+	}
+
+	public BigInteger getLocationId() {
+		return locationId;
+	}
+
+	public void setLocationId(BigInteger locationId) {
+		this.locationId = locationId;
+	}
+
+	public BigInteger getEventId() {
+		return eventId;
+	}
+
+	public void setEventId(BigInteger eventId) {
+		this.eventId = eventId;
 	}
 
 	@Transient

@@ -322,9 +322,9 @@ public class EngagementService {
 		final int hour = Instant.now().minus(Duration.ofMinutes(contact.getTimezoneOffset())).atZone(ZoneOffset.UTC)
 				.getHour();
 		if (hour > 6 && hour < 22) {
-			paramsAdminBlocked.setSearch("contactBlock.contactId=" + adminId + " and contactBlock.contactId2="
+			paramsAdminBlocked.setSearch("block.contactId=" + adminId + " and block.contactId2="
 					+ contact.getId()
-					+ " or contactBlock.contactId=" + contact.getId() + " and contactBlock.contactId2=" + adminId);
+					+ " or block.contactId=" + contact.getId() + " and block.contactId2=" + adminId);
 			if (repository.list(paramsAdminBlocked).size() == 0) {
 				params.setSearch("chat.contactId=" + adminId + " and chat.contactId2=" + contact.getId()
 						+ " and chat.createdAt>'"
