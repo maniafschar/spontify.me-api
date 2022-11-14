@@ -24,6 +24,9 @@ SELECT
 	location.latitude,
 	location.longitude,
 	location.name,
+	block.id,
+	block.note,
+	block.reason,
 	'' as geolocationDistance
 FROM
 	Event event,

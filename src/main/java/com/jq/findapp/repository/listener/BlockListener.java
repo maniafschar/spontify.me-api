@@ -13,7 +13,7 @@ public class BlockListener extends AbstractRepositoryListener<Block> {
 			notificationService.createTicket(TicketType.BLOCK,
 					block.getContactId() + " > " +
 							(block.getContactId2() != null ? "contact " + block.getContactId2()
-									: block.getContactId2() != null ? "location " + block.getLocationId()
+									: block.getLocationId() != null ? "location " + block.getLocationId()
 											: "event " + block.getEventId()),
 					"id: " + block.getId() +
 							"\ncontactId: " + block.getContactId() +
