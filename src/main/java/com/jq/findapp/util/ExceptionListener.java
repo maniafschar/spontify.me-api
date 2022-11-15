@@ -113,6 +113,8 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 				s.append("\n\n");
 			}
 		}
+		if (s.indexOf("x-forwarded-host: findapp.online") > 0)
+			return;
 		msg = msg.replaceFirst(SUBSTITUTE, "" + request.getServerPort()).replaceFirst(SUBSTITUTE, s.toString());
 		try {
 			notificationService.createTicket(TicketType.ERROR, ex.getMessage(), msg, userId);

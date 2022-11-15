@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException.Unauthorized;
 
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.service.NotificationService.Environment;
@@ -30,11 +31,21 @@ public class Android {
 	private String url;
 
 	public Environment send(Contact contact, String text, String action, String notificationId) throws Exception {
+		try {
+			send(contact, text, action, notificationId, false);
+		} catch (Unauthorized ex) {
+			send(contact, text, action, notificationId, true);
+		}
+		return Environment.Production;
+	}
+
+	private void send(Contact contact, String text, String action, String notificationId, boolean reset)
+			throws Exception {
 		WebClient.create(url)
 				.post()
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization",
-						"Bearer " + jwtGenerator.generateToken(getHeader(), getClaims(), "RSA"))
+						"Bearer " + jwtGenerator.generateToken(getHeader(), getClaims(reset), "RSA"))
 				.bodyValue(
 						IOUtils.toString(getClass().getResourceAsStream("/template/push.android"),
 								StandardCharsets.UTF_8)
@@ -44,7 +55,6 @@ public class Android {
 								.replace("{exec}", Strings.isEmpty(action) ? "" : action))
 				.retrieve()
 				.toEntity(String.class).block().getBody();
-		return Environment.Production;
 	}
 
 	private Map<String, String> getHeader() {
@@ -55,8 +65,8 @@ public class Android {
 		return map;
 	}
 
-	private Map<String, String> getClaims() throws Exception {
-		final long lastGeneration = jwtGenerator.getLastGeneration(keyId);
+	private Map<String, String> getClaims(boolean reset) throws Exception {
+		final long lastGeneration = jwtGenerator.getLastGeneration(keyId, reset);
 		final Map<String, String> map = new HashMap<>(5);
 		map.put("iss", clientEmail);
 		map.put("sub", clientEmail);

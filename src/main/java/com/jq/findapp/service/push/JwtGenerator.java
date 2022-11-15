@@ -13,8 +13,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,14 +27,14 @@ import com.jq.findapp.repository.Repository;
 
 @Component
 public class JwtGenerator {
-	private static Map<String, String> token = new Hashtable<>();
+	private static Map<String, String> token = new ConcurrentHashMap<>();
 	private static final long TIMEOUT = 3000000;
 	private static Map<String, PrivateKey> signingKey = new HashMap<>();
 
 	@Autowired
 	private Repository repository;
 
-	protected int getLastGeneration(String keyId) throws Exception {
+	protected int getLastGeneration(String keyId, boolean reset) throws Exception {
 		final String label = "push.gen." + keyId;
 		long lastGeneration = 0;
 		final QueryParams param = new QueryParams(Query.misc_setting);
@@ -48,7 +48,7 @@ public class JwtGenerator {
 			setting = repository.one(Setting.class, (BigInteger) settingMap.get("setting.id"));
 			lastGeneration = Long.valueOf(setting.getValue().toString());
 		}
-		if (System.currentTimeMillis() - lastGeneration > TIMEOUT) {
+		if (reset || System.currentTimeMillis() - lastGeneration > TIMEOUT) {
 			lastGeneration = System.currentTimeMillis();
 			setting.setValue("" + lastGeneration);
 			repository.save(setting);

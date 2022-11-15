@@ -94,7 +94,7 @@ public class Ios {
 	private Map<String, String> getClaims() throws Exception {
 		final Map<String, String> map = new HashMap<>(2);
 		map.put("iss", teamId);
-		map.put("iat", "" + jwtGenerator.getLastGeneration(keyId));
+		map.put("iat", "" + jwtGenerator.getLastGeneration(keyId, false));
 		return map;
 	}
 }
