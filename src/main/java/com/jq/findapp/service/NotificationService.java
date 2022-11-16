@@ -250,10 +250,11 @@ public class NotificationService {
 		}
 		try {
 			final String notificationId = notification == null ? "" : notification.getId().toString();
+			final String s = text.toString().replace("\"", "\\\"");
 			if ("ios".equals(contactTo.getPushSystem()))
-				ios.send(contactTo, text.toString(), action, getPingValues(contactTo).totalNew, notificationId);
+				ios.send(contactTo, s, action, getPingValues(contactTo).totalNew, notificationId);
 			else if ("android".equals(contactTo.getPushSystem()))
-				android.send(contactTo, text.toString(), action, notificationId);
+				android.send(contactTo, s, action, notificationId);
 			if (notification != null)
 				notification.setType(ContactNotificationType.valueOf(contactTo.getPushSystem()));
 			return true;

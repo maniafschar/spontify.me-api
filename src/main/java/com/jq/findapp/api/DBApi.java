@@ -51,6 +51,9 @@ public class DBApi {
 			@RequestHeader(required = false) String salt)
 			throws JsonMappingException, JsonProcessingException, IllegalAccessException {
 		params.setUser(authenticationService.verify(user, password, salt));
+		// TODO rm 0.3.0
+		if (params.getSearch() != null)
+			params.setSearch(params.getSearch().replaceAll("contactBlock.contactId", "block.contactId"));
 		return repository.one(params);
 	}
 
