@@ -5,11 +5,16 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Base64;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.io.IOUtils;
+
 import com.jq.findapp.api.model.WriteEntity;
+import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 
 public class EntityUtil {
@@ -51,5 +56,13 @@ public class EntityUtil {
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		ImageIO.write(resizedImage, "jpg", out);
 		return out.toByteArray();
+	}
+
+	public static String getImage(String url, int size) throws MalformedURLException, IOException {
+		final byte[] data = IOUtils.toByteArray(new URL(url));
+		final BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
+		if (img.getWidth() > 400 && img.getHeight() > 400)
+			return Repository.Attachment.createImage(".jpg", scaleImage(data, size));
+		return null;
 	}
 }

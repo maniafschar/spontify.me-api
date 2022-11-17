@@ -1,0 +1,641 @@
+{
+	"html_attributions": [],
+	"results": [
+		{
+			"geometry": {
+				"location": {
+					"lat": 48.1351253,
+					"lng": 11.5819806
+				},
+				"viewport": {
+					"northeast": {
+						"lat": 48.24821969652085,
+						"lng": 11.72287551432547
+					},
+					"southwest": {
+						"lat": 48.06160176222775,
+						"lng": 11.36079598983695
+					}
+				}
+			},
+			"icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/geocode-71.png",
+			"icon_background_color": "#7B9EB0",
+			"icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+			"name": "Munich",
+			"photos": [
+				{
+					"height": 560,
+					"html_attributions": [
+						"photographer"
+					],
+					"photo_reference": "AW30NDxhNMea-AEoAPJKmEMHI5giZ6PH8VMAfVvqmrAqBbidV5qnKzhbytm8XH4GsXWxHuLVmC4HqWZCex8ExuHDxIYqhF6CpnaQlHAykNAwmWzWAOhS4UaALjwvBgh34ZuDeUKv4wbnsfOICv2Jqnr6hXkxMPSagX87kCuCrqXoFKjhfMu9",
+					"width": 840
+				}
+			],
+			"place_id": "ChIJ2V-Mo_l1nkcRfZixfUq4DAE",
+			"reference": "ChIJ2V-Mo_l1nkcRfZixfUq4DAE",
+			"scope": "GOOGLE",
+			"types": [
+				"locality",
+				"political"
+			],
+			"vicinity": "Munich"
+		},
+		{
+			"business_status": "OPERATIONAL",
+			"geometry": {
+				"location": {
+					"lat": 48.07232219999999,
+					"lng": 11.5240004
+				},
+				"viewport": {
+					"northeast": {
+						"lat": 48.07368913029149,
+						"lng": 11.5252049302915
+					},
+					"southwest": {
+						"lat": 48.07099116970849,
+						"lng": 11.5225069697085
+					}
+				}
+			},
+			"icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+			"icon_background_color": "#7B9EB0",
+			"icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+			"name": "JNet Quality Consulting GmbH",
+			"photos": [
+				{
+					"height": 3465,
+					"html_attributions": [
+						"Viviana Pardo"
+					],
+					"photo_reference": "AW30NDyntz33HPnvRlvMAIGVYb7xB926I1rlkQSQaM_T4Z3PfjRGmG3-YJTX0qTv6Tkfkw4zRZ-VDrvlnbZgBpge7rMSZ1rYiCwD6toJFjOWYp1Pbkx-aNvdSqIjGmcXpITHAE321sl0SsbgbNXkjv34TtSd1MxGEmTVe4WUQRAw46jxG5a_",
+					"width": 4616
+				}
+			],
+			"opening_hours": {
+				"open_now": true
+			},
+			"place_id": "ChIJdcI1LJ_YnUcRE_sR6_0-1Sk",
+			"plus_code": {
+				"compound_code": "3GCF+WJ Munich, Germany",
+				"global_code": "8FWH3GCF+WJ"
+			},
+			"reference": "ChIJdcI1LJ_YnUcRE_sR6_0-1Sk",
+			"scope": "GOOGLE",
+			"types": [
+				"point_of_interest",
+				"establishment"
+			],
+			"vicinity": "Whistlerweg 27b, München"
+		},
+		{
+			"business_status": "CLOSED_TEMPORARILY",
+			"geometry": {
+				"location": {
+					"lat": 48.07218330000001,
+					"lng": 11.5233991
+				},
+				"viewport": {
+					"northeast": {
+						"lat": 48.07351808029151,
+						"lng": 11.5248745302915
+					},
+					"southwest": {
+						"lat": 48.07082011970851,
+						"lng": 11.5221765697085
+					}
+				}
+			},
+			"icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+			"icon_background_color": "#7B9EB0",
+			"icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+			"name": "Talentview * Talentprofile + Anforderungsprofile + Matching + Teamaufbau",
+			"permanently_closed": true,
+			"place_id": "ChIJJcVuILPenUcR0oet6DJEatg",
+			"plus_code": {
+				"compound_code": "3GCF+V9 Munich, Germany",
+				"global_code": "8FWH3GCF+V9"
+			},
+			"reference": "ChIJJcVuILPenUcR0oet6DJEatg",
+			"scope": "GOOGLE",
+			"types": [
+				"point_of_interest",
+				"establishment"
+			],
+			"vicinity": "Whistlerweg 20, München"
+		},
+		{
+			"business_status": "CLOSED_TEMPORARILY",
+			"geometry": {
+				"location": {
+					"lat": 48.0721916,
+					"lng": 11.5234011
+				},
+				"viewport": {
+					"northeast": {
+						"lat": 48.07352758029149,
+						"lng": 11.5248769302915
+					},
+					"southwest": {
+						"lat": 48.07082961970849,
+						"lng": 11.5221789697085
+					}
+				}
+			},
+			"icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+			"icon_background_color": "#7B9EB0",
+			"icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+			"name": "talentview",
+			"permanently_closed": true,
+			"place_id": "ChIJE_FEILPenUcR5dkqUfQecVc",
+			"plus_code": {
+				"compound_code": "3GCF+V9 Munich, Germany",
+				"global_code": "8FWH3GCF+V9"
+			},
+			"reference": "ChIJE_FEILPenUcR5dkqUfQecVc",
+			"scope": "GOOGLE",
+			"types": [
+				"point_of_interest",
+				"establishment"
+			],
+			"vicinity": "Whistlerweg 20, München"
+		},
+		{
+			"business_status": "CLOSED_TEMPORARILY",
+			"geometry": {
+				"location": {
+					"lat": 48.0726596,
+					"lng": 11.5235219
+				},
+				"viewport": {
+					"northeast": {
+						"lat": 48.0739883302915,
+						"lng": 11.5250067302915
+					},
+					"southwest": {
+						"lat": 48.0712903697085,
+						"lng": 11.5223087697085
+					}
+				}
+			},
+			"icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+			"icon_background_color": "#7B9EB0",
+			"icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+			"name": "pro project",
+			"permanently_closed": true,
+			"place_id": "ChIJQ8YnI7PenUcRzHLK5ChAsXs",
+			"plus_code": {
+				"compound_code": "3GFF+3C Munich, Germany",
+				"global_code": "8FWH3GFF+3C"
+			},
+			"reference": "ChIJQ8YnI7PenUcRzHLK5ChAsXs",
+			"scope": "GOOGLE",
+			"types": [
+				"point_of_interest",
+				"establishment"
+			],
+			"vicinity": "Whistlerweg 16, München"
+		},
+		{
+			"business_status": "OPERATIONAL",
+			"geometry": {
+				"location": {
+					"lat": 48.07232219999999,
+					"lng": 11.5240004
+				},
+				"viewport": {
+					"northeast": {
+						"lat": 48.07369018029149,
+						"lng": 11.5252052802915
+					},
+					"southwest": {
+						"lat": 48.0709922197085,
+						"lng": 11.5225073197085
+					}
+				}
+			},
+			"icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+			"icon_background_color": "#7B9EB0",
+			"icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+			"name": "spontify.me",
+			"photos": [
+				{
+					"height": 3465,
+					"html_attributions": [
+						"Viviana Pardo"
+					],
+					"photo_reference": "AW30NDyntz33HPnvRlvMAIGVYb7xB926I1rlkQSQaM_T4Z3PfjRGmG3-YJTX0qTv6Tkfkw4zRZ-VDrvlnbZgBpge7rMSZ1rYiCwD6toJFjOWYp1Pbkx-aNvdSqIjGmcXpITHAE321sl0SsbgbNXkjv34TtSd1MxGEmTVe4WUQRAw46jxG5a_",
+					"width": 4616
+				}
+			],
+			"place_id": "ChIJ331S0C7fnUcRPhmtqoAbQSc",
+			"plus_code": {
+				"compound_code": "3GCF+WJ Munich, Germany",
+				"global_code": "8FWH3GCF+WJ"
+			},
+			"rating": 5,
+			"reference": "ChIJ331S0C7fnUcRPhmtqoAbQSc",
+			"scope": "GOOGLE",
+			"types": [
+				"point_of_interest",
+				"establishment"
+			],
+			"user_ratings_total": 1,
+			"vicinity": "Whistlerweg 27b, München"
+		},
+		{
+			"business_status": "OPERATIONAL",
+			"geometry": {
+				"location": {
+					"lat": 48.07232219999999,
+					"lng": 11.5240004
+				},
+				"viewport": {
+					"northeast": {
+						"lat": 48.07368913029149,
+						"lng": 11.5252049302915
+					},
+					"southwest": {
+						"lat": 48.07099116970849,
+						"lng": 11.5225069697085
+					}
+				}
+			},
+			"icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+			"icon_background_color": "#7B9EB0",
+			"icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+			"name": "doctor",
+			"photos": [
+				{
+					"height": 791,
+					"html_attributions": [
+						"doctor"
+					],
+					"photo_reference": "AW30NDz2iXoGhJHtSTgSRKSB4jtoGYMCvyArd9vt1fJMN8QeOBtX7wKTsfc3-kuamKfErPZlvWZYMVAPjH4Kj-FIRQGFXXmLS204_9uMfFq6Hfyefo8CIjsxlj48_o-OznfOCrXEZWBeQH7dvbjaE6ARa3Aa0Iui1wMXQ-yz98S2dPMexM2u",
+					"width": 1440
+				}
+			],
+			"place_id": "ChIJ9SUQjwzfnUcRDrFpy1rqIgY",
+			"plus_code": {
+				"compound_code": "3GCF+WJ Munich, Germany",
+				"global_code": "8FWH3GCF+WJ"
+			},
+			"reference": "ChIJ9SUQjwzfnUcRDrFpy1rqIgY",
+			"scope": "GOOGLE",
+			"types": [
+				"point_of_interest",
+				"establishment"
+			],
+			"vicinity": "Whistlerweg 27b, München"
+		},
+		{
+			"business_status": "OPERATIONAL",
+			"geometry": {
+				"location": {
+					"lat": 48.07232219999999,
+					"lng": 11.5240004
+				},
+				"viewport": {
+					"northeast": {
+						"lat": 48.07368913029149,
+						"lng": 11.5252049302915
+					},
+					"southwest": {
+						"lat": 48.07099116970849,
+						"lng": 11.5225069697085
+					}
+				}
+			},
+			"icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+			"icon_background_color": "#7B9EB0",
+			"icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+			"name": "IT Berater Mani Afschar Yazdi in München",
+			"opening_hours": {
+				"open_now": true
+			},
+			"photos": [
+				{
+					"height": 2208,
+					"html_attributions": [
+						"IT Berater Mani Afschar Yazdi in München"
+					],
+					"photo_reference": "AW30NDzzDyT7F2X6oqQnifezj4t0r-KCTAwY7lgrMlS6uZaewD-Xhjfhf2Tm8eZnbdeDBXw7FMi8-ubeF3y0PFS5-tMTEGIDnloqYyoJh-58H5KF9vCeQwqnjEqwBgGNPXE5JJ0gNBsPwCt4HcsJgIsp3jew6-H3tUKml8JLcQpTbDp7yXpA",
+					"width": 1242
+				}
+			],
+			"place_id": "ChIJ07upHrPenUcRWLAGn4B5afU",
+			"plus_code": {
+				"compound_code": "3GCF+WJ Munich, Germany",
+				"global_code": "8FWH3GCF+WJ"
+			},
+			"rating": 5,
+			"reference": "ChIJ07upHrPenUcRWLAGn4B5afU",
+			"scope": "GOOGLE",
+			"types": [
+				"point_of_interest",
+				"establishment"
+			],
+			"user_ratings_total": 10,
+			"vicinity": "Whistlerweg 27b, München"
+		},
+		{
+			"business_status": "OPERATIONAL",
+			"geometry": {
+				"location": {
+					"lat": 48.0719404,
+					"lng": 11.5238015
+				},
+				"viewport": {
+					"northeast": {
+						"lat": 48.0732918302915,
+						"lng": 11.5251510802915
+					},
+					"southwest": {
+						"lat": 48.0705938697085,
+						"lng": 11.5224531197085
+					}
+				}
+			},
+			"icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+			"icon_background_color": "#7B9EB0",
+			"icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+			"name": "Whistlerweg",
+			"photos": [
+				{
+					"height": 3465,
+					"html_attributions": [
+						"Viviana Pardo"
+					],
+					"photo_reference": "AW30NDyntz33HPnvRlvMAIGVYb7xB926I1rlkQSQaM_T4Z3PfjRGmG3-YJTX0qTv6Tkfkw4zRZ-VDrvlnbZgBpge7rMSZ1rYiCwD6toJFjOWYp1Pbkx-aNvdSqIjGmcXpITHAE321sl0SsbgbNXkjv34TtSd1MxGEmTVe4WUQRAw46jxG5a_",
+					"width": 4616
+				}
+			],
+			"place_id": "ChIJa9-P4bLenUcRc3yUNIi400Q",
+			"plus_code": {
+				"compound_code": "3GCF+QG Munich, Germany",
+				"global_code": "8FWH3GCF+QG"
+			},
+			"reference": "ChIJa9-P4bLenUcRc3yUNIi400Q",
+			"scope": "GOOGLE",
+			"types": [
+				"transit_station",
+				"point_of_interest",
+				"establishment"
+			],
+			"vicinity": "Germany"
+		},
+		{
+			"business_status": "OPERATIONAL",
+			"geometry": {
+				"location": {
+					"lat": 48.0718603,
+					"lng": 11.524017
+				},
+				"viewport": {
+					"northeast": {
+						"lat": 48.0732063302915,
+						"lng": 11.5253652802915
+					},
+					"southwest": {
+						"lat": 48.0705083697085,
+						"lng": 11.5226673197085
+					}
+				}
+			},
+			"icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+			"icon_background_color": "#7B9EB0",
+			"icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+			"name": "Whistlerweg",
+			"photos": [
+				{
+					"height": 3465,
+					"html_attributions": [
+						"Viviana Pardo"
+					],
+					"photo_reference": "AW30NDyntz33HPnvRlvMAIGVYb7xB926I1rlkQSQaM_T4Z3PfjRGmG3-YJTX0qTv6Tkfkw4zRZ-VDrvlnbZgBpge7rMSZ1rYiCwD6toJFjOWYp1Pbkx-aNvdSqIjGmcXpITHAE321sl0SsbgbNXkjv34TtSd1MxGEmTVe4WUQRAw46jxG5a_",
+					"width": 4616
+				}
+			],
+			"place_id": "ChIJi0Oq47LenUcR24utAMqGtK8",
+			"plus_code": {
+				"compound_code": "3GCF+PJ Munich, Germany",
+				"global_code": "8FWH3GCF+PJ"
+			},
+			"reference": "ChIJi0Oq47LenUcR24utAMqGtK8",
+			"scope": "GOOGLE",
+			"types": [
+				"transit_station",
+				"point_of_interest",
+				"establishment"
+			],
+			"vicinity": "Germany"
+		},
+		{
+			"business_status": "OPERATIONAL",
+			"geometry": {
+				"location": {
+					"lat": 48.0729023,
+					"lng": 11.5236436
+				},
+				"viewport": {
+					"northeast": {
+						"lat": 48.0742402302915,
+						"lng": 11.5251081302915
+					},
+					"southwest": {
+						"lat": 48.0715422697085,
+						"lng": 11.5224101697085
+					}
+				}
+			},
+			"icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+			"icon_background_color": "#7B9EB0",
+			"icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+			"name": "Tamat e.V.",
+			"photos": [
+				{
+					"height": 3465,
+					"html_attributions": [
+						"Viviana Pardo"
+					],
+					"photo_reference": "AW30NDyntz33HPnvRlvMAIGVYb7xB926I1rlkQSQaM_T4Z3PfjRGmG3-YJTX0qTv6Tkfkw4zRZ-VDrvlnbZgBpge7rMSZ1rYiCwD6toJFjOWYp1Pbkx-aNvdSqIjGmcXpITHAE321sl0SsbgbNXkjv34TtSd1MxGEmTVe4WUQRAw46jxG5a_",
+					"width": 4616
+				}
+			],
+			"place_id": "ChIJQ7azPbPenUcRtdicJPT4Y_8",
+			"plus_code": {
+				"compound_code": "3GFF+5F Munich, Germany",
+				"global_code": "8FWH3GFF+5F"
+			},
+			"reference": "ChIJQ7azPbPenUcRtdicJPT4Y_8",
+			"scope": "GOOGLE",
+			"types": [
+				"point_of_interest",
+				"establishment"
+			],
+			"vicinity": "Whistlerweg 14c, München"
+		},
+		{
+			"business_status": "CLOSED_TEMPORARILY",
+			"geometry": {
+				"location": {
+					"lat": 48.0718251,
+					"lng": 11.5232678
+				},
+				"viewport": {
+					"northeast": {
+						"lat": 48.07324388029149,
+						"lng": 11.5246364802915
+					},
+					"southwest": {
+						"lat": 48.07054591970849,
+						"lng": 11.5219385197085
+					}
+				}
+			},
+			"icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+			"icon_background_color": "#7B9EB0",
+			"icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+			"name": "Fischer Stefan",
+			"permanently_closed": true,
+			"place_id": "ChIJrTly3rLenUcR1qm8S8LuWvA",
+			"plus_code": {
+				"compound_code": "3GCF+P8 Munich, Germany",
+				"global_code": "8FWH3GCF+P8"
+			},
+			"reference": "ChIJrTly3rLenUcR1qm8S8LuWvA",
+			"scope": "GOOGLE",
+			"types": [
+				"point_of_interest",
+				"establishment"
+			],
+			"vicinity": "Melchiorstraße 27, München"
+		},
+		{
+			"business_status": "CLOSED_TEMPORARILY",
+			"geometry": {
+				"location": {
+					"lat": 48.0726105,
+					"lng": 11.5250261
+				},
+				"viewport": {
+					"northeast": {
+						"lat": 48.07406398029151,
+						"lng": 11.5264355302915
+					},
+					"southwest": {
+						"lat": 48.07136601970851,
+						"lng": 11.5237375697085
+					}
+				}
+			},
+			"icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+			"icon_background_color": "#7B9EB0",
+			"icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+			"name": "Corvus Gmbh",
+			"permanently_closed": true,
+			"place_id": "ChIJAQC8CLPenUcRFnNpTh3RiO4",
+			"plus_code": {
+				"compound_code": "3GFG+22 Munich, Germany",
+				"global_code": "8FWH3GFG+22"
+			},
+			"reference": "ChIJAQC8CLPenUcRFnNpTh3RiO4",
+			"scope": "GOOGLE",
+			"types": [
+				"point_of_interest",
+				"establishment"
+			],
+			"vicinity": "Bertelestraße 66, München"
+		},
+		{
+			"geometry": {
+				"location": {
+					"lat": 48.0767846,
+					"lng": 11.5120033
+				},
+				"viewport": {
+					"northeast": {
+						"lat": 48.10546801549518,
+						"lng": 11.55216876457515
+					},
+					"southwest": {
+						"lat": 48.06160176222775,
+						"lng": 11.47093787594071
+					}
+				}
+			},
+			"icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/geocode-71.png",
+			"icon_background_color": "#7B9EB0",
+			"icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+			"name": "Thalkirchen-Obersendling-Forstenried-Fürstenried-Solln",
+			"photos": [
+				{
+					"height": 3465,
+					"html_attributions": [
+						"Viviana Pardo"
+					],
+					"photo_reference": "AW30NDyntz33HPnvRlvMAIGVYb7xB926I1rlkQSQaM_T4Z3PfjRGmG3-YJTX0qTv6Tkfkw4zRZ-VDrvlnbZgBpge7rMSZ1rYiCwD6toJFjOWYp1Pbkx-aNvdSqIjGmcXpITHAE321sl0SsbgbNXkjv34TtSd1MxGEmTVe4WUQRAw46jxG5a_",
+					"width": 4616
+				}
+			],
+			"place_id": "ChIJrxhrCzjZnUcRzHxkjk0n218",
+			"reference": "ChIJrxhrCzjZnUcRzHxkjk0n218",
+			"scope": "GOOGLE",
+			"types": [
+				"sublocality_level_1",
+				"sublocality",
+				"political"
+			],
+			"vicinity": "Thalkirchen-Obersendling-Forstenried-Fürstenried-Solln"
+		},
+		{
+			"business_status": "OPERATIONAL",
+			"geometry": {
+				"location": {
+					"lat": 48.0717193,
+					"lng": 11.5245068
+				},
+				"viewport": {
+					"northeast": {
+						"lat": 48.0731276802915,
+						"lng": 11.5258682802915
+					},
+					"southwest": {
+						"lat": 48.0704297197085,
+						"lng": 11.5231703197085
+					}
+				}
+			},
+			"icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+			"icon_background_color": "#7B9EB0",
+			"icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+			"name": "Frau Dr. med. Brigitte Hildebrand",
+			"photos": [
+				{
+					"height": 3465,
+					"html_attributions": [
+						"Viviana Pardo"
+					],
+					"photo_reference": "AW30NDyntz33HPnvRlvMAIGVYb7xB926I1rlkQSQaM_T4Z3PfjRGmG3-YJTX0qTv6Tkfkw4zRZ-VDrvlnbZgBpge7rMSZ1rYiCwD6toJFjOWYp1Pbkx-aNvdSqIjGmcXpITHAE321sl0SsbgbNXkjv34TtSd1MxGEmTVe4WUQRAw46jxG5a_",
+					"width": 4616
+				}
+			],
+			"place_id": "ChIJOUgn_LLenUcRWnsJnczT8CY",
+			"plus_code": {
+				"compound_code": "3GCF+MR Munich, Germany",
+				"global_code": "8FWH3GCF+MR"
+			},
+			"reference": "ChIJOUgn_LLenUcRWnsJnczT8CY",
+			"scope": "GOOGLE",
+			"types": [
+				"doctor",
+				"health",
+				"point_of_interest",
+				"establishment"
+			],
+			"vicinity": "Melchiorstraße 21A, München"
+		}
+	],
+	"status": "OK"
+}

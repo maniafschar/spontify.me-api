@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.entity.BaseEntity;
+import com.jq.findapp.entity.Block;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.QueryParams;
@@ -73,6 +74,9 @@ public class DBApi {
 		authenticationService.verify(user, password, salt);
 		if (entity.getValues().containsKey("contactId"))
 			return;
+		// TODO rm 0.3.0
+		if ("ContactBlock".equals(entity.getClassname()))
+			entity.setClassname(Block.class.getSimpleName());
 		final BaseEntity e = repository.one(entity.getClazz(), entity.getId());
 		if (checkWriteAuthorisation(e, user)) {
 			if (entity.getValues().containsKey("password")) {

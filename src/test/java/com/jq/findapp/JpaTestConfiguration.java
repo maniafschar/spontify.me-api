@@ -79,7 +79,12 @@ public class JpaTestConfiguration {
 		@Override
 		public String google(String param, BigInteger user) {
 			try {
-				return IOUtils.toString(getClass().getResourceAsStream("/googleResponse.json"), StandardCharsets.UTF_8);
+				return IOUtils.toString(
+						getClass().getResourceAsStream(
+								param.startsWith("place/nearbysearch/json?") ? "/googleNearBy.json"
+										: param.startsWith("place/photo?") ? "/googlePhoto.html"
+												: "/googleResponse.json"),
+						StandardCharsets.UTF_8);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}

@@ -1,4 +1,4 @@
-package com.jq.findapp.service;
+package com.jq.findapp.service.backend;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -14,7 +14,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.JpaTestConfiguration;
-import com.jq.findapp.service.backend.EngagementService;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith({ SpringExtension.class })

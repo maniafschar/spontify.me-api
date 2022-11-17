@@ -240,11 +240,11 @@ public class RepositoryTest {
 			b[i] = 23;
 		final Contact contact = utils.createContact();
 		final Chat chat = new Chat();
-		chat.setImage(".jpg" + Attachment.SEPARATOR + Base64.getEncoder().encodeToString(b));
+		chat.setImage(Attachment.createImage(".jpg", b));
 		chat.setContactId(contact.getId());
 		chat.setContactId2(adminId);
 		final Chat chat2 = new Chat();
-		chat2.setImage(chat.getImage());
+		chat2.setImage(Attachment.createImage(".jpg", b));
 		chat2.setContactId(chat.getContactId());
 		chat2.setContactId2(chat.getContactId2());
 		repository.save(chat);

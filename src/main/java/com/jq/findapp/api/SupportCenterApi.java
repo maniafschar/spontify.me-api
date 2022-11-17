@@ -29,6 +29,7 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.EventService;
+import com.jq.findapp.service.ImportLocationsService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.WhatToDoService;
 import com.jq.findapp.service.backend.DbService;
@@ -71,6 +72,9 @@ public class SupportCenterApi {
 
 	@Autowired
 	private StatisticsService statisticsService;
+
+	@Autowired
+	private ImportLocationsService importLocationsService;
 
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
@@ -181,6 +185,15 @@ public class SupportCenterApi {
 		if (supportCenterSecret.equals(secret)) {
 			authenticationService.verify(adminId, password, salt);
 			authenticationService.recoverSendEmailReminder(repository.one(Contact.class, id));
+		}
+	}
+
+	@PostMapping("import/location/{id}")
+	public void importLocation(@PathVariable final BigInteger id, @RequestHeader String password,
+			@RequestHeader String salt, @RequestHeader String secret) throws Exception {
+		if (supportCenterSecret.equals(secret)) {
+			authenticationService.verify(adminId, password, salt);
+			importLocationsService.importLocation(id);
 		}
 	}
 
