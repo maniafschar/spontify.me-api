@@ -113,7 +113,9 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 				s.append("\n\n");
 			}
 		}
-		if (s.indexOf("x-forwarded-host: findapp.online") > 0)
+		if (s.indexOf("x-forwarded-host: findapp.online") > 0
+				|| s.indexOf("500 INTERNAL_SERVER_ERROR") == 0 && s.indexOf(":/support/import/location/") > 0
+						&& (s.indexOf("ConstraintViolationException") > 0 || s.indexOf("Location exists") > 0))
 			return;
 		msg = msg.replaceFirst(SUBSTITUTE, "" + request.getServerPort()).replaceFirst(SUBSTITUTE, s.toString());
 		try {
