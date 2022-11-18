@@ -31,7 +31,9 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		params.setUser(repository.one(Contact.class, location.getContactId()));
 		params.setSearch(
 				"location.zipCode='" + location.getZipCode() + "' and LOWER(location.street)='"
-						+ location.getStreet().toLowerCase().replaceAll("'", "\\'") + "'");
+						+ (location.getStreet() == null ? ""
+								: location.getStreet().toLowerCase().replaceAll("'", "\\'"))
+						+ "'");
 		final Result list = repository.list(params);
 		for (int i = 0; i < list.size(); i++) {
 			if (isNameMatch((String) list.get(i).get("location.name"), location.getName(), true)) {
@@ -66,8 +68,9 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 						+ location.getName() + ", " + location.getAddress().replaceAll("\n", ", "),
 						location.getContactId()));
 		if (!"OK".equals(address.get("status").asText()))
-			throw new IllegalAccessException("Invalid address:\n"
-					+ new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(address));
+			throw new IllegalAccessException(
+					"Invalid address:\n" + location.getName() + "\n" + location.getAddress() + "\n"
+							+ new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(address));
 		final JsonNode result = address.get("results").get(0);
 		JsonNode n = result.get("geometry").get("location");
 		final GeoLocation geoLocation = externalService.convertAddress(address);
@@ -77,7 +80,8 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		location.setZipCode(geoLocation.getZipCode());
 		location.setStreet(geoLocation.getStreet());
 		location.setNumber(geoLocation.getNumber());
-		if (geoLocation.getStreet() != null && geoLocation.getStreet().trim().length() > 0) {
+		if (geoLocation.getStreet() != null && geoLocation.getStreet().trim().length() > 0
+				&& geoLocation.getLatitude() != null && geoLocation.getLongitude() != null) {
 			location.setLatitude(geoLocation.getLatitude());
 			location.setLongitude(geoLocation.getLongitude());
 		}

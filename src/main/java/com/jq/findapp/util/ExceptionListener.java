@@ -68,7 +68,7 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 		String msg = status + "\n\n" + request.getMethod() + " "
 				+ (request.getHeader("user") == null ? "" : request.getHeader("user") + "@")
 				+ SUBSTITUTE + ":" + request.getRequestURI() + getQueryString(request) + SUBSTITUTE
-				+ ex.getMessage() + "\n\n" + Strings.stackTraceToString(ex);
+				+ Strings.stackTraceToString(ex);
 		final Integer hash = msg.hashCode();
 		synchronized (SENT_ERRORS) {
 			if (SENT_ERRORS.contains(hash))

@@ -185,14 +185,16 @@ public class ImportLocationsService {
 		}
 	}
 
-	public void importLocation(BigInteger ticketId) throws Exception {
+	public void importLocation(BigInteger ticketId, String category) throws Exception {
 		final Ticket ticket = repository.one(Ticket.class, ticketId);
 		final JsonNode address = new ObjectMapper().readTree(new String(Attachment.getFile(ticket.getNote())));
 		final Location location = new Location();
 		location.setContactId(adminId);
 		location.setName(address.get("name").asText());
 		location.setParkingOption("3");
-		location.setCategory(ticket.getSubject().split(" ")[0]);
+		location.setCategory(category);
+		location.setLatitude((float) address.get("geometry").get("location").get("lat").asDouble());
+		location.setLongitude((float) address.get("geometry").get("location").get("lng").asDouble());
 		if (address.has("photos")) {
 			final String html = externalService.google(
 					"place/photo?maxheight=1200&photoreference="
@@ -207,5 +209,6 @@ public class ImportLocationsService {
 		}
 		location.setAddress(address.get("vicinity").asText().replaceAll(", ", "\n"));
 		repository.save(location);
+		repository.delete(ticket);
 	}
 }

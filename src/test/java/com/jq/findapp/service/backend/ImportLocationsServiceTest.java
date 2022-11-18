@@ -54,7 +54,7 @@ public class ImportLocationsServiceTest {
 		}
 
 		// when
-		importLocationsService.importLocation(ticketId);
+		importLocationsService.importLocation(ticketId, "3");
 
 		// then no exception
 		result = repository.list(new QueryParams(Query.location_listId));
