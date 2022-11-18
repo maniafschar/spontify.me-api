@@ -30,6 +30,8 @@ public enum Text {
 	engagement_like,
 	engagement_nearByContact,
 	engagement_nearByLocation,
+	engagement_newContacts,
+	engagement_newLocations,
 	engagement_newTown,
 	engagement_patience,
 	engagement_praise,

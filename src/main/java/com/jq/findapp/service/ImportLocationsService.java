@@ -47,8 +47,8 @@ public class ImportLocationsService {
 			new LocationType("bakery", "0"),
 			new LocationType("bank", null),
 			new LocationType("bar", "4"),
-			new LocationType("beauty_salon", null),
-			new LocationType("bicycle_store", null),
+			new LocationType("beauty_salon", "0"),
+			new LocationType("bicycle_store", "0"),
 			new LocationType("book_store", "0"),
 			new LocationType("bowling_alley", "3"),
 			new LocationType("bus_station", null),
@@ -172,7 +172,8 @@ public class ImportLocationsService {
 			addresses.get("results").elements().forEachRemaining(
 					e -> {
 						if (e.has("photos") &&
-								(!e.has("permanently_closed") || !e.get("permanently_closed").asBoolean())) {
+								(!e.has("permanently_closed") || !e.get("permanently_closed").asBoolean()) &&
+								e.has("rating") && e.get("rating").asDouble() > 3.5) {
 							try {
 								notificationService.createTicket(TicketType.LOCATION,
 										type.category + " " + e.get("name").asText(),

@@ -3,6 +3,7 @@ package com.jq.findapp.service.backend;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -48,14 +49,10 @@ public class EngagementService {
 	@Autowired
 	private AuthenticationService authenticationService;
 
-	private static ExternalService externalService;
+	@Autowired
+	private ExternalService externalService;
 
 	private static String currentVersion;
-
-	@Autowired
-	private void setExternalService(ExternalService externalService) {
-		EngagementService.externalService = externalService;
-	}
 
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
@@ -84,23 +81,67 @@ public class EngagementService {
 	private final QueryParams paramsAdminBlocked = new QueryParams(Query.contact_block);
 
 	enum REPLACMENT {
-		EMOJI_DANCING((contact, location) -> contact.getGender() != null && contact.getGender() == 1 ? "🕺🏻" : "💃"),
+		EMOJI_DANCING((contact, location, externalService,
+				repository) -> contact.getGender() != null && contact.getGender() == 1 ? "🕺🏻" : "💃"),
 		EMOJI_WAVING(
-				(contact, location) -> contact.getGender() != null && contact.getGender() == 1 ? "🙋🏻‍♂️" : "🙋‍♀️"),
-		CONTACT_PSEUDONYM((contact, location) -> contact.getPseudonym()),
-		CONTACT_CURRENT_TOWN((contact, location) -> {
+				(contact, location, externalService,
+						repository) -> contact.getGender() != null && contact.getGender() == 1 ? "🙋🏻‍♂️" : "🙋‍♀️"),
+		CONTACT_MODIFIED_AT((contact, location, externalService, repository) -> new SimpleDateFormat("d.M. H:mm")
+				.format(contact.getModifiedAt())),
+		CONTACT_PSEUDONYM((contact, location, externalService, repository) -> contact.getPseudonym()),
+		CONTACT_CURRENT_TOWN((contact, location, externalService, repository) -> {
 			try {
 				return externalService.getAddress(contact.getLatitude(), contact.getLongitude(), null).getTown();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 		}),
-		CONTACT_VERSION((contact, location) -> contact.getVersion()),
-		LOCATION_NAME((contact, location) -> location.getName()),
-		VERSION((contact, location) -> currentVersion);
+		CONTACT_VERSION((contact, location, externalService, repository) -> contact.getVersion()),
+		LOCATION_NAME((contact, location, externalService, repository) -> location.getName()),
+		NEW_CONTACTS_COUNT((contact, location, externalService, repository) -> {
+			final QueryParams params = new QueryParams(Query.contact_list);
+			params.setUser(contact);
+			params.setLatitude(contact.getLatitude());
+			params.setLongitude(contact.getLongitude());
+			params.setSearch(
+					"contact.createdAt>='" + Instant.ofEpochMilli(contact.getModifiedAt().getTime()) + "'");
+			return "" + repository.list(params).size();
+		}),
+		NEW_CONTACTS_DISTANCE((contact, location, externalService, repository) -> {
+			final QueryParams params = new QueryParams(Query.contact_list);
+			params.setUser(contact);
+			params.setLatitude(contact.getLatitude());
+			params.setLongitude(contact.getLongitude());
+			params.setSearch(
+					"contact.createdAt>='" + Instant.ofEpochMilli(contact.getModifiedAt().getTime()) + "'");
+			final Result result = repository.list(params);
+			return ""
+					+ (int) (((Number) result.get(result.size() - 1).get("_geolocationDistance")).doubleValue() + 0.5);
+		}),
+		NEW_LOCATIONS_COUNT((contact, location, externalService, repository) -> {
+			final QueryParams params = new QueryParams(Query.location_list);
+			params.setUser(contact);
+			params.setLatitude(contact.getLatitude());
+			params.setLongitude(contact.getLongitude());
+			params.setSearch(
+					"location.createdAt>='" + Instant.ofEpochMilli(contact.getModifiedAt().getTime()) + "'");
+			return "" + repository.list(params).size();
+		}),
+		NEW_LOCATIONS_DISTANCE((contact, location, externalService, repository) -> {
+			final QueryParams params = new QueryParams(Query.location_list);
+			params.setUser(contact);
+			params.setLatitude(contact.getLatitude());
+			params.setLongitude(contact.getLongitude());
+			params.setSearch(
+					"location.createdAt>='" + Instant.ofEpochMilli(contact.getModifiedAt().getTime()) + "'");
+			final Result result = repository.list(params);
+			return ""
+					+ (int) (((Number) result.get(result.size() - 1).get("_geolocationDistance")).doubleValue() + 0.5);
+		}),
+		VERSION((contact, location, externalService, repository) -> currentVersion);
 
 		private static interface Exec {
-			String replace(Contact contact, Location location);
+			String replace(Contact contact, Location location, ExternalService externalService, Repository repository);
 		}
 
 		private final Exec exec;
@@ -109,8 +150,11 @@ public class EngagementService {
 			this.exec = exec;
 		}
 
-		String replace(String s, Contact contact, Location location) {
-			return s.contains(name()) ? s.replaceAll(name(), exec.replace(contact, location)) : s;
+		String replace(String s, Contact contact, Location location, ExternalService externalService,
+				Repository repository) {
+			return s.contains(name())
+					? s.replaceAll(name(), exec.replace(contact, location, externalService, repository))
+					: s;
 		}
 
 	}
@@ -161,6 +205,30 @@ public class EngagementService {
 						return repository.list(params).size() > 0;
 					}
 					return false;
+				}));
+
+		chatTemplates.add(new ChatTemplate(Text.engagement_newLocations,
+				"",
+				contact -> {
+					final QueryParams params = new QueryParams(Query.location_list);
+					params.setUser(contact);
+					params.setLatitude(contact.getLatitude());
+					params.setLongitude(contact.getLongitude());
+					params.setSearch(
+							"location.createdAt>='" + Instant.ofEpochMilli(contact.getModifiedAt().getTime()) + "'");
+					return repository.list(params).size() > 1;
+				}));
+
+		chatTemplates.add(new ChatTemplate(Text.engagement_newContacts,
+				"",
+				contact -> {
+					final QueryParams params = new QueryParams(Query.contact_list);
+					params.setUser(contact);
+					params.setLatitude(contact.getLatitude());
+					params.setLongitude(contact.getLongitude());
+					params.setSearch(
+							"contact.createdAt>='" + Instant.ofEpochMilli(contact.getModifiedAt().getTime()) + "'");
+					return repository.list(params).size() > 1;
 				}));
 
 		chatTemplates.add(new ChatTemplate(Text.engagement_bluetoothMatch,
@@ -509,7 +577,7 @@ public class EngagementService {
 		if (repository.list(params).size() == 0) {
 			String s = textId.getText(contact.getLanguage());
 			for (REPLACMENT rep : REPLACMENT.values())
-				s = rep.replace(s, contact, location);
+				s = rep.replace(s, contact, location, externalService, repository);
 			final Chat chat = new Chat();
 			chat.setContactId(adminId);
 			chat.setContactId2(contact.getId());

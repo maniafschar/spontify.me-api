@@ -19,6 +19,8 @@
 		"like": "Hallo CONTACT_PSEUDONYM, was stört Dich an spontify.me, was fehlt Dir? 🤔\nSag uns offen Deine Meinung. EMOJI_WAVING",
 		"nearByContact": "Hallo CONTACT_PSEUDONYM, Sponti LOCATION_NAME matcht herrvorragend! Hast Du Lust Kontakt aufzunehmen? Starte eine Chat, vielleicht über Gemeinsamkeiten die Ihr habt.",
 		"nearByLocation": "Hallo CONTACT_PSEUDONYM, Du bist in der Nähe der Location LOCATION_NAME und sie könnte Dir gefallen. Vielleicht besuchst Du sie mal und bewertest sie?",
+		"newContacts": "Hallo CONTACT_PSEUDONYM, seit Deinem letzten Login am CONTACT_MODIFIED_AT haben sich NEW_CONTACTS_COUNT neue Spontis in Deinem Umkreis von NEW_CONTACTS_DISTANCE KM registriert. Vielleicht passt der eine oder andere Sponti zu Dir?",
+		"newLocations": "Hallo CONTACT_PSEUDONYM, seit Deinem letzten Login am CONTACT_MODIFIED_AT sind NEW_LOCATIONS_COUNT neue Locations in Deinem Umkreis von NEW_LOCATIONS_DISTANCE KM eingegeben worden. Vielleicht gefällt Dir die eine oder andere Location?",
 		"newTown": "Hey CONTACT_PSEUDONYM, wir möchten in CONTACT_CURRENT_TOWN wachsen und sind auf der Suche nach sympathischen Kontakten. Kennst Du vielleicht ein paar, die Du hier einladen könntest? EMOJI_WAVING",
 		"patience": "Gedulde Dich etwas, wir bauen gerade die Community in CONTACT_CURRENT_TOWN auf. Du kannst es beschleunigen, in dem Du Deine Freunde hier einlädst. EMOJI_WAVING",
 		"praise": "Hey CONTACT_PSEUDONYM, einfach mal ein Lob, nicht mehr, Du hast ein tolles Profil. Weiter so. ❤️\nWenn Dir irgendetwas bezüglich der App auf dem Herzen liegt, schreib es mir gerne hier.",
