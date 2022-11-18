@@ -115,8 +115,11 @@ public class EngagementService {
 			params.setSearch(
 					"contact.createdAt>='" + Instant.ofEpochMilli(contact.getModifiedAt().getTime()) + "'");
 			final Result result = repository.list(params);
-			return ""
-					+ (int) (((Number) result.get(result.size() - 1).get("_geolocationDistance")).doubleValue() + 0.5);
+			for (int i = result.size() - 1; i >= 0; i--) {
+				if (result.get(i).get("_geolocationDistance") instanceof Number)
+					return "" + (int) (((Number) result.get(i).get("_geolocationDistance")).doubleValue() + 0.5);
+			}
+			return "11";
 		}),
 		NEW_LOCATIONS_COUNT((contact, location, externalService, repository) -> {
 			final QueryParams params = new QueryParams(Query.location_list);
