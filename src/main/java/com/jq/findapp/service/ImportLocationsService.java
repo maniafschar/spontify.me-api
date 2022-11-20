@@ -4,7 +4,6 @@ import java.math.BigInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -20,6 +19,7 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.util.EntityUtil;
+import com.jq.findapp.util.Strings;
 
 @Service
 public class ImportLocationsService {
@@ -250,7 +250,7 @@ public class ImportLocationsService {
 			}
 		} catch (Exception ex) {
 			if (!ex.getMessage().contains("Failed on image") && !ex.getMessage().contains("Location exists")
-					&& !(ex instanceof ConstraintViolationException))
+					&& !Strings.stackTraceToString(ex).contains("Duplicate entry"))
 				notificationService.createTicket(TicketType.LOCATION,
 						category + " " + location.getName(), json, adminId);
 		}
