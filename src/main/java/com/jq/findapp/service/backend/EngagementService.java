@@ -213,6 +213,8 @@ public class EngagementService {
 		chatTemplates.add(new ChatTemplate(Text.engagement_newLocations,
 				"",
 				contact -> {
+					if (contact.getLongitude() == null)
+						return false;
 					final QueryParams params = new QueryParams(Query.location_list);
 					params.setUser(contact);
 					params.setLatitude(contact.getLatitude());
@@ -225,6 +227,8 @@ public class EngagementService {
 		chatTemplates.add(new ChatTemplate(Text.engagement_newContacts,
 				"",
 				contact -> {
+					if (contact.getLongitude() == null)
+						return false;
 					final QueryParams params = new QueryParams(Query.contact_list);
 					params.setUser(contact);
 					params.setLatitude(contact.getLatitude());

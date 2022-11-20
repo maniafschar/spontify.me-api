@@ -130,13 +130,17 @@ public enum Query {
 		final StringBuilder s = new StringBuilder(search.toLowerCase());
 		int p, p2;
 		while ((p = s.indexOf("'")) > -1) {
-			if ((p2 = s.indexOf("'", p + 1)) < 0)
-				throw new IllegalArgumentException("Invalid search expression: " + sql);
+			p2 = p;
+			do {
+				p2 = s.indexOf("'", p2 + 1);
+			} while (p2 > 0 && "\\".equals(s.substring(p2 - 1, p2)));
+			if (p2 < 0)
+				throw new IllegalArgumentException("Invalid quote in " + name() + " search: " + search);
 			s.delete(p, p2 + 1);
 		}
 		if (s.indexOf(";") > -1 || s.indexOf("union") > -1 || s.indexOf("select") > -1 || s.indexOf("update") > -1
 				|| s.indexOf("insert") > -1 || s.indexOf("delete") > -1)
-			throw new IllegalArgumentException("Invalid search expression: " + sql);
+			throw new IllegalArgumentException("Invalid expression in " + name() + " search: " + search);
 		return search;
 	}
 

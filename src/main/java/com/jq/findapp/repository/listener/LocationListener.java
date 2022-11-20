@@ -32,7 +32,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		params.setSearch(
 				"location.zipCode='" + location.getZipCode() + "' and LOWER(location.street)='"
 						+ (location.getStreet() == null ? ""
-								: location.getStreet().toLowerCase().replaceAll("'", "\\'"))
+								: location.getStreet().toLowerCase().replace("traße", "tr.").replaceAll("'", "\\'"))
 						+ "'");
 		final Result list = repository.list(params);
 		for (int i = 0; i < list.size(); i++) {
@@ -80,10 +80,16 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		location.setZipCode(geoLocation.getZipCode());
 		location.setStreet(geoLocation.getStreet());
 		location.setNumber(geoLocation.getNumber());
-		if (geoLocation.getStreet() != null && geoLocation.getStreet().trim().length() > 0
-				&& geoLocation.getLatitude() != null && geoLocation.getLongitude() != null) {
-			location.setLatitude(geoLocation.getLatitude());
-			location.setLongitude(geoLocation.getLongitude());
+		if (geoLocation.getStreet() != null && geoLocation.getStreet().trim().length() > 0) {
+			if (location.getStreet().contains("traße")) {
+				final String street = location.getStreet().replace("traße", "tr.");
+				location.setAddress(location.getAddress().replace(location.getStreet(), street));
+				location.setStreet(street);
+			}
+			if (geoLocation.getLatitude() != null && geoLocation.getLongitude() != null) {
+				location.setLatitude(geoLocation.getLatitude());
+				location.setLongitude(geoLocation.getLongitude());
+			}
 		}
 		n = result.get("address_components");
 		String s = "";
