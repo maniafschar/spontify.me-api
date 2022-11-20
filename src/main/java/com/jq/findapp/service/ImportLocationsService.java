@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -248,7 +249,8 @@ public class ImportLocationsService {
 				return true;
 			}
 		} catch (Exception ex) {
-			if (!ex.getMessage().contains("Failed on image") && !ex.getMessage().contains("Location exists"))
+			if (!ex.getMessage().contains("Failed on image") && !ex.getMessage().contains("Location exists")
+					&& !(ex instanceof ConstraintViolationException))
 				notificationService.createTicket(TicketType.LOCATION,
 						category + " " + location.getName(), json, adminId);
 		}
