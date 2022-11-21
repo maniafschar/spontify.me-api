@@ -61,6 +61,7 @@ public enum Query {
 	misc_listTicket,
 	misc_setting,
 	misc_statsApi,
+	misc_statsLocations,
 	misc_statsLog,
 	misc_statsUser;
 
@@ -95,13 +96,13 @@ public enum Query {
 		}
 	}
 
-	public String prepareSql(QueryParams params) {
-		String search = Strings.isEmpty(params.getSearch()) ? "1=1" : sanatizeSearchToken(params.getSearch());
+	public static String prepareSql(QueryParams params) {
+		String search = Strings.isEmpty(params.getSearch()) ? "1=1" : sanatizeSearchToken(params);
 		if (params.getSearchGeoLocation() != null)
 			search += " and " + params.getSearchGeoLocation();
-		if (addBlock && params.getUser() != null)
+		if (params.getQuery().addBlock && params.getUser() != null)
 			search += " and (select b.id from Block b where b.contactId=contact.id and b.contactId2={USERID} or b.contactId={USERID} and b.contactId2=contact.id) is null";
-		String s = sql.replace("{search}", search);
+		String s = params.getQuery().sql.replace("{search}", search);
 		if (s.contains("{ID}"))
 			s = s.replaceAll("\\{ID}", "" + params.getId());
 		if (s.contains("{USERAGE}"))
@@ -124,10 +125,10 @@ public enum Query {
 		return s;
 	}
 
-	private String sanatizeSearchToken(String search) {
-		if (search == null)
+	private static String sanatizeSearchToken(QueryParams params) {
+		if (params.getSearch() == null)
 			return "";
-		final StringBuilder s = new StringBuilder(search.toLowerCase());
+		final StringBuilder s = new StringBuilder(params.getSearch().toLowerCase());
 		int p, p2;
 		while ((p = s.indexOf("'")) > -1) {
 			p2 = p;
@@ -135,13 +136,15 @@ public enum Query {
 				p2 = s.indexOf("'", p2 + 1);
 			} while (p2 > 0 && "\\".equals(s.substring(p2 - 1, p2)));
 			if (p2 < 0)
-				throw new IllegalArgumentException("Invalid quote in " + name() + " search: " + search);
+				throw new IllegalArgumentException(
+						"Invalid quote in " + params.getQuery().name() + " search: " + params.getSearch());
 			s.delete(p, p2 + 1);
 		}
 		if (s.indexOf(";") > -1 || s.indexOf("union") > -1 || s.indexOf("select") > -1 || s.indexOf("update") > -1
 				|| s.indexOf("insert") > -1 || s.indexOf("delete") > -1)
-			throw new IllegalArgumentException("Invalid expression in " + name() + " search: " + search);
-		return search;
+			throw new IllegalArgumentException(
+					"Invalid expression in " + params.getQuery().name() + " search: " + params.getSearch());
+		return params.getSearch();
 	}
 
 	public Result createResult() {

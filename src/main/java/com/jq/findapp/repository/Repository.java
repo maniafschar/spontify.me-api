@@ -42,7 +42,7 @@ public class Repository {
 	public Result list(final QueryParams params) {
 		final GeoLocationProcessor geo = new GeoLocationProcessor(params);
 		final Result result = params.getQuery().createResult();
-		final String sql = params.getQuery().prepareSql(params);
+		final String sql = Query.prepareSql(params);
 		final List<Object> data = em.createQuery(sql).getResultList();
 		if (data != null && data.size() > 0) {
 			data.stream()
