@@ -5,7 +5,7 @@ SELECT
 	contact.pseudonym,
 	max(chat.id) as chatId,
 	max(chat.createdAt) as maxDate,
-	CASE WHEN chat.contactId={USERID} THEN 0 ELSE chat.contactId END as contactId,
+	(select contactId from Chat where id=max(chat.id)) as contactId,
 	sum(CASE WHEN chat.seen=true OR chat.contactId={USERID} THEN 0 ELSE 1 END) as unseen,
 	sum(CASE WHEN chat.seen=true OR chat.contactId<>{USERID} THEN 0 ELSE 1 END) as unseen2
 FROM

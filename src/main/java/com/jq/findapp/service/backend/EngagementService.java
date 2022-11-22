@@ -233,9 +233,10 @@ public class EngagementService {
 					params.setUser(contact);
 					params.setLatitude(contact.getLatitude());
 					params.setLongitude(contact.getLongitude());
+					params.setDistance(50);
 					params.setSearch(
 							"contact.createdAt>='" + Instant.ofEpochMilli(contact.getModifiedAt().getTime()) + "'");
-					return repository.list(params).size() > 1;
+					return repository.list(params).size() > 9;
 				}));
 
 		chatTemplates.add(new ChatTemplate(Text.engagement_bluetoothMatch,
@@ -428,8 +429,11 @@ public class EngagementService {
 	}
 
 	private void resetChatInstallCurrentVersion() throws Exception {
-		if (currentVersion == null)
-			currentVersion = (String) repository.one(new QueryParams(Query.contact_maxAppVersion)).get("_c");
+		if (currentVersion == null) {
+			final QueryParams params = new QueryParams(Query.contact_maxAppVersion);
+			params.setUser(repository.one(Contact.class, adminId));
+			currentVersion = (String) repository.one(params).get("_c");
+		}
 		final QueryParams params = new QueryParams(Query.contact_listChatFlat);
 		params.setLimit(0);
 		params.setSearch("chat.textId='" + Text.engagement_installCurrentVersion.name() +

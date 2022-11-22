@@ -45,10 +45,9 @@ public class Repository {
 		final String sql = Query.prepareSql(params);
 		final List<Object> data = em.createQuery(sql).getResultList();
 		if (data != null && data.size() > 0) {
-			data.stream()
-					.forEach(e -> {
-						result.getList().add(e instanceof Object[] ? (Object[]) e : new Object[] { e });
-					});
+			data.stream().forEach(e -> {
+				result.getList().add(e instanceof Object[] ? (Object[]) e : new Object[] { e });
+			});
 			geo.postProcessor(result.getList());
 			if (params.getLimit() > 0) {
 				final int max = result.size() - params.getLimit();
