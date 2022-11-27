@@ -1,0 +1,52 @@
+{
+	"business_status": "OPERATIONAL",
+	"geometry": {
+		"location": {
+			"lat": 48.1368017,
+			"lng": 11.5794795
+		},
+		"viewport": {
+			"northeast": {
+				"lat": 48.1382173302915,
+				"lng": 11.5808483802915
+			},
+			"southwest": {
+				"lat": 48.1355193697085,
+				"lng": 11.5781504197085
+			}
+		}
+	},
+	"icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/lodging-71.png",
+	"icon_background_color": "#909CE1",
+	"icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/hotel_pinlet",
+	"name": "Cortiina Hotel",
+	"opening_hours": {
+		"open_now": true
+	},
+	"photos": [
+		{
+			"height": 805,
+			"html_attributions": [
+				"<a href=\"https://maps.google.com/maps/contrib/101167821607341815549\">CORTIINA Hotel</a>"
+			],
+			"photo_reference": "AW30NDxQzhFGIiPMi_Czs_Bo6JQ39U_qJoC0fphTh5Hf-JOCR49KHKm3_rw_quR06fn4HAekQKGYf0FRBooCdJYQmL7hpOK-mE_fKVT-HH-yHoQ8V1vPe6zuSDnGuEjUQBexGCFrNu341bHGS-H8V_k1erlxCAsVsbNd8cV6SYe0GQTfFp1_",
+			"width": 800
+		}
+	],
+	"place_id": "ChIJZyLWSop1nkcRnQW0FofT8bU",
+	"plus_code": {
+		"compound_code": "4HPH+PQ Munich, Germany",
+		"global_code": "8FWH4HPH+PQ"
+	},
+	"rating": 4.4,
+	"reference": "ChIJZyLWSop1nkcRnQW0FofT8bU",
+	"scope": "GOOGLE",
+	"types": [
+		"lodging",
+		"bar",
+		"point_of_interest",
+		"establishment"
+	],
+	"user_ratings_total": 370,
+	"vicinity": "Ledererstraße 8, München"
+}

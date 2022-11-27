@@ -166,11 +166,11 @@ public class ImportLocationsService {
 		}
 	}
 
-	public boolean importLocation(BigInteger ticketId, String category) throws Exception {
+	public String importLocation(BigInteger ticketId, String category) throws Exception {
 		final Ticket ticket = repository.one(Ticket.class, ticketId);
-		final boolean imported = importLocation(new String(Attachment.getFile(ticket.getNote())), category);
+		final String result = importLocation(new String(Attachment.getFile(ticket.getNote())), category);
 		repository.delete(ticket);
-		return imported;
+		return result;
 	}
 
 	private String lookup(float latitude, float longitude, LocationType type) throws Exception {
@@ -197,7 +197,7 @@ public class ImportLocationsService {
 								|| mapType(e.get("types").get(0).asText()) == null)
 							notificationService.createTicket(TicketType.LOCATION,
 									type.category + " " + e.get("name").asText(), json, adminId);
-						else if (importLocation(json, mapType(e.get("types").get(0).asText())))
+						else if (importLocation(json, mapType(e.get("types").get(0).asText())) == null)
 							imported++;
 					} catch (Exception ex) {
 						throw new RuntimeException(ex);
@@ -217,7 +217,7 @@ public class ImportLocationsService {
 		return null;
 	}
 
-	private boolean importLocation(String json, String category) {
+	String importLocation(String json, String category) {
 		final Location location = new Location();
 		try {
 			final JsonNode address = new ObjectMapper().readTree(json);
@@ -239,28 +239,29 @@ public class ImportLocationsService {
 					+ ((int) location.getLatitude().floatValue() * roundingFactor) / roundingFactor
 					+ "%' and location.longitude like '"
 					+ ((int) location.getLongitude().floatValue() * roundingFactor) / roundingFactor + "%')");
-			if (repository.list(params).size() == 0) {
-				if (address.has("photos")) {
-					final String html = externalService.google(
-							"place/photo?maxheight=1200&photoreference="
-									+ address.get("photos").get(0).get("photo_reference").asText(),
-							adminId).replace("<A HREF=", "<a href=");
-					final Matcher matcher = href.matcher(html);
-					if (matcher.find()) {
-						location.setImage(EntityUtil.getImage(matcher.group(1), EntityUtil.IMAGE_SIZE));
-						if (location.getImage() != null)
-							location.setImageList(EntityUtil.getImage(matcher.group(1), EntityUtil.IMAGE_THUMB_SIZE));
-					}
+			if (repository.list(params).size() == 0 && address.has("photos")) {
+				final String html = externalService.google(
+						"place/photo?maxheight=1200&photoreference="
+								+ address.get("photos").get(0).get("photo_reference").asText(),
+						adminId).replace("<A HREF=", "<a href=");
+				final Matcher matcher = href.matcher(html);
+				if (matcher.find()) {
+					location.setImage(EntityUtil.getImage(matcher.group(1), EntityUtil.IMAGE_SIZE));
+					if (location.getImage() != null)
+						location.setImageList(EntityUtil.getImage(matcher.group(1), EntityUtil.IMAGE_THUMB_SIZE));
 				}
 				repository.save(location);
-				return true;
+				return null;
 			}
 		} catch (Exception ex) {
-			if (!ex.getMessage().contains("Failed on image") && !ex.getMessage().contains("Location exists")
+			if (ex.getMessage() != null
+					&& !ex.getMessage().contains("Failed on image")
+					&& !ex.getMessage().contains("Location exists")
 					&& !Strings.stackTraceToString(ex).contains("Duplicate entry"))
 				notificationService.createTicket(TicketType.LOCATION,
 						category + " " + location.getName(), json, adminId);
+			return "error: " + ex.getMessage();
 		}
-		return false;
+		return "exists";
 	}
 }

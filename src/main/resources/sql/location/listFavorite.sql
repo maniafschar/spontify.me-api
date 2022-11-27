@@ -7,4 +7,5 @@ SELECT
 FROM
 	LocationFavorite locationFavorite
 WHERE
+	locationFavorite.favorite=true and
 	{search}

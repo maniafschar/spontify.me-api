@@ -189,13 +189,13 @@ public class SupportCenterApi {
 	}
 
 	@PostMapping("import/location/{id}/{category}")
-	public boolean importLocation(@PathVariable final BigInteger id, @PathVariable final String category,
+	public String importLocation(@PathVariable final BigInteger id, @PathVariable final String category,
 			@RequestHeader String password, @RequestHeader String salt, @RequestHeader String secret) throws Exception {
 		if (supportCenterSecret.equals(secret)) {
 			authenticationService.verify(adminId, password, salt);
 			return importLocationsService.importLocation(id, category);
 		}
-		return false;
+		return null;
 	}
 
 	@PutMapping("scheduler")

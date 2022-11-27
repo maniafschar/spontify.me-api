@@ -1,11 +1,14 @@
-package com.jq.findapp.service.backend;
+package com.jq.findapp.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +25,6 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
-import com.jq.findapp.service.ImportLocationsService;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith({ SpringExtension.class })
@@ -68,5 +70,19 @@ public class ImportLocationsServiceTest {
 		assertTrue(location.getImageList().contains(Attachment.SEPARATOR));
 		assertTrue(location.getImage().length() > 5);
 		assertTrue(location.getImageList().length() > 5);
+	}
+
+	@Test
+	public void importLocationJSON() throws Exception {
+		// given
+		utils.createContact();
+		final String json = IOUtils.toString(getClass().getResourceAsStream("/googleNearByError.json"),
+				StandardCharsets.UTF_8);
+
+		// when
+		final String result = importLocationsService.importLocation(json, "2");
+
+		// then
+		assertEquals(null, result);
 	}
 }

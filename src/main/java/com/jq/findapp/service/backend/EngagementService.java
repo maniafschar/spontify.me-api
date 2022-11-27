@@ -358,7 +358,7 @@ public class EngagementService {
 					value += "|" + to.getId();
 					Thread.sleep(10000);
 				} catch (MailSendException ex) {
-					failedEmails += "\n" + to.getEmail();
+					failedEmails += "\n" + to.getEmail() + "\n" + Strings.stackTraceToString(ex);
 				}
 			}
 		}
