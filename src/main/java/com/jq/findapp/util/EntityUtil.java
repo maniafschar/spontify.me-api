@@ -59,10 +59,14 @@ public class EntityUtil {
 	}
 
 	public static String getImage(String url, int size) throws MalformedURLException, IOException {
-		final byte[] data = IOUtils.toByteArray(new URL(url));
-		final BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
-		if (img.getWidth() > 400 && img.getHeight() > 400)
-			return Repository.Attachment.createImage(".jpg", scaleImage(data, size));
+		try {
+			final byte[] data = IOUtils.toByteArray(new URL(url));
+			final BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
+			if (img.getWidth() > 400 && img.getHeight() > 400)
+				return Repository.Attachment.createImage(".jpg", scaleImage(data, size));
+		} catch (Exception ex) {
+			throw new IOException("Failed reading image: " + url, ex);
+		}
 		return null;
 	}
 }

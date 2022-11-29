@@ -103,10 +103,11 @@ public class IntegrationTest {
 	}
 
 	private void addFriend() {
-		Util.click("main>buttonIcon[onclick*=\"search\"]");
-		Util.sendKeys("search input[name=\"searchKeywords\"]", "pseudonym");
-		Util.click("search buttontext[onclick*=\"saveSearch\"]");
-		Util.click("search row:nth-of-type(1)");
+		Util.click("home buttontext[onclick*=\"contacts\"]");
+		Util.click("main>buttonIcon[onclick*=\"pageContact.getFilterFields\"]");
+		Util.sendKeys("filters input[name=\"filterKeywords\"]", "pseudonym");
+		Util.click("filters buttontext[onclick*=\"search\"]");
+		Util.click("contacts row:nth-of-type(1)");
 		Util.click("detail buttontext[name=\"buttonFriend\"]");
 		Util.click("detail buttontext[onclick*=\"sendRequestForFriendship\"]");
 	}

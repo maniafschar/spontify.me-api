@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Location;
@@ -74,6 +75,7 @@ public class ImportLocationsService {
 			new LocationType("electrician", null),
 			new LocationType("electronics_store", null),
 			new LocationType("embassy", "3"),
+			new LocationType("establishment", "3"),
 			new LocationType("fire_station", "3"),
 			new LocationType("florist", "0"),
 			new LocationType("funeral_home", null),
@@ -83,6 +85,7 @@ public class ImportLocationsService {
 			new LocationType("gym", "5"),
 			new LocationType("hair_care", "0"),
 			new LocationType("hardware_store", "0"),
+			new LocationType("health", "0"),
 			new LocationType("hindu_temple", "1"),
 			new LocationType("home_goods_store", "0"),
 			new LocationType("hospital", null),
@@ -111,6 +114,7 @@ public class ImportLocationsService {
 			new LocationType("pharmacy", "0"),
 			new LocationType("physiotherapist", "5"),
 			new LocationType("plumber", null),
+			new LocationType("point_of_interest", "3"),
 			new LocationType("police", null),
 			new LocationType("post_office", "0"),
 			new LocationType("primary_school", null),
@@ -189,15 +193,12 @@ public class ImportLocationsService {
 						(!e.has("permanently_closed") || !e.get("permanently_closed").asBoolean()) &&
 						e.has("rating") && e.get("rating").asDouble() > 3.5) {
 					try {
-						final String json = om.writerWithDefaultPrettyPrinter().writeValueAsString(e),
-								jsonLower = json.toLowerCase();
-						if (jsonLower.contains("sex") || jsonLower.contains("domina")
-								|| jsonLower.contains("bordel") || !e.has("types")
-								|| e.get("types").size() == 0
-								|| mapType(e.get("types").get(0).asText()) == null)
-							notificationService.createTicket(TicketType.LOCATION,
-									type.category + " " + e.get("name").asText(), json, adminId);
-						else if (importLocation(json, mapType(e.get("types").get(0).asText())) == null)
+						final String json = om.writeValueAsString(e), jsonLower = json.toLowerCase();
+						if (jsonLower.contains("sex") || jsonLower.contains("domina") || jsonLower.contains("bordel")) {
+							if (hasRelevantType(e.get("types")) && !exists(json2location(json)))
+								notificationService.createTicket(TicketType.LOCATION,
+										type.category + " " + e.get("name").asText(), json, adminId);
+						} else if (importLocation(json, null) == null)
 							imported++;
 					} catch (Exception ex) {
 						throw new RuntimeException(ex);
@@ -217,29 +218,25 @@ public class ImportLocationsService {
 		return null;
 	}
 
+	private boolean hasRelevantType(JsonNode types) {
+		if (types != null && types.size() > 0) {
+			final Iterator<JsonNode> type = types.elements();
+			while (type.hasNext()) {
+				if (mapType(type.next().asText()) != null)
+					return true;
+			}
+		}
+		return false;
+	}
+
 	String importLocation(String json, String category) {
-		final Location location = new Location();
-		try {
-			final JsonNode address = new ObjectMapper().readTree(json);
-			location.setContactId(adminId);
-			location.setName(address.get("name").asText());
-			location.setParkingOption("3");
+		final Location location = json2location(json);
+		if (category != null)
 			location.setCategory(category);
-			location.setLatitude((float) address.get("geometry").get("location").get("lat").asDouble());
-			location.setLongitude((float) address.get("geometry").get("location").get("lng").asDouble());
-			location.setAddress(address.get("vicinity").asText().replaceAll(", ", "\n"));
-			final QueryParams params = new QueryParams(Query.location_listId);
-			params.setSearch("LOWER(location.name) like '%"
-					+ location.getName().toLowerCase().replace("'", "''").replace(' ', '%')
-					+ "%' and (LOWER(location.address) like '%"
-					+ location.getAddress().toLowerCase().replace("traße", "tr.").replace('\n', '%')
-					+ "%' and location.category='"
-					+ location.getCategory()
-					+ "' or location.latitude like '"
-					+ ((int) location.getLatitude().floatValue() * roundingFactor) / roundingFactor
-					+ "%' and location.longitude like '"
-					+ ((int) location.getLongitude().floatValue() * roundingFactor) / roundingFactor + "%')");
-			if (repository.list(params).size() == 0 && address.has("photos")) {
+		final ObjectMapper om = new ObjectMapper();
+		try {
+			final JsonNode address = om.readTree(json);
+			if (!exists(location) && address.has("photos")) {
 				final String html = externalService.google(
 						"place/photo?maxheight=1200&photoreference="
 								+ address.get("photos").get(0).get("photo_reference").asText(),
@@ -255,13 +252,58 @@ public class ImportLocationsService {
 			}
 		} catch (Exception ex) {
 			if (ex.getMessage() != null
-					&& !ex.getMessage().contains("Failed on image")
+					&& !ex.getMessage().contains("Failed reading image")
 					&& !ex.getMessage().contains("Location exists")
-					&& !Strings.stackTraceToString(ex).contains("Duplicate entry"))
-				notificationService.createTicket(TicketType.LOCATION,
-						category + " " + location.getName(), json, adminId);
+					&& !ex.getMessage().contains("Invalid address")
+					&& !Strings.stackTraceToString(ex).contains("Duplicate entry")) {
+				try {
+					notificationService.createTicket(TicketType.LOCATION,
+							location.getCategory() + " " + location.getName(),
+							om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(json)), adminId);
+				} catch (JsonProcessingException e) {
+					throw new RuntimeException(e);
+				}
+			}
 			return "error: " + ex.getMessage();
 		}
 		return "exists";
+	}
+
+	private Location json2location(String json) {
+		try {
+			final Location location = new Location();
+			final JsonNode address = new ObjectMapper().readTree(json);
+			location.setContactId(adminId);
+			String name = address.get("name").asText();
+			if (name.length() > 100) {
+				name = name.substring(0, 101);
+				if (name.lastIndexOf(" ") > 10)
+					name = name.substring(0, name.lastIndexOf(" "));
+			}
+			location.setName(name);
+			location.setParkingOption("3");
+			location.setCategory(mapType(address.get("types").get(0).asText()));
+			location.setLatitude((float) address.get("geometry").get("location").get("lat").asDouble());
+			location.setLongitude((float) address.get("geometry").get("location").get("lng").asDouble());
+			location.setAddress(address.get("vicinity").asText().replace(", ", "\n"));
+			return location;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private boolean exists(Location location) {
+		final QueryParams params = new QueryParams(Query.location_listId);
+		params.setSearch("LOWER(location.name) like '%"
+				+ location.getName().toLowerCase().replace("'", "''").replace(' ', '%')
+				+ "%' and location.category='"
+				+ location.getCategory()
+				+ "' and (LOWER(location.address) like '%"
+				+ location.getAddress().toLowerCase().replace("traße", "tr.").replace('\n', '%')
+				+ "%' or location.latitude like '"
+				+ ((int) (location.getLatitude().floatValue() * roundingFactor)) / roundingFactor
+				+ "%' and location.longitude like '"
+				+ ((int) (location.getLongitude().floatValue() * roundingFactor)) / roundingFactor + "%')");
+		return repository.list(params).size() > 0;
 	}
 }
