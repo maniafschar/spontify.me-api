@@ -158,15 +158,13 @@ public class ImportLocationsService {
 		final float lat = ((int) (latitude * roundingFactor) / roundingFactor);
 		final float lon = ((int) (longitude * roundingFactor) / roundingFactor);
 		final QueryParams params = new QueryParams(Query.misc_listTicket);
-		for (LocationType type : TYPES) {
-			final String s = lat + "\n" + lon + "\n" + type.google;
-			params.setSearch("ticket.subject='import' and ticket.note like '" + s + "%' and ticket.type='"
-					+ TicketType.LOCATION.name() + "'");
-			if (type.category != null && repository.list(params).size() == 0) {
-				final String importResult = lookup(latitude, longitude, type);
-				notificationService.createTicket(TicketType.LOCATION, "import",
-						s + (importResult == null ? "" : "\n" + importResult), adminId);
-			}
+		final String s = lat + "\n" + lon;
+		params.setSearch("ticket.subject='import' and ticket.note like '" + s +
+				"%' and ticket.type='" + TicketType.LOCATION.name() + "'");
+		if (repository.list(params).size() == 0) {
+			final String importResult = importLocations(latitude, longitude);
+			notificationService.createTicket(TicketType.LOCATION, "import",
+					s + (importResult == null ? "" : "\n" + importResult), adminId);
 		}
 	}
 
@@ -177,11 +175,11 @@ public class ImportLocationsService {
 		return result;
 	}
 
-	private String lookup(float latitude, float longitude, LocationType type) throws Exception {
+	private String importLocations(float latitude, float longitude) throws Exception {
 		final ObjectMapper om = new ObjectMapper();
 		final JsonNode addresses = om.readTree(externalService.google(
 				"place/nearbysearch/json?radius=600&sensor=false&location="
-						+ latitude + "," + longitude + "&type=" + type.google,
+						+ latitude + "," + longitude,
 				adminId));
 		if ("OK".equals(addresses.get("status").asText())) {
 			int imported = 0, total = 0;
@@ -197,7 +195,8 @@ public class ImportLocationsService {
 						if (jsonLower.contains("sex") || jsonLower.contains("domina") || jsonLower.contains("bordel")) {
 							if (hasRelevantType(e.get("types")) && !exists(json2location(json)))
 								notificationService.createTicket(TicketType.LOCATION,
-										type.category + " " + e.get("name").asText(), json, adminId);
+										mapFirstRelevantType(e.get("types")) + " " + e.get("name").asText(), json,
+										adminId);
 						} else if (importLocation(json, null) == null)
 							imported++;
 					} catch (Exception ex) {
@@ -227,6 +226,18 @@ public class ImportLocationsService {
 			}
 		}
 		return false;
+	}
+
+	private String mapFirstRelevantType(JsonNode types) {
+		if (types != null && types.size() > 0) {
+			final Iterator<JsonNode> type = types.elements();
+			while (type.hasNext()) {
+				final String s = mapType(type.next().asText());
+				if (s != null)
+					return s;
+			}
+		}
+		return null;
 	}
 
 	String importLocation(String json, String category) {

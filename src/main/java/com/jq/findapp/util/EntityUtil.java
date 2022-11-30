@@ -55,7 +55,10 @@ public class EntityUtil {
 		resizedImage.flush();
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		ImageIO.write(resizedImage, "jpg", out);
-		return out.toByteArray();
+		final byte[] result = out.toByteArray();
+		if (result == null || result.length < 100)
+			throw new IOException("image not readable, length: " + (result == null ? -1 : result.length));
+		return result;
 	}
 
 	public static String getImage(String url, int size) throws MalformedURLException, IOException {
