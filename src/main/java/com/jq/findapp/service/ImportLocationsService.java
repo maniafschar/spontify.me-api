@@ -183,6 +183,7 @@ public class ImportLocationsService {
 				adminId));
 		if ("OK".equals(addresses.get("status").asText())) {
 			int imported = 0, total = 0;
+			String town = null;
 			final Iterator<JsonNode> result = addresses.get("results").elements();
 			while (result.hasNext()) {
 				final JsonNode e = result.next();
@@ -197,14 +198,19 @@ public class ImportLocationsService {
 								notificationService.createTicket(TicketType.LOCATION,
 										mapFirstRelevantType(e.get("types")) + " " + e.get("name").asText(), json,
 										adminId);
-						} else if (importLocation(json, null) == null)
+						} else if (importLocation(json, null) == null) {
 							imported++;
+							if (town == null) {
+								final Location location = json2location(json);
+								town = location.getCountry() + " " + location.getTown() + " " + location.getZipCode();
+							}
+						}
 					} catch (Exception ex) {
 						throw new RuntimeException(ex);
 					}
 				}
 			}
-			return imported + "/" + total;
+			return imported + "/" + total + "\n" + town;
 		}
 		return null;
 	}
