@@ -128,7 +128,7 @@ public class ActionApi {
 
 	@GetMapping("marketing")
 	public Map<String, String> marketing() {
-		if (LocalDate.now().isAfter(LocalDate.of(2022, Month.NOVEMBER, 30)))
+		if (LocalDate.now().isAfter(LocalDate.of(2022, Month.DECEMBER, 15)))
 			return null;
 		final Map<String, String> map = new HashMap<>();
 		map.put("label", "50€");
