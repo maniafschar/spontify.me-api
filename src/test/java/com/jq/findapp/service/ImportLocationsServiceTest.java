@@ -1,6 +1,5 @@
 package com.jq.findapp.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -45,21 +44,23 @@ public class ImportLocationsServiceTest {
 		// given
 		utils.createContact();
 		importLocationsService.lookup(48, 11);
-		Thread.sleep(1000);
-		Result result = repository.list(new QueryParams(Query.misc_listTicket));
 		BigInteger ticketId = BigInteger.ZERO;
-		for (int i = 0; i < result.size(); i++) {
-			final Map<String, Object> m = result.get(i);
-			if (m.get("ticket.type") == TicketType.LOCATION && !"import".equals(m.get("ticket.subject"))
-					&& ticketId.longValue() < ((BigInteger) m.get("ticket.id")).longValue())
-				ticketId = (BigInteger) m.get("ticket.id");
+		while (BigInteger.ZERO.equals(ticketId)) {
+			Thread.sleep(1000);
+			final Result result = repository.list(new QueryParams(Query.misc_listTicket));
+			for (int i = 0; i < result.size(); i++) {
+				final Map<String, Object> m = result.get(i);
+				if (m.get("ticket.type") == TicketType.LOCATION && !"import".equals(m.get("ticket.subject"))
+						&& ticketId.longValue() < ((BigInteger) m.get("ticket.id")).longValue())
+					ticketId = (BigInteger) m.get("ticket.id");
+			}
 		}
 
 		// when
 		importLocationsService.importLocation(ticketId, "3");
 
-		// then no exception
-		result = repository.list(new QueryParams(Query.location_listId));
+		// then
+		final Result result = repository.list(new QueryParams(Query.location_listId));
 		final Location location = repository.one(Location.class,
 				(BigInteger) result.get(result.size() - 1).get("location.id"));
 		assertNotNull(location.getName());
@@ -80,9 +81,9 @@ public class ImportLocationsServiceTest {
 				StandardCharsets.UTF_8);
 
 		// when
-		final String result = importLocationsService.importLocation(json, "2");
+		final Location location = importLocationsService.importLocation(json, "2");
 
 		// then
-		assertEquals(null, result);
+		assertNotNull(location);
 	}
 }

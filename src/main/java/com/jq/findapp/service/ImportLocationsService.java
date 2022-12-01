@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Location;
@@ -170,8 +169,13 @@ public class ImportLocationsService {
 
 	public String importLocation(BigInteger ticketId, String category) throws Exception {
 		final Ticket ticket = repository.one(Ticket.class, ticketId);
-		final String result = importLocation(new String(Attachment.getFile(ticket.getNote())), category);
-		repository.delete(ticket);
+		String result = null;
+		try {
+			importLocation(new String(Attachment.getFile(ticket.getNote())), category);
+			repository.delete(ticket);
+		} catch (IllegalArgumentException ex) {
+			result = ex.getMessage();
+		}
 		return result;
 	}
 
@@ -185,6 +189,7 @@ public class ImportLocationsService {
 			int imported = 0, total = 0;
 			String town = null;
 			final Iterator<JsonNode> result = addresses.get("results").elements();
+			Location location;
 			while (result.hasNext()) {
 				final JsonNode e = result.next();
 				total++;
@@ -198,11 +203,20 @@ public class ImportLocationsService {
 								notificationService.createTicket(TicketType.LOCATION,
 										mapFirstRelevantType(e.get("types")) + " " + e.get("name").asText(), json,
 										adminId);
-						} else if (importLocation(json, null) == null) {
-							imported++;
-							if (town == null) {
-								final Location location = json2location(json);
-								town = location.getCountry() + " " + location.getTown() + " " + location.getZipCode();
+						} else {
+							try {
+								if ((location = importLocation(json, null)) != null) {
+									imported++;
+									if (town == null)
+										town = location.getCountry() + " " + location.getTown() + " "
+												+ location.getZipCode();
+								}
+							} catch (IllegalArgumentException ex) {
+								location = json2location(json);
+								notificationService.createTicket(TicketType.LOCATION,
+										location.getCategory() + " " + location.getName(),
+										om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(json)),
+										adminId);
 							}
 						}
 					} catch (Exception ex) {
@@ -246,44 +260,39 @@ public class ImportLocationsService {
 		return null;
 	}
 
-	String importLocation(String json, String category) {
+	Location importLocation(String json, String category) {
 		final Location location = json2location(json);
 		if (category != null)
 			location.setCategory(category);
 		final ObjectMapper om = new ObjectMapper();
 		try {
 			final JsonNode address = om.readTree(json);
-			if (!exists(location) && address.has("photos")) {
-				final String html = externalService.google(
-						"place/photo?maxheight=1200&photoreference="
-								+ address.get("photos").get(0).get("photo_reference").asText(),
-						adminId).replace("<A HREF=", "<a href=");
-				final Matcher matcher = href.matcher(html);
-				if (matcher.find()) {
-					location.setImage(EntityUtil.getImage(matcher.group(1), EntityUtil.IMAGE_SIZE));
-					if (location.getImage() != null)
-						location.setImageList(EntityUtil.getImage(matcher.group(1), EntityUtil.IMAGE_THUMB_SIZE));
-				}
-				repository.save(location);
-				return null;
-			}
+			if (!address.has("photos"))
+				throw new IllegalArgumentException("no image in json");
+			if (exists(location))
+				throw new IllegalArgumentException("exists");
+			final String html = externalService.google(
+					"place/photo?maxheight=1200&photoreference="
+							+ address.get("photos").get(0).get("photo_reference").asText(),
+					adminId).replace("<A HREF=", "<a href=");
+			final Matcher matcher = href.matcher(html);
+			if (!matcher.find())
+				throw new IllegalArgumentException("no image in html: " + html);
+			location.setImage(EntityUtil.getImage(matcher.group(1), EntityUtil.IMAGE_SIZE));
+			if (location.getImage() != null)
+				location.setImageList(EntityUtil.getImage(matcher.group(1), EntityUtil.IMAGE_THUMB_SIZE));
+			repository.save(location);
+			return location;
 		} catch (Exception ex) {
 			if (ex.getMessage() != null
 					&& !ex.getMessage().contains("Failed reading image")
 					&& !ex.getMessage().contains("Location exists")
-					&& !ex.getMessage().contains("Invalid address")
+					// && !ex.getMessage().contains("Invalid address")
 					&& !Strings.stackTraceToString(ex).contains("Duplicate entry")) {
-				try {
-					notificationService.createTicket(TicketType.LOCATION,
-							location.getCategory() + " " + location.getName(),
-							om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(json)), adminId);
-				} catch (JsonProcessingException e) {
-					throw new RuntimeException(e);
-				}
+				throw new IllegalArgumentException(ex.getMessage());
 			}
-			return "error: " + ex.getMessage();
+			return null;
 		}
-		return "exists";
 	}
 
 	private Location json2location(String json) {
@@ -299,7 +308,7 @@ public class ImportLocationsService {
 			}
 			location.setName(name);
 			location.setParkingOption("3");
-			location.setCategory(mapType(address.get("types").get(0).asText()));
+			location.setCategory(mapFirstRelevantType(address.get("types")));
 			location.setLatitude((float) address.get("geometry").get("location").get("lat").asDouble());
 			location.setLongitude((float) address.get("geometry").get("location").get("lng").asDouble());
 			location.setAddress(address.get("vicinity").asText().replace(", ", "\n"));

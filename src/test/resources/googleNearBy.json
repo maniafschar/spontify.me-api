@@ -62,7 +62,7 @@
 			"icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
 			"icon_background_color": "#7B9EB0",
 			"icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
-			"name": "JNet Quality Consulting GmbH",
+			"name": "JNet Quality Sex Consulting GmbH",
 			"photos": [
 				{
 					"height": 3465,
@@ -81,9 +81,11 @@
 				"compound_code": "3GCF+WJ Munich, Germany",
 				"global_code": "8FWH3GCF+WJ"
 			},
+			"rating": 3.6,
 			"reference": "ChIJdcI1LJ_YnUcRE_sR6_0-1Sk",
 			"scope": "GOOGLE",
 			"types": [
+				"amusement_park",
 				"point_of_interest",
 				"establishment"
 			],
@@ -626,6 +628,7 @@
 				"compound_code": "3GCF+MR Munich, Germany",
 				"global_code": "8FWH3GCF+MR"
 			},
+			"rating": 5,
 			"reference": "ChIJOUgn_LLenUcRWnsJnczT8CY",
 			"scope": "GOOGLE",
 			"types": [
@@ -634,6 +637,7 @@
 				"point_of_interest",
 				"establishment"
 			],
+			"user_ratings_total": 1,
 			"vicinity": "Melchiorstraße 21A, München"
 		}
 	],
