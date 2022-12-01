@@ -264,6 +264,8 @@ public class ImportLocationsService {
 		final Location location = json2location(json);
 		if (category != null)
 			location.setCategory(category);
+		else if (location.getCategory() == null)
+			throw new RuntimeException("no relevant category found:\n" + json);
 		final ObjectMapper om = new ObjectMapper();
 		try {
 			final JsonNode address = om.readTree(json);
