@@ -23,7 +23,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 
 	@Override
 	public void prePersist(final Location location)
-			throws JsonMappingException, JsonProcessingException, IllegalAccessException {
+			throws JsonMappingException, JsonProcessingException, IllegalArgumentException {
 		lookupAddress(location);
 		final QueryParams params = new QueryParams(Query.location_list);
 		location.getCategory();
@@ -40,7 +40,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 				String category = (String) list.get(i).get("location.category");
 				for (int i2 = 0; i2 < location.getCategory().length(); i2++) {
 					if (category.contains(location.getCategory().substring(i2, i2 + 1)))
-						throw new IllegalAccessException("Location exists");
+						throw new IllegalArgumentException("location exists");
 				}
 			}
 		}
@@ -62,13 +62,13 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 	}
 
 	private void lookupAddress(Location location)
-			throws JsonMappingException, JsonProcessingException, IllegalAccessException {
+			throws JsonMappingException, JsonProcessingException, IllegalArgumentException {
 		final JsonNode address = new ObjectMapper().readTree(
 				externalService.google("geocode/json?address="
 						+ location.getAddress().replaceAll("\n", ", "), location.getContactId()));
 		if (!"OK".equals(address.get("status").asText())) {
-			throw new IllegalAccessException(
-					"Invalid address:\n" + location.getName() + "\n" + location.getAddress() + "\n"
+			throw new IllegalArgumentException(
+					"invalid address:\n" + location.getName() + "\n" + location.getAddress() + "\n"
 							+ new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(address));
 		}
 		final JsonNode result = address.get("results").get(0);

@@ -107,7 +107,7 @@ public class GeoLocationProcessor {
 
 	private void checkBounds(double radLat, double radLon) {
 		if (radLat < MIN_LAT || radLat > MAX_LAT || radLon < MIN_LON || radLon > MAX_LON)
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("out of bounds: " + radLat + "/" + radLon);
 	}
 
 	private double distanceTo(double latitude, double longitude) {
@@ -161,7 +161,7 @@ public class GeoLocationProcessor {
 	 */
 	private Point[] computeBoundingCoordinates(double distance) {
 		if (distance < 0d)
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("distance negative: " + distance);
 
 		// angular distance in radians on a great circle
 		double radDist = distance / radius;

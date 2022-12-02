@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Location;
@@ -175,6 +176,8 @@ public class ImportLocationsService {
 			repository.delete(ticket);
 		} catch (IllegalArgumentException ex) {
 			result = ex.getMessage();
+		} catch (Exception ex) {
+			result = Strings.stackTraceToString(ex);
 		}
 		return result;
 	}
@@ -211,12 +214,17 @@ public class ImportLocationsService {
 										town = location.getCountry() + " " + location.getTown() + " "
 												+ location.getZipCode();
 								}
-							} catch (IllegalArgumentException ex) {
-								location = json2location(json);
-								notificationService.createTicket(TicketType.LOCATION,
-										location.getCategory() + " " + location.getName(),
-										om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(json)),
-										adminId);
+							} catch (Exception ex) {
+								if (!ex.getMessage().contains("no image")
+										// && !ex.getMessage().contains("invalid address")
+										&& !ex.getMessage().contains("location exists")
+										&& !Strings.stackTraceToString(ex).contains("Duplicate entry")) {
+									location = json2location(json);
+									notificationService.createTicket(TicketType.LOCATION,
+											location.getCategory() + " " + location.getName(),
+											om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(json)),
+											adminId);
+								}
 							}
 						}
 					} catch (Exception ex) {
@@ -260,19 +268,20 @@ public class ImportLocationsService {
 		return null;
 	}
 
-	Location importLocation(String json, String category) {
+	Location importLocation(String json, String category) throws Exception {
 		final Location location = json2location(json);
 		if (category != null)
 			location.setCategory(category);
 		else if (location.getCategory() == null)
-			throw new RuntimeException("no relevant category found:\n" + json);
+			throw new IllegalArgumentException("no relevant category found:\n" + json);
 		final ObjectMapper om = new ObjectMapper();
+		String image;
 		try {
 			final JsonNode address = om.readTree(json);
 			if (!address.has("photos"))
 				throw new IllegalArgumentException("no image in json");
 			if (exists(location))
-				throw new IllegalArgumentException("exists");
+				throw new IllegalArgumentException("location exists");
 			final String html = externalService.google(
 					"place/photo?maxheight=1200&photoreference="
 							+ address.get("photos").get(0).get("photo_reference").asText(),
@@ -280,21 +289,15 @@ public class ImportLocationsService {
 			final Matcher matcher = href.matcher(html);
 			if (!matcher.find())
 				throw new IllegalArgumentException("no image in html: " + html);
-			location.setImage(EntityUtil.getImage(matcher.group(1), EntityUtil.IMAGE_SIZE));
-			if (location.getImage() != null)
-				location.setImageList(EntityUtil.getImage(matcher.group(1), EntityUtil.IMAGE_THUMB_SIZE));
-			repository.save(location);
-			return location;
-		} catch (Exception ex) {
-			if (ex.getMessage() != null
-					&& !ex.getMessage().contains("Failed reading image")
-					&& !ex.getMessage().contains("Location exists")
-					// && !ex.getMessage().contains("Invalid address")
-					&& !Strings.stackTraceToString(ex).contains("Duplicate entry")) {
-				throw new IllegalArgumentException(ex.getMessage());
-			}
-			return null;
+			image = matcher.group(1);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
 		}
+		location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE));
+		if (location.getImage() != null)
+			location.setImageList(EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE));
+		repository.save(location);
+		return location;
 	}
 
 	private Location json2location(String json) {

@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Base64;
 
@@ -57,18 +56,18 @@ public class EntityUtil {
 		ImageIO.write(resizedImage, "jpg", out);
 		final byte[] result = out.toByteArray();
 		if (result == null || result.length < 100)
-			throw new IOException("image not readable, length: " + (result == null ? -1 : result.length));
+			throw new IllegalArgumentException("no image, length: " + (result == null ? -1 : result.length));
 		return result;
 	}
 
-	public static String getImage(String url, int size) throws MalformedURLException, IOException {
+	public static String getImage(String url, int size) {
 		try {
 			final byte[] data = IOUtils.toByteArray(new URL(url));
 			final BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
 			if (img.getWidth() > 400 && img.getHeight() > 400)
 				return Repository.Attachment.createImage(".jpg", scaleImage(data, size));
 		} catch (Exception ex) {
-			throw new IOException("Failed reading image: " + url, ex);
+			throw new IllegalArgumentException("no image: " + url, ex);
 		}
 		return null;
 	}

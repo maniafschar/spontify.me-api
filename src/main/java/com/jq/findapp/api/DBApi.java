@@ -50,7 +50,7 @@ public class DBApi {
 	public Map<String, Object> one(final QueryParams params, @RequestHeader(required = false) BigInteger user,
 			@RequestHeader(required = false) String password,
 			@RequestHeader(required = false) String salt)
-			throws JsonMappingException, JsonProcessingException, IllegalAccessException {
+			throws JsonMappingException, JsonProcessingException, IllegalArgumentException {
 		params.setUser(authenticationService.verify(user, password, salt));
 		// TODO rm 0.3.0
 		if (params.getSearch() != null)
@@ -62,7 +62,7 @@ public class DBApi {
 	public List<Object[]> list(final QueryParams params, @RequestHeader(required = false) BigInteger user,
 			@RequestHeader(required = false) String password,
 			@RequestHeader(required = false) String salt)
-			throws JsonMappingException, JsonProcessingException, IllegalAccessException {
+			throws JsonMappingException, JsonProcessingException, IllegalArgumentException {
 		params.setUser(authenticationService.verify(user, password, salt));
 		return repository.list(params).getList();
 	}

@@ -70,7 +70,7 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 				+ SUBSTITUTE + ":" + request.getRequestURI() + getQueryString(request) + SUBSTITUTE
 				+ Strings.stackTraceToString(ex);
 		if (msg.indexOf("500 INTERNAL_SERVER_ERROR") == 0 && msg.indexOf(":/support/import/location/") > 0
-				&& (msg.indexOf("ConstraintViolationException") > 0 || msg.indexOf("Location exists") > 0))
+				&& (msg.indexOf("ConstraintViolationException") > 0 || msg.indexOf("location exists") > 0))
 			return;
 		final Integer hash = msg.hashCode();
 		synchronized (SENT_ERRORS) {

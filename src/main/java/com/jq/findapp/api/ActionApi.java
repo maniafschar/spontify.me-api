@@ -111,7 +111,7 @@ public class ActionApi {
 
 	@GetMapping("prevent/delete")
 	public Map<String, String> preventDelete(@RequestHeader BigInteger user, @RequestHeader String password,
-			@RequestHeader String salt) throws IllegalAccessException {
+			@RequestHeader String salt) {
 		final Contact contact = authenticationService.verify(user, password, salt);
 		final Map<String, String> m = marketing();
 		if (m != null)
@@ -121,7 +121,7 @@ public class ActionApi {
 
 	@GetMapping("quotation")
 	public String quotation(@RequestHeader BigInteger user, @RequestHeader String password,
-			@RequestHeader String salt) throws IllegalAccessException {
+			@RequestHeader String salt) {
 		authenticationService.verify(user, password, salt);
 		return QUOTATION.get((int) (Math.random() * (QUOTATION.size() - 1)));
 	}
