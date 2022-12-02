@@ -184,57 +184,72 @@ public class ImportLocationsService {
 
 	private String importLocations(float latitude, float longitude) throws Exception {
 		final ObjectMapper om = new ObjectMapper();
-		final JsonNode addresses = om.readTree(externalService.google(
+		JsonNode addresses = om.readTree(externalService.google(
 				"place/nearbysearch/json?radius=600&sensor=false&location="
 						+ latitude + "," + longitude,
 				adminId));
 		if ("OK".equals(addresses.get("status").asText())) {
-			int imported = 0, total = 0;
-			String town = null;
-			final Iterator<JsonNode> result = addresses.get("results").elements();
-			Location location;
-			while (result.hasNext()) {
-				final JsonNode e = result.next();
-				total++;
-				if (e.has("photos") &&
-						(!e.has("permanently_closed") || !e.get("permanently_closed").asBoolean()) &&
-						e.has("rating") && e.get("rating").asDouble() > 3.5) {
-					try {
-						final String json = om.writeValueAsString(e), jsonLower = json.toLowerCase();
-						if (jsonLower.contains("sex") || jsonLower.contains("domina") || jsonLower.contains("bordel")) {
-							if (hasRelevantType(e.get("types")) && !exists(json2location(json)))
-								notificationService.createTicket(TicketType.LOCATION,
-										mapFirstRelevantType(e.get("types")) + " " + e.get("name").asText(), json,
-										adminId);
-						} else {
-							try {
-								if ((location = importLocation(json, null)) != null) {
-									imported++;
-									if (town == null)
-										town = location.getCountry() + " " + location.getTown() + " "
-												+ location.getZipCode();
-								}
-							} catch (Exception ex) {
-								if (!ex.getMessage().contains("no image")
-										// && !ex.getMessage().contains("invalid address")
-										&& !ex.getMessage().contains("location exists")
-										&& !Strings.stackTraceToString(ex).contains("Duplicate entry")) {
-									location = json2location(json);
-									notificationService.createTicket(TicketType.LOCATION,
-											location.getCategory() + " " + location.getName(),
-											om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(json)),
-											adminId);
-								}
-							}
-						}
-					} catch (Exception ex) {
-						throw new RuntimeException(ex);
-					}
-				}
+			String result = importLocations(addresses.get("results").elements());
+			System.out.println(addresses.get("next_page_token"));
+			while (addresses.has("next_page_token")) {
+				addresses = om.readTree(externalService.google(
+						"place/nearbysearch/json?pagetoken=" + addresses.get("next_page_token").asText(),
+						adminId));
+				if ("OK".equals(addresses.get("status").asText()))
+					result += "\n" + importLocations(addresses.get("results").elements());
+				else
+					break;
 			}
-			return imported + "/" + total + "\n" + town;
+			return result;
 		}
 		return null;
+	}
+
+	private String importLocations(Iterator<JsonNode> result) {
+		final ObjectMapper om = new ObjectMapper();
+		int imported = 0, total = 0;
+		String town = null;
+		Location location;
+		while (result.hasNext()) {
+			final JsonNode e = result.next();
+			total++;
+			if (e.has("photos") &&
+					(!e.has("permanently_closed") || !e.get("permanently_closed").asBoolean()) &&
+					e.has("rating") && e.get("rating").asDouble() > 3.5) {
+				try {
+					final String json = om.writeValueAsString(e), jsonLower = json.toLowerCase();
+					if (jsonLower.contains("sex") || jsonLower.contains("domina") || jsonLower.contains("bordel")) {
+						if (hasRelevantType(e.get("types")) && !exists(json2location(json)))
+							notificationService.createTicket(TicketType.LOCATION,
+									mapFirstRelevantType(e.get("types")) + " " + e.get("name").asText(), json,
+									adminId);
+					} else {
+						try {
+							if ((location = importLocation(json, null)) != null) {
+								imported++;
+								if (town == null)
+									town = location.getCountry() + " " + location.getTown() + " "
+											+ location.getZipCode();
+							}
+						} catch (Exception ex) {
+							if (!ex.getMessage().contains("no image")
+									// && !ex.getMessage().contains("invalid address")
+									&& !ex.getMessage().contains("location exists")
+									&& !Strings.stackTraceToString(ex).toLowerCase().contains("duplicate entry")) {
+								location = json2location(json);
+								notificationService.createTicket(TicketType.LOCATION,
+										location.getCategory() + " " + location.getName(),
+										om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(json)),
+										adminId);
+							}
+						}
+					}
+				} catch (Exception ex) {
+					throw new RuntimeException(ex);
+				}
+			}
+		}
+		return imported + "/" + total + (town == null ? "" : "\n" + town);
 	}
 
 	private String mapType(String typeGoogle) {
