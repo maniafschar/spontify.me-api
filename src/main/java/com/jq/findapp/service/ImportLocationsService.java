@@ -190,7 +190,6 @@ public class ImportLocationsService {
 				adminId));
 		if ("OK".equals(addresses.get("status").asText())) {
 			String result = importLocations(addresses.get("results").elements());
-			System.out.println(addresses.get("next_page_token"));
 			while (addresses.has("next_page_token")) {
 				addresses = om.readTree(externalService.google(
 						"place/nearbysearch/json?pagetoken=" + addresses.get("next_page_token").asText(),
