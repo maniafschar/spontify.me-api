@@ -20,9 +20,11 @@ public class Location extends BaseEntity {
 	private Boolean openTimesBankholiday;
 	private Date paymentDate;
 	private Date urlActive;
+	private Float googleRating;
 	private Float latitude;
 	private Float longitude;
 	private Float paymentAmount;
+	private Integer googleRatingTotal;
 	private Short rating;
 	private String address;
 	private String address2;
@@ -410,6 +412,22 @@ public class Location extends BaseEntity {
 
 	public void setAttr5(String attr5) {
 		this.attr5 = attr5;
+	}
+
+	public Float getGoogleRating() {
+		return googleRating;
+	}
+
+	public void setGoogleRating(Float googleRating) {
+		this.googleRating = googleRating;
+	}
+
+	public Integer getGoogleRatingTotal() {
+		return googleRatingTotal;
+	}
+
+	public void setGoogleRatingTotal(Integer googleRatingTotal) {
+		this.googleRatingTotal = googleRatingTotal;
 	}
 
 	@Transient

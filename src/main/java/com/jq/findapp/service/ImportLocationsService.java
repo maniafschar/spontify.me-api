@@ -17,6 +17,7 @@ import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
@@ -214,11 +215,11 @@ public class ImportLocationsService {
 			total++;
 			if (e.has("photos") &&
 					(!e.has("permanently_closed") || !e.get("permanently_closed").asBoolean()) &&
-					e.has("rating") && e.get("rating").asDouble() > 3.5) {
+					e.has("rating") && e.get("rating").asDouble() > 3) {
 				try {
 					final String json = om.writeValueAsString(e), jsonLower = json.toLowerCase();
 					if (jsonLower.contains("sex") || jsonLower.contains("domina") || jsonLower.contains("bordel")) {
-						if (hasRelevantType(e.get("types")) && !exists(json2location(json)))
+						if (hasRelevantType(e.get("types")) && exists(json2location(json)) == null)
 							notificationService.createTicket(TicketType.LOCATION,
 									mapFirstRelevantType(e.get("types")) + " " + e.get("name").asText(), json,
 									adminId);
@@ -294,8 +295,17 @@ public class ImportLocationsService {
 			final JsonNode address = om.readTree(json);
 			if (!address.has("photos"))
 				throw new IllegalArgumentException("no image in json");
-			if (exists(location))
+			final BigInteger id = exists(location);
+			if (id != null) {
+				final Location l = repository.one(Location.class, id);
+				if (!location.getGoogleRating().equals(l.getGoogleRating())
+						|| !location.getGoogleRatingTotal().equals(l.getGoogleRatingTotal())) {
+					l.setGoogleRating(location.getGoogleRating());
+					l.setGoogleRatingTotal(location.getGoogleRatingTotal());
+					repository.save(l);
+				}
 				throw new IllegalArgumentException("location exists");
+			}
 			final String html = externalService.google(
 					"place/photo?maxheight=1200&photoreference="
 							+ address.get("photos").get(0).get("photo_reference").asText(),
@@ -304,7 +314,9 @@ public class ImportLocationsService {
 			if (!matcher.find())
 				throw new IllegalArgumentException("no image in html: " + html);
 			image = matcher.group(1);
-		} catch (JsonProcessingException e) {
+		} catch (
+
+		JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
 		location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE));
@@ -331,13 +343,15 @@ public class ImportLocationsService {
 			location.setLatitude((float) address.get("geometry").get("location").get("lat").asDouble());
 			location.setLongitude((float) address.get("geometry").get("location").get("lng").asDouble());
 			location.setAddress(address.get("vicinity").asText().replace(", ", "\n"));
+			location.setGoogleRating((float) address.get("rating").asDouble());
+			location.setGoogleRatingTotal(address.get("user_ratings_total").asInt());
 			return location;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private boolean exists(Location location) {
+	private BigInteger exists(Location location) {
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setSearch("LOWER(location.name) like '%"
 				+ location.getName().toLowerCase().replace("'", "''").replace(' ', '%')
@@ -349,6 +363,7 @@ public class ImportLocationsService {
 				+ ((int) (location.getLatitude().floatValue() * roundingFactor)) / roundingFactor
 				+ "%' and location.longitude like '"
 				+ ((int) (location.getLongitude().floatValue() * roundingFactor)) / roundingFactor + "%')");
-		return repository.list(params).size() > 0;
+		final Result result = repository.list(params);
+		return result.size() > 0 ? (BigInteger) result.get(0).get("location.id") : null;
 	}
 }
