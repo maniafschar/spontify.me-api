@@ -8,6 +8,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.jq.findapp.entity.Contact;
@@ -45,6 +46,7 @@ public class WhatToDoService {
 		}
 	}
 
+	@Async
 	public void findMatchingSpontis(ContactWhatToDo contactWhatToDo) throws Exception {
 		final Contact contact = repository.one(Contact.class, contactWhatToDo.getContactId());
 		String search = Score.getSearchContact(contact);

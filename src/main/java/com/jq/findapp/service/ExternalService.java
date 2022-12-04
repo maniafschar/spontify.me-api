@@ -107,10 +107,9 @@ public class ExternalService {
 					+ Strings.URL_APP
 					+ "/images/mapMe.png|shadow:false|{source}&markers=icon:" + Strings.URL_APP
 					+ "/images/mapLoc.png|shadow:false|{destination}&scale=2&size=600x200&maptype=roadmap&sensor=true&key=";
-			url = url.replaceAll("\\{source}", source);
+			url = url.replace("{source}", source);
 		}
-		url = url.replaceAll("\\{destination}", destination);
-		url = url.replaceAll("\\{gender}", contact.getGender() == null ? "2" : "" + contact.getGender()) + googleKey;
+		url = url.replace("{destination}", destination) + googleKey;
 		return Base64.getEncoder().encodeToString(
 				WebClient.create(url).get().retrieve().toEntity(byte[].class).block().getBody());
 	}

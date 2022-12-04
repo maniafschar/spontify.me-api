@@ -42,115 +42,121 @@ public class ImportLocationsService {
 	private BigInteger adminId;
 
 	private static final LocationType[] TYPES = {
-			new LocationType("accounting", null),
-			new LocationType("airport", "3"),
-			new LocationType("amusement_park", "3"),
-			new LocationType("aquarium", "3"),
-			new LocationType("art_gallery", "3"),
-			new LocationType("atm", null),
-			new LocationType("bakery", "0"),
-			new LocationType("bank", "0"),
-			new LocationType("bar", "4"),
-			new LocationType("beauty_salon", "0"),
-			new LocationType("bicycle_store", "0"),
-			new LocationType("book_store", "0"),
-			new LocationType("bowling_alley", "3"),
-			new LocationType("bus_station", null),
-			new LocationType("cafe", "2"),
-			new LocationType("campground", "3"),
-			new LocationType("car_dealer", "0"),
-			new LocationType("car_rental", null),
-			new LocationType("car_repair", null),
-			new LocationType("car_wash", null),
-			new LocationType("casino", "4"),
-			new LocationType("cemetery", "3"),
-			new LocationType("church", "1"),
-			new LocationType("city_hall", "3"),
-			new LocationType("clothing_store", "0"),
-			new LocationType("convenience_store", "0"),
-			new LocationType("courthouse", "3"),
-			new LocationType("dentist", "0"),
-			new LocationType("department_store", "0"),
-			new LocationType("doctor", "0"),
-			new LocationType("drugstore", "0"),
-			new LocationType("electrician", null),
-			new LocationType("electronics_store", null),
-			new LocationType("embassy", "3"),
-			new LocationType("establishment", "3"),
-			new LocationType("fire_station", "3"),
-			new LocationType("florist", "0"),
-			new LocationType("funeral_home", null),
-			new LocationType("furniture_store", "0"),
-			new LocationType("gas_station", "0"),
-			new LocationType("grocery_or_supermarket", "0"),
-			new LocationType("gym", "5"),
-			new LocationType("hair_care", "0"),
-			new LocationType("hardware_store", "0"),
-			new LocationType("health", "0"),
-			new LocationType("hindu_temple", "1"),
-			new LocationType("home_goods_store", "0"),
-			new LocationType("hospital", null),
-			new LocationType("insurance_agency", null),
-			new LocationType("jewelry_store", "0"),
-			new LocationType("laundry", null),
-			new LocationType("lawyer", null),
-			new LocationType("library", "1"),
-			new LocationType("light_rail_station", null),
-			new LocationType("liquor_store", "0"),
-			new LocationType("local_government_office", null),
-			new LocationType("locksmith", null),
-			new LocationType("lodging", "3"),
-			new LocationType("meal_delivery", "2"),
-			new LocationType("meal_takeaway", "2"),
-			new LocationType("mosque", "1"),
-			new LocationType("movie_rental", null),
-			new LocationType("movie_theater", "1"),
-			new LocationType("moving_company", null),
-			new LocationType("museum", "1"),
-			new LocationType("night_club", "5"),
-			new LocationType("painter", null),
-			new LocationType("park", "3"),
-			new LocationType("parking", null),
-			new LocationType("pet_store", "0"),
-			new LocationType("pharmacy", "0"),
-			new LocationType("physiotherapist", "5"),
-			new LocationType("plumber", null),
-			new LocationType("point_of_interest", "3"),
-			new LocationType("police", null),
-			new LocationType("post_office", "0"),
-			new LocationType("primary_school", null),
-			new LocationType("real_estate_agency", null),
-			new LocationType("restaurant", "2"),
-			new LocationType("roofing_contractor", null),
-			new LocationType("rv_park", null),
-			new LocationType("school", null),
-			new LocationType("secondary_school", null),
-			new LocationType("shoe_store", "0"),
-			new LocationType("shopping_mall", "0"),
-			new LocationType("spa", "3"),
-			new LocationType("stadium", "3"),
-			new LocationType("storage", null),
-			new LocationType("store", "0"),
-			new LocationType("subway_station", null),
-			new LocationType("supermarket", "0"),
-			new LocationType("synagogue", "1"),
-			new LocationType("taxi_stand", null),
-			new LocationType("tourist_attraction", "3"),
-			new LocationType("train_station", null),
-			new LocationType("transit_station", null),
-			new LocationType("travel_agency", null),
-			new LocationType("university", "1"),
-			new LocationType("veterinary_care", "0"),
-			new LocationType("zoo", "3")
+			new LocationType("accounting"),
+			new LocationType("airport", 3, 13),
+			new LocationType("amusement_park", 3, 14),
+			new LocationType("aquarium", 3, 15),
+			new LocationType("art_gallery", 3, 1),
+			new LocationType("atm"),
+			new LocationType("bakery", 0, 22),
+			new LocationType("bank", 0, 23),
+			new LocationType("bar", 4, 30),
+			new LocationType("beauty_salon", 0, 24),
+			new LocationType("bicycle_store", 0, 25),
+			new LocationType("book_store", 0, 26),
+			new LocationType("bowling_alley", 5, 24),
+			new LocationType("bus_station"),
+			new LocationType("cafe", 2, 24),
+			new LocationType("campground", 3, 16),
+			new LocationType("car_dealer", 0, 6),
+			new LocationType("car_rental"),
+			new LocationType("car_repair"),
+			new LocationType("car_wash"),
+			new LocationType("casino", 4, 31),
+			new LocationType("cemetery", 3, 17),
+			new LocationType("church", 1, 24),
+			new LocationType("city_hall", 3, 18),
+			new LocationType("clothing_store", 0, 1),
+			new LocationType("convenience_store", 0, 30),
+			new LocationType("courthouse", 3, 19),
+			new LocationType("dentist", 0, 28),
+			new LocationType("department_store", 0, 27),
+			new LocationType("doctor", 0, 28),
+			new LocationType("drugstore", 0, 20),
+			new LocationType("electrician"),
+			new LocationType("electronics_store"),
+			new LocationType("embassy", 3, 20),
+			new LocationType("establishment"),
+			new LocationType("fire_station", 3, 21),
+			new LocationType("florist", 0, 11),
+			new LocationType("funeral_home"),
+			new LocationType("furniture_store", 0, 16),
+			new LocationType("gas_station", 0, 29),
+			new LocationType("grocery_or_supermarket", 0, 30),
+			new LocationType("gym", 5, 27),
+			new LocationType("hair_care", 0, 21),
+			new LocationType("hardware_store", 0, 31),
+			new LocationType("health", 0, 20),
+			new LocationType("hindu_temple", 1, 24),
+			new LocationType("home_goods_store", 0, 32),
+			new LocationType("hospital"),
+			new LocationType("insurance_agency"),
+			new LocationType("jewelry_store", 0, 33),
+			new LocationType("laundry"),
+			new LocationType("lawyer"),
+			new LocationType("library", 1, 25),
+			new LocationType("light_rail_station"),
+			new LocationType("liquor_store", 0, 34),
+			new LocationType("local_government_office"),
+			new LocationType("locksmith"),
+			new LocationType("lodging", 3, 11),
+			new LocationType("meal_delivery", 2, null),
+			new LocationType("meal_takeaway", 2, null),
+			new LocationType("mosque", 1, 24),
+			new LocationType("movie_rental"),
+			new LocationType("movie_theater", 1, 8),
+			new LocationType("moving_company"),
+			new LocationType("museum", 3, 1),
+			new LocationType("night_club", 5, 21),
+			new LocationType("painter"),
+			new LocationType("park", 3, 14),
+			new LocationType("parking"),
+			new LocationType("pet_store", 0, 37),
+			new LocationType("pharmacy", 0, 20),
+			new LocationType("physiotherapist", 0, 20),
+			new LocationType("plumber"),
+			new LocationType("point_of_interest"),
+			new LocationType("police"),
+			new LocationType("post_office", 0, 36),
+			new LocationType("primary_school"),
+			new LocationType("real_estate_agency"),
+			new LocationType("restaurant", 2, null),
+			new LocationType("roofing_contractor"),
+			new LocationType("rv_park"),
+			new LocationType("school"),
+			new LocationType("secondary_school"),
+			new LocationType("shoe_store", 0, 0),
+			new LocationType("shopping_mall", 0, 27),
+			new LocationType("spa", 3, 35),
+			new LocationType("stadium", 3, 22),
+			new LocationType("storage"),
+			new LocationType("store", 0, 27),
+			new LocationType("subway_station"),
+			new LocationType("supermarket", 0, 30),
+			new LocationType("synagogue", 1, 24),
+			new LocationType("taxi_stand"),
+			new LocationType("tourist_attraction", 3, 0),
+			new LocationType("train_station"),
+			new LocationType("transit_station"),
+			new LocationType("travel_agency"),
+			new LocationType("university", 1, 26),
+			new LocationType("veterinary_care", 0, 20),
+			new LocationType("zoo", 3, 7)
 	};
 
 	private static class LocationType {
 		private final String google;
-		private final String category;
+		private final Integer category;
+		private final Integer subCategory;
 
-		private LocationType(String google, String category) {
+		private LocationType(String google) {
+			this(google, null, null);
+		}
+
+		private LocationType(String google, Integer category, Integer subCategory) {
 			this.google = google;
 			this.category = category;
+			this.subCategory = subCategory;
 		}
 	}
 
@@ -221,7 +227,7 @@ public class ImportLocationsService {
 					if (jsonLower.contains("sex") || jsonLower.contains("domina") || jsonLower.contains("bordel")) {
 						if (hasRelevantType(e.get("types")) && exists(json2location(json)) == null)
 							notificationService.createTicket(TicketType.LOCATION,
-									mapFirstRelevantType(e.get("types")) + " " + e.get("name").asText(), json,
+									mapFirstRelevantType(e.get("types")).category + " " + e.get("name").asText(), json,
 									adminId);
 					} else {
 						try {
@@ -252,10 +258,10 @@ public class ImportLocationsService {
 		return imported + "/" + total + (town == null ? "" : "\n" + town);
 	}
 
-	private String mapType(String typeGoogle) {
+	private LocationType mapType(String typeGoogle) {
 		for (LocationType type : TYPES) {
-			if (typeGoogle.equals(type.google))
-				return type.category;
+			if (typeGoogle.equals("" + type.google))
+				return type;
 		}
 		return null;
 	}
@@ -271,13 +277,13 @@ public class ImportLocationsService {
 		return false;
 	}
 
-	private String mapFirstRelevantType(JsonNode types) {
+	private LocationType mapFirstRelevantType(JsonNode types) {
 		if (types != null && types.size() > 0) {
 			final Iterator<JsonNode> type = types.elements();
 			while (type.hasNext()) {
-				final String s = mapType(type.next().asText());
-				if (s != null)
-					return s;
+				final LocationType t = mapType(type.next().asText());
+				if (t != null)
+					return t;
 			}
 		}
 		return null;
@@ -299,9 +305,13 @@ public class ImportLocationsService {
 			if (id != null) {
 				final Location l = repository.one(Location.class, id);
 				if (!location.getGoogleRating().equals(l.getGoogleRating())
-						|| !location.getGoogleRatingTotal().equals(l.getGoogleRatingTotal())) {
+						|| !location.getGoogleRatingTotal().equals(l.getGoogleRatingTotal())
+						|| !location.getCategory().equals(l.getCategory())
+						|| !location.getSubcategories().equals(l.getSubcategories())) {
 					l.setGoogleRating(location.getGoogleRating());
 					l.setGoogleRatingTotal(location.getGoogleRatingTotal());
+					l.setCategory(location.getCategory());
+					l.setSubcategories(location.getSubcategories());
 					repository.save(l);
 				}
 				throw new IllegalArgumentException("location exists");
@@ -314,9 +324,7 @@ public class ImportLocationsService {
 			if (!matcher.find())
 				throw new IllegalArgumentException("no image in html: " + html);
 			image = matcher.group(1);
-		} catch (
-
-		JsonProcessingException e) {
+		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
 		location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE));
@@ -332,6 +340,12 @@ public class ImportLocationsService {
 			final JsonNode address = new ObjectMapper().readTree(json);
 			location.setContactId(adminId);
 			String name = address.get("name").asText();
+			final LocationType type = mapFirstRelevantType(address);
+			if (type != null) {
+				location.setCategory("" + type.category);
+				location.setSubcategories(
+						type.subCategory == null ? guessSubcategory(type.category, name) : "" + type.subCategory);
+			}
 			if (name.length() > 100) {
 				name = name.substring(0, 101);
 				if (name.lastIndexOf(" ") > 10)
@@ -339,7 +353,6 @@ public class ImportLocationsService {
 			}
 			location.setName(name);
 			location.setParkingOption("3");
-			location.setCategory(mapFirstRelevantType(address.get("types")));
 			location.setLatitude((float) address.get("geometry").get("location").get("lat").asDouble());
 			location.setLongitude((float) address.get("geometry").get("location").get("lng").asDouble());
 			location.setAddress(address.get("vicinity").asText().replace(", ", "\n"));
@@ -349,6 +362,46 @@ public class ImportLocationsService {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private String guessSubcategory(int type, String name) {
+		if (type == 2) {
+			name = name.toLowerCase();
+			final String[] cats = {
+					"thai",
+					"vietnam",
+					"itali",
+					"french|franz",
+					"japan",
+					"bavaria|bayer|bräu",
+					"german|deutsch",
+					"spani",
+					"afghan",
+					"persian",
+					"lebanes",
+					"chinese",
+					"fish",
+					"meat",
+					"vegetari",
+					"vegan",
+					"pizza",
+					"pasta",
+					"barbecue",
+					"fast food",
+					"brunch",
+					"sport live",
+					"beergarden|biergarten",
+					"terrace|terasse",
+					"coffee|cafe",
+					"dessert",
+					"burger|mcdonald"
+			};
+			for (int i = 0; i < cats.length; i++) {
+				if (name.matches("(.*" + cats[i].replace("|", ".*)|(.*") + ".*)"))
+					return "" + i;
+			}
+		}
+		return null;
 	}
 
 	private BigInteger exists(Location location) {
