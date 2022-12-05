@@ -225,9 +225,9 @@ public class ImportLocationsService {
 				try {
 					final String json = om.writeValueAsString(e), jsonLower = json.toLowerCase();
 					if (jsonLower.contains("sex") || jsonLower.contains("domina") || jsonLower.contains("bordel")) {
-						if (hasRelevantType(e.get("types")) && exists(json2location(json)) == null)
+						if (mapFirstRelevantType(e) != null && exists(json2location(json)) == null)
 							notificationService.createTicket(TicketType.LOCATION,
-									mapFirstRelevantType(e.get("types")).category + " " + e.get("name").asText(), json,
+									mapFirstRelevantType(e).category + " " + e.get("name").asText(), json,
 									adminId);
 					} else {
 						try {
@@ -266,23 +266,13 @@ public class ImportLocationsService {
 		return null;
 	}
 
-	private boolean hasRelevantType(JsonNode types) {
-		if (types != null && types.size() > 0) {
-			final Iterator<JsonNode> type = types.elements();
-			while (type.hasNext()) {
-				if (mapType(type.next().asText()) != null)
-					return true;
-			}
-		}
-		return false;
-	}
-
-	private LocationType mapFirstRelevantType(JsonNode types) {
+	private LocationType mapFirstRelevantType(final JsonNode e) {
+		final JsonNode types = e.get("types");
 		if (types != null && types.size() > 0) {
 			final Iterator<JsonNode> type = types.elements();
 			while (type.hasNext()) {
 				final LocationType t = mapType(type.next().asText());
-				if (t != null)
+				if (t != null && t.category != null)
 					return t;
 			}
 		}
