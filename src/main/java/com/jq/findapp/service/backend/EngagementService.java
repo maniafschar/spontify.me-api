@@ -12,9 +12,7 @@ import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -286,51 +284,6 @@ public class EngagementService {
 				contact -> contact.getLongitude() != null));
 
 		chatTemplates.add(new ChatTemplate(Text.engagement_like, null, null));
-	}
-
-	public void sendSpontifyEmail() throws Exception {
-		final GregorianCalendar gc = new GregorianCalendar();
-		if (gc.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY || gc.get(Calendar.HOUR_OF_DAY) != 17)
-			return;
-		final QueryParams params = new QueryParams(Query.contact_listId);
-		params.setSearch(
-				"contact.verified=true and contact.version is null and contact.notificationEngagement=true");
-		params.setLimit(0);
-		final Result list = repository.list(params);
-		final Contact admin = repository.one(Contact.class, adminId);
-		final Map<String, String> text = new HashMap<>();
-		String value = "";
-		text.put("DE", "Das Beste kommt spontan!\n\n"
-				+ "findapp war schon immer auf Spontanität aus, nun tragen wir dem auch im Namen Rechnung. Aus findapp wird\n\n"
-				+ "spontify.me\n\n"
-				+ "nicht nur eine Umbenennung, sondern ein komplettes Redesign, einfachste Bedienung und ein modernes Look & Feel.\n\n"
-				+ "Schau rein, überzeuge Dich und wenn Dir die App gefällt, empfehle uns weiter. "
-				+ "Je großer die Community, desto mehr spontane Events und Begegnungen werden hier möglich.\n\n"
-				+ "Wir freuen uns auf Feedback. Einfach hier antworten oder in der App mir schreiben.\n\n"
-				+ "Liebe Grüße und bleib gesund!\n"
-				+ "Sponti Support");
-		text.put("EN", "The best comes spontaneously!\n\n"
-				+ "findapp has always been about spontaneity, now we take that into account in the name. findapp becommes\n\n"
-				+ "spontify.me\n\n"
-				+ "not only a renaming, but a complete redesign, simple operation and a modern look & feel.\n\n"
-				+ "Take a look, convince yourself and if you like the app, recommend us. "
-				+ "The larger the community, the more spontaneous events and encounters are possible here.\n\n"
-				+ "We look forward to feedback. Just reply here or write to me in the app.\n\n"
-				+ "Greetings and stay healthy!\n"
-				+ "Sponti Support");
-		for (int i = 0; i < list.size(); i++) {
-			final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
-			notificationService.sendNotificationEmail(admin, to, text.get(to.getLanguage()),
-					"https://blog.spontify.me");
-			value += "|" + to.getId();
-			Thread.sleep(10000);
-		}
-		if (value.length() > 0) {
-			Setting s = new Setting();
-			s.setLabel("findapp-spontify-email");
-			s.setValue(value.substring(1));
-			repository.save(s);
-		}
 	}
 
 	public void sendRegistrationReminder() throws Exception {

@@ -212,7 +212,6 @@ public class SupportCenterApi {
 				eventService.notifyCheckInOut(null);
 				importLogService.importLog();
 				statisticsService.update();
-				engagementService.sendSpontifyEmail();
 				engagementService.sendRegistrationReminder();
 				dbService.backup();
 			} finally {

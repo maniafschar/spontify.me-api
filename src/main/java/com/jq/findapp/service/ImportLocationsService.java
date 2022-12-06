@@ -169,7 +169,7 @@ public class ImportLocationsService {
 		params.setSearch("ticket.subject='import' and ticket.note like '" + s +
 				"%' and ticket.type='" + TicketType.LOCATION.name() + "'");
 		if (repository.list(params).size() == 0) {
-			final String importResult = importLocations(latitude, longitude);
+			final String importResult = retrieveLocations(latitude, longitude);
 			notificationService.createTicket(TicketType.LOCATION, "import",
 					s + (importResult == null ? "" : "\n" + importResult), adminId);
 		}
@@ -179,7 +179,7 @@ public class ImportLocationsService {
 		final Ticket ticket = repository.one(Ticket.class, ticketId);
 		String result = null;
 		try {
-			importLocation(new String(Attachment.getFile(ticket.getNote())), category);
+			importLocation(new ObjectMapper().readTree(new String(Attachment.getFile(ticket.getNote()))), category);
 			repository.delete(ticket);
 		} catch (IllegalArgumentException ex) {
 			result = ex.getMessage();
@@ -189,20 +189,20 @@ public class ImportLocationsService {
 		return result;
 	}
 
-	private String importLocations(float latitude, float longitude) throws Exception {
+	private String retrieveLocations(float latitude, float longitude) throws Exception {
 		final ObjectMapper om = new ObjectMapper();
-		JsonNode addresses = om.readTree(externalService.google(
+		JsonNode json = om.readTree(externalService.google(
 				"place/nearbysearch/json?radius=600&sensor=false&location="
 						+ latitude + "," + longitude,
 				adminId));
-		if ("OK".equals(addresses.get("status").asText())) {
-			String result = importLocations(addresses.get("results").elements());
-			while (addresses.has("next_page_token")) {
-				addresses = om.readTree(externalService.google(
-						"place/nearbysearch/json?pagetoken=" + addresses.get("next_page_token").asText(),
+		if ("OK".equals(json.get("status").asText())) {
+			String result = importLocations(json.get("results").elements());
+			while (json.has("next_page_token")) {
+				json = om.readTree(externalService.google(
+						"place/nearbysearch/json?pagetoken=" + json.get("next_page_token").asText(),
 						adminId));
-				if ("OK".equals(addresses.get("status").asText()))
-					result += "\n" + importLocations(addresses.get("results").elements());
+				if ("OK".equals(json.get("status").asText()))
+					result += "\n" + importLocations(json.get("results").elements());
 				else
 					break;
 			}
@@ -217,18 +217,19 @@ public class ImportLocationsService {
 		String town = null;
 		Location location;
 		while (result.hasNext()) {
-			final JsonNode e = result.next();
+			final JsonNode json = result.next();
 			total++;
-			if (e.has("photos") &&
-					(!e.has("permanently_closed") || !e.get("permanently_closed").asBoolean()) &&
-					e.has("rating") && e.get("rating").asDouble() > 3) {
+			location = json2location(json);
+			if (json.has("photos") && mapFirstRelevantType(json) != null && exists(location) == null &&
+					(!json.has("permanently_closed") || !json.get("permanently_closed").asBoolean()) &&
+					json.has("rating") && json.get("rating").asDouble() > 3) {
 				try {
-					final String json = om.writeValueAsString(e), jsonLower = json.toLowerCase();
+					final String jsonLower = om.writeValueAsString(json).toLowerCase();
 					if (jsonLower.contains("sex") || jsonLower.contains("domina") || jsonLower.contains("bordel")) {
-						if (mapFirstRelevantType(e) != null && exists(json2location(json)) == null)
-							notificationService.createTicket(TicketType.LOCATION,
-									mapFirstRelevantType(e).category + " " + e.get("name").asText(), json,
-									adminId);
+						notificationService.createTicket(TicketType.LOCATION,
+								location.getCategory() + " " + location.getName(),
+								om.writerWithDefaultPrettyPrinter().writeValueAsString(json),
+								adminId);
 					} else {
 						try {
 							if ((location = importLocation(json, null)) != null) {
@@ -238,14 +239,15 @@ public class ImportLocationsService {
 											+ location.getZipCode();
 							}
 						} catch (Exception ex) {
-							if (!ex.getMessage().contains("no image")
-									// && !ex.getMessage().contains("invalid address")
-									&& !ex.getMessage().contains("location exists")
-									&& !Strings.stackTraceToString(ex).toLowerCase().contains("duplicate entry")) {
-								location = json2location(json);
+							if (location != null && (ex.getMessage() == null
+									|| (!ex.getMessage().contains("no image")
+											// && !ex.getMessage().contains("invalid address")
+											&& !ex.getMessage().contains("location exists")
+											&& !Strings.stackTraceToString(ex).toLowerCase()
+													.contains("duplicate entry")))) {
 								notificationService.createTicket(TicketType.LOCATION,
 										location.getCategory() + " " + location.getName(),
-										om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(json)),
+										om.writerWithDefaultPrettyPrinter().writeValueAsString(json),
 										adminId);
 							}
 						}
@@ -260,14 +262,14 @@ public class ImportLocationsService {
 
 	private LocationType mapType(String typeGoogle) {
 		for (LocationType type : TYPES) {
-			if (typeGoogle.equals("" + type.google))
+			if (typeGoogle.equals(type.google))
 				return type;
 		}
 		return null;
 	}
 
-	private LocationType mapFirstRelevantType(final JsonNode e) {
-		final JsonNode types = e.get("types");
+	private LocationType mapFirstRelevantType(final JsonNode json) {
+		final JsonNode types = json.get("types");
 		if (types != null && types.size() > 0) {
 			final Iterator<JsonNode> type = types.elements();
 			while (type.hasNext()) {
@@ -279,17 +281,15 @@ public class ImportLocationsService {
 		return null;
 	}
 
-	Location importLocation(String json, String category) throws Exception {
+	Location importLocation(JsonNode json, String category) throws Exception {
 		final Location location = json2location(json);
 		if (category != null)
 			location.setCategory(category);
 		else if (location.getCategory() == null)
 			throw new IllegalArgumentException("no relevant category found:\n" + json);
-		final ObjectMapper om = new ObjectMapper();
 		String image;
 		try {
-			final JsonNode address = om.readTree(json);
-			if (!address.has("photos"))
+			if (!json.has("photos"))
 				throw new IllegalArgumentException("no image in json");
 			final BigInteger id = exists(location);
 			if (id != null) {
@@ -297,6 +297,7 @@ public class ImportLocationsService {
 				if (!location.getGoogleRating().equals(l.getGoogleRating())
 						|| !location.getGoogleRatingTotal().equals(l.getGoogleRatingTotal())
 						|| !location.getCategory().equals(l.getCategory())
+						|| location.getSubcategories() == null
 						|| !location.getSubcategories().equals(l.getSubcategories())) {
 					l.setGoogleRating(location.getGoogleRating());
 					l.setGoogleRatingTotal(location.getGoogleRatingTotal());
@@ -308,7 +309,7 @@ public class ImportLocationsService {
 			}
 			final String html = externalService.google(
 					"place/photo?maxheight=1200&photoreference="
-							+ address.get("photos").get(0).get("photo_reference").asText(),
+							+ json.get("photos").get(0).get("photo_reference").asText(),
 					adminId).replace("<A HREF=", "<a href=");
 			final Matcher matcher = href.matcher(html);
 			if (!matcher.find())
@@ -324,13 +325,12 @@ public class ImportLocationsService {
 		return location;
 	}
 
-	private Location json2location(String json) {
+	private Location json2location(final JsonNode json) {
 		try {
 			final Location location = new Location();
-			final JsonNode address = new ObjectMapper().readTree(json);
 			location.setContactId(adminId);
-			String name = address.get("name").asText();
-			final LocationType type = mapFirstRelevantType(address);
+			String name = json.get("name").asText();
+			final LocationType type = mapFirstRelevantType(json);
 			if (type != null) {
 				location.setCategory("" + type.category);
 				location.setSubcategories(
@@ -343,11 +343,11 @@ public class ImportLocationsService {
 			}
 			location.setName(name);
 			location.setParkingOption("3");
-			location.setLatitude((float) address.get("geometry").get("location").get("lat").asDouble());
-			location.setLongitude((float) address.get("geometry").get("location").get("lng").asDouble());
-			location.setAddress(address.get("vicinity").asText().replace(", ", "\n"));
-			location.setGoogleRating((float) address.get("rating").asDouble());
-			location.setGoogleRatingTotal(address.get("user_ratings_total").asInt());
+			location.setLatitude((float) json.get("geometry").get("location").get("lat").asDouble());
+			location.setLongitude((float) json.get("geometry").get("location").get("lng").asDouble());
+			location.setAddress(json.get("vicinity").asText().replace(", ", "\n"));
+			location.setGoogleRating((float) json.get("rating").asDouble());
+			location.setGoogleRatingTotal(json.get("user_ratings_total").asInt());
 			return location;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -361,29 +361,29 @@ public class ImportLocationsService {
 					"thai",
 					"vietnam",
 					"itali",
-					"french|franz",
+					"french|französisch",
 					"japan",
 					"bavaria|bayer|bräu",
 					"german|deutsch",
 					"spani",
 					"afghan",
 					"persian",
-					"lebanes",
+					"lebanes|libanesisch",
 					"chinese",
-					"fish",
-					"meat",
+					"fish|fisch",
+					"meat|fleisch",
 					"vegetari",
 					"vegan",
 					"pizza",
 					"pasta",
-					"barbecue",
-					"fast food",
+					"barbecue|grill",
+					"fast",
 					"brunch",
-					"sport live",
+					"sport",
 					"beergarden|biergarten",
 					"terrace|terasse",
 					"coffee|cafe",
-					"dessert",
+					"dessert|kuchen",
 					"burger|mcdonald"
 			};
 			for (int i = 0; i < cats.length; i++) {
