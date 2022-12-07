@@ -12,7 +12,6 @@ import com.jq.findapp.entity.ContactBluetooth;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
 import com.jq.findapp.entity.ContactLink;
 import com.jq.findapp.entity.ContactVisit;
-import com.jq.findapp.entity.ContactWhatToDo;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.Location;
@@ -28,7 +27,6 @@ import com.jq.findapp.repository.listener.ContactGeoLocationHistoryListener;
 import com.jq.findapp.repository.listener.ContactLinkListener;
 import com.jq.findapp.repository.listener.ContactListener;
 import com.jq.findapp.repository.listener.ContactVisitListener;
-import com.jq.findapp.repository.listener.ContactWhatToDoListener;
 import com.jq.findapp.repository.listener.EventListener;
 import com.jq.findapp.repository.listener.EventParticipateListener;
 import com.jq.findapp.repository.listener.LocationFavoriteListener;
@@ -57,8 +55,6 @@ public class Listeners {
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(ContactListener.class);
 		if (entity instanceof ContactVisit)
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(ContactVisitListener.class);
-		if (entity instanceof ContactWhatToDo)
-			return (AbstractRepositoryListener<T>) applicationContext.getBean(ContactWhatToDoListener.class);
 		if (entity instanceof Event)
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(EventListener.class);
 		if (entity instanceof EventParticipate)

@@ -22,6 +22,7 @@ public class Event extends BaseEntity {
     private Short confirm;
     private Short maxParticipants;
     private Short visibility;
+    private String category;
     private String image;
     private String imageList;
     private String link;
@@ -139,6 +140,14 @@ public class Event extends BaseEntity {
 
     public void setMarketingEvent(Boolean marketingEvent) {
         this.marketingEvent = marketingEvent;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     @Transient

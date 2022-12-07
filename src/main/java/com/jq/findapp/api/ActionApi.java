@@ -128,13 +128,11 @@ public class ActionApi {
 
 	@GetMapping("marketing")
 	public Map<String, String> marketing() {
-		if (LocalDate.now().isAfter(LocalDate.of(2022, Month.DECEMBER, 15)))
+		if (LocalDate.now().isAfter(LocalDate.of(2022, Month.DECEMBER, 6)))
 			return null;
 		final Map<String, String> map = new HashMap<>();
 		map.put("label", "50€");
 		map.put("url", "https://blog.spontify.me/stats.html#marketing");
-		// TODO rm0.3.0
-		map.put("action", map.get("url"));
 		return map;
 	}
 
@@ -246,31 +244,6 @@ public class ActionApi {
 			final Location location = repository.one(Location.class, (BigInteger) result.get(i).get("location.id"));
 			final Map<String, Object> m = new HashMap<>(4);
 			m.put("id", location.getId());
-			m.put("name", location.getName());
-			m.put("address", location.getAddress());
-			list.add(m);
-		}
-		return list;
-	}
-
-	// TODO remove 0.3.0
-	@GetMapping("nearByLocationAddress")
-	public List<Map<String, Object>> nearByLocationAddress(String search, @RequestHeader BigInteger user,
-			@RequestHeader String password, @RequestHeader String salt) throws Exception {
-		final Contact contact = authenticationService.verify(user, password, salt);
-		if (contact.getLongitude() == null)
-			return null;
-		final QueryParams params = new QueryParams(Query.location_listId);
-		params.setLongitude(contact.getLongitude());
-		params.setLatitude(contact.getLatitude());
-		params.setSearch(search);
-		final Result result = repository.list(params);
-		final List<Map<String, Object>> list = new ArrayList<>();
-		for (int i = 0; i < result.size(); i++) {
-			final Location location = repository.one(Location.class, (BigInteger) result.get(i).get("location.id"));
-			final Map<String, Object> m = new HashMap<>(4);
-			m.put("id", location.getId());
-			m.put("image", location.getImageList());
 			m.put("name", location.getName());
 			m.put("address", location.getAddress());
 			list.add(m);

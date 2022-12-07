@@ -37,7 +37,6 @@ public class ContactNotification extends BaseEntity {
 		contactFriendRequest,
 		contactVisitLocation,
 		contactVisitProfile,
-		contactWhatToDo,
 		eventChanged,
 		eventDelete,
 		eventNotify,

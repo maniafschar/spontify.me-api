@@ -1,12 +1,12 @@
 package com.jq.findapp.repository.listener;
 
 import java.math.BigInteger;
+import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
-import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,6 +26,12 @@ import com.jq.findapp.util.Strings;
 public class EventListener extends AbstractRepositoryListener<Event> {
 	@Autowired
 	private EventService eventService;
+
+	@Override
+	public void prePersist(Event event) throws Exception {
+		if (event.getEndDate() == null)
+			event.setEndDate(new Date(event.getStartDate().getTime()));
+	}
 
 	@Override
 	public void postPersist(Event event) throws Exception {

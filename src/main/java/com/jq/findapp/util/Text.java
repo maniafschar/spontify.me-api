@@ -51,7 +51,6 @@ public enum Text {
 	mail_contactVisitLocation,
 	mail_contactVisitProfile,
 	mail_contactWelcomeEmail,
-	mail_contactWhatToDo,
 	mail_eventChanged,
 	mail_eventDelete,
 	mail_eventNotify,

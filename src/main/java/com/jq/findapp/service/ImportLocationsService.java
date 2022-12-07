@@ -346,8 +346,10 @@ public class ImportLocationsService {
 			location.setLatitude((float) json.get("geometry").get("location").get("lat").asDouble());
 			location.setLongitude((float) json.get("geometry").get("location").get("lng").asDouble());
 			location.setAddress(json.get("vicinity").asText().replace(", ", "\n"));
-			location.setGoogleRating((float) json.get("rating").asDouble());
-			location.setGoogleRatingTotal(json.get("user_ratings_total").asInt());
+			if (json.has("rating"))
+				location.setGoogleRating((float) json.get("rating").asDouble());
+			if (json.has("user_ratings_total"))
+				location.setGoogleRatingTotal(json.get("user_ratings_total").asInt());
 			return location;
 		} catch (Exception e) {
 			throw new RuntimeException(e);

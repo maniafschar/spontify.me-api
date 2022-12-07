@@ -31,7 +31,6 @@ import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.EventService;
 import com.jq.findapp.service.ImportLocationsService;
 import com.jq.findapp.service.NotificationService;
-import com.jq.findapp.service.WhatToDoService;
 import com.jq.findapp.service.backend.DbService;
 import com.jq.findapp.service.backend.EngagementService;
 import com.jq.findapp.service.backend.ImportLogService;
@@ -63,9 +62,6 @@ public class SupportCenterApi {
 
 	@Autowired
 	private EventService eventService;
-
-	@Autowired
-	private WhatToDoService whatToDoService;
 
 	@Autowired
 	private DbService dbService;
@@ -206,7 +202,6 @@ public class SupportCenterApi {
 				dbService.update();
 				engagementService.sendChats();
 				engagementService.sendNearBy();
-				whatToDoService.findMatchingSpontis();
 				eventService.findMatchingSpontis();
 				eventService.notifyParticipation();
 				eventService.notifyCheckInOut(null);

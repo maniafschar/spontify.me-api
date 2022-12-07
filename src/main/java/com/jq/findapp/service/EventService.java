@@ -96,17 +96,19 @@ public class EventService {
 				final ZonedDateTime time = Instant.ofEpochMilli(event.getStartDate().getTime()).atZone(ZoneOffset.UTC);
 				if (time.getDayOfMonth() == now.getDayOfMonth() &&
 						(time.getHour() == 0 || time.getHour() > now.getHour() && time.getHour() < now.getHour() + 3)) {
-					if (event.getLocationId() != null
-							&& repository.one(Location.class, event.getLocationId()) != null) {
-						final Contact contact = repository.one(Contact.class, eventParticipate.getContactId());
-						final ZonedDateTime t = time.minus(Duration.ofMinutes(contact.getTimezoneOffset()));
-						notificationService.sendNotification(repository.one(Contact.class, event.getContactId()),
-								contact, ContactNotificationTextType.eventNotification,
-								Strings.encodeParam("e=" + event.getId()),
-								repository.one(Location.class, event.getLocationId()).getName(),
-								t.getHour() + ":" + (t.getMinute() < 10 ? "0" : "") + t.getMinute());
-					} else
-						repository.delete(event);
+					if (event.getLocationId() != null) {
+						if (repository.one(Location.class, event.getLocationId()) == null)
+							repository.delete(event);
+						else {
+							final Contact contact = repository.one(Contact.class, eventParticipate.getContactId());
+							final ZonedDateTime t = time.minus(Duration.ofMinutes(contact.getTimezoneOffset()));
+							notificationService.sendNotification(repository.one(Contact.class, event.getContactId()),
+									contact, ContactNotificationTextType.eventNotification,
+									Strings.encodeParam("e=" + event.getId()),
+									repository.one(Location.class, event.getLocationId()).getName(),
+									t.getHour() + ":" + (t.getMinute() < 10 ? "0" : "") + t.getMinute());
+						}
+					}
 				}
 			}
 		}

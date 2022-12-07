@@ -12,7 +12,6 @@ import org.apache.commons.io.IOUtils;
 import com.jq.findapp.util.Strings;
 
 public enum Query {
-	// TODO rm 0.3.0
 	contact_block,
 	contact_chat,
 	contact_eventParticipateCount,
@@ -30,7 +29,6 @@ public enum Query {
 	contact_listNotification(true),
 	contact_listSupportCenter,
 	contact_listVisit(true),
-	contact_listWhat2do,
 	contact_marketing(true),
 	contact_maxAppVersion,
 	contact_notification(true),
@@ -40,7 +38,6 @@ public enum Query {
 	contact_pingNotification(),
 	contact_token,
 	contact_unique,
-	contact_what2do,
 
 	location_eventParticipate,
 	location_list,
@@ -181,5 +178,9 @@ public enum Query {
 
 	public static Query get(String id) {
 		return valueOf(Query.class, id.replace('/', '_'));
+	}
+
+	public String getSql() {
+		return sql;
 	}
 }

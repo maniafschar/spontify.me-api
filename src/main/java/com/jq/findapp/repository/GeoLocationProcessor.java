@@ -29,28 +29,33 @@ public class GeoLocationProcessor {
 			if (params.getDistance() == null)
 				params.setDistance(100);
 			table = params.getQuery().name().split("_")[0];
-			if ("event".equals(table))
-				table = "location";
 			integer = params.getQuery().name().startsWith("contact_");
 			sort = params.isSort();
 			radLat = Math.toRadians(params.getLatitude());
 			radLon = Math.toRadians(params.getLongitude());
 			checkBounds(radLat, radLon);
-			final Point[] boundingCoordinates = computeBoundingCoordinates(params.getDistance());
-			final boolean meridian180WithinDistance = boundingCoordinates[0].getY() > boundingCoordinates[1].getY();
-			params.setSearchGeoLocation(
-					"((" + table + ".latitude >= " + boundingCoordinates[0].getX() + " and " + table + ".latitude <= "
-							+ boundingCoordinates[1].getX() + ") and (" + table + ".longitude >= "
-							+ boundingCoordinates[0].getY() + ' ' + (meridian180WithinDistance ? "or" : "and") + ' '
-							+ table + ".longitude <= " + boundingCoordinates[1].getY() + ") and " + "acos(sin("
-							+ radLat + ") * sin(radians(" + table + ".latitude)) + cos(" + radLat
-							+ ") * cos(radians(" + table + ".latitude)) * cos(radians(" + table + ".longitude) - "
-							+ radLon + ")) <= " + (params.getDistance() / radius) + ')');
-			if (params.getDistance() == null || params.getDistance() > 50000 || params.getDistance() < 1)
+			params.setSearchGeoLocation(getSearch(table, params.getDistance()));
+			if ("location".equals(table) && params.getQuery().getSql().contains("contact."))
+				params.setSearchGeoLocation("((location.latitude is not null and " + params.getSearchGeoLocation()
+						+ ") or (contact.latitude is not null and " + getSearch("contact", params.getDistance())
+						+ "))");
+			else if (params.getDistance() > 50000 || params.getDistance() < 1)
 				params.setSearchGeoLocation(
 						'(' + table + ".latitude is null or " + params.getSearchGeoLocation() + ')');
 		} else
 			params.setSearchGeoLocation(null);
+	}
+
+	private String getSearch(String table, int distance) {
+		final Point[] boundingCoordinates = computeBoundingCoordinates(distance);
+		final boolean meridian180WithinDistance = boundingCoordinates[0].getY() > boundingCoordinates[1].getY();
+		return "((" + table + ".latitude >= " + boundingCoordinates[0].getX() + " and " + table + ".latitude <= "
+				+ boundingCoordinates[1].getX() + ") and (" + table + ".longitude >= "
+				+ boundingCoordinates[0].getY() + ' ' + (meridian180WithinDistance ? "or" : "and") + ' '
+				+ table + ".longitude <= " + boundingCoordinates[1].getY() + ") and " + "acos(sin("
+				+ radLat + ") * sin(radians(" + table + ".latitude)) + cos(" + radLat
+				+ ") * cos(radians(" + table + ".latitude)) * cos(radians(" + table + ".longitude) - "
+				+ radLon + ")) <= " + (distance / radius) + ')';
 	}
 
 	public List<Object[]> postProcessor(List<Object[]> list) {

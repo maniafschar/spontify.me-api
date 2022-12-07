@@ -228,9 +228,6 @@ public class NotificationService {
 			final Map<String, Object> row = list.get(i);
 			values.chatUnseen.put("" + row.get("chat.contactId2"), ((Number) row.get("_c")).intValue());
 		}
-		// TODO rm .chat after 0.2.3
-		params.setQuery(Query.contact_listChat);
-		values.chat = repository.list(params).size();
 		return values;
 	}
 

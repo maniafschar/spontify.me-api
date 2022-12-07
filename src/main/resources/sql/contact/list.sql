@@ -52,28 +52,13 @@ SELECT
 	contactLink.contactId2,
 	contactLink.id,
 	contactLink.status,
-	contactWhatToDo.keywords,
-	contactWhatToDo.message,
-	contactWhatToDo.time,
 	'' as geolocationDistance
 FROM
-	Contact contact
-	left join ContactLink contactLink on
+	Contact contact left join
+	ContactLink contactLink on
 		contactLink.contactId={USERID} and contactLink.contactId2=contact.id
 	or
 		contactLink.contactId2={USERID} and contactLink.contactId=contact.id
-	left join ContactWhatToDo contactWhatToDo on
-		contactWhatToDo.id =
-		(
-				select
-					max(cwtd2.id)
-				from
-					ContactWhatToDo cwtd2
-				where
-					cwtd2.contactId=contact.id and
-					cwtd2.active=true and
-					cwtd2.time>current_timestamp
-		)
 WHERE
 	contact.verified=1 and
 	{search}

@@ -34,25 +34,7 @@ SELECT
 	contactVisit.count,
 	contactVisit.modifiedAt,
 	contactLink.status,
-	'' as geolocationDistance,
-	(
-		select
-			cwtd.message
-		from
-			ContactWhatToDo cwtd
-		where
-			cwtd.id=
-			(
-				select
-					max(cwtd2.id)
-				from
-					ContactWhatToDo cwtd2
-				where
-					cwtd2.contactId=contact.id and
-					cwtd2.active=true and
-					cwtd2.time>current_timestamp
-			)
-	) as contactWhatToDoMessage
+	'' as geolocationDistance
 FROM
 	ContactVisit contactVisit,
 	Contact contact

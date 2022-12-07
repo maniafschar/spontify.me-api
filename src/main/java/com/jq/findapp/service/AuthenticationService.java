@@ -31,7 +31,6 @@ import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactToken;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
-import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService.AuthenticationException.AuthenticationExceptionType;
@@ -378,21 +377,10 @@ public class AuthenticationService {
 
 	public Contact recoverVerifyEmail(String token) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_listId);
-		// TODO rm .replace after 0.3.0
-		params.setSearch("contact.loginLink like '%" + token.replace('y', '_') + "%'");
+		params.setSearch("contact.loginLink like '%" + token + "%'");
 		final Map<String, Object> user = repository.one(params);
-		if (user == null) {
-			params.setSearch("contact.loginLink is not null");
-			Result r = repository.list(params);
-			String s = "";
-			for (int i = 0; i < r.size(); i++) {
-				final Contact c = repository.one(Contact.class, (BigInteger) r.get(i).get("contact.id"));
-				s += c.getId() + ": " + c.getLoginLink() + "\n";
-			}
-			s += "++++++++++++++++++++++\n" + token;
-			notificationService.createTicket(TicketType.ERROR, "recoverVerifyEmail failed", s, null);
+		if (user == null)
 			return null;
-		}
 		final Contact contact = repository.one(Contact.class, new BigInteger(user.get("contact.id").toString()));
 		if (contact.getVerified() == null || !contact.getVerified()) {
 			contact.setVerified(Boolean.TRUE);
