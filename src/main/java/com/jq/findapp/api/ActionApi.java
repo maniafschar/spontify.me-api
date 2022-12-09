@@ -114,8 +114,9 @@ public class ActionApi {
 			@RequestHeader String salt) {
 		final Contact contact = authenticationService.verify(user, password, salt);
 		final Map<String, String> m = marketing();
-		if (m != null)
-			m.put("text", Text.preventDelete.getText(contact.getLanguage()));
+		if (m == null)
+			return Collections.emptyMap();
+		m.put("text", Text.preventDelete.getText(contact.getLanguage()));
 		return m;
 	}
 

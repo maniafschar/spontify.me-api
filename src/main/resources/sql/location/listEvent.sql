@@ -15,8 +15,36 @@ SELECT
 	event.type,
 	event.visibility,
 	contact.id,
+	contact.image,
 	contact.imageList,
 	contact.pseudonym,
+	contact.age,
+	contact.aboutMe,
+	contact.attr,
+	contact.attrEx,
+	contact.attr0,
+	contact.attr0Ex,
+	contact.attr1,
+	contact.attr1Ex,
+	contact.attr2,
+	contact.attr2Ex,
+	contact.attr3,
+	contact.attr3Ex,
+	contact.attr4,
+	contact.attr4Ex,
+	contact.attr5,
+	contact.attr5Ex,
+	contact.attrInterest,
+	contact.attrInterestEx,
+	contact.birthday,
+	contact.birthdayDisplay,
+	contact.budget,
+	contact.gender,
+	contact.guide,
+	contactLink.contactId,
+	contactLink.contactId2,
+	contactLink.id,
+	contactLink.status,
 	location.address,
 	location.attr0,
 	location.attr1,
@@ -45,7 +73,11 @@ FROM
 	Event event left join
 	Location location on event.locationId=location.id left join
 	LocationOpenTime locationOpenTime on locationOpenTime.locationId=location.id left join LocationFavorite locationFavorite on locationFavorite.locationId=location.id and locationFavorite.contactId={USERID},
-	Contact contact
+	Contact contact left join
+	ContactLink contactLink on
+		contactLink.contactId={USERID} and contactLink.contactId2=contact.id
+	or
+		contactLink.contactId2={USERID} and contactLink.contactId=contact.id
 WHERE
 	event.contactId=contact.id and
 	{search}

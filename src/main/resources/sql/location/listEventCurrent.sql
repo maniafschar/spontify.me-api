@@ -76,7 +76,6 @@ FROM
 		contactLink.contactId={USERID} and contactLink.contactId2=contact.id
 	or
 		contactLink.contactId2={USERID} and contactLink.contactId=contact.id
-
 WHERE
 	TO_DAYS(event.startDate)-14<=TO_DAYS(current_timestamp) and
 	TO_DAYS(event.endDate)>=TO_DAYS(current_timestamp) and
