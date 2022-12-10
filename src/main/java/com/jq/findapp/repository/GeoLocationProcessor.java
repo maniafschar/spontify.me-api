@@ -61,7 +61,7 @@ public class GeoLocationProcessor {
 	public List<Object[]> postProcessor(List<Object[]> list) {
 		if (list.size() > 0) {
 			final String[] header = (String[]) list.get(0);
-			int distance = -1, latitude = -1, longitude = -1;
+			int distance = -1, latitude = -1, longitude = -1, latitudeContact = -1, longitudeContact = -1;
 			for (int i = 0; i < header.length; i++) {
 				if ("_geolocationDistance".equals(header[i]))
 					distance = i;
@@ -69,6 +69,10 @@ public class GeoLocationProcessor {
 					latitude = i;
 				else if ((table + ".longitude").equals(header[i]))
 					longitude = i;
+				else if ("contact.longitude".equals(header[i]))
+					longitudeContact = i;
+				else if ("contact.latitude".equals(header[i]))
+					latitudeContact = i;
 			}
 			if (distance > -1 && latitude > -1 && longitude > -1) {
 				Object[] o2;
@@ -78,7 +82,14 @@ public class GeoLocationProcessor {
 					if (o2[latitude] != null && o2[longitude] != null)
 						o2[distance] = Double.valueOf(distanceTo(((Number) o2[latitude]).doubleValue(),
 								((Number) o2[longitude]).doubleValue()));
-					else
+					else if (latitudeContact > -1 && o2[latitudeContact] != null && o2[longitudeContact] != null) {
+						o2[distance] = Double.valueOf(distanceTo(((Number) o2[latitudeContact]).doubleValue(),
+								((Number) o2[longitudeContact]).doubleValue()));
+						if (((Number) o2[distance]).doubleValue() <= 1.5)
+							o2[distance] = 1;
+						else
+							o2[distance] = (int) (((Number) o2[distance]).doubleValue() + 0.5);
+					} else
 						o2[distance] = max;
 				}
 				if (sort) {

@@ -38,6 +38,8 @@ select
 	contact.gender,
 	contact.guide,
 	contact.imageList,
+	contact.latitude,
+	contact.longitude,
 	contactLink.contactId,
 	contactLink.contactId2,
 	contactLink.id,
