@@ -114,9 +114,8 @@ public class ActionApi {
 			@RequestHeader String salt) {
 		final Contact contact = authenticationService.verify(user, password, salt);
 		final Map<String, String> m = marketing();
-		if (m == null)
-			return Collections.emptyMap();
-		m.put("text", Text.preventDelete.getText(contact.getLanguage()));
+		if (m.containsKey("label"))
+			m.put("text", Text.preventDelete.getText(contact.getLanguage()));
 		return m;
 	}
 
@@ -130,7 +129,7 @@ public class ActionApi {
 	@GetMapping("marketing")
 	public Map<String, String> marketing() {
 		if (LocalDate.now().isAfter(LocalDate.of(2022, Month.DECEMBER, 6)))
-			return null;
+			return Collections.emptyMap();
 		final Map<String, String> map = new HashMap<>();
 		map.put("label", "50€");
 		map.put("url", "https://blog.spontify.me/stats.html#marketing");
