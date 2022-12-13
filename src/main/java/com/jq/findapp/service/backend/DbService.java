@@ -16,7 +16,7 @@ public class DbService {
 		repository.executeUpdate(
 				"update Contact set version=null where (version='0.9.9' or version='0.9.3') and os='android' and language='EN'");
 		repository.executeUpdate(
-				"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and (select modifiedAt from Contact contact where contact.id=contactNotification.contactId)>contactNotification.createdAt and TIMESTAMPDIFF(HOUR,contactNotification.createdAt,current_timestamp)>2");
+				"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and (select modifiedAt from Contact contact where contact.id=contactNotification.contactId)>contactNotification.createdAt and TIMESTAMPDIFF(MINUTE,contactNotification.createdAt,current_timestamp)>30");
 	}
 
 	public void backup() throws Exception {

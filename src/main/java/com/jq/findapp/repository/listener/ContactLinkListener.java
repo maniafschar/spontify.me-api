@@ -14,6 +14,11 @@ import com.jq.findapp.util.Strings;
 @Component
 public class ContactLinkListener extends AbstractRepositoryListener<ContactLink> {
 	@Override
+	public void prePersist(ContactLink entity) throws Exception {
+		entity.setStatus(Status.Pending);
+	}
+
+	@Override
 	public void postPersist(final ContactLink contactLink) throws Exception {
 		notificationService.sendNotification(
 				repository.one(Contact.class, contactLink.getContactId()),
