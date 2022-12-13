@@ -58,20 +58,36 @@ public class EventService {
 		final LocalDate now = LocalDate.now(ZoneId.systemDefault());
 		for (int i = 0; i < ids.size(); i++) {
 			params.setUser(repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id")));
+			params.setLatitude(params.getUser().getLatitude());
+			params.setLongitude(params.getUser().getLongitude());
 			final Result events = repository.list(params);
 			for (int i2 = 0; i2 < events.size(); i2++) {
 				final Event event = repository.one(Event.class, (BigInteger) events.get(i2).get("event.id"));
 				if (!params.getUser().getId().equals(event.getContactId())) {
 					final LocalDate realDate = getRealDate(event, now);
 					final Contact contactEvent = repository.one(Contact.class, event.getContactId());
-					if (realDate.isAfter(now) && realDate.minusDays(1).isBefore(now)
+					if ((realDate.isAfter(now) || realDate.isEqual(now))
+							&& realDate.minusDays(1).isBefore(now)
 							&& !isMaxParticipants(event, realDate, params.getUser())
-							&& Score.getContact(contactEvent, params.getUser()) > 0.3 &&
+							&& Score.getContact(contactEvent, params.getUser()) > 0.4) {
+						if (event.getLocationId() == null) {
+							final ZonedDateTime time = Instant.ofEpochMilli(event.getStartDate().getTime())
+									.atZone(ZoneOffset.UTC);
+							final ZonedDateTime t = time
+									.minus(Duration.ofMinutes(params.getUser().getTimezoneOffset()));
+							notificationService.sendNotification(contactEvent,
+									params.getUser(), ContactNotificationTextType.eventNotifyWithoutLocation,
+									Strings.encodeParam("e=" + event.getId()),
+									t.getHour() + ":" + (t.getMinute() < 10 ? "0" : "") + t.getMinute(),
+									Text.valueOf("category_verb" + event.getCategory())
+											.getText(params.getUser().getLanguage()));
+						} else
 							notificationService.sendNotification(contactEvent,
 									params.getUser(), ContactNotificationTextType.eventNotify,
 									Strings.encodeParam("e=" + event.getId()),
-									(String) events.get(i2).get("location.name")))
+									(String) events.get(i2).get("location.name"));
 						break;
+					}
 				}
 			}
 		}

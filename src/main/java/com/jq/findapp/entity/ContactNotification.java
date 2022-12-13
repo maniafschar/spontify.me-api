@@ -41,6 +41,7 @@ public class ContactNotification extends BaseEntity {
 		eventChanged,
 		eventDelete,
 		eventNotify,
+		eventNotifyWithoutLocation,
 		eventNotification,
 		eventParticipate,
 		locationMarketing,

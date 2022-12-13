@@ -45,6 +45,7 @@
 		"eventChanged": "hat das Event am <jq:EXTRA_1 /> in der Location <jq:EXTRA_3 /> geändert.\n<jq:EXTRA_2 />",
 		"eventDelete": "hat das Event am <jq:EXTRA_1 /> in der Location <jq:EXTRA_3 /> leider wieder gelöscht.\n<jq:EXTRA_2 />",
 		"eventNotify": "hat ein Event in der Location <jq:EXTRA_1 /> erstellt, welches für Dich interessant sein könnte! Du kannst es Dir ja überlegen...",
+		"eventNotifyWithoutLocation": "möchte um <jq:EXTRA_1 /> <jq:EXTRA_2 />. Hast du Zeit?",
 		"eventNotification": "Dein Event in der Location <jq:EXTRA_1 /> beginnt um <jq:EXTRA_2 /> Uhr!",
 		"eventParticipate": "nimmt am <jq:EXTRA_1 /> am Event \"<jq:EXTRA_2 />\" im <jq:EXTRA_3 /> teil.",
 		"feedback": "Wir danken Dir für Deinen Kommentar und melden uns bei Rückfragen.\n\n<jq:EXTRA_1 />",

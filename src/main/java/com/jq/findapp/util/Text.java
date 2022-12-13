@@ -54,6 +54,7 @@ public enum Text {
 	mail_eventChanged,
 	mail_eventDelete,
 	mail_eventNotify,
+	mail_eventNotifyWithoutLocation,
 	mail_eventNotification,
 	mail_eventParticipate,
 	mail_feedback,
