@@ -79,8 +79,8 @@ public class ImportLogService {
 						if (log.getQuery().startsWith("?"))
 							log.setQuery(log.getQuery().substring(1));
 						final String s[] = log.getBody().split(" \\| ");
-						params.setSearch("log.createdAt='" + s[0] + "' and log.body='" + s[1]
-								+ "' or log.body='" + log.getBody() + "'");
+						params.setSearch("log.createdAt='" + s[0] + "' and log.body='" + s[1].replace("'", "\\'")
+								+ "' or log.body='" + log.getBody().replace("'", "\\'") + "'");
 						if (repository.list(params).size() == 0)
 							repository.save(log);
 					}
