@@ -7,6 +7,9 @@ import java.util.List;
 import org.springframework.data.geo.Point;
 
 public class GeoLocationProcessor {
+	public final static float DEFAULT_LATITUDE = 48.13684f;
+	public final static float DEFAULT_LONGITUDE = 11.57685f;
+
 	private double radLat;
 	private double radLon;
 

@@ -40,6 +40,7 @@ import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.LocationOpenTime;
 import com.jq.findapp.entity.LocationVisit;
 import com.jq.findapp.entity.Ticket.TicketType;
+import com.jq.findapp.repository.GeoLocationProcessor;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -231,11 +232,11 @@ public class ActionApi {
 	public List<Map<String, Object>> searchLocation(String search, @RequestHeader BigInteger user,
 			@RequestHeader String password, @RequestHeader String salt) throws Exception {
 		final Contact contact = authenticationService.verify(user, password, salt);
-		if (contact.getLongitude() == null)
-			return null;
 		final QueryParams params = new QueryParams(Query.location_listId);
-		params.setLongitude(contact.getLongitude());
-		params.setLatitude(contact.getLatitude());
+		params.setLatitude(
+				contact.getLatitude() == null ? GeoLocationProcessor.DEFAULT_LATITUDE : contact.getLatitude());
+		params.setLongitude(
+				contact.getLongitude() == null ? GeoLocationProcessor.DEFAULT_LONGITUDE : contact.getLongitude());
 		search = search.replace('\'', '_');
 		params.setSearch("location.name like '%" + search + "%' or location.address like '%" + search + "%'");
 		final Result result = repository.list(params);
