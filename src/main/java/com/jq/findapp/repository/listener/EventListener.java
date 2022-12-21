@@ -58,9 +58,8 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 					if ("o".equals(event.getType()))
 						eventParticipate.setEventDate(new java.sql.Date(event.getStartDate().getTime()));
 					else
-						eventParticipate.setEventDate(java.sql.Date.valueOf(eventService.getRealDate(event,
-								Instant.ofEpochMilli(eventParticipate.getEventDate().getTime()).atZone(ZoneOffset.UTC)
-										.toLocalDate())));
+						eventParticipate
+								.setEventDate(java.sql.Date.valueOf(eventService.getRealDate(event).toLocalDate()));
 					repository.save(eventParticipate);
 				}
 				if (eventParticipate.getState() == 1 && !eventParticipate.getContactId().equals(event.getContactId())) {

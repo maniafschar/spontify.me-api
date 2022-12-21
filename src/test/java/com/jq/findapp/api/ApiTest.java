@@ -22,6 +22,7 @@ import com.jq.findapp.JpaTestConfiguration;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.backend.EngagementService;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith({ SpringExtension.class })
@@ -37,6 +38,9 @@ public class ApiTest {
 
 	@Autowired
 	private Utils utils;
+
+	@Autowired
+	private EngagementService engagementService;
 
 	@Test
 	public void test() throws Exception {

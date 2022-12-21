@@ -1,8 +1,12 @@
 package com.jq.findapp.api;
 
 import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.transaction.Transactional;
 import javax.ws.rs.Produces;
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.Log;
 import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
@@ -43,7 +48,7 @@ import com.jq.findapp.util.Text;
 @CrossOrigin(origins = { "https://sc.spontify.me" })
 @RequestMapping("support")
 public class SupportCenterApi {
-	private static volatile boolean schedulerRunning = false;
+	private static volatile byte schedulerRunning = 0;
 
 	@Autowired
 	private Repository repository;
@@ -80,6 +85,8 @@ public class SupportCenterApi {
 
 	@Value("${app.supportCenter.secret}")
 	private String supportCenterSecret;
+
+	private static final ExecutorService executorService = Executors.newCachedThreadPool();
 
 	@DeleteMapping("user/{id}")
 	public void userDelete(@PathVariable final BigInteger id, @RequestHeader String password,
@@ -196,23 +203,49 @@ public class SupportCenterApi {
 
 	@PutMapping("scheduler")
 	public void scheduler(@RequestHeader String secret) throws Exception {
-		if (schedulerSecret.equals(secret) && !schedulerRunning) {
-			try {
-				schedulerRunning = true;
-				dbService.update();
-				engagementService.sendChats();
-				engagementService.sendNearBy();
-				eventService.findMatchingSpontis();
-				eventService.notifyParticipation();
-				eventService.notifyCheckInOut(null);
-				importLogService.importLog();
-				statisticsService.update();
-				engagementService.sendRegistrationReminder();
-				dbService.backup();
-			} finally {
-				schedulerRunning = false;
-			}
+		if (schedulerSecret.equals(secret) && schedulerRunning == 0) {
+			run(dbService::update);
+			run(engagementService::sendChats);
+			run(engagementService::sendNearBy);
+			run(eventService::findMatchingSpontis);
+			run(eventService::notifyParticipation);
+			run(eventService::notifyCheckInOut);
+			run(importLogService::importLog);
+			run(statisticsService::update);
+			run(engagementService::sendRegistrationReminder);
+			run(dbService::backup);
 		}
+	}
+
+	private void run(Scheduler run) {
+		executorService.submit(new Runnable() {
+			@Override
+			public void run() {
+				schedulerRunning++;
+				final Log log = new Log();
+				final long time = System.currentTimeMillis();
+				log.setContactId(adminId);
+				log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
+				try {
+					final String[] result = run.run();
+					log.setUri("/support/scheduler/" + result[0]);
+					log.setBody(result[1]);
+					log.setStatus(log.getBody() != null && log.getBody().contains("Exception") ? 500 : 200);
+				} finally {
+					schedulerRunning--;
+					log.setTime((int) (System.currentTimeMillis() - time));
+					try {
+						repository.save(log);
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}
+			}
+		});
+	}
+
+	private interface Scheduler {
+		String[] run();
 	}
 
 	@GetMapping("healthcheck")

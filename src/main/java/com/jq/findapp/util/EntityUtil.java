@@ -66,9 +66,10 @@ public class EntityUtil {
 			final BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
 			if (img.getWidth() > 400 && img.getHeight() > 400)
 				return Repository.Attachment.createImage(".jpg", scaleImage(data, size));
+			throw new IllegalArgumentException(
+					"no image: [size " + img.getWidth() + "x" + img.getHeight() + " too small] " + url);
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("no image: " + url, ex);
 		}
-		return null;
 	}
 }

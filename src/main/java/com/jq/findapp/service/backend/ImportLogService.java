@@ -25,6 +25,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.util.Strings;
 
 @Service
 public class ImportLogService {
@@ -34,17 +35,23 @@ public class ImportLogService {
 	@Value("${app.url.lookupip}")
 	private String lookupip;
 
-	public void importLog() throws Exception {
-		final String separator = " | ";
-		importLog("logAd1", "ad", separator);
-		importLog("logAd", "ad", separator);
-		importLog("logWeb1", "web", separator);
-		importLog("logWeb", "web", separator);
-		repository.executeUpdate("update Log set createdAt=substring_index(body,'" + separator
-				+ "', 1), body=substring_index(body, '" + separator
-				+ "', -1) where (uri='ad' or uri='web') and body like '%"
-				+ separator + "%'");
-		lookupIps();
+	public String[] importLog() {
+		final String[] result = new String[] { getClass().getSimpleName() + "/importLog", null };
+		try {
+			final String separator = " | ";
+			importLog("logAd1", "ad", separator);
+			importLog("logAd", "ad", separator);
+			importLog("logWeb1", "web", separator);
+			importLog("logWeb", "web", separator);
+			repository.executeUpdate("update Log set createdAt=substring_index(body,'" + separator
+					+ "', 1), body=substring_index(body, '" + separator
+					+ "', -1) where (uri='ad' or uri='web') and body like '%"
+					+ separator + "%'");
+			lookupIps();
+		} catch (Exception e) {
+			result[1] = Strings.stackTraceToString(e);
+		}
+		return result;
 	}
 
 	private void importLog(final String name, final String uri, final String separator) throws Exception {
@@ -71,13 +78,18 @@ public class ImportLogService {
 					log.setBody(date.substring(0, 19) + separator + m.group(11));
 					if (log.getBody().length() > 255)
 						log.setBody(log.getBody().substring(0, 255));
-					log.setUri(uri);
 					log.setPort(80);
-					if ("/".equals(log.getQuery()) || "/stats.html".equals(log.getQuery())
-							|| log.getQuery().startsWith("/?")) {
-						log.setQuery(log.getQuery().substring(1));
-						if (log.getQuery().startsWith("?"))
-							log.setQuery(log.getQuery().substring(1));
+					if ("/stats.html".equals(log.getQuery()) || (!log.getQuery().contains(".")
+							&& !log.getQuery().contains("apple-app-site-association")
+							&& !log.getQuery().startsWith("/rest/")
+							&& log.getStatus() < 400)) {
+						if (log.getQuery().startsWith("/?")) {
+							log.setUri(uri);
+							log.setQuery(log.getQuery().substring(2));
+						} else {
+							log.setUri(uri + (log.getQuery().length() > 1 ? log.getQuery() : ""));
+							log.setQuery("");
+						}
 						final String s[] = log.getBody().split(" \\| ");
 						params.setSearch("log.createdAt='" + s[0] + "' and log.body like '" + s[1].replace("'", "_")
 								+ "' or log.body like '" + log.getBody().replace("'", "_") + "'");

@@ -403,7 +403,7 @@ public class ImportLocationsService {
 				+ "%' and location.category='"
 				+ location.getCategory()
 				+ "' and (LOWER(location.address) like '%"
-				+ location.getAddress().toLowerCase().replace("traße", "tr.").replace('\n', '%')
+				+ location.getAddress().toLowerCase().replace("traße", "tr.").replace('\n', '%').replace("'", "''")
 				+ "%' or location.latitude like '"
 				+ ((int) (location.getLatitude().floatValue() * roundingFactor)) / roundingFactor
 				+ "%' and location.longitude like '"
