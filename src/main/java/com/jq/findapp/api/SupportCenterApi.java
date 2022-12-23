@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.transaction.Transactional;
 import javax.ws.rs.Produces;
@@ -48,7 +49,7 @@ import com.jq.findapp.util.Text;
 @CrossOrigin(origins = { "https://sc.spontify.me" })
 @RequestMapping("support")
 public class SupportCenterApi {
-	private static volatile byte schedulerRunning = 0;
+	private static final AtomicInteger schedulerRunning = new AtomicInteger();
 
 	@Autowired
 	private Repository repository;
@@ -203,7 +204,7 @@ public class SupportCenterApi {
 
 	@PutMapping("scheduler")
 	public void scheduler(@RequestHeader String secret) throws Exception {
-		if (schedulerSecret.equals(secret) && schedulerRunning == 0) {
+		if (schedulerSecret.equals(secret) && schedulerRunning.get() == 0) {
 			run(dbService::update);
 			run(engagementService::sendChats);
 			run(engagementService::sendNearBy);
@@ -221,18 +222,18 @@ public class SupportCenterApi {
 		executorService.submit(new Runnable() {
 			@Override
 			public void run() {
-				schedulerRunning++;
 				final Log log = new Log();
 				final long time = System.currentTimeMillis();
-				log.setContactId(adminId);
-				log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
 				try {
+					schedulerRunning.incrementAndGet();
+					log.setContactId(adminId);
+					log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
 					final String[] result = run.run();
 					log.setUri("/support/scheduler/" + result[0]);
 					log.setBody(result[1]);
 					log.setStatus(log.getBody() != null && log.getBody().contains("Exception") ? 500 : 200);
 				} finally {
-					schedulerRunning--;
+					schedulerRunning.decrementAndGet();
 					log.setTime((int) (System.currentTimeMillis() - time));
 					try {
 						repository.save(log);
