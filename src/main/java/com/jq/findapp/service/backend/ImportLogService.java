@@ -39,11 +39,10 @@ public class ImportLogService {
 	public String[] importLog() {
 		final String[] result = new String[] { getClass().getSimpleName() + "/importLog", null };
 		try {
-			final String separator = " | ";
-			importLog("logAd1", "ad", separator);
-			importLog("logAd", "ad", separator);
-			importLog("logWeb1", "web", separator);
-			importLog("logWeb", "web", separator);
+			importLog("logAd1");
+			importLog("logAd");
+			importLog("logWeb1");
+			importLog("logWeb");
 			lookupIps();
 		} catch (Exception e) {
 			result[1] = Strings.stackTraceToString(e);
@@ -51,7 +50,7 @@ public class ImportLogService {
 		return result;
 	}
 
-	private void importLog(final String name, final String uri, final String separator) throws Exception {
+	private void importLog(final String name) throws Exception {
 		final DateFormat dateParser = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss", Locale.ENGLISH);
 		final Pattern pattern = Pattern.compile(
 				"([\\d.]+) (\\S) (\\S) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"(\\w+) ([^ ]*) ([^\"]*)\" (\\d+) (\\d+) \"([^\"]*)\" \"([^\"]*)\"");
@@ -72,7 +71,7 @@ public class ImportLogService {
 							log.setReferer(log.getReferer().substring(0, 255));
 					}
 					log.setCreatedAt(new Timestamp(dateParser.parse(m.group(4)).getTime()));
-					log.setBody(m.group(11));
+					log.setBody(m.group(11).replace("&#39;", "'"));
 					if (log.getBody().length() > 255)
 						log.setBody(log.getBody().substring(0, 255));
 					log.setPort(80);
@@ -80,6 +79,7 @@ public class ImportLogService {
 							&& !log.getQuery().contains("apple-app-site-association")
 							&& !log.getQuery().startsWith("/rest/")
 							&& log.getStatus() < 400)) {
+						final String uri = name.contains("Ad") ? "ad" : "web";
 						if (log.getQuery().startsWith("/?")) {
 							log.setUri(uri);
 							log.setQuery(log.getQuery().substring(2));
@@ -89,7 +89,7 @@ public class ImportLogService {
 						}
 						params.setSearch("log.ip='" + log.getIp() + "' and log.uri='" + log.getUri()
 								+ "' and log.createdAt='" + Instant.ofEpochMilli(log.getCreatedAt().getTime())
-								+ "' and log.body like '" + log.getBody().replace("'", "%") + "'");
+								+ "' and log.body like '" + log.getBody().replace("'", "''") + "'");
 						if (repository.list(params).size() == 0)
 							repository.save(log);
 					}
