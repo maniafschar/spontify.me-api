@@ -3,6 +3,7 @@ package com.jq.findapp.service.backend;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -43,10 +44,6 @@ public class ImportLogService {
 			importLog("logAd", "ad", separator);
 			importLog("logWeb1", "web", separator);
 			importLog("logWeb", "web", separator);
-			repository.executeUpdate("update Log set createdAt=substring_index(body,'" + separator
-					+ "', 1), body=substring_index(body, '" + separator
-					+ "', -1) where (uri='ad' or uri='web') and body like '%"
-					+ separator + "%'");
 			lookupIps();
 		} catch (Exception e) {
 			result[1] = Strings.stackTraceToString(e);
@@ -74,8 +71,8 @@ public class ImportLogService {
 						if (log.getReferer().length() > 255)
 							log.setReferer(log.getReferer().substring(0, 255));
 					}
-					final String date = Instant.ofEpochMilli(dateParser.parse(m.group(4)).getTime()).toString();
-					log.setBody(date.substring(0, 19) + separator + m.group(11));
+					log.setCreatedAt(new Timestamp(dateParser.parse(m.group(4)).getTime()));
+					log.setBody(m.group(11));
 					if (log.getBody().length() > 255)
 						log.setBody(log.getBody().substring(0, 255));
 					log.setPort(80);
@@ -90,9 +87,9 @@ public class ImportLogService {
 							log.setUri(uri + (log.getQuery().length() > 1 ? log.getQuery() : ""));
 							log.setQuery("");
 						}
-						final String s[] = log.getBody().split(" \\| ");
-						params.setSearch("log.createdAt='" + s[0] + "' and log.body like '" + s[1].replace("'", "_")
-								+ "' or log.body like '" + log.getBody().replace("'", "_") + "'");
+						params.setSearch("log.ip='" + log.getIp() + "' and log.uri='" + log.getUri()
+								+ "' and log.createdAt='" + Instant.ofEpochMilli(log.getCreatedAt().getTime())
+								+ "' and log.body like '" + log.getBody().replace("'", "%") + "'");
 						if (repository.list(params).size() == 0)
 							repository.save(log);
 					}
@@ -104,7 +101,7 @@ public class ImportLogService {
 	private void lookupIps() throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_listLog);
 		params.setLimit(0);
-		params.setSearch("(log.uri='ad' or log.uri='web') and ip.org is null");
+		params.setSearch("(log.uri like 'ad%' or log.uri like 'web%') and ip.org is null");
 		final Result result = repository.list(params);
 		final Pattern patternLoc = Pattern.compile("\"loc\": \"([^\"]*)\"");
 		final Set<Object> processed = new HashSet<>();
