@@ -60,10 +60,10 @@ public class ImportLogService {
 			while ((line = reader.readLine()) != null) {
 				Matcher m = pattern.matcher(line.replaceAll("\\\\\"", ""));
 				if (m.find()) {
+					final String path = m.group(6);
 					final Log log = new Log();
 					log.setIp(m.group(1));
 					log.setMethod(m.group(5));
-					log.setQuery(m.group(6));
 					log.setStatus(Integer.parseInt(m.group(8)));
 					if (!"-".equals(m.group(10))) {
 						log.setReferer(m.group(10));
@@ -75,17 +75,17 @@ public class ImportLogService {
 					if (log.getBody().length() > 255)
 						log.setBody(log.getBody().substring(0, 255));
 					log.setPort(80);
-					if ("/stats.html".equals(log.getQuery()) || (!log.getQuery().contains(".")
-							&& !log.getQuery().contains("apple-app-site-association")
-							&& !log.getQuery().startsWith("/rest/")
+					if ("/stats.html".equals(path) || (!path.contains(".")
+							&& !path.contains("apple-app-site-association")
+							&& !path.startsWith("/rest/")
 							&& log.getStatus() < 400)) {
-						final String uri = name.contains("Ad") ? "ad" : "web";
-						if (log.getQuery().startsWith("/?")) {
-							log.setUri(uri);
-							log.setQuery(log.getQuery().substring(2));
-						} else {
-							log.setUri(uri + (log.getQuery().length() > 1 ? log.getQuery() : ""));
-							log.setQuery("");
+						log.setUri(name.contains("Ad") ? "ad" : "web");
+						if (path.length() > 2) {
+							final String[] s = path.split("\\?");
+							if (s[0].length() > 1)
+								log.setUri(log.getUri() + s[0]);
+							if (s.length > 1)
+								log.setQuery(s[1]);
 						}
 						params.setSearch("log.ip='" + log.getIp() + "' and log.uri='" + log.getUri()
 								+ "' and log.createdAt='" + Instant.ofEpochMilli(log.getCreatedAt().getTime())

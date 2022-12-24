@@ -230,8 +230,9 @@ public class SupportCenterApi {
 					log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
 					final String[] result = run.run();
 					log.setUri("/support/scheduler/" + result[0]);
-					log.setBody(result[1]);
-					log.setStatus(log.getBody() != null && log.getBody().contains("Exception") ? 500 : 200);
+					log.setStatus(result[1] != null && result[1].contains("Exception") ? 500 : 200);
+					if (result[1] != null)
+						log.setBody(result[1].length() > 255 ? result[1].substring(0, 255) : result[1]);
 				} finally {
 					schedulerRunning.decrementAndGet();
 					log.setTime((int) (System.currentTimeMillis() - time));
