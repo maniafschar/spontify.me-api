@@ -3,6 +3,8 @@ package com.jq.findapp.service.backend;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -83,7 +85,7 @@ public class ImportLogService {
 						if (path.length() > 2) {
 							final String[] s = path.split("\\?");
 							if (s[0].length() > 1)
-								log.setUri(log.getUri() + s[0]);
+								log.setUri(log.getUri() + URLDecoder.decode(s[0], StandardCharsets.UTF_8));
 							if (s.length > 1)
 								log.setQuery(s[1]);
 						}
