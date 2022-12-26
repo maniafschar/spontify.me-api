@@ -567,8 +567,13 @@ public class EngagementService {
 			chat.setAction(action);
 			chat.setTextId(textId);
 			chat.setNote(s);
-			repository.save(chat);
-			return true;
+			try {
+				repository.save(chat);
+				return true;
+			} catch (IllegalArgumentException ex) {
+				if (!"duplicate chat".equals(ex.getMessage()))
+					throw new RuntimeException(ex);
+			}
 		}
 		return false;
 	}
