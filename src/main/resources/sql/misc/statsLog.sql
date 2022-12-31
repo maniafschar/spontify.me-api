@@ -4,7 +4,7 @@ SELECT
 FROM
 	Log log
 WHERE
-	log.uri<>'ad' and log.uri<>'web' and log.uri not like '/support/%' and log.createdAt>'2022-09-01'
+	log.uri<>'ad' and log.uri<>'web' and log.uri not like '/support/%' and log.createdAt>DATEADD(MONTH, -3, current_timestamp)
 GROUP BY
 	time
 ORDER BY

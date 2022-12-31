@@ -8,7 +8,7 @@ WHERE
 	log.uri<>'web' and
 	log.uri<>'ad' and
 	log.uri not like '/support/%' and
-	log.createdAt>'2022-09-01'
+	log.createdAt>DATEADD(MONTH, -3, current_timestamp)
 GROUP BY
 	label
 ORDER BY
