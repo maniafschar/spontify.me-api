@@ -204,28 +204,49 @@ public class SupportCenterApi {
 
 	@PutMapping("scheduler")
 	public void scheduler(@RequestHeader String secret) throws Exception {
-		if (schedulerSecret.equals(secret) && schedulerRunning.get() == 0) {
-			run(dbService::update);
-			run(engagementService::sendChats);
-			run(engagementService::sendNearBy);
-			run(eventService::findMatchingSpontis);
-			run(eventService::notifyParticipation);
-			run(eventService::notifyCheckInOut);
-			run(importLogService::importLog);
-			run(statisticsService::update);
-			run(engagementService::sendRegistrationReminder);
-			run(dbService::backup);
-		}
+		if (schedulerSecret.equals(secret)) {
+			if (schedulerRunning.get() == 0) {
+				runLast(dbService::backup);
+				runLast(engagementService::sendNearBy);
+				run(dbService::update);
+				run(engagementService::sendChats);
+				run(eventService::findMatchingSpontis);
+				run(eventService::notifyParticipation);
+				run(eventService::notifyCheckInOut);
+				run(importLogService::importLog);
+				run(statisticsService::update);
+				run(engagementService::sendRegistrationReminder);
+			} else
+				throw new RuntimeException("Scheduler already running " + schedulerRunning.get() + " processes");
+		} else
+			throw new RuntimeException("Scheduler secret incorrect: " + secret);
 	}
 
-	private void run(Scheduler run) {
+	private void runLast(final Scheduler run) {
+		run(run, true);
+	}
+
+	private void run(final Scheduler run) {
+		run(run, false);
+	}
+
+	private void run(final Scheduler run, final boolean last) {
+		final int id = schedulerRunning.incrementAndGet();
 		executorService.submit(new Runnable() {
 			@Override
 			public void run() {
+				if (last) {
+					do {
+						try {
+							Thread.sleep(500);
+						} catch (InterruptedException e) {
+							throw new RuntimeException(e);
+						}
+					} while (id != schedulerRunning.get());
+				}
 				final Log log = new Log();
 				final long time = System.currentTimeMillis();
 				try {
-					schedulerRunning.incrementAndGet();
 					log.setContactId(adminId);
 					log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
 					final String[] result = run.run();
