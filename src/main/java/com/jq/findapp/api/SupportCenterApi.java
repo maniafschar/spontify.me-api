@@ -208,8 +208,8 @@ public class SupportCenterApi {
 			if (schedulerRunning.get() == 0) {
 				runLast(dbService::backup);
 				runLast(engagementService::sendNearBy);
+				runLast(engagementService::sendChats);
 				run(dbService::update);
-				run(engagementService::sendChats);
 				run(eventService::findMatchingSpontis);
 				run(eventService::notifyParticipation);
 				run(eventService::notifyCheckInOut);
@@ -238,7 +238,7 @@ public class SupportCenterApi {
 				if (last) {
 					do {
 						try {
-							Thread.sleep(500);
+							Thread.sleep(100);
 						} catch (InterruptedException e) {
 							throw new RuntimeException(e);
 						}
