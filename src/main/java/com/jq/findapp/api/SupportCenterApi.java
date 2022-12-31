@@ -206,14 +206,18 @@ public class SupportCenterApi {
 	public void scheduler(@RequestHeader String secret) throws Exception {
 		if (schedulerSecret.equals(secret)) {
 			if (schedulerRunning.get() == 0) {
+				// last job is backup, even after importLog
 				runLast(dbService::backup);
+				// importLog paralell to the rest,does not interfere
+				run(importLogService::importLog);
+				// sendNearBy and sendChats after findMatchingSpontis
+				// to avoid multiple chat at the same time
 				runLast(engagementService::sendNearBy);
 				runLast(engagementService::sendChats);
-				run(dbService::update);
 				run(eventService::findMatchingSpontis);
+				run(dbService::update);
 				run(eventService::notifyParticipation);
 				run(eventService::notifyCheckInOut);
-				run(importLogService::importLog);
 				run(statisticsService::update);
 				run(engagementService::sendRegistrationReminder);
 			} else
