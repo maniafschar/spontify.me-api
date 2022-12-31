@@ -45,8 +45,8 @@
 		"contactWhatToDo": "",
 		"eventChanged": "hat das Event am <jq:EXTRA_1 /> in der Location <jq:EXTRA_3 /> geändert.\n<jq:EXTRA_2 />",
 		"eventDelete": "hat das Event am <jq:EXTRA_1 /> in der Location <jq:EXTRA_3 /> leider wieder gelöscht.\n<jq:EXTRA_2 />",
-		"eventNotify": "hat ein Event in der Location <jq:EXTRA_1 /> erstellt, welches für Dich interessant sein könnte! Du kannst es Dir ja überlegen...",
-		"eventNotifyWithoutLocation": "möchte um <jq:EXTRA_1 /> <jq:EXTRA_2 /> (<jq:EXTRA_3 />). Hast du Zeit?",
+		"eventNotify": "hat ein Event <jq:EXTRA_1 /> Uhr in der Location <jq:EXTRA_2 /> erstellt. Es passt zu Dir, schau mal rein...",
+		"eventNotifyWithoutLocation": "möchte um <jq:EXTRA_1 /> Uhr <jq:EXTRA_2 /> (<jq:EXTRA_3 />). Hast du Zeit?",
 		"eventNotification": "Dein Event in der Location <jq:EXTRA_1 /> beginnt um <jq:EXTRA_2 /> Uhr!",
 		"eventParticipate": "nimmt am <jq:EXTRA_1 /> am Event \"<jq:EXTRA_2 />\" im <jq:EXTRA_3 /> teil.",
 		"feedback": "Wir danken Dir für Deinen Kommentar und melden uns bei Rückfragen.\n\n<jq:EXTRA_1 />",
@@ -75,5 +75,7 @@
 		"scoring": "Aktuelle Punktzahl: "
 	},
 	"or": " oder ",
-	"preventDelete": "Im übrigen läuft momentan unsere Aktion <b>50 Euro</b> pro abgehaltenes Event in München und bald auch anderswo.<br/><br/>Triff Dich einfach mit Deinen <b>Freunden</b> in einer Location, stell dies vorher hier als <b>Event</b> hier ein und kassiere ab.<br/><br/>Kann das Dich überzeugen zu bleiben?"
+	"preventDelete": "Im übrigen läuft momentan unsere Aktion <b>50 Euro</b> pro abgehaltenes Event in München und bald auch anderswo.<br/><br/>Triff Dich einfach mit Deinen <b>Freunden</b> in einer Location, stell dies vorher hier als <b>Event</b> hier ein und kassiere ab.<br/><br/>Kann das Dich überzeugen zu bleiben?",
+	"today": "Heute",
+	"tomorrow": "Morgen"
 }

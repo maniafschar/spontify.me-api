@@ -71,15 +71,14 @@ public class EventService {
 								&& realDate.minusDays(1).isBefore(now)
 								&& !isMaxParticipants(event, realDate, params.getUser())
 								&& Score.getContact(contactEvent, params.getUser()) > 0.4) {
+							final ZonedDateTime t = realDate.atZone(ZoneOffset.UTC)
+									.minus(Duration.ofMinutes(params.getUser().getTimezoneOffset()));
+							final String time = t.getHour() + ":" + (t.getMinute() < 10 ? "0" : "") + t.getMinute();
 							if (event.getLocationId() == null) {
-								final ZonedDateTime time = Instant.ofEpochMilli(event.getStartDate().getTime())
-										.atZone(ZoneOffset.UTC);
-								final ZonedDateTime t = time
-										.minus(Duration.ofMinutes(params.getUser().getTimezoneOffset()));
 								notificationService.sendNotification(contactEvent,
 										params.getUser(), ContactNotificationTextType.eventNotifyWithoutLocation,
 										Strings.encodeParam("e=" + event.getId()),
-										t.getHour() + ":" + (t.getMinute() < 10 ? "0" : "") + t.getMinute(),
+										time,
 										Text.valueOf("category_verb" + event.getCategory())
 												.getText(params.getUser().getLanguage()),
 										event.getText());
@@ -87,6 +86,9 @@ public class EventService {
 								notificationService.sendNotification(contactEvent,
 										params.getUser(), ContactNotificationTextType.eventNotify,
 										Strings.encodeParam("e=" + event.getId()),
+										(realDate.getDayOfYear() == now.getDayOfYear()
+												? Text.today.getText(params.getUser().getLanguage())
+												: Text.tomorrow.getText(params.getUser().getLanguage())) + " " + time,
 										(String) events.get(i2).get("location.name"));
 							break;
 						}
