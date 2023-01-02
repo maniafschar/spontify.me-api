@@ -3,11 +3,12 @@ package com.jq.findapp.api;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.transaction.Transactional;
 import javax.ws.rs.Produces;
@@ -49,7 +50,7 @@ import com.jq.findapp.util.Text;
 @CrossOrigin(origins = { "https://sc.spontify.me" })
 @RequestMapping("support")
 public class SupportCenterApi {
-	private static final AtomicInteger schedulerRunning = new AtomicInteger();
+	private static final List<Integer> schedulerRunning = Collections.synchronizedList(new ArrayList<>());
 
 	@Autowired
 	private Repository repository;
@@ -205,23 +206,23 @@ public class SupportCenterApi {
 	@PutMapping("scheduler")
 	public void scheduler(@RequestHeader String secret) throws Exception {
 		if (schedulerSecret.equals(secret)) {
-			if (schedulerRunning.get() == 0) {
+			if (schedulerRunning.size() == 0) {
 				// last job is backup, even after importLog
 				runLast(dbService::backup);
 				// importLog paralell to the rest,does not interfere
 				run(importLogService::importLog);
-				// sendNearBy and sendChats after findMatchingSpontis
+				run(dbService::update);
+				run(statisticsService::update);
+				run(engagementService::sendRegistrationReminder);
+				// sendNearBy and sendChats after all event services
 				// to avoid multiple chat at the same time
 				runLast(engagementService::sendNearBy);
 				runLast(engagementService::sendChats);
 				run(eventService::findMatchingSpontis);
-				run(dbService::update);
 				run(eventService::notifyParticipation);
 				run(eventService::notifyCheckInOut);
-				run(statisticsService::update);
-				run(engagementService::sendRegistrationReminder);
 			} else
-				throw new RuntimeException("Scheduler already running " + schedulerRunning.get() + " processes");
+				throw new RuntimeException("Scheduler already running " + schedulerRunning.size() + " processes");
 		} else
 			throw new RuntimeException("Scheduler secret incorrect: " + secret);
 	}
@@ -235,7 +236,8 @@ public class SupportCenterApi {
 	}
 
 	private void run(final Scheduler run, final boolean last) {
-		final int id = schedulerRunning.incrementAndGet();
+		final Integer id = schedulerRunning.size() + 1;
+		schedulerRunning.add(id);
 		executorService.submit(new Runnable() {
 			@Override
 			public void run() {
@@ -246,7 +248,7 @@ public class SupportCenterApi {
 						} catch (InterruptedException e) {
 							throw new RuntimeException(e);
 						}
-					} while (id != schedulerRunning.get());
+					} while (schedulerRunning.stream().anyMatch(e -> e > id));
 				}
 				final Log log = new Log();
 				final long time = System.currentTimeMillis();
@@ -259,7 +261,7 @@ public class SupportCenterApi {
 					if (result[1] != null)
 						log.setBody(result[1].length() > 255 ? result[1].substring(0, 255) : result[1]);
 				} finally {
-					schedulerRunning.decrementAndGet();
+					schedulerRunning.remove(id);
 					log.setTime((int) (System.currentTimeMillis() - time));
 					try {
 						repository.save(log);
