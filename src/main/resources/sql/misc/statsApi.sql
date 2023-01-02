@@ -1,14 +1,14 @@
 SELECT
 	concat(log.method, ' ', SUBSTRING_INDEX(log.uri, '/', 3)) as label,
 	sum(log.time)*1.0/count(*) as time,
-	count(*)*1.0/(select count(*) from Log where uri<>'web' and uri<>'ad' and uri not like '/support/%' and createdAt>'2022-09-01') as percentage
+	count(*)*1.0/(select count(*) from Log where uri not like 'ad%' and log.uri not like 'web%' and uri not like '/support/%' and TO_DAYS(createdAt)>TO_DAYS(current_timestamp)-90) as percentage
 FROM
 	Log log
 WHERE
-	log.uri<>'web' and
-	log.uri<>'ad' and
+	log.uri not like 'web%' and
+	log.uri not like 'ad%' and
 	log.uri not like '/support/%' and
-	log.createdAt>DATEADD(MONTH, -3, current_timestamp)
+	TO_DAYS(log.createdAt)>TO_DAYS(current_timestamp)-90
 GROUP BY
 	label
 ORDER BY
