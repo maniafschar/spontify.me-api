@@ -7,6 +7,7 @@ import java.util.Base64;
 
 public class Strings {
 	public static final String URL_APP = "https://spontify.me";
+	public static final String URL_APP_NEW = "https://new.spontify.me";
 	public static final String URL_LOCALHOST = "https://localhost";
 	public static final String URL_LOCALHOST_TEST = "http://localhost:9000";
 

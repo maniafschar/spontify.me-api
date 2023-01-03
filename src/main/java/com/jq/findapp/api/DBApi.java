@@ -33,7 +33,7 @@ import com.jq.findapp.util.Strings;
 
 @RestController
 @Transactional
-@CrossOrigin(origins = { Strings.URL_APP, Strings.URL_LOCALHOST, Strings.URL_LOCALHOST_TEST })
+@CrossOrigin(origins = { Strings.URL_APP, Strings.URL_APP_NEW, Strings.URL_LOCALHOST, Strings.URL_LOCALHOST_TEST })
 @RequestMapping("db")
 public class DBApi {
 	@Autowired
