@@ -16,6 +16,7 @@ public class ContactGeoLocationHistory extends BaseEntity {
 	private Float heading;
 	private Float speed;
 	private Float accuracy;
+	private Boolean manual;
 
 	public BigInteger getContactId() {
 		return contactId;
@@ -63,5 +64,13 @@ public class ContactGeoLocationHistory extends BaseEntity {
 
 	public void setAccuracy(Float accuracy) {
 		this.accuracy = accuracy;
+	}
+
+	public Boolean getManual() {
+		return manual;
+	}
+
+	public void setManual(Boolean manual) {
+		this.manual = manual;
 	}
 }

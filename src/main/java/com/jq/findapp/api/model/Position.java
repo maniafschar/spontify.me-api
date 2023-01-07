@@ -7,6 +7,7 @@ public class Position {
 	private float heading;
 	private float speed;
 	private float accuracy;
+	private boolean manual;
 
 	public float getLatitude() {
 		return latitude;
@@ -56,4 +57,11 @@ public class Position {
 		this.accuracy = accuracy;
 	}
 
+	public boolean isManual() {
+		return manual;
+	}
+
+	public void setManual(boolean manual) {
+		this.manual = manual;
+	}
 }

@@ -280,6 +280,7 @@ public class ActionApi {
 				contactGeoLocationHistory.setAltitude(position.getAltitude());
 				contactGeoLocationHistory.setHeading(position.getHeading());
 				contactGeoLocationHistory.setSpeed(position.getSpeed());
+				contactGeoLocationHistory.setManual(position.isManual());
 				repository.save(contactGeoLocationHistory);
 				return result;
 			}

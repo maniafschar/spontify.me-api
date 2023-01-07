@@ -25,6 +25,7 @@ import com.jq.findapp.api.model.ExternalRegistration;
 import com.jq.findapp.api.model.InternalRegistration;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactToken;
+import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -68,6 +69,21 @@ public class AuthenticationApi {
 			final QueryParams params = new QueryParams(Query.location_listId);
 			params.setSearch("location.contactId=" + user.get("contact.id"));
 			user.put("location_added", repository.list(params).size());
+			params.setQuery(Query.contact_listGeoLocationHistory);
+			params.setSearch("contactGeoLocationHistory.contactId=" + user.get("contact.id"));
+			final Result result = repository.list(params);
+			if (result.size() > 0) {
+				final Map<String, Object> geoLocationHistory = result.get(0);
+				if (geoLocationHistory.containsKey("contactGeoLocationHistory.manual")
+						&& ((Boolean) geoLocationHistory.get("contactGeoLocationHistory.manual"))) {
+					final GeoLocation geoLocation = repository.one(GeoLocation.class,
+							(BigInteger) geoLocationHistory.get("contactGeoLocationHistory.geoLocationId"));
+					user.put("geo_location", "{\"lat\":" + geoLocation.getLatitude() +
+							",\"lon\":" + geoLocation.getLongitude()
+							+ ",\"street\":\"" + geoLocation.getStreet() +
+							"\",\"town\":\"" + geoLocation.getTown() + "\"}");
+				}
+			}
 			if (publicKey != null) {
 				final ContactToken t;
 				params.setQuery(Query.contact_token);
