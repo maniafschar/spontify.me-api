@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.jq.findapp.api.model.Position;
 import com.jq.findapp.api.model.WriteEntity;
@@ -93,6 +94,9 @@ public class ActionApi {
 
 	@Value("${app.google.keyJS}")
 	private String googleKeyJS;
+
+	@Value("${app.eventbrite.key}")
+	private String eventbriteKey;
 
 	@GetMapping("unique")
 	public Unique unique(String email) {
@@ -286,6 +290,15 @@ public class ActionApi {
 			}
 		}
 		return null;
+	}
+
+	@PostMapping("eventbrite")
+	public void eventbrite(@RequestBody final Map<String, Object> data) throws Exception {
+		String data2 = "";
+		if (!((String) data.get("api_url")).contains("{api-endpoint-to-fetch-object-details}"))
+			data2 = "\n\n" + WebClient.create(data.get("api_url") + "?token=" + eventbriteKey)
+					.get().retrieve().toEntity(String.class).block().getBody();
+		notificationService.createTicket(TicketType.ERROR, "eventbrite", data + data2, BigInteger.valueOf(3));
 	}
 
 	@GetMapping("ping")
