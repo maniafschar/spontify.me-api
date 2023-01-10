@@ -29,7 +29,6 @@ public enum Query {
 	contact_listNotification(true),
 	contact_listSupportCenter,
 	contact_listVisit(true),
-	contact_listWhat2do,
 	contact_maxAppVersion,
 	contact_notification(true),
 	contact_pingChat(true),
@@ -38,7 +37,6 @@ public enum Query {
 	contact_pingNotification(),
 	contact_token,
 	contact_unique,
-	contact_what2do,
 
 	location_eventParticipate,
 	location_list,
