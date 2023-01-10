@@ -79,6 +79,7 @@ public enum Text {
 	marketing_iPadTitle,
 	marketing_list,
 	marketing_noActions,
+	marketing_requestMarketing,
 	marketing_scoring,
 	or,
 	preventDelete,

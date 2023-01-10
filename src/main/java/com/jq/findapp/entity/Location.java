@@ -433,6 +433,10 @@ public class Location extends BaseEntity {
 	@Transient
 	@Override
 	public boolean writeAccess(BigInteger user, Repository repository) {
+		if (user.equals(getOwnerId()))
+			return true;
+		if (getOwnerId() != null)
+			return false;
 		if (user.equals(getContactId()))
 			return true;
 		final QueryParams params = new QueryParams(Query.location_list);

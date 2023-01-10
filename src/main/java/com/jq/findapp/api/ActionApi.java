@@ -32,6 +32,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.jq.findapp.api.model.Position;
 import com.jq.findapp.api.model.WriteEntity;
+import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
@@ -97,6 +98,9 @@ public class ActionApi {
 
 	@Value("${app.eventbrite.key}")
 	private String eventbriteKey;
+
+	@Value("${app.admin.id}")
+	private BigInteger adminId;
 
 	@GetMapping("unique")
 	public Unique unique(String email) {
@@ -299,6 +303,27 @@ public class ActionApi {
 			data2 = "\n\n" + WebClient.create(data.get("api_url") + "?token=" + eventbriteKey)
 					.get().retrieve().toEntity(String.class).block().getBody();
 		notificationService.createTicket(TicketType.ERROR, "eventbrite", data + data2, BigInteger.valueOf(3));
+	}
+
+	@PostMapping("requestMarketing")
+	public void requestMarketing(BigInteger id, @RequestHeader BigInteger user, @RequestHeader String password,
+			@RequestHeader String salt) throws Exception {
+		final Location location = repository.one(Location.class, id);
+		if (location == null)
+			throw new IllegalAccessException("Location " + id + " does not exist");
+		final Contact contact = authenticationService.verify(user, password, salt);
+		final Chat chat = new Chat();
+		chat.setContactId(contact.getId());
+		chat.setContactId2(adminId);
+		chat.setSeen(false);
+		chat.setNote(Text.marketing_requestMarketing.getText(contact.getLanguage()).replace("{0}",
+				location.getName() + " (" + location.getId() + ")"));
+		try {
+			repository.save(chat);
+		} catch (IllegalArgumentException ex) {
+			if (!"duplicate chat".equals(ex.getMessage()))
+				throw new RuntimeException(ex);
+		}
 	}
 
 	@GetMapping("ping")
