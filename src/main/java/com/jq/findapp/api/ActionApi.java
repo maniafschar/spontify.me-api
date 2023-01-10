@@ -5,8 +5,6 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Time;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -102,6 +100,9 @@ public class ActionApi {
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
 
+	@Value("${app.url}")
+	private String url;
+
 	@GetMapping("unique")
 	public Unique unique(String email) {
 		return authenticationService.unique(email);
@@ -121,11 +122,8 @@ public class ActionApi {
 	@GetMapping("prevent/delete")
 	public Map<String, String> preventDelete(@RequestHeader BigInteger user, @RequestHeader String password,
 			@RequestHeader String salt) {
-		final Contact contact = authenticationService.verify(user, password, salt);
-		final Map<String, String> m = marketing();
-		if (m.containsKey("label"))
-			m.put("text", Text.preventDelete.getText(contact.getLanguage()));
-		return m;
+		authenticationService.verify(user, password, salt);
+		return null;
 	}
 
 	@GetMapping("quotation")
@@ -136,13 +134,11 @@ public class ActionApi {
 	}
 
 	@GetMapping("marketing")
-	public Map<String, String> marketing() {
-		if (LocalDate.now().isAfter(LocalDate.of(2022, Month.DECEMBER, 6)))
-			return Collections.emptyMap();
-		final Map<String, String> map = new HashMap<>();
-		map.put("label", "50€");
-		map.put("url", "https://blog.spontify.me/stats.html#marketing");
-		return map;
+	public String marketing(BigInteger id, @RequestHeader BigInteger user, @RequestHeader String password,
+			@RequestHeader String salt) throws Exception {
+		final Contact contact = authenticationService.verify(user, password, salt);
+		final Location location = repository.one(Location.class, id);
+		return url + "?u=" + contact.getPseudonym() + "&l=" + location.getName();
 	}
 
 	@GetMapping("chat/{location}/{id}/{all}")
@@ -308,10 +304,10 @@ public class ActionApi {
 	@PostMapping("requestMarketing")
 	public void requestMarketing(BigInteger id, @RequestHeader BigInteger user, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
+		final Contact contact = authenticationService.verify(user, password, salt);
 		final Location location = repository.one(Location.class, id);
 		if (location == null)
 			throw new IllegalAccessException("Location " + id + " does not exist");
-		final Contact contact = authenticationService.verify(user, password, salt);
 		final Chat chat = new Chat();
 		chat.setContactId(contact.getId());
 		chat.setContactId2(adminId);

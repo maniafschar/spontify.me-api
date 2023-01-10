@@ -42,7 +42,6 @@
 		"contactVisitLocation": "besuchte <jq:EXTRA_2 />, ihr habt <jq:EXTRA_1 /> Gemeinsamkeiten.",
 		"contactVisitProfile": "besuchte Dein Profil, ihr habt <jq:EXTRA_1 /> Gemeinsamkeiten.",
 		"contactWelcomeEmail": "Vielen Dank für die Registrierung auf spontify.me. Bitte bestätige Deine Anmeldung, in dem Du auf den Link klickst.",
-		"contactWhatToDo": "",
 		"eventChanged": "hat das Event am <jq:EXTRA_1 /> in der Location <jq:EXTRA_3 /> geändert.\n<jq:EXTRA_2 />",
 		"eventDelete": "hat das Event am <jq:EXTRA_1 /> in der Location <jq:EXTRA_3 /> leider wieder gelöscht.\n<jq:EXTRA_2 />",
 		"eventNotify": "hat ein Event <jq:EXTRA_1 /> Uhr in der Location <jq:EXTRA_2 /> erstellt. Es passt zu Dir, schau mal rein...",
