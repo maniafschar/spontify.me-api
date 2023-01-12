@@ -17,6 +17,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.JpaTestConfiguration;
 import com.jq.findapp.entity.Contact;
@@ -56,6 +58,21 @@ public class ApiTest {
 		// then
 		assertNotNull(response);
 		assertTrue(response.length() > 10);
+	}
+
+	@Test
+	public void paypal() throws Exception {
+		// given
+		final JsonNode n = new ObjectMapper().readTree(
+				"{\"scope\":\"https://uri.paypal.com/services/customer/partner-referrals/readwrite https://uri.paypal.com/services/invoicing https://uri.paypal.com/services/vault/payment-tokens/read https://uri.paypal.com/services/disputes/read-buyer https://uri.paypal.com/services/payments/realtimepayment https://uri.paypal.com/services/customer/onboarding/user https://api.paypal.com/v1/vault/credit-card https://api.paypal.com/v1/payments/.* https://uri.paypal.com/services/payments/referenced-payouts-items/readwrite https://uri.paypal.com/services/reporting/search/read https://uri.paypal.com/services/customer/partner https://uri.paypal.com/services/vault/payment-tokens/readwrite https://uri.paypal.com/services/customer/merchant-integrations/read https://uri.paypal.com/services/applications/webhooks https://uri.paypal.com/services/disputes/update-seller https://uri.paypal.com/services/payments/payment/authcapture openid Braintree:Vault https://uri.paypal.com/services/disputes/read-seller https://uri.paypal.com/services/payments/refund https://uri.paypal.com/services/risk/raas/transaction-context https://uri.paypal.com/services/partners/merchant-accounts/readwrite https://uri.paypal.com/services/identity/grantdelegation https://uri.paypal.com/services/customer/onboarding/account https://uri.paypal.com/payments/payouts https://uri.paypal.com/services/customer/onboarding/sessions https://api.paypal.com/v1/vault/credit-card/.* https://uri.paypal.com/services/subscriptions\",\"access_token\":\"A21AAIvYuE4je0EzM2m3pNgDQZl2EqeMtrLxleSuAkk7eOwSWiX4tJsesJYJLFW0en2NMthOuJ7kh3rKo9BU02hOFB9wNqp_Q\",\"token_type\":\"Bearer\",\"app_id\":\"APP-80W284485P519543T\",\"expires_in\":32159,\"nonce\":\"2023-01-12T14:05:38ZWBS2iWYRhqU6gi33dXD9yheH0wZOjfYJQMsipAyzAUE\"}");
+
+		// when
+		String accessToken = n.get("access_token").asText();
+
+		// then
+		assertEquals(
+				"A21AAIvYuE4je0EzM2m3pNgDQZl2EqeMtrLxleSuAkk7eOwSWiX4tJsesJYJLFW0en2NMthOuJ7kh3rKo9BU02hOFB9wNqp_Q",
+				accessToken);
 	}
 
 	// @Test // need to authorize Google API for IP

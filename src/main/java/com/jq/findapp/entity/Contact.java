@@ -79,6 +79,7 @@ public class Contact extends BaseEntity {
 	private String loginLink;
 	@Column(columnDefinition = "TEXT")
 	private String password;
+	private String paypalMerchantId;
 	private String pseudonym;
 	private String pushSystem;
 	private String pushToken;
@@ -597,17 +598,25 @@ public class Contact extends BaseEntity {
 		this.lastLogin = lastLogin;
 	}
 
-	@Transient
-	@Override
-	public boolean writeAccess(BigInteger user, Repository repository) {
-		return user.equals(getId());
-	}
-
 	public Boolean getNotificationEngagement() {
 		return notificationEngagement;
 	}
 
 	public void setNotificationEngagement(Boolean notificationEngagement) {
 		this.notificationEngagement = notificationEngagement;
+	}
+
+	public String getPaypalMerchantId() {
+		return paypalMerchantId;
+	}
+
+	public void setPaypalMerchantId(String paypalMerchantId) {
+		this.paypalMerchantId = paypalMerchantId;
+	}
+
+	@Transient
+	@Override
+	public boolean writeAccess(BigInteger user, Repository repository) {
+		return user.equals(getId());
 	}
 }

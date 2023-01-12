@@ -6,6 +6,7 @@ import java.sql.Time;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import javax.transaction.Transactional;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,9 +30,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.model.Position;
 import com.jq.findapp.api.model.WriteEntity;
-import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
@@ -52,7 +55,6 @@ import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.NotificationService.Ping;
 import com.jq.findapp.util.EntityUtil;
 import com.jq.findapp.util.Strings;
-import com.jq.findapp.util.Text;
 
 @RestController
 @Transactional
@@ -97,11 +99,16 @@ public class ActionApi {
 	@Value("${app.eventbrite.key}")
 	private String eventbriteKey;
 
+	@Value("${app.paypal.key}")
+	private String paypalKey;
+
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
 
 	@Value("${app.url}")
 	private String url;
+
+	private final String paypalUrl = "https://api-m.sandbox.paypal.com/";
 
 	@GetMapping("unique")
 	public Unique unique(String email) {
@@ -301,25 +308,27 @@ public class ActionApi {
 		notificationService.createTicket(TicketType.ERROR, "eventbrite", data + data2, BigInteger.valueOf(3));
 	}
 
-	@PostMapping("requestMarketing")
-	public void requestMarketing(BigInteger id, @RequestHeader BigInteger user, @RequestHeader String password,
+	@GetMapping("paypalSignUpSellerUrl")
+	public String paypalSignUpSellerUrl(@RequestHeader BigInteger user, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
-		final Contact contact = authenticationService.verify(user, password, salt);
-		final Location location = repository.one(Location.class, id);
-		if (location == null)
-			throw new IllegalAccessException("Location " + id + " does not exist");
-		final Chat chat = new Chat();
-		chat.setContactId(contact.getId());
-		chat.setContactId2(adminId);
-		chat.setSeen(false);
-		chat.setNote(Text.marketing_requestMarketing.getText(contact.getLanguage()).replace("{0}",
-				location.getName() + " (" + location.getId() + ")"));
-		try {
-			repository.save(chat);
-		} catch (IllegalArgumentException ex) {
-			if (!"duplicate chat".equals(ex.getMessage()))
-				throw new RuntimeException(ex);
-		}
+		authenticationService.verify(user, password, salt);
+		JsonNode n = new ObjectMapper().readTree(WebClient.create(paypalUrl + "v1/oauth2/token")
+				.post().accept(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Basic " + Base64.getEncoder().encodeToString(paypalKey.getBytes()))
+				.bodyValue("grant_type=client_credentials")
+				.retrieve().toEntity(String.class).block().getBody());
+		n = new ObjectMapper().readTree(WebClient.create(paypalUrl + "v2/customer/partner-referrals")
+				.post().contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + n.get("access_token").asText())
+				.bodyValue(IOUtils.toString(getClass().getResourceAsStream("/template/paypalSignUpSeller.json"),
+						StandardCharsets.UTF_8).replace("{trackingId}", "" + user).replace("{returnUrl}", url))
+				.retrieve().toEntity(String.class).block().getBody());
+		return n.get("links").get(1).get("href").asText();
+	}
+
+	@PostMapping("paypal")
+	public void paypal(@RequestBody final String data) throws Exception {
+		notificationService.createTicket(TicketType.ERROR, "paypal", data, BigInteger.valueOf(3));
 	}
 
 	@GetMapping("ping")

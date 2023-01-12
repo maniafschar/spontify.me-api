@@ -42,6 +42,7 @@ SELECT
 	contact.notificationMarkEvent,
 	contact.notificationVisitLocation,
 	contact.notificationVisitProfile,
+	contact.paypalMerchantId,
 	contact.pseudonym,
 	contact.rating,
 	contact.search,

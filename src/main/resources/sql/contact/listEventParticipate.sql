@@ -43,6 +43,7 @@ select
 	contact.gender,
 	contact.guide,
 	contact.id,
+	contact.image,
 	contact.imageList,
 	contact.latitude,
 	contact.longitude,
@@ -51,10 +52,12 @@ select
 	contactLink.contactId2,
 	contactLink.id,
 	contactLink.status,
+	location.name,
+	location.address,
 	'' as geolocationDistance
 FROM
 	EventParticipate eventParticipate,
-	Event event,
+	Event event left join Location location on event.locationId=location.id,
 	Contact contact
 	left join ContactLink contactLink on
 		contactLink.contactId={USERID} and contactLink.contactId2=contact.id
