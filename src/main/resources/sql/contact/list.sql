@@ -29,7 +29,6 @@ SELECT
 	contact.guide,
 	contact.id,
 	contact.idDisplay,
-	contact.introState,
 	contact.image,
 	contact.imageList,
 	contact.language,

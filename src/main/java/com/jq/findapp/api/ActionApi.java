@@ -308,6 +308,35 @@ public class ActionApi {
 		notificationService.createTicket(TicketType.ERROR, "eventbrite", data + data2, BigInteger.valueOf(3));
 	}
 
+	@PostMapping("paypal")
+	public void paypal(@RequestBody final String data) throws Exception {
+		final ObjectMapper m = new ObjectMapper();
+		notificationService.createTicket(TicketType.PAYPAL, "webhook",
+				m.writerWithDefaultPrettyPrinter().writeValueAsString(m.readTree(data)), BigInteger.valueOf(3));
+	}
+
+	@PutMapping("paypalRegister")
+	public Map<String, Object> paypalRegister(BigInteger merchantId, String merchantIdInPayPal,
+			boolean permissionsGranted, boolean consentStatus, String accountStatus, String riskStatus,
+			@RequestHeader BigInteger user, @RequestHeader String password, @RequestHeader String salt)
+			throws Exception {
+		final Contact contact = authenticationService.verify(user, password, salt);
+		if (user.equals(merchantId) && permissionsGranted && consentStatus) {
+			contact.setPaypalMerchantId(merchantIdInPayPal);
+			repository.save(contact);
+			final QueryParams params = new QueryParams(Query.contact_list);
+			params.setUser(contact);
+			params.setSearch("contact.id=" + user);
+			return repository.one(params);
+		}
+		notificationService.createTicket(TicketType.PAYPAL, "failed register",
+				"user: " + merchantId + "\npaypal merchant id: " + merchantIdInPayPal + "\npermissionsGranted: "
+						+ permissionsGranted + "\nconsentStatus: " + consentStatus + "\naccountStatus: " + accountStatus
+						+ "\nriskStatus:" + riskStatus,
+				user);
+		return null;
+	}
+
 	@GetMapping("paypalSignUpSellerUrl")
 	public String paypalSignUpSellerUrl(@RequestHeader BigInteger user, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
@@ -324,11 +353,6 @@ public class ActionApi {
 						StandardCharsets.UTF_8).replace("{trackingId}", "" + user).replace("{returnUrl}", url))
 				.retrieve().toEntity(String.class).block().getBody());
 		return n.get("links").get(1).get("href").asText();
-	}
-
-	@PostMapping("paypal")
-	public void paypal(@RequestBody final String data) throws Exception {
-		notificationService.createTicket(TicketType.ERROR, "paypal", data, BigInteger.valueOf(3));
 	}
 
 	@GetMapping("ping")

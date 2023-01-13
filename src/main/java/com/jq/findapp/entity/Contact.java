@@ -74,7 +74,6 @@ public class Contact extends BaseEntity {
 	private String idDisplay;
 	private String image;
 	private String imageList;
-	private String introState;
 	private String language;
 	private String loginLink;
 	@Column(columnDefinition = "TEXT")
@@ -508,14 +507,6 @@ public class Contact extends BaseEntity {
 
 	public void setLatitude(Float latitude) {
 		this.latitude = latitude;
-	}
-
-	public String getIntroState() {
-		return introState;
-	}
-
-	public void setIntroState(String introState) {
-		this.introState = introState;
 	}
 
 	public String getAppleId() {
