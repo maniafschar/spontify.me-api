@@ -46,7 +46,6 @@ public enum Query {
 	location_listEventCurrent(true),
 	location_listFavorite,
 	location_listId,
-	location_listOpenTime,
 	location_listVisit,
 	location_rating(true),
 	location_ratingOverview(true),

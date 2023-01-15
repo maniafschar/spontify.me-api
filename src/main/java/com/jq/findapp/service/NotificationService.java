@@ -316,8 +316,7 @@ public class NotificationService {
 		if (ContactNotificationTextType.contactFriendRequest == notificationTextType
 				|| ContactNotificationTextType.contactFriendApproved == notificationTextType)
 			return contact.getNotificationFriendRequest();
-		if (ContactNotificationTextType.contactVisitLocation == notificationTextType
-				|| ContactNotificationTextType.locationRatingMatch == notificationTextType)
+		if (ContactNotificationTextType.contactVisitLocation == notificationTextType)
 			return contact.getNotificationVisitLocation();
 		if (ContactNotificationTextType.contactVisitProfile == notificationTextType)
 			return contact.getNotificationVisitProfile();

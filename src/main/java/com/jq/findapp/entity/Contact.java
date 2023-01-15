@@ -43,7 +43,6 @@ public class Contact extends BaseEntity {
 	private Short birthdayDisplay;
 	private Short gender;
 	private Short rating;
-	private Short timezoneOffset = 0;
 	private String aboutMe;
 	private String ageDivers;
 	private String ageFemale;
@@ -83,6 +82,7 @@ public class Contact extends BaseEntity {
 	private String pushSystem;
 	private String pushToken;
 	private String storage;
+	private String timezone;
 	private String version;
 
 	public enum OS {
@@ -573,12 +573,12 @@ public class Contact extends BaseEntity {
 		return passwordReset;
 	}
 
-	public Short getTimezoneOffset() {
-		return timezoneOffset;
+	public String getTimezone() {
+		return timezone;
 	}
 
-	public void setTimezoneOffset(Short timezoneOffset) {
-		this.timezoneOffset = timezoneOffset;
+	public void setTimezone(String timezone) {
+		this.timezone = timezone;
 	}
 
 	public Timestamp getLastLogin() {

@@ -5,15 +5,15 @@ import java.math.BigInteger;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 
-import com.jq.findapp.repository.listener.LocationRatingListener;
+import com.jq.findapp.repository.listener.EventRatingListener;
 
 @Entity
-@EntityListeners(LocationRatingListener.class)
-public class LocationRating extends BaseEntity {
+@EntityListeners(EventRatingListener.class)
+public class EventRating extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger locationId;
+	private BigInteger eventId;
 	private Short rating;
-	private Short paid;
 	private String text;
 	private String image;
 
@@ -49,12 +49,12 @@ public class LocationRating extends BaseEntity {
 		this.locationId = locationId;
 	}
 
-	public Short getPaid() {
-		return paid;
+	public BigInteger getEventId() {
+		return eventId;
 	}
 
-	public void setPaid(Short paid) {
-		this.paid = paid;
+	public void setEventId(BigInteger eventId) {
+		this.eventId = eventId;
 	}
 
 	public String getImage() {

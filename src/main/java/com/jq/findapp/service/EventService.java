@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,8 +72,8 @@ public class EventService {
 								&& realDate.minusDays(1).isBefore(now)
 								&& !isMaxParticipants(event, realDate, params.getUser())
 								&& Score.getContact(contactEvent, params.getUser()) > 0.4) {
-							final ZonedDateTime t = realDate.atZone(ZoneOffset.UTC)
-									.minus(Duration.ofMinutes(params.getUser().getTimezoneOffset()));
+							final ZonedDateTime t = realDate
+									.atZone(TimeZone.getTimeZone(params.getUser().getTimezone()).toZoneId());
 							final String time = t.getHour() + ":" + (t.getMinute() < 10 ? "0" : "") + t.getMinute();
 							if (event.getLocationId() == null) {
 								notificationService.sendNotification(contactEvent,
@@ -129,7 +130,8 @@ public class EventService {
 								repository.delete(event);
 							else {
 								final Contact contact = repository.one(Contact.class, eventParticipate.getContactId());
-								final ZonedDateTime t = time.minus(Duration.ofMinutes(contact.getTimezoneOffset()));
+								final ZonedDateTime t = event.getStartDate().toInstant()
+										.atZone(TimeZone.getTimeZone(contact.getTimezone()).toZoneId());
 								notificationService.sendNotification(
 										repository.one(Contact.class, event.getContactId()),
 										contact, ContactNotificationTextType.eventNotification,

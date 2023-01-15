@@ -6,13 +6,13 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -360,8 +360,7 @@ public class EngagementService {
 	}
 
 	private boolean isTimeForNewChat(Contact contact, final QueryParams params, boolean nearBy) {
-		final int hour = Instant.now().minus(Duration.ofMinutes(contact.getTimezoneOffset())).atZone(ZoneOffset.UTC)
-				.getHour();
+		final int hour = Instant.now().atZone(TimeZone.getTimeZone(contact.getTimezone()).toZoneId()).getHour();
 		if (hour > 6 && hour < 22) {
 			paramsAdminBlocked.setSearch("block.contactId=" + adminId + " and block.contactId2="
 					+ contact.getId()

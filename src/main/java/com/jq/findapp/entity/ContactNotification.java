@@ -43,8 +43,7 @@ public class ContactNotification extends BaseEntity {
 		eventNotifyWithoutLocation,
 		eventNotification,
 		eventParticipate,
-		locationMarketing,
-		locationRatingMatch;
+		eventRated;
 	}
 
 	public String getText() {

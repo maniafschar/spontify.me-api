@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
@@ -30,7 +29,6 @@ import com.jq.findapp.JpaTestConfiguration;
 import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactBluetooth;
-import com.jq.findapp.entity.ContactRating;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.entity.Ticket.TicketType;
@@ -60,21 +58,11 @@ public class RepositoryTest {
 		return chat;
 	}
 
-	private ContactRating createRatingContact(final Contact contact) throws Exception {
-		final ContactRating rating = new ContactRating();
-		rating.setText("Hi");
-		rating.setContactId(contact.getId());
-		rating.setContactId2(adminId);
-		repository.save(rating);
-		return rating;
-	}
-
 	@Test
 	public void saveChat() throws Exception {
 		// given
 		final Contact contact = utils.createContact();
 		final Chat chat = createChat(contact);
-		final ContactRating rating = createRatingContact(contact);
 		final long created = chat.getCreatedAt().getTime();
 		final byte[] b = new byte[500];
 		for (int i = 0; i < b.length; i++)
@@ -89,8 +77,6 @@ public class RepositoryTest {
 		assertEquals("Hi", chat.getNote());
 		assertTrue(chat.getImage().startsWith(".jpg" + Attachment.SEPARATOR));
 		assertNotEquals(created, chat.getModifiedAt().getTime());
-		assertNotNull(rating.getCreatedAt());
-		assertNull(rating.getModifiedAt());
 	}
 
 	@Test

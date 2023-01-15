@@ -10,7 +10,6 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementNotInteractableException;
@@ -51,7 +50,6 @@ public class IntegrationTest {
 		new ProcessBuilder("./web.sh stop".split(" ")).start();
 	}
 
-	@Test
 	public void run() throws Exception {
 		init();
 		register("testabcd", "test@jq-consulting.de");

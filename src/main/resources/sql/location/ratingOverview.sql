@@ -1,17 +1,17 @@
 SELECT
-	sum(case when locationRating.rating<26 then 1 else 0 end) as one,
-	sum(case when locationRating.rating>25 and locationRating.rating<51 then 1 else 0 end) as two,
-	sum(case when locationRating.rating>50 and locationRating.rating<76 then 1 else 0 end) as three,
-	sum(case when locationRating.rating>75 then 1 else 0 end) as four,
+	sum(case when eventRating.rating<26 then 1 else 0 end) as one,
+	sum(case when eventRating.rating>25 and eventRating.rating<51 then 1 else 0 end) as two,
+	sum(case when eventRating.rating>50 and eventRating.rating<76 then 1 else 0 end) as three,
+	sum(case when eventRating.rating>75 then 1 else 0 end) as four,
 	(
 		select
-			concat(lr.createdAt,' ',lr.rating,' ',lr.id)
+			concat(er.createdAt,' ',er.rating,' ',er.id)
 		from
-			LocationRating lr
+			EventRating er
 		where
-			lr.locationId={ID} and
-			lr.contactId={USERID} and
-			lr.createdAt=(select max(lr2.createdAt) from LocationRating lr2 where lr2.locationId={ID} and lr2.contactId={USERID})
+			er.locationId={ID} and
+			er.contactId={USERID} and
+			er.createdAt=(select max(er2.createdAt) from EventRating er2 where er2.locationId={ID} and er2.contactId={USERID})
 	) as lastRating,
 	(
 		select
@@ -22,13 +22,13 @@ SELECT
 			lo.id={ID}
 	) as ownerId
 FROM
-	LocationRating locationRating,
+	EventRating eventRating,
 	Contact contact
 WHERE
-	locationRating.locationId={ID} and
-	locationRating.contactId=contact.id and
+	eventRating.locationId={ID} and
+	eventRating.contactId=contact.id and
 	{search}
 GROUP BY
-	locationRating.locationId
+	eventRating.locationId
 ORDER BY
-	locationRating.id DESC
+	eventRating.id DESC

@@ -16,7 +16,6 @@ import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.LocationFavorite;
-import com.jq.findapp.entity.LocationRating;
 import com.jq.findapp.entity.LocationVisit;
 import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.repository.listener.AbstractRepositoryListener;
@@ -31,7 +30,6 @@ import com.jq.findapp.repository.listener.EventListener;
 import com.jq.findapp.repository.listener.EventParticipateListener;
 import com.jq.findapp.repository.listener.LocationFavoriteListener;
 import com.jq.findapp.repository.listener.LocationListener;
-import com.jq.findapp.repository.listener.LocationRatingListener;
 import com.jq.findapp.repository.listener.LocationVisitListener;
 import com.jq.findapp.repository.listener.TicketListener;
 
@@ -63,8 +61,6 @@ public class Listeners {
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(LocationFavoriteListener.class);
 		if (entity instanceof Location)
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(LocationListener.class);
-		if (entity instanceof LocationRating)
-			return (AbstractRepositoryListener<T>) applicationContext.getBean(LocationRatingListener.class);
 		if (entity instanceof LocationVisit)
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(LocationVisitListener.class);
 		if (entity instanceof Ticket)

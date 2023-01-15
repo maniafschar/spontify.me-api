@@ -1,24 +1,24 @@
 SELECT
-	locationRating.id,
-	locationRating.contactId,
-	locationRating.createdAt,
-	locationRating.locationId,
-	locationRating.rating,
-	locationRating.text,
-	locationRating.paid,
-	locationRating.modifiedAt,
-	locationRating.image,
+	eventRating.id,
+	eventRating.contactId,
+	eventRating.createdAt,
+	eventRating.locationId,
+	eventRating.rating,
+	eventRating.text,
+	eventRating.eventId,
+	eventRating.modifiedAt,
+	eventRating.image,
 	contact.pseudonym,
 	location.name,
 	location.image,
 	location.bonus
 FROM
-	LocationRating locationRating,
+	EventRating eventRating,
 	Contact contact,
 	Location location
 WHERE
-	locationRating.contactId=contact.id and
-	locationRating.locationId=location.id and
+	eventRating.contactId=contact.id and
+	eventRating.locationId=location.id and
 	{search}
 ORDER BY
-	locationRating.id asc
+	eventRating.id asc

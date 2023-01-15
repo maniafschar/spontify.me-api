@@ -3,7 +3,10 @@ package com.jq.findapp.util;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.Base64;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class Strings {
 	public static final String URL_APP = "https://spontify.me";
@@ -46,5 +49,10 @@ public class Strings {
 			}
 		}
 		return s;
+	}
+
+	public static String formatDate(String format, Date date, String zone) {
+		return new SimpleDateFormat(format == null ? "dd.MM.yyyy HH:mm" : format)
+				.format(date.toInstant().atZone(TimeZone.getTimeZone(zone).toZoneId()));
 	}
 }

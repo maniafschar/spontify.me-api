@@ -65,13 +65,10 @@ select
 	location.attr5,
 	locationFavorite.id,
 	locationFavorite.favorite,
-	'' as geolocationDistance,
-	sum(case when WEEKDAY(current_timestamp)=locationOpenTime.day and locationOpenTime.openAt<=current_time and (locationOpenTime.closeAt>current_time or locationOpenTime.closeAt='00:00:00') then 1 else 0 end) as isOpen,
-	count(locationOpenTime.id) as openTimesEntries
+	'' as geolocationDistance
 FROM
 	Event event left join EventParticipate eventParticipate on eventParticipate.contactId={USERID} and eventParticipate.eventId=event.id left join
 	Location location on event.locationId=location.id left join
-	LocationOpenTime locationOpenTime on locationOpenTime.locationId=location.id left join 
 	LocationFavorite locationFavorite on locationFavorite.locationId=location.id and locationFavorite.contactId={USERID},
 	Contact contact left join
 	ContactLink contactLink on

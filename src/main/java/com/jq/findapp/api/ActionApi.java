@@ -2,7 +2,6 @@ package com.jq.findapp.api;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.sql.Time;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -40,7 +39,6 @@ import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.ContactVisit;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Location;
-import com.jq.findapp.entity.LocationOpenTime;
 import com.jq.findapp.entity.LocationVisit;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.GeoLocationProcessor;
@@ -370,35 +368,6 @@ public class ActionApi {
 		authenticationService.verify(user, password, salt);
 		final Location location = repository.one(Location.class, entity.getId());
 		if (location.writeAccess(user, repository)) {
-			for (int i = 0; i < entity.getValues().size(); i++) {
-				if ("x".equals(entity.getValues().get("openTimes.day" + i))) {
-					final String id = entity.getValues().remove("openTimes.id" + i).toString();
-					if (id.length() > 0)
-						repository.delete(repository.one(LocationOpenTime.class, new BigInteger(id)));
-					entity.getValues().remove("openTimes.day" + i);
-					entity.getValues().remove("openTimes.openAt" + i);
-					entity.getValues().remove("openTimes.closeAt" + i);
-				} else if (entity.getValues().get("openTimes.day" + i) != null) {
-					final LocationOpenTime ot = new LocationOpenTime();
-					String s = entity.getValues().remove("openTimes.id" + i).toString();
-					if (s.length() > 0)
-						ot.setId(new BigInteger(s));
-					ot.setDay(Short.valueOf(entity.getValues().remove("openTimes.day" + i).toString()));
-					s = entity.getValues().remove("openTimes.openAt" + i).toString();
-					if (s.split(":").length == 2)
-						s += ":00";
-					if (s.contains(":"))
-						ot.setOpenAt(Time.valueOf(s));
-					s = entity.getValues().remove("openTimes.closeAt" + i).toString();
-					if (s.split(":").length == 2)
-						s += ":00";
-					if (s.contains(":"))
-						ot.setCloseAt(Time.valueOf(s));
-					ot.setLocationId(location.getId());
-					if (ot.getCloseAt() != null && ot.getOpenAt() != null)
-						repository.save(ot);
-				}
-			}
 			EntityUtil.addImageList(entity);
 			location.populate(entity.getValues());
 			repository.save(location);
