@@ -67,7 +67,6 @@ public class ImportLocationsServiceTest {
 		assertNotNull(location.getName());
 		assertNotNull(location.getAddress());
 		assertNotNull(location.getCategory());
-		assertNotNull(location.getParkingOption());
 		assertTrue(location.getImage().contains(Attachment.SEPARATOR));
 		assertTrue(location.getImageList().contains(Attachment.SEPARATOR));
 		assertTrue(location.getImage().length() > 5);

@@ -14,145 +14,154 @@ import com.jq.findapp.repository.listener.EventListener;
 @Entity
 @EntityListeners(EventListener.class)
 public class Event extends BaseEntity {
-    private BigInteger contactId;
-    private BigInteger locationId;
-    private Boolean marketingEvent = Boolean.FALSE;
-    private Date endDate;
-    private Double price;
-    private Short confirm;
-    private Short maxParticipants;
-    private Short visibility;
-    private String category;
-    private String image;
-    private String imageList;
-    private String link;
-    private String text;
-    private String type;
-    private Timestamp startDate;
+	private BigInteger contactId;
+	private BigInteger locationId;
+	private Boolean marketingEvent = Boolean.FALSE;
+	private Date endDate;
+	private Double price;
+	private Short confirm;
+	private Short maxParticipants;
+	private Short visibility;
+	private String category;
+	private String hashtags;
+	private String image;
+	private String imageList;
+	private String link;
+	private String text;
+	private String type;
+	private Timestamp startDate;
 
-    public BigInteger getLocationId() {
-        return locationId;
-    }
+	public BigInteger getLocationId() {
+		return locationId;
+	}
 
-    public void setLocationId(BigInteger locationId) {
-        this.locationId = locationId;
-    }
+	public void setLocationId(BigInteger locationId) {
+		this.locationId = locationId;
+	}
 
-    public BigInteger getContactId() {
-        return contactId;
-    }
+	public BigInteger getContactId() {
+		return contactId;
+	}
 
-    public void setContactId(BigInteger contactId) {
-        this.contactId = contactId;
-    }
+	public void setContactId(BigInteger contactId) {
+		this.contactId = contactId;
+	}
 
-    public String getType() {
-        return type;
-    }
+	public String getType() {
+		return type;
+	}
 
-    public void setType(String type) {
-        this.type = type;
-    }
+	public void setType(String type) {
+		this.type = type;
+	}
 
-    public Timestamp getStartDate() {
-        return startDate;
-    }
+	public Timestamp getStartDate() {
+		return startDate;
+	}
 
-    public void setStartDate(Timestamp startDate) {
-        this.startDate = startDate;
-    }
+	public void setStartDate(Timestamp startDate) {
+		this.startDate = startDate;
+	}
 
-    public Date getEndDate() {
-        return endDate;
-    }
+	public Date getEndDate() {
+		return endDate;
+	}
 
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
 
-    public String getText() {
-        return text;
-    }
+	public String getText() {
+		return text;
+	}
 
-    public void setText(String text) {
-        this.text = text;
-    }
+	public void setText(String text) {
+		this.text = text;
+	}
 
-    public String getImage() {
-        return image;
-    }
+	public String getImage() {
+		return image;
+	}
 
-    public void setImage(String image) {
-        this.image = image;
-    }
+	public void setImage(String image) {
+		this.image = image;
+	}
 
-    public String getImageList() {
-        return imageList;
-    }
+	public String getImageList() {
+		return imageList;
+	}
 
-    public void setImageList(String imageList) {
-        this.imageList = imageList;
-    }
+	public void setImageList(String imageList) {
+		this.imageList = imageList;
+	}
 
-    public String getLink() {
-        return link;
-    }
+	public String getLink() {
+		return link;
+	}
 
-    public void setLink(String link) {
-        this.link = link;
-    }
+	public void setLink(String link) {
+		this.link = link;
+	}
 
-    public void setConfirm(Short confirm) {
-        this.confirm = confirm;
-    }
+	public void setConfirm(Short confirm) {
+		this.confirm = confirm;
+	}
 
-    public void setPrice(Double price) {
-        this.price = price;
-    }
+	public void setPrice(Double price) {
+		this.price = price;
+	}
 
-    public void setVisibility(Short visibility) {
-        this.visibility = visibility;
-    }
+	public void setVisibility(Short visibility) {
+		this.visibility = visibility;
+	}
 
-    public void setMaxParticipants(Short maxParticipants) {
-        this.maxParticipants = maxParticipants;
-    }
+	public void setMaxParticipants(Short maxParticipants) {
+		this.maxParticipants = maxParticipants;
+	}
 
-    public Short getConfirm() {
-        return confirm;
-    }
+	public Short getConfirm() {
+		return confirm;
+	}
 
-    public Double getPrice() {
-        return price;
-    }
+	public Double getPrice() {
+		return price;
+	}
 
-    public Short getVisibility() {
-        return visibility;
-    }
+	public Short getVisibility() {
+		return visibility;
+	}
 
-    public Short getMaxParticipants() {
-        return maxParticipants;
-    }
+	public Short getMaxParticipants() {
+		return maxParticipants;
+	}
 
-    public Boolean getMarketingEvent() {
-        return marketingEvent;
-    }
+	public Boolean getMarketingEvent() {
+		return marketingEvent;
+	}
 
-    public void setMarketingEvent(Boolean marketingEvent) {
-        this.marketingEvent = marketingEvent;
-    }
+	public void setMarketingEvent(Boolean marketingEvent) {
+		this.marketingEvent = marketingEvent;
+	}
 
-    public String getCategory() {
-        return category;
-    }
+	public String getCategory() {
+		return category;
+	}
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
+	public void setCategory(String category) {
+		this.category = category;
+	}
 
-    @Transient
-    @Override
-    public boolean writeAccess(BigInteger user, Repository repository) {
-        return user.equals(getContactId());
-    }
+	public String getHashtags() {
+		return hashtags;
+	}
+
+	public void setHashtags(String hashtags) {
+		this.hashtags = hashtags;
+	}
+
+	@Transient
+	@Override
+	public boolean writeAccess(BigInteger user, Repository repository) {
+		return user.equals(getContactId());
+	}
 }

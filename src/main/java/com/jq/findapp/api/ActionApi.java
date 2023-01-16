@@ -124,26 +124,11 @@ public class ActionApi {
 		}
 	}
 
-	@GetMapping("prevent/delete")
-	public Map<String, String> preventDelete(@RequestHeader BigInteger user, @RequestHeader String password,
-			@RequestHeader String salt) {
-		authenticationService.verify(user, password, salt);
-		return null;
-	}
-
 	@GetMapping("quotation")
 	public String quotation(@RequestHeader BigInteger user, @RequestHeader String password,
 			@RequestHeader String salt) {
 		authenticationService.verify(user, password, salt);
 		return QUOTATION.get((int) (Math.random() * (QUOTATION.size() - 1)));
-	}
-
-	@GetMapping("marketing")
-	public String marketing(BigInteger id, @RequestHeader BigInteger user, @RequestHeader String password,
-			@RequestHeader String salt) throws Exception {
-		final Contact contact = authenticationService.verify(user, password, salt);
-		final Location location = repository.one(Location.class, id);
-		return url + "?u=" + contact.getPseudonym() + "&l=" + location.getName();
 	}
 
 	@GetMapping("chat/{location}/{id}/{all}")
@@ -362,6 +347,7 @@ public class ActionApi {
 		return notificationService.getPingValues(contact);
 	}
 
+	// TODO delete 0.4.0
 	@PutMapping("one")
 	public void save(@RequestBody final WriteEntity entity, @RequestHeader BigInteger user,
 			@RequestHeader String password, @RequestHeader String salt) throws Exception {

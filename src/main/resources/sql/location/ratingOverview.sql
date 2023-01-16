@@ -12,15 +12,7 @@ SELECT
 			er.locationId={ID} and
 			er.contactId={USERID} and
 			er.createdAt=(select max(er2.createdAt) from EventRating er2 where er2.locationId={ID} and er2.contactId={USERID})
-	) as lastRating,
-	(
-		select
-			lo.ownerId
-		from
-			Location lo
-		where
-			lo.id={ID}
-	) as ownerId
+	) as lastRating
 FROM
 	EventRating eventRating,
 	Contact contact

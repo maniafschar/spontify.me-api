@@ -1,7 +1,6 @@
 package com.jq.findapp.entity;
 
 import java.math.BigInteger;
-import java.sql.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -16,14 +15,9 @@ import com.jq.findapp.repository.listener.LocationListener;
 @EntityListeners(LocationListener.class)
 public class Location extends BaseEntity {
 	private BigInteger contactId;
-	private BigInteger ownerId;
-	private Boolean openTimesBankholiday;
-	private Date paymentDate;
-	private Date urlActive;
 	private Float googleRating;
 	private Float latitude;
 	private Float longitude;
-	private Float paymentAmount;
 	private Integer googleRatingTotal;
 	private Short rating;
 	private String address;
@@ -40,7 +34,6 @@ public class Location extends BaseEntity {
 	private String attr4Ex;
 	private String attr5;
 	private String attr5Ex;
-	private String bonus;
 	private String budget;
 	private String category;
 	private String country;
@@ -50,9 +43,6 @@ public class Location extends BaseEntity {
 	private String imageList;
 	private String marketingMail;
 	private String name;
-	private String openTimesText;
-	private String parkingOption;
-	private String parkingText;
 	private String street;
 	private String number;
 	private String subcategories;
@@ -76,14 +66,6 @@ public class Location extends BaseEntity {
 
 	public void setContactId(BigInteger contactId) {
 		this.contactId = contactId;
-	}
-
-	public BigInteger getOwnerId() {
-		return ownerId;
-	}
-
-	public void setOwnerId(BigInteger ownerId) {
-		this.ownerId = ownerId;
 	}
 
 	public String getCategory() {
@@ -148,22 +130,6 @@ public class Location extends BaseEntity {
 
 	public void setUrl(String url) {
 		this.url = url;
-	}
-
-	public Date getPaymentDate() {
-		return paymentDate;
-	}
-
-	public void setPaymentDate(Date paymentDate) {
-		this.paymentDate = paymentDate;
-	}
-
-	public Date getUrlActive() {
-		return urlActive;
-	}
-
-	public void setUrlActive(Date urlActive) {
-		this.urlActive = urlActive;
 	}
 
 	public String getZipCode() {
@@ -238,44 +204,12 @@ public class Location extends BaseEntity {
 		this.telephone = telephone;
 	}
 
-	public String getParkingText() {
-		return parkingText;
-	}
-
-	public void setParkingText(String parkingText) {
-		this.parkingText = parkingText;
-	}
-
-	public String getParkingOption() {
-		return parkingOption;
-	}
-
-	public void setParkingOption(String parkingOption) {
-		this.parkingOption = parkingOption;
-	}
-
 	public Short getRating() {
 		return rating;
 	}
 
 	public void setRating(Short rating) {
 		this.rating = rating;
-	}
-
-	public String getOpenTimesText() {
-		return openTimesText;
-	}
-
-	public void setOpenTimesText(String openTimesText) {
-		this.openTimesText = openTimesText;
-	}
-
-	public Boolean getOpenTimesBankholiday() {
-		return openTimesBankholiday;
-	}
-
-	public void setOpenTimesBankholiday(Boolean openTimesBankholiday) {
-		this.openTimesBankholiday = openTimesBankholiday;
 	}
 
 	public String getSubcategories() {
@@ -286,28 +220,12 @@ public class Location extends BaseEntity {
 		this.subcategories = subcategories;
 	}
 
-	public void setPaymentAmount(Float paymentAmount) {
-		this.paymentAmount = paymentAmount;
-	}
-
 	public void setLatitude(Float latitude) {
 		this.latitude = latitude;
 	}
 
 	public void setLongitude(Float longitude) {
 		this.longitude = longitude;
-	}
-
-	public String getBonus() {
-		return bonus;
-	}
-
-	public void setBonus(String bonus) {
-		this.bonus = bonus;
-	}
-
-	public Float getPaymentAmount() {
-		return paymentAmount;
 	}
 
 	public Float getLatitude() {
@@ -433,10 +351,6 @@ public class Location extends BaseEntity {
 	@Transient
 	@Override
 	public boolean writeAccess(BigInteger user, Repository repository) {
-		if (user.equals(getOwnerId()))
-			return true;
-		if (getOwnerId() != null)
-			return false;
 		if (user.equals(getContactId()))
 			return true;
 		final QueryParams params = new QueryParams(Query.location_list);

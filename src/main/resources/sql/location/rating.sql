@@ -10,8 +10,7 @@ SELECT
 	eventRating.image,
 	contact.pseudonym,
 	location.name,
-	location.image,
-	location.bonus
+	location.image
 FROM
 	EventRating eventRating,
 	Contact contact,
