@@ -10,20 +10,10 @@ import com.jq.findapp.repository.listener.EventRatingListener;
 @Entity
 @EntityListeners(EventRatingListener.class)
 public class EventRating extends BaseEntity {
-	private BigInteger contactId;
-	private BigInteger locationId;
 	private BigInteger eventId;
 	private Short rating;
 	private String text;
 	private String image;
-
-	public BigInteger getContactId() {
-		return contactId;
-	}
-
-	public void setContactId(BigInteger contactId) {
-		this.contactId = contactId;
-	}
 
 	public Short getRating() {
 		return rating;
@@ -39,14 +29,6 @@ public class EventRating extends BaseEntity {
 
 	public void setText(String text) {
 		this.text = text;
-	}
-
-	public BigInteger getLocationId() {
-		return locationId;
-	}
-
-	public void setLocationId(BigInteger locationId) {
-		this.locationId = locationId;
 	}
 
 	public BigInteger getEventId() {

@@ -1,23 +1,22 @@
 SELECT
 	eventRating.id,
-	eventRating.contactId,
 	eventRating.createdAt,
-	eventRating.locationId,
 	eventRating.rating,
 	eventRating.text,
 	eventRating.eventId,
 	eventRating.modifiedAt,
 	eventRating.image,
-	contact.pseudonym,
-	location.name,
-	location.image
+	event.locationId,
+	contact.id,
+	contact.imageList,
+	contact.pseudonym
 FROM
 	EventRating eventRating,
-	Contact contact,
-	Location location
+	Event event,
+	Contact contact
 WHERE
-	eventRating.contactId=contact.id and
-	eventRating.locationId=location.id and
+	event.id=eventRating.eventId and
+	contact.id=event.contactId and
 	{search}
 ORDER BY
 	eventRating.id asc
