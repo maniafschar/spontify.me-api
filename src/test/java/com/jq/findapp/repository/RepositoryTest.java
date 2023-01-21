@@ -263,10 +263,10 @@ public class RepositoryTest {
 	public void convertObject2Json() throws Exception {
 		// given
 		final Contact contact = new Contact();
-		contact.setAttr("xyz");
+		contact.setSkills("xyz");
 		contact.setAboutMe("about others");
 		final JsonNode node = new ObjectMapper().convertValue(contact, JsonNode.class);
-		((ObjectNode) node).put("attr", "abc");
+		((ObjectNode) node).put("skills", "abc");
 
 		// when
 		final String result = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(node);

@@ -167,10 +167,7 @@ public class EngagementService {
 
 		chatTemplates.add(new ChatTemplate(Text.engagement_uploadProfileAttributes,
 				"ui.navigation.goTo(&quot;settings&quot;)",
-				contact -> (Strings.isEmpty(contact.getAttr0()) && Strings.isEmpty(contact.getAttr1())
-						&& Strings.isEmpty(contact.getAttr2()) && Strings.isEmpty(contact.getAttr3())
-						&& Strings.isEmpty(contact.getAttr4()) && Strings.isEmpty(contact.getAttr5())
-						&& Strings.isEmpty(contact.getAttr()))
+				contact -> (Strings.isEmpty(contact.getSkills()) && Strings.isEmpty(contact.getSkillsText()))
 						|| (Strings.isEmpty(contact.getAgeMale()) && Strings.isEmpty(contact.getAgeFemale())
 								&& Strings.isEmpty(contact.getAgeDivers()))
 						|| contact.getGender() == null || contact.getBirthday() == null));
@@ -185,14 +182,6 @@ public class EngagementService {
 		chatTemplates.add(new ChatTemplate(Text.engagement_allowLocation,
 				"",
 				contact -> contact.getLongitude() == null && contact.getOs() != OS.web));
-
-		chatTemplates.add(new ChatTemplate(Text.engagement_becomeGuide,
-				"ui.navigation.goTo(&quot;settings&quot;)",
-				contact -> contact.getGuide() == null || !contact.getGuide()));
-
-		chatTemplates.add(new ChatTemplate(Text.engagement_guide,
-				"pageInfo.socialShare()",
-				contact -> contact.getGuide() != null && contact.getGuide()));
 
 		chatTemplates.add(new ChatTemplate(Text.engagement_addEvent,
 				"",
@@ -272,12 +261,9 @@ public class EngagementService {
 				"",
 				contact -> contact.getLongitude() != null && contact.getImage() != null
 						&& contact.getBirthday() != null && !Strings.isEmpty(contact.getAboutMe())
-						&& !Strings.isEmpty(contact.getAttr()) && !Strings.isEmpty(contact.getAttrInterest())
+						&& !Strings.isEmpty(contact.getSkills())
 						&& (!Strings.isEmpty(contact.getAgeDivers()) || !Strings.isEmpty(contact.getAgeFemale())
-								|| !Strings.isEmpty(contact.getAgeMale()))
-						&& (!Strings.isEmpty(contact.getAttr0()) || !Strings.isEmpty(contact.getAttr1())
-								|| !Strings.isEmpty(contact.getAttr2()) || !Strings.isEmpty(contact.getAttr3())
-								|| !Strings.isEmpty(contact.getAttr4()) || !Strings.isEmpty(contact.getAttr5()))));
+								|| !Strings.isEmpty(contact.getAgeMale()))));
 
 		chatTemplates.add(new ChatTemplate(Text.engagement_patience,
 				"pageInfo.socialShare()",
@@ -416,14 +402,8 @@ public class EngagementService {
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setSearch(
 					"contact.id<>" + adminId + " and contact.verified=true and contact.notificationEngagement=true and "
-							+ "contact.version is not null and contact.longitude is not null and ("
-							+ "length(contact.attrInterest)>0 or length(contact.attrInterestEx)>0 or "
-							+ "length(contact.attr0)>0 or length(contact.attr0Ex)>0 or "
-							+ "length(contact.attr1)>0 or length(contact.attr1Ex)>0 or "
-							+ "length(contact.attr2)>0 or length(contact.attr2Ex)>0 or "
-							+ "length(contact.attr3)>0 or length(contact.attr3Ex)>0 or "
-							+ "length(contact.attr4)>0 or length(contact.attr4Ex)>0 or "
-							+ "length(contact.attr5)>0 or length(contact.attr5Ex)>0)");
+							+ "contact.version is not null and contact.longitude is not null and "
+							+ "(length(contact.skills)>0 or length(contact.skillsText)>0)");
 			params.setLimit(0);
 			final Result ids = repository.list(params);
 			params.setQuery(Query.contact_chat);

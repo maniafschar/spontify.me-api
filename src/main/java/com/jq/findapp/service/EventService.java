@@ -45,13 +45,7 @@ public class EventService {
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setSearch(
 					"contact.verified=true and contact.version is not null and contact.longitude is not null and (" +
-							"(length(contact.attrInterest)>0 or length(contact.attrInterestEx)>0) and (" +
-							"length(contact.attr0)>0 or length(contact.attr0Ex)>0 or " +
-							"length(contact.attr1)>0 or length(contact.attr1Ex)>0 or " +
-							"length(contact.attr2)>0 or length(contact.attr2Ex)>0 or " +
-							"length(contact.attr3)>0 or length(contact.attr3Ex)>0 or " +
-							"length(contact.attr4)>0 or length(contact.attr4Ex)>0 or " +
-							"length(contact.attr5)>0 or length(contact.attr5Ex)>0))");
+							"(length(contact.skliis)>0 or length(contact.skillsText)>0))");
 			params.setLimit(0);
 			final Result ids = repository.list(params);
 			params.setQuery(Query.location_listEventCurrent);

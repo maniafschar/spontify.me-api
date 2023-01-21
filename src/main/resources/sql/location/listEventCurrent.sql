@@ -16,27 +16,12 @@ select
 	contact.pseudonym,
 	contact.age,
 	contact.aboutMe,
-	contact.attr,
-	contact.attrEx,
-	contact.attr0,
-	contact.attr0Ex,
-	contact.attr1,
-	contact.attr1Ex,
-	contact.attr2,
-	contact.attr2Ex,
-	contact.attr3,
-	contact.attr3Ex,
-	contact.attr4,
-	contact.attr4Ex,
-	contact.attr5,
-	contact.attr5Ex,
-	contact.attrInterest,
-	contact.attrInterestEx,
+	contact.skills,
+	contact.skillsText,
 	contact.birthday,
 	contact.birthdayDisplay,
 	contact.budget,
 	contact.gender,
-	contact.guide,
 	contact.imageList,
 	contact.latitude,
 	contact.longitude,
@@ -54,12 +39,6 @@ select
 	location.latitude,
 	location.longitude,
 	location.address,
-	location.attr0,
-	location.attr1,
-	location.attr2,
-	location.attr3,
-	location.attr4,
-	location.attr5,
 	locationFavorite.id,
 	locationFavorite.favorite,
 	'' as geolocationDistance
@@ -82,7 +61,7 @@ WHERE
 			select cl from ContactLink cl where cl.status=1 and (cl.contactId={USERID} and cl.contactId2=event.contactId or cl.contactId2={USERID} and cl.contactId=event.contactId)
 		) is not null or
 		event.visibility=2 and
-		(REGEXP_LIKE(contact.attrInterest, '{USERATTRIBUTES}')=1 or REGEXP_LIKE(contact.attrInterestEx, '{USERATTRIBUTESEX}')=1) and
+		(REGEXP_LIKE(contact.skills, '{USERSKILLS}')=1 or REGEXP_LIKE(contact.skillsText, '{USERSKILLSTEXT}')=1) and
 		(
 			{USERGENDER}=1 and contact.ageMale like '%,%' and {USERAGE}>=substring(contact.ageMale,1,2) and {USERAGE}<=substring(contact.ageMale,4,2) or
 			{USERGENDER}=2 and contact.ageFemale like '%,%' and {USERAGE}>=substring(contact.ageFemale,1,2) and {USERAGE}<=substring(contact.ageFemale,4,2) or

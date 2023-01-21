@@ -117,8 +117,8 @@ public class NotificationService {
 				final int age = me.getAge().intValue();
 				if (s2.indexOf(',') < 1 || ("18".equals(s[0]) || age >= Integer.parseInt(s[0]))
 						&& ("99".equals(s[1]) || age <= Integer.parseInt(s[1]))) {
-					final List<String> attribs = compareAttributes(me.getAttr(), other.getAttrInterest());
-					final List<String> attribsEx = compareAttributes(me.getAttrEx(), other.getAttrInterestEx());
+					final List<String> attribs = compareAttributes(me.getSkills(), other.getSkills());
+					final List<String> attribsEx = compareAttributes(me.getSkillsText(), other.getSkillsText());
 					if (attribs.size() > 0 || attribsEx.size() > 0) {
 						String[] param2 = new String[param == null ? 1 : param.length + 1];
 						param2[0] = "" + (attribs.size() + attribsEx.size());

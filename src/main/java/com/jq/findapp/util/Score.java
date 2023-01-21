@@ -28,21 +28,10 @@ public class Score {
 					+ contact.getAgeDivers().split(",")[1] + " or ";
 		if (search.contains("contact.age"))
 			search = search.substring(0, search.length() - 4) + ") and (";
-		for (int i = 0; i < 6; i++) {
-			String attr = (String) contact.getClass().getMethod("getAttr" + i).invoke(contact);
-			if (!Strings.isEmpty(attr))
-				search += "REGEXP_LIKE(contact.attr" + i + ", '" + attr.replace('\u0015', '|') + "')=1 or ";
-			attr = (String) contact.getClass().getMethod("getAttr" + i + "Ex").invoke(contact);
-			if (!Strings.isEmpty(attr))
-				search += "REGEXP_LIKE(contact.attr" + i + "Ex, '"
-						+ attr.replace(',', '|').replace('(', ' ').replace(')', ' ') + "')=1 or ";
-		}
-		if (!Strings.isEmpty(contact.getAttrInterest()))
-			search += "REGEXP_LIKE(contact.attr, '" + contact.getAttrInterest().replace('\u0015', '|') + "')=1 or ";
-		if (!Strings.isEmpty(contact.getAttrInterestEx()))
-			search += "REGEXP_LIKE(contact.attrEx, '"
-					+ contact.getAttrInterestEx().replace(',', '|').replace('(', ' ').replace(')', ' ')
-					+ "')=1 or ";
+		if (!Strings.isEmpty(contact.getSkills()))
+			search += "REGEXP_LIKE(contact.skills, '" + contact.getSkills() + "')=1 or ";
+		if (!Strings.isEmpty(contact.getSkillsText()))
+			search += "REGEXP_LIKE(contact.skillsText, '" + contact.getSkillsText() + "')=1 or ";
 		if (search.endsWith(" or "))
 			search = search.substring(0, search.length() - 4);
 		if (search.endsWith("("))
@@ -65,14 +54,8 @@ public class Score {
 
 	public static double getContact(Contact contact, Contact contact2) throws Exception {
 		final Result score = new Result();
-		for (int i = 0; i < 6; i++) {
-			match((String) contact.getClass().getMethod("getAttr" + i).invoke(contact),
-					(String) contact2.getClass().getMethod("getAttr" + i).invoke(contact2), score);
-			match((String) contact.getClass().getMethod("getAttr" + i + "Ex").invoke(contact),
-					(String) contact2.getClass().getMethod("getAttr" + i + "Ex").invoke(contact2), score);
-		}
-		match(contact.getAttrInterest(), contact2.getAttr(), score);
-		match(contact.getAttrInterestEx(), contact2.getAttrEx(), score);
+		match(contact.getSkills(), contact2.getSkills(), score);
+		match(contact.getSkillsText(), contact2.getSkillsText(), score);
 		match(contact.getBudget(), contact2.getBudget(), score);
 		return score.total < 8 ? 0 : score.percantage();
 	}
