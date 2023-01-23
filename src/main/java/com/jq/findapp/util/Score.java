@@ -1,7 +1,6 @@
 package com.jq.findapp.util;
 
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.Location;
 
 public class Score {
 	private static class Result {
@@ -15,8 +14,6 @@ public class Score {
 
 	public static String getSearchContact(Contact contact) throws Exception {
 		String search = "";
-		if (!Strings.isEmpty(contact.getBudget()))
-			search += "REGEXP_LIKE(contact.budget, '" + contact.getBudget().replace('\u0015', '|') + "')=1) and (";
 		if (!Strings.isEmpty(contact.getAgeMale()))
 			search += "contact.gender=1 and contact.age>=" + contact.getAgeMale().split(",")[0] + " and contact.age<="
 					+ contact.getAgeMale().split(",")[1] + " or ";
@@ -56,22 +53,6 @@ public class Score {
 		final Result score = new Result();
 		match(contact.getSkills(), contact2.getSkills(), score);
 		match(contact.getSkillsText(), contact2.getSkillsText(), score);
-		match(contact.getBudget(), contact2.getBudget(), score);
 		return score.total < 8 ? 0 : score.percantage();
 	}
-
-	public static double getLocation(Contact contact, Location location) throws Exception {
-		final Result score = new Result();
-		match(location.getBudget(), contact.getBudget(), score);
-		if (score.match > 0) {
-			for (int i = 0; i < 6; i++) {
-				match((String) location.getClass().getMethod("getAttr" + i).invoke(location),
-						(String) contact.getClass().getMethod("getAttr" + i).invoke(contact), score);
-				match((String) location.getClass().getMethod("getAttr" + i + "Ex").invoke(location),
-						(String) contact.getClass().getMethod("getAttr" + i + "Ex").invoke(contact), score);
-			}
-		}
-		return score.total < 2 ? 0 : score.percantage();
-	}
-
 }

@@ -16,7 +16,6 @@ import com.jq.findapp.repository.listener.EventListener;
 public class Event extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger locationId;
-	private Boolean marketingEvent = Boolean.FALSE;
 	private Date endDate;
 	private Double price;
 	private Short confirm;
@@ -26,7 +25,8 @@ public class Event extends BaseEntity {
 	private String hashtags;
 	private String image;
 	private String imageList;
-	private String link;
+	private String skills;
+	private String skillsText;
 	private String text;
 	private String type;
 	private Timestamp startDate;
@@ -95,14 +95,6 @@ public class Event extends BaseEntity {
 		this.imageList = imageList;
 	}
 
-	public String getLink() {
-		return link;
-	}
-
-	public void setLink(String link) {
-		this.link = link;
-	}
-
 	public void setConfirm(Short confirm) {
 		this.confirm = confirm;
 	}
@@ -135,14 +127,6 @@ public class Event extends BaseEntity {
 		return maxParticipants;
 	}
 
-	public Boolean getMarketingEvent() {
-		return marketingEvent;
-	}
-
-	public void setMarketingEvent(Boolean marketingEvent) {
-		this.marketingEvent = marketingEvent;
-	}
-
 	public String getCategory() {
 		return category;
 	}
@@ -157,6 +141,22 @@ public class Event extends BaseEntity {
 
 	public void setHashtags(String hashtags) {
 		this.hashtags = hashtags;
+	}
+
+	public String getSkills() {
+		return skills;
+	}
+
+	public void setSkills(String skills) {
+		this.skills = skills;
+	}
+
+	public String getSkillsText() {
+		return skillsText;
+	}
+
+	public void setSkillsText(String skillsText) {
+		this.skillsText = skillsText;
 	}
 
 	@Transient

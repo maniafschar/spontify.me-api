@@ -8,7 +8,6 @@ SELECT
 	contact.skillsText,
 	contact.birthday,
 	contact.birthdayDisplay,
-	contact.budget,
 	contact.createdAt,
 	contact.device,
 	contact.gender,

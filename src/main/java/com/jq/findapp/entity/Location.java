@@ -22,7 +22,6 @@ public class Location extends BaseEntity {
 	private Short rating;
 	private String address;
 	private String address2;
-	private String budget;
 	private String category;
 	private String country;
 	private String description;
@@ -39,14 +38,6 @@ public class Location extends BaseEntity {
 	private String url;
 	private String urlInternal;
 	private String zipCode;
-
-	public String getBudget() {
-		return budget;
-	}
-
-	public void setBudget(String budget) {
-		this.budget = budget;
-	}
 
 	public BigInteger getContactId() {
 		return contactId;

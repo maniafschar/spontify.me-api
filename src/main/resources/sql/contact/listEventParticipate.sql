@@ -12,7 +12,6 @@ select
 	event.endDate,
 	event.contactId,
 	event.locationId,
-	event.marketingEvent,
 	event.maxParticipants,
 	event.confirm,
 	event.price,

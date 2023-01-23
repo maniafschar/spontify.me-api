@@ -5,7 +5,6 @@ SELECT
 	contact.skillsText,
 	contact.birthday,
 	contact.birthdayDisplay,
-	contact.budget,
 	contact.gender,
 	contact.id,
 	contact.idDisplay,

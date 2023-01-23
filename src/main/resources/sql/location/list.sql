@@ -1,6 +1,5 @@
 select
 	location.address,
-	location.budget,
 	location.category,
 	location.contactId,
 	location.description,

@@ -18,7 +18,7 @@ import com.jq.findapp.repository.listener.ContactListener;
 @EntityListeners(ContactListener.class)
 public class Contact extends BaseEntity {
 	private Boolean active = true;
-	private Boolean findMe = true;
+	private Boolean bluetooth = true;
 	private Boolean notificationEngagement = true;
 	private Boolean notificationBirthday = true;
 	private Boolean notificationChat = true;
@@ -47,7 +47,6 @@ public class Contact extends BaseEntity {
 	private String ageFemale;
 	private String ageMale;
 	private String appleId;
-	private String budget;
 	private String email;
 	private String emailVerified;
 	private String facebookId;
@@ -117,12 +116,12 @@ public class Contact extends BaseEntity {
 		this.imageList = imageList;
 	}
 
-	public Boolean getFindMe() {
-		return findMe;
+	public Boolean getBluetooth() {
+		return bluetooth;
 	}
 
-	public void setFindMe(Boolean findMe) {
-		this.findMe = findMe;
+	public void setBluetooth(Boolean bluetooth) {
+		this.bluetooth = bluetooth;
 	}
 
 	public Date getBirthday() {
@@ -331,14 +330,6 @@ public class Contact extends BaseEntity {
 
 	public void setStorage(String storage) {
 		this.storage = storage;
-	}
-
-	public String getBudget() {
-		return budget;
-	}
-
-	public void setBudget(String budget) {
-		this.budget = budget;
 	}
 
 	public Short getRating() {

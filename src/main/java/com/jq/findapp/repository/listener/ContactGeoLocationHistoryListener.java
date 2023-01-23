@@ -18,7 +18,6 @@ public class ContactGeoLocationHistoryListener extends AbstractRepositoryListene
 
 	@Override
 	public void postPersist(final ContactGeoLocationHistory contactGeoLocationHistory) throws Exception {
-		eventService.notifyCheckInOut(contactGeoLocationHistory.getContactId());
 		final GeoLocation geoLocation = repository.one(GeoLocation.class, contactGeoLocationHistory.getGeoLocationId());
 		importLocationsService.lookup(geoLocation.getLatitude(), geoLocation.getLongitude());
 	}

@@ -226,13 +226,21 @@ public class ActionApi {
 	public List<Map<String, Object>> searchLocation(String search, @RequestHeader BigInteger user,
 			@RequestHeader String password, @RequestHeader String salt) throws Exception {
 		final Contact contact = authenticationService.verify(user, password, salt);
+		if (Strings.isEmpty(search))
+			return null;
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setLatitude(
 				contact.getLatitude() == null ? GeoLocationProcessor.DEFAULT_LATITUDE : contact.getLatitude());
 		params.setLongitude(
 				contact.getLongitude() == null ? GeoLocationProcessor.DEFAULT_LONGITUDE : contact.getLongitude());
-		search = search.replace('\'', '_');
-		params.setSearch("location.name like '%" + search + "%' or location.address like '%" + search + "%'");
+		final String[] s = search.replace('\'', '_').split(" ");
+		final StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < s.length; i++) {
+			if (!Strings.isEmpty(s[i]))
+				sb.append(" and (location.name like '%" + s[i] + "%' or location.address2 like '%" + s[i]
+						+ "%' or location.telephone like '%" + s[i] + "%')");
+		}
+		params.setSearch(sb.substring(5));
 		final Result result = repository.list(params);
 		final List<Map<String, Object>> list = new ArrayList<>();
 		for (int i = 0; i < result.size(); i++) {

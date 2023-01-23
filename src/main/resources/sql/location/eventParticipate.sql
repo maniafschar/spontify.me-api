@@ -10,7 +10,6 @@ select
 	event.id,
 	event.locationId,
 	event.contactId,
-	event.marketingEvent,
 	event.maxParticipants,
 	event.price,
 	event.startDate,

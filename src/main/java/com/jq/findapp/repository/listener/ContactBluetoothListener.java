@@ -19,7 +19,7 @@ public class ContactBluetoothListener extends AbstractRepositoryListener<Contact
 	public void postPersist(final ContactBluetooth contactBlutooth) throws Exception {
 		final Contact me = repository.one(Contact.class, contactBlutooth.getContactId());
 		final Contact other = repository.one(Contact.class, contactBlutooth.getContactId2());
-		if (me.getFindMe() != null && me.getFindMe() && other.getFindMe() != null && other.getFindMe()) {
+		if (me.getBluetooth() != null && me.getBluetooth() && other.getBluetooth() != null && other.getBluetooth()) {
 			notificationService.sendNotificationOnMatch(ContactNotificationTextType.contactFindMe, me, other);
 			notificationService.sendNotificationOnMatch(ContactNotificationTextType.contactFindMe, other, me);
 		}
