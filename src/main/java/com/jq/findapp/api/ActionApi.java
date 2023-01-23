@@ -237,8 +237,8 @@ public class ActionApi {
 		final StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < s.length; i++) {
 			if (!Strings.isEmpty(s[i]))
-				sb.append(" and (location.name like '%" + s[i] + "%' or location.address2 like '%" + s[i]
-						+ "%' or location.telephone like '%" + s[i] + "%')");
+				sb.append(" and (location.name like '%" + s[i] + "%' or location.address like '%" + s[i]
+						+ "%' or location.address2 like '%" + s[i] + "%' or location.telephone like '%" + s[i] + "%')");
 		}
 		params.setSearch(sb.substring(5));
 		final Result result = repository.list(params);
