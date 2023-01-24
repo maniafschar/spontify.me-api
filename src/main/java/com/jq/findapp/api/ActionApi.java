@@ -32,7 +32,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.model.Position;
-import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
@@ -51,7 +50,6 @@ import com.jq.findapp.service.AuthenticationService.Unique;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.NotificationService.Ping;
-import com.jq.findapp.util.EntityUtil;
 import com.jq.findapp.util.Strings;
 
 @RestController
@@ -352,18 +350,5 @@ public class ActionApi {
 		contact.setActive(true);
 		repository.save(contact);
 		return notificationService.getPingValues(contact);
-	}
-
-	// TODO delete 0.4.0
-	@PutMapping("one")
-	public void save(@RequestBody final WriteEntity entity, @RequestHeader BigInteger user,
-			@RequestHeader String password, @RequestHeader String salt) throws Exception {
-		authenticationService.verify(user, password, salt);
-		final Location location = repository.one(Location.class, entity.getId());
-		if (location.writeAccess(user, repository)) {
-			EntityUtil.addImageList(entity);
-			location.populate(entity.getValues());
-			repository.save(location);
-		}
 	}
 }
