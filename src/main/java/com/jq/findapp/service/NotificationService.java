@@ -226,7 +226,7 @@ public class NotificationService {
 		values.chatUnseen = new HashMap<>();
 		for (int i = 0; i < list.size(); i++) {
 			final Map<String, Object> row = list.get(i);
-			values.chatUnseen.put("" + row.get("chat.contactId2"), ((Number) row.get("_c")).intValue());
+			values.chatUnseen.put("" + row.get("contactChat.contactId2"), ((Number) row.get("_c")).intValue());
 		}
 		return values;
 	}
@@ -310,8 +310,7 @@ public class NotificationService {
 	}
 
 	private boolean userWantsNotification(ContactNotificationTextType notificationTextType, Contact contact) {
-		if (ContactNotificationTextType.chatNew == notificationTextType
-				|| ContactNotificationTextType.chatLocation == notificationTextType)
+		if (ContactNotificationTextType.chatNew == notificationTextType)
 			return contact.getNotificationChat();
 		if (ContactNotificationTextType.contactFriendRequest == notificationTextType
 				|| ContactNotificationTextType.contactFriendApproved == notificationTextType)

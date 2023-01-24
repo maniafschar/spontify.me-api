@@ -1,20 +1,19 @@
 SELECT
-	chat.id,
-	chat.contactId,
-	chat.contactId2,
-	chat.createdAt,
-	chat.image,
-	chat.note,
-	chat.action,
-	chat.textId,
-	chat.seen,
-	(select pseudonym from Contact contact where chat.locationId is not null and contact.id=chat.contactId) as pseudonym
+	contactChat.id,
+	contactChat.contactId,
+	contactChat.contactId2,
+	contactChat.createdAt,
+	contactChat.image,
+	contactChat.note,
+	contactChat.action,
+	contactChat.textId,
+	contactChat.seen
 FROM
-	Chat chat
+	ContactChat contactChat
 WHERE
 	{search}
 GROUP BY
-	chat.id
+	contactChat.id
 ORDER BY
-	chat.createdAt desc,
-	chat.id desc
+	contactChat.createdAt desc,
+	contactChat.id desc

@@ -1,12 +1,12 @@
 SELECT
-	max(chat.id) as c
+	max(contactChat.id) as c
 FROM
-	Chat chat,
+	ContactChat contactChat,
 	Contact contact
 WHERE
 	(
-		(chat.contactId2={USERID} and contact.id=chat.contactId)
+		(contactChat.contactId2={USERID} and contact.id=contactChat.contactId)
 		or
-		(chat.contactId={USERID} and contact.id=chat.contactId2)
+		(contactChat.contactId={USERID} and contact.id=contactChat.contactId2)
 	) and contact.id<>{USERID} and contact.verified=1 and
 	{search}

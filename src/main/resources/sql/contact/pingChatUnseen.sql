@@ -1,13 +1,13 @@
 SELECT
-	chat.contactId2,
+	contactChat.contactId2,
 	count(*) as c
 FROM
-	Chat chat,
+	ContactChat contactChat,
 	Contact contact
 WHERE
 	contact.id={USERID} and
-	contact.id=chat.contactId and
-	chat.seen=false and
+	contact.id=contactChat.contactId and
+	contactChat.seen=false and
 	{search}
 GROUP BY
-	chat.contactId2
+	contactChat.contactId2

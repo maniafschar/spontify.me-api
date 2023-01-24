@@ -131,33 +131,32 @@ public class ActionApi {
 		return QUOTATION.get((int) (Math.random() * (QUOTATION.size() - 1)));
 	}
 
-	@GetMapping("chat/{location}/{id}/{all}")
-	public List<Object[]> chat(@PathVariable final boolean location, @PathVariable final BigInteger id,
+	@GetMapping("chat/{id}/{all}")
+	public List<Object[]> chat(@PathVariable final BigInteger id,
 			@PathVariable final boolean all, @RequestHeader BigInteger user, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_chat);
 		params.setUser(authenticationService.verify(user, password, salt));
-		if (location)
-			params.setSearch("chat.locationId=" + id);
-		else if (all)
-			params.setSearch("chat.contactId=" + user + " and chat.contactId2=" + id + " or chat.contactId=" + id
-					+ " and chat.contactId2=" + user);
+		if (all)
+			params.setSearch("contactChat.contactId=" + user + " and contactChat.contactId2=" + id
+					+ " or contactChat.contactId=" + id
+					+ " and contactChat.contactId2=" + user);
 		else
-			params.setSearch("chat.seen=false and chat.contactId=" + id + " and chat.contactId2=" + user);
+			params.setSearch(
+					"contactChat.seen=false and contactChat.contactId=" + id + " and contactChat.contactId2=" + user);
 		final Result result = repository.list(params);
-		if (!location) {
-			params.setSearch("chat.seen=false and chat.contactId=" + id + " and chat.contactId2=" + user);
-			final Result unseen = repository.list(params);
-			if (unseen.size() > 0) {
-				repository.executeUpdate(
-						"update Chat chat set chat.seen=true, chat.modifiedAt=now() where (chat.seen is null or chat.seen=false) and chat.contactId="
-								+ id + " and chat.contactId2=" + user);
-				final Contact contact = repository.one(Contact.class, id);
-				if (contact.getModifiedAt().before(new Date(Instant.now().minus(Duration.ofDays(3)).toEpochMilli())))
-					notificationService.sendNotification(params.getUser(), contact,
-							ContactNotificationTextType.chatSeen,
-							"chat=" + user);
-			}
+		params.setSearch(
+				"contactChat.seen=false and contactChat.contactId=" + id + " and contactChat.contactId2=" + user);
+		final Result unseen = repository.list(params);
+		if (unseen.size() > 0) {
+			repository.executeUpdate(
+					"update Chat chat set contactChat.seen=true, contactChat.modifiedAt=now() where (contactChat.seen is null or contactChat.seen=false) and contactChat.contactId="
+							+ id + " and contactChat.contactId2=" + user);
+			final Contact contact = repository.one(Contact.class, id);
+			if (contact.getModifiedAt().before(new Date(Instant.now().minus(Duration.ofDays(3)).toEpochMilli())))
+				notificationService.sendNotification(params.getUser(), contact,
+						ContactNotificationTextType.chatSeen,
+						"chat=" + user);
 		}
 		return result.getList();
 	}

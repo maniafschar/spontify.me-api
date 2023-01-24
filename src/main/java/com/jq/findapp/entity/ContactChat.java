@@ -7,15 +7,14 @@ import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
-import com.jq.findapp.repository.listener.ChatListener;
+import com.jq.findapp.repository.listener.ContactChatListener;
 import com.jq.findapp.util.Text;
 
 @Entity
-@EntityListeners(ChatListener.class)
-public class Chat extends BaseEntity {
+@EntityListeners(ContactChatListener.class)
+public class ContactChat extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger contactId2;
-	private BigInteger locationId;
 	private Boolean seen = false;
 	private String note;
 	private String action;
@@ -29,14 +28,6 @@ public class Chat extends BaseEntity {
 
 	public void setContactId(BigInteger contactId) {
 		this.contactId = contactId;
-	}
-
-	public BigInteger getLocationId() {
-		return locationId;
-	}
-
-	public void setLocationId(BigInteger locationId) {
-		this.locationId = locationId;
 	}
 
 	public BigInteger getContactId2() {

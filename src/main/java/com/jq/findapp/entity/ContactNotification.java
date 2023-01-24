@@ -27,7 +27,6 @@ public class ContactNotification extends BaseEntity {
 	}
 
 	public enum ContactNotificationTextType {
-		chatLocation,
 		chatNew,
 		chatSeen,
 		contactBirthday,

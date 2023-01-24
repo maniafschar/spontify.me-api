@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.entity.Block;
-import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactBluetooth;
+import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
 import com.jq.findapp.entity.ContactLink;
 import com.jq.findapp.entity.ContactVisit;
@@ -20,8 +20,8 @@ import com.jq.findapp.entity.LocationVisit;
 import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.repository.listener.AbstractRepositoryListener;
 import com.jq.findapp.repository.listener.BlockListener;
-import com.jq.findapp.repository.listener.ChatListener;
 import com.jq.findapp.repository.listener.ContactBluetoothListener;
+import com.jq.findapp.repository.listener.ContactChatListener;
 import com.jq.findapp.repository.listener.ContactGeoLocationHistoryListener;
 import com.jq.findapp.repository.listener.ContactLinkListener;
 import com.jq.findapp.repository.listener.ContactListener;
@@ -39,8 +39,8 @@ public class Listeners {
 	private ApplicationContext applicationContext;
 
 	private <T extends BaseEntity> AbstractRepositoryListener<T> entity2listener(T entity) {
-		if (entity instanceof Chat)
-			return (AbstractRepositoryListener<T>) applicationContext.getBean(ChatListener.class);
+		if (entity instanceof ContactChat)
+			return (AbstractRepositoryListener<T>) applicationContext.getBean(ContactChatListener.class);
 		if (entity instanceof Block)
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(BlockListener.class);
 		if (entity instanceof ContactBluetooth)
