@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementNotInteractableException;
@@ -50,6 +51,7 @@ public class IntegrationTest {
 		new ProcessBuilder("./web.sh stop".split(" ")).start();
 	}
 
+	@Test
 	public void run() throws Exception {
 		init();
 		register("testabcd", "test@jq-consulting.de");
@@ -64,14 +66,14 @@ public class IntegrationTest {
 	}
 
 	private void register(String pseudonym, String email) {
-		Util.click("home homeBody buttontext:nth-of-type(1)");
+		Util.click("home homeHeader");
 		Util.click("hint buttontext");
 		Util.sendKeys("login input[name=\"email\"]", email);
 		Util.click("login tab:nth-of-type(3)");
 		Util.sendKeys("login input[name=\"pseudonym\"]", pseudonym);
 		Util.click("login input[name=\"agb\"]");
 		Util.sleep(5000);
-		Util.click("login buttontext:nth-of-type(1)");
+		Util.click("login buttontext[onclick*=\"register\"]");
 		final String s = Util.email(0).lines().reduce(
 				(e, e2) -> e.startsWith("https://") ? e : e2.startsWith("https://") ? e2 : "").get();
 		driver.navigate().to(url + s.substring(s.indexOf('?')));
@@ -80,32 +82,28 @@ public class IntegrationTest {
 	}
 
 	private void addLocation(String name, String address, boolean duplicate) {
-		Util.click("home homeBody buttontext:nth-of-type(2)");
-		Util.click("menu a[onclick*=\"events.edit\"]");
+		Util.click("navigation item.events");
+		Util.click("menu a[onclick*=\"pageEvent.edit\"]");
+		Util.sleep(500);
 		Util.click("buttontext[onclick*=\"pageLocation.edit\"]");
 		Util.sendKeys("popup input[name=\"name\"]", name);
 		Util.get("popup textarea[name=\"address\"]").clear();
 		Util.sendKeys("popup textarea[name=\"address\"]", address);
-		Util.click("popup input[name=\"budget\"]:nth-of-type(2)");
-		Util.click("popup input[name=\"parkingOption\"]:nth-of-type(2)");
-		Util.click("popup input[name=\"locationcategory\"]:nth-of-type(5)");
-		Util.click("popup dialogbuttons buttontext");
+		Util.click("popup dialogButtons buttontext");
 		if (duplicate) {
 			Util.get("popup popupHint").getText().toLowerCase().contains("location");
 			Util.click("popupTitle");
 		}
-		Util.click("main>buttonIcon[class*=\"center\"]");
-		Util.sleep(500);
-		Util.click("main>buttonIcon[class*=\"center\"]");
+		Util.click("navigation item.home");
 		Util.sleep(300);
 	}
 
 	private void addFriend() {
-		Util.click("home buttontext[onclick*=\"contacts\"]");
-		Util.click("main>buttonIcon[onclick*=\"pageContact.getFilterFields\"]");
-		Util.sendKeys("filters input[name=\"filterKeywords\"]", "pseudonym");
-		Util.click("filters buttontext[onclick*=\"search\"]");
-		Util.click("contacts row:nth-of-type(1)");
+		Util.click("navigation item.search");
+		Util.click("search tabHeader tab[i=\"contacts\"]");
+		Util.sendKeys("search div.contacts input[name=\"keywords\"]", "pseudonym");
+		Util.click("search div.contacts buttontext[onclick*=\"pageSearch.\"]");
+		Util.click("search div.contacts row:nth-of-type(1)");
 		Util.click("detail buttontext[name=\"buttonFriend\"]");
 		Util.click("detail buttontext[onclick*=\"sendRequestForFriendship\"]");
 	}

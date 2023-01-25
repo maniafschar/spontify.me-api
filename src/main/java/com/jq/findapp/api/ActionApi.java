@@ -148,7 +148,7 @@ public class ActionApi {
 		final Result unseen = repository.list(params);
 		if (unseen.size() > 0) {
 			repository.executeUpdate(
-					"update Chat chat set contactChat.seen=true, contactChat.modifiedAt=now() where (contactChat.seen is null or contactChat.seen=false) and contactChat.contactId="
+					"update ContactChat contactChat set contactChat.seen=true, contactChat.modifiedAt=now() where (contactChat.seen is null or contactChat.seen=false) and contactChat.contactId="
 							+ id + " and contactChat.contactId2=" + user);
 			final Contact contact = repository.one(Contact.class, id);
 			if (contact.getModifiedAt().before(new Date(Instant.now().minus(Duration.ofDays(3)).toEpochMilli())))

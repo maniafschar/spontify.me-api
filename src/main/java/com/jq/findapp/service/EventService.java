@@ -72,7 +72,8 @@ public class EventService {
 										params.getUser(), ContactNotificationTextType.eventNotifyWithoutLocation,
 										Strings.encodeParam("e=" + event.getId()),
 										time,
-										Text.valueOf("category_verb" + event.getCategory())
+										// TODO replace getCategory
+										Text.valueOf("category_verb" /* + event.getCategory() */)
 												.getText(params.getUser().getLanguage()),
 										event.getText());
 							} else

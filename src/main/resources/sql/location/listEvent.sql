@@ -1,5 +1,4 @@
 SELECT
-	event.category,
 	event.confirm,
 	event.contactId,
 	event.endDate,
@@ -9,6 +8,8 @@ SELECT
 	event.locationId,
 	event.maxParticipants,
 	event.price,
+	event.skills,
+	event.skillsText,
 	event.startDate,
 	event.text,
 	event.type,

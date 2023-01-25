@@ -21,8 +21,6 @@ public class Event extends BaseEntity {
 	private Short confirm;
 	private Short maxParticipants;
 	private Short visibility;
-	private String category;
-	private String hashtags;
 	private String image;
 	private String imageList;
 	private String skills;
@@ -125,22 +123,6 @@ public class Event extends BaseEntity {
 
 	public Short getMaxParticipants() {
 		return maxParticipants;
-	}
-
-	public String getCategory() {
-		return category;
-	}
-
-	public void setCategory(String category) {
-		this.category = category;
-	}
-
-	public String getHashtags() {
-		return hashtags;
-	}
-
-	public void setHashtags(String hashtags) {
-		this.hashtags = hashtags;
 	}
 
 	public String getSkills() {
