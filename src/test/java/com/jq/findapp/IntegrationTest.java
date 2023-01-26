@@ -35,7 +35,6 @@ import com.jq.findapp.util.Utils;
 public class IntegrationTest {
 	private static WebDriver driver;
 	private static String url = "http://localhost:9000/";
-	private static long sleep = 600;
 
 	@Autowired
 	private Utils utils;
@@ -44,7 +43,7 @@ public class IntegrationTest {
 	public static void start() throws Exception {
 		new ProcessBuilder("./web.sh start".split(" ")).start();
 		driver = new SafariDriver();
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(50, TimeUnit.MILLISECONDS);
 	}
 
 	@AfterAll
@@ -117,7 +116,6 @@ public class IntegrationTest {
 		if (Util.get("popup .unpaid").getAttribute("style").contains("none"))
 			throw new RuntimeException("Event .unpaid should be visible!");
 		Util.sendKeys("popup input[name=\"price\"]", "10");
-		Util.sleep(sleep);
 		if (Util.get("popup .paid").getAttribute("style").contains("none"))
 			throw new RuntimeException("Event .paid should be visible!");
 		if (!Util.get("popup .unpaid").getAttribute("style").contains("none"))
@@ -150,7 +148,7 @@ public class IntegrationTest {
 
 	private static class Util {
 		private static String email(int i) {
-			sleep(sleep);
+			sleep(1000);
 			final List<String> files = Arrays.asList(new File("target/email").list());
 			files.sort((e1, e2) -> e1.compareTo(e2));
 			try {
@@ -171,24 +169,36 @@ public class IntegrationTest {
 		}
 
 		private static WebElement get(String id) {
-			WebElement d = driver.findElement(By.cssSelector(id));
-			System.out.println(d);
-			return d;
+			final int maxWait = 20;
+			int i = 0;
+			while (driver.findElements(By.cssSelector("main [toggle]")).size() > 0 ||
+					driver.findElements(By.cssSelector("main [class*=\"animated\"]")).size() > 0 ||
+					driver.findElements(By.cssSelector("content[class*=\"SlideOut\"]")).size() > 0) {
+				if (i++ > maxWait)
+					throw new RuntimeException("Timeout while animation, tried to get " + id);
+				sleep(100);
+			}
+			List<WebElement> list;
+			i = 0;
+			while ((list = driver.findElements(By.cssSelector(id))).size() == 0) {
+				if (i++ > maxWait)
+					throw new RuntimeException("Timeout while finding element " + id);
+				sleep(100);
+			}
+			return list.get(0);
 		}
 
 		private static void click(String id) {
 			((JavascriptExecutor) driver).executeScript("arguments[0].click()", get(id));
-			Util.sleep(sleep);
 		}
 
 		private static void sendKeys(String id, String keys) {
 			for (int i = 0; i < 5; i++) {
 				try {
 					get(id).sendKeys(keys);
-					Util.sleep(sleep);
 					return;
 				} catch (ElementNotInteractableException e) {
-					sleep(sleep / 2);
+					sleep(250);
 				}
 			}
 			throw new RuntimeException("Failed to send keys " + keys + " for id " + id);
