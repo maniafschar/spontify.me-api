@@ -95,7 +95,6 @@ public class ApiTest {
 		final Location location = repository.one(Location.class, new BigInteger(response));
 		assertEquals(47.666f, location.getLatitude());
 		assertEquals(11.777f, location.getLongitude());
-		assertEquals("1", location.getCategory());
 		assertEquals("test", location.getName());
 		assertEquals("Rottach-Egern", location.getTown());
 		assertEquals("83700", location.getZipCode());

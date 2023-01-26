@@ -29,7 +29,6 @@ select
 	contactLink.id,
 	contactLink.status,
 	location.id,
-	location.category,
 	location.name,
 	location.town,
 	location.description,

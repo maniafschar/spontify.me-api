@@ -32,7 +32,6 @@ SELECT
 	contactLink.id,
 	contactLink.status,
 	location.address,
-	location.category,
 	location.description,
 	location.id,
 	location.image,

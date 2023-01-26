@@ -1,5 +1,4 @@
 select
-	location.category,
 	location.contactId,
 	location.description,
 	location.id,

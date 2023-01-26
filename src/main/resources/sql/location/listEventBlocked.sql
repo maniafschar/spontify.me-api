@@ -13,7 +13,6 @@ SELECT
 	event.text,
 	event.type,
 	event.visibility,
-	location.category,
 	location.description,
 	location.id,
 	location.imageList,

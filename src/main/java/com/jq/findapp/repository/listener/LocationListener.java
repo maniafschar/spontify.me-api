@@ -26,8 +26,6 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 			throws JsonMappingException, JsonProcessingException, IllegalArgumentException {
 		lookupAddress(location);
 		final QueryParams params = new QueryParams(Query.location_list);
-		location.getCategory();
-		location.getName();
 		params.setUser(repository.one(Contact.class, location.getContactId()));
 		params.setSearch(
 				"location.zipCode='" + location.getZipCode() + "' and LOWER(location.street)='"
@@ -37,13 +35,8 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 						+ "'");
 		final Result list = repository.list(params);
 		for (int i = 0; i < list.size(); i++) {
-			if (isNameMatch((String) list.get(i).get("location.name"), location.getName(), true)) {
-				String category = (String) list.get(i).get("location.category");
-				for (int i2 = 0; i2 < location.getCategory().length(); i2++) {
-					if (category.contains(location.getCategory().substring(i2, i2 + 1)))
-						throw new IllegalArgumentException("location exists");
-				}
-			}
+			if (isNameMatch((String) list.get(i).get("location.name"), location.getName(), true))
+				throw new IllegalArgumentException("location exists");
 		}
 	}
 
