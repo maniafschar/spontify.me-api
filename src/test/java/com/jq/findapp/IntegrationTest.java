@@ -3,7 +3,9 @@ package com.jq.findapp;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -58,7 +60,7 @@ public class IntegrationTest {
 		register("testabcd", "test@jq-consulting.de");
 		addLocation("location 1", "Melchiorstr. 9\n81479 München", false);
 		addEvent();
-		listMyEvents();
+		eventRating();
 		addLocation("location 1", "Melchiorstr. 9\n81479 München", true);
 		listLocations();
 		addFriend();
@@ -129,12 +131,14 @@ public class IntegrationTest {
 		Util.click("popup dialogButtons buttontext[onclick*=\"save\"]");
 	}
 
-	private void listMyEvents() {
+	private void eventRating() throws Exception {
 		Util.click("navigation item.events");
 		Util.click("menu a[onclick*=\"communication.loadList(ui.query.eventMy()\"]");
-		if (!Util.get("events row div text").getText().contains("mega ***"))
-			throw new RuntimeException("New event not in list!");
-		Util.get("events row.participate");
+		final String id = Util.get("events row.participate").getAttribute("i").split("_")[0];
+		utils.setEventDate(new BigInteger(id), new Timestamp(System.currentTimeMillis() - 86460000));
+		Util.click("menu a[onclick*=\"communication.loadList(ui.query.eventTickets()\"]");
+		Util.click("events row.participate");
+		Util.click("detail buttontext[onclick*=\"ratings.\"]");
 	}
 
 	private void addFriend() {
