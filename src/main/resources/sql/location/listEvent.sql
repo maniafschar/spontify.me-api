@@ -46,6 +46,7 @@ SELECT
 	location.latitude,
 	location.longitude,
 	location.name,
+	location.rating,
 	location.town,
 	locationFavorite.id,
 	locationFavorite.favorite,

@@ -19,6 +19,9 @@ public class EventRatingListener extends AbstractRepositoryListener<EventRating>
 		repository.executeUpdate(
 				"update Location location set rating=(select sum(rating)/count(*) from EventRating eventRating, Event event where event.locationId=location.id and eventRating.eventId=event.id) where location.id="
 						+ event.getLocationId());
+		repository.executeUpdate(
+				"update Event event set rating=(select sum(rating)/count(*) from EventRating eventRating where eventRating.eventId=event.id) where event.id="
+						+ event.getId());
 		notificationService.locationNotifyOnMatch(
 				repository.one(Contact.class, event.getContactId()),
 				event.getLocationId(), ContactNotificationTextType.eventRated,

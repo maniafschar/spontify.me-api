@@ -17,6 +17,7 @@ public class Event extends BaseEntity {
 	private Double price;
 	private Short confirm;
 	private Short maxParticipants;
+	private Short rating;
 	private Short visibility;
 	private String image;
 	private String imageList;
@@ -136,6 +137,14 @@ public class Event extends BaseEntity {
 
 	public void setSkillsText(String skillsText) {
 		this.skillsText = skillsText;
+	}
+
+	public Short getRating() {
+		return rating;
+	}
+
+	public void setRating(Short rating) {
+		this.rating = rating;
 	}
 
 	@Transient
