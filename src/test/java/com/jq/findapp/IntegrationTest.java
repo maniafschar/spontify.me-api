@@ -134,6 +134,7 @@ public class IntegrationTest {
 		Util.click("menu a[onclick*=\"communication.loadList(ui.query.eventMy()\"]");
 		if (!Util.get("events row div text").getText().contains("mega ***"))
 			throw new RuntimeException("New event not in list!");
+		Util.get("events row.participate");
 	}
 
 	private void addFriend() {

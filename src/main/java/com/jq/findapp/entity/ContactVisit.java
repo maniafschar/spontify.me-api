@@ -3,12 +3,8 @@ package com.jq.findapp.entity;
 import java.math.BigInteger;
 
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-
-import com.jq.findapp.repository.listener.ContactVisitListener;
 
 @Entity
-@EntityListeners(ContactVisitListener.class)
 public class ContactVisit extends BaseEntity {
 	private Long count;
 	private BigInteger contactId;

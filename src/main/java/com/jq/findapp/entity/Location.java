@@ -3,16 +3,13 @@ package com.jq.findapp.entity;
 import java.math.BigInteger;
 
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.Transient;
 
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.repository.listener.LocationListener;
 
 @Entity
-@EntityListeners(LocationListener.class)
 public class Location extends BaseEntity {
 	private BigInteger contactId;
 	private Float googleRating;

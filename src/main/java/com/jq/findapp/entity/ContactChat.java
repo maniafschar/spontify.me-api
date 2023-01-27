@@ -3,15 +3,12 @@ package com.jq.findapp.entity;
 import java.math.BigInteger;
 
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
-import com.jq.findapp.repository.listener.ContactChatListener;
 import com.jq.findapp.util.Text;
 
 @Entity
-@EntityListeners(ContactChatListener.class)
 public class ContactChat extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger contactId2;

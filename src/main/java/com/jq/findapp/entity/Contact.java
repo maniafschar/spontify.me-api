@@ -6,16 +6,13 @@ import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Transient;
 
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.repository.listener.ContactListener;
 
 @Entity
-@EntityListeners(ContactListener.class)
 public class Contact extends BaseEntity {
 	private Boolean active = true;
 	private Boolean bluetooth = true;

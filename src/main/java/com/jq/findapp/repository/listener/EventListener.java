@@ -37,7 +37,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 		eventParticipate.setState((short) 1);
 		eventParticipate.setContactId(event.getContactId());
 		eventParticipate.setEventId(event.getId());
-		eventParticipate.setEventDate(new java.sql.Date(event.getStartDate().getTime()));
+		eventParticipate.setEventDate(new Date(event.getStartDate().getTime()));
 		repository.save(eventParticipate);
 	}
 
