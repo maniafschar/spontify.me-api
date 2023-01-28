@@ -2,6 +2,7 @@ package com.jq.findapp.repository.listener;
 
 import java.math.BigInteger;
 import java.sql.Date;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -46,7 +47,8 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 		if (event.old("startDate") != null || event.old("price") != null) {
 			final QueryParams params = new QueryParams(Query.location_eventParticipate);
 			params.setSearch(
-					"eventParticipate.eventId=" + event.getId() + " and eventParticipate.eventDate>=current_timestamp");
+					"eventParticipate.eventId=" + event.getId() + " and eventParticipate.eventDate>='"
+							+ Instant.now().minus((Duration.ofDays(1))) + "'");
 			final Result result = repository.list(params);
 			for (int i = 0; i < result.size(); i++) {
 				final EventParticipate eventParticipate = repository.one(EventParticipate.class,
