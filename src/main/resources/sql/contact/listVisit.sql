@@ -16,8 +16,10 @@ SELECT
 	contact.rating,
 	contactVisit.id,
 	contactVisit.count,
+	contactVisit.createdAt,
 	contactVisit.modifiedAt,
 	contactLink.status,
+	case when contactVisit.modifiedAt is null then contactVisit.createdAt else contactVisit.modifiedAt end as time,
 	'' as geolocationDistance
 FROM
 	ContactVisit contactVisit,
@@ -29,4 +31,4 @@ WHERE
 	contact.id<>{USERID} and contact.verified=1 and
 	{search}
 ORDER BY
-	contactVisit.modifiedAt DESC
+	time DESC

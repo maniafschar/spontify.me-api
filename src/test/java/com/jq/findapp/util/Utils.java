@@ -3,13 +3,13 @@ package com.jq.findapp.util;
 import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.ZoneId;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.Event;
 import com.jq.findapp.repository.Repository;
 
 @Component
@@ -45,9 +45,8 @@ public class Utils {
 	}
 
 	public void setEventDate(BigInteger id, Timestamp date) throws Exception {
-		final Event event = repository.one(Event.class, id);
-		event.setStartDate(date);
-		event.setContactId(BigInteger.ONE);
-		repository.save(event);
+		final String d = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString();
+		repository.executeUpdate("update Event set startDate='" + d + "', contactId=1 where id=" + id);
+		repository.executeUpdate("update EventParticipate set eventDate='" + d + "' where eventId=" + id);
 	}
 }
