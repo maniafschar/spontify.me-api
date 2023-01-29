@@ -17,7 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.FindappApplication;
-import com.jq.findapp.JpaTestConfiguration;
+import com.jq.findapp.TestConfig;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
@@ -27,8 +27,8 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.util.Utils;
 
-@ExtendWith({ SpringExtension.class })
-@SpringBootTest(classes = { FindappApplication.class, JpaTestConfiguration.class }, properties = { "app.admin.id=3" })
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = { FindappApplication.class, TestConfig.class }, properties = { "app.admin.id=3" })
 @ActiveProfiles("test")
 public class ImportLocationsServiceTest {
 	@Autowired
@@ -67,7 +67,6 @@ public class ImportLocationsServiceTest {
 		assertNotNull(location.getName());
 		assertNotNull(location.getAddress());
 		assertNotNull(location.getCategory());
-		assertNotNull(location.getParkingOption());
 		assertTrue(location.getImage().contains(Attachment.SEPARATOR));
 		assertTrue(location.getImageList().contains(Attachment.SEPARATOR));
 		assertTrue(location.getImage().length() > 5);

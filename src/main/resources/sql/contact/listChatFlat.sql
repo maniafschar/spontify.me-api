@@ -1,8 +1,8 @@
 SELECT
-	chat.id
+	contactChat.id
 FROM
 	Contact contact,
-	Chat chat
+	ContactChat contactChat
 WHERE
-	chat.contactId2=contact.id and
+	contactChat.contactId2=contact.id and
 	{search}

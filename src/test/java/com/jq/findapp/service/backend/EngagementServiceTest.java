@@ -13,11 +13,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.jq.findapp.FindappApplication;
-import com.jq.findapp.JpaTestConfiguration;
+import com.jq.findapp.TestConfig;
 import com.jq.findapp.util.Utils;
 
-@ExtendWith({ SpringExtension.class })
-@SpringBootTest(classes = { FindappApplication.class, JpaTestConfiguration.class }, properties = { "app.admin.id=3" })
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = { FindappApplication.class, TestConfig.class })
 @ActiveProfiles("test")
 public class EngagementServiceTest {
 	@Autowired

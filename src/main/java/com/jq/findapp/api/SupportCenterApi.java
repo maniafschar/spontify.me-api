@@ -220,7 +220,6 @@ public class SupportCenterApi {
 				runLast(engagementService::sendChats);
 				run(eventService::findMatchingSpontis);
 				run(eventService::notifyParticipation);
-				run(eventService::notifyCheckInOut);
 			} else
 				throw new RuntimeException("Scheduler already running " + schedulerRunning.size() + " processes");
 		} else

@@ -3,16 +3,13 @@ package com.jq.findapp.entity;
 import java.math.BigInteger;
 
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Transient;
 
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.repository.listener.ContactLinkListener;
 
 @Entity
-@EntityListeners(ContactLinkListener.class)
 public class ContactLink extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger contactId2;

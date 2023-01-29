@@ -2,7 +2,6 @@ package com.jq.findapp.api;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.sql.Time;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -33,14 +32,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.model.Position;
-import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.ContactVisit;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Location;
-import com.jq.findapp.entity.LocationOpenTime;
 import com.jq.findapp.entity.LocationVisit;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.GeoLocationProcessor;
@@ -53,7 +50,6 @@ import com.jq.findapp.service.AuthenticationService.Unique;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.NotificationService.Ping;
-import com.jq.findapp.util.EntityUtil;
 import com.jq.findapp.util.Strings;
 
 @RestController
@@ -126,13 +122,6 @@ public class ActionApi {
 		}
 	}
 
-	@GetMapping("prevent/delete")
-	public Map<String, String> preventDelete(@RequestHeader BigInteger user, @RequestHeader String password,
-			@RequestHeader String salt) {
-		authenticationService.verify(user, password, salt);
-		return null;
-	}
-
 	@GetMapping("quotation")
 	public String quotation(@RequestHeader BigInteger user, @RequestHeader String password,
 			@RequestHeader String salt) {
@@ -140,41 +129,32 @@ public class ActionApi {
 		return QUOTATION.get((int) (Math.random() * (QUOTATION.size() - 1)));
 	}
 
-	@GetMapping("marketing")
-	public String marketing(BigInteger id, @RequestHeader BigInteger user, @RequestHeader String password,
-			@RequestHeader String salt) throws Exception {
-		final Contact contact = authenticationService.verify(user, password, salt);
-		final Location location = repository.one(Location.class, id);
-		return url + "?u=" + contact.getPseudonym() + "&l=" + location.getName();
-	}
-
-	@GetMapping("chat/{location}/{id}/{all}")
-	public List<Object[]> chat(@PathVariable final boolean location, @PathVariable final BigInteger id,
+	@GetMapping("chat/{id}/{all}")
+	public List<Object[]> chat(@PathVariable final BigInteger id,
 			@PathVariable final boolean all, @RequestHeader BigInteger user, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_chat);
 		params.setUser(authenticationService.verify(user, password, salt));
-		if (location)
-			params.setSearch("chat.locationId=" + id);
-		else if (all)
-			params.setSearch("chat.contactId=" + user + " and chat.contactId2=" + id + " or chat.contactId=" + id
-					+ " and chat.contactId2=" + user);
+		if (all)
+			params.setSearch("contactChat.contactId=" + user + " and contactChat.contactId2=" + id
+					+ " or contactChat.contactId=" + id
+					+ " and contactChat.contactId2=" + user);
 		else
-			params.setSearch("chat.seen=false and chat.contactId=" + id + " and chat.contactId2=" + user);
+			params.setSearch(
+					"contactChat.seen=false and contactChat.contactId=" + id + " and contactChat.contactId2=" + user);
 		final Result result = repository.list(params);
-		if (!location) {
-			params.setSearch("chat.seen=false and chat.contactId=" + id + " and chat.contactId2=" + user);
-			final Result unseen = repository.list(params);
-			if (unseen.size() > 0) {
-				repository.executeUpdate(
-						"update Chat chat set chat.seen=true, chat.modifiedAt=now() where (chat.seen is null or chat.seen=false) and chat.contactId="
-								+ id + " and chat.contactId2=" + user);
-				final Contact contact = repository.one(Contact.class, id);
-				if (contact.getModifiedAt().before(new Date(Instant.now().minus(Duration.ofDays(3)).toEpochMilli())))
-					notificationService.sendNotification(params.getUser(), contact,
-							ContactNotificationTextType.chatSeen,
-							"chat=" + user);
-			}
+		params.setSearch(
+				"contactChat.seen=false and contactChat.contactId=" + id + " and contactChat.contactId2=" + user);
+		final Result unseen = repository.list(params);
+		if (unseen.size() > 0) {
+			repository.executeUpdate(
+					"update ContactChat contactChat set contactChat.seen=true, contactChat.modifiedAt=now() where (contactChat.seen is null or contactChat.seen=false) and contactChat.contactId="
+							+ id + " and contactChat.contactId2=" + user);
+			final Contact contact = repository.one(Contact.class, id);
+			if (contact.getModifiedAt().before(new Date(Instant.now().minus(Duration.ofDays(3)).toEpochMilli())))
+				notificationService.sendNotification(params.getUser(), contact,
+						ContactNotificationTextType.chatSeen,
+						"chat=" + user);
 		}
 		return result.getList();
 	}
@@ -243,13 +223,21 @@ public class ActionApi {
 	public List<Map<String, Object>> searchLocation(String search, @RequestHeader BigInteger user,
 			@RequestHeader String password, @RequestHeader String salt) throws Exception {
 		final Contact contact = authenticationService.verify(user, password, salt);
+		if (Strings.isEmpty(search))
+			return null;
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setLatitude(
 				contact.getLatitude() == null ? GeoLocationProcessor.DEFAULT_LATITUDE : contact.getLatitude());
 		params.setLongitude(
 				contact.getLongitude() == null ? GeoLocationProcessor.DEFAULT_LONGITUDE : contact.getLongitude());
-		search = search.replace('\'', '_');
-		params.setSearch("location.name like '%" + search + "%' or location.address like '%" + search + "%'");
+		final String[] s = search.replace('\'', '_').split(" ");
+		final StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < s.length; i++) {
+			if (!Strings.isEmpty(s[i]))
+				sb.append(" and (location.name like '%" + s[i] + "%' or location.address like '%" + s[i]
+						+ "%' or location.address2 like '%" + s[i] + "%' or location.telephone like '%" + s[i] + "%')");
+		}
+		params.setSearch(sb.substring(5));
 		final Result result = repository.list(params);
 		final List<Map<String, Object>> list = new ArrayList<>();
 		for (int i = 0; i < result.size(); i++) {
@@ -362,46 +350,5 @@ public class ActionApi {
 		contact.setActive(true);
 		repository.save(contact);
 		return notificationService.getPingValues(contact);
-	}
-
-	@PutMapping("one")
-	public void save(@RequestBody final WriteEntity entity, @RequestHeader BigInteger user,
-			@RequestHeader String password, @RequestHeader String salt) throws Exception {
-		authenticationService.verify(user, password, salt);
-		final Location location = repository.one(Location.class, entity.getId());
-		if (location.writeAccess(user, repository)) {
-			for (int i = 0; i < entity.getValues().size(); i++) {
-				if ("x".equals(entity.getValues().get("openTimes.day" + i))) {
-					final String id = entity.getValues().remove("openTimes.id" + i).toString();
-					if (id.length() > 0)
-						repository.delete(repository.one(LocationOpenTime.class, new BigInteger(id)));
-					entity.getValues().remove("openTimes.day" + i);
-					entity.getValues().remove("openTimes.openAt" + i);
-					entity.getValues().remove("openTimes.closeAt" + i);
-				} else if (entity.getValues().get("openTimes.day" + i) != null) {
-					final LocationOpenTime ot = new LocationOpenTime();
-					String s = entity.getValues().remove("openTimes.id" + i).toString();
-					if (s.length() > 0)
-						ot.setId(new BigInteger(s));
-					ot.setDay(Short.valueOf(entity.getValues().remove("openTimes.day" + i).toString()));
-					s = entity.getValues().remove("openTimes.openAt" + i).toString();
-					if (s.split(":").length == 2)
-						s += ":00";
-					if (s.contains(":"))
-						ot.setOpenAt(Time.valueOf(s));
-					s = entity.getValues().remove("openTimes.closeAt" + i).toString();
-					if (s.split(":").length == 2)
-						s += ":00";
-					if (s.contains(":"))
-						ot.setCloseAt(Time.valueOf(s));
-					ot.setLocationId(location.getId());
-					if (ot.getCloseAt() != null && ot.getOpenAt() != null)
-						repository.save(ot);
-				}
-			}
-			EntityUtil.addImageList(entity);
-			location.populate(entity.getValues());
-			repository.save(location);
-		}
 	}
 }

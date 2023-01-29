@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.entity.Block;
-import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactBluetooth;
+import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
 import com.jq.findapp.entity.ContactLink;
 import com.jq.findapp.entity.ContactVisit;
@@ -16,13 +16,12 @@ import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.LocationFavorite;
-import com.jq.findapp.entity.LocationRating;
 import com.jq.findapp.entity.LocationVisit;
 import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.repository.listener.AbstractRepositoryListener;
 import com.jq.findapp.repository.listener.BlockListener;
-import com.jq.findapp.repository.listener.ChatListener;
 import com.jq.findapp.repository.listener.ContactBluetoothListener;
+import com.jq.findapp.repository.listener.ContactChatListener;
 import com.jq.findapp.repository.listener.ContactGeoLocationHistoryListener;
 import com.jq.findapp.repository.listener.ContactLinkListener;
 import com.jq.findapp.repository.listener.ContactListener;
@@ -31,7 +30,6 @@ import com.jq.findapp.repository.listener.EventListener;
 import com.jq.findapp.repository.listener.EventParticipateListener;
 import com.jq.findapp.repository.listener.LocationFavoriteListener;
 import com.jq.findapp.repository.listener.LocationListener;
-import com.jq.findapp.repository.listener.LocationRatingListener;
 import com.jq.findapp.repository.listener.LocationVisitListener;
 import com.jq.findapp.repository.listener.TicketListener;
 
@@ -41,8 +39,8 @@ public class Listeners {
 	private ApplicationContext applicationContext;
 
 	private <T extends BaseEntity> AbstractRepositoryListener<T> entity2listener(T entity) {
-		if (entity instanceof Chat)
-			return (AbstractRepositoryListener<T>) applicationContext.getBean(ChatListener.class);
+		if (entity instanceof ContactChat)
+			return (AbstractRepositoryListener<T>) applicationContext.getBean(ContactChatListener.class);
 		if (entity instanceof Block)
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(BlockListener.class);
 		if (entity instanceof ContactBluetooth)
@@ -63,8 +61,6 @@ public class Listeners {
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(LocationFavoriteListener.class);
 		if (entity instanceof Location)
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(LocationListener.class);
-		if (entity instanceof LocationRating)
-			return (AbstractRepositoryListener<T>) applicationContext.getBean(LocationRatingListener.class);
 		if (entity instanceof LocationVisit)
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(LocationVisitListener.class);
 		if (entity instanceof Ticket)

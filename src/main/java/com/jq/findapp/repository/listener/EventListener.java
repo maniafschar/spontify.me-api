@@ -2,11 +2,10 @@ package com.jq.findapp.repository.listener;
 
 import java.math.BigInteger;
 import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,7 +38,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 		eventParticipate.setState((short) 1);
 		eventParticipate.setContactId(event.getContactId());
 		eventParticipate.setEventId(event.getId());
-		eventParticipate.setEventDate(new java.sql.Date(event.getStartDate().getTime()));
+		eventParticipate.setEventDate(new Date(event.getStartDate().getTime()));
 		repository.save(eventParticipate);
 	}
 
@@ -48,12 +47,12 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 		if (event.old("startDate") != null || event.old("price") != null) {
 			final QueryParams params = new QueryParams(Query.location_eventParticipate);
 			params.setSearch(
-					"eventParticipate.eventId=" + event.getId() + " and eventParticipate.eventDate>=current_timestamp");
+					"eventParticipate.eventId=" + event.getId() + " and eventParticipate.eventDate>='"
+							+ Instant.now().minus((Duration.ofDays(1))) + "'");
 			final Result result = repository.list(params);
 			for (int i = 0; i < result.size(); i++) {
 				final EventParticipate eventParticipate = repository.one(EventParticipate.class,
 						(BigInteger) result.get(i).get("eventParticipate.id"));
-				final LocalTime eventDate = event.getStartDate().toInstant().atZone(ZoneOffset.UTC).toLocalTime();
 				if (event.old("startDate") != null) {
 					if ("o".equals(event.getType()))
 						eventParticipate.setEventDate(new java.sql.Date(event.getStartDate().getTime()));
@@ -63,17 +62,18 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 					repository.save(eventParticipate);
 				}
 				if (eventParticipate.getState() == 1 && !eventParticipate.getContactId().equals(event.getContactId())) {
-					final Instant time = Instant.ofEpochMilli(eventParticipate.getEventDate().getTime())
-							.plus(Duration.ofSeconds((eventDate.getHour() * 60 + eventDate.getMinute()) * 60));
+					final Instant time = eventParticipate.getEventDate().toInstant();
 					if (time.isAfter(Instant.now())) {
+						final ZonedDateTime t = event.getStartDate().toInstant().atZone(ZoneOffset.UTC);
 						final Contact contactTo = repository.one(Contact.class, eventParticipate.getContactId());
 						final Contact contactFrom = repository.one(Contact.class, event.getContactId());
-						time.minus(Duration.ofMinutes(contactTo.getTimezoneOffset()));
 						notificationService.sendNotification(contactFrom, contactTo,
 								ContactNotificationTextType.eventChanged,
 								Strings.encodeParam("e=" + event.getId()),
-								new SimpleDateFormat("dd.MM.yyyy").format(eventParticipate.getEventDate()) +
-										new SimpleDateFormat(" HH:mm").format(new Date(time.toEpochMilli())),
+								Strings.formatDate(null,
+										new Date(time.plusSeconds((t.getHour() * 60 + t.getMinute()) * 60)
+												.toEpochMilli()),
+										contactTo.getTimezone()),
 								event.getText(),
 								repository.one(Location.class, event.getLocationId()).getName());
 					}
@@ -91,18 +91,17 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 			final EventParticipate eventParticipate = repository.one(EventParticipate.class,
 					(BigInteger) result.get(i).get("eventParticipate.id"));
 			if (eventParticipate.getState() == 1 && !eventParticipate.getContactId().equals(event.getContactId())) {
-				final LocalTime eventDate = event.getStartDate().toInstant().atZone(ZoneOffset.UTC).toLocalTime();
-				final Instant time = eventParticipate.getEventDate().toInstant()
-						.plus(Duration.ofSeconds((eventDate.getHour() * 60 + eventDate.getMinute()) * 60));
+				final Instant time = eventParticipate.getEventDate().toInstant();
 				if (time.isAfter(Instant.now())) {
+					final ZonedDateTime t = event.getStartDate().toInstant().atZone(ZoneOffset.UTC);
 					final Contact contactTo = repository.one(Contact.class, eventParticipate.getContactId());
 					final Contact contactFrom = repository.one(Contact.class, eventParticipate.getContactId());
-					time.minus(Duration.ofMinutes(contactTo.getTimezoneOffset()));
 					notificationService.sendNotification(contactFrom, contactTo,
 							ContactNotificationTextType.eventDelete,
 							Strings.encodeParam("p=" + contactFrom.getId()),
-							new SimpleDateFormat("dd.MM.yyyy").format(eventParticipate.getEventDate()) +
-									new SimpleDateFormat(" HH:mm").format(new Date(time.toEpochMilli())),
+							Strings.formatDate(null,
+									new Date(time.plusSeconds((t.getHour() * 60 + t.getMinute()) * 60).toEpochMilli()),
+									contactTo.getTimezone()),
 							event.getText(),
 							repository.one(Location.class, event.getLocationId()).getName());
 				}

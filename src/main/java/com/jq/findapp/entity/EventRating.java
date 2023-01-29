@@ -5,11 +5,12 @@ import java.math.BigInteger;
 import javax.persistence.Entity;
 
 @Entity
-public class ContactRating extends BaseEntity {
+public class EventRating extends BaseEntity {
 	private BigInteger contactId;
-	private BigInteger contactId2;
+	private BigInteger eventParticipateId;
 	private Short rating;
 	private String text;
+	private String image;
 
 	public BigInteger getContactId() {
 		return contactId;
@@ -35,11 +36,19 @@ public class ContactRating extends BaseEntity {
 		this.text = text;
 	}
 
-	public BigInteger getContactId2() {
-		return contactId2;
+	public BigInteger getEventParticipateId() {
+		return eventParticipateId;
 	}
 
-	public void setContactId2(BigInteger contactId2) {
-		this.contactId2 = contactId2;
+	public void setEventParticipateId(BigInteger eventParticipateId) {
+		this.eventParticipateId = eventParticipateId;
+	}
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
 	}
 }

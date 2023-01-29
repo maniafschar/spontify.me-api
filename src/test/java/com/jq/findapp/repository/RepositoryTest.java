@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
@@ -26,11 +25,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.FindappApplication;
-import com.jq.findapp.JpaTestConfiguration;
-import com.jq.findapp.entity.Chat;
+import com.jq.findapp.TestConfig;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactBluetooth;
-import com.jq.findapp.entity.ContactRating;
+import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.entity.Ticket.TicketType;
@@ -38,8 +36,8 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.util.Utils;
 
-@ExtendWith({ SpringExtension.class })
-@SpringBootTest(classes = { FindappApplication.class, JpaTestConfiguration.class })
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = { FindappApplication.class, TestConfig.class })
 @ActiveProfiles("test")
 public class RepositoryTest {
 	@Autowired
@@ -51,46 +49,34 @@ public class RepositoryTest {
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
 
-	private Chat createChat(final Contact contact) throws Exception {
-		final Chat chat = new Chat();
-		chat.setNote("Hi");
-		chat.setContactId(contact.getId());
-		chat.setContactId2(adminId);
-		repository.save(chat);
-		return chat;
-	}
-
-	private ContactRating createRatingContact(final Contact contact) throws Exception {
-		final ContactRating rating = new ContactRating();
-		rating.setText("Hi");
-		rating.setContactId(contact.getId());
-		rating.setContactId2(adminId);
-		repository.save(rating);
-		return rating;
+	private ContactChat createChat(final Contact contact) throws Exception {
+		final ContactChat contactChat = new ContactChat();
+		contactChat.setNote("Hi");
+		contactChat.setContactId(contact.getId());
+		contactChat.setContactId2(adminId);
+		repository.save(contactChat);
+		return contactChat;
 	}
 
 	@Test
 	public void saveChat() throws Exception {
 		// given
 		final Contact contact = utils.createContact();
-		final Chat chat = createChat(contact);
-		final ContactRating rating = createRatingContact(contact);
-		final long created = chat.getCreatedAt().getTime();
+		final ContactChat contactChat = createChat(contact);
+		final long created = contactChat.getCreatedAt().getTime();
 		final byte[] b = new byte[500];
 		for (int i = 0; i < b.length; i++)
 			b[i] = 24;
-		chat.setImage(".jpg" + Attachment.SEPARATOR + Base64.getEncoder().encodeToString(b));
+		contactChat.setImage(".jpg" + Attachment.SEPARATOR + Base64.getEncoder().encodeToString(b));
 
 		// when
-		repository.save(chat);
+		repository.save(contactChat);
 
 		// then
-		assertEquals(created, chat.getCreatedAt().getTime());
-		assertEquals("Hi", chat.getNote());
-		assertTrue(chat.getImage().startsWith(".jpg" + Attachment.SEPARATOR));
-		assertNotEquals(created, chat.getModifiedAt().getTime());
-		assertNotNull(rating.getCreatedAt());
-		assertNull(rating.getModifiedAt());
+		assertEquals(created, contactChat.getCreatedAt().getTime());
+		assertEquals("Hi", contactChat.getNote());
+		assertTrue(contactChat.getImage().startsWith(".jpg" + Attachment.SEPARATOR));
+		assertNotEquals(created, contactChat.getModifiedAt().getTime());
 	}
 
 	@Test
@@ -215,15 +201,15 @@ public class RepositoryTest {
 	public void chat_duplicateNote() throws Exception {
 		// given
 		final Contact contact = utils.createContact();
-		final Chat chat = createChat(contact);
-		final Chat chat2 = new Chat();
-		chat2.setNote(chat.getNote());
-		chat2.setContactId(chat.getContactId());
-		chat2.setContactId2(chat.getContactId2());
+		final ContactChat contactChat = createChat(contact);
+		final ContactChat contactChat2 = new ContactChat();
+		contactChat2.setNote(contactChat.getNote());
+		contactChat2.setContactId(contactChat.getContactId());
+		contactChat2.setContactId2(contactChat.getContactId2());
 
 		// when
 		try {
-			repository.save(chat2);
+			repository.save(contactChat2);
 			throw new RuntimeException("no exception thrown");
 		} catch (IllegalArgumentException ex) {
 
@@ -239,19 +225,19 @@ public class RepositoryTest {
 		for (int i = 0; i < b.length; i++)
 			b[i] = 23;
 		final Contact contact = utils.createContact();
-		final Chat chat = new Chat();
-		chat.setImage(Attachment.createImage(".jpg", b));
-		chat.setContactId(contact.getId());
-		chat.setContactId2(adminId);
-		final Chat chat2 = new Chat();
-		chat2.setImage(Attachment.createImage(".jpg", b));
-		chat2.setContactId(chat.getContactId());
-		chat2.setContactId2(chat.getContactId2());
-		repository.save(chat);
+		final ContactChat contactChat = new ContactChat();
+		contactChat.setImage(Attachment.createImage(".jpg", b));
+		contactChat.setContactId(contact.getId());
+		contactChat.setContactId2(adminId);
+		final ContactChat contactChat2 = new ContactChat();
+		contactChat2.setImage(Attachment.createImage(".jpg", b));
+		contactChat2.setContactId(contactChat.getContactId());
+		contactChat2.setContactId2(contactChat.getContactId2());
+		repository.save(contactChat);
 
 		// when
 		try {
-			repository.save(chat2);
+			repository.save(contactChat2);
 			throw new RuntimeException("no exception thrown");
 		} catch (IllegalArgumentException ex) {
 
@@ -277,10 +263,10 @@ public class RepositoryTest {
 	public void convertObject2Json() throws Exception {
 		// given
 		final Contact contact = new Contact();
-		contact.setAttr("xyz");
+		contact.setSkills("xyz");
 		contact.setAboutMe("about others");
 		final JsonNode node = new ObjectMapper().convertValue(contact, JsonNode.class);
-		((ObjectNode) node).put("attr", "abc");
+		((ObjectNode) node).put("skills", "abc");
 
 		// when
 		final String result = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(node);

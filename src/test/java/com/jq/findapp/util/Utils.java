@@ -3,6 +3,7 @@ package com.jq.findapp.util;
 import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.ZoneId;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,5 +42,14 @@ public class Utils {
 			} while (contact.getId().intValue() < adminId.intValue());
 		}
 		return contact;
+	}
+
+	public void setEventDate(BigInteger id, Timestamp date) throws Exception {
+		String d = date.toInstant().atZone(ZoneId.systemDefault()).toString();
+		d = d.substring(0, d.indexOf('.')).replace('T', ' ');
+		repository.executeUpdate("update Event set startDate='" + d + "', endDate='"
+				+ (d = d.substring(0, d.indexOf(' '))) + "', contactId=1 where id=" + id);
+		repository.executeUpdate("update EventParticipate set eventDate='" + d + "' where eventId=" + id);
+		repository.executeUpdate("update Contact set latitude=2, longitude=-2 where id=1");
 	}
 }

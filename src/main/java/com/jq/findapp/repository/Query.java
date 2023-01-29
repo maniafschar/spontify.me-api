@@ -46,15 +46,13 @@ public enum Query {
 	location_listEventCurrent(true),
 	location_listFavorite,
 	location_listId,
-	location_listOpenTime,
 	location_listVisit,
-	location_rating(true),
-	location_ratingOverview(true),
 
 	misc_block,
 	misc_geoLocation,
 	misc_listLog,
 	misc_listTicket,
+	misc_rating,
 	misc_setting,
 	misc_statsApi,
 	misc_statsLocations,
@@ -107,15 +105,16 @@ public enum Query {
 		if (s.contains("{USERGENDER}"))
 			s = s.replaceAll("\\{USERGENDER}",
 					"" + (params.getUser().getGender() == null ? 0 : params.getUser().getGender()));
-		if (s.contains("{USERATTRIBUTES}"))
-			s = s.replaceAll("\\{USERATTRIBUTES}",
-					params.getUser().getAttr() == null
-							|| params.getUser().getAttr().trim().length() == 0 ? "-"
-									: params.getUser().getAttr().replace('\u0015', '|'));
-		if (s.contains("{USERATTRIBUTESEX}"))
-			s = s.replaceAll("\\{USERATTRIBUTESEX}",
-					params.getUser().getAttrEx() == null || params.getUser().getAttrEx().trim().length() == 0 ? "-"
-							: params.getUser().getAttrEx().replace(',', '|'));
+		if (s.contains("{USERSKILLS}"))
+			s = s.replaceAll("\\{USERSKILLS}",
+					params.getUser().getSkills() == null
+							|| params.getUser().getSkills().trim().length() == 0 ? "-"
+									: params.getUser().getSkills());
+		if (s.contains("{USERSKILLSTEXT}"))
+			s = s.replaceAll("\\{USERSKILLSTEXT}",
+					params.getUser().getSkillsText() == null || params.getUser().getSkillsText().trim().length() == 0
+							? "-"
+							: params.getUser().getSkillsText());
 		if (s.contains("{USERID}"))
 			s = s.replaceAll("\\{USERID}", "" + params.getUser().getId());
 		return s;

@@ -7,18 +7,17 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.jq.findapp.entity.Chat;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.Location;
-import com.jq.findapp.repository.GeoLocationProcessor;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -44,13 +43,7 @@ public class EventService {
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setSearch(
 					"contact.verified=true and contact.version is not null and contact.longitude is not null and (" +
-							"(length(contact.attrInterest)>0 or length(contact.attrInterestEx)>0) and (" +
-							"length(contact.attr0)>0 or length(contact.attr0Ex)>0 or " +
-							"length(contact.attr1)>0 or length(contact.attr1Ex)>0 or " +
-							"length(contact.attr2)>0 or length(contact.attr2Ex)>0 or " +
-							"length(contact.attr3)>0 or length(contact.attr3Ex)>0 or " +
-							"length(contact.attr4)>0 or length(contact.attr4Ex)>0 or " +
-							"length(contact.attr5)>0 or length(contact.attr5Ex)>0))");
+							"(length(contact.skliis)>0 or length(contact.skillsText)>0))");
 			params.setLimit(0);
 			final Result ids = repository.list(params);
 			params.setQuery(Query.location_listEventCurrent);
@@ -71,15 +64,16 @@ public class EventService {
 								&& realDate.minusDays(1).isBefore(now)
 								&& !isMaxParticipants(event, realDate, params.getUser())
 								&& Score.getContact(contactEvent, params.getUser()) > 0.4) {
-							final ZonedDateTime t = realDate.atZone(ZoneOffset.UTC)
-									.minus(Duration.ofMinutes(params.getUser().getTimezoneOffset()));
+							final ZonedDateTime t = realDate
+									.atZone(TimeZone.getTimeZone(params.getUser().getTimezone()).toZoneId());
 							final String time = t.getHour() + ":" + (t.getMinute() < 10 ? "0" : "") + t.getMinute();
 							if (event.getLocationId() == null) {
 								notificationService.sendNotification(contactEvent,
 										params.getUser(), ContactNotificationTextType.eventNotifyWithoutLocation,
 										Strings.encodeParam("e=" + event.getId()),
 										time,
-										Text.valueOf("category_verb" + event.getCategory())
+										// TODO replace getCategory
+										Text.valueOf("category_verb" /* + event.getCategory() */)
 												.getText(params.getUser().getLanguage()),
 										event.getText());
 							} else
@@ -129,7 +123,8 @@ public class EventService {
 								repository.delete(event);
 							else {
 								final Contact contact = repository.one(Contact.class, eventParticipate.getContactId());
-								final ZonedDateTime t = time.minus(Duration.ofMinutes(contact.getTimezoneOffset()));
+								final ZonedDateTime t = event.getStartDate().toInstant()
+										.atZone(TimeZone.getTimeZone(contact.getTimezone()).toZoneId());
 								notificationService.sendNotification(
 										repository.one(Contact.class, event.getContactId()),
 										contact, ContactNotificationTextType.eventNotification,
@@ -145,20 +140,6 @@ public class EventService {
 			result[1] = Strings.stackTraceToString(e);
 		}
 		return result;
-	}
-
-	public String[] notifyCheckInOut() {
-		final String[] result = new String[] { getClass().getSimpleName() + "/notifyCheckInOut", null };
-		try {
-			new CheckInOut().exec(null);
-		} catch (Exception e) {
-			result[1] = Strings.stackTraceToString(e);
-		}
-		return result;
-	}
-
-	public void notifyCheckInOut(BigInteger contactId) throws Exception {
-		new CheckInOut().exec(contactId);
 	}
 
 	public LocalDateTime getRealDate(Event event) {
@@ -190,86 +171,5 @@ public class EventService {
 		params.setSearch("eventParticipate.eventId=" + event.getId() + " and eventParticipate.eventDate='"
 				+ date.toLocalDate() + "' and eventParticipate.state=1");
 		return ((Number) repository.one(params).get("_c")).intValue() >= event.getMaxParticipants().intValue();
-	}
-
-	private class CheckInOut {
-		private void exec(BigInteger contactId) throws Exception {
-			final QueryParams params = new QueryParams(Query.location_eventParticipate);
-			params.setSearch((contactId == null ? "" : "eventParticipate.contactId=" + contactId + " and ") +
-					"event.marketingEvent=true and event.startDate>='"
-					+ Instant.now().minus(Duration.ofHours(3)) + "' and event.startDate<='"
-					+ Instant.now().plus(Duration.ofHours(1)) + "' and eventParticipate.state=1");
-			final Result result = repository.list(params);
-			for (int i = 0; i < result.size(); i++) {
-				final Contact contact = repository.one(Contact.class,
-						(BigInteger) result.get(i).get("event.contactId"));
-				sendCheckInOut((BigInteger) result.get(i).get("event.id"),
-						contact.getLatitude(), contact.getLongitude(), contactId != null);
-			}
-		}
-
-		private void sendCheckInOut(BigInteger eventId, Float latitude, Float longitude, boolean fromLocationService)
-				throws Exception {
-			final QueryParams params = new QueryParams(Query.contact_chat);
-			final Event event = repository.one(Event.class, eventId);
-			final Instant eventTime = Instant.ofEpochMilli(event.getStartDate().getTime());
-			if (latitude == null) {
-				if (Instant.now().plus(Duration.ofMinutes(10)).isAfter(eventTime)) {
-					params.setSearch("chat.contactId2=" + event.getContactId() + " and chat.textId='"
-							+ Text.marketing_eventLocationFailed + "' and chat.createdAt>'"
-							+ Instant.now().minus(Duration.ofDays(1)) + "'");
-					if (repository.list(params).size() == 0)
-						sendChat(event, Text.marketing_eventLocationFailed, 0);
-				}
-				return;
-			}
-			final Location location = repository.one(Location.class, event.getLocationId());
-			final double distance = GeoLocationProcessor.distance(location.getLatitude(), location.getLongitude(),
-					latitude, longitude);
-			final double maxDistance = 0.1;
-			if (shouldSendChat(Text.marketing_eventCheckedIn, event.getContactId())) {
-				if (Instant.now().plus(Duration.ofMinutes(10)).isAfter(eventTime)) {
-					if (fromLocationService && distance < maxDistance)
-						sendChat(event, Text.marketing_eventCheckedIn, distance);
-					else if (Instant.now().minus(Duration.ofMinutes(10)).isAfter(eventTime))
-						sendChat(event, Text.marketing_eventCheckedInFailed, distance);
-				}
-			} else if (Instant.now().minus(Duration.ofHours(1)).isAfter(eventTime)) {
-				if (fromLocationService && distance < maxDistance)
-					sendChat(event, Text.marketing_eventCheckedOut, distance);
-				else if (distance >= maxDistance)
-					sendChat(event, Text.marketing_eventCheckedOutFailedDistance, distance);
-				else
-					sendChat(event, Text.marketing_eventCheckedOutFailedOpenApp, distance);
-			}
-		}
-
-		private boolean shouldSendChat(Text text, BigInteger contactId) {
-			final QueryParams params = new QueryParams(Query.contact_chat);
-			params.setSearch("chat.contactId2=" + contactId +
-					" and chat.textId='" + text +
-					"' and chat.createdAt>'" + Instant.now().minus(Duration.ofHours(6)) + "'");
-			return repository.list(params).size() == 0;
-		}
-
-		private void sendChat(Event event, Text text, double distance) throws Exception {
-			if (shouldSendChat(text, event.getContactId())) {
-				final String d;
-				if (distance >= 1)
-					d = String.format("%.1f", distance) + "km";
-				else
-					d = ((int) (distance * 1000.0)) + "m";
-				final Contact contact = repository.one(Contact.class, event.getContactId());
-				final Chat chat = new Chat();
-				chat.setContactId(adminId);
-				chat.setContactId2(contact.getId());
-				chat.setSeen(false);
-				chat.setTextId(text);
-				chat.setNote(text.getText(contact.getLanguage()).replace("<jq:EXTRA_1 />", contact.getPseudonym())
-						.replace("<jq:EXTRA_2 />", repository.one(Location.class, event.getLocationId()).getName())
-						.replace("<jq:EXTRA_3 />", d));
-				repository.save(chat);
-			}
-		}
 	}
 }

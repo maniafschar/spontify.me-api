@@ -1,47 +1,24 @@
 package com.jq.findapp.entity;
 
 import java.math.BigInteger;
-import java.sql.Date;
 
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.Transient;
 
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.repository.listener.LocationListener;
 
 @Entity
-@EntityListeners(LocationListener.class)
 public class Location extends BaseEntity {
 	private BigInteger contactId;
-	private BigInteger ownerId;
-	private Boolean openTimesBankholiday;
-	private Date paymentDate;
-	private Date urlActive;
 	private Float googleRating;
 	private Float latitude;
 	private Float longitude;
-	private Float paymentAmount;
 	private Integer googleRatingTotal;
 	private Short rating;
 	private String address;
 	private String address2;
-	private String attr0;
-	private String attr0Ex;
-	private String attr1;
-	private String attr1Ex;
-	private String attr2;
-	private String attr2Ex;
-	private String attr3;
-	private String attr3Ex;
-	private String attr4;
-	private String attr4Ex;
-	private String attr5;
-	private String attr5Ex;
-	private String bonus;
-	private String budget;
 	private String category;
 	private String country;
 	private String description;
@@ -50,9 +27,6 @@ public class Location extends BaseEntity {
 	private String imageList;
 	private String marketingMail;
 	private String name;
-	private String openTimesText;
-	private String parkingOption;
-	private String parkingText;
 	private String street;
 	private String number;
 	private String subcategories;
@@ -62,28 +36,12 @@ public class Location extends BaseEntity {
 	private String urlInternal;
 	private String zipCode;
 
-	public String getBudget() {
-		return budget;
-	}
-
-	public void setBudget(String budget) {
-		this.budget = budget;
-	}
-
 	public BigInteger getContactId() {
 		return contactId;
 	}
 
 	public void setContactId(BigInteger contactId) {
 		this.contactId = contactId;
-	}
-
-	public BigInteger getOwnerId() {
-		return ownerId;
-	}
-
-	public void setOwnerId(BigInteger ownerId) {
-		this.ownerId = ownerId;
 	}
 
 	public String getCategory() {
@@ -148,22 +106,6 @@ public class Location extends BaseEntity {
 
 	public void setUrl(String url) {
 		this.url = url;
-	}
-
-	public Date getPaymentDate() {
-		return paymentDate;
-	}
-
-	public void setPaymentDate(Date paymentDate) {
-		this.paymentDate = paymentDate;
-	}
-
-	public Date getUrlActive() {
-		return urlActive;
-	}
-
-	public void setUrlActive(Date urlActive) {
-		this.urlActive = urlActive;
 	}
 
 	public String getZipCode() {
@@ -238,44 +180,12 @@ public class Location extends BaseEntity {
 		this.telephone = telephone;
 	}
 
-	public String getParkingText() {
-		return parkingText;
-	}
-
-	public void setParkingText(String parkingText) {
-		this.parkingText = parkingText;
-	}
-
-	public String getParkingOption() {
-		return parkingOption;
-	}
-
-	public void setParkingOption(String parkingOption) {
-		this.parkingOption = parkingOption;
-	}
-
 	public Short getRating() {
 		return rating;
 	}
 
 	public void setRating(Short rating) {
 		this.rating = rating;
-	}
-
-	public String getOpenTimesText() {
-		return openTimesText;
-	}
-
-	public void setOpenTimesText(String openTimesText) {
-		this.openTimesText = openTimesText;
-	}
-
-	public Boolean getOpenTimesBankholiday() {
-		return openTimesBankholiday;
-	}
-
-	public void setOpenTimesBankholiday(Boolean openTimesBankholiday) {
-		this.openTimesBankholiday = openTimesBankholiday;
 	}
 
 	public String getSubcategories() {
@@ -286,10 +196,6 @@ public class Location extends BaseEntity {
 		this.subcategories = subcategories;
 	}
 
-	public void setPaymentAmount(Float paymentAmount) {
-		this.paymentAmount = paymentAmount;
-	}
-
 	public void setLatitude(Float latitude) {
 		this.latitude = latitude;
 	}
@@ -298,120 +204,12 @@ public class Location extends BaseEntity {
 		this.longitude = longitude;
 	}
 
-	public String getBonus() {
-		return bonus;
-	}
-
-	public void setBonus(String bonus) {
-		this.bonus = bonus;
-	}
-
-	public Float getPaymentAmount() {
-		return paymentAmount;
-	}
-
 	public Float getLatitude() {
 		return latitude;
 	}
 
 	public Float getLongitude() {
 		return longitude;
-	}
-
-	public String getAttr0Ex() {
-		return attr0Ex;
-	}
-
-	public void setAttr0Ex(String attr0Ex) {
-		this.attr0Ex = attr0Ex;
-	}
-
-	public String getAttr1Ex() {
-		return attr1Ex;
-	}
-
-	public void setAttr1Ex(String attr1Ex) {
-		this.attr1Ex = attr1Ex;
-	}
-
-	public String getAttr2Ex() {
-		return attr2Ex;
-	}
-
-	public void setAttr2Ex(String attr2Ex) {
-		this.attr2Ex = attr2Ex;
-	}
-
-	public String getAttr3Ex() {
-		return attr3Ex;
-	}
-
-	public void setAttr3Ex(String attr3Ex) {
-		this.attr3Ex = attr3Ex;
-	}
-
-	public String getAttr4Ex() {
-		return attr4Ex;
-	}
-
-	public void setAttr4Ex(String attr4Ex) {
-		this.attr4Ex = attr4Ex;
-	}
-
-	public String getAttr5Ex() {
-		return attr5Ex;
-	}
-
-	public void setAttr5Ex(String attr5Ex) {
-		this.attr5Ex = attr5Ex;
-	}
-
-	public String getAttr0() {
-		return attr0;
-	}
-
-	public void setAttr0(String attr0) {
-		this.attr0 = attr0;
-	}
-
-	public String getAttr1() {
-		return attr1;
-	}
-
-	public void setAttr1(String attr1) {
-		this.attr1 = attr1;
-	}
-
-	public String getAttr2() {
-		return attr2;
-	}
-
-	public void setAttr2(String attr2) {
-		this.attr2 = attr2;
-	}
-
-	public String getAttr3() {
-		return attr3;
-	}
-
-	public void setAttr3(String attr3) {
-		this.attr3 = attr3;
-	}
-
-	public String getAttr4() {
-		return attr4;
-	}
-
-	public void setAttr4(String attr4) {
-		this.attr4 = attr4;
-	}
-
-	public String getAttr5() {
-		return attr5;
-	}
-
-	public void setAttr5(String attr5) {
-		this.attr5 = attr5;
 	}
 
 	public Float getGoogleRating() {
@@ -433,10 +231,6 @@ public class Location extends BaseEntity {
 	@Transient
 	@Override
 	public boolean writeAccess(BigInteger user, Repository repository) {
-		if (user.equals(getOwnerId()))
-			return true;
-		if (getOwnerId() != null)
-			return false;
 		if (user.equals(getContactId()))
 			return true;
 		final QueryParams params = new QueryParams(Query.location_list);

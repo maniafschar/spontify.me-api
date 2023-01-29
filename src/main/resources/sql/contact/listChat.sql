@@ -3,19 +3,19 @@ SELECT
 	contact.gender,
 	contact.imageList,
 	contact.pseudonym,
-	max(chat.id) as chatId,
-	max(chat.createdAt) as maxDate,
-	(select contactId from Chat where id=max(chat.id)) as contactId,
-	sum(CASE WHEN chat.seen=true OR chat.contactId={USERID} THEN 0 ELSE 1 END) as unseen,
-	sum(CASE WHEN chat.seen=true OR chat.contactId<>{USERID} THEN 0 ELSE 1 END) as unseen2
+	max(contactChat.id) as chatId,
+	max(contactChat.createdAt) as maxDate,
+	(select contactId from ContactChat where id=max(contactChat.id)) as contactId,
+	sum(CASE WHEN contactChat.seen=true OR contactChat.contactId={USERID} THEN 0 ELSE 1 END) as unseen,
+	sum(CASE WHEN contactChat.seen=true OR contactChat.contactId<>{USERID} THEN 0 ELSE 1 END) as unseen2
 FROM
 	Contact contact,
-	Chat chat
+	ContactChat contactChat
 WHERE
 	(
-		(chat.contactId2={USERID} and contact.id=chat.contactId)
+		(contactChat.contactId2={USERID} and contact.id=contactChat.contactId)
 		or
-		(chat.contactId={USERID} and contact.id=chat.contactId2)
+		(contactChat.contactId={USERID} and contact.id=contactChat.contactId2)
 	) and contact.id<>{USERID} and contact.verified=1 and
 	{search}
 GROUP BY

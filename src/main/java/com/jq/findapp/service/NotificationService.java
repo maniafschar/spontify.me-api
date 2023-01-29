@@ -117,8 +117,8 @@ public class NotificationService {
 				final int age = me.getAge().intValue();
 				if (s2.indexOf(',') < 1 || ("18".equals(s[0]) || age >= Integer.parseInt(s[0]))
 						&& ("99".equals(s[1]) || age <= Integer.parseInt(s[1]))) {
-					final List<String> attribs = compareAttributes(me.getAttr(), other.getAttrInterest());
-					final List<String> attribsEx = compareAttributes(me.getAttrEx(), other.getAttrInterestEx());
+					final List<String> attribs = compareAttributes(me.getSkills(), other.getSkills());
+					final List<String> attribsEx = compareAttributes(me.getSkillsText(), other.getSkillsText());
 					if (attribs.size() > 0 || attribsEx.size() > 0) {
 						String[] param2 = new String[param == null ? 1 : param.length + 1];
 						param2[0] = "" + (attribs.size() + attribsEx.size());
@@ -226,7 +226,7 @@ public class NotificationService {
 		values.chatUnseen = new HashMap<>();
 		for (int i = 0; i < list.size(); i++) {
 			final Map<String, Object> row = list.get(i);
-			values.chatUnseen.put("" + row.get("chat.contactId2"), ((Number) row.get("_c")).intValue());
+			values.chatUnseen.put("" + row.get("contactChat.contactId2"), ((Number) row.get("_c")).intValue());
 		}
 		return values;
 	}
@@ -310,14 +310,12 @@ public class NotificationService {
 	}
 
 	private boolean userWantsNotification(ContactNotificationTextType notificationTextType, Contact contact) {
-		if (ContactNotificationTextType.chatNew == notificationTextType
-				|| ContactNotificationTextType.chatLocation == notificationTextType)
+		if (ContactNotificationTextType.chatNew == notificationTextType)
 			return contact.getNotificationChat();
 		if (ContactNotificationTextType.contactFriendRequest == notificationTextType
 				|| ContactNotificationTextType.contactFriendApproved == notificationTextType)
 			return contact.getNotificationFriendRequest();
-		if (ContactNotificationTextType.contactVisitLocation == notificationTextType
-				|| ContactNotificationTextType.locationRatingMatch == notificationTextType)
+		if (ContactNotificationTextType.contactVisitLocation == notificationTextType)
 			return contact.getNotificationVisitLocation();
 		if (ContactNotificationTextType.contactVisitProfile == notificationTextType)
 			return contact.getNotificationVisitProfile();

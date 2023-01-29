@@ -1,27 +1,11 @@
 SELECT
 	contact.age,
 	contact.aboutMe,
-	contact.attr,
-	contact.attrEx,
-	contact.attr0,
-	contact.attr0Ex,
-	contact.attr1,
-	contact.attr1Ex,
-	contact.attr2,
-	contact.attr2Ex,
-	contact.attr3,
-	contact.attr3Ex,
-	contact.attr4,
-	contact.attr4Ex,
-	contact.attr5,
-	contact.attr5Ex,
-	contact.attrInterest,
-	contact.attrInterestEx,
+	contact.skills,
+	contact.skillsText,
 	contact.birthday,
 	contact.birthdayDisplay,
-	contact.budget,
 	contact.gender,
-	contact.guide,
 	contact.id,
 	contact.idDisplay,
 	contact.image,
@@ -32,8 +16,10 @@ SELECT
 	contact.rating,
 	contactVisit.id,
 	contactVisit.count,
+	contactVisit.createdAt,
 	contactVisit.modifiedAt,
 	contactLink.status,
+	case when contactVisit.modifiedAt is null then contactVisit.createdAt else contactVisit.modifiedAt end as time,
 	'' as geolocationDistance
 FROM
 	ContactVisit contactVisit,
@@ -45,4 +31,4 @@ WHERE
 	contact.id<>{USERID} and contact.verified=1 and
 	{search}
 ORDER BY
-	contactVisit.modifiedAt DESC
+	time DESC

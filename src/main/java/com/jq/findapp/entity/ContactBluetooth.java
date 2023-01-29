@@ -3,12 +3,8 @@ package com.jq.findapp.entity;
 import java.math.BigInteger;
 
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-
-import com.jq.findapp.repository.listener.ContactBluetoothListener;
 
 @Entity
-@EntityListeners(ContactBluetoothListener.class)
 public class ContactBluetooth extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger contactId2;

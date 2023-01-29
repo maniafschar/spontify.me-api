@@ -27,7 +27,6 @@ public class ContactNotification extends BaseEntity {
 	}
 
 	public enum ContactNotificationTextType {
-		chatLocation,
 		chatNew,
 		chatSeen,
 		contactBirthday,
@@ -43,8 +42,7 @@ public class ContactNotification extends BaseEntity {
 		eventNotifyWithoutLocation,
 		eventNotification,
 		eventParticipate,
-		locationMarketing,
-		locationRatingMatch;
+		eventRated;
 	}
 
 	public String getText() {

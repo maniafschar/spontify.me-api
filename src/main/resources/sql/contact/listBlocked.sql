@@ -10,8 +10,6 @@ SELECT
 	contact.age,
 	contact.birthdayDisplay,
 	contact.gender,
-	contact.attr,
-	contact.attrEx,
 	contact.rating,
 	block.id,
 	block.note,

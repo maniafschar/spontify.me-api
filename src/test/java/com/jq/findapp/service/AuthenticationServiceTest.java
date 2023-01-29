@@ -26,7 +26,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.jq.findapp.FindappApplication;
-import com.jq.findapp.JpaTestConfiguration;
+import com.jq.findapp.TestConfig;
 import com.jq.findapp.api.model.InternalRegistration;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactToken;
@@ -40,8 +40,8 @@ import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.EncryptionTest;
 import com.jq.findapp.util.Utils;
 
-@ExtendWith({ SpringExtension.class })
-@SpringBootTest(classes = { FindappApplication.class, JpaTestConfiguration.class })
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = { FindappApplication.class, TestConfig.class })
 @ActiveProfiles("test")
 public class AuthenticationServiceTest {
 	@Autowired

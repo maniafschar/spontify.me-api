@@ -10,7 +10,6 @@ select
 	event.id,
 	event.locationId,
 	event.contactId,
-	event.marketingEvent,
 	event.maxParticipants,
 	event.price,
 	event.startDate,
@@ -18,6 +17,8 @@ select
 	event.type,
 	event.visibility
 FROM
-	EventParticipate eventParticipate left join Event event on event.id=eventParticipate.eventId
+	EventParticipate eventParticipate,
+	Event event
 WHERE
+	event.id=eventParticipate.eventId and
 	{search}

@@ -102,9 +102,6 @@ public class AuthenticationApi {
 				repository.save(t);
 				user.put("auto_login_token", Encryption.encrypt(t.getToken(), publicKey));
 			}
-			if ("0.2.6".equals(contact.getVersion()))
-				user.put("script_correction",
-						"ui.labels.event={acceptedMarketingEvent:'Dein Event wurde genehmigt, viel Spaß!'}");
 		}
 		return user;
 	}
