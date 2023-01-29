@@ -47,7 +47,7 @@ public class IntegrationTest {
 		new ProcessBuilder("./web.sh start".split(" ")).start();
 		driver = new SafariDriver();
 		driver.manage().timeouts().implicitlyWait(50, TimeUnit.MILLISECONDS);
-		driver.manage().window().setSize(new Dimension(600, 860));
+		driver.manage().window().setSize(new Dimension(450, 800));
 	}
 
 	@AfterAll
