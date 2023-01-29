@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -29,9 +30,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.jq.findapp.util.Utils;
 
-@ExtendWith({ SpringExtension.class })
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = { FindappApplication.class,
-		JpaTestConfiguration.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+		TestConfig.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestPropertySource(properties = "server.port=9001")
 @ActiveProfiles("test")
 public class IntegrationTest {
@@ -46,6 +47,7 @@ public class IntegrationTest {
 		new ProcessBuilder("./web.sh start".split(" ")).start();
 		driver = new SafariDriver();
 		driver.manage().timeouts().implicitlyWait(50, TimeUnit.MILLISECONDS);
+		driver.manage().window().setSize(new Dimension(600, 860));
 	}
 
 	@AfterAll
@@ -180,14 +182,14 @@ public class IntegrationTest {
 					driver.findElements(By.cssSelector("main [class*=\"animated\"]")).size() > 0 ||
 					driver.findElements(By.cssSelector("content[class*=\"SlideOut\"]")).size() > 0) {
 				if (i++ > maxWait)
-					throw new RuntimeException("Timeout while animation, tried to get " + id);
+					throw new RuntimeException("Timeout during animation, tried to get " + id);
 				sleep(100);
 			}
 			List<WebElement> list;
 			i = 0;
 			while ((list = driver.findElements(By.cssSelector(id))).size() == 0) {
 				if (i++ > maxWait)
-					throw new RuntimeException("Timeout while finding element " + id);
+					throw new RuntimeException("Timeout during finding element " + id);
 				sleep(100);
 			}
 			return list.get(0);

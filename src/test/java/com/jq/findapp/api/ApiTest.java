@@ -20,16 +20,16 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.FindappApplication;
-import com.jq.findapp.JpaTestConfiguration;
+import com.jq.findapp.TestConfig;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.backend.EngagementService;
 import com.jq.findapp.util.Utils;
 
-@ExtendWith({ SpringExtension.class })
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = { FindappApplication.class,
-		JpaTestConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT, properties = { "app.admin.id=1" })
+		TestConfig.class }, webEnvironment = WebEnvironment.RANDOM_PORT, properties = { "app.admin.id=1" })
 @ActiveProfiles("test")
 public class ApiTest {
 	@LocalServerPort

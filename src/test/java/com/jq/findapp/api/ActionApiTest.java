@@ -15,12 +15,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.FindappApplication;
-import com.jq.findapp.JpaTestConfiguration;
+import com.jq.findapp.TestConfig;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.service.ExternalService;
 
-@ExtendWith({ SpringExtension.class })
-@SpringBootTest(classes = { FindappApplication.class, JpaTestConfiguration.class })
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = { FindappApplication.class, TestConfig.class })
 @ActiveProfiles("test")
 public class ActionApiTest {
 	@Autowired

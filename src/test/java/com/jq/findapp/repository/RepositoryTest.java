@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.FindappApplication;
-import com.jq.findapp.JpaTestConfiguration;
+import com.jq.findapp.TestConfig;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactBluetooth;
 import com.jq.findapp.entity.ContactChat;
@@ -36,8 +36,8 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.util.Utils;
 
-@ExtendWith({ SpringExtension.class })
-@SpringBootTest(classes = { FindappApplication.class, JpaTestConfiguration.class })
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = { FindappApplication.class, TestConfig.class })
 @ActiveProfiles("test")
 public class RepositoryTest {
 	@Autowired

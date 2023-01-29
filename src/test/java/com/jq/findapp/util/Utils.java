@@ -45,8 +45,11 @@ public class Utils {
 	}
 
 	public void setEventDate(BigInteger id, Timestamp date) throws Exception {
-		final String d = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString();
-		repository.executeUpdate("update Event set startDate='" + d + "', contactId=1 where id=" + id);
+		String d = date.toInstant().atZone(ZoneId.systemDefault()).toString();
+		d = d.substring(0, d.indexOf('.')).replace('T', ' ');
+		repository.executeUpdate("update Event set startDate='" + d + "', endDate='"
+				+ (d = d.substring(0, d.indexOf(' '))) + "', contactId=1 where id=" + id);
 		repository.executeUpdate("update EventParticipate set eventDate='" + d + "' where eventId=" + id);
+		repository.executeUpdate("update Contact set latitude=2, longitude=-2 where id=1");
 	}
 }
