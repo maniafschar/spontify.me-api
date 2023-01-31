@@ -13,7 +13,7 @@ public class GeoLocationProcessor {
 	private double radLat;
 	private double radLon;
 
-	private boolean integer;
+	private boolean roundToInteger;
 	private boolean sort;
 	private String table;
 
@@ -32,7 +32,9 @@ public class GeoLocationProcessor {
 			if (params.getDistance() == null)
 				params.setDistance(100);
 			table = params.getQuery().name().split("_")[0];
-			integer = params.getQuery().name().startsWith("contact_");
+			if ("event".equals(table))
+				table = "location";
+			roundToInteger = params.getQuery().name().startsWith("contact_");
 			sort = params.isSort();
 			radLat = Math.toRadians(params.getLatitude());
 			radLon = Math.toRadians(params.getLongitude());
@@ -112,7 +114,7 @@ public class GeoLocationProcessor {
 					final Object[] row = ((Object[]) list.get(i));
 					if (row[distance] == max)
 						row[distance] = null;
-					else if (integer) {
+					else if (roundToInteger) {
 						if (((Number) row[distance]).doubleValue() <= 1.5)
 							row[distance] = 1;
 						else

@@ -39,6 +39,8 @@ select
 	contactLink.status,
 	location.name,
 	location.address,
+	location.image,
+	location.imageList,
 	'' as geolocationDistance
 FROM
 	EventParticipate eventParticipate,

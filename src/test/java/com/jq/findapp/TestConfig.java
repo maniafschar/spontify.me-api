@@ -92,7 +92,7 @@ public class TestConfig {
 		public void onApplicationEvent(ContextRefreshedEvent event) {
 			final ApplicationContext applicationContext = event.getApplicationContext();
 			applicationContext.getBean(RequestMappingHandlerMapping.class).getHandlerMethods()
-					.forEach((e, f) -> System.out.println(e + "\n" + f));
+					.forEach((e, f) -> System.out.println(e + " => " + f));
 		}
 	}
 

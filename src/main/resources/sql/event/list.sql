@@ -52,7 +52,8 @@ SELECT
 	locationFavorite.favorite,
 	'' as geolocationDistance
 FROM
-	Event event left join EventParticipate eventParticipate on eventParticipate.contactId={USERID} and eventParticipate.eventId=event.id left join
+	Event event left join 
+	EventParticipate eventParticipate on event.id=eventParticipate.eventId left join
 	Location location on event.locationId=location.id left join
 	LocationFavorite locationFavorite on locationFavorite.locationId=location.id and locationFavorite.contactId={USERID},
 	Contact contact left join

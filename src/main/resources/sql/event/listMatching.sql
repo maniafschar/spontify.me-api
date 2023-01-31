@@ -12,13 +12,6 @@ select
 	event.startDate,
 	event.text,
 	event.visibility,
-	eventParticipate.id,
-	eventParticipate.contactId,
-	eventParticipate.eventId,
-	eventParticipate.eventDate,
-	eventParticipate.state,
-	eventParticipate.reason,
-	eventParticipate.modifiedAt,
 	contact.id,
 	contact.pseudonym,
 	contact.age,
@@ -48,8 +41,7 @@ select
 	locationFavorite.favorite,
 	'' as geolocationDistance
 FROM
-	Event event left join EventParticipate eventParticipate on eventParticipate.contactId={USERID} and eventParticipate.eventId=event.id left join
-	Location location on event.locationId=location.id left join
+	Event event left join Location location on event.locationId=location.id left join
 	LocationFavorite locationFavorite on locationFavorite.locationId=location.id and locationFavorite.contactId={USERID},
 	Contact contact left join
 	ContactLink contactLink on

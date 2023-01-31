@@ -46,7 +46,7 @@ public class EventService {
 							"(length(contact.skliis)>0 or length(contact.skillsText)>0))");
 			params.setLimit(0);
 			final Result ids = repository.list(params);
-			params.setQuery(Query.location_listEventCurrent);
+			params.setQuery(Query.event_listMatching);
 			params.setDistance(50);
 			params.setSearch("TO_DAYS(event.startDate)-1<=TO_DAYS(current_timestamp)");
 			final LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
@@ -98,7 +98,7 @@ public class EventService {
 	public String[] notifyParticipation() {
 		final String[] result = new String[] { getClass().getSimpleName() + "/notifyParticipation", null };
 		try {
-			final QueryParams params = new QueryParams(Query.location_eventParticipate);
+			final QueryParams params = new QueryParams(Query.event_listParticipateRaw);
 			params.setSearch("eventParticipate.state=1 and eventParticipate.eventDate>'"
 					+ Instant.now().minus((Duration.ofDays(1)))
 					+ "' and eventParticipate.eventDate<'"
@@ -167,9 +167,10 @@ public class EventService {
 	private boolean isMaxParticipants(Event event, LocalDateTime date, Contact contact) {
 		if (event.getMaxParticipants() == null)
 			return false;
-		final QueryParams params = new QueryParams(Query.contact_eventParticipateCount);
+		final QueryParams params = new QueryParams(Query.event_listParticipateRaw);
+		params.setUser(contact);
 		params.setSearch("eventParticipate.eventId=" + event.getId() + " and eventParticipate.eventDate='"
 				+ date.toLocalDate() + "' and eventParticipate.state=1");
-		return ((Number) repository.one(params).get("_c")).intValue() >= event.getMaxParticipants().intValue();
+		return repository.list(params).size() >= event.getMaxParticipants().intValue();
 	}
 }

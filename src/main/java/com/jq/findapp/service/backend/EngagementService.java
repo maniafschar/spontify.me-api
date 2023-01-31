@@ -186,7 +186,7 @@ public class EngagementService {
 		chatTemplates.add(new ChatTemplate(Text.engagement_addEvent,
 				"",
 				contact -> {
-					final QueryParams params = new QueryParams(Query.location_listEvent);
+					final QueryParams params = new QueryParams(Query.event_list);
 					params.setUser(contact);
 					params.setSearch("event.contactId=" + contact.getId());
 					if (repository.list(params).size() == 0) {

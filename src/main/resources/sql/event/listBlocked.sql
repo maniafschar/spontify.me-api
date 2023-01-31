@@ -19,15 +19,16 @@ SELECT
 	location.latitude,
 	location.longitude,
 	location.name,
+	contact.pseudonym,
 	block.id,
 	block.note,
 	block.reason,
 	'' as geolocationDistance
 FROM
-	Event event,
-	Location location,
-	Block block
+	Event event left join Location location on event.locationId=location.id,
+	Block block,
+	Contact contact
 WHERE
 	block.eventId=event.id and
 	block.contactId={USERID} and
-	event.locationId=location.id
+	event.contactId=contact.id
