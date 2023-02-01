@@ -37,14 +37,23 @@ select
 	contactLink.contactId2,
 	contactLink.id,
 	contactLink.status,
-	location.name,
 	location.address,
+	location.description,
+	location.id,
 	location.image,
 	location.imageList,
+	location.latitude,
+	location.longitude,
+	location.name,
+	location.rating,
+	location.town,
+	locationFavorite.id,
+	locationFavorite.favorite,
 	'' as geolocationDistance
 FROM
 	EventParticipate eventParticipate,
-	Event event left join Location location on event.locationId=location.id,
+	Event event left join Location location on event.locationId=location.id left join
+	LocationFavorite locationFavorite on locationFavorite.locationId=location.id and locationFavorite.contactId={USERID},
 	Contact contact
 	left join ContactLink contactLink on
 		contactLink.contactId={USERID} and contactLink.contactId2=contact.id
