@@ -6,7 +6,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -356,7 +355,7 @@ public class AuthenticationService {
 		notificationService.sendNotificationEmail(repository.one(Contact.class, adminId),
 				contact,
 				Text.mail_contactRegistrationReminder.getText(contact.getLanguage()).replace("<jq:EXTRA_1 />",
-						new SimpleDateFormat("dd.MM.yyyy HH:mm").format(contact.getCreatedAt())),
+						Strings.formatDate(null, contact.getCreatedAt(), contact.getTimezone())),
 				"r=" + s);
 	}
 

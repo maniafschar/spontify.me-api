@@ -3,7 +3,6 @@ package com.jq.findapp.service.backend;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -84,8 +83,8 @@ public class EngagementService {
 		EMOJI_WAVING(
 				(contact, location, externalService,
 						repository) -> contact.getGender() != null && contact.getGender() == 1 ? "🙋🏻‍♂️" : "🙋‍♀️"),
-		CONTACT_MODIFIED_AT((contact, location, externalService, repository) -> new SimpleDateFormat("d.M. H:mm")
-				.format(contact.getModifiedAt())),
+		CONTACT_MODIFIED_AT((contact, location, externalService, repository) -> Strings.formatDate(null,
+				contact.getModifiedAt(), contact.getTimezone())),
 		CONTACT_PSEUDONYM((contact, location, externalService, repository) -> contact.getPseudonym()),
 		CONTACT_CURRENT_TOWN((contact, location, externalService, repository) -> {
 			try {

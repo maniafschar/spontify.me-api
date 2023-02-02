@@ -1,5 +1,6 @@
 package com.jq.findapp.repository.listener;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -23,7 +24,7 @@ public class EventParticipateListener extends AbstractRepositoryListener<EventPa
 			if (event != null && !event.getContactId().equals(eventParticipate.getContactId())) {
 				final Contact contactTo = repository.one(Contact.class, event.getContactId());
 				final Contact contactFrom = repository.one(Contact.class, eventParticipate.getContactId());
-				final Instant time = eventParticipate.getEventDate().toInstant();
+				final Instant time = new Timestamp(eventParticipate.getEventDate().getTime()).toInstant();
 				final ZonedDateTime t = event.getStartDate().toInstant().atZone(ZoneOffset.UTC);
 				notificationService.sendNotification(contactFrom, contactTo,
 						ContactNotificationTextType.eventParticipate,

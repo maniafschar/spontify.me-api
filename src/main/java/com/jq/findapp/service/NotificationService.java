@@ -13,7 +13,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -335,7 +334,7 @@ public class NotificationService {
 		String s2;
 		Strings.replaceString(html, "<jq:pseudonym />", contactTo.getPseudonym());
 		Strings.replaceString(text, "<jq:pseudonym />", contactTo.getPseudonym());
-		s2 = new SimpleDateFormat("dd.MM.yy HH:mm").format(new Date());
+		s2 = Strings.formatDate(null, new Date(), contactTo.getTimezone());
 		Strings.replaceString(html, "<jq:time />", s2);
 		Strings.replaceString(text, "<jq:time />", s2);
 		s2 = message;

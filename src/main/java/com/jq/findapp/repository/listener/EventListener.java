@@ -2,6 +2,7 @@ package com.jq.findapp.repository.listener;
 
 import java.math.BigInteger;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -62,7 +63,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 					repository.save(eventParticipate);
 				}
 				if (eventParticipate.getState() == 1 && !eventParticipate.getContactId().equals(event.getContactId())) {
-					final Instant time = eventParticipate.getEventDate().toInstant();
+					final Instant time = new Timestamp(eventParticipate.getEventDate().getTime()).toInstant();
 					if (time.isAfter(Instant.now())) {
 						final ZonedDateTime t = event.getStartDate().toInstant().atZone(ZoneOffset.UTC);
 						final Contact contactTo = repository.one(Contact.class, eventParticipate.getContactId());
@@ -91,7 +92,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 			final EventParticipate eventParticipate = repository.one(EventParticipate.class,
 					(BigInteger) result.get(i).get("eventParticipate.id"));
 			if (eventParticipate.getState() == 1 && !eventParticipate.getContactId().equals(event.getContactId())) {
-				final Instant time = eventParticipate.getEventDate().toInstant();
+				final Instant time = new Timestamp(eventParticipate.getEventDate().getTime()).toInstant();
 				if (time.isAfter(Instant.now())) {
 					final ZonedDateTime t = event.getStartDate().toInstant().atZone(ZoneOffset.UTC);
 					final Contact contactTo = repository.one(Contact.class, eventParticipate.getContactId());
