@@ -57,15 +57,4 @@ public class InternalRegistration extends AbstractRegistration {
 	public void setPseudonym(String pseudonym) {
 		this.pseudonym = pseudonym;
 	}
-
-	@Override
-	public String toString() {
-		return super.toString() +
-				"\nagb: " + isAgb() +
-				"\nbirthday: " + getBirthday() +
-				"\nemail: " + getEmail() +
-				"\ngender: " + getGender() +
-				"\npseudonym: " + getPseudonym() +
-				"\ntime: " + getTime();
-	}
 }

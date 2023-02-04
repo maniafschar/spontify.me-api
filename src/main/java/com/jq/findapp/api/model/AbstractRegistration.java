@@ -8,6 +8,7 @@ public abstract class AbstractRegistration {
 	private Device device;
 	private String language;
 	private String version;
+	private String timezone;
 
 	public OS getOs() {
 		return os;
@@ -41,11 +42,11 @@ public abstract class AbstractRegistration {
 		this.version = version;
 	}
 
-	@Override
-	public String toString() {
-		return "\ndevice: " + getDevice() +
-				"\nlanguage: " + getLanguage() +
-				"\nos: " + getOs() +
-				"\nversion: " + getVersion();
+	public String getTimezone() {
+		return timezone;
+	}
+
+	public void setTimezone(String timezone) {
+		this.timezone = timezone;
 	}
 }

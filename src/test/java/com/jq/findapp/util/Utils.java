@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.ZoneId;
+import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +35,7 @@ public class Utils {
 				contact.setBirthday(new Date(3000000000L));
 				contact.setVisitPage(new Timestamp(System.currentTimeMillis() - 3000000L));
 				contact.setGender((short) 1);
+				contact.setTimezone(TimeZone.getDefault().getID());
 				contact.setPseudonym("pseudonym");
 				contact.setVerified(true);
 				contact.setPassword(Encryption.encryptDB("secret_password"));

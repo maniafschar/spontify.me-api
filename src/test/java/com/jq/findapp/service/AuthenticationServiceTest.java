@@ -15,6 +15,7 @@ import java.sql.Date;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
@@ -96,6 +97,7 @@ public class AuthenticationServiceTest {
 		registration.setPseudonym("İrem Fettahoğlu");
 		registration.setLanguage("DE");
 		registration.setTime(5000);
+		registration.setTimezone(TimeZone.getDefault().getID());
 
 		// when
 		authenticationService.register(registration);

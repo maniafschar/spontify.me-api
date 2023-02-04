@@ -219,6 +219,16 @@ public class ActionApi {
 		return externalService.google(param, user);
 	}
 
+	@GetMapping("teaser/{type}")
+	public List<Object[]> teaser(@PathVariable final String type) {
+		final QueryParams params = new QueryParams(
+				"contacts".equals(type) ? Query.contact_listTeaser : Query.event_listTeaser);
+		params.setLimit(20);
+		params.setLatitude(48.13684f);
+		params.setLongitude(11.57685f);
+		return repository.list(params).getList();
+	}
+
 	@GetMapping("searchLocation")
 	public List<Map<String, Object>> searchLocation(String search, @RequestHeader BigInteger user,
 			@RequestHeader String password, @RequestHeader String salt) throws Exception {

@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import javax.mail.SendFailedException;
@@ -200,6 +201,7 @@ public class AuthenticationService {
 		contact.setPseudonym(registration.getPseudonym());
 		contact.setLanguage(registration.getLanguage());
 		contact.setEmail(registration.getEmail().toLowerCase().trim());
+		contact.setTimezone(registration.getTimezone());
 		try {
 			notificationService.sendNotificationEmail(repository.one(Contact.class, adminId), contact,
 					Text.mail_contactWelcomeEmail.getText(contact.getLanguage()), "r=" + generateLoginParam(contact));
@@ -226,6 +228,8 @@ public class AuthenticationService {
 		contact.setPassword(Encryption.encryptDB(generatePin(20)));
 		contact.setPasswordReset(Instant.now().toEpochMilli());
 		contact.setBirthdayDisplay((short) 2);
+		contact.setTimezone(
+				registration.getTimezone() == null ? TimeZone.getDefault().getID() : registration.getTimezone());
 		contact.setEmail(contact.getEmail().toLowerCase().trim());
 		if (contact.getIdDisplay() == null) {
 			final String[] name = contact.getPseudonym().split(" ");

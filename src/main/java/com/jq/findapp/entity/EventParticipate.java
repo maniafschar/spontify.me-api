@@ -13,6 +13,7 @@ public class EventParticipate extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger eventId;
 	private Date eventDate;
+	private String payment;
 	private String reason;
 	private Short state;
 
@@ -46,6 +47,14 @@ public class EventParticipate extends BaseEntity {
 
 	public void setReason(String reason) {
 		this.reason = reason;
+	}
+
+	public String getPayment() {
+		return payment;
+	}
+
+	public void setPayment(String payment) {
+		this.payment = payment;
 	}
 
 	public Short getState() {

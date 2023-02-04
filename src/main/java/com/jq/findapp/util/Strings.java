@@ -3,7 +3,7 @@ package com.jq.findapp.util;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.Date;
 import java.util.TimeZone;
@@ -52,7 +52,7 @@ public class Strings {
 	}
 
 	public static String formatDate(String format, Date date, String zone) {
-		return new SimpleDateFormat(format == null ? "dd.MM.yyyy HH:mm" : format)
-				.format(date.toInstant().atZone(TimeZone.getTimeZone(zone).toZoneId()));
+		return date.toInstant().atZone(TimeZone.getTimeZone(zone).toZoneId())
+				.format(DateTimeFormatter.ofPattern(format == null ? "dd.MM.yyyy HH:mm" : format));
 	}
 }
