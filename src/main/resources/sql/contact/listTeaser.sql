@@ -1,4 +1,5 @@
 SELECT
+	contact.id,
 	contact.imageList,
 	contact.pseudonym,
 	contact.latitude,
