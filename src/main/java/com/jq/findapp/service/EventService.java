@@ -43,7 +43,7 @@ public class EventService {
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setSearch(
 					"contact.verified=true and contact.version is not null and contact.longitude is not null and (" +
-							"(length(contact.skliis)>0 or length(contact.skillsText)>0))");
+							"(length(contact.skills)>0 or length(contact.skillsText)>0))");
 			params.setLimit(0);
 			final Result ids = repository.list(params);
 			params.setQuery(Query.event_listMatching);
