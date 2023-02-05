@@ -264,6 +264,8 @@ public class ActionApi {
 				params.setLatitude(contact.getLatitude());
 				params.setLongitude(contact.getLongitude());
 			}
+			if (params.getQuery() == Query.contact_listTeaser)
+				params.setSearch("contact.id<>" + user);
 		}
 		return repository.list(params).getList();
 	}
