@@ -1,6 +1,9 @@
 SELECT
 	contact.imageList,
-	contact.pseudonym
+	contact.pseudonym,
+	contact.latitude,
+	contact.longitude,
+	'' as geolocationDistance
 FROM
 	Contact contact
 WHERE

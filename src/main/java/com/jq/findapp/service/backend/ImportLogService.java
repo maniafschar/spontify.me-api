@@ -36,7 +36,7 @@ public class ImportLogService {
 	private Repository repository;
 
 	@Value("${app.url.lookupip}")
-	private String lookupip;
+	private String lookupIp;
 
 	public String[] importLog() {
 		final String[] result = new String[] { getClass().getSimpleName() + "/importLog", null };
@@ -105,19 +105,17 @@ public class ImportLogService {
 		params.setLimit(0);
 		params.setSearch("(log.uri like 'ad%' or log.uri like 'web%') and ip.org is null");
 		final Result result = repository.list(params);
-		final Pattern patternLoc = Pattern.compile("\"loc\": \"([^\"]*)\"");
 		final Set<Object> processed = new HashSet<>();
 		for (int i = 0; i < result.size(); i++) {
 			if (!processed.contains(result.get(i).get("log.ip"))) {
 				processed.add(result.get(i).get("log.ip"));
 				final String json = WebClient
-						.create(lookupip.replace("{ip}", (String) result.get(i).get("log.ip"))).get()
+						.create(lookupIp.replace("{ip}", (String) result.get(i).get("log.ip"))).get()
 						.retrieve().toEntity(String.class).block().getBody();
 				final Ip ip = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 						.readValue(json, Ip.class);
-				final Matcher m = patternLoc.matcher(json);
-				m.find();
-				final String location = m.group(1);
+				final String location = new ObjectMapper().readTree(json.getBytes(StandardCharsets.UTF_8)).get("loc")
+						.asText();
 				ip.setLatitude(Float.parseFloat(location.split(",")[0]));
 				ip.setLongitude(Float.parseFloat(location.split(",")[1]));
 				repository.save(ip);

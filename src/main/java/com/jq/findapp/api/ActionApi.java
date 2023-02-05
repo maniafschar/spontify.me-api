@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.model.Position;
@@ -37,6 +38,7 @@ import com.jq.findapp.entity.ContactGeoLocationHistory;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.ContactVisit;
 import com.jq.findapp.entity.GeoLocation;
+import com.jq.findapp.entity.Ip;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.LocationVisit;
 import com.jq.findapp.entity.Ticket.TicketType;
@@ -103,6 +105,9 @@ public class ActionApi {
 
 	@Value("${app.url}")
 	private String url;
+
+	@Value("${app.url.lookupip}")
+	private String lookupIp;
 
 	private final String paypalUrl = "https://api-m.sandbox.paypal.com/";
 
@@ -220,12 +225,46 @@ public class ActionApi {
 	}
 
 	@GetMapping("teaser/{type}")
-	public List<Object[]> teaser(@PathVariable final String type) {
+	public List<Object[]> teaser(@PathVariable final String type, @RequestHeader(required = false) BigInteger user,
+			@RequestHeader(required = false) String password, @RequestHeader(required = false) String salt,
+			@RequestHeader(required = false, name = "X-Forwarded-For") String ip) throws Exception {
 		final QueryParams params = new QueryParams(
 				"contacts".equals(type) ? Query.contact_listTeaser : Query.event_listTeaser);
 		params.setLimit(20);
+		params.setDistance(100000);
 		params.setLatitude(48.13684f);
 		params.setLongitude(11.57685f);
+		if (user == null) {
+			if (ip != null) {
+				final QueryParams params2 = new QueryParams(Query.misc_listIp);
+				params2.setSearch("ip.ip='" + ip + "'");
+				final Result result = repository.list(params2);
+				if (result.size() > 0) {
+					params.setLatitude(((Number) result.get(0).get("ip.latitude")).floatValue());
+					params.setLongitude(((Number) result.get(0).get("ip.longitude")).floatValue());
+				} else {
+					final String json = WebClient
+							.create(lookupIp.replace("{ip}", ip)).get()
+							.retrieve().toEntity(String.class).block().getBody();
+					final Ip ip2 = new ObjectMapper()
+							.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+							.readValue(json, Ip.class);
+					final String location = new ObjectMapper().readTree(json.getBytes(StandardCharsets.UTF_8))
+							.get("loc").asText();
+					ip2.setLatitude(Float.parseFloat(location.split(",")[0]));
+					ip2.setLongitude(Float.parseFloat(location.split(",")[1]));
+					repository.save(ip2);
+					params.setLatitude(ip2.getLatitude());
+					params.setLongitude(ip2.getLongitude());
+				}
+			}
+		} else {
+			final Contact contact = authenticationService.verify(user, password, salt);
+			if (contact.getLatitude() != null) {
+				params.setLatitude(contact.getLatitude());
+				params.setLongitude(contact.getLongitude());
+			}
+		}
 		return repository.list(params).getList();
 	}
 

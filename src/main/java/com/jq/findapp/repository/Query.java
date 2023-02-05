@@ -52,6 +52,7 @@ public enum Query {
 
 	misc_block,
 	misc_geoLocation,
+	misc_listIp,
 	misc_listLog,
 	misc_listTicket,
 	misc_rating,

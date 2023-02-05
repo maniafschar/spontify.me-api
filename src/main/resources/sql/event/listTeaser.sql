@@ -7,7 +7,10 @@ SELECT
 	event.startDate,
 	event.text,
 	event.type,
-	location.imageList
+	location.imageList,
+	location.latitude,
+	location.longitude,
+	'' as geolocationDistance
 FROM
 	Event event,
 	Location location
