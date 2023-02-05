@@ -63,6 +63,7 @@ public class Contact extends BaseEntity {
 	private String skillsText;
 	private String storage;
 	private String timezone;
+	private String urls;
 	private String version;
 
 	public enum OS {
@@ -191,6 +192,14 @@ public class Contact extends BaseEntity {
 
 	public void setFacebookId(String facebookId) {
 		this.facebookId = facebookId;
+	}
+
+	public String getUrls() {
+		return urls;
+	}
+
+	public void setUrls(String urls) {
+		this.urls = urls;
 	}
 
 	public String getFbToken() {
