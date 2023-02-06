@@ -29,6 +29,7 @@ SELECT
 	contact.skills,
 	contact.skillsText,
 	contact.storage,
+	contact.teaser,
 	contact.urls,
 	contact.verified,
 	contact.visitPage,

@@ -6,6 +6,10 @@ SELECT
 	eventRating.text,
 	eventRating.modifiedAt,
 	eventRating.image,
+	eventParticipate.id,
+	eventParticipate.eventDate,
+	eventParticipate.state,
+	event.id,
 	contact.imageList,
 	contact.pseudonym
 FROM

@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Log;
 import com.jq.findapp.entity.Ticket;
+import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -209,7 +210,7 @@ public class SupportCenterApi {
 			if (schedulerRunning.size() == 0) {
 				// last job is backup, even after importLog
 				runLast(dbService::backup);
-				// importLog paralell to the rest,does not interfere
+				// importLog paralell to the rest, does not interfere
 				run(importLogService::importLog);
 				run(dbService::update);
 				run(statisticsService::update);
@@ -257,8 +258,10 @@ public class SupportCenterApi {
 					final String[] result = run.run();
 					log.setUri("/support/scheduler/" + result[0]);
 					log.setStatus(result[1] != null && result[1].contains("Exception") ? 500 : 200);
-					if (result[1] != null)
+					if (result[1] != null) {
 						log.setBody(result[1].length() > 255 ? result[1].substring(0, 255) : result[1]);
+						notificationService.createTicket(TicketType.ERROR, "scheduler", result[1], adminId);
+					}
 				} finally {
 					schedulerRunning.remove(id);
 					log.setTime((int) (System.currentTimeMillis() - time));

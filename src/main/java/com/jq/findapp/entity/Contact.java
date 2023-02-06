@@ -24,6 +24,7 @@ public class Contact extends BaseEntity {
 	private Boolean notificationVisitLocation = true;
 	private Boolean notificationVisitProfile = true;
 	private Boolean search = true;
+	private Boolean teaser = true;
 	private Boolean verified = false;
 	private Date birthday;
 	@Enumerated(EnumType.STRING)
@@ -328,6 +329,14 @@ public class Contact extends BaseEntity {
 
 	public void setSearch(Boolean search) {
 		this.search = search;
+	}
+
+	public Boolean getTeaser() {
+		return teaser;
+	}
+
+	public void setTeaser(Boolean teaser) {
+		this.teaser = teaser;
 	}
 
 	public String getStorage() {

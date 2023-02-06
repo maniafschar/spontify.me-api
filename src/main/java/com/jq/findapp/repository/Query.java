@@ -26,7 +26,7 @@ public enum Query {
 	contact_listId,
 	contact_listNotification(true),
 	contact_listSupportCenter,
-	contact_listTeaser,
+	contact_listTeaser(true),
 	contact_listVisit(true),
 	contact_maxAppVersion,
 	contact_notification(true),
@@ -42,7 +42,7 @@ public enum Query {
 	event_listMatching(true),
 	event_listParticipate(true),
 	event_listParticipateRaw(true),
-	event_listTeaser,
+	event_listTeaser(true),
 
 	location_list,
 	location_listBlocked,

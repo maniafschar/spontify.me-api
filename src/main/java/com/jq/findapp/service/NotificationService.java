@@ -13,6 +13,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -414,12 +416,19 @@ public class NotificationService {
 				text = "..." + subject.substring(252) + "\n\n" + text;
 				subject = subject.substring(0, 252) + "...";
 			}
+			final QueryParams params = new QueryParams(Query.misc_listTicket);
+			params.setSearch("subject='" + subject + "' and type='" + type.name() + "' and createdAt>'"
+					+ Instant.now().minus(Duration.ofDays(1)) + "' and contactId=" + user);
+			final Result result = repository.list(params);
+			for (int i = 0; i < result.size(); i++) {
+				if (text.equals(result.get(i).get("ticket.note")))
+					return;
+			}
 			final Ticket ticket = new Ticket();
 			ticket.setSubject(subject);
 			ticket.setNote(text);
 			ticket.setType(type);
-			if (ticket.getContactId() == null)
-				ticket.setContactId(user);
+			ticket.setContactId(user);
 			repository.save(ticket);
 			if (type == TicketType.BLOCK)
 				sendEmail(null, "Block", null, text, null);

@@ -13,8 +13,10 @@ SELECT
 	'' as geolocationDistance
 FROM
 	Event event,
-	Location location
+	Location location,
+	Contact contact
 WHERE
 	location.id=event.locationId and
+	contact.id=event.contactId and
 	(event.imageList is not null or location.imageList is not null) and
 	{search}

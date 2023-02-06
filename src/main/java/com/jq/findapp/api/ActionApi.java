@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
@@ -258,14 +259,17 @@ public class ActionApi {
 					params.setLongitude(ip2.getLongitude());
 				}
 			}
+			params.setSearch("contact.teaser=true");
 		} else {
-			final Contact contact = authenticationService.verify(user, password, salt);
-			if (contact.getLatitude() != null) {
-				params.setLatitude(contact.getLatitude());
-				params.setLongitude(contact.getLongitude());
+			params.setUser(authenticationService.verify(user, password, salt));
+			if (params.getUser().getLatitude() != null) {
+				params.setLatitude(params.getUser().getLatitude());
+				params.setLongitude(params.getUser().getLongitude());
 			}
 			if (params.getQuery() == Query.contact_listTeaser)
 				params.setSearch("contact.id<>" + user);
+			else
+				params.setSearch("event.endDate>'" + Instant.now().atZone(ZoneOffset.UTC).toLocalDate() + "'");
 		}
 		return repository.list(params).getList();
 	}
