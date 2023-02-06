@@ -44,7 +44,7 @@
 		"eventChanged": "has changed the Event on <jq:EXTRA_1 /> in the Location <jq:EXTRA_3 />.\n<jq:EXTRA_2 />",
 		"eventDelete": "unfortunately has delete the Event on <jq:EXTRA_1 /> in the Location <jq:EXTRA_3 />.\n<jq:EXTRA_2 />",
 		"eventNotify": "has created this event <jq:EXTRA_1 /> o'clock at the location <jq:EXTRA_2 />. It suits you, take a look...",
-		"eventNotifyWithoutLocation": "is looking for skills <jq:EXTRA_2 /> at <jq:EXTRA_1 /> o'clock (<jq:EXTRA_3 />). Do you have time?",
+		"eventNotifyWithoutLocation": "is looking for someone at <jq:EXTRA_1 /> o'clock: (<jq:EXTRA_2 />). Do you have time?",
 		"eventNotification": "Your Event in location <jq:EXTRA_1 /> begins at <jq:EXTRA_2 /> o'clock!",
 		"eventParticipate": "participates in the <jq:EXTRA_1 /> in the event \"<jq:EXTRA_2 />\" in the <jq:EXTRA_3 />.",
 		"eventRated": "",

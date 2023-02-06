@@ -12,7 +12,6 @@ SELECT
 	event.startDate,
 	event.text,
 	event.type,
-	event.visibility,
 	location.description,
 	location.id,
 	location.imageList,

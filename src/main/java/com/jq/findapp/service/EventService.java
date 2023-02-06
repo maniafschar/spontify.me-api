@@ -48,7 +48,8 @@ public class EventService {
 			final Result ids = repository.list(params);
 			params.setQuery(Query.event_listMatching);
 			params.setDistance(50);
-			params.setSearch("TO_DAYS(event.startDate)-1<=TO_DAYS(current_timestamp)");
+			params.setSearch(
+					"event.startDate>=current_timestamp and TO_DAYS(event.startDate)-1<=TO_DAYS(current_timestamp)");
 			final LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
 			for (int i = 0; i < ids.size(); i++) {
 				params.setUser(repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id")));
@@ -70,16 +71,13 @@ public class EventService {
 							if (event.getLocationId() == null) {
 								notificationService.sendNotification(contactEvent,
 										params.getUser(), ContactNotificationTextType.eventNotifyWithoutLocation,
-										Strings.encodeParam("e=" + event.getId()),
+										Strings.encodeParam("e=" + event.getId() + "_" + realDate.toLocalDate()),
 										time,
-										// TODO replace getCategory
-										Text.valueOf("category_verb" /* + event.getCategory() */)
-												.getText(params.getUser().getLanguage()),
 										event.getText());
 							} else
 								notificationService.sendNotification(contactEvent,
 										params.getUser(), ContactNotificationTextType.eventNotify,
-										Strings.encodeParam("e=" + event.getId()),
+										Strings.encodeParam("e=" + event.getId() + "_" + realDate.toLocalDate()),
 										(realDate.getDayOfYear() == now.getDayOfYear()
 												? Text.today.getText(params.getUser().getLanguage())
 												: Text.tomorrow.getText(params.getUser().getLanguage())) + " " + time,
@@ -128,7 +126,8 @@ public class EventService {
 								notificationService.sendNotification(
 										repository.one(Contact.class, event.getContactId()),
 										contact, ContactNotificationTextType.eventNotification,
-										Strings.encodeParam("e=" + event.getId()),
+										Strings.encodeParam(
+												"e=" + event.getId() + "_" + eventParticipate.getEventDate()),
 										repository.one(Location.class, event.getLocationId()).getName(),
 										t.getHour() + ":" + (t.getMinute() < 10 ? "0" : "") + t.getMinute());
 							}

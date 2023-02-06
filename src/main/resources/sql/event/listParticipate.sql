@@ -16,7 +16,6 @@ select
 	event.skills,
 	event.skillsText,
 	event.startDate,
-	event.visibility,
 	event.text,
 	event.type,
 	event.price,

@@ -20,6 +20,8 @@ public class DbService {
 				"update Contact set version=null where (version='0.9.9' or version='0.9.3') and os='android' and language='EN'");
 		repository.executeUpdate(
 				"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and (select modifiedAt from Contact contact where contact.id=contactNotification.contactId)>contactNotification.createdAt and TIMESTAMPDIFF(MINUTE,contactNotification.createdAt,current_timestamp)>30");
+		repository.executeUpdate(
+				"update Contact set timezone='Europe/Berlin' where timezone is null");
 		return new String[] { getClass().getSimpleName() + "/update", null };
 	}
 

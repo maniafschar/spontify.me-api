@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
 
 import org.apache.commons.io.IOUtils;
@@ -61,7 +62,6 @@ import com.jq.findapp.util.Strings;
 @RequestMapping("action")
 public class ActionApi {
 	private static final List<String> QUOTATION = new ArrayList<>();
-	private static final List<Integer> SENT_NOTIFICATIONS = new ArrayList<>();
 
 	static {
 		try {
@@ -118,14 +118,10 @@ public class ActionApi {
 	}
 
 	@PostMapping("notify")
-	public void notify(String text, @RequestHeader(required = false) BigInteger user) {
-		if (text != null) {
-			final Integer hash = text.hashCode();
-			if (!SENT_NOTIFICATIONS.contains(hash)) {
-				notificationService.createTicket(TicketType.ERROR, "client", text, user);
-				SENT_NOTIFICATIONS.add(hash);
-			}
-		}
+	public void notify(String text, @RequestHeader(required = false) BigInteger user,
+			@RequestHeader(required = false, name = "X-Forwarded-For") String ip) {
+		if (text != null)
+			notificationService.createTicket(TicketType.ERROR, "client", "IP\n\t" + ip + "\n\n" + text, user);
 	}
 
 	@GetMapping("quotation")
@@ -254,7 +250,11 @@ public class ActionApi {
 							.get("loc").asText();
 					ip2.setLatitude(Float.parseFloat(location.split(",")[0]));
 					ip2.setLongitude(Float.parseFloat(location.split(",")[1]));
-					repository.save(ip2);
+					try {
+						repository.save(ip2);
+					} catch (PersistenceException ex) {
+						// most probably added meanwhile, just continue
+					}
 					params.setLatitude(ip2.getLatitude());
 					params.setLongitude(ip2.getLongitude());
 				}

@@ -29,7 +29,12 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 
 	@Override
 	public void prePersist(Event event) throws Exception {
-		if (event.getEndDate() == null)
+		preUpdate(event);
+	}
+
+	@Override
+	public void preUpdate(Event event) throws Exception {
+		if ("o".equals(event.getType()))
 			event.setEndDate(new Date(event.getStartDate().getTime()));
 	}
 
@@ -70,7 +75,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 						final Contact contactFrom = repository.one(Contact.class, event.getContactId());
 						notificationService.sendNotification(contactFrom, contactTo,
 								ContactNotificationTextType.eventChanged,
-								Strings.encodeParam("e=" + event.getId()),
+								Strings.encodeParam("e=" + event.getId() + "_" + eventParticipate.getEventDate()),
 								Strings.formatDate(null,
 										new Date(time.plusSeconds((t.getHour() * 60 + t.getMinute()) * 60)
 												.toEpochMilli()),

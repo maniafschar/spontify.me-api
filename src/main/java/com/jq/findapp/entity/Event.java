@@ -18,7 +18,6 @@ public class Event extends BaseEntity {
 	private Short confirm;
 	private Short maxParticipants;
 	private Short rating;
-	private Short visibility;
 	private String image;
 	private String imageList;
 	private String skills;
@@ -99,10 +98,6 @@ public class Event extends BaseEntity {
 		this.price = price;
 	}
 
-	public void setVisibility(Short visibility) {
-		this.visibility = visibility;
-	}
-
 	public void setMaxParticipants(Short maxParticipants) {
 		this.maxParticipants = maxParticipants;
 	}
@@ -113,10 +108,6 @@ public class Event extends BaseEntity {
 
 	public Double getPrice() {
 		return price;
-	}
-
-	public Short getVisibility() {
-		return visibility;
 	}
 
 	public Short getMaxParticipants() {
