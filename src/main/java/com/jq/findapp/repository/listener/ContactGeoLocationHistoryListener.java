@@ -5,14 +5,10 @@ import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.ContactGeoLocationHistory;
 import com.jq.findapp.entity.GeoLocation;
-import com.jq.findapp.service.EventService;
 import com.jq.findapp.service.ImportLocationsService;
 
 @Component
 public class ContactGeoLocationHistoryListener extends AbstractRepositoryListener<ContactGeoLocationHistory> {
-	@Autowired
-	private EventService eventService;
-
 	@Autowired
 	private ImportLocationsService importLocationsService;
 

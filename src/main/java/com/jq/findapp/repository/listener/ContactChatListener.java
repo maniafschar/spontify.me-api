@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -15,10 +16,14 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.util.Text;
 
 @Component
 public class ContactChatListener extends AbstractRepositoryListener<ContactChat> {
+	@Autowired
+	private ExternalService externalService;
+
 	@Override
 	public void prePersist(final ContactChat contactChat) throws Exception {
 		if (contactChat.getContactId2() == null)
@@ -34,6 +39,21 @@ public class ContactChatListener extends AbstractRepositoryListener<ContactChat>
 			throw new IllegalArgumentException("duplicate chat");
 		}
 		notifyContact(contactChat);
+		if (contactChat.getContactId().intValue() == 551 && contactChat.getContactId2().equals(adminId)
+				&& contactChat.getNote() != null
+				&& contactChat.getNote().indexOf(Attachment.SEPARATOR) < 0)
+			createGptAnswer(contactChat);
+	}
+
+	@Async
+	private void createGptAnswer(ContactChat contactChat) throws Exception {
+		final ContactChat chat = new ContactChat();
+		chat.setNote(externalService.chatGpt(contactChat.getNote()));
+		chat.setContactId(adminId);
+		chat.setContactId2(contactChat.getContactId());
+		repository.save(chat);
+		contactChat.setSeen(Boolean.TRUE);
+		repository.save(contactChat);
 	}
 
 	@Async

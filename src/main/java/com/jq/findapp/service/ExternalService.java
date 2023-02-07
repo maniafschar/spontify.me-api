@@ -10,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Contact;
@@ -33,6 +35,9 @@ public class ExternalService {
 
 	@Value("${app.chatGPT.key}")
 	private String chatGpt;
+
+	@Value("${app.admin.id}")
+	protected BigInteger adminId;
 
 	public String google(String param, BigInteger user) {
 		final String result = WebClient
@@ -118,17 +123,16 @@ public class ExternalService {
 				WebClient.create(url).get().retrieve().toEntity(byte[].class).block().getBody());
 	}
 
-	public String chatGpt(String text) {
-		System.out.println(chatGpt);
-		System.out.println("{\"model\": \"text-davinci-003\", \"prompt\": \"" + text
-				+ "\", \"temperature\": 0, \"max_tokens\": 7}");
-		return WebClient
+	public String chatGpt(String text) throws JsonMappingException, JsonProcessingException {
+		final String s = WebClient
 				.create("https://api.openai.com/v1/completions")
 				.post().accept(MediaType.APPLICATION_JSON)
 				.header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
 				.header("Authorization", "Bearer " + chatGpt)
 				.bodyValue("{\"model\": \"text-davinci-003\", \"prompt\": \"" + text
-						+ "\", \"temperature\": 0, \"max_tokens\": 7}")
+						+ "\", \"temperature\": 0, \"max_tokens\": 200}")
 				.retrieve().toEntity(String.class).block().getBody();
+		notificationService.createTicket(TicketType.ERROR, "gpt", text + "\n\n" + s, adminId);
+		return new ObjectMapper().readTree(s).get("choices").get(0).get("text").asText().trim();
 	}
 }
