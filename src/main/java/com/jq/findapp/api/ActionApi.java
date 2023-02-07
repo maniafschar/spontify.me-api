@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -129,6 +130,13 @@ public class ActionApi {
 			@RequestHeader String salt) {
 		authenticationService.verify(user, password, salt);
 		return QUOTATION.get((int) (Math.random() * (QUOTATION.size() - 1)));
+	}
+
+	@GetMapping("chat/gpt")
+	public String chatGpt(@RequestParam String text, @RequestHeader BigInteger user, @RequestHeader String password,
+			@RequestHeader String salt) throws Exception {
+		authenticationService.verify(user, password, salt);
+		return externalService.chatGpt(text);
 	}
 
 	@GetMapping("chat/{id}/{all}")
@@ -356,6 +364,18 @@ public class ActionApi {
 		final ObjectMapper m = new ObjectMapper();
 		notificationService.createTicket(TicketType.PAYPAL, "webhook",
 				m.writerWithDefaultPrettyPrinter().writeValueAsString(m.readTree(data)), BigInteger.valueOf(3));
+	}
+
+	@GetMapping("paypalKey")
+	public Map<String, Object> paypalKey(@RequestHeader BigInteger user, @RequestHeader String password,
+			@RequestHeader String salt)
+			throws Exception {
+		authenticationService.verify(user, password, salt);
+		final Map<String, Object> paypalConfig = new HashMap<>(3);
+		paypalConfig.put("fee", 20);
+		paypalConfig.put("currency", "EUR");
+		paypalConfig.put("key", paypalKey.substring(0, paypalKey.indexOf(':')));
+		return paypalConfig;
 	}
 
 	@PutMapping("paypalRegister")

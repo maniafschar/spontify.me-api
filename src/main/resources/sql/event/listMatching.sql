@@ -23,5 +23,4 @@ WHERE
 	{search}
 GROUP BY
 	event.id,
-	contact.id,
-	locationFavorite.id
+	contact.id

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -29,6 +30,9 @@ public class ExternalService {
 
 	@Value("${app.google.key}")
 	private String googleKey;
+
+	@Value("${app.chatGPT.key}")
+	private String chatGpt;
 
 	public String google(String param, BigInteger user) {
 		final String result = WebClient
@@ -112,5 +116,19 @@ public class ExternalService {
 		url = url.replace("{destination}", destination) + googleKey;
 		return Base64.getEncoder().encodeToString(
 				WebClient.create(url).get().retrieve().toEntity(byte[].class).block().getBody());
+	}
+
+	public String chatGpt(String text) {
+		System.out.println(chatGpt);
+		System.out.println("{\"model\": \"text-davinci-003\", \"prompt\": \"" + text
+				+ "\", \"temperature\": 0, \"max_tokens\": 7}");
+		return WebClient
+				.create("https://api.openai.com/v1/completions")
+				.post().accept(MediaType.APPLICATION_JSON)
+				.header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", "Bearer " + chatGpt)
+				.bodyValue("{\"model\": \"text-davinci-003\", \"prompt\": \"" + text
+						+ "\", \"temperature\": 0, \"max_tokens\": 7}")
+				.retrieve().toEntity(String.class).block().getBody();
 	}
 }
