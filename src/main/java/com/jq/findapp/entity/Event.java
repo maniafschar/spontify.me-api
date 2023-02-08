@@ -24,6 +24,7 @@ public class Event extends BaseEntity {
 	private String skillsText;
 	private String text;
 	private String type;
+	private String url;
 	private Timestamp startDate;
 
 	public BigInteger getLocationId() {
@@ -136,6 +137,14 @@ public class Event extends BaseEntity {
 
 	public void setRating(Short rating) {
 		this.rating = rating;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 	@Transient

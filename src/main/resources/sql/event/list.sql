@@ -13,6 +13,7 @@ SELECT
 	event.startDate,
 	event.text,
 	event.type,
+	event.url,
 	eventParticipate.id,
 	eventParticipate.contactId,
 	eventParticipate.eventId,

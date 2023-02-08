@@ -18,7 +18,7 @@ select
 	event.startDate,
 	event.text,
 	event.type,
-	event.price,
+	event.url,
 	contact.age,
 	contact.aboutMe,
 	contact.skills,
