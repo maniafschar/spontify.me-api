@@ -64,7 +64,7 @@ public class GeoLocationProcessor {
 	}
 
 	public List<Object[]> postProcessor(List<Object[]> list) {
-		if (list.size() > 0) {
+		if (table != null && list.size() > 0) {
 			final String[] header = (String[]) list.get(0);
 			int distance = -1, latitude = -1, longitude = -1, latitudeContact = -1, longitudeContact = -1;
 			for (int i = 0; i < header.length; i++) {

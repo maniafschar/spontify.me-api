@@ -1,17 +1,17 @@
 package com.jq.findapp.service;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Contact;
@@ -123,16 +123,16 @@ public class ExternalService {
 				WebClient.create(url).get().retrieve().toEntity(byte[].class).block().getBody());
 	}
 
-	public String chatGpt(String text) throws JsonMappingException, JsonProcessingException {
+	public String chatGpt(String prompt) throws Exception {
 		final String s = WebClient
 				.create("https://api.openai.com/v1/completions")
 				.post().accept(MediaType.APPLICATION_JSON)
 				.header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
 				.header("Authorization", "Bearer " + chatGpt)
-				.bodyValue("{\"model\": \"text-davinci-003\", \"prompt\": \"" + text
-						+ "\", \"temperature\": 0, \"max_tokens\": 200}")
+				.bodyValue(IOUtils.toString(getClass().getResourceAsStream("/template/gpt.json"),
+						StandardCharsets.UTF_8).replace("{prompt}", prompt))
 				.retrieve().toEntity(String.class).block().getBody();
-		notificationService.createTicket(TicketType.ERROR, "gpt", text + "\n\n" + s, adminId);
+		notificationService.createTicket(TicketType.ERROR, "gpt", prompt + "\n\n" + s, adminId);
 		return new ObjectMapper().readTree(s).get("choices").get(0).get("text").asText().trim();
 	}
 }
