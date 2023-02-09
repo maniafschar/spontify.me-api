@@ -1,6 +1,7 @@
 package com.jq.findapp.service;
 
 import java.math.BigInteger;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
@@ -85,6 +86,22 @@ public class ExternalService {
 			return geoLocation;
 		}
 		return null;
+	}
+
+	public GeoLocation getLatLng(String town, BigInteger user) throws Exception {
+		final QueryParams params = new QueryParams(Query.misc_geoLocation);
+		params.setSearch("geoLocation.town like '%" + town + "%'");
+		final Map<String, Object> persistedAddress = repository.one(params);
+		if (persistedAddress.get("_id") != null)
+			return repository.one(GeoLocation.class, (BigInteger) persistedAddress.get("_id"));
+		final GeoLocation geoLocation = convertAddress(
+				new ObjectMapper().readTree(
+						google("geocode/json?address=" + URLEncoder.encode(town, StandardCharsets.UTF_8), user)));
+		if (geoLocation != null)
+			repository.save(geoLocation);
+		else
+			notificationService.createTicket(TicketType.ERROR, "No google address", town, user);
+		return geoLocation;
 	}
 
 	public GeoLocation getAddress(float latitude, float longitude, BigInteger user) throws Exception {
