@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -130,13 +129,6 @@ public class ActionApi {
 			@RequestHeader String salt) {
 		authenticationService.verify(user, password, salt);
 		return QUOTATION.get((int) (Math.random() * (QUOTATION.size() - 1)));
-	}
-
-	@GetMapping("chat/gpt")
-	public String chatGpt(@RequestParam String text, @RequestHeader BigInteger user, @RequestHeader String password,
-			@RequestHeader String salt) throws Exception {
-		authenticationService.verify(user, password, salt);
-		return externalService.chatGpt(text);
 	}
 
 	@GetMapping("chat/{id}/{all}")

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClientResponseException.TooManyRequests;
 
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactChat;
@@ -34,9 +35,21 @@ public class ChatService {
 		contactChat.setSeen(Boolean.TRUE);
 		repository.save(contactChat);
 		final ContactChat chat = new ContactChat();
-		chat.setNote(externalService.chatGpt(contactChat.getNote()));
 		chat.setContactId(adminId);
 		chat.setContactId2(contactChat.getContactId());
+		while (true) {
+			try {
+				chat.setNote(externalService.chatGpt(contactChat.getNote()));
+				break;
+			} catch (TooManyRequests ex) {
+				Thread.sleep(1000);
+			}
+		}
+		if (chat.getNote().contains("\n\n")) {
+			contactChat.setNote(contactChat.getNote() + chat.getNote().substring(0, chat.getNote().indexOf("\n\n")));
+			chat.setNote(chat.getNote().substring(chat.getNote().indexOf("\n\n")).trim());
+			repository.save(contactChat);
+		}
 		repository.save(chat);
 	}
 
