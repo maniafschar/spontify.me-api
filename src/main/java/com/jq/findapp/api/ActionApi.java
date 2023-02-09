@@ -1,6 +1,7 @@
 package com.jq.findapp.api;
 
 import java.math.BigInteger;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
@@ -219,6 +220,14 @@ public class ActionApi {
 			return externalService.getAddress(Float.parseFloat(l[0]), Float.parseFloat(l[1]), user);
 		}
 		return externalService.google(param, user);
+	}
+
+	@GetMapping("geocode")
+	public Object geocode(final String town, @RequestHeader BigInteger user,
+			@RequestHeader String password, @RequestHeader String salt)
+			throws Exception {
+		authenticationService.verify(user, password, salt);
+		return externalService.google("geocode/json?address=" + URLEncoder.encode(town, StandardCharsets.UTF_8), user);
 	}
 
 	@GetMapping("teaser/{type}")
