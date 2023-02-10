@@ -21,6 +21,7 @@ public enum Text {
 	category_verb5,
 	engagement_addEvent,
 	engagement_addFriends,
+	engagement_ai,
 	engagement_allowLocation,
 	engagement_bluetoothMatch,
 	engagement_bluetoothNoMatch,

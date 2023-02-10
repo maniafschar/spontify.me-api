@@ -49,4 +49,12 @@ public abstract class AbstractRegistration {
 	public void setTimezone(String timezone) {
 		this.timezone = timezone;
 	}
+
+	@Override
+	public String toString() {
+		return "\ndevice: " + getDevice() +
+				"\nlanguage: " + getLanguage() +
+				"\nos: " + getOs() +
+				"\nversion: " + getVersion();
+	}
 }

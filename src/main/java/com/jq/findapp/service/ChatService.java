@@ -12,6 +12,8 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
+import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.util.Text;
@@ -32,11 +34,17 @@ public class ChatService {
 
 	@Async
 	public void createGptAnswer(ContactChat contactChat) throws Exception {
+		final QueryParams params = new QueryParams(Query.contact_chat);
+		params.setSearch("contactChat.textId='" + Text.engagement_ai.name() + "' and (contactChat.contactId="
+				+ contactChat.getContactId() + " or contactChat.contactId2=" + contactChat.getContactId() + ")");
+		if (repository.list(params).size() > 40)
+			return;
 		contactChat.setSeen(Boolean.TRUE);
 		repository.save(contactChat);
 		final ContactChat chat = new ContactChat();
 		chat.setContactId(adminId);
 		chat.setContactId2(contactChat.getContactId());
+		chat.setTextId(Text.engagement_ai);
 		while (true) {
 			try {
 				chat.setNote(externalService.chatGpt(contactChat.getNote()));
@@ -46,7 +54,8 @@ public class ChatService {
 			}
 		}
 		if (chat.getNote().contains("\n\n")) {
-			contactChat.setNote(contactChat.getNote() + chat.getNote().substring(0, chat.getNote().indexOf("\n\n")));
+			final String s = chat.getNote().substring(0, chat.getNote().indexOf("\n\n"));
+			contactChat.setNote(contactChat.getNote() + (Character.isLetterOrDigit(s.charAt(0)) ? " " : "") + s);
 			chat.setNote(chat.getNote().substring(chat.getNote().indexOf("\n\n")).trim());
 			repository.save(contactChat);
 		}
