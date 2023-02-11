@@ -25,6 +25,9 @@ public class ContactListener extends AbstractRepositoryListener<Contact> {
 	@Override
 	public void prePersist(final Contact contact) {
 		contact.setPseudonym(sanitizePseudonym(contact.getPseudonym()));
+		contact.setAgeDivers("18,99");
+		contact.setAgeFemale("18,99");
+		contact.setAgeMale("18,99");
 	}
 
 	@Override
