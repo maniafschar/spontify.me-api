@@ -10,6 +10,7 @@
 	"engagement": {
 		"addEvent": "Hey CONTACT_PSEUDONYM, Events sind unkompliziert, leicht zu erstellen und machen Spaß. EMOJI_DANCING\nÖffne Deine Lieblingslocations und klicke auf Events unten auf der Seite. Dort kannst Du ein neues Event anlegen, z.B. ein Essen für 4 Personen, nur sichtbar für Spontis die zu Dir passen.\n\nSo lernst Du und Deine Freunde im nu neue Spontis kennen. EMOJI_WAVING",
 		"addFriends": "Hey CONTACT_PSEUDONYM, Lust Deine Frende hinzuzufügen? EMOJI_DANCING\nAuf der Info-Seite findest Du den Button, lade sie einfach ein... EMOJI_WAVING",
+		"ai": "ai",
 		"allowLocation": "Hey CONTACT_PSEUDONYM, Du hast Deinen Standort nicht freigegeben. 🤔\nDamit können wir Dir keine Spontis, Events und Locations in Deiner Umgebung anzeigen. 😢\nWir sind Open Source und verkaufen Deine Daten nicht. Du kannst den Standort über die App Einstellungen freischalten. 👍",
 		"becomeGuide": "Hey CONTACT_PSEUDONYM, bist Du kontaktfreudig und organisierst gerne Events? Als Guide zeigst schlagen wir Dir immer wieder besonders passende Spontis vor, um Deine Events zu boostern und Deinen Bekanntenkreis zu erweitern. Möchtest Du ein Guide werden? EMOJI_DANCING\nSetze einfach das Häckchen in den Einstellungen EMOJI_WAVING",
 		"bluetoothMatch": "Hey CONTACT_PSEUDONYM, Du hattest schon ein paar Bluetooth Matches. Hast Du sie angesprochen?\nWie war's? Wenn Du möchtest, erzähl mir drüber... EMOJI_DANCING",

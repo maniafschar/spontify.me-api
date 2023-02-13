@@ -32,6 +32,7 @@ public class Contact extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private OS os;
 	private Timestamp lastLogin;
+	private Timestamp recommend;
 	private Timestamp visitPage;
 	private Float latitude;
 	private Float longitude;
@@ -177,6 +178,14 @@ public class Contact extends BaseEntity {
 
 	public void setVisitPage(Timestamp visitPage) {
 		this.visitPage = visitPage;
+	}
+
+	public Timestamp getRecommend() {
+		return recommend;
+	}
+
+	public void setRecommend(Timestamp recommend) {
+		this.recommend = recommend;
 	}
 
 	public Short getAge() {

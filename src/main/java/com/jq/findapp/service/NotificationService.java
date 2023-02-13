@@ -211,24 +211,24 @@ public class NotificationService {
 		final Ping values = new Ping();
 		values.userId = contact.getId();
 		values.notification = ((Number) repository.one(params).get("_c")).intValue();
-		values.totalNew = values.notification;
 		params.setQuery(Query.contact_pingChat);
-		values.firstChatId = (BigInteger) repository.one(params).get("_c");
+		values.chat.put("firstId", (BigInteger) repository.one(params).get("_c"));
 		params.setQuery(Query.contact_pingChatNew);
 		Result list = repository.list(params);
-		values.chatNew = new HashMap<>();
+		final Map<BigInteger, String> chatNew = new HashMap<>();
 		for (int i = 0; i < list.size(); i++) {
 			final Map<String, Object> row = list.get(i);
-			values.chatNew.put((BigInteger) row.get("contact.id"), (String) row.get("contact.pseudonym"));
-			values.totalNew++;
+			chatNew.put((BigInteger) row.get("contact.id"), (String) row.get("contact.pseudonym"));
 		}
+		values.chat.put("new", chatNew);
 		params.setQuery(Query.contact_pingChatUnseen);
 		list = repository.list(params);
-		values.chatUnseen = new HashMap<>();
+		final Map<String, Integer> chatUnseen = new HashMap<>();
 		for (int i = 0; i < list.size(); i++) {
 			final Map<String, Object> row = list.get(i);
-			values.chatUnseen.put("" + row.get("contactChat.contactId2"), ((Number) row.get("_c")).intValue());
+			chatUnseen.put("" + row.get("contactChat.contactId2"), ((Number) row.get("_c")).intValue());
 		}
+		values.chat.put("unseen", chatUnseen);
 		return values;
 	}
 
@@ -249,9 +249,10 @@ public class NotificationService {
 		try {
 			final String notificationId = notification == null ? "" : notification.getId().toString();
 			final String s = text.toString().replace("\"", "\\\"");
-			if ("ios".equals(contactTo.getPushSystem()))
-				ios.send(contactTo, s, action, getPingValues(contactTo).totalNew, notificationId);
-			else if ("android".equals(contactTo.getPushSystem()))
+			if ("ios".equals(contactTo.getPushSystem())) {
+				final Ping p = getPingValues(contactTo);
+				ios.send(contactTo, s, action, ((Map<?, ?>) p.chat.get("new")).size() + p.notification, notificationId);
+			} else if ("android".equals(contactTo.getPushSystem()))
 				android.send(contactTo, s, action, notificationId);
 			if (notification != null)
 				notification.setType(ContactNotificationType.valueOf(contactTo.getPushSystem()));
@@ -460,40 +461,25 @@ public class NotificationService {
 	}
 
 	public static class Ping {
-		private BigInteger firstChatId;
 		private BigInteger userId;
-		private Map<BigInteger, String> chatNew;
-		private Map<String, Integer> chatUnseen;
-		private int chat;
+		private Boolean recommend;
 		private int notification;
-		private int totalNew;
+		private Map<String, Object> chat = new HashMap<>();
 
 		public BigInteger getUserId() {
 			return userId;
 		}
 
-		public Map<BigInteger, String> getChatNew() {
-			return chatNew;
-		}
-
-		public Map<String, Integer> getChatUnseen() {
-			return chatUnseen;
-		}
-
-		public int getChat() {
+		public Map<String, Object> getChat() {
 			return chat;
-		}
-
-		public BigInteger getFirstChatId() {
-			return firstChatId;
 		}
 
 		public int getNotification() {
 			return notification;
 		}
 
-		public int getTotalNew() {
-			return totalNew;
+		public Boolean getRecommend() {
+			return recommend;
 		}
 	}
 

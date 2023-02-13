@@ -28,8 +28,10 @@ public class TextTest {
 		// given
 
 		// when
-		for (Text id : Text.values())
+		for (Text id : Text.values()) {
+			System.out.println(id);
 			id.getText("DE");
+		}
 
 		// then no exceptions
 	}
