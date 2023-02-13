@@ -361,14 +361,17 @@ public class ActionApi {
 	}
 
 	@GetMapping("paypalKey")
-	public Map<String, Object> paypalKey(@RequestHeader BigInteger user, @RequestHeader String password,
-			@RequestHeader String salt)
+	public Map<String, Object> paypalKey(@RequestHeader(required = false) BigInteger user,
+			@RequestHeader(required = false) String password, @RequestHeader(required = false) String salt)
 			throws Exception {
-		authenticationService.verify(user, password, salt);
 		final Map<String, Object> paypalConfig = new HashMap<>(3);
 		paypalConfig.put("fee", 20);
-		paypalConfig.put("currency", "EUR");
-		paypalConfig.put("key", paypalKey.substring(0, paypalKey.indexOf(':')));
+		if (user != null) {
+			authenticationService.verify(user, password, salt);
+			paypalConfig.put("currency", "EUR");
+			paypalConfig.put("key", paypalKey.substring(0, paypalKey.indexOf(':')));
+
+		}
 		return paypalConfig;
 	}
 
