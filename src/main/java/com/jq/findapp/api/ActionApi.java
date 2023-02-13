@@ -432,7 +432,7 @@ public class ActionApi {
 		final QueryParams param = new QueryParams(Query.misc_setting);
 		param.setSearch("setting.label='paypal.sandbox'");
 		final Map<String, Object> settings = repository.one(param);
-		return settings == null || !("," + settings.get("value") + ",").contains("," + user + ",") ? paypalKey
+		return settings == null || !("," + settings.get("setting.value") + ",").contains("," + user + ",") ? paypalKey
 				: paypalSandboxKey;
 	}
 }
