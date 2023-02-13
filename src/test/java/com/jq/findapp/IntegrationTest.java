@@ -25,15 +25,14 @@ import org.openqa.selenium.safari.SafariDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.jq.findapp.util.Utils;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = { FindappApplication.class,
-		TestConfig.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@TestPropertySource(properties = "server.port=9001")
+		TestConfig.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
+				"server.port=9001" })
 @ActiveProfiles("test")
 public class IntegrationTest {
 	private static WebDriver driver;
@@ -135,10 +134,10 @@ public class IntegrationTest {
 
 	private void eventRating() throws Exception {
 		Util.click("navigation item.events");
-		Util.click("menu a[onclick*=\"communication.loadList(ui.query.eventMy()\"]");
+		Util.click("menu a[onclick*=\"ui.query.eventMy()\"]");
 		final String id = Util.get("events row.participate").getAttribute("i").split("_")[0];
 		utils.setEventDate(new BigInteger(id), new Timestamp(System.currentTimeMillis() - 86460000));
-		Util.click("menu a[onclick*=\"communication.loadList(ui.query.eventTickets()\"]");
+		Util.click("menu a[onclick*=\"ui.query.eventTickets()\"]");
 		Util.click("events row.participate");
 		Util.click("detail buttontext[onclick*=\"ratings.\"]");
 	}

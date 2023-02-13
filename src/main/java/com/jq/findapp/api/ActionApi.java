@@ -101,6 +101,9 @@ public class ActionApi {
 	@Value("${app.paypal.key}")
 	private String paypalKey;
 
+	@Value("${app.paypal.sandbox.key}")
+	private String paypalSandboxKey;
+
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
 
@@ -368,9 +371,9 @@ public class ActionApi {
 		paypalConfig.put("fee", 20);
 		if (user != null) {
 			authenticationService.verify(user, password, salt);
+			final String s = getPaypalKey(user);
+			paypalConfig.put("key", s.substring(0, s.indexOf(':')));
 			paypalConfig.put("currency", "EUR");
-			paypalConfig.put("key", paypalKey.substring(0, paypalKey.indexOf(':')));
-
 		}
 		return paypalConfig;
 	}
@@ -403,7 +406,8 @@ public class ActionApi {
 		authenticationService.verify(user, password, salt);
 		JsonNode n = new ObjectMapper().readTree(WebClient.create(paypalUrl + "v1/oauth2/token")
 				.post().accept(MediaType.APPLICATION_JSON)
-				.header("Authorization", "Basic " + Base64.getEncoder().encodeToString(paypalKey.getBytes()))
+				.header("Authorization",
+						"Basic " + Base64.getEncoder().encodeToString((getPaypalKey(user)).getBytes()))
 				.bodyValue("grant_type=client_credentials")
 				.retrieve().toEntity(String.class).block().getBody());
 		n = new ObjectMapper().readTree(WebClient.create(paypalUrl + "v2/customer/partner-referrals")
@@ -422,5 +426,13 @@ public class ActionApi {
 		contact.setActive(true);
 		repository.save(contact);
 		return notificationService.getPingValues(contact);
+	}
+
+	private String getPaypalKey(BigInteger user) {
+		final QueryParams param = new QueryParams(Query.misc_setting);
+		param.setSearch("setting.label='paypal.sandbox'");
+		final Map<String, Object> settings = repository.one(param);
+		return settings == null || !("," + settings.get("value") + ",").contains("," + user + ",") ? paypalKey
+				: paypalSandboxKey;
 	}
 }
