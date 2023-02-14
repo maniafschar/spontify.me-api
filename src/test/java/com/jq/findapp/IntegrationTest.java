@@ -66,6 +66,7 @@ public class IntegrationTest {
 			addLocation("location 1", "Melchiorstr. 9\n81479 München", true);
 			addFriend();
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			Util.sleep(10000);
 			throw ex;
 		}
@@ -95,7 +96,7 @@ public class IntegrationTest {
 	private void addLocation(String name, String address, boolean duplicate) {
 		Util.click("navigation item.events");
 		Util.click("menu a[onclick*=\"pageEvent.edit\"]");
-		Util.sleep(400);
+		Util.sleep(600);
 		Util.click("popup buttontext[onclick*=\"pageLocation.edit\"]");
 		Util.sendKeys("popup input[name=\"name\"]", name);
 		Util.get("popup textarea[name=\"address\"]").clear();
@@ -105,6 +106,7 @@ public class IntegrationTest {
 			Util.get("popup popupHint").getText().toLowerCase().contains("location");
 			Util.click("popupTitle");
 		}
+		Util.click("navigation item.home");
 	}
 
 	private void addEvent() {
@@ -129,6 +131,7 @@ public class IntegrationTest {
 		Util.sendKeys("popup textarea[name=\"text\"]", "mega sex");
 		Util.click("popup dialogButtons buttontext[onclick*=\"save\"]");
 		Util.click("popup dialogButtons buttontext[onclick*=\"save\"]");
+		Util.click("navigation item.home");
 	}
 
 	private void addRating() throws Exception {
@@ -146,15 +149,16 @@ public class IntegrationTest {
 		if (!Util.get("search tabBody div.locations row:last-child div text title").getText().contains("location 1"))
 			throw new RuntimeException("New location not in list!");
 		Util.click("search tabBody div.locations row:last-child");
-		Util.get("detail ratingSelection");
+		Util.click("detail ratingSelection");
 		Util.click("search tabHeader tab[i=\"contacts\"]");
 		Util.click("search tabBody div.contacts buttontext[onclick*=\"pageSearch\"]");
-		Util.click("search tabBody div.contacts row:last-child");
-		Util.get("detail ratingSelection");
+		Util.click("search tabBody div.contacts row:first-child");
+		Util.click("detail ratingSelection");
 		Util.click("navigation item.events");
 		Util.click("menu a[onclick*=\"ui.query.eventTickets()\"]");
 		Util.click("events row.participate");
-		Util.get("detail ratingSelection");
+		Util.click("detail ratingSelection");
+		Util.click("navigation item.home");
 	}
 
 	private void addFriend() {
@@ -165,6 +169,11 @@ public class IntegrationTest {
 		Util.click("search tabBody div.contacts row:nth-of-type(1)");
 		Util.click("detail buttontext[name=\"buttonFriend\"]");
 		Util.click("detail buttontext[onclick*=\"sendRequestForFriendship\"]");
+		Util.click("navigation item.search");
+		Util.click("search tabBody div.contacts row:nth-of-type(1)");
+		Util.click("detail buttontext[name=\"buttonFriend\"]");
+		Util.get("detail text[name=\"friend\"]>div>span");
+		Util.click("navigation item.home");
 	}
 
 	private static class Util {
