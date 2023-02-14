@@ -57,14 +57,18 @@ public class IntegrationTest {
 
 	@Test
 	public void run() throws Exception {
-		init();
-		register("testabcd", "test@jq-consulting.de");
-		addLocation("location 1", "Melchiorstr. 9\n81479 München", false);
-		addEvent();
-		eventRating();
-		addLocation("location 1", "Melchiorstr. 9\n81479 München", true);
-		listLocations();
-		addFriend();
+		try {
+			init();
+			register("testabcd", "test@jq-consulting.de");
+			addLocation("location 1", "Melchiorstr. 9\n81479 München", false);
+			addEvent();
+			addRating();
+			addLocation("location 1", "Melchiorstr. 9\n81479 München", true);
+			addFriend();
+		} catch (Exception ex) {
+			Util.sleep(10000);
+			throw ex;
+		}
 	}
 
 	private void init() throws Exception {
@@ -91,6 +95,7 @@ public class IntegrationTest {
 	private void addLocation(String name, String address, boolean duplicate) {
 		Util.click("navigation item.events");
 		Util.click("menu a[onclick*=\"pageEvent.edit\"]");
+		Util.sleep(400);
 		Util.click("popup buttontext[onclick*=\"pageLocation.edit\"]");
 		Util.sendKeys("popup input[name=\"name\"]", name);
 		Util.get("popup textarea[name=\"address\"]").clear();
@@ -102,18 +107,12 @@ public class IntegrationTest {
 		}
 	}
 
-	private void listLocations() {
-		Util.click("navigation item.search");
-		Util.click("search tabHeader tab[i=\"locations\"]");
-		Util.click("search tabBody div.locations buttontext[onclick*=\"pageSearch\"]");
-		if (!Util.get("search tabBody div.locations row:last-child div text title").getText().contains("location 1"))
-			throw new RuntimeException("New location not in list!");
-	}
-
 	private void addEvent() {
 		Util.click("navigation item.events");
 		Util.click("menu a[onclick*=\"pageEvent.edit\"]");
-		Util.click("popup eventLocationInputHelper li");
+		Util.sendKeys("popup input[name=\"location\"]", "loca");
+		Util.sleep(1000);
+		Util.click("popup eventLocationInputHelper ul li");
 		if (!Util.get("popup .paid").getAttribute("style").contains("none"))
 			throw new RuntimeException("Event .paid should be invisible!");
 		if (Util.get("popup .unpaid").getAttribute("style").contains("none"))
@@ -132,7 +131,7 @@ public class IntegrationTest {
 		Util.click("popup dialogButtons buttontext[onclick*=\"save\"]");
 	}
 
-	private void eventRating() throws Exception {
+	private void addRating() throws Exception {
 		Util.click("navigation item.events");
 		Util.click("menu a[onclick*=\"ui.query.eventMy()\"]");
 		final String id = Util.get("events row.participate").getAttribute("i").split("_")[0];
@@ -140,6 +139,22 @@ public class IntegrationTest {
 		Util.click("menu a[onclick*=\"ui.query.eventTickets()\"]");
 		Util.click("events row.participate");
 		Util.click("detail buttontext[onclick*=\"ratings.\"]");
+		Util.click("popup buttontext[onclick*=\"ratings.\"]");
+		Util.click("navigation item.search");
+		Util.click("search tabHeader tab[i=\"locations\"]");
+		Util.click("search tabBody div.locations buttontext[onclick*=\"pageSearch\"]");
+		if (!Util.get("search tabBody div.locations row:last-child div text title").getText().contains("location 1"))
+			throw new RuntimeException("New location not in list!");
+		Util.click("search tabBody div.locations row:last-child");
+		Util.get("detail ratingSelection");
+		Util.click("search tabHeader tab[i=\"contacts\"]");
+		Util.click("search tabBody div.contacts buttontext[onclick*=\"pageSearch\"]");
+		Util.click("search tabBody div.contacts row:last-child");
+		Util.get("detail ratingSelection");
+		Util.click("navigation item.events");
+		Util.click("menu a[onclick*=\"ui.query.eventTickets()\"]");
+		Util.click("events row.participate");
+		Util.get("detail ratingSelection");
 	}
 
 	private void addFriend() {

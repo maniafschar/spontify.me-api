@@ -33,7 +33,7 @@ public enum Query {
 	contact_pingChat(true),
 	contact_pingChatNew(true),
 	contact_pingChatUnseen(true),
-	contact_pingNotification(),
+	contact_pingNotification,
 	contact_token,
 	contact_unique,
 

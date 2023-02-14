@@ -6,19 +6,10 @@ import javax.persistence.Entity;
 
 @Entity
 public class EventRating extends BaseEntity {
-	private BigInteger contactId;
 	private BigInteger eventParticipateId;
 	private Short rating;
 	private String text;
 	private String image;
-
-	public BigInteger getContactId() {
-		return contactId;
-	}
-
-	public void setContactId(BigInteger contactId) {
-		this.contactId = contactId;
-	}
 
 	public Short getRating() {
 		return rating;

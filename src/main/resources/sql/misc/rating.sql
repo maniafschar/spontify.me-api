@@ -1,6 +1,5 @@
 SELECT
 	eventRating.id,
-	eventRating.contactId,
 	eventRating.createdAt,
 	eventRating.rating,
 	eventRating.text,
@@ -20,7 +19,7 @@ FROM
 WHERE
 	eventParticipate.id=eventRating.eventParticipateId and
 	event.id=eventParticipate.eventId and
-	contact.id=eventRating.contactId and
+	contact.id=eventParticipate.contactId and
 	{search}
 ORDER BY
 	eventRating.id desc
