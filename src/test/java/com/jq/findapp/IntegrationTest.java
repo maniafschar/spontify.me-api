@@ -74,6 +74,7 @@ public class IntegrationTest {
 
 	private void init() throws Exception {
 		utils.createContact();
+		utils.initPaypalSandbox();
 		driver.get(url);
 	}
 

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.Setting;
 import com.jq.findapp.repository.Repository;
 
 @Component
@@ -53,5 +54,15 @@ public class Utils {
 				+ (d = d.substring(0, d.indexOf(' '))) + "', contactId=1 where id=" + id);
 		repository.executeUpdate("update EventParticipate set eventDate='" + d + "' where eventId=" + id);
 		repository.executeUpdate("update Contact set latitude=2, longitude=-2 where id=1");
+	}
+
+	public void initPaypalSandbox() throws Exception {
+		String v = "";
+		for (int i = 1; i < 20; i++)
+			v += "," + i;
+		final Setting setting = new Setting();
+		setting.setLabel("paypal.sandbox");
+		setting.setValue(v.substring(1));
+		repository.save(setting);
 	}
 }
