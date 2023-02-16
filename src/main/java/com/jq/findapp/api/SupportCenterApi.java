@@ -5,8 +5,10 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -16,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,7 +51,7 @@ import com.jq.findapp.util.Text;
 
 @RestController
 @Transactional
-@CrossOrigin(origins = { "https://sc.spontify.me" })
+@CrossOrigin(origins = { "https://sc.skills.community" })
 @RequestMapping("support")
 public class SupportCenterApi {
 	private static final List<Integer> schedulerRunning = Collections.synchronizedList(new ArrayList<>());
@@ -80,6 +83,9 @@ public class SupportCenterApi {
 	@Autowired
 	private ImportLocationsService importLocationsService;
 
+	@Autowired
+	private MetricsEndpoint metricsEndpoint;
+
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
 
@@ -94,10 +100,8 @@ public class SupportCenterApi {
 	@DeleteMapping("user/{id}")
 	public void userDelete(@PathVariable final BigInteger id, @RequestHeader String password,
 			@RequestHeader String salt, @RequestHeader String secret) throws Exception {
-		if (supportCenterSecret.equals(secret)) {
-			authenticationService.verify(adminId, password, salt);
+		if (supportCenterSecret.equals(secret) && authenticationService.verify(adminId, password, salt) != null)
 			authenticationService.deleteAccount(repository.one(Contact.class, id));
-		}
 	}
 
 	@GetMapping("user")
@@ -128,10 +132,8 @@ public class SupportCenterApi {
 	@DeleteMapping("ticket/{id}")
 	public void ticketDelete(@PathVariable final BigInteger id, @RequestHeader String password,
 			@RequestHeader String salt, @RequestHeader String secret) throws Exception {
-		if (supportCenterSecret.equals(secret)) {
-			authenticationService.verify(adminId, password, salt);
+		if (supportCenterSecret.equals(secret) && authenticationService.verify(adminId, password, salt) != null)
 			repository.delete(repository.one(Ticket.class, id));
-		}
 	}
 
 	@GetMapping("log")
@@ -160,8 +162,7 @@ public class SupportCenterApi {
 	@PostMapping("marketing")
 	public void marketing(@RequestBody Map<String, Object> data, @RequestHeader String password,
 			@RequestHeader String salt, @RequestHeader String secret) throws Exception {
-		if (supportCenterSecret.equals(secret)) {
-			authenticationService.verify(adminId, password, salt);
+		if (supportCenterSecret.equals(secret) && authenticationService.verify(adminId, password, salt) != null) {
 			final List<String> ids = (List<String>) data.get("ids");
 			if (ids.size() == 0) {
 				final QueryParams params = new QueryParams(
@@ -188,18 +189,28 @@ public class SupportCenterApi {
 	public void resend(@PathVariable final BigInteger id, @RequestHeader String password, @RequestHeader String salt,
 			@RequestHeader String secret)
 			throws Exception {
-		if (supportCenterSecret.equals(secret)) {
-			authenticationService.verify(adminId, password, salt);
+		if (supportCenterSecret.equals(secret) && authenticationService.verify(adminId, password, salt) != null)
 			authenticationService.recoverSendEmailReminder(repository.one(Contact.class, id));
-		}
 	}
 
 	@PostMapping("import/location/{id}/{category}")
 	public String importLocation(@PathVariable final BigInteger id, @PathVariable final String category,
 			@RequestHeader String password, @RequestHeader String salt, @RequestHeader String secret) throws Exception {
-		if (supportCenterSecret.equals(secret)) {
-			authenticationService.verify(adminId, password, salt);
+		if (supportCenterSecret.equals(secret) && authenticationService.verify(adminId, password, salt) != null)
 			return importLocationsService.importLocation(id, category);
+		return null;
+	}
+
+	@GetMapping("metrics")
+	public Map<String, Object> metrics(@RequestHeader String password, @RequestHeader String salt,
+			@RequestHeader String secret) throws Exception {
+		if (supportCenterSecret.equals(secret) && authenticationService.verify(adminId, password, salt) != null) {
+			final Map<String, Object> result = new HashMap<>();
+			final Set<String> names = metricsEndpoint.listNames().getNames();
+			names.forEach(e -> {
+				result.put(e, metricsEndpoint.metric(e, null));
+			});
+			return result;
 		}
 		return null;
 	}
