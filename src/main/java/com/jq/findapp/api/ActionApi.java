@@ -158,8 +158,7 @@ public class ActionApi {
 			final Contact contact = repository.one(Contact.class, id);
 			if (contact.getModifiedAt().before(new Date(Instant.now().minus(Duration.ofDays(3)).toEpochMilli())))
 				notificationService.sendNotification(params.getUser(), contact,
-						ContactNotificationTextType.chatSeen,
-						"chat=" + user);
+						ContactNotificationTextType.chatSeen, "chat=" + user);
 		}
 		return result.getList();
 	}
