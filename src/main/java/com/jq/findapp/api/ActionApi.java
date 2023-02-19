@@ -366,13 +366,19 @@ public class ActionApi {
 	public Map<String, Object> paypalKey(@RequestHeader(required = false) BigInteger user,
 			@RequestHeader(required = false) String password, @RequestHeader(required = false) String salt)
 			throws Exception {
+		final int fee = 20;
 		final Map<String, Object> paypalConfig = new HashMap<>(3);
-		paypalConfig.put("fee", 20);
+		paypalConfig.put("fee", fee);
 		if (user != null) {
-			authenticationService.verify(user, password, salt);
+			final Contact contact = authenticationService.verify(user, password, salt);
 			final String s = getPaypalKey(user);
 			paypalConfig.put("key", s.substring(0, s.indexOf(':')));
 			paypalConfig.put("currency", "EUR");
+			paypalConfig.put("fee", contact.getFee());
+			if (contact.getFeeDate() != null && contact.getFee().intValue() != fee) {
+				paypalConfig.put("feeDate", contact.getFeeDate());
+				paypalConfig.put("feeAfter", fee);
+			}
 		}
 		return paypalConfig;
 	}

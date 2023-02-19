@@ -27,6 +27,7 @@ public class Contact extends BaseEntity {
 	private Boolean teaser = true;
 	private Boolean verified = false;
 	private Date birthday;
+	private Date feeDate;
 	@Enumerated(EnumType.STRING)
 	private Device device;
 	@Enumerated(EnumType.STRING)
@@ -39,6 +40,7 @@ public class Contact extends BaseEntity {
 	private Long passwordReset;
 	private Short age;
 	private Short birthdayDisplay;
+	private Short fee;
 	private Short gender;
 	private Short rating;
 	private String aboutMe;
@@ -122,6 +124,22 @@ public class Contact extends BaseEntity {
 
 	public void setBluetooth(Boolean bluetooth) {
 		this.bluetooth = bluetooth;
+	}
+
+	public Short getFee() {
+		return fee;
+	}
+
+	public void setFee(Short fee) {
+		this.fee = fee;
+	}
+
+	public Date getFeeDate() {
+		return feeDate;
+	}
+
+	public void setFeeDate(Date feeDate) {
+		this.feeDate = feeDate;
 	}
 
 	public Date getBirthday() {
