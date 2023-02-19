@@ -263,9 +263,9 @@ public class NotificationService {
 			repository.save(contactTo);
 			return false;
 		} catch (Exception ex) {
-			final QueryParams param = new QueryParams(Query.misc_setting);
-			param.setSearch("setting.label like 'push.gen.%'");
-			final Result settings = repository.list(param);
+			final QueryParams params = new QueryParams(Query.misc_setting);
+			params.setSearch("setting.label like 'push.gen.%'");
+			final Result settings = repository.list(params);
 			String setting = "\n\n";
 			for (int i = 0; i < settings.size(); i++)
 				setting += new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(settings.get(i))

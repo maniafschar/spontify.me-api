@@ -37,9 +37,9 @@ public class JwtGenerator {
 	protected int getLastGeneration(String keyId, boolean reset) throws Exception {
 		final String label = "push.gen." + keyId;
 		long lastGeneration = 0;
-		final QueryParams param = new QueryParams(Query.misc_setting);
-		param.setSearch("setting.label='" + label + "'");
-		final Map<String, Object> settingMap = repository.one(param);
+		final QueryParams params = new QueryParams(Query.misc_setting);
+		params.setSearch("setting.label='" + label + "'");
+		final Map<String, Object> settingMap = repository.one(params);
 		final Setting setting;
 		if (settingMap == null) {
 			setting = new Setting();

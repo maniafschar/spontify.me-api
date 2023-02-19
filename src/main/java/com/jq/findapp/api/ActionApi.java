@@ -428,9 +428,9 @@ public class ActionApi {
 	}
 
 	private String getPaypalKey(BigInteger user) {
-		final QueryParams param = new QueryParams(Query.misc_setting);
-		param.setSearch("setting.label='paypal.sandbox'");
-		final Map<String, Object> settings = repository.one(param);
+		final QueryParams params = new QueryParams(Query.misc_setting);
+		params.setSearch("setting.label='paypal.sandbox'");
+		final Map<String, Object> settings = repository.one(params);
 		return settings == null || !("," + settings.get("setting.value") + ",").contains("," + user + ",") ? paypalKey
 				: paypalSandboxKey;
 	}
