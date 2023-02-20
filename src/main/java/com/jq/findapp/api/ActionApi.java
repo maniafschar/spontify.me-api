@@ -372,7 +372,7 @@ public class ActionApi {
 				final EventParticipate eventParticipate = repository.one(EventParticipate.class,
 						(BigInteger) result.get(i).get("eventParticipate.id"));
 				eventParticipate.setState((short) -1);
-				eventParticipate.setReason("Paypal Refund " + Instant.now());
+				eventParticipate.setReason(n.get("resource").get("note_to_payer").asText());
 				repository.save(eventParticipate);
 			}
 		}
