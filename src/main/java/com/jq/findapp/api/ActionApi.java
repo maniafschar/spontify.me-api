@@ -39,6 +39,7 @@ import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.ContactVisit;
+import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Ip;
 import com.jq.findapp.entity.Location;
@@ -358,8 +359,23 @@ public class ActionApi {
 	@PostMapping("paypal")
 	public void paypal(@RequestBody final String data) throws Exception {
 		final ObjectMapper m = new ObjectMapper();
+		final JsonNode n = m.readTree(data);
 		notificationService.createTicket(TicketType.PAYPAL, "webhook",
-				m.writerWithDefaultPrettyPrinter().writeValueAsString(m.readTree(data)), BigInteger.valueOf(3));
+				m.writerWithDefaultPrettyPrinter().writeValueAsString(n), BigInteger.valueOf(3));
+		if ("PAYMENT.CAPTURE.REFUNDED".equals(n.get("event_type").asText())) {
+			String id = n.get("resource").get("links").get(1).get("href").asText();
+			id = id.substring(id.lastIndexOf('/') + 1);
+			final QueryParams params = new QueryParams(Query.event_listParticipateRaw);
+			params.setSearch("eventParticipate.payment like '%" + id + "%'");
+			final Result result = repository.list(params);
+			for (int i = 0; i < result.size(); i++) {
+				final EventParticipate eventParticipate = repository.one(EventParticipate.class,
+						(BigInteger) result.get(i).get("eventParticipate.id"));
+				eventParticipate.setState((short) -1);
+				eventParticipate.setReason("Paypal Refund " + Instant.now());
+				repository.save(eventParticipate);
+			}
+		}
 	}
 
 	@GetMapping("paypalKey")

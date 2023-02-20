@@ -15,13 +15,6 @@ SELECT
 	event.text,
 	event.type,
 	event.url,
-	eventParticipate.id,
-	eventParticipate.contactId,
-	eventParticipate.eventId,
-	eventParticipate.eventDate,
-	eventParticipate.state,
-	eventParticipate.reason,
-	eventParticipate.modifiedAt,
 	contact.id,
 	contact.image,
 	contact.imageList,
@@ -56,7 +49,6 @@ SELECT
 	'' as geolocationDistance
 FROM
 	Event event left join 
-	EventParticipate eventParticipate on event.id=eventParticipate.eventId left join
 	Location location on event.locationId=location.id left join
 	LocationFavorite locationFavorite on locationFavorite.locationId=location.id and locationFavorite.contactId={USERID},
 	Contact contact left join
@@ -67,5 +59,3 @@ FROM
 WHERE
 	event.contactId=contact.id and
 	{search}
-GROUP BY
-	event.id

@@ -1,0 +1,70 @@
+{
+	"id": "WH-6D472715BP815503E-18M79880RV312045E",
+	"event_version": "1.0",
+	"create_time": "2023-02-08T14:20:48.277Z",
+	"resource_type": "refund",
+	"resource_version": "2.0",
+	"event_type": "PAYMENT.CAPTURE.REFUNDED",
+	"summary": "A EUR 10.0 EUR capture payment was refunded",
+	"resource": {
+		"seller_payable_breakdown": {
+			"platform_fees": [
+				{
+					"amount": {
+						"value": "2.00",
+						"currency_code": "EUR"
+					}
+				}
+			],
+			"total_refunded_amount": {
+				"value": "10.00",
+				"currency_code": "EUR"
+			},
+			"paypal_fee": {
+				"value": "0.19",
+				"currency_code": "EUR"
+			},
+			"gross_amount": {
+				"value": "10.00",
+				"currency_code": "EUR"
+			},
+			"net_amount": {
+				"value": "7.81",
+				"currency_code": "EUR"
+			}
+		},
+		"amount": {
+			"value": "10.00",
+			"currency_code": "EUR"
+		},
+		"update_time": "2023-02-08T06:20:44-08:00",
+		"create_time": "2023-02-08T06:20:44-08:00",
+		"links": [
+			{
+				"method": "GET",
+				"rel": "self",
+				"href": "https://api.sandbox.paypal.com/v2/payments/refunds/6RK76367MW9546619"
+			},
+			{
+				"method": "GET",
+				"rel": "up",
+				"href": "https://api.sandbox.paypal.com/v2/payments/captures/2J476521SE713422J"
+			}
+		],
+		"id": "6RK76367MW9546619",
+		"note_to_payer": "10.0 EUR; 2023-02-08 Credit has been processed and claim is now closed. Please refer Dispute ID PP-R-OYI-10040996. Thank you.",
+		"status": "COMPLETED"
+	},
+	"links": [
+		{
+			"href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-6D472715BP815503E-18M79880RV312045E",
+			"rel": "self",
+			"method": "GET"
+		},
+		{
+			"href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-6D472715BP815503E-18M79880RV312045E/resend",
+			"rel": "resend",
+			"method": "POST"
+		}
+	]
+}

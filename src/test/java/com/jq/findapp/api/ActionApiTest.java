@@ -49,4 +49,18 @@ public class ActionApiTest {
 		assertEquals("81479", address.getZipCode());
 		assertEquals((float) 48.072197, address.getLatitude());
 	}
+
+	@Test
+	public void paypal_refund() throws Exception {
+		// given
+		final JsonNode n = new ObjectMapper()
+				.readTree(IOUtils.toString(getClass().getResourceAsStream("/paypalWebhook.json"),
+						StandardCharsets.UTF_8));
+
+		// when
+		final String href = n.get("resource").get("links").get(1).get("href").asText();
+
+		// then
+		assertEquals("https://api.sandbox.paypal.com/v2/payments/captures/2J476521SE713422J", href);
+	}
 }
