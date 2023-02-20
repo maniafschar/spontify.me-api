@@ -114,7 +114,8 @@ public class ActionApi {
 	@Value("${app.url.lookupip}")
 	private String lookupIp;
 
-	private final String paypalUrl = "https://api-m.sandbox.paypal.com/";
+	private final String paypalUrl = "https://api-m.paypal.com/";
+	private final String paypalSandboxUrl = "https://api-m.sandbox.paypal.com/";
 
 	@GetMapping("unique")
 	public Unique unique(String email) {
@@ -425,13 +426,15 @@ public class ActionApi {
 	public String paypalSignUpSellerUrl(@RequestHeader BigInteger user, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
 		authenticationService.verify(user, password, salt);
-		JsonNode n = new ObjectMapper().readTree(WebClient.create(paypalUrl + "v1/oauth2/token")
+		final String ppUrl = getPaypalUrl(user);
+		JsonNode n = new ObjectMapper().readTree(WebClient.create(ppUrl + "v1/oauth2/token")
 				.post().accept(MediaType.APPLICATION_JSON)
 				.header("Authorization",
 						"Basic " + Base64.getEncoder().encodeToString((getPaypalKey(user)).getBytes()))
 				.bodyValue("grant_type=client_credentials")
 				.retrieve().toEntity(String.class).block().getBody());
-		n = new ObjectMapper().readTree(WebClient.create(paypalUrl + "v2/customer/partner-referrals")
+		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(n));
+		n = new ObjectMapper().readTree(WebClient.create(ppUrl + "v2/customer/partner-referrals")
 				.post().contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer " + n.get("access_token").asText())
 				.bodyValue(IOUtils.toString(getClass().getResourceAsStream("/template/paypalSignUpSeller.json"),
@@ -449,11 +452,18 @@ public class ActionApi {
 		return notificationService.getPingValues(contact);
 	}
 
-	private String getPaypalKey(BigInteger user) {
+	private boolean isPaypalSandbox(BigInteger user) {
 		final QueryParams params = new QueryParams(Query.misc_setting);
 		params.setSearch("setting.label='paypal.sandbox'");
 		final Map<String, Object> settings = repository.one(params);
-		return settings == null || !("," + settings.get("setting.value") + ",").contains("," + user + ",") ? paypalKey
-				: paypalSandboxKey;
+		return settings != null && ("," + settings.get("setting.value") + ",").contains("," + user + ",");
+	}
+
+	private String getPaypalKey(BigInteger user) {
+		return isPaypalSandbox(user) ? paypalSandboxKey : paypalKey;
+	}
+
+	private String getPaypalUrl(BigInteger user) {
+		return isPaypalSandbox(user) ? paypalSandboxUrl : paypalUrl;
 	}
 }
