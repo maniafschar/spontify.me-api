@@ -4,7 +4,7 @@
 	"aps": {
 		"alert": {
 			"body": "{text}",
-			"title": "spontify.me"
+			"title": "{from}"
 		},
 		"badge": {badge},
 		"content-available": "1"

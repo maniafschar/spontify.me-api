@@ -35,7 +35,7 @@ public class LogFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		if (referer == null)
-			referer = Pattern.compile("(https://([a-z]*.)?spontify.me|http[s]?://localhost).*");
+			referer = Pattern.compile("(https://([a-z]*.)?skillvents.com|http[s]?://localhost).*");
 		final ContentCachingRequestWrapper req = new ContentCachingRequestWrapper((HttpServletRequest) request);
 		final HttpServletResponse res = (HttpServletResponse) response;
 		final Log log = new Log();

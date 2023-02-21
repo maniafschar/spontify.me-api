@@ -30,16 +30,18 @@ public class Android {
 	@Value("${push.fcm.url}")
 	private String url;
 
-	public Environment send(Contact contact, String text, String action, String notificationId) throws Exception {
+	public Environment send(Contact contactFrom, Contact contactTo, String text, String action, String notificationId)
+			throws Exception {
 		try {
-			send(contact, text, action, notificationId, false);
+			send(contactFrom, contactTo, text, action, notificationId, false);
 		} catch (Unauthorized ex) {
-			send(contact, text, action, notificationId, true);
+			send(contactFrom, contactTo, text, action, notificationId, true);
 		}
 		return Environment.Production;
 	}
 
-	private void send(Contact contact, String text, String action, String notificationId, boolean reset)
+	private void send(Contact contactFrom, Contact contactTo, String text, String action, String notificationId,
+			boolean reset)
 			throws Exception {
 		WebClient.create(url)
 				.post()
@@ -49,7 +51,8 @@ public class Android {
 				.bodyValue(
 						IOUtils.toString(getClass().getResourceAsStream("/template/push.android"),
 								StandardCharsets.UTF_8)
-								.replace("{to}", contact.getPushToken())
+								.replace("{from}", contactFrom.getPseudonym())
+								.replace("{to}", contactTo.getPushToken())
 								.replace("{text}", text)
 								.replace("{notificationId}", notificationId)
 								.replace("{exec}", Strings.isEmpty(action) ? "" : action))

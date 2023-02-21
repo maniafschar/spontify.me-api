@@ -233,10 +233,10 @@ public class AuthenticationServiceTest {
 	@Test
 	public void referer() {
 		// given
-		final Pattern pattern = Pattern.compile("(https://([a-z]*.)?spontify.me|http[s]?://localhost).*");
+		final Pattern pattern = Pattern.compile("(https://([a-z]*.)?skillvents.com|http[s]?://localhost).*");
 
 		// when
-		final boolean result = pattern.matcher("https://sc.spontify.me/rest/gähn").find();
+		final boolean result = pattern.matcher("https://sc.skillvents.com/rest/gähn").find();
 
 		// then
 		assertTrue(result);
@@ -249,8 +249,7 @@ public class AuthenticationServiceTest {
 		System.setProperty("javax.net.debug", "all");
 
 		// when
-		final Environment environmet = ios.send(contact,
-				"uzgku", "chat=12", 12, "1");
+		final Environment environmet = ios.send(contact, contact, "uzgku", "chat=12", 12, "1");
 
 		// then
 		assertEquals(Environment.Development, environmet);
@@ -264,7 +263,7 @@ public class AuthenticationServiceTest {
 				"dHFZR7_iWnc:APA91bF7Z9NsdMRN0nX5C2il8dOqbmJ8DFtAdqb4_2thbOGB0LJK_2m1zjtyXyHD1tmdog6TQsTXbHvKPyv-EuqNik4vM1VlGSY-h6wG6JdM4k9h8es7duf08pfSEYezwuUyGcDkWkQd");
 
 		// when
-		android.send(contact, "text", "action", "");
+		android.send(contact, contact, "text", "action", "");
 
 		// then no exception
 	}

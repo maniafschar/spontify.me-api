@@ -1,4 +1,4 @@
-spontify.me
+skillvents
 
 <jq:newsTitle />
 <jq:pseudonym />

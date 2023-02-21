@@ -156,8 +156,6 @@ public class NotificationService {
 			for (int i = 0; i < param.length; i++)
 				Strings.replaceString(text, "<jq:EXTRA_" + (i + 1) + " />", param[i]);
 		}
-		if (text.charAt(0) < 'A' || text.charAt(0) > 'Z')
-			text.insert(0, contactFrom.getPseudonym() + (text.charAt(0) == ':' ? "" : " "));
 		if (text.length() > 250) {
 			text.delete(247, text.length());
 			if (text.lastIndexOf(" ") > 180)
@@ -171,7 +169,7 @@ public class NotificationService {
 		if (userWantsNotification(notificationTextType, contactTo)) {
 			boolean b = !Strings.isEmpty(contactTo.getPushSystem()) && !Strings.isEmpty(contactTo.getPushToken());
 			if (b)
-				b = sendNotificationDevice(text, contactTo, action, notification);
+				b = sendNotificationDevice(contactFrom, contactTo, text, action, notification);
 			if (!b) {
 				sendNotificationEmail(contactFrom, contactTo, text.toString(), action);
 				if (notification != null)
@@ -232,8 +230,8 @@ public class NotificationService {
 		return values;
 	}
 
-	private boolean sendNotificationDevice(final StringBuilder text, final Contact contactTo, String action,
-			ContactNotification notification) throws Exception {
+	private boolean sendNotificationDevice(final Contact contactFrom, final Contact contactTo, final StringBuilder text,
+			String action, ContactNotification notification) throws Exception {
 		if (Strings.isEmpty(text) || Strings.isEmpty(contactTo.getPushSystem())
 				|| Strings.isEmpty(contactTo.getPushToken()))
 			return false;
@@ -251,9 +249,10 @@ public class NotificationService {
 			final String s = text.toString().replace("\"", "\\\"");
 			if ("ios".equals(contactTo.getPushSystem())) {
 				final Ping p = getPingValues(contactTo);
-				ios.send(contactTo, s, action, ((Map<?, ?>) p.chat.get("new")).size() + p.notification, notificationId);
+				ios.send(contactFrom, contactTo, s, action, ((Map<?, ?>) p.chat.get("new")).size() + p.notification,
+						notificationId);
 			} else if ("android".equals(contactTo.getPushSystem()))
-				android.send(contactTo, s, action, notificationId);
+				android.send(contactFrom, contactTo, s, action, notificationId);
 			if (notification != null)
 				notification.setType(ContactNotificationType.valueOf(contactTo.getPushSystem()));
 			return true;
@@ -343,8 +342,8 @@ public class NotificationService {
 		s2 = message;
 		if (s2.startsWith(contactFrom.getPseudonym() + ": "))
 			s2 = s2.substring(contactFrom.getPseudonym().length() + 2).trim();
-		Strings.replaceString(html, "<jq:text />", s2.replaceAll("\n", "<br />").replaceAll("spontify.me",
-				"<a href=\"https://spontify.me\" style=\"color:rgb(246,255,187);text-decoration:none;\">spontify.me</a>"));
+		Strings.replaceString(html, "<jq:text />", s2.replaceAll("\n", "<br />").replaceAll("skillvents",
+				"<a href=\"https://skillvents.com\" style=\"color:rgb(246,255,187);text-decoration:none;\">skillvents</a>"));
 		Strings.replaceString(text, "<jq:text />", s2);
 		if (Strings.isEmpty(action))
 			s2 = server;

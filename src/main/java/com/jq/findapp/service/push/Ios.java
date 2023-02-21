@@ -46,27 +46,30 @@ public class Ios {
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
 
-	public Environment send(Contact contact, String text, String action, int badge, String notificationId)
+	public Environment send(Contact contactFrom, Contact contactTo, String text, String action, int badge,
+			String notificationId)
 			throws Exception {
 		try {
-			send(url, contact, text, action, badge, notificationId);
+			send(contactFrom, contactTo, url, text, action, badge, notificationId);
 			return Environment.Production;
 		} catch (NotFoundException ex) {
-			if (adminId.equals(contact.getId())) {
-				send(urlTest, contact, text, action, badge, notificationId);
+			if (adminId.equals(contactTo.getId())) {
+				send(contactFrom, contactTo, urlTest, text, action, badge, notificationId);
 				return Environment.Development;
 			}
 			throw ex;
 		}
 	}
 
-	private void send(String url, Contact contact, String text, String action, int badge, String notificationId)
+	private void send(Contact contactFrom, Contact contactTo, String url, String text, String action, int badge,
+			String notificationId)
 			throws Exception {
 		final HttpRequest request = HttpRequest.newBuilder()
 				.POST(BodyPublishers.ofString(
 						IOUtils
 								.toString(getClass().getResourceAsStream("/template/push.ios"), StandardCharsets.UTF_8)
 								.replace("{text}", text)
+								.replace("{from}", contactFrom.getPseudonym())
 								.replace("{badge}", "" + badge)
 								.replace("{notificationId}", notificationId)
 								.replace("{exec}", Strings.isEmpty(action) ? "" : action)))
@@ -74,13 +77,13 @@ public class Ios {
 				.header("apns-topic", topic)
 				.header("authorization", "bearer " + jwtGenerator.generateToken(getHeader(), getClaims(), "EC"))
 				.header("Content-Type", "application/json")
-				.uri(new URI(url + contact.getPushToken()))
+				.uri(new URI(url + contactTo.getPushToken()))
 				.build();
 		final HttpClient client = HttpClient.newBuilder().version(Version.HTTP_2).build();
 		final HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 		if (response.statusCode() >= 300 || response.statusCode() < 200)
 			throw new NotFoundException(
-					"Failed to push to " + contact.getId() + ": " + text + "\n" + response.statusCode() + " "
+					"Failed to push to " + contactTo.getId() + ": " + text + "\n" + response.statusCode() + " "
 							+ response.body());
 	}
 

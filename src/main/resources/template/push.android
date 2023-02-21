@@ -6,7 +6,7 @@
 			"notificationId": "{notificationId}"
 		},
 		"notification": {
-			"title": "spontify.me",
+			"title": "{from}",
 			"body": "{text}"
 		},
 		"token": "{to}"

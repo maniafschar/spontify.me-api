@@ -19,7 +19,7 @@ public class ExternalServiceTest {
 	@Test
 	public void importLog() throws ParseException {
 		// given
-		final String line = "134.96.235.1 - - [22/Oct/2022:06:58:54 +0200] \"GET /js/main.js HTTP/1.1\" 200 4654 \"https://blog.spontify.me/\" \"\\\"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.5304.18 Safari/537.36\\\"\"";
+		final String line = "134.96.235.1 - - [22/Oct/2022:06:58:54 +0200] \"GET /js/main.js HTTP/1.1\" 200 4654 \"https://blog.skillvents.com/\" \"\\\"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.5304.18 Safari/537.36\\\"\"";
 		final Pattern pattern = Pattern.compile(
 				"([\\d.]+) (\\S) (\\S) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"(\\w+) ([^ ]*) ([^\"]*)\" (\\d+) (\\d+) \"([^\"]*)\" \"([^\"]*)\"");
 		final Matcher m = pattern.matcher(line.replaceAll("\\\\\"", ""));
@@ -36,7 +36,7 @@ public class ExternalServiceTest {
 		assertEquals("HTTP/1.1", m.group(7));
 		assertEquals("200", m.group(8));
 		assertEquals("4654", m.group(9));
-		assertEquals("https://blog.spontify.me/", m.group(10));
+		assertEquals("https://blog.skillvents.com/", m.group(10));
 		assertEquals(
 				"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.5304.18 Safari/537.36",
 				m.group(11));

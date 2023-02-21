@@ -436,6 +436,8 @@ public class ActionApi {
 		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(n));
 		n = new ObjectMapper().readTree(WebClient.create(ppUrl + "v2/customer/partner-referrals")
 				.post().contentType(MediaType.APPLICATION_JSON)
+				.header("User-Agent",
+						"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:94.0) Gecko/20100101 Firefox/94.0")
 				.header("Authorization", "Bearer " + n.get("access_token").asText())
 				.bodyValue(IOUtils.toString(getClass().getResourceAsStream("/template/paypalSignUpSeller.json"),
 						StandardCharsets.UTF_8).replace("{trackingId}", "" + user).replace("{returnUrl}", url))
