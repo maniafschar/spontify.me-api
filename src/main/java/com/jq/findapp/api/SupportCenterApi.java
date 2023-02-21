@@ -39,6 +39,7 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
+import com.jq.findapp.service.ChatService;
 import com.jq.findapp.service.EventService;
 import com.jq.findapp.service.ImportLocationsService;
 import com.jq.findapp.service.NotificationService;
@@ -82,6 +83,9 @@ public class SupportCenterApi {
 
 	@Autowired
 	private ImportLocationsService importLocationsService;
+
+	@Autowired
+	private ChatService chatService;
 
 	@Autowired
 	private MetricsEndpoint metricsEndpoint;
@@ -223,6 +227,7 @@ public class SupportCenterApi {
 				runLast(dbService::backup);
 				// importLog paralell to the rest, does not interfere
 				run(importLogService::importLog);
+				run(chatService::answerAi);
 				run(dbService::update);
 				run(statisticsService::update);
 				run(engagementService::sendRegistrationReminder);
@@ -238,15 +243,15 @@ public class SupportCenterApi {
 			throw new RuntimeException("Scheduler secret incorrect: " + secret);
 	}
 
-	private void runLast(final Scheduler run) {
-		run(run, true);
+	private void runLast(final Scheduler scheduler) {
+		run(scheduler, true);
 	}
 
-	private void run(final Scheduler run) {
-		run(run, false);
+	private void run(final Scheduler scheduler) {
+		run(scheduler, false);
 	}
 
-	private void run(final Scheduler run, final boolean last) {
+	private void run(final Scheduler scheduler, final boolean last) {
 		final Integer id = schedulerRunning.size() + 1;
 		schedulerRunning.add(id);
 		executorService.submit(new Runnable() {
@@ -266,12 +271,14 @@ public class SupportCenterApi {
 				try {
 					log.setContactId(adminId);
 					log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
-					final String[] result = run.run();
+					final String[] result = scheduler.run();
 					log.setUri("/support/scheduler/" + result[0]);
-					log.setStatus(result[1] != null && result[1].contains("Exception") ? 500 : 200);
-					if (result[1] != null) {
-						log.setBody(result[1].length() > 255 ? result[1].substring(0, 255) : result[1]);
-						notificationService.createTicket(TicketType.ERROR, "scheduler", result[1], adminId);
+					if (result.length > 1) {
+						log.setStatus(result[1] != null && result[1].contains("Exception") ? 500 : 200);
+						if (result[1] != null) {
+							log.setBody(result[1].length() > 255 ? result[1].substring(0, 255) : result[1]);
+							notificationService.createTicket(TicketType.ERROR, "scheduler", result[1], adminId);
+						}
 					}
 				} finally {
 					schedulerRunning.remove(id);
