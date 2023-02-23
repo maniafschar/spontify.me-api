@@ -1,6 +1,10 @@
 package com.jq.findapp.service.backend;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +26,10 @@ public class DbService {
 				"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and (select modifiedAt from Contact contact where contact.id=contactNotification.contactId)>contactNotification.createdAt and TIMESTAMPDIFF(MINUTE,contactNotification.createdAt,current_timestamp)>30");
 		repository.executeUpdate(
 				"update Contact set timezone='Europe/Berlin' where timezone is null");
+		final LocalDate d = LocalDate.ofInstant(Instant.now().minus(Duration.ofDays(183)), ZoneId.systemDefault());
+		repository.executeUpdate(
+				"update ContactToken set token='' where modifiedAt is not null and modifiedAt<'" + d
+						+ "' or modifiedAt is null and createdAt<'" + d + "'");
 		return new String[] { getClass().getSimpleName() + "/update", null };
 	}
 
