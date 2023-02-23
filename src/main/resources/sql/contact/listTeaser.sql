@@ -1,9 +1,19 @@
 SELECT
+	contact.age,
+	contact.aboutMe,
+	contact.birthday,
+	contact.birthdayDisplay,
+	contact.gender,
 	contact.id,
+	contact.idDisplay,
+	contact.image,
 	contact.imageList,
-	contact.pseudonym,
 	contact.latitude,
 	contact.longitude,
+	contact.pseudonym,
+	contact.rating,
+	contact.skills,
+	contact.skillsText,
 	'' as geolocationDistance
 FROM
 	Contact contact

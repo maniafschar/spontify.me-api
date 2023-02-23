@@ -169,7 +169,11 @@ public class ActionApi {
 	public Map<String, Object> one(final QueryParams params, @RequestHeader(required = false) BigInteger user,
 			@RequestHeader(required = false) String password, @RequestHeader(required = false) String salt)
 			throws Exception {
-		params.setUser(authenticationService.verify(user, password, salt));
+		if (user == null) {
+			if (params.getQuery() != Query.contact_listTeaser && params.getQuery() != Query.event_listTeaser)
+				throw new RuntimeException("unauthenticated request");
+		} else
+			params.setUser(authenticationService.verify(user, password, salt));
 		final Map<String, Object> one = repository.one(params);
 		if (one != null) {
 			if (params.getQuery() == Query.contact_list) {
@@ -252,8 +256,7 @@ public class ActionApi {
 					final Ip ip2 = new ObjectMapper()
 							.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 							.readValue(json, Ip.class);
-					final String location = new ObjectMapper().readTree(json.getBytes(StandardCharsets.UTF_8))
-							.get("loc").asText();
+					final String location = new ObjectMapper().readTree(json).get("loc").asText();
 					ip2.setLatitude(Float.parseFloat(location.split(",")[0]));
 					ip2.setLongitude(Float.parseFloat(location.split(",")[1]));
 					try {
@@ -429,6 +432,7 @@ public class ActionApi {
 		final String ppUrl = getPaypalUrl(user);
 		JsonNode n = new ObjectMapper().readTree(WebClient.create(ppUrl + "v1/oauth2/token")
 				.post().accept(MediaType.APPLICATION_JSON)
+				.header("User-Agent", "curl/7.55.1")
 				.header("Authorization",
 						"Basic " + Base64.getEncoder().encodeToString((getPaypalKey(user)).getBytes()))
 				.bodyValue("grant_type=client_credentials")
@@ -436,8 +440,7 @@ public class ActionApi {
 		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(n));
 		n = new ObjectMapper().readTree(WebClient.create(ppUrl + "v2/customer/partner-referrals")
 				.post().contentType(MediaType.APPLICATION_JSON)
-				.header("User-Agent",
-						"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:94.0) Gecko/20100101 Firefox/94.0")
+				.header("User-Agent", "curl/7.55.1")
 				.header("Authorization", "Bearer " + n.get("access_token").asText())
 				.bodyValue(IOUtils.toString(getClass().getResourceAsStream("/template/paypalSignUpSeller.json"),
 						StandardCharsets.UTF_8).replace("{trackingId}", "" + user).replace("{returnUrl}", url))
