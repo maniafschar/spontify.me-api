@@ -37,34 +37,36 @@ public enum Text {
 	engagement_uploadProfileAttributes,
 	engagement_uploadProfileImage,
 	engagement_welcome,
-	mail_chatNew,
-	mail_chatSeen,
-	mail_contactBirthday,
-	mail_contactDelete,
-	mail_contactFindMe,
-	mail_contactFriendApproved,
-	mail_contactFriendRequest,
 	mail_contactPasswordReset,
 	mail_contactRegistrationReminder,
-	mail_contactVisitLocation,
-	mail_contactVisitProfile,
 	mail_contactWelcomeEmail,
-	mail_eventChanged,
-	mail_eventDelete,
-	mail_eventNotify,
-	mail_eventNotifyWithoutLocation,
-	mail_eventNotification,
-	mail_eventParticipate,
-	mail_eventRated,
-	mail_feedback,
-	mail_locationMarketing,
-	mail_newsTitle,
-	mail_newsTitleFrom,
-	mail_sentImg,
-	mail_sentPos1,
-	mail_sentPos2,
-	mail_sentEntries,
-	mail_sentEntry,
+	mail_title,
+	mail_titleFrom,
+	notification_chatNew,
+	notification_chatSeen,
+	notification_contactBirthday,
+	notification_contactDelete,
+	notification_contactFindMe,
+	notification_contactFriendApproved,
+	notification_contactFriendRequest,
+	notification_contactVisitLocation,
+	notification_contactVisitProfile,
+	notification_eventChanged,
+	notification_eventDelete,
+	notification_eventNotify,
+	notification_eventNotifyWithoutLocation,
+	notification_eventNotification,
+	notification_eventParticipate,
+	notification_eventParticipateOnline,
+	notification_eventParticipateWithoutLocation,
+	notification_eventRated,
+	notification_feedback,
+	notification_locationMarketing,
+	notification_sentImg,
+	notification_sentPos1,
+	notification_sentPos2,
+	notification_sentEntries,
+	notification_sentEntry,
 	or,
 	preventDelete,
 	today,
@@ -98,9 +100,13 @@ public enum Text {
 	}
 
 	public String getText(String language) {
-		if (name().contains("_"))
-			return languages.get(language).get(name().substring(0, name().indexOf('_')))
-					.get(name().substring(name().indexOf('_') + 1)).asText();
-		return languages.get(language).get(name()).asText();
+		return getText(language, name());
+	}
+
+	public static String getText(String language, String label) {
+		if (label.contains("_"))
+			return languages.get(language).get(label.substring(0, label.indexOf('_')))
+					.get(label.substring(label.indexOf('_') + 1)).asText();
+		return languages.get(language).get(label).asText();
 	}
 }

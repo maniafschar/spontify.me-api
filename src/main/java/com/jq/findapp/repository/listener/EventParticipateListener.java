@@ -26,15 +26,34 @@ public class EventParticipateListener extends AbstractRepositoryListener<EventPa
 				final Contact contactFrom = repository.one(Contact.class, eventParticipate.getContactId());
 				final Instant time = new Timestamp(eventParticipate.getEventDate().getTime()).toInstant();
 				final ZonedDateTime t = event.getStartDate().toInstant().atZone(ZoneOffset.UTC);
-				notificationService.sendNotification(contactFrom, contactTo,
-						ContactNotificationTextType.eventParticipate,
-						Strings.encodeParam("p=" + contactFrom.getId()),
-						Strings.formatDate(null,
-								new Date(time.plusSeconds((t.getHour() * 60 + t.getMinute()) * 60)
-										.toEpochMilli()),
-								contactTo.getTimezone()),
-						event.getText(),
-						repository.one(Location.class, event.getLocationId()).getName());
+				if (event.getLocationId() == null || event.getLocationId().intValue() == -2)
+					notificationService.sendNotification(contactFrom, contactTo,
+							ContactNotificationTextType.eventParticipateWithoutLocation,
+							Strings.encodeParam("p=" + contactFrom.getId()),
+							Strings.formatDate(null,
+									new Date(time.plusSeconds((t.getHour() * 60 + t.getMinute()) * 60)
+											.toEpochMilli()),
+									contactTo.getTimezone()),
+							event.getText());
+				else if (event.getLocationId().intValue() == -1)
+					notificationService.sendNotification(contactFrom, contactTo,
+							ContactNotificationTextType.eventParticipateOnline,
+							Strings.encodeParam("p=" + contactFrom.getId()),
+							Strings.formatDate(null,
+									new Date(time.plusSeconds((t.getHour() * 60 + t.getMinute()) * 60)
+											.toEpochMilli()),
+									contactTo.getTimezone()),
+							event.getText());
+				else
+					notificationService.sendNotification(contactFrom, contactTo,
+							ContactNotificationTextType.eventParticipate,
+							Strings.encodeParam("p=" + contactFrom.getId()),
+							Strings.formatDate(null,
+									new Date(time.plusSeconds((t.getHour() * 60 + t.getMinute()) * 60)
+											.toEpochMilli()),
+									contactTo.getTimezone()),
+							event.getText(),
+							repository.one(Location.class, event.getLocationId()).getName());
 			}
 		}
 	}

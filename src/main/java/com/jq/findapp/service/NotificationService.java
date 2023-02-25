@@ -151,7 +151,7 @@ public class NotificationService {
 				return false;
 		}
 		final StringBuilder text = new StringBuilder(
-				Text.valueOf("mail_" + notificationTextType).getText(contactTo.getLanguage()));
+				Text.getText(contactTo.getLanguage(), "notification_" + notificationTextType.name()));
 		if (param != null) {
 			for (int i = 0; i < param.length; i++)
 				Strings.replaceString(text, "<jq:EXTRA_" + (i + 1) + " />", param[i]);
@@ -344,7 +344,7 @@ public class NotificationService {
 			s2 = s2.substring(contactFrom.getPseudonym().length() + 2).trim();
 		Strings.replaceString(html, "<jq:text />", s2.replaceAll("\n", "<br />").replaceAll("skillvents",
 				"<a href=\"https://skillvents.com\" style=\"color:rgb(246,255,187);text-decoration:none;\">skillvents</a>"));
-		Strings.replaceString(text, "<jq:text />", s2);
+		Strings.replaceString(text, "<jq:text />", sanatizeHtml(s2));
 		if (Strings.isEmpty(action))
 			s2 = server;
 		else if (action.startsWith("https://"))
@@ -356,9 +356,9 @@ public class NotificationService {
 		Strings.replaceString(html, "<jq:url />", Strings.URL_APP);
 		Strings.replaceString(text, "<jq:url />", Strings.URL_APP);
 		if (contactFrom == null || contactTo.getId() != null && contactFrom.getId().equals(contactTo.getId()))
-			s2 = Text.mail_newsTitle.getText(contactTo.getLanguage());
+			s2 = Text.mail_title.getText(contactTo.getLanguage());
 		else
-			s2 = Text.mail_newsTitleFrom.getText(contactTo.getLanguage()).replaceAll("<jq:pseudonymFrom />",
+			s2 = Text.mail_titleFrom.getText(contactTo.getLanguage()).replaceAll("<jq:pseudonymFrom />",
 					contactFrom.getPseudonym());
 		Strings.replaceString(html, "<jq:newsTitle />", s2);
 		Strings.replaceString(text, "<jq:newsTitle />", s2);
@@ -388,6 +388,14 @@ public class NotificationService {
 			message += "...";
 		}
 		sendEmail(contactTo.getEmail(), message, imgProfile, text.toString(), html.toString());
+	}
+
+	private String sanatizeHtml(String s) {
+		s = s.replace("<ul>", "\n\n");
+		s = s.replace("<li>", "* ");
+		s = s.replace("</li>", "\n");
+		s = s.replace("</ul>", "\n");
+		return s.replaceAll("<[^>]*>", "");
 	}
 
 	private void sendEmail(final String to, final String subject,

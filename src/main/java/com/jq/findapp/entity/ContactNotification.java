@@ -42,6 +42,8 @@ public class ContactNotification extends BaseEntity {
 		eventNotifyWithoutLocation,
 		eventNotification,
 		eventParticipate,
+		eventParticipateOnline,
+		eventParticipateWithoutLocation,
 		eventRated;
 	}
 

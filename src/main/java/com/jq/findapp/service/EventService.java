@@ -116,7 +116,7 @@ public class EventService {
 					if (time.getDayOfMonth() == now.getDayOfMonth() &&
 							(time.getHour() == 0
 									|| time.getHour() > now.getHour() && time.getHour() < now.getHour() + 3)) {
-						if (event.getLocationId() != null) {
+						if (event.getLocationId() != null && event.getLocationId().compareTo(BigInteger.ZERO) > 0) {
 							if (repository.one(Location.class, event.getLocationId()) == null)
 								repository.delete(event);
 							else {

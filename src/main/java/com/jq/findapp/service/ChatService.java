@@ -92,17 +92,17 @@ public class ChatService {
 		final Contact contactTo = repository.one(Contact.class, contactChat.getContactId2());
 		String s = null;
 		if (contactChat.getNote() == null)
-			s = Text.mail_sentImg.getText(contactTo.getLanguage());
+			s = Text.notification_sentImg.getText(contactTo.getLanguage());
 		else {
 			s = contactChat.getNote();
 			if (s.indexOf(Attachment.SEPARATOR) > -1)
 				s = new String(Repository.Attachment.getFile(s), StandardCharsets.UTF_8);
 			if (s.indexOf(" :openPos(") == 0)
-				s = (contactFrom.getGender() == null || contactFrom.getGender() == 2 ? Text.mail_sentPos2
-						: Text.mail_sentPos1)
+				s = (contactFrom.getGender() == null || contactFrom.getGender() == 2 ? Text.notification_sentPos2
+						: Text.notification_sentPos1)
 						.getText(contactTo.getLanguage());
 			else if (s.indexOf(" :open(") == 0)
-				s = (s.lastIndexOf(" :open(") == 0 ? Text.mail_sentEntry : Text.mail_sentEntries)
+				s = (s.lastIndexOf(" :open(") == 0 ? Text.notification_sentEntry : Text.notification_sentEntries)
 						.getText(contactTo.getLanguage());
 		}
 		notificationService.sendNotification(contactFrom, contactTo, ContactNotificationTextType.chatNew,

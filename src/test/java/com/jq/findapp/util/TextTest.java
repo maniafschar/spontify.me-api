@@ -18,7 +18,7 @@ public class TextTest {
 
 		// when
 		for (ContactNotificationTextType id : ContactNotificationTextType.values())
-			Text.valueOf("mail_" + id).getText("DE");
+			Text.valueOf("notification_" + id).getText("DE");
 
 		// then no exceptions
 	}

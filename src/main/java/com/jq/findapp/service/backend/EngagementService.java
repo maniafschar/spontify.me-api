@@ -10,7 +10,9 @@ import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,10 +91,13 @@ public class EngagementService {
 		CONTACT_CURRENT_TOWN((contact, location, externalService, repository) -> {
 			try {
 				return externalService.getAddress(contact.getLatitude(), contact.getLongitude(), null).getTown();
-			} catch (Exception e) {
+			} catch (
+
+		Exception e) {
 				throw new RuntimeException(e);
 			}
 		}),
+
 		CONTACT_VERSION((contact, location, externalService, repository) -> contact.getVersion()),
 		LOCATION_NAME((contact, location, externalService, repository) -> location.getName()),
 		NEW_CONTACTS_COUNT((contact, location, externalService, repository) -> {
@@ -278,7 +283,7 @@ public class EngagementService {
 			if (gc.get(Calendar.HOUR_OF_DAY) < 9 || gc.get(Calendar.HOUR_OF_DAY) > 18)
 				return result;
 			final QueryParams params = new QueryParams(Query.contact_listId);
-			params.setSearch("contact.createdAt>'" + Instant.now().minus(Duration.ofHours(3))
+			params.setSearch("contact.createdAt<'" + Instant.now().minus(Duration.ofHours(3))
 					+ "' and contact.verified=false and contact.notificationEngagement=true");
 			params.setLimit(0);
 			final Result list = repository.list(params);
@@ -321,6 +326,7 @@ public class EngagementService {
 		final String[] result = new String[] { getClass().getSimpleName() + "/sendChats", null };
 		try {
 			resetChatInstallCurrentVersion();
+			sendSkillventsEmail();
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setLimit(0);
 			params.setSearch("contact.id<>" + adminId
@@ -343,6 +349,47 @@ public class EngagementService {
 			result[1] = Strings.stackTraceToString(e);
 		}
 		return result;
+	}
+
+	private void sendSkillventsEmail() throws Exception {
+		final QueryParams params = new QueryParams(Query.contact_listId);
+		params.setLimit(0);
+		final Result list = repository.list(params);
+		final Contact admin = repository.one(Contact.class, adminId);
+		final Map<String, String> text = new HashMap<>();
+		text.put("DE",
+				"<span style=\"text-align:left;\">spontify.me war schon geil, skillvents ist der neue heiße Shit\n\n"
+						+ "Jeder hat <span class=\"highlightColor\">Vorlieben</span>, viele möchten sie vertiefen, manche möchten sie anderen beibringen und sich austauschen. Was magst Du?"
+						+ "<ul><li>Mountainbiken?</li>"
+						+ "<li>Exotisch kochen?</li>"
+						+ "<li>Über Nietzsche philosophieren?</li>"
+						+ "<li>Bei einem Gläschen Wein Dein Französisch vertiefen?</li>"
+						+ "<li>Karten spielen?</li>"
+						+ "<li>Konzerte besuchen?</li></ul>"
+						+ "In <span class=\"highlightColor\">skillvents</span> findest Du nicht nur passende Events, Du kannst selbst auch <span class=\"highlightColor\">Suchanfragen</span> einstellen, um spontan Gleichgesinnte zu finden.\n\n"
+						+ "skillvents ist nicht nur kostenlos, Du kannst sogar <span class=\"highlightColor\">Geld verdienen</span>. Baue Dir Deine Community auf, veranstalte tolle skillvents, erweitere Deinen Bekanntheitsgrad. Sind Teilnehmer bereit, für Dein skillvent zu bezahlen, dann kannst Du mit Deinem Paypal Account kostenpflichtige skillvents einstellen. Die Bezahlung der Teilnehmer landet, abzüglich unserer Gebühr von 20%, direkt und sofort auf Dein Paypal Account.\n\n"
+						+ "Sponti Support</span>");
+		text.put("EN", "The best comes spontaneously!\n\n"
+				+ "findapp has always been about spontaneity, now we take that into account in the name. findapp becommes\n\n"
+				+ "spontify.me\n\n"
+				+ "not only a renaming, but a complete redesign, simple operation and a modern look & feel.\n\n"
+				+ "Take a look, convince yourself and if you like the app, recommend us. "
+				+ "The larger the community, the more spontaneous events and encounters are possible here.\n\n"
+				+ "We look forward to feedback. Just reply here or write to me in the app.\n\n"
+				+ "Greetings and stay healthy!\n"
+				+ "Sponti Support");
+		final Setting s = repository.one(Setting.class, new BigInteger("22"));
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).get("contact.id").equals(BigInteger.ONE)
+					&& !s.getValue().contains("," + list.get(i).get("contact.id") + ",")) {
+				final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
+				notificationService.sendNotificationEmail(admin, to, text.get(to.getLanguage()),
+						"https://skillvents.com");
+				Thread.sleep(10000);
+				s.setValue(s.getValue() + to.getId() + ",");
+			}
+		}
+		repository.save(s);
 	}
 
 	private boolean isTimeForNewChat(Contact contact, final QueryParams params, boolean nearBy) {
