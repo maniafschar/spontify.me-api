@@ -394,8 +394,8 @@ public class ActionApi {
 			final String s = getPaypalKey(user);
 			paypalConfig.put("key", s.substring(0, s.indexOf(':')));
 			paypalConfig.put("currency", "EUR");
-			paypalConfig.put("fee", contact.getFee());
-			if (contact.getFeeDate() != null && contact.getFee().intValue() != fee) {
+			paypalConfig.put("fee", contact.getFee() == null ? fee : contact.getFee());
+			if (contact.getFeeDate() != null && ((Number) paypalConfig.get("fee")).intValue() != fee) {
 				paypalConfig.put("feeDate", contact.getFeeDate());
 				paypalConfig.put("feeAfter", fee);
 			}

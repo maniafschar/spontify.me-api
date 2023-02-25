@@ -25,11 +25,9 @@ SELECT
 	location.longitude,
 	'' as geolocationDistance
 FROM
-	Event event,
-	Location location,
+	Event event left join Location location on location.id=event.locationId,
 	Contact contact
 WHERE
-	location.id=event.locationId and
 	contact.id=event.contactId and
-	(event.imageList is not null or location.imageList is not null) and
+	(event.image is not null or location.image is not null or contact.image is not null) and
 	{search}
