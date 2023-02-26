@@ -60,5 +60,4 @@ FROM
 		contactLink.contactId2={USERID} and contactLink.contactId=contact.id
 WHERE
 	event.id=eventParticipate.eventId and
-	eventParticipate.contactId=contact.id and
 	{search}

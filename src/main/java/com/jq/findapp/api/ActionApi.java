@@ -278,7 +278,7 @@ public class ActionApi {
 			if (params.getQuery() == Query.contact_listTeaser)
 				params.setSearch("contact.id<>" + user);
 			else
-				params.setSearch("event.endDate>'" + Instant.now().atZone(ZoneOffset.UTC).toLocalDate() + "'");
+				params.setSearch("event.endDate>='" + Instant.now().atZone(ZoneOffset.UTC).toLocalDate() + "'");
 		}
 		return repository.list(params).getList();
 	}
