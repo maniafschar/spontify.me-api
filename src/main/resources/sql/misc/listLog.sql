@@ -12,6 +12,7 @@ SELECT
 	log.status,
 	log.time,
 	log.uri,
+	log.webCall,
 	ip.hostname,
 	ip.country,
 	ip.region,

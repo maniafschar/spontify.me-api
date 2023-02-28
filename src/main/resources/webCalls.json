@@ -1,0 +1,485 @@
+[
+	{
+		"url": "POST db/one",
+		"body": "{classname:'ContactBluetooth',values:{contactId2:id}}",
+		"call": "bluetooth.scanStart()"
+	},
+	{
+		"url": "PUT db/one",
+		"body": "{bluetooth:false,classname:'Contact'}",
+		"call": "bluetooth.toggle()"
+	},
+	{
+		"url": "PUT db/one",
+		"body": "{bluetooth:true,classname:'Contact'}",
+		"call": "bluetooth.toggle()"
+	},
+	{
+		"url": "GET action/google?param=js",
+		"call": "communication.loadMap(callback)"
+	},
+	{
+		"url": "GET action/ping",
+		"call": "communication.ping()"
+	},
+	{
+		"url": "GET db/list?query=contact_listNotification",
+		"call": "communication.ping()"
+	},
+	{
+		"url": "POST action/notify",
+		"call": "communication.sendError(text)"
+	},
+	{
+		"url": "PUT db/one",
+		"body": "{pushSystem:global.getOS(),pushToken:e.registrationId,classname:'Contact'}",
+		"call": "communication.notification.saveToken(e)"
+	},
+	{
+		"url": "GET action/one?query= + action + &distance=100000&latitude= + geoData.current.lat + &longitude= + geoData.current.lon",
+		"call": "details.open(id, action, callback)"
+	},
+	{
+		"url": "GET action/google?param= + encodeURIComponent(town= + ui.q(popup input).value.trim())",
+		"call": "geoData.mapReposition()"
+	},
+	{
+		"url": "POST action/position",
+		"call": "geoData.save(position, exec)"
+	},
+	{
+		"url": "PUT db/one",
+		"body": "{latitude:geoData.current.lat,longitude:geoData.current.lon,classname:'Contact'}",
+		"call": "geoData.reset()"
+	},
+	{
+		"url": "GET action/map?destination= + l2",
+		"call": "global.replaceInternalLinks(s)"
+	},
+	{
+		"url": "GET db/list?query= + table + _list&distance=100000&search= + encodeURIComponent(( + search.substring(4) + ))",
+		"call": "global.replaceInternalLinks(s)"
+	},
+	{
+		"url": "GET (window.location && window.location.href && window.location.href.indexOf(global.server) == 0 ? / : ) + js/lang/ + lang + .json",
+		"call": "initialisation.setLanguage(lang, exec)"
+	},
+	{
+		"url": "GET (window.location && window.location.href && window.location.href.indexOf(global.server) == 0 ? / : ) + js/lang/ + lang + .html",
+		"call": "initialisation.setLanguageInternal(s, lang, exec)"
+	},
+	{
+		"url": "PUT action/paypalRegister",
+		"call": "initialisation.showStartDialogs()"
+	},
+	{
+		"url": "PUT db/one",
+		"body": "{active:false,classname:'Contact'}",
+		"call": "initialisation.initApp()"
+	},
+	{
+		"url": "PUT db/one",
+		"body": "{active:true,classname:'Contact'}",
+		"call": "initialisation.initApp()"
+	},
+	{
+		"url": "PUT db/one",
+		"body": "{language:lang,classname:'Contact'}",
+		"call": "initialisation.setLanguageInternal(s, lang, exec)"
+	},
+	{
+		"url": "GET db/one?query=contact_list&search= + encodeURIComponent(contact.id=3)",
+		"call": "pageChat.initActiveChats()"
+	},
+	{
+		"url": "GET db/list?query=contact_listChat&limit=0",
+		"call": "pageChat.initActiveChats()"
+	},
+	{
+		"url": "GET action/quotation",
+		"call": "pageChat.insertQuote(event)"
+	},
+	{
+		"url": "GET action/chat/ + id + /true",
+		"call": "pageChat.open(id)"
+	},
+	{
+		"url": "GET db/one?query=contact_list&search= + encodeURIComponent(contact.id= + id)",
+		"call": "pageChat.open(id)"
+	},
+	{
+		"url": "GET db/one?query=contact_chat&search= + encodeURIComponent(contactChat.id= + r.chatId)",
+		"call": "pageChat.postSendChatImage(r)"
+	},
+	{
+		"url": "GET action/chat/ + id + /false",
+		"call": "pageChat.refresh()"
+	},
+	{
+		"url": "POST db/one",
+		"body": "{classname:'ContactChat',values:v}",
+		"call": "pageChat.sendChat(id, msg, event)"
+	},
+	{
+		"url": "POST action/chatGroups",
+		"call": "pageChat.sendChatGroup()"
+	},
+	{
+		"url": "POST db/one",
+		"call": "pageChat.sendChatImage()"
+	},
+	{
+		"url": "PUT db/one",
+		"call": "pageContact.block()"
+	},
+	{
+		"url": "POST db/one",
+		"call": "pageContact.block()"
+	},
+	{
+		"url": "PUT db/one",
+		"body": "{classname:'ContactLink',id:linkId,values:{status:status}}",
+		"call": "pageContact.confirmFriendship(linkId, status, id)"
+	},
+	{
+		"url": "POST db/one",
+		"body": "{classname:'ContactLink',values:{contactId2:id}}",
+		"call": "pageContact.sendRequestForFriendship(id)"
+	},
+	{
+		"url": "GET db/one?query=misc_block&search= + encodeURIComponent(block.contactId= + user.contact.id +  and block.contactId2= + id)",
+		"call": "pageContact.toggleBlockUser(id)"
+	},
+	{
+		"url": "DELETE db/one",
+		"call": "pageContact.addToGroup(event, id)"
+	},
+	{
+		"url": "POST db/one",
+		"call": "pageContact.addToGroup(event, id)"
+	},
+	{
+		"url": "DELETE db/one",
+		"body": "{classname:'ContactGroup',id:ui.q('input[name=\"groupdialog\"]:checked').getAttribute('value')}",
+		"call": "pageContact.delete()"
+	},
+	{
+		"url": "GET db/list?query=contact_listGroup&search= + encodeURIComponent(contactGroup.contactId= + user.contact.id)",
+		"call": "pageContact.getGroups(exec)"
+	},
+	{
+		"url": "PUT db/one",
+		"body": "{classname:'ContactGroup',id:ui.q('input[name=\"groupdialog\"]:checked').getAttribute('value'),values:{name:s}}",
+		"call": "pageContact.rename()"
+	},
+	{
+		"url": "POST db/one",
+		"body": "{classname:'ContactGroup',values:{name:e.value.replace(/</g,'&lt;')}}",
+		"call": "pageContact.saveGroup(id)"
+	},
+	{
+		"url": "GET db/list?query=contact_listGroupLink&search= + encodeURIComponent(contactGroupLink.contactId2= + id)",
+		"call": "pageContact.toggleGroups(id, friendship)"
+	},
+	{
+		"url": "GET db/list?latitude= + geoData.current.lat + &longitude= + geoData.current.lon + &distance=100000&query=location_list&search= + encodeURIComponent(location.contactId= + id)",
+		"call": "pageContact.toggleLocation(id)"
+	},
+	{
+		"url": "GET db/list?latitude= + geoData.current.lat + &longitude= + geoData.current.lon + &query=contact_listGroupLink&search= + encodeURIComponent(contactGroupLink.contactGroupId= + v)",
+		"call": "pageContact.loadListGroups()"
+	},
+	{
+		"url": "GET db/list?query=event_listParticipateRaw&search= + encodeURIComponent(eventParticipate.eventId= + v.event.id +  and eventParticipate.eventDate=\\ + v.id.split(_)[1] + \\)",
+		"call": "pageEvent.detail(v)"
+	},
+	{
+		"url": "GET action/paypalKey",
+		"call": "pageEvent.edit(locationID, id)"
+	},
+	{
+		"url": "GET /images/location.svg",
+		"call": "pageEvent.init()"
+	},
+	{
+		"url": "GET /images/contact.svg",
+		"call": "pageEvent.init()"
+	},
+	{
+		"url": "GET action/searchLocation?search= + encodeURIComponent(s)",
+		"call": "pageEvent.locations()"
+	},
+	{
+		"url": "GET db/list?query=event_list&search= + encodeURIComponent(event.locationId>0 and event.contactId= + user.contact.id)",
+		"call": "pageEvent.locationsOfPastEvents()"
+	},
+	{
+		"url": "GET action/paypalKey",
+		"call": "pageEvent.openPaypal(paypalMerchantId)"
+	},
+	{
+		"url": "PUT db/one",
+		"call": "pageEvent.participate(order)"
+	},
+	{
+		"url": "POST db/one",
+		"call": "pageEvent.participate(order)"
+	},
+	{
+		"url": "PUT db/one",
+		"call": "pageEvent.save()"
+	},
+	{
+		"url": "POST db/one",
+		"call": "pageEvent.save()"
+	},
+	{
+		"url": "GET action/paypalSignUpSellerUrl",
+		"call": "pageEvent.signUpPaypal()"
+	},
+	{
+		"url": "GET db/list?query=event_list&search= + encodeURIComponent(event. + field + Id= + id)",
+		"call": "pageEvent.toggle(id)"
+	},
+	{
+		"url": "GET db/list?query=event_listParticipate&search= + encodeURIComponent(eventParticipate.eventId= + id[0] +  and eventParticipate.eventDate=\\ + id[1] + \\ and eventParticipate.contactId= + u +  and eventParticipate.contactId=contact.id)",
+		"call": "pageEvent.verifyParticipation(id)"
+	},
+	{
+		"url": "GET db/list?params",
+		"call": "pageEvent.loadEvents(params)"
+	},
+	{
+		"url": "GET db/list?query=event_listParticipateRaw&search= + encodeURIComponent(eventParticipate.contactId= + user.contact.id)",
+		"call": "pageEvent.loadEvents(params)"
+	},
+	{
+		"url": "GET db/list?query=contact_list&distance=50&latitude= + geoData.current.lat + &longitude= + geoData.current.lon + &search= + encodeURIComponent(search)",
+		"call": "pageEvent.loadPotentialParticipants()"
+	},
+	{
+		"url": "GET db/list?query=event_listParticipate&latitude= + geoData.current.lat + &longitude= + geoData.current.lon + &distance=100000&limit=0&search= + encodeURIComponent(eventParticipate.state=1 and eventParticipate.eventId= + id[0] +  and eventParticipate.eventDate=\\ + id[1] + \\ and eventParticipate.contactId=contact.id)",
+		"call": "pageEvent.toggleParticipants(event)"
+	},
+	{
+		"url": "PUT db/one",
+		"body": "{classname:'ContactNotification',id:id,values:{seen:true}}",
+		"call": "pageHome.clickNotification(id, action)"
+	},
+	{
+		"url": "GET action/teaser/contacts",
+		"call": "pageHome.init(force)"
+	},
+	{
+		"url": "GET action/teaser/events",
+		"call": "pageHome.init(force)"
+	},
+	{
+		"url": "GET action/paypalKey",
+		"call": "pageInfo.init()"
+	},
+	{
+		"url": "PUT db/one",
+		"body": "{recommend:global.date.local2server(newDate()),classname:'Contact'}",
+		"call": "pageInfo.socialShareDialog()"
+	},
+	{
+		"url": "PUT db/one",
+		"call": "pageLocation.block()"
+	},
+	{
+		"url": "POST db/one",
+		"call": "pageLocation.block()"
+	},
+	{
+		"url": "DELETE db/one",
+		"body": "{classname:classname,id:id}",
+		"call": "pageLocation.deleteElement(id, classname)"
+	},
+	{
+		"url": "GET action/map?source= + geoData.current.lat + , + geoData.current.lon + &destination= + v.latitude + , + v.longitude",
+		"call": "pageLocation.detailLocationEvent(l, id)"
+	},
+	{
+		"url": "GET action/google?param= + encodeURIComponent(latlng= + geoData.current.lat + , + geoData.current.lon)",
+		"call": "pageLocation.prefillAddress()"
+	},
+	{
+		"url": "GET action/google?param= + encodeURIComponent(place/nearbysearch/json?radius=100&sensor=false&location= + geoData.current.lat + , + geoData.current.lon)",
+		"call": "pageLocation.showLocationsNearby(event)"
+	},
+	{
+		"url": "PUT db/one",
+		"call": "pageLocation.save()"
+	},
+	{
+		"url": "POST db/one",
+		"call": "pageLocation.save()"
+	},
+	{
+		"url": "GET db/one?query=misc_block&search= + encodeURIComponent(block.contactId= + user.contact.id +  and  + (id.indexOf && id.indexOf(_) > 0 ? block.eventId= + id.substring(0, id.indexOf(_)) : block.locationId= + id))",
+		"call": "pageLocation.toggleBlock(id)"
+	},
+	{
+		"url": "PUT db/one",
+		"call": "pageLocation.toggleFavorite(id)"
+	},
+	{
+		"url": "POST db/one",
+		"call": "pageLocation.toggleFavorite(id)"
+	},
+	{
+		"url": "GET authentication/loginAuto?token= + encodeURIComponent(Encryption.encPUB(token)) + &publicKey= + encodeURIComponent(Encryption.jsEncrypt.getPublicKeyB64())",
+		"call": "pageLogin.autoLogin(exec)"
+	},
+	{
+		"url": "GET action/unique?email= + encodeURIComponent(pageLogin.getRealPseudonym(f.value))",
+		"call": "pageLogin.checkUnique(f, exec)"
+	},
+	{
+		"url": "GET authentication/login?os= + global.getOS() + &device= + global.getDevice() + &version= + global.appVersion + &timezone= + encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone) + &email= + encodeURIComponent(Encryption.encPUB(u)) + (autoLogin ? &publicKey= + encodeURIComponent(Encryption.jsEncrypt.getPublicKeyB64()) : )",
+		"call": "pageLogin.login(u, p, autoLogin, exec)"
+	},
+	{
+		"url": "GET action/birthday",
+		"call": "pageLogin.login(u, p, autoLogin, exec)"
+	},
+	{
+		"url": "PUT authentication/loginExternal",
+		"body": "{user:u,from:os,language:global.language,version:global.appVersion,device:global.getDevice(),os:global.getOS(),timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,publicKey:Encryption.jsEncrypt.getPublicKeyB64()}",
+		"call": "pageLogin.loginToServer(os, u, exec)"
+	},
+	{
+		"url": "GET authentication/logoff + token",
+		"call": "pageLogin.logoff()"
+	},
+	{
+		"url": "POST authentication/register",
+		"call": "pageLogin.register()"
+	},
+	{
+		"url": "GET authentication/recoverSendEmail?email= + encodeURIComponent(Encryption.encPUB(email))",
+		"call": "pageLogin.sendVerificationEmail()"
+	},
+	{
+		"url": "GET authentication/recoverVerifyEmail?token= + encodeURIComponent(Encryption.encPUB(e.substring(0, 10) + s2 + e.substring(10))) + &publicKey= + encodeURIComponent(Encryption.jsEncrypt.getPublicKeyB64())",
+		"call": "pageLogin.verifyEmail(e, email)"
+	},
+	{
+		"url": "PUT db/one",
+		"body": "{fbToken:response.token,classname:'Contact'}",
+		"call": "pageLogin.openFB(exec)"
+	},
+	{
+		"url": "PUT db/one",
+		"body": "{password:Encryption.encPUB(ui.val('popup[name=\"passwd\"]')),classname:'Contact'}",
+		"call": "pageLogin.savePassword()"
+	},
+	{
+		"url": "PUT db/one",
+		"body": "d, intro.closeHint",
+		"call": "pageLogin.saveProfile()"
+	},
+	{
+		"url": "GET db/list?latitude= + geoData.current.lat + &longitude= + geoData.current.lon + &distance=100000&query=contact_list&search= + encodeURIComponent(pageSearch.contacts.getSearch())",
+		"call": "pageSearch.contacts.search()"
+	},
+	{
+		"url": "GET db/list?latitude= + geoData.current.lat + &longitude= + geoData.current.lon + &distance=100000&query=location_list&search= + encodeURIComponent(pageSearch.locations.getSearch())",
+		"call": "pageSearch.locations.search()"
+	},
+	{
+		"url": "POST db/one",
+		"body": "{classname:'Ticket',values:{type:'REGISTRATION',subject:'Delete',note:s}}",
+		"call": "pageSettings.deleteProfile()"
+	},
+	{
+		"url": "DELETE authentication/one",
+		"call": "pageSettings.deleteProfile()"
+	},
+	{
+		"url": "GET db/one?query=contact_list&search= + encodeURIComponent(contact.id= + user.contact.id)",
+		"call": "pageSettings.init(exec)"
+	},
+	{
+		"url": "GET action/paypalKey",
+		"call": "pageSettings.init(exec)"
+	},
+	{
+		"url": "GET db/one?query=contact_list&search= + encodeURIComponent(contact.id= + user.contact.id)",
+		"call": "pageSettings.postSave(goToID)"
+	},
+	{
+		"url": "DELETE db/one",
+		"body": "{classname:'Block',id:blockId}",
+		"call": "pageSettings.unblock(id, blockId)"
+	},
+	{
+		"url": "GET db/list?query=contact_listBlocked&limit=0",
+		"call": "pageSettings.toggleBlocked()"
+	},
+	{
+		"url": "GET db/list?query=location_listBlocked&limit=0",
+		"call": "pageSettings.toggleBlocked()"
+	},
+	{
+		"url": "GET db/list?query=event_listBlocked&limit=0",
+		"call": "pageSettings.toggleBlocked()"
+	},
+	{
+		"url": "PUT db/one",
+		"body": "formFunc.getForm('settings tabBody'",
+		"call": "pageSettings.save(goToID, saveNewEmail)"
+	},
+	{
+		"url": "GET db/list?query=misc_rating&search= + encodeURIComponent(event.id= + id +  and eventParticipate.contactId= + user.contact.id)",
+		"call": "ratings.open(id, search)"
+	},
+	{
+		"url": "GET db/list?query=misc_rating&search= + encodeURIComponent(search)",
+		"call": "ratings.open(id, search)"
+	},
+	{
+		"url": "POST db/one",
+		"call": "ratings.save()"
+	},
+	{
+		"url": "PUT db/one",
+		"body": "{classname:'Contact',id:user.contact.id,values:{visitPage:global.date.local2server(newDate())}}",
+		"call": "ui.query.contactVisits()"
+	},
+	{
+		"url": "GET /images/ + id + .svg",
+		"call": "ui.image.fetchSVG(id)"
+	},
+	{
+		"url": "GET db/list?query=contact_list&distance=100000&limit=0&latitude= + geoData.current.lat + &longitude= + geoData.current.lon + &search= + encodeURIComponent(contactLink.status=\\Friends\\)",
+		"call": "ui.query.contactFriends()"
+	},
+	{
+		"url": "GET db/list?query=contact_listVisit&distance=100000&sort=false&latitude= + geoData.current.lat + &longitude= + geoData.current.lon + &search= + encodeURIComponent(contactVisit.contactId2=contact.id and contactVisit.contactId= + user.contact.id)",
+		"call": "ui.query.contactVisitees()"
+	},
+	{
+		"url": "GET db/list?query=contact_listVisit&distance=100000&sort=false&latitude= + geoData.current.lat + &longitude= + geoData.current.lon + &search= + encodeURIComponent(contactVisit.contactId=contact.id and contactVisit.contactId2= + user.contact.id)",
+		"call": "ui.query.contactVisits()"
+	},
+	{
+		"url": "GET db/list?query=event_listParticipate&distance=100000&latitude= + geoData.current.lat + &longitude= + geoData.current.lon + &search= + encodeURIComponent(eventParticipate.contactId= + user.contact.id +  and event.contactId=contact.id)",
+		"call": "ui.query.eventTickets()"
+	},
+	{
+		"url": "PUT db/one",
+		"call": "user.save(data, success)"
+	},
+	{
+		"url": "PUT db/one",
+		"body": "{storage:JSON.stringify(user.contact.storage),classname:'Contact'}",
+		"call": "user.remove(key)"
+	},
+	{
+		"url": "PUT db/one",
+		"body": "{storage:JSON.stringify(user.contact.storage),classname:'Contact'}",
+		"call": "user.set(key, value)"
+	}
+]

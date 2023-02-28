@@ -28,7 +28,7 @@ import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = { FindappApplication.class, TestConfig.class }, properties = { "app.admin.id=3" })
+@SpringBootTest(classes = { FindappApplication.class, TestConfig.class })
 @ActiveProfiles("test")
 public class ImportLocationsServiceTest {
 	@Autowired

@@ -136,6 +136,16 @@ public class ActionApi {
 		return QUOTATION.get((int) (Math.random() * (QUOTATION.size() - 1)));
 	}
 
+	@GetMapping("birthday")
+	public Map<String, String> birthday(@RequestHeader BigInteger user, @RequestHeader String password,
+			@RequestHeader String salt) {
+		authenticationService.verify(user, password, salt);
+		final Map<String, String> map = new HashMap<>(2);
+		map.put("text", QUOTATION.get((int) (Math.random() * (QUOTATION.size() - 1))));
+		map.put("image", Strings.URL_APP + "/images/happyBirthday.png");
+		return map;
+	}
+
 	@GetMapping("chat/{id}/{all}")
 	public List<Object[]> chat(@PathVariable final BigInteger id,
 			@PathVariable final boolean all, @RequestHeader BigInteger user, @RequestHeader String password,

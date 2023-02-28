@@ -226,6 +226,7 @@ public class SupportCenterApi {
 				// last job is backup, even after importLog
 				runLast(dbService::backup);
 				// importLog paralell to the rest, does not interfere
+				run(importLogService::mapWebCalls);
 				run(importLogService::importLog);
 				run(chatService::answerAi);
 				run(dbService::update);

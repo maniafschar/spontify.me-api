@@ -28,8 +28,7 @@ import com.jq.findapp.service.backend.EngagementService;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = { FindappApplication.class,
-		TestConfig.class }, webEnvironment = WebEnvironment.RANDOM_PORT, properties = { "app.admin.id=1" })
+@SpringBootTest(classes = { FindappApplication.class, TestConfig.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 public class ApiTest {
 	@LocalServerPort

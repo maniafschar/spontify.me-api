@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 public class Log extends BaseEntity {
 	private String method;
 	private String body;
+	private String webCall;
 	private String referer;
 	private String query;
 	private String ip;
@@ -95,5 +96,13 @@ public class Log extends BaseEntity {
 
 	public void setReferer(String referer) {
 		this.referer = referer;
+	}
+
+	public String getWebCall() {
+		return webCall;
+	}
+
+	public void setWebCall(String webCall) {
+		this.webCall = webCall;
 	}
 }
