@@ -39,6 +39,7 @@ public class LogFilter implements Filter {
 		final ContentCachingRequestWrapper req = new ContentCachingRequestWrapper((HttpServletRequest) request);
 		final HttpServletResponse res = (HttpServletResponse) response;
 		final Log log = new Log();
+		log.setWebCall(req.getHeader("webCall"));
 		final boolean loggable = !"OPTIONS".equals(req.getMethod()) && !"/action/ping".equals(req.getRequestURI());
 		if (loggable) {
 			log.setUri(req.getRequestURI());
