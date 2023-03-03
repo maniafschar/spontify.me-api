@@ -9,6 +9,7 @@ SELECT
 	eventParticipate.eventDate,
 	eventParticipate.state,
 	event.id,
+	contact.id,
 	contact.imageList,
 	contact.pseudonym
 FROM
