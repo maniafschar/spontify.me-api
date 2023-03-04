@@ -3,6 +3,7 @@ SELECT
 	eventRating.createdAt,
 	eventRating.rating,
 	eventRating.text,
+	eventRating.description,
 	eventRating.modifiedAt,
 	eventRating.image,
 	eventParticipate.id,

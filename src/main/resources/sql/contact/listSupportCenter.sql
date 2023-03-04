@@ -3,7 +3,7 @@ SELECT
 	contact.ageDivers,
 	contact.ageFemale,
 	contact.ageMale,
-	contact.aboutMe,
+	contact.description,
 	contact.skills,
 	contact.skillsText,
 	contact.birthday,

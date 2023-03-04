@@ -18,6 +18,7 @@ public class Event extends BaseEntity {
 	private Short confirm;
 	private Short maxParticipants;
 	private Short rating;
+	private String description;
 	private String image;
 	private String imageList;
 	private String skills;
@@ -73,6 +74,14 @@ public class Event extends BaseEntity {
 
 	public void setText(String text) {
 		this.text = text;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public String getImage() {

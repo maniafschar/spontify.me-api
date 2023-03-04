@@ -48,6 +48,7 @@ public class Contact extends BaseEntity {
 	private String ageFemale;
 	private String ageMale;
 	private String appleId;
+	private String description;
 	private String email;
 	private String emailVerified;
 	private String facebookId;
@@ -180,6 +181,14 @@ public class Contact extends BaseEntity {
 
 	public void setAboutMe(String aboutMe) {
 		this.aboutMe = aboutMe;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public String getIdDisplay() {

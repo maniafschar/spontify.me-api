@@ -1,6 +1,7 @@
 SELECT
 	contact.age,
 	contact.aboutMe,
+	contact.description,
 	contact.birthday,
 	contact.birthdayDisplay,
 	contact.gender,

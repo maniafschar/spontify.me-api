@@ -34,7 +34,7 @@ public class EventParticipateListener extends AbstractRepositoryListener<EventPa
 									new Date(time.plusSeconds((t.getHour() * 60 + t.getMinute()) * 60)
 											.toEpochMilli()),
 									contactTo.getTimezone()),
-							event.getText());
+							event.getDescription());
 				else if (event.getLocationId().intValue() == -1)
 					notificationService.sendNotification(contactFrom, contactTo,
 							ContactNotificationTextType.eventParticipateOnline,
@@ -43,7 +43,7 @@ public class EventParticipateListener extends AbstractRepositoryListener<EventPa
 									new Date(time.plusSeconds((t.getHour() * 60 + t.getMinute()) * 60)
 											.toEpochMilli()),
 									contactTo.getTimezone()),
-							event.getText());
+							event.getDescription());
 				else
 					notificationService.sendNotification(contactFrom, contactTo,
 							ContactNotificationTextType.eventParticipate,
@@ -52,7 +52,7 @@ public class EventParticipateListener extends AbstractRepositoryListener<EventPa
 									new Date(time.plusSeconds((t.getHour() * 60 + t.getMinute()) * 60)
 											.toEpochMilli()),
 									contactTo.getTimezone()),
-							event.getText(),
+							event.getDescription(),
 							repository.one(Location.class, event.getLocationId()).getName());
 			}
 		}

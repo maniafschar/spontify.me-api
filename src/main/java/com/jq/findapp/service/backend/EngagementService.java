@@ -264,7 +264,7 @@ public class EngagementService {
 		chatTemplates.add(new ChatTemplate(Text.engagement_praise,
 				"",
 				contact -> contact.getLongitude() != null && contact.getImage() != null
-						&& contact.getBirthday() != null && !Strings.isEmpty(contact.getAboutMe())
+						&& contact.getBirthday() != null && !Strings.isEmpty(contact.getDescription())
 						&& !Strings.isEmpty(contact.getSkills())
 						&& (!Strings.isEmpty(contact.getAgeDivers()) || !Strings.isEmpty(contact.getAgeFemale())
 								|| !Strings.isEmpty(contact.getAgeMale()))));

@@ -73,7 +73,7 @@ public class EventService {
 										params.getUser(), ContactNotificationTextType.eventNotifyWithoutLocation,
 										Strings.encodeParam("e=" + event.getId() + "_" + realDate.toLocalDate()),
 										time,
-										event.getText());
+										event.getDescription());
 							} else
 								notificationService.sendNotification(contactEvent,
 										params.getUser(), ContactNotificationTextType.eventNotify,

@@ -264,7 +264,7 @@ public class RepositoryTest {
 		// given
 		final Contact contact = new Contact();
 		contact.setSkills("xyz");
-		contact.setAboutMe("about others");
+		contact.setDescription("about others");
 		final JsonNode node = new ObjectMapper().convertValue(contact, JsonNode.class);
 		((ObjectNode) node).put("skills", "abc");
 

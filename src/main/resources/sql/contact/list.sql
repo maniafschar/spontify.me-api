@@ -4,6 +4,7 @@ SELECT
 	contact.ageFemale,
 	contact.ageMale,
 	contact.aboutMe,
+	contact.description,
 	contact.birthday,
 	contact.birthdayDisplay,
 	contact.bluetooth,

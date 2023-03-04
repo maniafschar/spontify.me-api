@@ -80,7 +80,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 										new Date(time.plusSeconds((t.getHour() * 60 + t.getMinute()) * 60)
 												.toEpochMilli()),
 										contactTo.getTimezone()),
-								event.getText(),
+								event.getDescription(),
 								repository.one(Location.class, event.getLocationId()).getName());
 					}
 				}
@@ -108,7 +108,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 							Strings.formatDate(null,
 									new Date(time.plusSeconds((t.getHour() * 60 + t.getMinute()) * 60).toEpochMilli()),
 									contactTo.getTimezone()),
-							event.getText(),
+							event.getDescription(),
 							repository.one(Location.class, event.getLocationId()).getName());
 				}
 			}

@@ -11,6 +11,7 @@ SELECT
 	event.skillsText,
 	event.startDate,
 	event.text,
+	event.description,
 	event.type,
 	location.description,
 	location.id,
