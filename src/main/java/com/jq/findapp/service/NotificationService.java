@@ -340,8 +340,6 @@ public class NotificationService {
 		Strings.replaceString(html, "<jq:time />", s2);
 		Strings.replaceString(text, "<jq:time />", s2);
 		s2 = message;
-		if (s2.startsWith(contactFrom.getPseudonym() + ": "))
-			s2 = s2.substring(contactFrom.getPseudonym().length() + 2).trim();
 		Strings.replaceString(html, "<jq:text />", s2.replaceAll("\n", "<br />").replaceAll("skillvents",
 				"<a href=\"https://skillvents.com\" style=\"color:rgb(246,255,187);text-decoration:none;\">skillvents</a>"));
 		Strings.replaceString(text, "<jq:text />", sanatizeHtml(s2));
