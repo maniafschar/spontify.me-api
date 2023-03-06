@@ -123,7 +123,7 @@ public class Repository {
 		public final static String SEPARATOR = "\u0015";
 		public final static String PATH = "attachments/";
 		public final static String PUBLIC = "PUBLIC/";
-		private final static Pattern RESOLVABLE_COLUMNS = Pattern.compile(".*(image|note|storage).*");
+		private final static Pattern RESOLVABLE_COLUMNS = Pattern.compile(".*(image|note|storage|authenticateVideo).*");
 
 		public static String createImage(String name, byte[] data) {
 			return name + SEPARATOR + Base64.getEncoder().encodeToString(data);

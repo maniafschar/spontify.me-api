@@ -15,6 +15,7 @@ import com.jq.findapp.repository.Repository;
 @Entity
 public class Contact extends BaseEntity {
 	private Boolean active = true;
+	private Boolean authenticate = false;
 	private Boolean bluetooth = true;
 	private Boolean notificationEngagement = true;
 	private Boolean notificationBirthday = true;
@@ -48,6 +49,7 @@ public class Contact extends BaseEntity {
 	private String ageFemale;
 	private String ageMale;
 	private String appleId;
+	private String authenticateVideo;
 	private String description;
 	private String email;
 	private String emailVerified;
@@ -60,7 +62,7 @@ public class Contact extends BaseEntity {
 	private String loginLink;
 	@Column(columnDefinition = "TEXT")
 	private String password;
-	private String paypalMerchantId;
+	private String phone;
 	private String pseudonym;
 	private String pushSystem;
 	private String pushToken;
@@ -165,6 +167,14 @@ public class Contact extends BaseEntity {
 
 	public void setActive(Boolean active) {
 		this.active = active;
+	}
+
+	public Boolean getAuthenticate() {
+		return authenticate;
+	}
+
+	public void setAuthenticate(Boolean authenticate) {
+		this.authenticate = authenticate;
 	}
 
 	public String getLanguage() {
@@ -479,12 +489,12 @@ public class Contact extends BaseEntity {
 		this.notificationEngagement = notificationEngagement;
 	}
 
-	public String getPaypalMerchantId() {
-		return paypalMerchantId;
+	public String getPhone() {
+		return phone;
 	}
 
-	public void setPaypalMerchantId(String paypalMerchantId) {
-		this.paypalMerchantId = paypalMerchantId;
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 
 	public String getSkills() {
@@ -501,6 +511,14 @@ public class Contact extends BaseEntity {
 
 	public void setSkillsText(String skillsText) {
 		this.skillsText = skillsText;
+	}
+
+	public String getAuthenticateVideo() {
+		return authenticateVideo;
+	}
+
+	public void setAuthenticateVideo(String authenticateVideo) {
+		this.authenticateVideo = authenticateVideo;
 	}
 
 	@Transient

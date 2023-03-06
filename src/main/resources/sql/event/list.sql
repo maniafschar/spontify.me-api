@@ -31,7 +31,6 @@ SELECT
 	contact.gender,
 	contact.latitude,
 	contact.longitude,
-	contact.paypalMerchantId,
 	contactLink.contactId,
 	contactLink.contactId2,
 	contactLink.id,

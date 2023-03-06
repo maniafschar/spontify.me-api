@@ -6,7 +6,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,12 +18,10 @@ import javax.transaction.Transactional;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -411,51 +408,6 @@ public class ActionApi {
 			}
 		}
 		return paypalConfig;
-	}
-
-	@PutMapping("paypalRegister")
-	public Map<String, Object> paypalRegister(BigInteger merchantId, String merchantIdInPayPal,
-			boolean permissionsGranted, boolean consentStatus, String accountStatus, String riskStatus,
-			@RequestHeader BigInteger user, @RequestHeader String password, @RequestHeader String salt)
-			throws Exception {
-		final Contact contact = authenticationService.verify(user, password, salt);
-		if (user.equals(merchantId) && permissionsGranted && consentStatus) {
-			contact.setPaypalMerchantId(merchantIdInPayPal);
-			repository.save(contact);
-			final QueryParams params = new QueryParams(Query.contact_list);
-			params.setUser(contact);
-			params.setSearch("contact.id=" + user);
-			return repository.one(params);
-		}
-		notificationService.createTicket(TicketType.PAYPAL, "failed register",
-				"user: " + merchantId + "\npaypal merchant id: " + merchantIdInPayPal + "\npermissionsGranted: "
-						+ permissionsGranted + "\nconsentStatus: " + consentStatus + "\naccountStatus: " + accountStatus
-						+ "\nriskStatus:" + riskStatus,
-				user);
-		return null;
-	}
-
-	@GetMapping("paypalSignUpSellerUrl")
-	public String paypalSignUpSellerUrl(@RequestHeader BigInteger user, @RequestHeader String password,
-			@RequestHeader String salt) throws Exception {
-		authenticationService.verify(user, password, salt);
-		final String ppUrl = getPaypalUrl(user);
-		JsonNode n = new ObjectMapper().readTree(WebClient.create(ppUrl + "v1/oauth2/token")
-				.post().accept(MediaType.APPLICATION_JSON)
-				.header("User-Agent", "curl/7.55.1")
-				.header("Authorization",
-						"Basic " + Base64.getEncoder().encodeToString((getPaypalKey(user)).getBytes()))
-				.bodyValue("grant_type=client_credentials")
-				.retrieve().toEntity(String.class).block().getBody());
-		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(n));
-		n = new ObjectMapper().readTree(WebClient.create(ppUrl + "v2/customer/partner-referrals")
-				.post().contentType(MediaType.APPLICATION_JSON)
-				.header("User-Agent", "curl/7.55.1")
-				.header("Authorization", "Bearer " + n.get("access_token").asText())
-				.bodyValue(IOUtils.toString(getClass().getResourceAsStream("/template/paypalSignUpSeller.json"),
-						StandardCharsets.UTF_8).replace("{trackingId}", "" + user).replace("{returnUrl}", url))
-				.retrieve().toEntity(String.class).block().getBody());
-		return n.get("links").get(1).get("href").asText();
 	}
 
 	@GetMapping("ping")
