@@ -38,7 +38,7 @@
 	},
 	"notification": {
 		"authenticate": "Deine Video-Authentifizierung für den {0} ist bestätigt. Bitte logge Dich zu diesem Zeitpunkt unter diesem Link in den Video Call ein:\n\n{1}\n\nHalte Deinen Personalausweis bereit.\n\nBis dann\nskillvents support",
-		"chatNew": ": <jq:EXTRA_1 />",
+		"chatNew": "<jq:EXTRA_1 />",
 		"chatSeen": "hat Deine Chatnachricht gelesen.",
 		"contactBirthday": "wird heute <jq:EXTRA_1 /> Jahre jung.",
 		"contactDelete": "hat skillvents verlassen 😢",

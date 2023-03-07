@@ -361,7 +361,7 @@ public class NotificationService {
 		Strings.replaceString(html, "<jq:newsTitle />", s2);
 		Strings.replaceString(text, "<jq:newsTitle />", s2);
 		byte[] imgProfile = null;
-		if (contactFrom == null || contactFrom.getImage() != null) {
+		if (contactFrom != null && contactFrom.getImage() != null) {
 			imgProfile = Attachment.getFile(contactFrom.getImage());
 			Strings.replaceString(html, "<jq:image />",
 					"<img style=\"height:150px;min-height:150px;max-height:150px;width:150px;min-width:150px;max-width:150px;\" src=\"cid:img_profile\" width=\"150\" height=\"150\" />");

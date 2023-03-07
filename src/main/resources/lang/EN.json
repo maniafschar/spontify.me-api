@@ -38,7 +38,7 @@
 	},
 	"notification": {
 		"authenticate": "Your video authentication for the {0} is confirmed. Please log into the video call on time using this link:\n\n{1}\n\nHave your ID card ready.\n\nUntil then\nskillvents support",
-		"chatNew": ": <jq:EXTRA_1 />",
+		"chatNew": "<jq:EXTRA_1 />",
 		"chatSeen": "has seen your chat message.",
 		"contactBirthday": "will be <jq:EXTRA_1 /> years young today.",
 		"contactDelete": "has left skillvents 😢",
