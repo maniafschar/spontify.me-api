@@ -35,6 +35,7 @@ public class Contact extends BaseEntity {
 	private OS os;
 	private Timestamp lastLogin;
 	private Timestamp recommend;
+	private Timestamp videoCall;
 	private Timestamp visitPage;
 	private Float latitude;
 	private Float longitude;
@@ -49,7 +50,6 @@ public class Contact extends BaseEntity {
 	private String ageFemale;
 	private String ageMale;
 	private String appleId;
-	private String authenticateVideo;
 	private String description;
 	private String email;
 	private String emailVerified;
@@ -62,7 +62,6 @@ public class Contact extends BaseEntity {
 	private String loginLink;
 	@Column(columnDefinition = "TEXT")
 	private String password;
-	private String phone;
 	private String pseudonym;
 	private String pushSystem;
 	private String pushToken;
@@ -489,14 +488,6 @@ public class Contact extends BaseEntity {
 		this.notificationEngagement = notificationEngagement;
 	}
 
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
-
 	public String getSkills() {
 		return skills;
 	}
@@ -513,12 +504,12 @@ public class Contact extends BaseEntity {
 		this.skillsText = skillsText;
 	}
 
-	public String getAuthenticateVideo() {
-		return authenticateVideo;
+	public Timestamp getVideoCall() {
+		return videoCall;
 	}
 
-	public void setAuthenticateVideo(String authenticateVideo) {
-		this.authenticateVideo = authenticateVideo;
+	public void setVideoCall(Timestamp videoCall) {
+		this.videoCall = videoCall;
 	}
 
 	@Transient

@@ -1,5 +1,6 @@
 SELECT
 	contact.id,
+	contact.authenticate,
 	contact.gender,
 	contact.imageList,
 	contact.pseudonym,

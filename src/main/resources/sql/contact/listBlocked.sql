@@ -1,5 +1,6 @@
 SELECT
 	contact.id,
+	contact.authenticate,
 	contact.birthday,
 	contact.image,
 	contact.imageList,

@@ -214,7 +214,7 @@ public class AuthenticationService {
 
 	public Unique unique(String email) {
 		email = email.toLowerCase();
-		final QueryParams params = new QueryParams(Query.contact_unique);
+		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("LOWER(contact.email)='" + email + "'");
 		return new Unique(email, repository.one(params) == null, AuthenticationService.BLOCKED_EMAIL_DOMAINS
 				.contains(email.substring(email.indexOf('@') + 1)));

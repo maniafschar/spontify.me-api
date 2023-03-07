@@ -33,6 +33,7 @@ SELECT
 	contact.teaser,
 	contact.urls,
 	contact.verified,
+	contact.videoCall,
 	contact.visitPage,
 	contactLink.contactId,
 	contactLink.contactId2,

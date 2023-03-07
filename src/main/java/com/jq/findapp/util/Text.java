@@ -42,6 +42,7 @@ public enum Text {
 	mail_contactWelcomeEmail,
 	mail_title,
 	mail_titleFrom,
+	notification_authenticate,
 	notification_chatNew,
 	notification_chatSeen,
 	notification_contactBirthday,

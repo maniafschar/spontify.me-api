@@ -2,10 +2,13 @@ package com.jq.findapp.api;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,6 +21,8 @@ import javax.transaction.Transactional;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +38,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.model.Position;
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.ContactVisit;
@@ -52,7 +58,9 @@ import com.jq.findapp.service.AuthenticationService.Unique;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.NotificationService.Ping;
+import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Strings;
+import com.jq.findapp.util.Text;
 
 @RestController
 @Transactional
@@ -101,6 +109,12 @@ public class ActionApi {
 
 	@Value("${app.paypal.sandbox.key}")
 	private String paypalSandboxKey;
+
+	@Value("${app.paypal.merchant.id}")
+	private String paypalMerchantId;
+
+	@Value("${app.authenticate.video.url}")
+	private String authenticateVideoUrl;
 
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
@@ -367,6 +381,27 @@ public class ActionApi {
 		notificationService.createTicket(TicketType.ERROR, "eventbrite", data + data2, BigInteger.valueOf(3));
 	}
 
+	@PostMapping("videoCall/{date}")
+	public void videoCall(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") final LocalDateTime date,
+			@RequestHeader BigInteger user, @RequestHeader String password, @RequestHeader String salt)
+			throws Exception {
+		final Contact contact = authenticationService.verify(user, password, salt);
+		contact.setVideoCall(new Timestamp(date.toInstant(ZoneOffset.UTC).toEpochMilli()));
+		repository.save(contact);
+		final String note = Text.notification_authenticate.getText(contact.getLanguage())
+				.replace("{0}",
+						Strings.formatDate(null, new Date(date.toInstant(ZoneOffset.UTC).toEpochMilli()),
+								contact.getTimezone()))
+				.replace("{1}", authenticateVideoUrl);
+		final ContactChat chat = new ContactChat();
+		chat.setContactId(adminId);
+		chat.setContactId2(user);
+		chat.setTextId(Text.notification_authenticate);
+		chat.setNote(note);
+		repository.save(chat);
+		notificationService.sendNotificationEmail(null, repository.one(Contact.class, adminId), note, null);
+	}
+
 	@PostMapping("paypal")
 	public void paypal(@RequestBody final String data) throws Exception {
 		final ObjectMapper m = new ObjectMapper();
@@ -390,9 +425,9 @@ public class ActionApi {
 	}
 
 	@GetMapping("paypalKey")
-	public Map<String, Object> paypalKey(@RequestHeader(required = false) BigInteger user,
-			@RequestHeader(required = false) String password, @RequestHeader(required = false) String salt)
-			throws Exception {
+	public Map<String, Object> paypalKey(BigInteger id, String publicKey,
+			@RequestHeader(required = false) BigInteger user, @RequestHeader(required = false) String password,
+			@RequestHeader(required = false) String salt) throws Exception {
 		final int fee = 20;
 		final Map<String, Object> paypalConfig = new HashMap<>(3);
 		paypalConfig.put("fee", fee);
@@ -402,6 +437,18 @@ public class ActionApi {
 			paypalConfig.put("key", s.substring(0, s.indexOf(':')));
 			paypalConfig.put("currency", "EUR");
 			paypalConfig.put("fee", contact.getFee() == null ? fee : contact.getFee());
+			if (id != null) {
+				final JsonNode n = new ObjectMapper().readTree(WebClient.create(getPaypalUrl(user) + "v1/oauth2/token")
+						.post().accept(MediaType.APPLICATION_JSON)
+						.header("User-Agent", "curl/7.55.1")
+						.header("Authorization",
+								"Basic " + Base64.getEncoder().encodeToString((getPaypalKey(user)).getBytes()))
+						.bodyValue("grant_type=client_credentials")
+						.retrieve().toEntity(String.class).block().getBody());
+				paypalConfig.put("email", Encryption.encrypt(repository.one(Contact.class, id).getEmail(), publicKey));
+				paypalConfig.put("merchant", Encryption.encrypt(paypalMerchantId, publicKey));
+				paypalConfig.put("token", n.get("access_token").asText());
+			}
 			if (contact.getFeeDate() != null && ((Number) paypalConfig.get("fee")).intValue() != fee) {
 				paypalConfig.put("feeDate", contact.getFeeDate());
 				paypalConfig.put("feeAfter", fee);

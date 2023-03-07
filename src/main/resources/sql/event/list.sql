@@ -17,6 +17,7 @@ SELECT
 	event.type,
 	event.url,
 	contact.id,
+	contact.authenticate,
 	contact.image,
 	contact.imageList,
 	contact.pseudonym,
