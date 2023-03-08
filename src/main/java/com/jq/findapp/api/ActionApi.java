@@ -108,9 +108,6 @@ public class ActionApi {
 	@Value("${app.paypal.sandbox.key}")
 	private String paypalSandboxKey;
 
-	@Value("${app.paypal.merchant.id}")
-	private String paypalMerchantId;
-
 	@Value("${app.authenticate.video.url}")
 	private String authenticateVideoUrl;
 
@@ -122,9 +119,6 @@ public class ActionApi {
 
 	@Value("${app.url.lookupip}")
 	private String lookupIp;
-
-	private final String paypalUrl = "https://api-m.paypal.com/";
-	private final String paypalSandboxUrl = "https://api-m.sandbox.paypal.com/";
 
 	@GetMapping("unique")
 	public Unique unique(String email) {
@@ -463,9 +457,5 @@ public class ActionApi {
 
 	private String getPaypalKey(BigInteger user) {
 		return isPaypalSandbox(user) ? paypalSandboxKey : paypalKey;
-	}
-
-	private String getPaypalUrl(BigInteger user) {
-		return isPaypalSandbox(user) ? paypalSandboxUrl : paypalUrl;
 	}
 }
