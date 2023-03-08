@@ -79,7 +79,7 @@ public class IntegrationTest {
 	}
 
 	private void register(String pseudonym, String email) {
-		Util.click("home homeHeader");
+		Util.click("navigation item.events");
 		Util.click("hint buttontext");
 		Util.sendKeys("login input[name=\"email\"]", email);
 		Util.click("login tab:nth-of-type(3)");
@@ -129,7 +129,7 @@ public class IntegrationTest {
 		Util.click("popup hashtags category");
 		Util.click("popup dialogButtons buttontext[onclick*=\"save\"]");
 		Util.click("popup hashtags div label[onclick*=\"Architektur\"]");
-		Util.sendKeys("popup textarea[name=\"text\"]", "mega sex");
+		Util.sendKeys("popup textarea[name=\"description\"]", "mega sex");
 		Util.click("popup dialogButtons buttontext[onclick*=\"save\"]");
 		Util.click("popup dialogButtons buttontext[onclick*=\"save\"]");
 		Util.click("navigation item.home");

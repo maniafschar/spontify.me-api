@@ -93,6 +93,8 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 		final QueryParams params = new QueryParams(Query.event_listParticipateRaw);
 		params.setSearch("eventParticipate.eventId=" + event.getId());
 		final Result result = repository.list(params);
+		if (result.size() > 0 && event.getPrice() != null && event.getPrice() > 0)
+			throw new RuntimeException("Paid events with participants cannot be deleted");
 		for (int i = 0; i < result.size(); i++) {
 			final EventParticipate eventParticipate = repository.one(EventParticipate.class,
 					(BigInteger) result.get(i).get("eventParticipate.id"));

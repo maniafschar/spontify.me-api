@@ -8,7 +8,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,7 +21,6 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -436,20 +434,10 @@ public class ActionApi {
 			final String s = getPaypalKey(user);
 			paypalConfig.put("key", s.substring(0, s.indexOf(':')));
 			paypalConfig.put("currency", "EUR");
-			paypalConfig.put("fee", contact.getFee() == null ? fee : contact.getFee());
-			if (id != null) {
-				final JsonNode n = new ObjectMapper().readTree(WebClient.create(getPaypalUrl(user) + "v1/oauth2/token")
-						.post().accept(MediaType.APPLICATION_JSON)
-						.header("User-Agent", "curl/7.55.1")
-						.header("Authorization",
-								"Basic " + Base64.getEncoder().encodeToString((getPaypalKey(user)).getBytes()))
-						.bodyValue("grant_type=client_credentials")
-						.retrieve().toEntity(String.class).block().getBody());
+			if (id != null)
 				paypalConfig.put("email", Encryption.encrypt(repository.one(Contact.class, id).getEmail(), publicKey));
-				paypalConfig.put("merchant", Encryption.encrypt(paypalMerchantId, publicKey));
-				paypalConfig.put("token", n.get("access_token").asText());
-			}
-			if (contact.getFeeDate() != null && ((Number) paypalConfig.get("fee")).intValue() != fee) {
+			if (contact.getFee() != null && contact.getFeeDate() != null && contact.getFee().intValue() != fee) {
+				paypalConfig.put("fee", contact.getFee());
 				paypalConfig.put("feeDate", contact.getFeeDate());
 				paypalConfig.put("feeAfter", fee);
 			}
