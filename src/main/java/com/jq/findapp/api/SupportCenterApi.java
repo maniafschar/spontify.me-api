@@ -205,6 +205,18 @@ public class SupportCenterApi {
 		return null;
 	}
 
+	@PostMapping("authenticate/{id}")
+	public void authenticate(@PathVariable final BigInteger id, String image, @RequestHeader String password,
+			@RequestHeader String salt, @RequestHeader String secret) throws Exception {
+		if (supportCenterSecret.equals(secret)) {
+			final Contact contact = authenticationService.verify(adminId, password, salt);
+			contact.setImageAuthenticate(image);
+			contact.setAuthenticate(Boolean.TRUE);
+			contact.setVideoCall(null);
+			repository.save(contact);
+		}
+	}
+
 	@GetMapping("metrics")
 	public Map<String, Object> metrics(@RequestHeader String password, @RequestHeader String salt,
 			@RequestHeader String secret) throws Exception {

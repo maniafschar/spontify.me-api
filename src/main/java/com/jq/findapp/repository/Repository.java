@@ -123,7 +123,7 @@ public class Repository {
 		public final static String SEPARATOR = "\u0015";
 		public final static String PATH = "attachments/";
 		public final static String PUBLIC = "PUBLIC/";
-		private final static Pattern RESOLVABLE_COLUMNS = Pattern.compile(".*(image|note|storage|authenticateVideo).*");
+		private final static Pattern RESOLVABLE_COLUMNS = Pattern.compile(".*(image|note|storage).*");
 
 		public static String createImage(String name, byte[] data) {
 			return name + SEPARATOR + Base64.getEncoder().encodeToString(data);
@@ -244,7 +244,7 @@ public class Repository {
 				final Path path = Paths.get(PATH + PUBLIC + getFilename(id));
 				if (!Files.exists(path.getParent()))
 					Files.createDirectory(path.getParent());
-				IOUtils.write(Base64.getDecoder().decode(s[1]), new FileOutputStream(PATH + PUBLIC + getFilename(id)));
+				IOUtils.write(Base64.getDecoder().decode(s[1]), new FileOutputStream(path.toFile()));
 				if (old != null)
 					new File(PATH + PUBLIC + getFilename(old)).delete();
 			} else if (s[1].length() > 255) {

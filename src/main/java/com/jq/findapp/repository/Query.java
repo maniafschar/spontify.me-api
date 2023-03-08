@@ -28,6 +28,7 @@ public enum Query {
 	contact_listSupportCenter,
 	contact_listTeaser(true),
 	contact_listVisit(true),
+	contact_listVideoCalls,
 	contact_maxAppVersion,
 	contact_notification(true),
 	contact_pingChat(true),

@@ -57,6 +57,7 @@ public class Contact extends BaseEntity {
 	private String fbToken;
 	private String idDisplay;
 	private String image;
+	private String imageAuthenticate;
 	private String imageList;
 	private String language;
 	private String loginLink;
@@ -110,6 +111,14 @@ public class Contact extends BaseEntity {
 
 	public void setImage(String image) {
 		this.image = image;
+	}
+
+	public String getImageAuthenticate() {
+		return imageAuthenticate;
+	}
+
+	public void setImageAuthenticate(String imageAuthenticate) {
+		this.imageAuthenticate = imageAuthenticate;
 	}
 
 	public String getImageList() {

@@ -32,6 +32,8 @@ public class ContactListener extends AbstractRepositoryListener<Contact> {
 
 	@Override
 	public void preUpdate(final Contact contact) throws Exception {
+		if (contact.old("email") != null)
+			contact.setAuthenticate(Boolean.FALSE);
 		if (contact.old("visitPage") != null)
 			contact.setVisitPage(new Timestamp(Instant.now().toEpochMilli()));
 		if (contact.old("pushToken") != null)
