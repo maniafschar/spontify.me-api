@@ -116,9 +116,13 @@ public class AuthenticationApi {
 	private Boolean getVideoTimeSlot(BigInteger id) {
 		if (adminId.equals(id))
 			return true;
-		final Timestamp t = repository.one(Contact.class, id).getVideoCall();
-		if (t == null)
+		final QueryParams params = new QueryParams(Query.contact_listVideoCalls);
+		params.setUser(repository.one(Contact.class, id));
+		params.setSearch("contactVideoCall.contactId=" + id);
+		final Result list = repository.list(params);
+		if (list.size() == 0)
 			return false;
+		final Timestamp t = (Timestamp) list.get(0).get("contactVideoCall.time");
 		return t.getTime() > System.currentTimeMillis() - 600000 && t.getTime() < System.currentTimeMillis() + 600000;
 	}
 

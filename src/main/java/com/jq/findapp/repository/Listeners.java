@@ -5,12 +5,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.BaseEntity;
-import com.jq.findapp.entity.Block;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactBluetooth;
 import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
 import com.jq.findapp.entity.ContactLink;
+import com.jq.findapp.entity.ContactVideoCall;
 import com.jq.findapp.entity.ContactVisit;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.EventParticipate;
@@ -41,7 +41,7 @@ public class Listeners {
 	private ApplicationContext applicationContext;
 
 	private <T extends BaseEntity> AbstractRepositoryListener<T> entity2listener(T entity) {
-		if (entity instanceof Block)
+		if (entity instanceof ContactVideoCall)
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(BlockListener.class);
 		if (entity instanceof Contact)
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(ContactListener.class);

@@ -35,7 +35,6 @@ public class Contact extends BaseEntity {
 	private OS os;
 	private Timestamp lastLogin;
 	private Timestamp recommend;
-	private Timestamp videoCall;
 	private Timestamp visitPage;
 	private Float latitude;
 	private Float longitude;
@@ -511,14 +510,6 @@ public class Contact extends BaseEntity {
 
 	public void setSkillsText(String skillsText) {
 		this.skillsText = skillsText;
-	}
-
-	public Timestamp getVideoCall() {
-		return videoCall;
-	}
-
-	public void setVideoCall(Timestamp videoCall) {
-		this.videoCall = videoCall;
 	}
 
 	@Transient

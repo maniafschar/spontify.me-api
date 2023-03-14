@@ -1,7 +1,10 @@
 SELECT
-	contact.videoCall,
-	case when contact.id={USERID} then contact.id else null end as id
+	contactVideoCall.time,
+	contactVideoCall.type,
+	case when contactVideoCall.id={USERID} then contactVideoCall.id else null end as id
 FROM
-	Contact contact
+	ContactVideoCall contactVideoCall
 WHERE
 	{search}
+ORDER BY
+	contactVideoCall.id DESC

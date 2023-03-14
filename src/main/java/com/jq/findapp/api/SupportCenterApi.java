@@ -212,7 +212,6 @@ public class SupportCenterApi {
 			final Contact contact = authenticationService.verify(adminId, password, salt);
 			contact.setImageAuthenticate(image);
 			contact.setAuthenticate(Boolean.TRUE);
-			contact.setVideoCall(null);
 			repository.save(contact);
 		}
 	}

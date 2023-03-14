@@ -39,6 +39,8 @@ import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
+import com.jq.findapp.entity.ContactVideoCall;
+import com.jq.findapp.entity.ContactVideoCall.ContactVideoCallType;
 import com.jq.findapp.entity.ContactVisit;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.GeoLocation;
@@ -405,7 +407,11 @@ public class ActionApi {
 		data.put("appId", videoAppId);
 		data.put("authKey", videoAuthKey);
 		data.put("authSecret", videoAuthSecret);
-		data.put("timeslot", contact.getVideoCall());
+		final QueryParams params = new QueryParams(Query.contact_listVideoCalls);
+		params.setSearch("contactVideoCall.contactId=" + user);
+		final Result list = repository.list(params);
+		if (list.size() > 0)
+			data.put("timeslot", list.get(0).get("contactVideoCall.time"));
 		if (contact.getId().equals(adminId)) {
 			data.put("isAdmin", Boolean.TRUE);
 			data.put("callerId", videoAdminId);
@@ -430,8 +436,11 @@ public class ActionApi {
 			@RequestHeader BigInteger user, @RequestHeader String password, @RequestHeader String salt)
 			throws Exception {
 		final Contact contact = authenticationService.verify(user, password, salt);
-		contact.setVideoCall(new Timestamp(date.toInstant(ZoneOffset.UTC).toEpochMilli()));
-		repository.save(contact);
+		final ContactVideoCall videoCall = new ContactVideoCall();
+		videoCall.setContactId(user);
+		videoCall.setType(ContactVideoCallType.AUTHENTICATE);
+		videoCall.setTime(new Timestamp(date.toInstant(ZoneOffset.UTC).toEpochMilli()));
+		repository.save(videoCall);
 		final String note = Text.notification_authenticate.getText(contact.getLanguage())
 				.replace("{0}",
 						Strings.formatDate(null, new Date(date.toInstant(ZoneOffset.UTC).toEpochMilli()),
