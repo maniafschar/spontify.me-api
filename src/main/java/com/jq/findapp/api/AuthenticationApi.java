@@ -1,6 +1,7 @@
 package com.jq.findapp.api;
 
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
@@ -10,6 +11,7 @@ import javax.transaction.Transactional;
 import javax.ws.rs.core.Context;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -49,6 +51,9 @@ public class AuthenticationApi {
 	@Autowired
 	private AuthenticationExternalService authenticationExternalService;
 
+	@Value("${app.admin.id}")
+	private BigInteger adminId;
+
 	@GetMapping("logoff")
 	public void logoff(String token, @RequestHeader BigInteger user, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
@@ -69,6 +74,8 @@ public class AuthenticationApi {
 			final QueryParams params = new QueryParams(Query.location_listId);
 			params.setSearch("location.contactId=" + user.get("contact.id"));
 			user.put("location_added", repository.list(params).size());
+			if (getVideoTimeSlot((BigInteger) user.get("contact.id")))
+				user.put("login_video_call", Boolean.TRUE);
 			params.setQuery(Query.contact_listGeoLocationHistory);
 			params.setSearch("contactGeoLocationHistory.contactId=" + user.get("contact.id"));
 			final Result result = repository.list(params);
@@ -104,6 +111,15 @@ public class AuthenticationApi {
 			}
 		}
 		return user;
+	}
+
+	private Boolean getVideoTimeSlot(BigInteger id) {
+		if (adminId.equals(id))
+			return true;
+		final Timestamp t = repository.one(Contact.class, id).getVideoCall();
+		if (t == null)
+			return false;
+		return t.getTime() > System.currentTimeMillis() - 600000 && t.getTime() < System.currentTimeMillis() + 600000;
 	}
 
 	@DeleteMapping("one")

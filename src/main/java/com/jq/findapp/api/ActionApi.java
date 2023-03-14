@@ -108,9 +108,6 @@ public class ActionApi {
 	@Value("${app.paypal.sandbox.key}")
 	private String paypalSandboxKey;
 
-	@Value("${app.authenticate.video.url}")
-	private String authenticateVideoUrl;
-
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
 
@@ -119,6 +116,33 @@ public class ActionApi {
 
 	@Value("${app.url.lookupip}")
 	private String lookupIp;
+
+	@Value("${app.video.chat.admin.id}")
+	private String videoAdminId;
+
+	@Value("${app.video.chat.admin.login}")
+	private String videoAdminLogin;
+
+	@Value("${app.video.chat.admin.password}")
+	private String videoAdminPassword;
+
+	@Value("${app.video.chat.customer.id}")
+	private String videoCustomerId;
+
+	@Value("${app.video.chat.customer.login}")
+	private String videoCustomerLogin;
+
+	@Value("${app.video.chat.customer.password}")
+	private String videoCustomerPassword;
+
+	@Value("${app.video.chat.appId}")
+	private String videoAppId;
+
+	@Value("${app.video.chat.authKey}")
+	private String videoAuthKey;
+
+	@Value("${app.video.chat.authSecret}")
+	private String videoAuthSecret;
 
 	@GetMapping("unique")
 	public Unique unique(String email) {
@@ -373,6 +397,34 @@ public class ActionApi {
 		notificationService.createTicket(TicketType.ERROR, "eventbrite", data + data2, BigInteger.valueOf(3));
 	}
 
+	@GetMapping("videoCallInit")
+	public Map<String, Object> videoCallInit(@RequestHeader BigInteger user, @RequestHeader String password,
+			@RequestHeader String salt) throws Exception {
+		final Contact contact = authenticationService.verify(user, password, salt);
+		final Map<String, Object> data = new HashMap<>();
+		data.put("appId", videoAppId);
+		data.put("authKey", videoAuthKey);
+		data.put("authSecret", videoAuthSecret);
+		data.put("timeslot", contact.getVideoCall());
+		if (contact.getId().equals(adminId)) {
+			data.put("isAdmin", Boolean.TRUE);
+			data.put("callerId", videoAdminId);
+			data.put("callerLogin", videoAdminLogin);
+			data.put("callerPassword", videoAdminPassword);
+			data.put("callerName", contact.getPseudonym());
+			data.put("calleeId", videoCustomerId);
+			data.put("calleeName", "customer");
+		} else {
+			data.put("callerId", videoCustomerId);
+			data.put("callerLogin", videoCustomerLogin);
+			data.put("callerPassword", videoCustomerPassword);
+			data.put("callerName", contact.getPseudonym());
+			data.put("calleeId", videoAdminId);
+			data.put("calleeName", repository.one(Contact.class, adminId).getPseudonym());
+		}
+		return data;
+	}
+
 	@PostMapping("videoCall/{date}")
 	public void videoCall(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") final LocalDateTime date,
 			@RequestHeader BigInteger user, @RequestHeader String password, @RequestHeader String salt)
@@ -383,15 +435,13 @@ public class ActionApi {
 		final String note = Text.notification_authenticate.getText(contact.getLanguage())
 				.replace("{0}",
 						Strings.formatDate(null, new Date(date.toInstant(ZoneOffset.UTC).toEpochMilli()),
-								contact.getTimezone()))
-				.replace("{1}", authenticateVideoUrl);
+								contact.getTimezone()));
 		final ContactChat chat = new ContactChat();
 		chat.setContactId(adminId);
 		chat.setContactId2(user);
 		chat.setTextId(Text.notification_authenticate);
 		chat.setNote(note);
 		repository.save(chat);
-		notificationService.sendNotificationEmail(null, repository.one(Contact.class, adminId), note, null);
 	}
 
 	@PostMapping("paypal")
