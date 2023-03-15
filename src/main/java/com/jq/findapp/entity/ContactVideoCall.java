@@ -16,9 +16,10 @@ public class ContactVideoCall extends BaseEntity {
 	private Timestamp time;
 	@Enumerated(EnumType.STRING)
 	private ContactVideoCallType type;
+	private String description;
 
 	public enum ContactVideoCallType {
-		AUTHENTICATE
+		AUTHENTICATE, OTHER
 	}
 
 	public Timestamp getTime() {
@@ -43,6 +44,14 @@ public class ContactVideoCall extends BaseEntity {
 
 	public void setType(ContactVideoCallType type) {
 		this.type = type;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	@Transient

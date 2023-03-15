@@ -2,10 +2,8 @@ package com.jq.findapp.api;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,7 +18,6 @@ import javax.transaction.Transactional;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,7 +37,6 @@ import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.ContactVideoCall;
-import com.jq.findapp.entity.ContactVideoCall.ContactVideoCallType;
 import com.jq.findapp.entity.ContactVisit;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.GeoLocation;
@@ -431,25 +427,20 @@ public class ActionApi {
 		return data;
 	}
 
-	@PostMapping("videoCall/{date}")
-	public void videoCall(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") final LocalDateTime date,
-			@RequestHeader BigInteger user, @RequestHeader String password, @RequestHeader String salt)
-			throws Exception {
+	@PostMapping("videoCall")
+	public void videoCall(@RequestBody final ContactVideoCall videoCall, @RequestHeader BigInteger user,
+			@RequestHeader String password, @RequestHeader String salt) throws Exception {
 		final Contact contact = authenticationService.verify(user, password, salt);
-		final ContactVideoCall videoCall = new ContactVideoCall();
 		videoCall.setContactId(user);
-		videoCall.setType(ContactVideoCallType.AUTHENTICATE);
-		videoCall.setTime(new Timestamp(date.toInstant(ZoneOffset.UTC).toEpochMilli()));
 		repository.save(videoCall);
 		final String note = Text.notification_authenticate.getText(contact.getLanguage())
-				.replace("{0}",
-						Strings.formatDate(null, new Date(date.toInstant(ZoneOffset.UTC).toEpochMilli()),
-								contact.getTimezone()));
+				.replace("{0}", Strings.formatDate(null, videoCall.getTime(), contact.getTimezone()));
 		final ContactChat chat = new ContactChat();
 		chat.setContactId(adminId);
 		chat.setContactId2(user);
 		chat.setTextId(Text.notification_authenticate);
 		chat.setNote(note);
+		chat.setAction("pageChat.connectVideo()");
 		repository.save(chat);
 	}
 
