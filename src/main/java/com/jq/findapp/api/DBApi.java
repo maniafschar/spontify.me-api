@@ -87,16 +87,7 @@ public class DBApi {
 	public BigInteger create(@RequestBody final WriteEntity entity, @RequestHeader BigInteger user,
 			@RequestHeader String password, @RequestHeader String salt)
 			throws Exception {
-		authenticationService.verify(user, password, salt);
-		final BaseEntity e = entity.getClazz().newInstance();
-		try {
-			if (e.getClass().getDeclaredMethod("getContactId") != null)
-				entity.getValues().put("contactId", user);
-		} catch (NoSuchMethodException ex) {
-			// no need to handle
-		}
-		EntityUtil.addImageList(entity);
-		e.populate(entity.getValues());
+		final BaseEntity e = EntityUtil.createEntity(entity, authenticationService.verify(user, password, salt));
 		repository.save(e);
 		return e.getId();
 	}

@@ -14,6 +14,7 @@ import com.jq.findapp.repository.Repository;
 
 @Entity
 public class Contact extends BaseEntity {
+	private BigInteger clientId;
 	private Boolean active = true;
 	private Boolean authenticate = false;
 	private Boolean bluetooth = true;
@@ -78,6 +79,14 @@ public class Contact extends BaseEntity {
 
 	public enum Device {
 		computer, phone, tablet
+	}
+
+	public BigInteger getClientId() {
+		return clientId;
+	}
+
+	public void setClientId(BigInteger clientId) {
+		this.clientId = clientId;
 	}
 
 	public OS getOs() {

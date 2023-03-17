@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Setting;
 import com.jq.findapp.repository.Repository;
@@ -23,12 +24,23 @@ public class Utils {
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
 
+	public Client createClient() throws Exception {
+		Client client = repository.one(Client.class, BigInteger.ONE);
+		if (client == null) {
+			client = new Client();
+			client.setName("abc");
+			repository.save(client);
+		}
+		return client;
+	}
+
 	public Contact createContact() throws Exception {
 		Contact contact = repository.one(Contact.class, adminId);
 		if (contact == null) {
 			int i = 1;
 			do {
 				contact = new Contact();
+				contact.setClientId(BigInteger.ONE);
 				contact.setEmail("test" + i + "@jq-consulting.de");
 				contact.setLanguage("DE");
 				contact.setIdDisplay("123456" + i++);

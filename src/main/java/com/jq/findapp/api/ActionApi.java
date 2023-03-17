@@ -405,6 +405,7 @@ public class ActionApi {
 		data.put("authSecret", videoAuthSecret);
 		final QueryParams params = new QueryParams(Query.contact_listVideoCalls);
 		params.setSearch("contactVideoCall.contactId=" + user);
+		params.setUser(contact);
 		final Result list = repository.list(params);
 		if (list.size() > 0)
 			data.put("timeslot", list.get(0).get("contactVideoCall.time"));

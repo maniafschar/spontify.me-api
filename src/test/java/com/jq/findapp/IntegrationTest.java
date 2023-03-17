@@ -35,7 +35,6 @@ import com.jq.findapp.util.Utils;
 				"server.port=9001" })
 @ActiveProfiles("test")
 public class IntegrationTest {
-	private static WebDriver driver;
 	private static String url = "http://localhost:9000/";
 
 	@Autowired
@@ -44,14 +43,14 @@ public class IntegrationTest {
 	@BeforeAll
 	public static void start() throws Exception {
 		new ProcessBuilder("./web.sh start".split(" ")).start();
-		driver = new SafariDriver();
-		driver.manage().timeouts().implicitlyWait(50, TimeUnit.MILLISECONDS);
-		driver.manage().window().setSize(new Dimension(450, 800));
+		Util.driver = new SafariDriver();
+		Util.driver.manage().timeouts().implicitlyWait(50, TimeUnit.MILLISECONDS);
+		Util.driver.manage().window().setSize(new Dimension(450, 800));
 	}
 
 	@AfterAll
 	public static void stop() throws Exception {
-		driver.close();
+		Util.driver.close();
 		new ProcessBuilder("./web.sh stop".split(" ")).start();
 	}
 
@@ -73,9 +72,10 @@ public class IntegrationTest {
 	}
 
 	private void init() throws Exception {
+		utils.createClient();
 		utils.createContact();
 		utils.initPaypalSandbox();
-		driver.get(url);
+		Util.driver.get(url);
 	}
 
 	private void register(String pseudonym, String email) {
@@ -89,7 +89,7 @@ public class IntegrationTest {
 		Util.click("login buttontext[onclick*=\"register\"]");
 		final String s = Util.email(0).lines().reduce(
 				(e, e2) -> e.startsWith("https://") ? e : e2.startsWith("https://") ? e2 : "").get();
-		driver.navigate().to(url + s.substring(s.indexOf('?')));
+		Util.driver.navigate().to(url + s.substring(s.indexOf('?')));
 		Util.sendKeys("popup input[name=\"passwd\"]", "qwer1234");
 		Util.click("popup buttontext");
 	}
@@ -177,7 +177,9 @@ public class IntegrationTest {
 		Util.click("navigation item.home");
 	}
 
-	private static class Util {
+	static class Util {
+		static WebDriver driver;
+
 		private static String email(int i) {
 			sleep(1000);
 			final List<String> files = Arrays.asList(new File("target/email").list());
@@ -191,7 +193,7 @@ public class IntegrationTest {
 			}
 		}
 
-		private static void sleep(long ms) {
+		static void sleep(long ms) {
 			try {
 				Thread.sleep(ms);
 			} catch (InterruptedException e) {
@@ -199,40 +201,40 @@ public class IntegrationTest {
 			}
 		}
 
-		private static WebElement get(String id) {
+		static WebElement get(String path) {
 			final int maxWait = 20;
 			int i = 0;
 			while (driver.findElements(By.cssSelector("main [toggle]")).size() > 0 ||
 					driver.findElements(By.cssSelector("main [class*=\"animated\"]")).size() > 0 ||
 					driver.findElements(By.cssSelector("content[class*=\"SlideOut\"]")).size() > 0) {
 				if (i++ > maxWait)
-					throw new RuntimeException("Timeout during animation, tried to get " + id);
+					throw new RuntimeException("Timeout during animation, tried to get " + path);
 				sleep(100);
 			}
 			List<WebElement> list;
 			i = 0;
-			while ((list = driver.findElements(By.cssSelector(id))).size() == 0) {
+			while ((list = driver.findElements(By.cssSelector(path))).size() == 0) {
 				if (i++ > maxWait)
-					throw new RuntimeException("Timeout during finding element " + id);
+					throw new RuntimeException("Timeout during finding element " + path);
 				sleep(100);
 			}
 			return list.get(0);
 		}
 
-		private static void click(String id) {
+		static void click(String id) {
 			((JavascriptExecutor) driver).executeScript("arguments[0].click()", get(id));
 		}
 
-		private static void sendKeys(String id, String keys) {
+		static void sendKeys(String path, String keys) {
 			for (int i = 0; i < 5; i++) {
 				try {
-					get(id).sendKeys(keys);
+					get(path).sendKeys(keys);
 					return;
 				} catch (ElementNotInteractableException e) {
 					sleep(250);
 				}
 			}
-			throw new RuntimeException("Failed to send keys " + keys + " for id " + id);
+			throw new RuntimeException("Failed to send keys " + keys + " for path " + path);
 		}
 	}
 }

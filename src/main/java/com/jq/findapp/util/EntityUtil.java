@@ -13,6 +13,8 @@ import javax.imageio.ImageIO;
 import org.apache.commons.io.IOUtils;
 
 import com.jq.findapp.api.model.WriteEntity;
+import com.jq.findapp.entity.BaseEntity;
+import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 
@@ -71,5 +73,24 @@ public class EntityUtil {
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("no image: " + url, ex);
 		}
+	}
+
+	public static BaseEntity createEntity(WriteEntity entity, Contact contact) throws Exception {
+		final BaseEntity e = entity.getClazz().newInstance();
+		try {
+			if (e.getClass().getDeclaredMethod("getContactId") != null)
+				entity.getValues().put("contactId", contact.getId());
+		} catch (NoSuchMethodException ex) {
+			// no need to handle
+		}
+		try {
+			if (e.getClass().getDeclaredMethod("getClientId") != null)
+				entity.getValues().put("clientId", contact.getClientId());
+		} catch (NoSuchMethodException ex) {
+			// no need to handle
+		}
+		addImageList(entity);
+		e.populate(entity.getValues());
+		return e;
 	}
 }
