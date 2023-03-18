@@ -12,9 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.PersistenceException;
-import javax.transaction.Transactional;
-
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,6 +54,9 @@ import com.jq.findapp.service.NotificationService.Ping;
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
+
+import jakarta.persistence.PersistenceException;
+import jakarta.transaction.Transactional;
 
 @RestController
 @Transactional

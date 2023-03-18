@@ -11,7 +11,7 @@ WHERE
 	TO_DAYS(event.startDate)-14<=TO_DAYS(current_timestamp) and
 	TO_DAYS(event.endDate)>=TO_DAYS(current_timestamp) and
 	(
-		(REGEXP_LIKE(event.skills, '{USERSKILLS}')=1 or REGEXP_LIKE(event.skillsText, '{USERSKILLSTEXT}')=1) and
+		(REGEXP_LIKE(event.skills, '{USERSKILLS}')=true or REGEXP_LIKE(event.skillsText, '{USERSKILLSTEXT}')=true) and
 		(
 			event.price>0 or
 			{USERGENDER}=1 and contact.ageMale like '%,%' and {USERAGE}>=substring(contact.ageMale,1,2) and {USERAGE}<=substring(contact.ageMale,4,2) or

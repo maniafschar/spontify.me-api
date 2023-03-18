@@ -46,5 +46,5 @@ FROM
 	or
 		contactLink.contactId2={USERID} and contactLink.contactId=contact.id
 WHERE
-	contact.verified=1 and
+	contact.verified=true and
 	{search}

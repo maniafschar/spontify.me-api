@@ -1,11 +1,11 @@
 package com.jq.findapp.entity;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 @Entity
 public class Setting extends BaseEntity {
 	private String label;
-	private String value;
+	private String data;
 
 	public String getLabel() {
 		return label;
@@ -15,11 +15,11 @@ public class Setting extends BaseEntity {
 		this.label = label;
 	}
 
-	public String getValue() {
-		return value;
+	public String getData() {
+		return data;
 	}
 
-	public void setValue(String value) {
-		this.value = value;
+	public void setData(String data) {
+		this.data = data;
 	}
 }

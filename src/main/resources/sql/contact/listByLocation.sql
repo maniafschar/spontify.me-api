@@ -3,7 +3,7 @@ select
 FROM
 	Contact contact, GeoLocation geoLocation, ContactGeoLocationHistory contactGeoLocationHistory JOIN  ContactGeoLocationHistory h2
 	on contactGeoLocationHistory.contactId=h2.contactId and
-	contactGeoLocationHistory.id=(select max(id) from ContactGeoLocationHistory where contact_Id=contactGeoLocationHistory.contactId)
+	contactGeoLocationHistory.id=(select max(id) from ContactGeoLocationHistory where contactId=contactGeoLocationHistory.contactId)
 WHERE
 	geoLocation.id=contactGeoLocationHistory.geoLocationId and
 	contact.id=contactGeoLocationHistory.contactId and

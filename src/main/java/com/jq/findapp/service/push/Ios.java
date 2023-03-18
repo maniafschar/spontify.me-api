@@ -12,8 +12,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.NotFoundException;
-
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +20,8 @@ import org.springframework.stereotype.Component;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.service.NotificationService.Environment;
 import com.jq.findapp.util.Strings;
+
+import jakarta.ws.rs.NotFoundException;
 
 @Component
 public class Ios {

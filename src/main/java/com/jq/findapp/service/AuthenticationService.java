@@ -15,8 +15,6 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
-import javax.mail.SendFailedException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -38,6 +36,8 @@ import com.jq.findapp.service.AuthenticationService.AuthenticationException.Auth
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
+
+import jakarta.mail.SendFailedException;
 
 @Service
 public class AuthenticationService {

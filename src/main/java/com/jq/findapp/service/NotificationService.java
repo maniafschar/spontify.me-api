@@ -21,10 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.activation.DataSource;
 import javax.imageio.ImageIO;
-import javax.mail.internet.MimeMessage;
-import javax.ws.rs.NotFoundException;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +50,10 @@ import com.jq.findapp.service.push.Android;
 import com.jq.findapp.service.push.Ios;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
+
+import jakarta.activation.DataSource;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.ws.rs.NotFoundException;
 
 @Service
 public class NotificationService {

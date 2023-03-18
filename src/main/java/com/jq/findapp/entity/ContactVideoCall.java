@@ -3,12 +3,12 @@ package com.jq.findapp.entity;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Transient;
-
 import com.jq.findapp.repository.Repository;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Transient;
 
 @Entity
 public class ContactVideoCall extends BaseEntity {

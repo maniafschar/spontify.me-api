@@ -310,7 +310,7 @@ public class EngagementService {
 			if (value.length() > 0) {
 				final Setting s = new Setting();
 				s.setLabel("registration-reminder");
-				s.setValue(value.substring(1));
+				s.setData(value.substring(1));
 				repository.save(s);
 			}
 			if (failedEmails.length() > 0)
@@ -381,12 +381,12 @@ public class EngagementService {
 		final Setting s = repository.one(Setting.class, new BigInteger("22"));
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).get("contact.id").equals(BigInteger.ONE)
-					&& !s.getValue().contains("," + list.get(i).get("contact.id") + ",")) {
+					&& !s.getData().contains("," + list.get(i).get("contact.id") + ",")) {
 				final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
 				notificationService.sendNotificationEmail(admin, to, text.get(to.getLanguage()),
 						"https://skillvents.com");
 				Thread.sleep(10000);
-				s.setValue(s.getValue() + to.getId() + ",");
+				s.setData(s.getData() + to.getId() + ",");
 			}
 		}
 		repository.save(s);

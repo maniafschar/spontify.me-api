@@ -7,9 +7,6 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.transaction.Transactional;
-import javax.ws.rs.core.Context;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -23,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jq.findapp.api.model.AbstractRegistration;
 import com.jq.findapp.api.model.ExternalRegistration;
 import com.jq.findapp.api.model.InternalRegistration;
 import com.jq.findapp.entity.Contact;
@@ -37,6 +33,9 @@ import com.jq.findapp.service.AuthenticationExternalService;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Strings;
+
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.core.Context;
 
 @RestController
 @Transactional
@@ -62,9 +61,10 @@ public class AuthenticationApi {
 	}
 
 	@PostMapping("register")
-	public void register(@RequestBody final InternalRegistration registration, @RequestHeader BigInteger clientId)
+	public void register(@RequestBody final InternalRegistration registration,
+			@RequestHeader(defaultValue = "1") BigInteger clientId)
 			throws Exception {
-		addClientId(registration, clientId);
+		registration.setClientId(clientId);
 		authenticationService.register(registration);
 	}
 
@@ -137,17 +137,13 @@ public class AuthenticationApi {
 
 	@PutMapping("loginExternal")
 	public String loginExternal(@RequestBody final ExternalRegistration registration,
-			@RequestHeader BigInteger clientId) throws Exception {
-		addClientId(registration, clientId);
+			@RequestHeader(defaultValue = "1") BigInteger clientId) throws Exception {
+		registration.setClientId(clientId);
 		registration.getUser().put("id", Encryption.decryptBrowser(registration.getUser().get("id")));
 		final Contact contact = authenticationExternalService.register(registration);
 		return contact == null ? null
 				: Encryption.encrypt(contact.getEmail() + "\u0015" + authenticationService.getPassword(contact),
 						registration.getPublicKey());
-	}
-
-	private void addClientId(final AbstractRegistration registration, BigInteger clientId) {
-		registration.setClientId(clientId == null ? BigInteger.ONE : clientId);
 	}
 
 	@GetMapping("loginAuto")

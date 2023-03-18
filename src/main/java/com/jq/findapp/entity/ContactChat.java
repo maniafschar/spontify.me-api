@@ -2,11 +2,11 @@ package com.jq.findapp.entity;
 
 import java.math.BigInteger;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-
 import com.jq.findapp.util.Text;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 @Entity
 public class ContactChat extends BaseEntity {

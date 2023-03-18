@@ -3,9 +3,9 @@ package com.jq.findapp.entity;
 import java.beans.Transient;
 import java.math.BigInteger;
 
-import javax.persistence.Entity;
-
 import com.jq.findapp.repository.Repository;
+
+import jakarta.persistence.Entity;
 
 @Entity
 public class ContactGroupLink extends BaseEntity {

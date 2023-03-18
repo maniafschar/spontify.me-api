@@ -17,9 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,6 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.repository.Query.Result;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @org.springframework.stereotype.Repository
 @Transactional(propagation = Propagation.REQUIRES_NEW)

@@ -2,10 +2,10 @@ package com.jq.findapp.entity;
 
 import java.math.BigInteger;
 
-import javax.persistence.Entity;
-import javax.persistence.Transient;
-
 import com.jq.findapp.repository.Repository;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Transient;
 
 @Entity
 public class ContactGroup extends BaseEntity {

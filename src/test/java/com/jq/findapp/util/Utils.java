@@ -74,7 +74,7 @@ public class Utils {
 			v += "," + i;
 		final Setting setting = new Setting();
 		setting.setLabel("paypal.sandbox");
-		setting.setValue(v.substring(1));
+		setting.setData(v.substring(1));
 		repository.save(setting);
 	}
 }

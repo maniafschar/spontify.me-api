@@ -4,8 +4,6 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
-import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,6 +28,8 @@ import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.EntityUtil;
 import com.jq.findapp.util.Strings;
+
+import jakarta.transaction.Transactional;
 
 @RestController
 @Transactional

@@ -2,7 +2,7 @@ package com.jq.findapp.entity;
 
 import java.math.BigInteger;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 @Entity
 public class ContactBluetooth extends BaseEntity {

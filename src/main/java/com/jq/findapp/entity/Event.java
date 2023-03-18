@@ -5,9 +5,9 @@ import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.Timestamp;
 
-import javax.persistence.Entity;
-
 import com.jq.findapp.repository.Repository;
+
+import jakarta.persistence.Entity;
 
 @Entity
 public class Event extends BaseEntity {

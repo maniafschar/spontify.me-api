@@ -46,11 +46,11 @@ public class JwtGenerator {
 			setting.setLabel(label);
 		} else {
 			setting = repository.one(Setting.class, (BigInteger) settingMap.get("setting.id"));
-			lastGeneration = Long.valueOf(setting.getValue().toString());
+			lastGeneration = Long.valueOf(setting.getData().toString());
 		}
 		if (reset || System.currentTimeMillis() - lastGeneration > TIMEOUT) {
 			lastGeneration = System.currentTimeMillis();
-			setting.setValue("" + lastGeneration);
+			setting.setData("" + lastGeneration);
 			repository.save(setting);
 			token.remove(keyId);
 		}

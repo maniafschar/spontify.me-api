@@ -12,10 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -32,6 +29,8 @@ import com.jq.findapp.service.AuthenticationService.AuthenticationException;
 import com.jq.findapp.service.AuthenticationService.AuthenticationException.AuthenticationExceptionType;
 import com.jq.findapp.service.NotificationService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @RestControllerAdvice
 public class ExceptionListener extends ResponseEntityExceptionHandler {
 	private static final List<Integer> SENT_ERRORS = new ArrayList<>();
@@ -45,20 +44,14 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Object> handle(Exception ex, WebRequest request) {
-		final Map<String, Object> body = new HashMap<>();
+		final HttpStatus statusCode = ex instanceof AuthenticationException ? HttpStatus.UNAUTHORIZED
+				: HttpStatus.INTERNAL_SERVER_ERROR;
+		final Map<String, Object> body = new HashMap<>(3);
 		body.put("msg", ex.getMessage());
 		body.put("class", ex.getClass().getSimpleName());
 		body.put("time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-		return handleExceptionInternal(ex, body, null,
-				ex instanceof AuthenticationException ? HttpStatus.UNAUTHORIZED : HttpStatus.INTERNAL_SERVER_ERROR,
-				request);
-	}
-
-	@Override
-	public ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
-			HttpStatus status, WebRequest request) {
-		report(((ServletWebRequest) request).getRequest(), ex, status);
-		return super.handleExceptionInternal(ex, body, headers, status, request);
+		report(((ServletWebRequest) request).getRequest(), ex, statusCode);
+		return createResponseEntity(body, null, statusCode, request);
 	}
 
 	private void report(HttpServletRequest request, Exception ex, HttpStatus status) {

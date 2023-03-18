@@ -11,7 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -24,7 +24,6 @@ import com.jq.findapp.TestConfig;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.backend.EngagementService;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith(SpringExtension.class)
@@ -39,9 +38,6 @@ public class ApiTest {
 
 	@Autowired
 	private Utils utils;
-
-	@Autowired
-	private EngagementService engagementService;
 
 	@Test
 	public void test() throws Exception {

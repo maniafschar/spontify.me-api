@@ -30,7 +30,7 @@ FROM
 	contactLink.contactId2=contact.id or contactLink.contactId2={USERID} and
 	contactLink.contactId=contact.id
 WHERE
-	contact.id<>{USERID} and contact.verified=1 and
+	contact.id<>{USERID} and contact.verified=true and
 	{search}
 ORDER BY
 	time DESC

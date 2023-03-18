@@ -1,6 +1,6 @@
 package com.jq.findapp.entity;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 @Entity
 public class GeoLocation extends BaseEntity {

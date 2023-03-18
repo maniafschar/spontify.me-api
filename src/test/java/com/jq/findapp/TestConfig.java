@@ -17,34 +17,30 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
 import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.ExternalService;
+
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
 
 @Profile("test")
 @TestConfiguration
@@ -84,16 +80,6 @@ public class TestConfig {
 			return null;
 		}).when(javaMailSender).send(any(MimeMessage.class));
 		return javaMailSender;
-	}
-
-	@Component
-	public class EndpointsListener implements ApplicationListener<ContextRefreshedEvent> {
-		@Override
-		public void onApplicationEvent(ContextRefreshedEvent event) {
-			final ApplicationContext applicationContext = event.getApplicationContext();
-			applicationContext.getBean(RequestMappingHandlerMapping.class).getHandlerMethods()
-					.forEach((e, f) -> System.out.println(e + " => " + f));
-		}
 	}
 
 	@RestController

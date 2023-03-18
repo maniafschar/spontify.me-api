@@ -1,7 +1,7 @@
 SELECT
 	setting.id,
 	setting.label,
-	setting.value,
+	setting.data,
 	setting.createdAt,
 	setting.modifiedAt
 FROM

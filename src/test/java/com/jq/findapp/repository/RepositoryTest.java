@@ -120,6 +120,7 @@ public class RepositoryTest {
 		// when
 		for (Query query : Query.values()) {
 			params.setQuery(query);
+			System.out.println(query);
 			final Result result = repository.list(params);
 
 			// then
