@@ -115,8 +115,13 @@ public class Repository {
 		listeners.postRemove(entity);
 	}
 
-	public void executeUpdate(String hql) {
-		em.createQuery(hql).executeUpdate();
+	public void executeUpdate(String hql, Object... params) {
+		final jakarta.persistence.Query query = em.createQuery(hql);
+		if (params != null) {
+			for (int i = 0; i < params.length; i++)
+				query.setParameter(i + 1, params[i]);
+		}
+		query.executeUpdate();
 	}
 
 	public static class Attachment {
