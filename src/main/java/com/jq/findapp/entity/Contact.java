@@ -45,6 +45,7 @@ public class Contact extends BaseEntity {
 	private Short fee;
 	private Short gender;
 	private Short rating;
+	// TODO rm
 	private String aboutMe;
 	private String ageDivers;
 	private String ageFemale;

@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jq.findapp.api.model.AbstractRegistration;
 import com.jq.findapp.api.model.ExternalRegistration;
 import com.jq.findapp.api.model.InternalRegistration;
 import com.jq.findapp.entity.Contact;
@@ -61,7 +62,9 @@ public class AuthenticationApi {
 	}
 
 	@PostMapping("register")
-	public void register(@RequestBody final InternalRegistration registration) throws Exception {
+	public void register(@RequestBody final InternalRegistration registration, @RequestHeader BigInteger clientId)
+			throws Exception {
+		addClientId(registration, clientId);
 		authenticationService.register(registration);
 	}
 
@@ -133,12 +136,18 @@ public class AuthenticationApi {
 	}
 
 	@PutMapping("loginExternal")
-	public String loginExternal(@RequestBody final ExternalRegistration registration) throws Exception {
+	public String loginExternal(@RequestBody final ExternalRegistration registration,
+			@RequestHeader BigInteger clientId) throws Exception {
+		addClientId(registration, clientId);
 		registration.getUser().put("id", Encryption.decryptBrowser(registration.getUser().get("id")));
 		final Contact contact = authenticationExternalService.register(registration);
 		return contact == null ? null
 				: Encryption.encrypt(contact.getEmail() + "\u0015" + authenticationService.getPassword(contact),
 						registration.getPublicKey());
+	}
+
+	private void addClientId(final AbstractRegistration registration, BigInteger clientId) {
+		registration.setClientId(clientId == null ? BigInteger.ONE : clientId);
 	}
 
 	@GetMapping("loginAuto")

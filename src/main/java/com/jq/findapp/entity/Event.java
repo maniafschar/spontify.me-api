@@ -11,7 +11,6 @@ import com.jq.findapp.repository.Repository;
 
 @Entity
 public class Event extends BaseEntity {
-	private BigInteger clientId;
 	private BigInteger contactId;
 	private BigInteger locationId;
 	private Date endDate;
@@ -24,18 +23,11 @@ public class Event extends BaseEntity {
 	private String imageList;
 	private String skills;
 	private String skillsText;
+	// TODO rm
 	private String text;
 	private String type;
 	private String url;
 	private Timestamp startDate;
-
-	public BigInteger getClientId() {
-		return clientId;
-	}
-
-	public void setClientId(BigInteger clientId) {
-		this.clientId = clientId;
-	}
 
 	public BigInteger getLocationId() {
 		return locationId;

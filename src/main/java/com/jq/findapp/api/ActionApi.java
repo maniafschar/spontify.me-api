@@ -267,8 +267,9 @@ public class ActionApi {
 	}
 
 	@GetMapping("teaser/{type}")
-	public List<Object[]> teaser(@PathVariable final String type, @RequestHeader(required = false) BigInteger user,
-			@RequestHeader(required = false) String password, @RequestHeader(required = false) String salt,
+	public List<Object[]> teaser(@PathVariable final String type, @RequestHeader(required = false) BigInteger clientId,
+			@RequestHeader(required = false) BigInteger user, @RequestHeader(required = false) String password,
+			@RequestHeader(required = false) String salt,
 			@RequestHeader(required = false, name = "X-Forwarded-For") String ip) throws Exception {
 		final QueryParams params = new QueryParams(
 				"contacts".equals(type) ? Query.contact_listTeaser : Query.event_listTeaser);
@@ -315,6 +316,8 @@ public class ActionApi {
 			else
 				params.setSearch("event.endDate>='" + Instant.now().atZone(ZoneOffset.UTC).toLocalDate() + "'");
 		}
+		if (clientId != null)
+			params.setSearch(params.getSearch() + " and contact.clientId=" + clientId);
 		return repository.list(params).getList();
 	}
 

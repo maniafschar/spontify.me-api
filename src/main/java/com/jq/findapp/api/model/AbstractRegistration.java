@@ -1,5 +1,7 @@
 package com.jq.findapp.api.model;
 
+import java.math.BigInteger;
+
 import com.jq.findapp.entity.Contact.Device;
 import com.jq.findapp.entity.Contact.OS;
 
@@ -9,6 +11,7 @@ public abstract class AbstractRegistration {
 	private String language;
 	private String version;
 	private String timezone;
+	private BigInteger clientId;
 
 	public OS getOs() {
 		return os;
@@ -50,11 +53,11 @@ public abstract class AbstractRegistration {
 		this.timezone = timezone;
 	}
 
-	@Override
-	public String toString() {
-		return "\ndevice: " + getDevice() +
-				"\nlanguage: " + getLanguage() +
-				"\nos: " + getOs() +
-				"\nversion: " + getVersion();
+	public BigInteger getClientId() {
+		return clientId;
+	}
+
+	public void setClientId(BigInteger clientId) {
+		this.clientId = clientId;
 	}
 }

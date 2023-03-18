@@ -220,9 +220,10 @@ public class AuthenticationService {
 				.contains(email.substring(email.indexOf('@') + 1)));
 	}
 
-	public void saveRegistration(Contact contact, AbstractRegistration registration) throws Exception {
+	void saveRegistration(Contact contact, AbstractRegistration registration) throws Exception {
 		contact.setDevice(registration.getDevice());
 		contact.setLanguage(registration.getLanguage());
+		contact.setClientId(registration.getClientId());
 		contact.setOs(registration.getOs());
 		contact.setVersion(registration.getVersion());
 		contact.setVisitPage(new Timestamp(Instant.now().toEpochMilli() - 1000));

@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 public class EventRating extends BaseEntity {
 	private BigInteger eventParticipateId;
 	private Short rating;
+	// TODO rm
 	private String text;
 	private String description;
 	private String image;
