@@ -10,7 +10,7 @@ import java.util.TimeZone;
 
 public class Strings {
 	public static final String URL_APP = "https://skillvents.com";
-	public static final String URL_APP_NEW = "https://new.skillvents.com";
+	public static final String URL_APP_NEW = "https://skills.community";
 	public static final String URL_LOCALHOST = "https://localhost";
 	public static final String URL_LOCALHOST_TEST = "http://localhost:9000";
 
