@@ -1,6 +1,6 @@
 package com.jq.findapp;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -8,9 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.safari.SafariDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -33,9 +32,12 @@ public class Screenshots {
 
 	@BeforeAll
 	public static void start() throws Exception {
-		Util.driver = new SafariDriver();
+		System.setProperty("webdriver.chrome.driver", "../ChromeDriver");
+		ChromeOptions options = new ChromeOptions();
+		options.addArguments("--remote-allow-origins=*");
+		Util.driver = new ChromeDriver(options);
 		js = (JavascriptExecutor) Util.driver;
-		Util.driver.manage().timeouts().implicitlyWait(50, TimeUnit.MILLISECONDS);
+		Util.driver.manage().timeouts().implicitlyWait(Duration.ofMillis(50));
 		Util.driver.manage().window().setSize(new Dimension(450, 800));
 	}
 

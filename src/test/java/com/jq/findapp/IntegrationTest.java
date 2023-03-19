@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.AfterAll;
@@ -44,7 +44,7 @@ public class IntegrationTest {
 	public static void start() throws Exception {
 		new ProcessBuilder("./web.sh start".split(" ")).start();
 		Util.driver = new SafariDriver();
-		Util.driver.manage().timeouts().implicitlyWait(50, TimeUnit.MILLISECONDS);
+		Util.driver.manage().timeouts().implicitlyWait(Duration.ofMillis(50));
 		Util.driver.manage().window().setSize(new Dimension(450, 800));
 	}
 
