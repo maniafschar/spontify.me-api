@@ -167,6 +167,7 @@ public class IntegrationTest {
 		Util.click("search tabHeader tab[i=\"contacts\"]");
 		Util.sendKeys("search tabBody div.contacts input[name=\"keywords\"]", "pseudonym");
 		Util.click("search tabBody div.contacts buttontext[onclick*=\"pageSearch.\"]");
+		Util.sleep(1500);
 		Util.click("search tabBody div.contacts row:nth-of-type(1)");
 		Util.click("detail buttontext[name=\"buttonFriend\"]");
 		Util.click("detail buttontext[onclick*=\"sendRequestForFriendship\"]");

@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.Contact;
@@ -64,6 +65,7 @@ public class ContactListener extends AbstractRepositoryListener<Contact> {
 		}
 	}
 
+	@Async
 	@Override
 	public void postUpdate(final Contact contact) throws Exception {
 		if (contact.old("email") != null)

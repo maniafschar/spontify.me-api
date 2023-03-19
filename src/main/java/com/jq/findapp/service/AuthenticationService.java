@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -365,7 +364,6 @@ public class AuthenticationService {
 				"r=" + s);
 	}
 
-	@Async
 	public String recoverSendEmail(String email) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.email='" + email + '\'');

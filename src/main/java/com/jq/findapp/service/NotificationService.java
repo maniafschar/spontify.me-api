@@ -107,7 +107,7 @@ public class NotificationService {
 	}
 
 	@Async
-	public String[] sendNotificationOnMatch(ContactNotificationTextType textID, final Contact me, final Contact other,
+	public void sendNotificationOnMatch(ContactNotificationTextType textID, final Contact me, final Contact other,
 			String... param) throws Exception {
 		if (me != null && other != null && !me.getId().equals(other.getId()) && me.getAge() != null
 				&& me.getGender() != null) {
@@ -128,13 +128,11 @@ public class NotificationService {
 							for (int i = 0; i < param.length; i++)
 								param2[i + 1] = param[i];
 						}
-						if (sendNotification(me, other, textID, Strings.encodeParam("p=" + me.getId()), param2))
-							return new String[] { attributesToString(attribs), attributesToString(attribsEx) };
+						sendNotification(me, other, textID, Strings.encodeParam("p=" + me.getId()), param2);
 					}
 				}
 			}
 		}
-		return null;
 	}
 
 	public boolean sendNotification(Contact contactFrom, Contact contactTo,

@@ -71,11 +71,13 @@
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
 			<scope>test</scope>
+			<version>4.8.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-api</artifactId>
 			<scope>test</scope>
+			<version>4.8.1</version>
 		</dependency>
 	</dependencies>
 
