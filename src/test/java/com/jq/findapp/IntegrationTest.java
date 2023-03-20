@@ -229,7 +229,9 @@ public class IntegrationTest {
 		static void sendKeys(String path, String keys) {
 			for (int i = 0; i < 5; i++) {
 				try {
-					get(path).sendKeys(keys);
+					final WebElement e = get(path);
+					e.clear();
+					e.sendKeys(keys);
 					return;
 				} catch (ElementNotInteractableException e) {
 					sleep(250);

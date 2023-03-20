@@ -1,43 +1,47 @@
 package com.jq.findapp;
 
-import java.time.Duration;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.jq.findapp.IntegrationTest.Util;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = { FindappApplication.class, TestConfig.class })
-@ActiveProfiles("test")
 public class Screenshots {
+	private static final String dir = "screenshots/";
 	private static JavascriptExecutor js;
-	private static String url = "https://skillvents.com/";
-
-	@Value("${app.admin.screenshot.user}")
-	protected String user;
-
-	@Value("${app.admin.screenshot.password}")
-	protected String password;
 
 	@BeforeAll
 	public static void start() throws Exception {
 		System.setProperty("webdriver.chrome.driver", "../ChromeDriver");
-		ChromeOptions options = new ChromeOptions();
+		final Map<String, Object> userAgent = new HashMap<>(), deviceMetrics = new HashMap<>();
+		deviceMetrics.put("width", 360);
+		deviceMetrics.put("height", 640);
+		deviceMetrics.put("pixelRatio", 3.0);
+		userAgent.put("deviceMetrics", deviceMetrics);
+		userAgent.put("pixelRatio", 3.0);
+		userAgent.put("mobileEmulationEnabled", Boolean.TRUE);
+		userAgent.put("userAgent",
+				"Mozilla/5.0 (Linux; Android 7.0; SAMSUNG SM-A510F Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/5.4 Chrome/51.0.2704.106 Mobile Safari/537.36");
+		final ChromeOptions options = new ChromeOptions();
 		options.addArguments("--remote-allow-origins=*");
+		options.setExperimentalOption("mobileEmulation", userAgent);
 		Util.driver = new ChromeDriver(options);
 		js = (JavascriptExecutor) Util.driver;
-		Util.driver.manage().timeouts().implicitlyWait(Duration.ofMillis(50));
 		Util.driver.manage().window().setSize(new Dimension(450, 800));
 	}
 
@@ -49,30 +53,37 @@ public class Screenshots {
 	@Test
 	public void run() throws Exception {
 		try {
-			init();
+			new File(dir).mkdir();
+			Util.driver.get("https://skills.community/");
 			Util.sleep(3000);
-			js.executeScript("screenshot('home')");
-			js.executeScript("pageLogin.login('" + user + "', '" + password + "');");
+			screenshot("home");
+			login();
 			Util.sleep(1000);
 			js.executeScript("ui.navigation.goTo('search')");
 			Util.sleep(1000);
-			Util.sendKeys("search div.contacts input[name=\"keywords\"]", "fc bayern");
+			Util.sendKeys("search div.contacts input[name=\"keywords\"]", "");
 			Util.sleep(1000);
 			js.executeScript("pageSearch.contacts.search()");
 			Util.sleep(1000);
-			js.executeScript("screenshot('search', true)");
-			Util.sleep(10000);
+			screenshot("search");
 		} catch (Exception ex) {
-			Util.sleep(10000);
 			throw ex;
 		}
 	}
 
-	private void init() throws Exception {
-		Util.driver.get(url);
-		js.executeScript("var script = document.createElement('script');" +
-				"script.src = 'js/screenshots.js';" +
-				"script.onload = function(){init()};" +
-				"document.head.appendChild(script);");
+	private void login() throws IOException {
+		final String props = IOUtils.toString(Screenshots.class.getResourceAsStream("/application.properties"),
+				StandardCharsets.UTF_8);
+		final Matcher matcherUser = Pattern.compile(".*app\\.admin\\.screenshot\\.user=([^\n]*).*").matcher(props);
+		final Matcher matcherPassword = Pattern.compile(".*app\\.admin\\.screenshot\\.password=([^\n]*).*")
+				.matcher(props);
+		matcherUser.find();
+		matcherPassword.find();
+		js.executeScript("pageLogin.login('" + matcherUser.group(1) + "', '" + matcherPassword.group(1) + "');");
+	}
+
+	private void screenshot(String name) throws Exception {
+		IOUtils.write(((ChromeDriver) Util.driver).getScreenshotAs(OutputType.BYTES),
+				new FileOutputStream(dir + name + ".png"));
 	}
 }
