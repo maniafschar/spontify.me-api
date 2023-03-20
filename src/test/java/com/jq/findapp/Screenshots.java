@@ -24,25 +24,34 @@ import com.jq.findapp.IntegrationTest.Util;
 public class Screenshots {
 	private static final String dir = "screenshots/";
 	private static JavascriptExecutor js;
+	private static final Map<String, Object> userAgent = new HashMap<>();
+	private static final Map<String, Object> deviceMetrics = new HashMap<>();
+	private static final ChromeOptions options = new ChromeOptions();
+	private static final double resolution = 1.0;
 
 	@BeforeAll
 	public static void start() throws Exception {
+		new File(dir).mkdir();
 		System.setProperty("webdriver.chrome.driver", "../ChromeDriver");
-		final Map<String, Object> userAgent = new HashMap<>(), deviceMetrics = new HashMap<>();
-		deviceMetrics.put("width", 360);
-		deviceMetrics.put("height", 640);
-		deviceMetrics.put("pixelRatio", 3.0);
+		deviceMetrics.put("pixelRatio", resolution);
 		userAgent.put("deviceMetrics", deviceMetrics);
-		userAgent.put("pixelRatio", 3.0);
+		userAgent.put("pixelRatio", resolution);
 		userAgent.put("mobileEmulationEnabled", Boolean.TRUE);
 		userAgent.put("userAgent",
 				"Mozilla/5.0 (Linux; Android 7.0; SAMSUNG SM-A510F Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/5.4 Chrome/51.0.2704.106 Mobile Safari/537.36");
-		final ChromeOptions options = new ChromeOptions();
 		options.addArguments("--remote-allow-origins=*");
 		options.setExperimentalOption("mobileEmulation", userAgent);
+	}
+
+	private String openBrowser(int width, int height) {
+		deviceMetrics.put("width", width);
+		deviceMetrics.put("height", height);
+		if (Util.driver != null)
+			Util.driver.close();
 		Util.driver = new ChromeDriver(options);
 		js = (JavascriptExecutor) Util.driver;
-		Util.driver.manage().window().setSize(new Dimension(450, 800));
+		Util.driver.manage().window().setSize(new Dimension((int) (width / resolution), (int) (height / resolution)));
+		return width + "x" + height;
 	}
 
 	@AfterAll
@@ -52,23 +61,34 @@ public class Screenshots {
 
 	@Test
 	public void run() throws Exception {
-		try {
-			new File(dir).mkdir();
-			Util.driver.get("https://skills.community/");
-			Util.sleep(3000);
-			screenshot("home");
-			login();
-			Util.sleep(1000);
-			js.executeScript("ui.navigation.goTo('search')");
-			Util.sleep(1000);
-			Util.sendKeys("search div.contacts input[name=\"keywords\"]", "");
-			Util.sleep(1000);
-			js.executeScript("pageSearch.contacts.search()");
-			Util.sleep(1000);
-			screenshot("search");
-		} catch (Exception ex) {
-			throw ex;
-		}
+		screenshots(openBrowser(640, 960)); // 3.5
+		screenshots(openBrowser(640, 1136)); // 4
+		screenshots(openBrowser(750, 1334)); // 4.7
+		screenshots(openBrowser(1242, 2208)); // 5.5
+		screenshots(openBrowser(1242, 2688)); // 6.5
+		screenshots(openBrowser(1290, 2796)); // 6.7
+		screenshots(openBrowser(2048, 2732)); // iPad 3. gen
+	}
+
+	private void screenshots(String name) throws Exception {
+		// Util.driver.get("https://skills.community/");
+		Util.driver.get("https://skillvents.com/");
+		Util.sleep(3000);
+		screenshot(name);
+		login();
+		Util.sleep(1000);
+		js.executeScript("ui.navigation.goTo('search')");
+		Util.sleep(1000);
+		Util.sendKeys("search div.contacts input[name=\"keywords\"]", "");
+		Util.sleep(1000);
+		js.executeScript("pageSearch.contacts.search()");
+		Util.sleep(1000);
+		js.executeScript(
+				"var e=ui.qa('row img[src*=\"contact.svg\"]');for(var i=0;i<e.length;i++)ui.parents(e[i],'row').outerHTML='';");
+		js.executeScript(
+				"var e=ui.qa('row[i=\"217\"],row[i=\"223\"],row[i=\"244\"],row[i=\"276\"],row[i=\"607\"],row[i=\"793\"]');for(var i=0;i<e.length;i++)ui.parents(e[i],'row').outerHTML='';");
+		screenshot(name + "-2");
+		js.executeScript("pageLogin.logoff()");
 	}
 
 	private void login() throws IOException {
@@ -79,7 +99,8 @@ public class Screenshots {
 				.matcher(props);
 		matcherUser.find();
 		matcherPassword.find();
-		js.executeScript("pageLogin.login('" + matcherUser.group(1) + "', '" + matcherPassword.group(1) + "');");
+		js.executeScript("pageLogin.login('" + matcherUser.group(1) + "','" + matcherPassword.group(1) + "')");
+		js.executeScript("geoData.save({latitude:48.119335544742256,longitude:11.564400465904775})");
 	}
 
 	private void screenshot(String name) throws Exception {
