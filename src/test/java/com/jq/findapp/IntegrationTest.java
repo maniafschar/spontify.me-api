@@ -32,7 +32,7 @@ import com.jq.findapp.util.Utils;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = { FindappApplication.class,
 		TestConfig.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
-				"server.port=9001" })
+				"server.port=9001", "server.servlet.context-path=/rest" })
 @ActiveProfiles("test")
 public class IntegrationTest {
 	private static String url = "http://localhost:9000/";
@@ -75,7 +75,16 @@ public class IntegrationTest {
 		utils.createClient();
 		utils.createContact();
 		utils.initPaypalSandbox();
-		Util.driver.get(url);
+		for (int i = 0; i < 20; i++) {
+			Util.sleep(1000);
+			Util.driver.get(url);
+			try {
+				Util.get("navigation item.events");
+				break;
+			} catch (Exception ex) {
+				// wait
+			}
+		}
 	}
 
 	private void register(String pseudonym, String email) {

@@ -10,15 +10,20 @@ import java.util.concurrent.Executor;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Strings;
 
 @Configuration
-public class AsyncConfiguration implements AsyncConfigurer {
+@EnableWebSocketMessageBroker
+public class FindappConfiguration implements AsyncConfigurer, WebSocketMessageBrokerConfigurer {
 	private static final List<Integer> SENT_ERRORS = new ArrayList<>();
 
 	@Autowired
@@ -57,4 +62,14 @@ public class AsyncConfiguration implements AsyncConfigurer {
 		};
 	}
 
+	@Override
+	public void configureMessageBroker(MessageBrokerRegistry config) {
+		config.enableSimpleBroker("/topic");
+		config.setApplicationDestinationPrefixes("/app");
+	}
+
+	@Override
+	public void registerStompEndpoints(StompEndpointRegistry registry) {
+		registry.addEndpoint("/gs-guide-websocket").withSockJS();
+	}
 }
