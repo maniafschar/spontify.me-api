@@ -292,7 +292,7 @@ public class EngagementService {
 			params.setQuery(Query.misc_setting);
 			for (int i = 0; i < list.size(); i++) {
 				final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
-				params.setSearch("setting.label='registration-reminder' and concat('|', setting.value, '|') like '%|"
+				params.setSearch("setting.label='registration-reminder' and concat('|', setting.data, '|') like '%|"
 						+ to.getId() + "|%'");
 				final Result result2 = repository.list(params);
 				if (result2.size() == 0

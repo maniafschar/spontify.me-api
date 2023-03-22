@@ -43,17 +43,6 @@ public class Screenshots {
 		options.setExperimentalOption("mobileEmulation", userAgent);
 	}
 
-	private String openBrowser(int width, int height) {
-		deviceMetrics.put("width", width);
-		deviceMetrics.put("height", height);
-		if (Util.driver != null)
-			Util.driver.close();
-		Util.driver = new ChromeDriver(options);
-		js = (JavascriptExecutor) Util.driver;
-		Util.driver.manage().window().setSize(new Dimension((int) (width / resolution), (int) (height / resolution)));
-		return width + "x" + height;
-	}
-
 	@AfterAll
 	public static void stop() throws Exception {
 		Util.driver.close();
@@ -70,9 +59,20 @@ public class Screenshots {
 		screenshots(openBrowser(2048, 2732)); // iPad 3. gen
 	}
 
+	private String openBrowser(int width, int height) {
+		deviceMetrics.put("width", width);
+		deviceMetrics.put("height", height);
+		if (Util.driver != null)
+			Util.driver.close();
+		Util.driver = new ChromeDriver(options);
+		js = (JavascriptExecutor) Util.driver;
+		Util.driver.manage().window().setSize(new Dimension((int) (width / resolution), (int) (height / resolution)));
+		return width + "x" + height;
+	}
+
 	private void screenshots(String name) throws Exception {
-		// Util.driver.get("https://skills.community/");
-		Util.driver.get("https://skillvents.com/");
+		Util.driver.get("https://skills.community/");
+		// Util.driver.get("https://skillvents.com/");
 		Util.sleep(3000);
 		screenshot(name);
 		login();

@@ -506,7 +506,7 @@ public class ActionApi {
 		final QueryParams params = new QueryParams(Query.misc_setting);
 		params.setSearch("setting.label='paypal.sandbox'");
 		final Map<String, Object> settings = repository.one(params);
-		return settings != null && ("," + settings.get("setting.value") + ",").contains("," + user + ",");
+		return settings != null && ("," + settings.get("setting.data") + ",").contains("," + user + ",");
 	}
 
 	private String getPaypalKey(BigInteger user) {
