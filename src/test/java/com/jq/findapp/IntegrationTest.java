@@ -59,6 +59,7 @@ public class IntegrationTest {
 		try {
 			init();
 			register("testabcd", "test@jq-consulting.de");
+			Util.sleep(999999);
 			addLocation("location 1", "Melchiorstr. 9\n81479 München", false);
 			addEvent();
 			addRating();

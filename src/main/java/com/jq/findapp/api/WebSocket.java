@@ -1,31 +1,41 @@
 package com.jq.findapp.api;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import com.jq.findapp.service.AuthenticationService;
+
 @Controller
 public class WebSocket {
+	@Autowired
+	private AuthenticationService authenticationService;
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
 
 	@MessageMapping("/video")
 	public void video(Message message) throws Exception {
-		System.out.println(message);
-		messagingTemplate.convertAndSendToUser("" + message.id2, "/video", message);
+		authenticationService.verify(message.getUser(), message.getPassword(), message.getSalt());
+		message.setUser(null);
+		message.setPassword(null);
+		message.setSalt(null);
+		messagingTemplate.convertAndSendToUser("" + message.getId(), "/video", message);
 	}
 
 	private static class Message {
-		String type;
-		String name;
 		BigInteger id;
-		BigInteger id2;
-		String candidate;
-		String offer;
+		BigInteger user;
+		Map<String, Object> candidate;
 		String answer;
+		String name;
+		String password;
+		String offer;
+		String salt;
+		String type;
 
 		public String getType() {
 			return type;
@@ -51,19 +61,19 @@ public class WebSocket {
 			this.id = id;
 		}
 
-		public BigInteger getId2() {
-			return id2;
+		public BigInteger getUser() {
+			return user;
 		}
 
-		public void setId2(BigInteger id2) {
-			this.id2 = id2;
+		public void setUser(BigInteger user) {
+			this.user = user;
 		}
 
-		public String getCandidate() {
+		public Map<String, Object> getCandidate() {
 			return candidate;
 		}
 
-		public void setCandidate(String candidate) {
+		public void setCandidate(Map<String, Object> candidate) {
 			this.candidate = candidate;
 		}
 
@@ -81,6 +91,22 @@ public class WebSocket {
 
 		public void setAnswer(String answer) {
 			this.answer = answer;
+		}
+
+		public String getPassword() {
+			return password;
+		}
+
+		public void setPassword(String password) {
+			this.password = password;
+		}
+
+		public String getSalt() {
+			return salt;
+		}
+
+		public void setSalt(String salt) {
+			this.salt = salt;
 		}
 	}
 }
