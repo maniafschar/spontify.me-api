@@ -64,12 +64,14 @@ public class FindappConfiguration implements AsyncConfigurer, WebSocketMessageBr
 
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry config) {
-		config.enableSimpleBroker("/topic");
-		config.setApplicationDestinationPrefixes("/app");
+		config.enableSimpleBroker("/user");
+		config.setApplicationDestinationPrefixes("/ws");
+		config.setUserDestinationPrefix("/user");
 	}
 
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/gs-guide-websocket").withSockJS();
+		registry.addEndpoint("/ws/init").setAllowedOrigins(Strings.URL_APP, Strings.URL_APP_NEW, Strings.URL_LOCALHOST,
+				Strings.URL_LOCALHOST_TEST).withSockJS();
 	}
 }
