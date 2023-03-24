@@ -20,7 +20,6 @@ public class WebSocket {
 	@MessageMapping("/video")
 	public void video(Message message) throws Exception {
 		authenticationService.verify(message.getUser(), message.getPassword(), message.getSalt());
-		message.setUser(null);
 		message.setPassword(null);
 		message.setSalt(null);
 		messagingTemplate.convertAndSendToUser("" + message.getId(), "/video", message);
@@ -30,10 +29,10 @@ public class WebSocket {
 		BigInteger id;
 		BigInteger user;
 		Map<String, Object> candidate;
-		String answer;
+		Map<String, Object> offer;
+		Map<String, Object> answer;
 		String name;
 		String password;
-		String offer;
 		String salt;
 		String type;
 
@@ -77,19 +76,19 @@ public class WebSocket {
 			this.candidate = candidate;
 		}
 
-		public String getOffer() {
+		public Map<String, Object> getOffer() {
 			return offer;
 		}
 
-		public void setOffer(String offer) {
+		public void setOffer(Map<String, Object> offer) {
 			this.offer = offer;
 		}
 
-		public String getAnswer() {
+		public Map<String, Object> getAnswer() {
 			return answer;
 		}
 
-		public void setAnswer(String answer) {
+		public void setAnswer(Map<String, Object> answer) {
 			this.answer = answer;
 		}
 
