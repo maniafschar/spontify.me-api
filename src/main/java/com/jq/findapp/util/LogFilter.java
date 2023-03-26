@@ -50,7 +50,7 @@ public class LogFilter implements Filter {
 					log.setReferer(log.getReferer().substring(0, 255));
 			}
 			log.setIp(req.getHeader("X-Forwarded-For"));
-			log.setPort(req.getServerPort());
+			log.setPort(req.getLocalPort());
 			if (req.getHeader("user") != null)
 				log.setContactId(new BigInteger(req.getHeader("user")));
 			final String query = req.getQueryString();

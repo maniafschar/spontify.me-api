@@ -18,31 +18,22 @@ public class WebSocket {
 	private SimpMessagingTemplate messagingTemplate;
 
 	@MessageMapping("/video")
-	public void video(Message message) throws Exception {
+	public void video(VideoMessage message) throws Exception {
 		authenticationService.verify(message.getUser(), message.getPassword(), message.getSalt());
 		message.setPassword(null);
 		message.setSalt(null);
 		messagingTemplate.convertAndSendToUser("" + message.getId(), "/video", message);
 	}
 
-	private static class Message {
+	private static class VideoMessage {
 		BigInteger id;
 		BigInteger user;
+		Map<String, Object> answer;
 		Map<String, Object> candidate;
 		Map<String, Object> offer;
-		Map<String, Object> answer;
 		String name;
 		String password;
 		String salt;
-		String type;
-
-		public String getType() {
-			return type;
-		}
-
-		public void setType(String type) {
-			this.type = type;
-		}
 
 		public String getName() {
 			return name;

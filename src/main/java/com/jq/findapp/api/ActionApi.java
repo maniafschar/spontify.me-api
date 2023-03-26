@@ -115,33 +115,6 @@ public class ActionApi {
 	@Value("${app.url.lookupip}")
 	private String lookupIp;
 
-	@Value("${app.video.chat.admin.id}")
-	private String videoAdminId;
-
-	@Value("${app.video.chat.admin.login}")
-	private String videoAdminLogin;
-
-	@Value("${app.video.chat.admin.password}")
-	private String videoAdminPassword;
-
-	@Value("${app.video.chat.customer.id}")
-	private String videoCustomerId;
-
-	@Value("${app.video.chat.customer.login}")
-	private String videoCustomerLogin;
-
-	@Value("${app.video.chat.customer.password}")
-	private String videoCustomerPassword;
-
-	@Value("${app.video.chat.appId}")
-	private String videoAppId;
-
-	@Value("${app.video.chat.authKey}")
-	private String videoAuthKey;
-
-	@Value("${app.video.chat.authSecret}")
-	private String videoAuthSecret;
-
 	@GetMapping("unique")
 	public Unique unique(String email) {
 		return authenticationService.unique(email);
@@ -398,41 +371,8 @@ public class ActionApi {
 		notificationService.createTicket(TicketType.ERROR, "eventbrite", data + data2, BigInteger.valueOf(3));
 	}
 
-	@GetMapping("videoCallInit")
-	public Map<String, Object> videoCallInit(@RequestHeader BigInteger user, @RequestHeader String password,
-			@RequestHeader String salt) throws Exception {
-		final Contact contact = authenticationService.verify(user, password, salt);
-		final Map<String, Object> data = new HashMap<>();
-		data.put("appId", videoAppId);
-		data.put("authKey", videoAuthKey);
-		data.put("authSecret", videoAuthSecret);
-		final QueryParams params = new QueryParams(Query.contact_listVideoCalls);
-		params.setSearch("contactVideoCall.contactId=" + user);
-		params.setUser(contact);
-		final Result list = repository.list(params);
-		if (list.size() > 0)
-			data.put("timeslot", list.get(0).get("contactVideoCall.time"));
-		if (contact.getId().equals(adminId)) {
-			data.put("isAdmin", Boolean.TRUE);
-			data.put("callerId", videoAdminId);
-			data.put("callerLogin", videoAdminLogin);
-			data.put("callerPassword", videoAdminPassword);
-			data.put("callerName", contact.getPseudonym());
-			data.put("calleeId", videoCustomerId);
-			data.put("calleeName", "customer");
-		} else {
-			data.put("callerId", videoCustomerId);
-			data.put("callerLogin", videoCustomerLogin);
-			data.put("callerPassword", videoCustomerPassword);
-			data.put("callerName", contact.getPseudonym());
-			data.put("calleeId", videoAdminId);
-			data.put("calleeName", repository.one(Contact.class, adminId).getPseudonym());
-		}
-		return data;
-	}
-
-	@PostMapping("videoCall")
-	public void videoCall(@RequestBody final ContactVideoCall videoCall, @RequestHeader BigInteger user,
+	@PostMapping("appointment")
+	public void appointment(@RequestBody final ContactVideoCall videoCall, @RequestHeader BigInteger user,
 			@RequestHeader String password, @RequestHeader String salt) throws Exception {
 		final Contact contact = authenticationService.verify(user, password, salt);
 		videoCall.setContactId(user);
@@ -444,7 +384,7 @@ public class ActionApi {
 		chat.setContactId2(user);
 		chat.setTextId(Text.notification_authenticate);
 		chat.setNote(note);
-		chat.setAction("pageChat.connectVideo()");
+		chat.setAction("video.startAdminCall()");
 		repository.save(chat);
 	}
 

@@ -34,6 +34,8 @@ public class Contact extends BaseEntity {
 	private Device device;
 	@Enumerated(EnumType.STRING)
 	private OS os;
+	@Enumerated(EnumType.STRING)
+	private ContactType type;
 	private Timestamp lastLogin;
 	private Timestamp recommend;
 	private Timestamp visitPage;
@@ -80,6 +82,10 @@ public class Contact extends BaseEntity {
 
 	public enum Device {
 		computer, phone, tablet
+	}
+
+	public enum ContactType {
+		admin, clientAdmin
 	}
 
 	public BigInteger getClientId() {
