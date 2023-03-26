@@ -26,10 +26,12 @@ import javax.imageio.ImageIO;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.reactive.function.client.WebClientResponseException.NotFound;
 
@@ -71,6 +73,9 @@ public class NotificationService {
 
 	@Value("${app.url}")
 	private String server;
+
+	@Value("${app.server.webSocket}")
+	private String serverWebSocket;
 
 	@Value("${app.email.address}")
 	private String from;
@@ -161,6 +166,8 @@ public class NotificationService {
 				text.delete(text.lastIndexOf(" "), text.length());
 			text.append("...");
 		}
+		WebClient.create(serverWebSocket + "refresh/" + contactTo.getId()).post().accept(MediaType.TEXT_PLAIN)
+				.bodyValue(getPingValues(contactTo)).retrieve().toEntity(String.class).block().getBody();
 		ContactNotification notification = null;
 		if (notificationTextType != ContactNotificationTextType.chatNew
 				&& (notification = save(contactTo, contactFrom, text.toString(), action, notificationTextType)) == null)

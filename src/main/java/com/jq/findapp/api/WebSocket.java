@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.jq.findapp.service.AuthenticationService;
 
@@ -14,6 +17,7 @@ import com.jq.findapp.service.AuthenticationService;
 public class WebSocket {
 	@Autowired
 	private AuthenticationService authenticationService;
+
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
 
@@ -23,6 +27,11 @@ public class WebSocket {
 		message.setPassword(null);
 		message.setSalt(null);
 		messagingTemplate.convertAndSendToUser("" + message.getId(), "/video", message);
+	}
+
+	@PostMapping("/refresh/{id}")
+	public void refresh(@RequestBody final Object payload, @PathVariable final BigInteger id) throws Exception {
+		messagingTemplate.convertAndSendToUser("" + id, "/refresh", payload);
 	}
 
 	private static class VideoMessage {
