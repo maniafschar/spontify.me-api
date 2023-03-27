@@ -2,7 +2,6 @@ SELECT
 	eventRating.id,
 	eventRating.createdAt,
 	eventRating.rating,
-	eventRating.text,
 	eventRating.description,
 	eventRating.modifiedAt,
 	eventRating.image,

@@ -47,8 +47,6 @@ public class Contact extends BaseEntity {
 	private Short fee;
 	private Short gender;
 	private Short rating;
-	// TODO rm
-	private String aboutMe;
 	private String ageDivers;
 	private String ageFemale;
 	private String ageMale;
@@ -206,14 +204,6 @@ public class Contact extends BaseEntity {
 
 	public void setLanguage(String language) {
 		this.language = language;
-	}
-
-	public String getAboutMe() {
-		return aboutMe;
-	}
-
-	public void setAboutMe(String aboutMe) {
-		this.aboutMe = aboutMe;
 	}
 
 	public String getDescription() {

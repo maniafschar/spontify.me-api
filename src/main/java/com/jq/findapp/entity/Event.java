@@ -23,8 +23,6 @@ public class Event extends BaseEntity {
 	private String imageList;
 	private String skills;
 	private String skillsText;
-	// TODO rm
-	private String text;
 	private String type;
 	private String url;
 	private Timestamp startDate;
@@ -67,14 +65,6 @@ public class Event extends BaseEntity {
 
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	public void setText(String text) {
-		this.text = text;
 	}
 
 	public String getDescription() {

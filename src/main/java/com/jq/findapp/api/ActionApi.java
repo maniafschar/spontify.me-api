@@ -240,7 +240,7 @@ public class ActionApi {
 	}
 
 	@GetMapping("teaser/{type}")
-	public List<Object[]> teaser(@PathVariable final String type, @RequestHeader(required = false) BigInteger clientId,
+	public List<Object[]> teaser(@PathVariable final String type, @RequestHeader BigInteger clientId,
 			@RequestHeader(required = false) BigInteger user, @RequestHeader(required = false) String password,
 			@RequestHeader(required = false) String salt,
 			@RequestHeader(required = false, name = "X-Forwarded-For") String ip) throws Exception {

@@ -1,6 +1,5 @@
 SELECT
 	contact.age,
-	contact.aboutMe,
 	contact.authenticate,
 	contact.description,
 	contact.skills,

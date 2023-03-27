@@ -271,6 +271,8 @@ public class AuthenticationService {
 		final Map<String, Object> user = repository.one(params);
 		if (user != null) {
 			final Contact c2 = repository.one(Contact.class, (BigInteger) user.get("contact.id"));
+			if (!c2.getClientId().equals(contact.getClientId()))
+				return null;
 			verify(c2, password, salt, true);
 			c2.setActive(true);
 			c2.setLastLogin(new Timestamp(Instant.now().toEpochMilli()));

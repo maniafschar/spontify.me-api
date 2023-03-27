@@ -83,12 +83,6 @@ public class EntityUtil {
 		} catch (NoSuchMethodException ex) {
 			// no need to handle
 		}
-		try {
-			if (e.getClass().getDeclaredMethod("getClientId") != null)
-				entity.getValues().put("clientId", contact.getClientId());
-		} catch (NoSuchMethodException ex) {
-			// no need to handle
-		}
 		addImageList(entity);
 		e.populate(entity.getValues());
 		return e;

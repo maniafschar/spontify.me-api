@@ -8,8 +8,6 @@ import jakarta.persistence.Entity;
 public class EventRating extends BaseEntity {
 	private BigInteger eventParticipateId;
 	private Short rating;
-	// TODO rm
-	private String text;
 	private String description;
 	private String image;
 
@@ -19,14 +17,6 @@ public class EventRating extends BaseEntity {
 
 	public void setRating(Short rating) {
 		this.rating = rating;
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	public void setText(String text) {
-		this.text = text;
 	}
 
 	public String getDescription() {

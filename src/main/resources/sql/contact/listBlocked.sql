@@ -6,7 +6,6 @@ SELECT
 	contact.imageList,
 	contact.language,
 	contact.pseudonym,
-	contact.aboutMe,
 	contact.description,
 	contact.idDisplay,
 	contact.age,

@@ -69,9 +69,10 @@ public class AuthenticationApi {
 	}
 
 	@GetMapping("login")
-	public Map<String, Object> login(Contact contact, String publicKey, @RequestHeader String password,
-			@RequestHeader String salt) throws Exception {
+	public Map<String, Object> login(Contact contact, String publicKey, @RequestHeader BigInteger clientId,
+			@RequestHeader String password, @RequestHeader String salt) throws Exception {
 		contact.setEmail(Encryption.decryptBrowser(contact.getEmail()));
+		contact.setClientId(clientId);
 		final Map<String, Object> user = authenticationService.login(contact, password, salt);
 		if (user != null) {
 			final QueryParams params = new QueryParams(Query.location_listId);

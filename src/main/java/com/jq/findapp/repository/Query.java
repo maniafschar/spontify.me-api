@@ -24,6 +24,7 @@ public enum Query {
 	contact_listGroup,
 	contact_listGroupLink,
 	contact_listId,
+	contact_listNews,
 	contact_listNotification(true),
 	contact_listSupportCenter,
 	contact_listTeaser(true),

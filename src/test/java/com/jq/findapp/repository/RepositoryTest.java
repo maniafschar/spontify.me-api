@@ -251,10 +251,10 @@ public class RepositoryTest {
 	public void attachment_columns() {
 		// given
 		final Pattern pattern = Pattern.compile(
-				".*(image|note|storage|description|aboutMe).*");
+				".*(image|note|storage|description).*");
 
 		// when
-		final boolean matches = pattern.matcher("xyzaboutMeabc").matches();
+		final boolean matches = pattern.matcher("xyzdescriptionabc").matches();
 
 		// then
 		assertTrue(matches);
