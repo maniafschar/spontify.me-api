@@ -39,7 +39,7 @@ public class Utils {
 			int i = 1;
 			do {
 				contact = new Contact();
-				contact.setClientId(BigInteger.ONE);
+				contact.setClientId(BigInteger.ZERO);
 				contact.setEmail("test" + i + "@jq-consulting.de");
 				contact.setLanguage("DE");
 				contact.setIdDisplay("123456" + i++);

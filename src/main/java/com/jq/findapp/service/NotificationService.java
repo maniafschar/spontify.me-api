@@ -307,15 +307,6 @@ public class NotificationService {
 		return a;
 	}
 
-	private String attributesToString(List<String> a) {
-		if (a.size() == 0)
-			return "";
-		final StringBuilder s = new StringBuilder();
-		for (int i = 0; i < a.size(); i++)
-			s.append("," + a.get(i));
-		return s.substring(1);
-	}
-
 	private boolean userWantsNotification(ContactNotificationTextType notificationTextType, Contact contact) {
 		if (ContactNotificationTextType.chatNew == notificationTextType)
 			return contact.getNotificationChat();

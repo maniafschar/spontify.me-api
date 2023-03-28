@@ -32,7 +32,8 @@ import com.jq.findapp.util.Utils;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = { FindappApplication.class,
 		TestConfig.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
-				"server.port=9001", "server.servlet.context-path=/rest" })
+				"server.port=9001", "server.servlet.context-path=/rest",
+				"app.server.webSocket=http://127.0.0.1:9001/rest/" })
 @ActiveProfiles("test")
 public class IntegrationTest {
 	private static String url = "http://localhost:9000/";
@@ -59,6 +60,7 @@ public class IntegrationTest {
 		try {
 			init();
 			register("testabcd", "test@jq-consulting.de");
+			Util.sleep(99999999);
 			addLocation("location 1", "Melchiorstr. 9\n81479 München", false);
 			addEvent();
 			addRating();

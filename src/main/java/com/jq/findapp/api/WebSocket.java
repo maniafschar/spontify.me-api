@@ -21,7 +21,7 @@ public class WebSocket {
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
 
-	@MessageMapping("/video")
+	@MessageMapping("video")
 	public void video(VideoMessage message) throws Exception {
 		authenticationService.verify(message.getUser(), message.getPassword(), message.getSalt());
 		message.setPassword(null);
@@ -29,7 +29,7 @@ public class WebSocket {
 		messagingTemplate.convertAndSendToUser("" + message.getId(), "/video", message);
 	}
 
-	@PostMapping("/refresh/{id}")
+	@PostMapping("refresh/{id}")
 	public void refresh(@RequestBody final Object payload, @PathVariable final BigInteger id) throws Exception {
 		messagingTemplate.convertAndSendToUser("" + id, "/refresh", payload);
 	}
