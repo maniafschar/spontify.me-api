@@ -34,6 +34,7 @@ public class ContactNotification extends BaseEntity {
 		contactFindMe,
 		contactFriendApproved,
 		contactFriendRequest,
+		contactVideoCall,
 		contactVisitLocation,
 		contactVisitProfile,
 		eventChanged,

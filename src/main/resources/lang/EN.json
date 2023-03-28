@@ -44,6 +44,7 @@
 		"contactDelete": "has left skillvents 😢",
 		"contactFindMe": "is in your vicinity, you have <jq:EXTRA_1 /> common skills.",
 		"contactFriendApproved": "has confirmed your friend request.",
+		"contactVideoCall": "is calling you",
 		"contactFriendRequest": "would like to be friends with you.",
 		"contactVisitLocation": "visited <jq:EXTRA_2 />, you have <jq:EXTRA_1 /> common skills.",
 		"contactVisitProfile": "visited your profile, you have <jq:EXTRA_1 /> common skills.",

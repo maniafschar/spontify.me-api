@@ -1,6 +1,7 @@
 package com.jq.findapp.api;
 
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.jq.findapp.entity.Contact;
+import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
 
 @Controller
@@ -19,14 +22,23 @@ public class WebSocket {
 	private AuthenticationService authenticationService;
 
 	@Autowired
+	private Repository repository;
+
+	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
 
 	@MessageMapping("video")
 	public void video(VideoMessage message) throws Exception {
 		authenticationService.verify(message.getUser(), message.getPassword(), message.getSalt());
-		message.setPassword(null);
-		message.setSalt(null);
-		messagingTemplate.convertAndSendToUser("" + message.getId(), "/video", message);
+		if (repository.one(Contact.class, message.getId()).getActive().booleanValue()) {
+			message.setPassword(null);
+			message.setSalt(null);
+			messagingTemplate.convertAndSendToUser("" + message.getId(), "/video", message);
+		} else {
+			final VideoMessage answer = new VideoMessage();
+			answer.setAnswer(Collections.singletonMap("userState", "offline"));
+			messagingTemplate.convertAndSendToUser("" + message.getUser(), "/video", answer);
+		}
 	}
 
 	@PostMapping("refresh/{id}")

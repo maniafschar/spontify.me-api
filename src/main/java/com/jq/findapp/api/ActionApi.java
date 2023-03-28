@@ -362,15 +362,6 @@ public class ActionApi {
 		return null;
 	}
 
-	@PostMapping("eventbrite")
-	public void eventbrite(@RequestBody final Map<String, Object> data) throws Exception {
-		String data2 = "";
-		if (!((String) data.get("api_url")).contains("{api-endpoint-to-fetch-object-details}"))
-			data2 = "\n\n" + WebClient.create(data.get("api_url") + "?token=" + eventbriteKey)
-					.get().retrieve().toEntity(String.class).block().getBody();
-		notificationService.createTicket(TicketType.ERROR, "eventbrite", data + data2, BigInteger.valueOf(3));
-	}
-
 	@PostMapping("appointment")
 	public void appointment(@RequestBody final ContactVideoCall videoCall, @RequestHeader BigInteger user,
 			@RequestHeader String password, @RequestHeader String salt) throws Exception {
@@ -408,6 +399,14 @@ public class ActionApi {
 				repository.save(eventParticipate);
 			}
 		}
+	}
+
+	@PostMapping("videocall/{id}")
+	public void videocall(@PathVariable final BigInteger id, @RequestHeader BigInteger user,
+			@RequestHeader String password, @RequestHeader String salt) throws Exception {
+		final Contact contact = authenticationService.verify(user, password, salt);
+		notificationService.sendNotification(contact, repository.one(Contact.class, id),
+				ContactNotificationTextType.contactVideoCall, "video=" + user);
 	}
 
 	@GetMapping("paypalKey")

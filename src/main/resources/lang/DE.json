@@ -45,6 +45,7 @@
 		"contactFindMe": "ist in Deiner unmittelbarren Umgebung, ihr habt <jq:EXTRA_1 /> gemeinsame Skills.",
 		"contactFriendApproved": "hat Deine Freundschaftsanfrage bestätigt.",
 		"contactFriendRequest": "möchte mit Dir befreundet sein.",
+		"contactVideoCall": "ruft Dich an",
 		"contactVisitLocation": "besuchte <jq:EXTRA_2 />, ihr habt <jq:EXTRA_1 /> gemeinsame Skills.",
 		"contactVisitProfile": "besuchte Dein Profil, ihr habt <jq:EXTRA_1 /> gemeinsame Skills.",
 		"eventChanged": "hat das Event am <jq:EXTRA_1 /> in der Location <jq:EXTRA_3 /> geändert.\n<jq:EXTRA_2 />",
