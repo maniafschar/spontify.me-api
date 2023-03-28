@@ -16,4 +16,4 @@ WHERE
 	contactNews.contactId=contact.id and
 	{search}
 ORDER BY
-	contactNews.publish
+	contactNews.publish DESC

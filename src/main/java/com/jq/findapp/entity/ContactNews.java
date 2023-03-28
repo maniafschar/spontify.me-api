@@ -3,7 +3,10 @@ package com.jq.findapp.entity;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 
+import com.jq.findapp.repository.Repository;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.Transient;
 
 @Entity
 public class ContactNews extends BaseEntity {
@@ -51,5 +54,11 @@ public class ContactNews extends BaseEntity {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	@Transient
+	@Override
+	public boolean writeAccess(BigInteger user, Repository repository) {
+		return user.equals(getContactId());
 	}
 }
