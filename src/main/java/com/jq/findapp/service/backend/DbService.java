@@ -19,12 +19,12 @@ public class DbService {
 	public String[] update() {
 		final String[] result = new String[] { getClass().getSimpleName() + "/update", null };
 		try {
-			final Instant instant = Instant.now();
-			instant.minus(Duration.ofSeconds(90));
+			final String modifiedAt = Instant.now().minus(Duration.ofSeconds(90)).toString();
 			repository.executeUpdate(
-					"update Contact set age=(YEAR(current_timestamp) - YEAR(birthday) - case when MONTH(current_timestamp) < MONTH(birthday) or MONTH(current_timestamp) = MONTH(birthday) and DAY(current_timestamp) < DAY(birthday) then 1 else 0 end) where birthday is not null");
+					"update Contact set age=cast((YEAR(current_timestamp) - YEAR(birthday) - case when MONTH(current_timestamp) < MONTH(birthday) or MONTH(current_timestamp) = MONTH(birthday) and DAY(current_timestamp) < DAY(birthday) then 1 else 0 end) as short) where birthday is not null");
 			repository.executeUpdate(
-					"update Contact set active=false where modifiedAt<'" + instant + "'");
+					"update Contact set active=false where modifiedAt<'"
+							+ modifiedAt.substring(0, modifiedAt.indexOf('.')) + "'");
 			repository.executeUpdate(
 					"update Contact set version=null where (version='0.9.9' or version='0.9.3') and os='android' and language='EN'");
 			repository.executeUpdate(
