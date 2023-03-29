@@ -19,12 +19,14 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.repository.Query.Result;
+import com.jq.findapp.util.Strings;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -39,10 +41,13 @@ public class Repository {
 	@Autowired
 	private Listeners listeners;
 
+	@Value("${app.admin.id}")
+	private BigInteger adminId;
+
 	public Result list(final QueryParams params) {
 		final GeoLocationProcessor geo = new GeoLocationProcessor(params);
 		final Result result = params.getQuery().createResult();
-		final String sql = params.getQuery().prepareSql(params);
+		final String sql = prepareSql(params);
 		final List<Object> data = em.createQuery(sql).getResultList();
 		if (data != null && data.size() > 0) {
 			if (params.getLimit() > 0 && params.getSearchGeoLocation() == null) {
@@ -70,6 +75,68 @@ public class Repository {
 			Attachment.resolve(result.getList());
 		}
 		return result;
+	}
+
+	private String prepareSql(QueryParams params) {
+		String search = Strings.isEmpty(params.getSearch()) ? "1=1" : sanatizeSearchToken(params);
+		if (params.getSearchGeoLocation() != null)
+			search += " and " + params.getSearchGeoLocation();
+		if (params.getQuery().addBlock && params.getUser() != null) {
+			if (params.getQuery().name().startsWith("contact_"))
+				search += " and (select b.id from Block b where b.contactId=contact.id and b.contactId2={USERID} or b.contactId={USERID} and b.contactId2=contact.id) is null";
+			else if (params.getQuery().name().startsWith("location_"))
+				search += " and (select b.id from Block b where b.contactId={USERID} and b.locationId=location.id) is null";
+			else if (params.getQuery().name().startsWith("event_"))
+				search += " and (select b.id from Block b where b.contactId={USERID} and b.eventId=event.id) is null";
+		}
+		String s = params.getQuery().getSql().replace("{search}", search);
+		if (s.contains("{ID}"))
+			s = s.replaceAll("\\{ID}", "" + params.getId());
+		if (s.contains("{CLIENTID}"))
+			s = s.replaceAll("\\{CLIENTID}", "" + params.getUser().getClientId());
+		if (s.contains("{ADMINID}"))
+			s = s.replaceAll("\\{ADMINID}", "" + adminId);
+		if (s.contains("{USERAGE}"))
+			s = s.replaceAll("\\{USERAGE}",
+					"" + (params.getUser().getAge() == null ? 0 : params.getUser().getAge()));
+		if (s.contains("{USERGENDER}"))
+			s = s.replaceAll("\\{USERGENDER}",
+					"" + (params.getUser().getGender() == null ? 0 : params.getUser().getGender()));
+		if (s.contains("{USERSKILLS}"))
+			s = s.replaceAll("\\{USERSKILLS}",
+					params.getUser().getSkills() == null
+							|| params.getUser().getSkills().trim().length() == 0 ? "-"
+									: params.getUser().getSkills());
+		if (s.contains("{USERSKILLSTEXT}"))
+			s = s.replaceAll("\\{USERSKILLSTEXT}",
+					params.getUser().getSkillsText() == null || params.getUser().getSkillsText().trim().length() == 0
+							? "-"
+							: params.getUser().getSkillsText());
+		if (s.contains("{USERID}"))
+			s = s.replaceAll("\\{USERID}", "" + params.getUser().getId());
+		return s;
+	}
+
+	private String sanatizeSearchToken(QueryParams params) {
+		if (params.getSearch() == null)
+			return "";
+		final StringBuilder s = new StringBuilder(params.getSearch().toLowerCase());
+		int p, p2;
+		while ((p = s.indexOf("'")) > -1) {
+			p2 = p;
+			do {
+				p2 = s.indexOf("'", p2 + 1);
+			} while (p2 > 0 && "\\".equals(s.substring(p2 - 1, p2)));
+			if (p2 < 0)
+				throw new IllegalArgumentException(
+						"Invalid quote in " + params.getQuery().name() + " search: " + params.getSearch());
+			s.delete(p, p2 + 1);
+		}
+		if (s.indexOf(";") > -1 || s.indexOf("union") > -1 || s.indexOf("select") > -1 || s.indexOf("update") > -1
+				|| s.indexOf("insert") > -1 || s.indexOf("delete") > -1)
+			throw new IllegalArgumentException(
+					"Invalid expression in " + params.getQuery().name() + " search: " + params.getSearch());
+		return params.getSearch();
 	}
 
 	public List<BaseEntity> list(String hql) throws ClassNotFoundException {

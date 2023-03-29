@@ -279,6 +279,7 @@ public class ActionApi {
 			}
 			final Contact contact = new Contact();
 			contact.setClientId(clientId);
+			contact.setId(BigInteger.ZERO);
 			params.setUser(contact);
 			params.setSearch("contact.teaser=true");
 		} else {
@@ -292,8 +293,6 @@ public class ActionApi {
 			else
 				params.setSearch("event.endDate>='" + Instant.now().atZone(ZoneOffset.UTC).toLocalDate() + "'");
 		}
-		if (clientId != null)
-			params.setSearch(params.getSearch() + " and contact.clientId=" + clientId);
 		return repository.list(params).getList();
 	}
 

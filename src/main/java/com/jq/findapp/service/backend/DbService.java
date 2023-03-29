@@ -23,7 +23,7 @@ public class DbService {
 			repository.executeUpdate(
 					"update Contact set age=cast((YEAR(current_timestamp) - YEAR(birthday) - case when MONTH(current_timestamp) < MONTH(birthday) or MONTH(current_timestamp) = MONTH(birthday) and DAY(current_timestamp) < DAY(birthday) then 1 else 0 end) as short) where birthday is not null");
 			repository.executeUpdate(
-					"update Contact set active=false where modifiedAt<'"
+					"update Contact set active=false where modifiedAt is null or modifiedAt<'"
 							+ modifiedAt.substring(0, modifiedAt.indexOf('.')) + "'");
 			repository.executeUpdate(
 					"update Contact set version=null where (version='0.9.9' or version='0.9.3') and os='android' and language='EN'");
