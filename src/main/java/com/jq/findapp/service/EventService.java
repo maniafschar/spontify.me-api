@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.Event;
@@ -37,8 +38,8 @@ public class EventService {
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
 
-	public String[] findMatchingSpontis() {
-		final String[] result = new String[] { getClass().getSimpleName() + "/findMatchingSpontis", null };
+	public SchedulerResult findMatchingSpontis() {
+		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/findMatchingSpontis");
 		try {
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setSearch(
@@ -88,13 +89,13 @@ public class EventService {
 				}
 			}
 		} catch (Exception e) {
-			result[1] = Strings.stackTraceToString(e);
+			result.exception = e;
 		}
 		return result;
 	}
 
-	public String[] notifyParticipation() {
-		final String[] result = new String[] { getClass().getSimpleName() + "/notifyParticipation", null };
+	public SchedulerResult notifyParticipation() {
+		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/notifyParticipation");
 		try {
 			final QueryParams params = new QueryParams(Query.event_listParticipateRaw);
 			params.setSearch("eventParticipate.state=1 and eventParticipate.eventDate>'"
@@ -136,7 +137,7 @@ public class EventService {
 				}
 			}
 		} catch (Exception e) {
-			result[1] = Strings.stackTraceToString(e);
+			result.exception = e;
 		}
 		return result;
 	}

@@ -14,6 +14,7 @@ FROM
 	Contact contact
 WHERE
 	contactNews.contactId=contact.id and
+	contact.clientId={CLIENTID} and
 	{search}
 ORDER BY
 	contactNews.publish DESC

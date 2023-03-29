@@ -50,6 +50,7 @@ public enum Text {
 	notification_contactFindMe,
 	notification_contactFriendApproved,
 	notification_contactFriendRequest,
+	notification_contactVideoCall,
 	notification_contactVisitLocation,
 	notification_contactVisitProfile,
 	notification_eventChanged,

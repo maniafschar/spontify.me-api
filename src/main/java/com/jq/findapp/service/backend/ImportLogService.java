@@ -22,13 +22,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Ip;
 import com.jq.findapp.entity.Log;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.util.Strings;
 
 @Service
 public class ImportLogService {
@@ -38,8 +38,8 @@ public class ImportLogService {
 	@Value("${app.url.lookupip}")
 	private String lookupIp;
 
-	public String[] importLog() {
-		final String[] result = new String[] { getClass().getSimpleName() + "/importLog", null };
+	public SchedulerResult importLog() {
+		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importLog");
 		try {
 			importLog("logAd1");
 			importLog("logAd");
@@ -47,7 +47,7 @@ public class ImportLogService {
 			importLog("logWeb");
 			lookupIps();
 		} catch (Exception e) {
-			result[1] = Strings.stackTraceToString(e);
+			result.exception = e;
 		}
 		return result;
 	}

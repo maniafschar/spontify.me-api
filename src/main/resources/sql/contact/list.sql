@@ -47,4 +47,5 @@ FROM
 		contactLink.contactId2={USERID} and contactLink.contactId=contact.id
 WHERE
 	contact.verified=true and
+	(contact.clientId={CLIENTID} or contact.id={ADMINID}) and
 	{search}

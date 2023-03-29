@@ -19,4 +19,5 @@ FROM
 	Contact contact
 WHERE
 	contact.imageList is not null and
+	contact.clientId={CLIENTID} and
 	{search}

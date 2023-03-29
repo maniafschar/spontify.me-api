@@ -268,11 +268,10 @@ public class AuthenticationService {
 		params.setSearch("contact.email='" + contact.getEmail() + "'");
 		params.setUser(new Contact());
 		params.getUser().setId(BigInteger.valueOf(0L));
+		params.getUser().setClientId(contact.getClientId());
 		final Map<String, Object> user = repository.one(params);
 		if (user != null) {
 			final Contact c2 = repository.one(Contact.class, (BigInteger) user.get("contact.id"));
-			if (!c2.getClientId().equals(contact.getClientId()))
-				return null;
 			verify(c2, password, salt, true);
 			c2.setActive(true);
 			c2.setLastLogin(new Timestamp(Instant.now().toEpochMilli()));

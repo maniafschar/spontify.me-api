@@ -1,6 +1,7 @@
 package com.jq.findapp.repository;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.jq.findapp.util.Strings;
 
@@ -16,7 +18,6 @@ public enum Query {
 	contact_chat,
 	contact_list(true),
 	contact_listBlocked,
-	contact_listByLocation,
 	contact_listChat(true),
 	contact_listChatFlat,
 	contact_listFriends,
@@ -44,6 +45,7 @@ public enum Query {
 	event_listParticipate(true),
 	event_listParticipateRaw(true),
 	event_listTeaser(true),
+	event_rating,
 
 	location_list(true),
 	location_listBlocked,
@@ -56,12 +58,14 @@ public enum Query {
 	misc_listIp,
 	misc_listLog,
 	misc_listTicket,
-	misc_rating,
 	misc_setting,
 	misc_statsApi,
 	misc_statsLocations,
 	misc_statsLog,
 	misc_statsUser;
+
+	@Value("${app.admin.id}")
+	private static BigInteger adminId;
 
 	private final String sql;
 	private final boolean addBlock;
@@ -94,7 +98,7 @@ public enum Query {
 		}
 	}
 
-	public static String prepareSql(QueryParams params) {
+	public String prepareSql(QueryParams params) {
 		String search = Strings.isEmpty(params.getSearch()) ? "1=1" : sanatizeSearchToken(params);
 		if (params.getSearchGeoLocation() != null)
 			search += " and " + params.getSearchGeoLocation();
@@ -109,6 +113,10 @@ public enum Query {
 		String s = params.getQuery().sql.replace("{search}", search);
 		if (s.contains("{ID}"))
 			s = s.replaceAll("\\{ID}", "" + params.getId());
+		if (s.contains("{CLIENTID}"))
+			s = s.replaceAll("\\{CLIENTID}", "" + params.getUser().getClientId());
+		if (s.contains("{ADMINID}"))
+			s = s.replaceAll("\\{ADMINID}", "" + adminId);
 		if (s.contains("{USERAGE}"))
 			s = s.replaceAll("\\{USERAGE}",
 					"" + (params.getUser().getAge() == null ? 0 : params.getUser().getAge()));

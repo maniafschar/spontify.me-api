@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailSendException;
 import org.springframework.stereotype.Service;
 
+import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.OS;
 import com.jq.findapp.entity.ContactChat;
@@ -276,8 +277,8 @@ public class EngagementService {
 		chatTemplates.add(new ChatTemplate(Text.engagement_like, null, null));
 	}
 
-	public String[] sendRegistrationReminder() {
-		final String[] result = new String[] { getClass().getSimpleName() + "/sendRegistrationReminder", null };
+	public SchedulerResult sendRegistrationReminder() {
+		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/sendRegistrationReminder");
 		try {
 			final GregorianCalendar gc = new GregorianCalendar();
 			if (gc.get(Calendar.HOUR_OF_DAY) < 9 || gc.get(Calendar.HOUR_OF_DAY) > 18)
@@ -317,13 +318,13 @@ public class EngagementService {
 				notificationService.createTicket(TicketType.ERROR, "sendRegistrationReminder",
 						"Failed Emails:" + failedEmails, null);
 		} catch (Exception e) {
-			result[1] = Strings.stackTraceToString(e);
+			result.exception = e;
 		}
 		return result;
 	}
 
-	public String[] sendChats() {
-		final String[] result = new String[] { getClass().getSimpleName() + "/sendChats", null };
+	public SchedulerResult sendChats() {
+		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/sendChats");
 		try {
 			resetChatInstallCurrentVersion();
 			sendSkillventsEmail();
@@ -346,7 +347,7 @@ public class EngagementService {
 					sendChatTemplate(contact);
 			}
 		} catch (Exception e) {
-			result[1] = Strings.stackTraceToString(e);
+			result.exception = e;
 		}
 		return result;
 	}
@@ -446,8 +447,8 @@ public class EngagementService {
 		}
 	}
 
-	public String[] sendNearBy() {
-		final String[] result = new String[] { getClass().getSimpleName() + "/sendNearBy", null };
+	public SchedulerResult sendNearBy() {
+		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/sendNearBy");
 		try {
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setSearch(
@@ -466,7 +467,7 @@ public class EngagementService {
 				}
 			}
 		} catch (Exception e) {
-			result[1] = Strings.stackTraceToString(e);
+			result.exception = e;
 		}
 		return result;
 	}

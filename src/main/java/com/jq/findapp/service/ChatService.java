@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
@@ -18,7 +19,6 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
-import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
 
 @Service
@@ -40,28 +40,28 @@ public class ChatService {
 		createGptAnswerIntern(contactChat);
 	}
 
-	public String[] answerAi() {
+	public SchedulerResult answerAi() {
+		final SchedulerResult result=new SchedulerResult(getClass().getSimpleName() + "/answerAi");
 		final QueryParams params = new QueryParams(Query.contact_chat);
 		params.setSearch("contactChat.contactId<>" + adminId + " and contactChat.textId='" + Text.engagement_ai.name()
 				+ "' and contactChat.createdAt>'"
 				+ Instant.now().minus(Duration.ofDays(3)) + "'");
-		String error = null;
-		final Result result = repository.list(params);
-		for (int i = 0; i < result.size(); i++) {
+		final Result result2 = repository.list(params);
+		for (int i = 0; i < result2.size(); i++) {
 			params.setSearch(
-					"contactChat.contactId=" + adminId + " and contactChat.id>" + result.get(i).get("contactChat.id"));
+					"contactChat.contactId=" + adminId + " and contactChat.id>" + result2.get(i).get("contactChat.id"));
 			if (repository.list(params).size() == 0) {
 				try {
 					createGptAnswer(
-							repository.one(ContactChat.class, (BigInteger) result.get(i).get("contactChat.id")));
+							repository.one(ContactChat.class, (BigInteger) result2.get(i).get("contactChat.id")));
 				} catch (Exception ex) {
-					if (error == null)
-						error = Strings.stackTraceToString(ex);
+					if (result.exception == null)
+						result.exception = ex;
 					break;
 				}
 			}
 		}
-		return new String[] { getClass().getSimpleName() + "/answerAi", error };
+		return result;
 	}
 
 	private void createGptAnswerIntern(ContactChat contactChat) throws Exception {

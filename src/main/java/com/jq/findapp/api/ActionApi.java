@@ -277,6 +277,9 @@ public class ActionApi {
 					params.setLongitude(ip2.getLongitude());
 				}
 			}
+			final Contact contact = new Contact();
+			contact.setClientId(clientId);
+			params.setUser(contact);
 			params.setSearch("contact.teaser=true");
 		} else {
 			params.setUser(authenticationService.verify(user, password, salt));

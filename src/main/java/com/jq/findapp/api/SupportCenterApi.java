@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,7 +30,6 @@ import com.jq.findapp.entity.Log;
 import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
-import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
@@ -44,7 +42,6 @@ import com.jq.findapp.service.backend.EngagementService;
 import com.jq.findapp.service.backend.ImportLogService;
 import com.jq.findapp.service.backend.StatisticsService;
 import com.jq.findapp.util.Strings;
-import com.jq.findapp.util.Text;
 
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Produces;
@@ -163,32 +160,6 @@ public class SupportCenterApi {
 		}
 	}
 
-	@PostMapping("marketing")
-	public void marketing(@RequestBody Map<String, Object> data, @RequestHeader String password,
-			@RequestHeader String salt, @RequestHeader String secret) throws Exception {
-		if (supportCenterSecret.equals(secret) && authenticationService.verify(adminId, password, salt) != null) {
-			final List<String> ids = (List<String>) data.get("ids");
-			if (ids.size() == 0) {
-				final QueryParams params = new QueryParams(
-						Strings.isEmpty(data.get("search")) || !((String) data.get("search")).contains("geoLocation")
-								? Query.contact_listId
-								: Query.contact_listByLocation);
-				params.setLimit(0);
-				params.setSearch((Strings.isEmpty(data.get("search")) ? "" : data.get("search") + " and ") +
-						"contact.id<>" + adminId + " and contact.verified=true and contact.version is not null");
-				final Result result = repository.list(params);
-				for (int i = 0; i < result.size(); i++)
-					ids.add(result.get(i).get("contact.id").toString());
-			}
-			String action = (String) data.get("action");
-			if (action != null && action.startsWith("https://"))
-				action = "ui.navigation.openHTML(&quot;" + action + "&quot;)";
-			for (String id : ids)
-				engagementService.sendChat(Text.valueOf((String) data.get("text")),
-						repository.one(Contact.class, BigInteger.valueOf(Long.parseLong(id))), null, action);
-		}
-	}
-
 	@PutMapping("resend/{id}")
 	public void resend(@PathVariable final BigInteger id, @RequestHeader String password, @RequestHeader String salt,
 			@RequestHeader String secret)
@@ -282,15 +253,14 @@ public class SupportCenterApi {
 				try {
 					log.setContactId(adminId);
 					log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
-					final String[] result = scheduler.run();
-					log.setUri("/support/scheduler/" + result[0]);
-					if (result.length > 1) {
-						log.setStatus(result[1] != null && result[1].contains("Exception") ? 500 : 200);
-						if (result[1] != null) {
-							log.setBody(result[1].length() > 255 ? result[1].substring(0, 255) : result[1]);
-							notificationService.createTicket(TicketType.ERROR, "scheduler", result[1], adminId);
-						}
-					}
+					final SchedulerResult result = scheduler.run();
+					log.setUri("/support/scheduler/" + result.name);
+					log.setStatus(Strings.isEmpty(result.exception) ? 200 : 500);
+					if (result.result != null)
+						log.setBody(result.result.length() > 255 ? result.result.substring(0, 255) : result.result);
+					if (result.exception != null)
+						notificationService.createTicket(TicketType.ERROR, "scheduler",
+								Strings.stackTraceToString(result.exception), adminId);
 				} finally {
 					schedulerRunning.remove(id);
 					log.setTime((int) (System.currentTimeMillis() - time));
@@ -305,7 +275,17 @@ public class SupportCenterApi {
 	}
 
 	private interface Scheduler {
-		String[] run();
+		SchedulerResult run();
+	}
+
+	public static class SchedulerResult {
+		private final String name;
+		public String result;
+		public Exception exception;
+
+		public SchedulerResult(String name) {
+			this.name = name;
+		}
 	}
 
 	@GetMapping("healthcheck")

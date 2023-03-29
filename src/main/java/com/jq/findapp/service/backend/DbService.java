@@ -8,16 +8,16 @@ import java.time.ZoneId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.util.Strings;
 
 @Service
 public class DbService {
 	@Autowired
 	private Repository repository;
 
-	public String[] update() {
-		final String[] result = new String[] { getClass().getSimpleName() + "/update", null };
+	public SchedulerResult update() {
+		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/update");
 		try {
 			final String modifiedAt = Instant.now().minus(Duration.ofSeconds(90)).toString();
 			repository.executeUpdate(
@@ -36,17 +36,17 @@ public class DbService {
 					"update ContactToken set token='' where modifiedAt is not null and modifiedAt<'" + d
 							+ "' or modifiedAt is null and createdAt<'" + d + "'");
 		} catch (Exception e) {
-			result[1] = Strings.stackTraceToString(e);
+			result.exception = e;
 		}
 		return result;
 	}
 
-	public String[] backup() {
-		final String[] result = new String[] { getClass().getSimpleName() + "/backup", null };
+	public SchedulerResult backup() {
+		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/backup");
 		try {
 			new ProcessBuilder("./backup.sh").start().waitFor();
 		} catch (Exception e) {
-			result[1] = Strings.stackTraceToString(e);
+			result.exception = e;
 		}
 		return result;
 	}

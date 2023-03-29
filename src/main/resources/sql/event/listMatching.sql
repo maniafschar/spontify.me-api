@@ -20,6 +20,7 @@ WHERE
 		)
 	) and
 	event.contactId=contact.id and
+	contact.clientId={CLIENTID} and
 	{search}
 GROUP BY
 	event.id,
