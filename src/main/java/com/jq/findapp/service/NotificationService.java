@@ -26,7 +26,6 @@ import javax.imageio.ImageIO;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -166,10 +165,11 @@ public class NotificationService {
 				text.delete(text.lastIndexOf(" "), text.length());
 			text.append("...");
 		}
-		WebClient.create(serverWebSocket + "refresh/" + contactTo.getId()).post().accept(MediaType.TEXT_PLAIN)
-				.bodyValue(getPingValues(contactTo)).retrieve().toEntity(String.class).block().getBody();
+		WebClient.create(serverWebSocket + "refresh/" + contactTo.getId()).post()
+				.bodyValue(getPingValues(contactTo)).retrieve().toBodilessEntity();
 		ContactNotification notification = null;
 		if (notificationTextType != ContactNotificationTextType.chatNew
+				&& notificationTextType != ContactNotificationTextType.contactVideoCall
 				&& (notification = save(contactTo, contactFrom, text.toString(), action, notificationTextType)) == null)
 			return false;
 		if (userWantsNotification(notificationTextType, contactTo)) {
