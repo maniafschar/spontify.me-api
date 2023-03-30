@@ -12,6 +12,7 @@ public class Strings {
 	public static final String URL_APP = "https://skillvents.com";
 	public static final String URL_APP_NEW = "https://skills.community";
 	public static final String URL_LOCALHOST = "https://localhost";
+	public static final String URL_LOCALHOST_APP = "app://localhost";
 	public static final String URL_LOCALHOST_TEST = "http://localhost:9000";
 
 	public static String encodeParam(final String param) {

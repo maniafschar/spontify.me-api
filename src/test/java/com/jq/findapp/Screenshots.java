@@ -77,6 +77,10 @@ public class Screenshots {
 		screenshot(name);
 		login();
 		Util.sleep(1000);
+		js.executeScript("pageHome.openNews()");
+		Util.sleep(1000);
+		screenshot(name + "-news");
+		Util.sleep(1000);
 		js.executeScript("ui.navigation.goTo('search')");
 		Util.sleep(1000);
 		Util.sendKeys("search div.contacts input[name=\"keywords\"]", "");
@@ -87,7 +91,7 @@ public class Screenshots {
 				"var e=ui.qa('row img[src*=\"contact.svg\"]');for(var i=0;i<e.length;i++)ui.parents(e[i],'row').outerHTML='';");
 		js.executeScript(
 				"var e=ui.qa('row[i=\"217\"],row[i=\"223\"],row[i=\"244\"],row[i=\"276\"],row[i=\"607\"],row[i=\"793\"]');for(var i=0;i<e.length;i++)ui.parents(e[i],'row').outerHTML='';");
-		screenshot(name + "-2");
+		screenshot(name + "-search");
 		js.executeScript("pageLogin.logoff()");
 	}
 

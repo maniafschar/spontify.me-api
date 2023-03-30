@@ -2,18 +2,22 @@ package com.jq.findapp.api;
 
 import java.math.BigInteger;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
-import com.jq.findapp.entity.Contact;
-import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
 
 @Controller
@@ -22,15 +26,16 @@ public class WebSocket {
 	private AuthenticationService authenticationService;
 
 	@Autowired
-	private Repository repository;
-
-	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
+
+	private Pattern numbers = Pattern.compile("\\d+");
+
+	private static final Map<String, String> USERS = new Hashtable<>();
 
 	@MessageMapping("video")
 	public void video(VideoMessage message) throws Exception {
 		authenticationService.verify(message.getUser(), message.getPassword(), message.getSalt());
-		if (repository.one(Contact.class, message.getId()).getActive().booleanValue()) {
+		if (USERS.containsKey("" + message.getId())) {
 			message.setPassword(null);
 			message.setSalt(null);
 			messagingTemplate.convertAndSendToUser("" + message.getId(), "/video", message);
@@ -44,6 +49,18 @@ public class WebSocket {
 	@PostMapping("refresh/{id}")
 	public void refresh(@RequestBody final Object payload, @PathVariable final BigInteger id) throws Exception {
 		messagingTemplate.convertAndSendToUser("" + id, "/refresh", payload);
+	}
+
+	@EventListener
+	public void handleSessionSubscribeEvent(SessionSubscribeEvent event) {
+		final Matcher matcher = numbers.matcher((String) event.getMessage().getHeaders().get("simpDestination"));
+		if (matcher.find())
+			USERS.put(matcher.group(), (String) event.getMessage().getHeaders().get("simpSessionId"));
+	}
+
+	@EventListener
+	public void handleSessionDisconnectEvent(SessionDisconnectEvent event) {
+		USERS.values().remove(event.getMessage().getHeaders().get("simpSessionId"));
 	}
 
 	private static class VideoMessage {
