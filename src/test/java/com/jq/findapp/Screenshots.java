@@ -74,11 +74,13 @@ public class Screenshots {
 		Util.driver.get("https://skills.community/");
 		// Util.driver.get("https://skillvents.com/");
 		Util.sleep(3000);
+		js.executeScript(
+				"var p={},e=ui.qa('card img');for(var i=0;i<e.length;i++)if(p[e[i].src])ui.parents(e[i],'card').outerHTML='';else p[e[i].src]=true;");
 		screenshot(name);
 		login();
 		Util.sleep(1000);
 		js.executeScript("pageHome.openNews()");
-		Util.sleep(1000);
+		Util.sleep(2000);
 		screenshot(name + "-news");
 		Util.sleep(1000);
 		js.executeScript("ui.navigation.goTo('search')");

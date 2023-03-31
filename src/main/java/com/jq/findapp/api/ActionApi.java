@@ -152,8 +152,7 @@ public class ActionApi {
 		params.setUser(authenticationService.verify(user, password, salt));
 		if (all)
 			params.setSearch("contactChat.contactId=" + user + " and contactChat.contactId2=" + id
-					+ " or contactChat.contactId=" + id
-					+ " and contactChat.contactId2=" + user);
+					+ " or contactChat.contactId=" + id + " and contactChat.contactId2=" + user);
 		else
 			params.setSearch(
 					"contactChat.seen=false and contactChat.contactId=" + id + " and contactChat.contactId2=" + user);
@@ -174,42 +173,48 @@ public class ActionApi {
 	}
 
 	@GetMapping("one")
-	public Map<String, Object> one(final QueryParams params, @RequestHeader(required = false) BigInteger user,
-			@RequestHeader(required = false) String password, @RequestHeader(required = false) String salt)
-			throws Exception {
+	public Map<String, Object> one(final QueryParams params, @RequestHeader BigInteger clientId,
+			@RequestHeader(required = false) BigInteger user, @RequestHeader(required = false) String password,
+			@RequestHeader(required = false) String salt) throws Exception {
 		if (user == null) {
 			if (params.getQuery() != Query.contact_listTeaser && params.getQuery() != Query.event_listTeaser)
 				throw new RuntimeException("unauthenticated request");
+			final Contact contact = new Contact();
+			contact.setClientId(clientId);
+			contact.setId(BigInteger.ZERO);
+			params.setUser(contact);
 		} else
 			params.setUser(authenticationService.verify(user, password, salt));
 		final Map<String, Object> one = repository.one(params);
 		if (one != null) {
-			if (params.getQuery() == Query.contact_list) {
-				final BigInteger contactId2 = (BigInteger) one.get("contact.id");
-				if (!contactId2.equals(params.getUser().getId())) {
-					final QueryParams params2 = new QueryParams(Query.contact_listVisit);
-					params2.setUser(params.getUser());
-					params2.setSearch(
-							"contactVisit.contactId=" + params.getUser().getId() + " and contactVisit.contactId2="
-									+ contactId2 + " and contact.id=" + contactId2);
-					final Map<String, Object> visitMap = repository.one(params2);
-					final ContactVisit visit;
-					if (visitMap == null) {
-						visit = new ContactVisit();
-						visit.setContactId(params.getUser().getId());
-						visit.setContactId2(contactId2);
-						visit.setCount(1L);
-					} else {
-						visit = repository.one(ContactVisit.class, (BigInteger) visitMap.get("contactVisit.id"));
-						visit.setCount(visit.getCount() + 1);
+			if (user != null) {
+				if (params.getQuery() == Query.contact_list) {
+					final BigInteger contactId2 = (BigInteger) one.get("contact.id");
+					if (!contactId2.equals(params.getUser().getId())) {
+						final QueryParams params2 = new QueryParams(Query.contact_listVisit);
+						params2.setUser(params.getUser());
+						params2.setSearch(
+								"contactVisit.contactId=" + params.getUser().getId() + " and contactVisit.contactId2="
+										+ contactId2 + " and contact.id=" + contactId2);
+						final Map<String, Object> visitMap = repository.one(params2);
+						final ContactVisit visit;
+						if (visitMap == null) {
+							visit = new ContactVisit();
+							visit.setContactId(params.getUser().getId());
+							visit.setContactId2(contactId2);
+							visit.setCount(1L);
+						} else {
+							visit = repository.one(ContactVisit.class, (BigInteger) visitMap.get("contactVisit.id"));
+							visit.setCount(visit.getCount() + 1);
+						}
+						repository.save(visit);
 					}
+				} else if (params.getQuery() == Query.location_list) {
+					final LocationVisit visit = new LocationVisit();
+					visit.setLocationId((BigInteger) one.get("location.id"));
+					visit.setContactId(params.getUser().getId());
 					repository.save(visit);
 				}
-			} else if (params.getQuery() == Query.location_list) {
-				final LocationVisit visit = new LocationVisit();
-				visit.setLocationId((BigInteger) one.get("location.id"));
-				visit.setContactId(params.getUser().getId());
-				repository.save(visit);
 			}
 			return one;
 		}
