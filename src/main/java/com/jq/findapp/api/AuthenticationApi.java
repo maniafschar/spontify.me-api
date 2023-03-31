@@ -68,7 +68,8 @@ public class AuthenticationApi {
 	}
 
 	@GetMapping("login")
-	public Map<String, Object> login(Contact contact, String publicKey, @RequestHeader BigInteger clientId,
+	public Map<String, Object> login(Contact contact, String publicKey,
+			@RequestHeader(defaultValue = "1") BigInteger clientId,
 			@RequestHeader String password, @RequestHeader String salt) throws Exception {
 		contact.setEmail(Encryption.decryptBrowser(contact.getEmail()));
 		contact.setClientId(clientId);

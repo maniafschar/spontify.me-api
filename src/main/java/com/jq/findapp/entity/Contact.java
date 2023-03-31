@@ -518,6 +518,14 @@ public class Contact extends BaseEntity {
 		this.skillsText = skillsText;
 	}
 
+	public ContactType getType() {
+		return type;
+	}
+
+	public void setType(ContactType type) {
+		this.type = type;
+	}
+
 	@Transient
 	@Override
 	public boolean writeAccess(BigInteger user, Repository repository) {
