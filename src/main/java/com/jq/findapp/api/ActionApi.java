@@ -15,6 +15,7 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -173,7 +174,7 @@ public class ActionApi {
 	}
 
 	@GetMapping("one")
-	public Map<String, Object> one(final QueryParams params, @RequestHeader BigInteger clientId,
+	public Map<String, Object> one(final QueryParams params, @RequestHeader(defaultValue = "1") BigInteger clientId,
 			@RequestHeader(required = false) BigInteger user, @RequestHeader(required = false) String password,
 			@RequestHeader(required = false) String salt) throws Exception {
 		if (user == null) {
@@ -245,7 +246,8 @@ public class ActionApi {
 	}
 
 	@GetMapping("teaser/{type}")
-	public List<Object[]> teaser(@PathVariable final String type, @RequestHeader BigInteger clientId,
+	public List<Object[]> teaser(@PathVariable final String type,
+			@RequestHeader(defaultValue = "1") BigInteger clientId,
 			@RequestHeader(required = false) BigInteger user, @RequestHeader(required = false) String password,
 			@RequestHeader(required = false) String salt,
 			@RequestHeader(required = false, name = "X-Forwarded-For") String ip) throws Exception {
@@ -408,6 +410,7 @@ public class ActionApi {
 		}
 	}
 
+	@Async
 	@PostMapping("videocall/{id}")
 	public void videocall(@PathVariable final BigInteger id, @RequestHeader BigInteger user,
 			@RequestHeader String password, @RequestHeader String salt) throws Exception {

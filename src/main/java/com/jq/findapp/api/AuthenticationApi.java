@@ -62,8 +62,7 @@ public class AuthenticationApi {
 
 	@PostMapping("register")
 	public void register(@RequestBody final InternalRegistration registration,
-			@RequestHeader(defaultValue = "1") BigInteger clientId)
-			throws Exception {
+			@RequestHeader(defaultValue = "1") BigInteger clientId) throws Exception {
 		registration.setClientId(clientId);
 		authenticationService.register(registration);
 	}

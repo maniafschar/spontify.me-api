@@ -6,7 +6,6 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
@@ -29,13 +28,10 @@ import jakarta.servlet.http.HttpServletResponse;
 public class LogFilter implements Filter {
 	@Autowired
 	private Repository repository;
-	private Pattern referer = null;
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		if (referer == null)
-			referer = Pattern.compile("(https://([a-z]*.)?skillvents.com|http[s]?://localhost).*");
 		final ContentCachingRequestWrapper req = new ContentCachingRequestWrapper((HttpServletRequest) request);
 		final HttpServletResponse res = (HttpServletResponse) response;
 		final Log log = new Log();
@@ -44,8 +40,8 @@ public class LogFilter implements Filter {
 		if (loggable) {
 			log.setUri(req.getRequestURI());
 			log.setMethod(req.getMethod());
-			if (req.getHeader("Referer") != null && !referer.matcher(req.getHeader("Referer")).matches()) {
-				log.setReferer(req.getHeader("Referer"));
+			if (req.getHeader("referer") != null) {
+				log.setReferer(req.getHeader("referer"));
 				if (log.getReferer().length() > 255)
 					log.setReferer(log.getReferer().substring(0, 255));
 			}
