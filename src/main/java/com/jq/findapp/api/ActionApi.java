@@ -56,7 +56,6 @@ import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
 
-import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
 
 @RestController
@@ -266,22 +265,23 @@ public class ActionApi {
 					params.setLatitude(((Number) result.get(0).get("ip.latitude")).floatValue());
 					params.setLongitude(((Number) result.get(0).get("ip.longitude")).floatValue());
 				} else {
-					final String json = WebClient
-							.create(lookupIp.replace("{ip}", ip)).get()
-							.retrieve().toEntity(String.class).block().getBody();
-					final Ip ip2 = new ObjectMapper()
-							.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-							.readValue(json, Ip.class);
-					final String location = new ObjectMapper().readTree(json).get("loc").asText();
-					ip2.setLatitude(Float.parseFloat(location.split(",")[0]));
-					ip2.setLongitude(Float.parseFloat(location.split(",")[1]));
 					try {
+						final String json = WebClient
+								.create(lookupIp.replace("{ip}", ip)).get()
+								.retrieve().toEntity(String.class).block().getBody();
+						final Ip ip2 = new ObjectMapper()
+								.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+								.readValue(json, Ip.class);
+						final String location = new ObjectMapper().readTree(json).get("loc").asText();
+						ip2.setLatitude(Float.parseFloat(location.split(",")[0]));
+						ip2.setLongitude(Float.parseFloat(location.split(",")[1]));
 						repository.save(ip2);
-					} catch (PersistenceException ex) {
-						// most probably added meanwhile, just continue
+						params.setLatitude(ip2.getLatitude());
+						params.setLongitude(ip2.getLongitude());
+					} catch (Exception ex) {
+						notificationService.createTicket(TicketType.ERROR, "ip lookup teaser",
+								Strings.stackTraceToString(ex), adminId);
 					}
-					params.setLatitude(ip2.getLatitude());
-					params.setLongitude(ip2.getLongitude());
 				}
 			}
 			final Contact contact = new Contact();
