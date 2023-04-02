@@ -55,8 +55,8 @@ public class StatisticsApi {
 		final Contact contact = authenticationService.verify(user, password, salt);
 		if (contact.getType() == ContactType.adminContent) {
 			final QueryParams params = new QueryParams(Query.contact_statisticsGeoLocation);
-			params.setSearch("contact.longitude is not null and contact.id<>" + adminId);
-			// + " and contact.clientId=" + contact.getClientId());
+			params.setSearch("contact.longitude is not null and contact.id<>" + adminId
+					+ " and contact.clientId=" + contact.getClientId());
 			final Result result = repository.list(params);
 			final List<Float[]> latLng = new ArrayList<>();
 			for (int i = 0; i < result.size(); i++) {
