@@ -40,6 +40,7 @@ import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.backend.DbService;
 import com.jq.findapp.service.backend.EngagementService;
 import com.jq.findapp.service.backend.ImportLogService;
+import com.jq.findapp.service.backend.IpService;
 import com.jq.findapp.service.backend.StatisticsService;
 import com.jq.findapp.util.Strings;
 
@@ -83,6 +84,9 @@ public class SupportCenterApi {
 
 	@Autowired
 	private ChatService chatService;
+
+	@Autowired
+	private IpService ipService;
 
 	@Autowired
 	private MetricsEndpoint metricsEndpoint;
@@ -211,6 +215,7 @@ public class SupportCenterApi {
 				run(importLogService::importLog);
 				run(chatService::answerAi);
 				run(dbService::update);
+				run(ipService::lookupIps);
 				run(statisticsService::update);
 				run(engagementService::sendRegistrationReminder);
 				// sendNearBy and sendChats after all event services
@@ -218,6 +223,7 @@ public class SupportCenterApi {
 				runLast(engagementService::sendNearBy);
 				runLast(engagementService::sendChats);
 				run(eventService::findMatchingSpontis);
+				run(eventService::notifyParticipation);
 				run(eventService::notifyParticipation);
 			} else
 				throw new RuntimeException("Scheduler already running " + schedulerRunning.size() + " processes");

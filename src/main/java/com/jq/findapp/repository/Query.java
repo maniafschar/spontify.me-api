@@ -35,6 +35,7 @@ public enum Query {
 	contact_pingChatNew(true),
 	contact_pingChatUnseen(true),
 	contact_pingNotification,
+	contact_statisticsGeoLocation,
 	contact_token,
 
 	event_list(true),

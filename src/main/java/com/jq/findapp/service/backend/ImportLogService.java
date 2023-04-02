@@ -9,24 +9,17 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.HashSet;
 import java.util.Locale;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
-import com.jq.findapp.entity.Ip;
 import com.jq.findapp.entity.Log;
 import com.jq.findapp.repository.Query;
-import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 
@@ -34,6 +27,8 @@ import com.jq.findapp.repository.Repository;
 public class ImportLogService {
 	@Autowired
 	private Repository repository;
+	@Autowired
+	private IpService ipService;
 
 	@Value("${app.url.lookupip}")
 	private String lookupIp;
@@ -45,7 +40,7 @@ public class ImportLogService {
 			importLog("logAd");
 			importLog("logWeb1");
 			importLog("logWeb");
-			lookupIps();
+			ipService.lookupLogIps();
 		} catch (Exception e) {
 			result.exception = e;
 		}
@@ -96,29 +91,6 @@ public class ImportLogService {
 							repository.save(log);
 					}
 				}
-			}
-		}
-	}
-
-	private void lookupIps() throws Exception {
-		final QueryParams params = new QueryParams(Query.misc_listLog);
-		params.setLimit(0);
-		params.setSearch("(log.uri like 'ad%' or log.uri like 'web%') and ip.org is null");
-		final Result result = repository.list(params);
-		final Set<Object> processed = new HashSet<>();
-		for (int i = 0; i < result.size(); i++) {
-			if (!processed.contains(result.get(i).get("log.ip"))) {
-				processed.add(result.get(i).get("log.ip"));
-				final String json = WebClient
-						.create(lookupIp.replace("{ip}", (String) result.get(i).get("log.ip"))).get()
-						.retrieve().toEntity(String.class).block().getBody();
-				final Ip ip = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-						.readValue(json, Ip.class);
-				final String location = new ObjectMapper().readTree(json.getBytes(StandardCharsets.UTF_8)).get("loc")
-						.asText();
-				ip.setLatitude(Float.parseFloat(location.split(",")[0]));
-				ip.setLongitude(Float.parseFloat(location.split(",")[1]));
-				repository.save(ip);
 			}
 		}
 	}

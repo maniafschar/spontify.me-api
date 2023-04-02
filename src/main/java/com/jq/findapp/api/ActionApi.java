@@ -24,9 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.client.WebClient;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.model.Position;
@@ -56,6 +54,7 @@ import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
 
+import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
 
 @RestController
@@ -266,21 +265,13 @@ public class ActionApi {
 					params.setLongitude(((Number) result.get(0).get("ip.longitude")).floatValue());
 				} else {
 					try {
-						final String json = WebClient
-								.create(lookupIp.replace("{ip}", ip)).get()
-								.retrieve().toEntity(String.class).block().getBody();
-						final Ip ip2 = new ObjectMapper()
-								.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-								.readValue(json, Ip.class);
-						final String location = new ObjectMapper().readTree(json).get("loc").asText();
-						ip2.setLatitude(Float.parseFloat(location.split(",")[0]));
-						ip2.setLongitude(Float.parseFloat(location.split(",")[1]));
+						final Ip ip2 = new Ip();
+						ip2.setLatitude(0f);
+						ip2.setLongitude(0f);
+						ip2.setIp(ip);
 						repository.save(ip2);
-						params.setLatitude(ip2.getLatitude());
-						params.setLongitude(ip2.getLongitude());
-					} catch (Exception ex) {
-						notificationService.createTicket(TicketType.ERROR, "ip lookup teaser",
-								Strings.stackTraceToString(ex), adminId);
+					} catch (PersistenceException ex) {
+						// most probably added meanwhile, just continue
 					}
 				}
 			}
