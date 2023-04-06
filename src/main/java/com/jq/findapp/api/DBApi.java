@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,13 +26,11 @@ import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.EntityUtil;
-import com.jq.findapp.util.Strings;
 
 import jakarta.transaction.Transactional;
 
 @RestController
 @Transactional
-@CrossOrigin(origins = { Strings.URL_APP, Strings.URL_APP_NEW, Strings.URL_LOCALHOST, Strings.URL_LOCALHOST_TEST })
 @RequestMapping("db")
 public class DBApi {
 	@Autowired

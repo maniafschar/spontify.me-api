@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,13 +77,17 @@ public class Screenshots {
 		Util.sleep(3000);
 		js.executeScript(
 				"var p={},e=ui.qa('card img');for(var i=0;i<e.length;i++)if(p[e[i].src])ui.parents(e[i],'card').outerHTML='';else p[e[i].src]=true;");
+		js.executeScript(
+				"var e=ui.qa('card[onclick*=\"(223,\"],card[onclick*=\"(244,\"],card[onclick*=\"(245,\"],card[onclick*=\"(324,\"],card[onclick*=\"(435,\"],card[onclick*=\"(445,\"],card[onclick*=\"(459,\"],card[onclick*=\"(645,\"],card[onclick*=\"(723,\"],card[onclick*=\"(385,\"],card[onclick*=\"(276,\"],card[onclick*=\"(607,\"],card[onclick*=\"(793,\"]');for(var i=0;i<e.length;i++)e[i].outerHTML='';");
 		screenshot(name);
 		login();
 		Util.sleep(1000);
-		js.executeScript("pageHome.openNews()");
-		Util.sleep(2000);
-		screenshot(name + "-news");
-		Util.sleep(1000);
+		if (Util.driver.getTitle().contains("Fanclub")) {
+			js.executeScript("pageHome.openNews()");
+			Util.sleep(2000);
+			screenshot(name + "-news");
+			Util.sleep(1000);
+		}
 		js.executeScript("ui.navigation.goTo('search')");
 		Util.sleep(1000);
 		Util.sendKeys("search div.contacts input[name=\"keywords\"]", "");
@@ -92,8 +97,17 @@ public class Screenshots {
 		js.executeScript(
 				"var e=ui.qa('row img[src*=\"contact.svg\"]');for(var i=0;i<e.length;i++)ui.parents(e[i],'row').outerHTML='';");
 		js.executeScript(
-				"var e=ui.qa('row[i=\"217\"],row[i=\"223\"],row[i=\"244\"],row[i=\"276\"],row[i=\"607\"],row[i=\"793\"]');for(var i=0;i<e.length;i++)ui.parents(e[i],'row').outerHTML='';");
+				"var e=ui.qa('row[i=\"223\"],row[i=\"244\"],row[i=\"276\"],row[i=\"607\"],row[i=\"793\"]');for(var i=0;i<e.length;i++)ui.parents(e[i],'row').outerHTML='';");
 		screenshot(name + "-search");
+		if (Util.driver.getTitle().contains("Fanclub")) {
+			final String orgWindow = Util.driver.getWindowHandle();
+			js.executeScript("ui.navigation.openHTML('stats.html','stats')");
+			final Set<String> windowHandles = Util.driver.getWindowHandles();
+			Util.driver.switchTo().window((String) windowHandles.toArray()[1]);
+			Util.sleep(2000);
+			screenshot(name + "-stats");
+			Util.driver.switchTo().window(orgWindow);
+		}
 		js.executeScript("pageLogin.logoff()");
 	}
 

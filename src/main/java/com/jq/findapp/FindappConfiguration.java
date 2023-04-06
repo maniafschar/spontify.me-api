@@ -9,10 +9,13 @@ import java.util.concurrent.Executor;
 
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -25,6 +28,14 @@ import com.jq.findapp.util.Strings;
 @EnableWebSocketMessageBroker
 public class FindappConfiguration implements AsyncConfigurer, WebSocketMessageBrokerConfigurer {
 	private static final List<Integer> SENT_ERRORS = new ArrayList<>();
+	private static final String[] allowedOrigins = {
+			"https://skills.community",
+			"https://*.fan-club.online",
+			"https://skillvents.com",
+			"https://localhost",
+			"app://localhost",
+			"http://localhost:9000"
+	};
 
 	@Autowired
 	private NotificationService notificationService;
@@ -34,6 +45,17 @@ public class FindappConfiguration implements AsyncConfigurer, WebSocketMessageBr
 		final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 		executor.initialize();
 		return executor;
+	}
+
+	@Bean
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurer() {
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/**").allowedOriginPatterns(allowedOrigins).allowedHeaders("*")
+						.allowedMethods("GET", "PUT", "POST", "ORIGINS", "DELETE");
+			}
+		};
 	}
 
 	@Override
@@ -71,8 +93,6 @@ public class FindappConfiguration implements AsyncConfigurer, WebSocketMessageBr
 
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/ws/init").setAllowedOrigins(
-				Strings.URL_APP, Strings.URL_APP_NEW, Strings.URL_LOCALHOST, Strings.URL_LOCALHOST_APP,
-				Strings.URL_LOCALHOST_TEST).withSockJS();
+		registry.addEndpoint("/ws/init").setAllowedOriginPatterns(allowedOrigins).withSockJS();
 	}
 }

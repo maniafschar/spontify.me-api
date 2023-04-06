@@ -16,7 +16,6 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -59,7 +58,6 @@ import jakarta.transaction.Transactional;
 
 @RestController
 @Transactional
-@CrossOrigin(origins = { Strings.URL_APP, Strings.URL_APP_NEW, Strings.URL_LOCALHOST, Strings.URL_LOCALHOST_TEST })
 @RequestMapping("action")
 public class ActionApi {
 	private static final List<String> QUOTATION = new ArrayList<>();
@@ -96,9 +94,6 @@ public class ActionApi {
 	@Value("${app.google.keyJS}")
 	private String googleKeyJS;
 
-	@Value("${app.eventbrite.key}")
-	private String eventbriteKey;
-
 	@Value("${app.paypal.key}")
 	private String paypalKey;
 
@@ -107,12 +102,6 @@ public class ActionApi {
 
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
-
-	@Value("${app.url}")
-	private String url;
-
-	@Value("${app.url.lookupip}")
-	private String lookupIp;
 
 	@GetMapping("unique")
 	public Unique unique(String email) {
@@ -139,7 +128,7 @@ public class ActionApi {
 		authenticationService.verify(user, password, salt);
 		final Map<String, String> map = new HashMap<>(2);
 		map.put("text", QUOTATION.get((int) (Math.random() * (QUOTATION.size() - 1))));
-		map.put("image", Strings.URL_APP + "/images/happyBirthday.png");
+		map.put("image", "images/happyBirthday.png");
 		return map;
 	}
 

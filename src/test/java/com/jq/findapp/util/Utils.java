@@ -28,6 +28,8 @@ public class Utils {
 		if (client == null) {
 			client = new Client();
 			client.setName("abc");
+			client.setEmail("abc@jq-consulting.de");
+			client.setUrl("https://abc.de");
 			repository.save(client);
 		}
 		return client;

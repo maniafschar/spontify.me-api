@@ -35,6 +35,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import org.springframework.web.reactive.function.client.WebClientResponseException.NotFound;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
@@ -70,14 +71,8 @@ public class NotificationService {
 	@Autowired
 	private Ios ios;
 
-	@Value("${app.url}")
-	private String server;
-
 	@Value("${app.server.webSocket}")
 	private String serverWebSocket;
-
-	@Value("${app.email.address}")
-	private String from;
 
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
@@ -340,16 +335,17 @@ public class NotificationService {
 		Strings.replaceString(html, "<jq:text />", s2.replaceAll("\n", "<br />").replaceAll("skillvents",
 				"<a href=\"https://skillvents.com\" style=\"color:rgb(246,255,187);text-decoration:none;\">skillvents</a>"));
 		Strings.replaceString(text, "<jq:text />", sanatizeHtml(s2));
+		final String url = repository.one(Client.class, contactTo.getClientId()).getUrl();
 		if (Strings.isEmpty(action))
-			s2 = server;
+			s2 = url;
 		else if (action.startsWith("https://"))
 			s2 = action;
 		else
-			s2 = server + "?" + action;
+			s2 = url + "?" + action;
 		Strings.replaceString(html, "<jq:link />", s2);
 		Strings.replaceString(text, "<jq:link />", s2);
-		Strings.replaceString(html, "<jq:url />", Strings.URL_APP);
-		Strings.replaceString(text, "<jq:url />", Strings.URL_APP);
+		Strings.replaceString(html, "<jq:url />", url);
+		Strings.replaceString(text, "<jq:url />", url);
 		if (contactFrom == null || contactTo.getId() != null && contactFrom.getId().equals(contactTo.getId()))
 			s2 = Text.mail_title.getText(contactTo.getLanguage());
 		else
@@ -382,7 +378,7 @@ public class NotificationService {
 				message = message.substring(0, 77);
 			message += "...";
 		}
-		sendEmail(contactTo.getEmail(), message, imgProfile, text.toString(), html.toString());
+		sendEmail(contactTo, message, imgProfile, text.toString(), html.toString());
 	}
 
 	private String sanatizeHtml(String s) {
@@ -393,12 +389,13 @@ public class NotificationService {
 		return s.replaceAll("<[^>]*>", "");
 	}
 
-	private void sendEmail(final String to, final String subject,
+	private void sendEmail(final Contact to, final String subject,
 			final byte[] imgProfile, final String text, String html) throws Exception {
 		final MimeMessage msg = email.createMimeMessage();
 		final MimeMessageHelper helper = new MimeMessageHelper(msg, html != null);
+		final String from = repository.one(Client.class, to.getClientId()).getEmail();
 		helper.setFrom(from);
-		helper.setTo(to == null ? from : to);
+		helper.setTo(to == null ? from : to.getEmail());
 		helper.setSubject(subject);
 		if (html != null) {
 			helper.setText(text, html);
@@ -407,7 +404,7 @@ public class NotificationService {
 				helper.addInline("img_profile", new MyDataSource(imageRound(imgProfile), "image.jpg"));
 		} else
 			helper.setText(text);
-		createTicket(TicketType.EMAIL, to, text, adminId);
+		createTicket(TicketType.EMAIL, to.getEmail(), text, adminId);
 		email.send(msg);
 	}
 

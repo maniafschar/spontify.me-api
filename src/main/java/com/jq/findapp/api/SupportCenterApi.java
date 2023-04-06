@@ -50,7 +50,7 @@ import jakarta.ws.rs.core.MediaType;
 
 @RestController
 @Transactional
-@CrossOrigin(origins = { "https://sc.skillvents.com" })
+@CrossOrigin(origins = { "https://sc.skills.community" })
 @RequestMapping("support")
 public class SupportCenterApi {
 	private static final List<Integer> schedulerRunning = Collections.synchronizedList(new ArrayList<>());

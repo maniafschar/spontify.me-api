@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,13 +18,11 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
-import com.jq.findapp.util.Strings;
 
 import jakarta.transaction.Transactional;
 
 @RestController
 @Transactional
-@CrossOrigin(origins = { Strings.URL_APP, Strings.URL_APP_NEW, Strings.URL_LOCALHOST, Strings.URL_LOCALHOST_TEST })
 @RequestMapping("statistics")
 public class StatisticsApi {
 	@Autowired
@@ -55,8 +52,9 @@ public class StatisticsApi {
 		final Contact contact = authenticationService.verify(user, password, salt);
 		if (contact.getType() == ContactType.adminContent) {
 			final QueryParams params = new QueryParams(Query.contact_statisticsGeoLocation);
-			params.setSearch("contact.longitude is not null and contact.id<>" + adminId
-					+ " and contact.clientId=" + contact.getClientId());
+			params.setSearch("contact.longitude is not null and contact.id<>" + adminId);
+			// + " and contactGeoLocationHistory.manual=false and contact.clientId=" +
+			// contact.getClientId());
 			final Result result = repository.list(params);
 			final List<Float[]> latLng = new ArrayList<>();
 			for (int i = 0; i < result.size(); i++) {

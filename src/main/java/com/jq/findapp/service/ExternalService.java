@@ -15,13 +15,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.util.Strings;
 
 @Service
 public class ExternalService {
@@ -124,14 +124,14 @@ public class ExternalService {
 	}
 
 	public String map(String source, String destination, Contact contact) {
-		String url;
+		String url = repository.one(Client.class, contact.getClientId()).getUrl();
 		if (source == null || source.length() == 0)
-			url = "https://maps.googleapis.com/maps/api/staticmap?{destination}&markers=icon:" + Strings.URL_APP
+			url = "https://maps.googleapis.com/maps/api/staticmap?{destination}&markers=icon:" + url
 					+ "/images/mapMe.png|shadow:false|{destination}&scale=2&size=200x200&maptype=roadmap&key=";
 		else {
 			url = "https://maps.googleapis.com/maps/api/staticmap?{source}|{destination}&markers=icon:"
-					+ Strings.URL_APP
-					+ "/images/mapMe.png|shadow:false|{source}&markers=icon:" + Strings.URL_APP
+					+ url
+					+ "/images/mapMe.png|shadow:false|{source}&markers=icon:" + url
 					+ "/images/mapLoc.png|shadow:false|{destination}&scale=2&size=600x200&maptype=roadmap&sensor=true&key=";
 			url = url.replace("{source}", source);
 		}

@@ -202,6 +202,7 @@ public class AuthenticationService {
 		contact.setLanguage(registration.getLanguage());
 		contact.setEmail(registration.getEmail().toLowerCase().trim());
 		contact.setTimezone(registration.getTimezone());
+		contact.setClientId(registration.getClientId());
 		try {
 			notificationService.sendNotificationEmail(repository.one(Contact.class, adminId), contact,
 					Text.mail_contactWelcomeEmail.getText(contact.getLanguage()), "r=" + generateLoginParam(contact));

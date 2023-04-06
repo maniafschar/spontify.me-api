@@ -14,7 +14,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
@@ -27,11 +26,9 @@ import com.jq.findapp.repository.Repository;
 public class ImportLogService {
 	@Autowired
 	private Repository repository;
+
 	@Autowired
 	private IpService ipService;
-
-	@Value("${app.url.lookupip}")
-	private String lookupIp;
 
 	public SchedulerResult importLog() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importLog");

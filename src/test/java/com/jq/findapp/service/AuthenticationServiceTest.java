@@ -87,11 +87,13 @@ public class AuthenticationServiceTest {
 	@Test
 	public void register() throws Exception {
 		// given
+		utils.createClient();
 		utils.createContact();
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.email='test@jq-consulting.de'");
 		final InternalRegistration registration = new InternalRegistration();
 		registration.setAgb(true);
+		registration.setClientId(BigInteger.ONE);
 		registration.setBirthday(new Date(3000000000L));
 		registration.setEmail("test@jq-consulting.de");
 		registration.setPseudonym("İrem Fettahoğlu");
