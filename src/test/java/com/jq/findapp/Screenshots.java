@@ -73,7 +73,7 @@ public class Screenshots {
 
 	private void screenshots(String name) throws Exception {
 		// Util.driver.get("https://skills.community/");
-		Util.driver.get("https://fcalpenkickers.fan-club.online/");
+		Util.driver.get("https://alpenherz.fan-club.online/");
 		Util.sleep(3000);
 		js.executeScript(
 				"var p={},e=ui.qa('card img');for(var i=0;i<e.length;i++)if(p[e[i].src])ui.parents(e[i],'card').outerHTML='';else p[e[i].src]=true;");

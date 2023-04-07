@@ -42,13 +42,18 @@ public class WebSocket {
 		} else {
 			final VideoMessage answer = new VideoMessage();
 			answer.setAnswer(Collections.singletonMap("userState", "offline"));
+			answer.setId(message.getUser());
 			messagingTemplate.convertAndSendToUser("" + message.getUser(), "/video", answer);
 		}
 	}
 
 	@PostMapping("refresh/{id}")
-	public void refresh(@RequestBody final Object payload, @PathVariable final BigInteger id) throws Exception {
-		messagingTemplate.convertAndSendToUser("" + id, "/refresh", payload);
+	public boolean refresh(@RequestBody final Object payload, @PathVariable final BigInteger id) throws Exception {
+		if (USERS.containsKey("" + id)) {
+			messagingTemplate.convertAndSendToUser("" + id, "/refresh", payload);
+			return true;
+		}
+		return false;
 	}
 
 	@EventListener
