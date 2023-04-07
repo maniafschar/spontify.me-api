@@ -72,8 +72,8 @@ public class Screenshots {
 	}
 
 	private void screenshots(String name) throws Exception {
-		Util.driver.get("https://skills.community/");
-		// Util.driver.get("https://skillvents.com/");
+		// Util.driver.get("https://skills.community/");
+		Util.driver.get("https://fcalpenkickers.fan-club.online/");
 		Util.sleep(3000);
 		js.executeScript(
 				"var p={},e=ui.qa('card img');for(var i=0;i<e.length;i++)if(p[e[i].src])ui.parents(e[i],'card').outerHTML='';else p[e[i].src]=true;");
@@ -99,6 +99,10 @@ public class Screenshots {
 		js.executeScript(
 				"var e=ui.qa('row[i=\"223\"],row[i=\"244\"],row[i=\"276\"],row[i=\"607\"],row[i=\"793\"]');for(var i=0;i<e.length;i++)ui.parents(e[i],'row').outerHTML='';");
 		screenshot(name + "-search");
+		js.executeScript(
+				"ui.classRemove('videoCall videochat', 'hidden');var e=ui.q('videoCall').style;e.display='block';e.background='url(https://fan-club.online/images/videoCall.jpg)';e.backgroundSize='auto 100%';e.backgroundPosition='center';ui.q('videoCall call').style.display='none';");
+		Util.sleep(2000);
+		screenshot(name + "-video");
 		if (Util.driver.getTitle().contains("Fanclub")) {
 			final String orgWindow = Util.driver.getWindowHandle();
 			js.executeScript("ui.navigation.openHTML('stats.html','stats')");
@@ -106,6 +110,7 @@ public class Screenshots {
 			Util.driver.switchTo().window((String) windowHandles.toArray()[1]);
 			Util.sleep(2000);
 			screenshot(name + "-stats");
+			js.executeScript("window.close()");
 			Util.driver.switchTo().window(orgWindow);
 		}
 		js.executeScript("pageLogin.logoff()");
