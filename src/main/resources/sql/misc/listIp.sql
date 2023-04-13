@@ -1,4 +1,5 @@
 SELECT
+	ip.id,
 	ip.ip,
 	ip.hostname,
 	ip.org,

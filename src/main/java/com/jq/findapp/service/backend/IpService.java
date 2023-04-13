@@ -2,8 +2,6 @@ package com.jq.findapp.service.backend;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +16,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.util.Strings;
 
 @Service
 public class IpService {
@@ -53,7 +52,7 @@ public class IpService {
 				ip.setTimezone(ip2.getTimezone());
 				ip.setLatitude(Float.parseFloat(location.split(",")[0]));
 				ip.setLongitude(Float.parseFloat(location.split(",")[1]));
-				repository.save(ip);
+				save(ip);
 			} catch (Exception ex) {
 				result.exception = ex;
 			}
@@ -66,10 +65,9 @@ public class IpService {
 		params.setLimit(0);
 		params.setSearch("(log.uri like 'ad%' or log.uri like 'web%') and ip.org is null");
 		final Result result = repository.list(params);
-		final Set<Object> processed = new HashSet<>();
 		for (int i = 0; i < result.size(); i++) {
-			if (!processed.contains(result.get(i).get("log.ip"))) {
-				processed.add(result.get(i).get("log.ip"));
+			params.setSearch("log.ip='" + result.get(i).get("log.ip") + "'");
+			if (repository.list(params).size() == 0) {
 				final String json = WebClient
 						.create(lookupIp.replace("{ip}", (String) result.get(i).get("log.ip"))).get()
 						.retrieve().toEntity(String.class).block().getBody();
@@ -79,8 +77,30 @@ public class IpService {
 						.asText();
 				ip2.setLatitude(Float.parseFloat(location.split(",")[0]));
 				ip2.setLongitude(Float.parseFloat(location.split(",")[1]));
-				repository.save(ip2);
+				save(ip2);
 			}
+		}
+	}
+
+	private void save(Ip ip) throws Exception {
+		try {
+			repository.save(ip);
+		} catch (Exception ex) {
+			if (!Strings.stackTraceToString(ex).contains("Duplicate entry"))
+				throw ex;
+			final QueryParams params = new QueryParams(Query.misc_listLog);
+			params.setSearch("log.ip='" + ip.getIp() + "'");
+			final Ip ip2 = repository.one(Ip.class, (BigInteger) repository.one(params).get("ip.id"));
+			ip2.setCity(ip.getCity());
+			ip2.setCountry(ip.getCountry());
+			ip2.setHostname(ip.getHostname());
+			ip2.setLatitude(ip.getLatitude());
+			ip2.setLongitude(ip.getLongitude());
+			ip2.setOrg(ip.getOrg());
+			ip2.setPostal(ip.getPostal());
+			ip2.setRegion(ip.getRegion());
+			ip2.setTimezone(ip.getTimezone());
+			repository.save(ip2);
 		}
 	}
 }

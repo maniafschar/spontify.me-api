@@ -393,9 +393,14 @@ public class NotificationService {
 			final byte[] imgProfile, final String text, String html) throws Exception {
 		final MimeMessage msg = email.createMimeMessage();
 		final MimeMessageHelper helper = new MimeMessageHelper(msg, html != null);
-		final String from = repository.one(Client.class, to.getClientId()).getEmail();
-		helper.setFrom(from);
-		helper.setTo(to == null ? from : to.getEmail());
+		if (to == null) {
+			final String from = repository.one(Contact.class, adminId).getEmail();
+			helper.setFrom(from);
+			helper.setTo(from);
+		} else {
+			helper.setFrom(repository.one(Client.class, to.getClientId()).getEmail());
+			helper.setTo(to.getEmail());
+		}
 		helper.setSubject(subject);
 		if (html != null) {
 			helper.setText(text, html);
@@ -404,7 +409,8 @@ public class NotificationService {
 				helper.addInline("img_profile", new MyDataSource(imageRound(imgProfile), "image.jpg"));
 		} else
 			helper.setText(text);
-		createTicket(TicketType.EMAIL, to.getEmail(), text, adminId);
+		if (to != null)
+			createTicket(TicketType.EMAIL, to.getEmail(), text, adminId);
 		email.send(msg);
 	}
 

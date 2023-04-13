@@ -25,6 +25,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Log;
 import com.jq.findapp.entity.Ticket;
@@ -188,6 +191,33 @@ public class SupportCenterApi {
 			contact.setImageAuthenticate(image);
 			contact.setAuthenticate(Boolean.TRUE);
 			repository.save(contact);
+		}
+	}
+
+	@PutMapping("client/{id}")
+	public void client(@PathVariable final BigInteger id, String data, @RequestHeader String password,
+			@RequestHeader String salt, @RequestHeader String secret) throws Exception {
+		if (supportCenterSecret.equals(secret) && authenticationService.verify(adminId, password, salt) != null) {
+			final Client client = repository.one(Client.class, id);
+			final JsonNode json = new ObjectMapper().readTree(data);
+			boolean modified = false;
+			String field = "email";
+			if (json.has(field) && !json.get(field).asText().equals(client.getEmail())) {
+				client.setEmail(json.get(field).asText());
+				modified = true;
+			}
+			field = "name";
+			if (json.has(field) && !json.get(field).asText().equals(client.getName())) {
+				client.setName(json.get(field).asText());
+				modified = true;
+			}
+			field = "url";
+			if (json.has(field) && !json.get(field).asText().equals(client.getUrl())) {
+				client.setUrl(json.get(field).asText());
+				modified = true;
+			}
+			if (modified)
+				repository.save(client);
 		}
 	}
 
