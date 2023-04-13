@@ -18,6 +18,7 @@ SELECT
 	location.latitude,
 	location.longitude,
 	location.name,
+	contact.imageList,
 	contact.pseudonym,
 	block.id,
 	block.note,

@@ -42,7 +42,7 @@ public enum Query {
 	event_listBlocked,
 	event_listMatching(true),
 	event_listParticipate(true),
-	event_listParticipateRaw(true),
+	event_listParticipateRaw,
 	event_listTeaser(true),
 	event_rating,
 
