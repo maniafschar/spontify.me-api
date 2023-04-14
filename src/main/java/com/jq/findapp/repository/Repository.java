@@ -82,7 +82,8 @@ public class Repository {
 		if (params.getSearchGeoLocation() != null)
 			search += " and " + params.getSearchGeoLocation();
 		if (params.getQuery().addBlock && params.getUser() != null) {
-			search += " and (select b.id from Block b where b.contactId=contact.id and b.contactId2={USERID} or b.contactId={USERID} and b.contactId2=contact.id) is null";
+			if (params.getQuery().name().startsWith("contact_") || params.getQuery().name().startsWith("event_"))
+				search += " and (select b.id from Block b where b.contactId=contact.id and b.contactId2={USERID} or b.contactId={USERID} and b.contactId2=contact.id) is null";
 			if (params.getQuery().name().startsWith("location_") || params.getQuery().name().startsWith("event_"))
 				search += " and (select b.id from Block b where b.contactId={USERID} and b.locationId=location.id) is null";
 			if (params.getQuery().name().startsWith("event_"))
