@@ -104,8 +104,8 @@ public class ActionApi {
 	private BigInteger adminId;
 
 	@GetMapping("unique")
-	public Unique unique(String email) {
-		return authenticationService.unique(email);
+	public Unique unique(@RequestHeader(defaultValue = "1") BigInteger clientId, String email) {
+		return authenticationService.unique(clientId, email);
 	}
 
 	@PostMapping("notify")

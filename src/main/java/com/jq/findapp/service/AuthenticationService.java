@@ -184,7 +184,7 @@ public class AuthenticationService {
 			throw new IllegalAccessException("time");
 		if (!EMAIL.matcher(registration.getEmail()).find())
 			throw new IllegalAccessException("email");
-		final Unique unique = unique(registration.getEmail());
+		final Unique unique = unique(registration.getClientId(), registration.getEmail());
 		if (!unique.unique)
 			throw new IllegalAccessException("email");
 		if (unique.blocked) {
@@ -212,10 +212,10 @@ public class AuthenticationService {
 		}
 	}
 
-	public Unique unique(String email) {
+	public Unique unique(BigInteger clientId, String email) {
 		email = email.toLowerCase();
 		final QueryParams params = new QueryParams(Query.contact_listId);
-		params.setSearch("LOWER(contact.email)='" + email + "'");
+		params.setSearch("LOWER(contact.email)='" + email + "' and contact.clientId=" + clientId);
 		return new Unique(email, repository.one(params) == null, AuthenticationService.BLOCKED_EMAIL_DOMAINS
 				.contains(email.substring(email.indexOf('@') + 1)));
 	}
