@@ -74,7 +74,9 @@ public class Ios {
 								.replace("{notificationId}", notificationId)
 								.replace("{exec}", Strings.isEmpty(action) ? "" : action)))
 				.header("apns-push-type", "alert")
-				.header("apns-topic", topic)
+				.header("apns-topic",
+						BigInteger.ONE.equals(contactTo.getClientId()) ? topic
+								: "com.jq.fanclub.client" + contactTo.getClientId())
 				.header("authorization", "bearer " + jwtGenerator.generateToken(getHeader(), getClaims(), "EC"))
 				.header("Content-Type", "application/json")
 				.uri(new URI(url + contactTo.getPushToken()))

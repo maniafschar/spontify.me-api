@@ -247,7 +247,7 @@ public class AuthenticationServiceTest {
 	public void ios() throws Exception {
 		// given
 		final Contact contact = utils.createContact();
-		contact.setPushToken("cfaad64c709275f0d04080a93f43640c9de89a4e941f0026fa2ae238eef7240d");
+		contact.setPushToken("5c9479d45126fa0f99e8f7692c4cb1bad18d0c71bfb34d4298abd93e48cf419d");
 		System.setProperty("javax.net.debug", "all");
 
 		// when
