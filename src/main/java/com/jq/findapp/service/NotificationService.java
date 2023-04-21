@@ -9,9 +9,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.math.BigInteger;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
@@ -24,11 +23,13 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.mail.DefaultAuthenticator;
+import org.apache.commons.mail.ImageHtmlEmail;
+import org.apache.commons.mail.resolver.DataSourceUrlResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -53,8 +54,6 @@ import com.jq.findapp.service.push.Ios;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
 
-import jakarta.activation.DataSource;
-import jakarta.mail.internet.MimeMessage;
 import jakarta.ws.rs.NotFoundException;
 
 @Service
@@ -63,7 +62,7 @@ public class NotificationService {
 	private Repository repository;
 
 	@Autowired
-	private JavaMailSender email;
+	private MailCreateor mailCreateor;
 
 	@Autowired
 	private Android android;
@@ -77,15 +76,14 @@ public class NotificationService {
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
 
-	private static final byte[] LOGO;
+	@Value("${app.mail.host}")
+	private String emailHost;
 
-	static {
-		try {
-			LOGO = IOUtils.toByteArray(NotificationService.class.getResourceAsStream("/template/logoEmail.png"));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+	@Value("${app.mail.port}")
+	private int emailPort;
+
+	@Value("${app.mail.password}")
+	private String emailPassword;
 
 	public enum Environment {
 		Production, Development
@@ -99,8 +97,7 @@ public class NotificationService {
 		final Result favorites = repository.list(params);
 		final Location location = repository.one(Location.class, locationId);
 		for (int i = 0; i < favorites.size(); i++)
-			sendNotificationOnMatch(notificationTextType,
-					me,
+			sendNotificationOnMatch(notificationTextType, me,
 					repository.one(Contact.class, (BigInteger) favorites.get(i).get("locationFavorite.contactId")),
 					location.getName(), param);
 	}
@@ -325,17 +322,21 @@ public class NotificationService {
 				IOUtils.toString(getClass().getResourceAsStream("/template/email.html"), StandardCharsets.UTF_8));
 		final StringBuilder text = new StringBuilder(
 				IOUtils.toString(getClass().getResourceAsStream("/template/email.txt"), StandardCharsets.UTF_8));
+		final String url = repository.one(Client.class, contactTo.getClientId()).getUrl();
+		final Map<String, String> css = (Map<String, String>) new ObjectMapper()
+				.readValue(repository.one(Client.class, contactTo.getClientId()).getCss(), Map.class);
 		String s2;
+		for (String key : css.keySet())
+			Strings.replaceString(html, "--" + key, css.get(key));
+		Strings.replaceString(html, "<jq:logo />", url + "/images/logo.png");
 		Strings.replaceString(html, "<jq:pseudonym />", contactTo.getPseudonym());
 		Strings.replaceString(text, "<jq:pseudonym />", contactTo.getPseudonym());
 		s2 = Strings.formatDate(null, new Date(), contactTo.getTimezone());
 		Strings.replaceString(html, "<jq:time />", s2);
 		Strings.replaceString(text, "<jq:time />", s2);
 		s2 = message;
-		Strings.replaceString(html, "<jq:text />", s2.replaceAll("\n", "<br />").replaceAll("skillvents",
-				"<a href=\"https://skillvents.com\" style=\"color:rgb(246,255,187);text-decoration:none;\">skillvents</a>"));
+		Strings.replaceString(html, "<jq:text />", s2.replaceAll("\n", "<br />"));
 		Strings.replaceString(text, "<jq:text />", sanatizeHtml(s2));
-		final String url = repository.one(Client.class, contactTo.getClientId()).getUrl();
 		if (Strings.isEmpty(action))
 			s2 = url;
 		else if (action.startsWith("https://"))
@@ -356,8 +357,12 @@ public class NotificationService {
 		byte[] imgProfile = null;
 		if (contactFrom != null && contactFrom.getImage() != null) {
 			imgProfile = Attachment.getFile(contactFrom.getImage());
+			final QueryParams params = new QueryParams(Query.contact_list);
+			params.setUser(contactFrom);
+			params.setSearch("contact.id=" + contactFrom.getId());
 			Strings.replaceString(html, "<jq:image />",
-					"<img style=\"height:150px;min-height:150px;max-height:150px;width:150px;min-width:150px;max-width:150px;\" src=\"cid:img_profile\" width=\"150\" height=\"150\" />");
+					"<img src=\"" + url + "/med/" + repository.one(params).get("contact.image")
+							+ "\" width=\"150\" height=\"150\" style=\"height:150px;min-height:150px;max-height:150px;width:150px;min-width:150px;max-width:150px;border-radius:75px;\" />");
 		} else
 			Strings.replaceString(html, "<jq:image />", "");
 		if (message.indexOf("\n") > 0)
@@ -391,27 +396,26 @@ public class NotificationService {
 
 	private void sendEmail(final Contact to, final String subject,
 			final byte[] imgProfile, final String text, String html) throws Exception {
-		final MimeMessage msg = email.createMimeMessage();
-		final MimeMessageHelper helper = new MimeMessageHelper(msg, html != null);
-		if (to == null) {
-			final String from = repository.one(Contact.class, adminId).getEmail();
-			helper.setFrom(from);
-			helper.setTo(from);
-		} else {
-			helper.setFrom(repository.one(Client.class, to.getClientId()).getEmail());
-			helper.setTo(to.getEmail());
+		final String from = to == null ? repository.one(Contact.class, adminId).getEmail()
+				: repository.one(Client.class, to.getClientId()).getEmail();
+		final ImageHtmlEmail email = mailCreateor.create();
+		email.setHostName(emailHost);
+		email.setSmtpPort(emailPort);
+		email.setCharset(StandardCharsets.UTF_8.name());
+		email.setAuthenticator(new DefaultAuthenticator(from, emailPassword));
+		email.setSSLOnConnect(true);
+		email.setFrom(from);
+		email.addTo(to == null ? from : to.getEmail());
+		email.setSubject(subject);
+		email.setTextMsg(text);
+		if (html != null && to != null) {
+			email.setDataSourceResolver(
+					new DataSourceUrlResolver(new URL(repository.one(Client.class, to.getClientId()).getUrl())));
+			email.setHtmlMsg(html);
 		}
-		helper.setSubject(subject);
-		if (html != null) {
-			helper.setText(text, html);
-			helper.addInline("img_logo", new MyDataSource(LOGO, "logoEmail.png"));
-			if (imgProfile != null)
-				helper.addInline("img_profile", new MyDataSource(imageRound(imgProfile), "image.jpg"));
-		} else
-			helper.setText(text);
 		if (to != null)
 			createTicket(TicketType.EMAIL, to.getEmail(), text, adminId);
-		email.send(msg);
+		email.send();
 	}
 
 	public void createTicket(TicketType type, String subject, String text, BigInteger user) {
@@ -488,33 +492,10 @@ public class NotificationService {
 		}
 	}
 
-	private class MyDataSource implements DataSource {
-		private final byte[] data;
-		private final String name;
-
-		private MyDataSource(byte[] data, String name) {
-			this.data = data;
-			this.name = name;
-		}
-
-		@Override
-		public OutputStream getOutputStream() throws IOException {
-			return null;
-		}
-
-		@Override
-		public String getName() {
-			return name;
-		}
-
-		@Override
-		public String getContentType() {
-			return "image/" + name.substring(name.lastIndexOf('.') + 1).toLowerCase();
-		}
-
-		@Override
-		public InputStream getInputStream() throws IOException {
-			return new ByteArrayInputStream(data);
+	@Component
+	public static class MailCreateor {
+		public ImageHtmlEmail create() {
+			return new ImageHtmlEmail();
 		}
 	}
 }

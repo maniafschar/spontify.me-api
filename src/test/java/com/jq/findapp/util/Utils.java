@@ -29,7 +29,8 @@ public class Utils {
 			client = new Client();
 			client.setName("abc");
 			client.setEmail("abc@jq-consulting.de");
-			client.setUrl("https://abc.de");
+			client.setUrl("https://fan-club.online");
+			client.setCss("{}");
 			repository.save(client);
 		}
 		return client;
@@ -39,9 +40,10 @@ public class Utils {
 		Contact contact = repository.one(Contact.class, adminId);
 		if (contact == null) {
 			int i = 1;
+			createClient();
 			do {
 				contact = new Contact();
-				contact.setClientId(BigInteger.ZERO);
+				contact.setClientId(BigInteger.ONE);
 				contact.setEmail("test" + i + "@jq-consulting.de");
 				contact.setLanguage("DE");
 				contact.setIdDisplay("123456" + i++);

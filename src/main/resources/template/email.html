@@ -21,13 +21,13 @@
 	<table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%"
 		style="text-align:center;margin:0;line-height:1.7;font-size:16px;font-family:Comfortaa,Verdana,Helvetica,Arial,sans-serif;padding:1.5em;position:relative;display:block;width:100%;height:100%;">
 		<tr>
-			<td bgcolor="#6faed4"
-				style="padding:1em;color:white;background:rgb(25, 50, 100);background:linear-gradient(120deg, rgb(70, 138, 180) 0%, rgb(25, 50, 100) 100%);background-size:100% 100%;">
+			<td bgcolor="--bg1start"
+				style="padding:1em;color:white;background:--bg1start;background:linear-gradient(120deg, --bg1stop 0%, --bg1start 100%);background-size:100% 100%;">
 				<a href="<jq:url />">
 					<div>
-						<img src="cid:img_logo"
-							style="height:125px;min-height:125px;max-height:125px;width:250px;min-width:250px;max-width:250px;"
-							width="250" height="125" />
+						<img src="<jq:logo />"
+							style="height:125px;min-height:125px;max-height:125px;width:125px;min-width:125px;max-width:125px;"
+							width="125" height="125" />
 					</div>
 					<div>
 						<jq:image />
@@ -36,14 +36,13 @@
 				<br />
 				<jq:newsTitle />
 				<br />
-				<b style="color:rgb(255, 220, 70)">
+				<b style="color:--bg2stop;">
 					<jq:pseudonym />
 				</b>
 				<br /><br />
 				<jq:text />
 				<br /><br />
-				<a href="<jq:link />"
-					style="display:block;padding-bottom:6em;color:rgb(255, 220, 70);text-decoration:none;">
+				<a href="<jq:link />" style="display:block;padding-bottom:6em;color:--bg2stop;text-decoration:none;">
 					<jq:link />
 				</a>
 			</td>

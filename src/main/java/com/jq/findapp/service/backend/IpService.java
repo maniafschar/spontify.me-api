@@ -65,8 +65,9 @@ public class IpService {
 		params.setLimit(0);
 		params.setSearch("(log.uri like 'ad%' or log.uri like 'web%') and ip.org is null");
 		final Result result = repository.list(params);
+		params.setQuery(Query.misc_listIp);
 		for (int i = 0; i < result.size(); i++) {
-			params.setSearch("log.ip='" + result.get(i).get("log.ip") + "'");
+			params.setSearch("ip.ip='" + result.get(i).get("log.ip") + "'");
 			if (repository.list(params).size() == 0) {
 				final String json = WebClient
 						.create(lookupIp.replace("{ip}", (String) result.get(i).get("log.ip"))).get()

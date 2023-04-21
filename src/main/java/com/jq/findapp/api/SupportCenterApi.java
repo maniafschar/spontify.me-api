@@ -1,6 +1,8 @@
 package com.jq.findapp.api;
 
 import java.math.BigInteger;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -11,6 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +51,7 @@ import com.jq.findapp.service.backend.IpService;
 import com.jq.findapp.service.backend.StatisticsService;
 import com.jq.findapp.util.Strings;
 
+import io.micrometer.core.instrument.util.IOUtils;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
@@ -161,10 +166,9 @@ public class SupportCenterApi {
 	@Produces(MediaType.TEXT_PLAIN)
 	public void email(final BigInteger id, final String text, final String action,
 			@RequestHeader String password, @RequestHeader String salt, @RequestHeader String secret) throws Exception {
-		if (supportCenterSecret.equals(secret)) {
-			final Contact contact = authenticationService.verify(adminId, password, salt);
-			notificationService.sendNotificationEmail(contact, repository.one(Contact.class, id), text, action);
-		}
+		if (supportCenterSecret.equals(secret))
+			notificationService.sendNotificationEmail(authenticationService.verify(adminId, password, salt),
+					repository.one(Contact.class, id), text, action);
 	}
 
 	@PutMapping("resend/{id}")
@@ -212,9 +216,26 @@ public class SupportCenterApi {
 				modified = true;
 			}
 			field = "url";
-			if (json.has(field) && !json.get(field).asText().equals(client.getUrl())) {
-				client.setUrl(json.get(field).asText());
-				modified = true;
+			if (json.has(field)) {
+				if (!json.get(field).asText().equals(client.getUrl())) {
+					client.setUrl(json.get(field).asText());
+					modified = true;
+				}
+				String css = IOUtils.toString(new URL(client.getUrl() + "/css/style.css").openStream(),
+						StandardCharsets.UTF_8);
+				Matcher matcher = Pattern.compile(":root \\{([^}])*").matcher(css);
+				if (matcher.find()) {
+					css = matcher.group();
+					matcher = Pattern.compile("--([^:].*): (.*);").matcher(css);
+					css = "{";
+					while (matcher.find())
+						css += "\"" + matcher.group(1) + "\":\"" + matcher.group(2) + "\",";
+					css = css.substring(0, css.length() - 1) + "}";
+					if (!css.equals(client.getCss())) {
+						client.setCss(css);
+						modified = true;
+					}
+				}
 			}
 			if (modified)
 				repository.save(client);

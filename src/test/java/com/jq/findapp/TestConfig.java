@@ -1,9 +1,8 @@
 package com.jq.findapp;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.spy;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,13 +19,14 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.ImageHtmlEmail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,9 +38,7 @@ import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.ExternalService;
-
-import jakarta.mail.Session;
-import jakarta.mail.internet.MimeMessage;
+import com.jq.findapp.service.NotificationService.MailCreateor;
 
 @Profile("test")
 @TestConfiguration
@@ -70,16 +68,21 @@ public class TestConfig {
 
 	@Bean
 	@Primary
-	public JavaMailSender javaMailSender() {
-		final JavaMailSender javaMailSender = mock(JavaMailSender.class);
-		when(javaMailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
+	public MailCreateor mailCreator() throws EmailException {
+		final MailCreateor mailCreateor = mock(MailCreateor.class);
 		doAnswer(e -> {
-			new File("target/email/").mkdir();
-			new FileOutputStream("target/email/" + System.currentTimeMillis() + Math.random())
-					.write(IOUtils.toByteArray(((MimeMessage) e.getArgument(0)).getInputStream()));
-			return null;
-		}).when(javaMailSender).send(any(MimeMessage.class));
-		return javaMailSender;
+			final ImageHtmlEmail imageHtmlEmail = spy(new ImageHtmlEmail());
+			doAnswer(f -> {
+				imageHtmlEmail.buildMimeMessage();
+				new File("target/email/").mkdir();
+				System.out.println("m:" + imageHtmlEmail.getMimeMessage());
+				new FileOutputStream("target/email/" + System.currentTimeMillis() + Math.random())
+						.write(IOUtils.toByteArray(imageHtmlEmail.getMimeMessage().getInputStream()));
+				return "";
+			}).when(imageHtmlEmail).send();
+			return imageHtmlEmail;
+		}).when(mailCreateor).create();
+		return mailCreateor;
 	}
 
 	@RestController

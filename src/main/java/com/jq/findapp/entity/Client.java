@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 
 @Entity
 public class Client extends BaseEntity {
+	private String css;
 	private String name;
 	private String email;
 	private String url;
@@ -30,5 +31,13 @@ public class Client extends BaseEntity {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public String getCss() {
+		return css;
+	}
+
+	public void setCss(String css) {
+		this.css = css;
 	}
 }
