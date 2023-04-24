@@ -29,8 +29,9 @@ import com.jq.findapp.util.Strings;
 public class FindappConfiguration implements AsyncConfigurer, WebSocketMessageBrokerConfigurer {
 	private static final List<Integer> SENT_ERRORS = new ArrayList<>();
 	private static final String[] allowedOrigins = {
-			"https://skills.community",
+			"https://after-work.events",
 			"https://*.fan-club.online",
+			"https://skills.community",
 			"https://skillvents.com",
 			"https://localhost",
 			"app://localhost",

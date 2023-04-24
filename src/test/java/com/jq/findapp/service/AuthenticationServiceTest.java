@@ -248,6 +248,7 @@ public class AuthenticationServiceTest {
 		// given
 		final Contact contact = utils.createContact();
 		contact.setPushToken("5c9479d45126fa0f99e8f7692c4cb1bad18d0c71bfb34d4298abd93e48cf419d");
+		contact.setClientId(new BigInteger("7"));
 		System.setProperty("javax.net.debug", "all");
 
 		// when
