@@ -100,7 +100,11 @@ public class Screenshots {
 				"var e=ui.qa('row[i=\"223\"],row[i=\"244\"],row[i=\"276\"],row[i=\"607\"],row[i=\"793\"]');for(var i=0;i<e.length;i++)ui.parents(e[i],'row').outerHTML='';");
 		screenshot(name + "-search");
 		js.executeScript(
-				"ui.classRemove('videoCall videochat', 'hidden');var e=ui.q('videoCall').style;e.display='block';e.background='url(https://fan-club.online/images/videoCall.jpg)';e.backgroundSize='auto 100%';e.backgroundPosition='center';ui.q('videoCall call').style.display='none';");
+				"ui.classRemove('videoCall videochat', 'hidden');var e=ui.q('videoCall').style;e.display='block';e.background='url(https://fan-club.online/images/videoCall.jpg)';e.backgroundSize='"
+						+ ((double) 568 / 800 < Double.valueOf(name.split("x")[0]) / Double.valueOf(name.split("x")[1])
+								? "100% auto"
+								: "auto 100%")
+						+ "';e.backgroundPosition='center';ui.q('videoCall call').style.display='none';");
 		Util.sleep(2000);
 		screenshot(name + "-video");
 		if (Util.driver.getTitle().contains("Fanclub")) {
