@@ -52,6 +52,7 @@ import com.jq.findapp.service.push.Android;
 import com.jq.findapp.service.push.Ios;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
+import com.jq.findapp.util.Text.TextId;
 
 import jakarta.ws.rs.NotFoundException;
 
@@ -62,6 +63,9 @@ public class NotificationService {
 
 	@Autowired
 	private MailCreateor mailCreateor;
+
+	@Autowired
+	private Text text;
 
 	@Autowired
 	private Android android;
@@ -144,31 +148,31 @@ public class NotificationService {
 			if (repository.list(params).size() > 0)
 				return false;
 		}
-		final StringBuilder text = new StringBuilder(
-				Text.getText(contactTo.getLanguage(), "notification_" + notificationTextType.name()));
+		final StringBuilder s = new StringBuilder(
+				text.getText(contactTo, TextId.valueOf("notification_" + notificationTextType.name())));
 		if (param != null) {
 			for (int i = 0; i < param.length; i++)
-				Strings.replaceString(text, "<jq:EXTRA_" + (i + 1) + " />", param[i]);
+				Strings.replaceString(s, "<jq:EXTRA_" + (i + 1) + " />", param[i]);
 		}
-		if (text.length() > 250) {
-			text.delete(247, text.length());
-			if (text.lastIndexOf(" ") > 180)
-				text.delete(text.lastIndexOf(" "), text.length());
-			text.append("...");
+		if (s.length() > 250) {
+			s.delete(247, s.length());
+			if (s.lastIndexOf(" ") > 180)
+				s.delete(s.lastIndexOf(" "), s.length());
+			s.append("...");
 		}
 		WebClient.create(serverWebSocket + "refresh/" + contactTo.getId()).post()
 				.bodyValue(getPingValues(contactTo)).retrieve().toBodilessEntity();
 		ContactNotification notification = null;
 		if (notificationTextType != ContactNotificationTextType.chatNew
 				&& notificationTextType != ContactNotificationTextType.contactVideoCall
-				&& (notification = save(contactTo, contactFrom, text.toString(), action, notificationTextType)) == null)
+				&& (notification = save(contactTo, contactFrom, s.toString(), action, notificationTextType)) == null)
 			return false;
 		if (userWantsNotification(notificationTextType, contactTo)) {
 			boolean b = !Strings.isEmpty(contactTo.getPushSystem()) && !Strings.isEmpty(contactTo.getPushToken());
 			if (b)
-				b = sendNotificationDevice(contactFrom, contactTo, text, action, notification);
+				b = sendNotificationDevice(contactFrom, contactTo, s, action, notification);
 			if (!b) {
-				sendNotificationEmail(contactFrom, contactTo, text.toString(), action);
+				sendNotificationEmail(contactFrom, contactTo, s.toString(), action);
 				if (notification != null)
 					notification.setType(ContactNotificationType.email);
 			}
@@ -319,19 +323,19 @@ public class NotificationService {
 			throws Exception {
 		final StringBuilder html = new StringBuilder(
 				IOUtils.toString(getClass().getResourceAsStream("/template/email.html"), StandardCharsets.UTF_8));
-		final StringBuilder text = new StringBuilder(
+		final StringBuilder s = new StringBuilder(
 				IOUtils.toString(getClass().getResourceAsStream("/template/email.txt"), StandardCharsets.UTF_8));
 		final String url = repository.one(Client.class, contactTo.getClientId()).getUrl();
 		String s2;
 		Strings.replaceString(html, "<jq:logo />", url + "/images/logo.png");
 		Strings.replaceString(html, "<jq:pseudonym />", contactTo.getPseudonym());
-		Strings.replaceString(text, "<jq:pseudonym />", contactTo.getPseudonym());
+		Strings.replaceString(s, "<jq:pseudonym />", contactTo.getPseudonym());
 		s2 = Strings.formatDate(null, new Date(), contactTo.getTimezone());
 		Strings.replaceString(html, "<jq:time />", s2);
-		Strings.replaceString(text, "<jq:time />", s2);
+		Strings.replaceString(s, "<jq:time />", s2);
 		s2 = message;
 		Strings.replaceString(html, "<jq:text />", s2.replaceAll("\n", "<br />"));
-		Strings.replaceString(text, "<jq:text />", sanatizeHtml(s2));
+		Strings.replaceString(s, "<jq:text />", sanatizeHtml(s2));
 		if (Strings.isEmpty(action))
 			s2 = url;
 		else if (action.startsWith("https://"))
@@ -339,16 +343,16 @@ public class NotificationService {
 		else
 			s2 = url + "?" + action;
 		Strings.replaceString(html, "<jq:link />", s2);
-		Strings.replaceString(text, "<jq:link />", s2);
+		Strings.replaceString(s, "<jq:link />", s2);
 		Strings.replaceString(html, "<jq:url />", url);
-		Strings.replaceString(text, "<jq:url />", url);
+		Strings.replaceString(s, "<jq:url />", url);
 		if (contactFrom == null || contactTo.getId() != null && contactFrom.getId().equals(contactTo.getId()))
-			s2 = Text.mail_title.getText(contactTo.getLanguage());
+			s2 = text.getText(contactTo, TextId.mail_title);
 		else
-			s2 = Text.mail_titleFrom.getText(contactTo.getLanguage()).replaceAll("<jq:pseudonymFrom />",
+			s2 = text.getText(contactTo, TextId.mail_titleFrom).replaceAll("<jq:pseudonymFrom />",
 					contactFrom.getPseudonym());
 		Strings.replaceString(html, "<jq:newsTitle />", s2);
-		Strings.replaceString(text, "<jq:newsTitle />", s2);
+		Strings.replaceString(s, "<jq:newsTitle />", s2);
 		if (contactFrom != null && contactFrom.getImage() != null) {
 			final QueryParams params = new QueryParams(Query.contact_list);
 			params.setUser(contactFrom);
@@ -381,7 +385,7 @@ public class NotificationService {
 				message = message.substring(0, 77);
 			message += "...";
 		}
-		sendEmail(contactTo, message, text.toString(), html.toString());
+		sendEmail(contactTo, message, s.toString(), html.toString());
 	}
 
 	private String sanatizeHtml(String s) {

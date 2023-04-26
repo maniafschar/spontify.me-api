@@ -12,7 +12,7 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.ChatService;
-import com.jq.findapp.util.Text;
+import com.jq.findapp.util.Text.TextId;
 
 @Component
 public class ContactChatListener extends AbstractRepositoryListener<ContactChat> {
@@ -32,7 +32,7 @@ public class ContactChatListener extends AbstractRepositoryListener<ContactChat>
 			throw new IllegalArgumentException("duplicate chat");
 		}
 		chatService.notifyContact(contactChat);
-		if (contactChat.getTextId() == Text.engagement_ai
+		if (contactChat.getTextId() == TextId.engagement_ai
 				&& contactChat.getContactId2().equals(adminId)
 				&& contactChat.getNote() != null
 				&& contactChat.getNote().indexOf(Attachment.SEPARATOR) < 0)

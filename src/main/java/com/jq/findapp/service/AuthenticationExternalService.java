@@ -58,7 +58,7 @@ public class AuthenticationExternalService {
 		if (registration.getUser().get("email") == null || !registration.getUser().get("email").contains("@"))
 			registration.getUser().put("email",
 					registration.getUser().get("id") + '.' + registration.getFrom().name().toLowerCase()
-							+ "@skillvents.com");
+							+ "@after-work.events");
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.email='" + registration.getUser().get("email") + '\'');
 		final Map<String, Object> contact = repository.one(params);
@@ -78,7 +78,7 @@ public class AuthenticationExternalService {
 		final Contact c = new Contact();
 		c.setVerified(true);
 		c.setEmail(registration.getUser().get("email"));
-		if (!c.getEmail().endsWith("@skillvents.com"))
+		if (!c.getEmail().endsWith("@after-work.events"))
 			c.setEmailVerified(c.getEmail());
 		c.setPseudonym(registration.getUser().get("name").trim());
 		if ("".equals(c.getPseudonym()))

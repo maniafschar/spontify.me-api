@@ -1,4 +1,4 @@
-skillvents
+afterwork
 
 <jq:newsTitle />
 <jq:pseudonym />

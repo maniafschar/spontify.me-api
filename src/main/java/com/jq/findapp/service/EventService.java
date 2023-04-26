@@ -26,6 +26,7 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.util.Score;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
+import com.jq.findapp.util.Text.TextId;
 
 @Service
 public class EventService {
@@ -34,6 +35,9 @@ public class EventService {
 
 	@Autowired
 	private NotificationService notificationService;
+
+	@Autowired
+	private Text text;
 
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
@@ -80,8 +84,8 @@ public class EventService {
 										params.getUser(), ContactNotificationTextType.eventNotify,
 										Strings.encodeParam("e=" + event.getId() + "_" + realDate.toLocalDate()),
 										(realDate.getDayOfYear() == now.getDayOfYear()
-												? Text.today.getText(params.getUser().getLanguage())
-												: Text.tomorrow.getText(params.getUser().getLanguage())) + " " + time,
+												? text.getText(params.getUser(), TextId.today)
+												: text.getText(params.getUser(), TextId.tomorrow)) + " " + time,
 										(String) events.get(i2).get("location.name"));
 							break;
 						}

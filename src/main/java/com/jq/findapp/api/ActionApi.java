@@ -52,6 +52,7 @@ import com.jq.findapp.service.NotificationService.Ping;
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
+import com.jq.findapp.util.Text.TextId;
 
 import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
@@ -87,6 +88,9 @@ public class ActionApi {
 
 	@Autowired
 	private ExternalService externalService;
+
+	@Autowired
+	private Text text;
 
 	@Value("${app.google.key}")
 	private String googleKey;
@@ -357,12 +361,12 @@ public class ActionApi {
 		final Contact contact = authenticationService.verify(user, password, salt);
 		videoCall.setContactId(user);
 		repository.save(videoCall);
-		final String note = Text.notification_authenticate.getText(contact.getLanguage())
+		final String note = text.getText(contact, TextId.notification_authenticate)
 				.replace("{0}", Strings.formatDate(null, videoCall.getTime(), contact.getTimezone()));
 		final ContactChat chat = new ContactChat();
 		chat.setContactId(adminId);
 		chat.setContactId2(user);
-		chat.setTextId(Text.notification_authenticate);
+		chat.setTextId(TextId.notification_authenticate);
 		chat.setNote(note);
 		chat.setAction("video.startAdminCall()");
 		repository.save(chat);

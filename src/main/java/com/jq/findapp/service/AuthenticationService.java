@@ -35,6 +35,7 @@ import com.jq.findapp.service.AuthenticationService.AuthenticationException.Auth
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
+import com.jq.findapp.util.Text.TextId;
 
 import jakarta.mail.SendFailedException;
 
@@ -57,6 +58,9 @@ public class AuthenticationService {
 
 	@Autowired
 	private NotificationService notificationService;
+
+	@Autowired
+	private Text text;
 
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
@@ -205,7 +209,7 @@ public class AuthenticationService {
 		contact.setClientId(registration.getClientId());
 		try {
 			notificationService.sendNotificationEmail(repository.one(Contact.class, adminId), contact,
-					Text.mail_contactWelcomeEmail.getText(contact.getLanguage()), "r=" + generateLoginParam(contact));
+					text.getText(contact, TextId.mail_contactWelcomeEmail), "r=" + generateLoginParam(contact));
 			saveRegistration(contact, registration);
 		} catch (SendFailedException ex) {
 			throw new IllegalAccessException("email");
@@ -361,7 +365,7 @@ public class AuthenticationService {
 			s = contact.getLoginLink().substring(0, 10) + contact.getLoginLink().substring(20);
 		notificationService.sendNotificationEmail(repository.one(Contact.class, adminId),
 				contact,
-				Text.mail_contactRegistrationReminder.getText(contact.getLanguage()).replace("<jq:EXTRA_1 />",
+				text.getText(contact, TextId.mail_contactRegistrationReminder).replace("<jq:EXTRA_1 />",
 						Strings.formatDate(null, contact.getCreatedAt(), contact.getTimezone())),
 				"r=" + s);
 	}
@@ -375,7 +379,7 @@ public class AuthenticationService {
 			final String s = generateLoginParam(contact);
 			repository.save(contact);
 			notificationService.sendNotificationEmail(contact, contact,
-					Text.mail_contactPasswordReset.getText(contact.getLanguage()), "r=" + s);
+					text.getText(contact, TextId.mail_contactPasswordReset), "r=" + s);
 			return "ok";
 		}
 		return "nok:Email";

@@ -17,7 +17,7 @@
 		"bluetoothNoMatch": "Hey CONTACT_PSEUDONYM, Du hast noch keinen Bluetooth Match. Möchtest Du Deine Freunde einladen, damit die Community wächst und mehr Matches sich ergeben? EMOJI_DANCING",
 		"guide": "Hey CONTACT_PSEUDONYM, Du bist ein Guide, möchtest Du Deine Freunde einladen, damit die Community wächst? EMOJI_DANCING",
 		"installCurrentVersion": "Hey CONTACT_PSEUDONYM, Du benutzt nicht die aktuelle Version VERSION der App. In der aktuellen Version sind einige neue Features hinzugekommen, möchtest Du aktualisieren?",
-		"like": "Hallo CONTACT_PSEUDONYM, was stört Dich an skillvents, was fehlt Dir? 🤔\nSag uns offen Deine Meinung. EMOJI_WAVING",
+		"like": "Hallo CONTACT_PSEUDONYM, was stört Dich an APP_TITLE, was fehlt Dir? 🤔\nSag uns offen Deine Meinung. EMOJI_WAVING",
 		"nearByContact": "Hallo CONTACT_PSEUDONYM, Sponti LOCATION_NAME matcht herrvorragend! Hast Du Lust Kontakt aufzunehmen? Starte eine Chat, vielleicht über Skills die Ihr habt.",
 		"nearByLocation": "Hallo CONTACT_PSEUDONYM, Du bist in der Nähe der Location LOCATION_NAME und sie könnte Dir gefallen. Vielleicht besuchst Du sie mal und bewertest sie?",
 		"newContacts": "Hallo CONTACT_PSEUDONYM, seit Deinem letzten Login am CONTACT_MODIFIED_AT haben sich NEW_CONTACTS_COUNT neue Spontis in Deinem Umkreis von NEW_CONTACTS_DISTANCE KM registriert. Vielleicht passt der eine oder andere Sponti zu Dir?",
@@ -27,21 +27,21 @@
 		"praise": "Hey CONTACT_PSEUDONYM, einfach mal ein Lob, nicht mehr, Du hast ein tolles Profil. Weiter so. ❤️\nWenn Dir irgendetwas bezüglich der App auf dem Herzen liegt, schreib es mir gerne hier.",
 		"uploadProfileAttributes": "Hey CONTACT_PSEUDONYM, die passenden Skills zusammen mit Deinen Geburtstag und Dein Geschlecht verhelfen Dir passende Spontis, Events und Locations zu finden und \"Heute schon was vor?\" oder Bluetooth Matching zu nutzen. Klick mich, wenn Du jetzt Deine Angaben ergänzen möchtest.",
 		"uploadProfileImage": "81% mehr Interaktionen erhältst Du mit einem attraktiven Bild in Deinem Profil. Es lohnt sich, probiere es mal aus. Frag mich, wenn Du Probleme bezüglich der Benutzung der App hast.",
-		"welcome": "Hallo CONTACT_PSEUDONYM,\n\nschön, dass Du da bist. Schau Dich um und kontaktiere mich, wenn Du Fragen hast.\n\nViel Spaß\nDein skillvents Team"
+		"welcome": "Hallo CONTACT_PSEUDONYM,\n\nschön, dass Du da bist. Schau Dich um und kontaktiere mich, wenn Du Fragen hast.\n\nViel Spaß\nDein APP_TITLE Team"
 	},
 	"mail": {
 		"contactPasswordReset": "Dein Passwort wurde zurück gesetzt. Klicke auf den Link, Du wirst anschließend aufgefordert, ein neues Passwort einzugeben.",
-		"contactRegistrationReminder": "Das Beste kommt spontan!\n\nDazu zählt vielleicht nicht diese spontane Email. Trotzdem würden wir uns freuen, wenn Du Deine Registrierung vom <jq:EXTRA_1 /> auf skillvents (früher spontify.me) abschließt.\n\nWar die Registrierung ein Versehen und möchtest Du sie rückgängig machen, so antworte einfach auf diese Email. Wir löschen dann Deine Registrierung für Dich.\n\nLiebe Grüße und bleib gesund!\nSponti Support",
-		"contactWelcomeEmail": "Vielen Dank für die Registrierung auf skillvents. Bitte bestätige Deine Anmeldung, in dem Du auf den Link klickst.",
+		"contactRegistrationReminder": "Das Beste kommt spontan!\n\nDazu zählt vielleicht nicht diese spontane Email. Trotzdem würden wir uns freuen, wenn Du Deine Registrierung vom <jq:EXTRA_1 /> auf APP_TITLE (früher spontify.me) abschließt.\n\nWar die Registrierung ein Versehen und möchtest Du sie rückgängig machen, so antworte einfach auf diese Email. Wir löschen dann Deine Registrierung für Dich.\n\nLiebe Grüße und bleib gesund!\nSponti Support",
+		"contactWelcomeEmail": "Vielen Dank für die Registrierung auf APP_TITLE. Bitte bestätige Deine Anmeldung, in dem Du auf den Link klickst.",
 		"title": "eine Nachricht für",
 		"titleFrom": "eine Nachricht von <jq:pseudonymFrom /> für"
 	},
 	"notification": {
-		"authenticate": "Deine Videoauthentifizierungstermin für den {0} ist bestätigt. Klicke zu diesem Zeitpunkt auf diese Nachricht, der Video-Anruf öffnet sich dann automatisch.\n\nHalte Deinen Personalausweis bereit.\n\nBis dann\nskillvents support",
+		"authenticate": "Deine Videoauthentifizierungstermin für den {0} ist bestätigt. Klicke zu diesem Zeitpunkt auf diese Nachricht, der Video-Anruf öffnet sich dann automatisch.\n\nHalte Deinen Personalausweis bereit.\n\nBis dann\nAPP_TITLE support",
 		"chatNew": "<jq:EXTRA_1 />",
 		"chatSeen": "hat Deine Chatnachricht gelesen.",
 		"contactBirthday": "wird heute <jq:EXTRA_1 /> Jahre jung.",
-		"contactDelete": "hat skillvents verlassen 😢",
+		"contactDelete": "hat APP_TITLE verlassen 😢",
 		"contactFindMe": "ist in Deiner unmittelbarren Umgebung, ihr habt <jq:EXTRA_1 /> gemeinsame Skills.",
 		"contactFriendApproved": "hat Deine Freundschaftsanfrage bestätigt.",
 		"contactFriendRequest": "möchte mit Dir befreundet sein.",
@@ -59,8 +59,8 @@
 		"eventRated": "",
 		"feedback": "Wir danken Dir für Deinen Kommentar und melden uns bei Rückfragen.\n\n<jq:EXTRA_1 />",
 		"locationMarketing": "<jq:EXTRA_2 /> hat folgendes Angebot: <jqEXTRA_1 />",
-		"sentEntry": "hat Dir einen skillvents Link gesendet.",
-		"sentEntries": "hat Dir mehrere skillvents Links gesendet.",
+		"sentEntry": "hat Dir einen APP_TITLE Link gesendet.",
+		"sentEntries": "hat Dir mehrere APP_TITLE Links gesendet.",
 		"sentImg": "hat Dir ein Bild geschickt.",
 		"sentPos1": "hat Dir seine aktuelle Position gesendet.",
 		"sentPos2": " hat Dir ihre aktuelle Position gesendet."

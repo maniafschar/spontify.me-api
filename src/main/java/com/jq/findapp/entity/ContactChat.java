@@ -3,6 +3,7 @@ package com.jq.findapp.entity;
 import java.math.BigInteger;
 
 import com.jq.findapp.util.Text;
+import com.jq.findapp.util.Text.TextId;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,7 +18,7 @@ public class ContactChat extends BaseEntity {
 	private String action;
 	private String image;
 	@Enumerated(EnumType.STRING)
-	private Text textId;
+	private TextId textId;
 
 	public BigInteger getContactId() {
 		return contactId;
@@ -67,11 +68,11 @@ public class ContactChat extends BaseEntity {
 		this.action = action;
 	}
 
-	public Text getTextId() {
+	public TextId getTextId() {
 		return textId;
 	}
 
-	public void setTextId(Text textId) {
+	public void setTextId(TextId textId) {
 		this.textId = textId;
 	}
 }

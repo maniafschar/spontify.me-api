@@ -20,6 +20,7 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.util.Text;
+import com.jq.findapp.util.Text.TextId;
 
 @Service
 public class ChatService {
@@ -32,6 +33,9 @@ public class ChatService {
 	@Autowired
 	private Repository repository;
 
+	@Autowired
+	private Text text;
+
 	@Value("${app.admin.id}")
 	protected BigInteger adminId;
 
@@ -41,9 +45,9 @@ public class ChatService {
 	}
 
 	public SchedulerResult answerAi() {
-		final SchedulerResult result=new SchedulerResult(getClass().getSimpleName() + "/answerAi");
+		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/answerAi");
 		final QueryParams params = new QueryParams(Query.contact_chat);
-		params.setSearch("contactChat.contactId<>" + adminId + " and contactChat.textId='" + Text.engagement_ai.name()
+		params.setSearch("contactChat.contactId<>" + adminId + " and contactChat.textId='" + TextId.engagement_ai.name()
 				+ "' and contactChat.createdAt>'"
 				+ Instant.now().minus(Duration.ofDays(3)) + "'");
 		final Result result2 = repository.list(params);
@@ -66,7 +70,7 @@ public class ChatService {
 
 	private void createGptAnswerIntern(ContactChat contactChat) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_chat);
-		params.setSearch("contactChat.textId='" + Text.engagement_ai.name() + "' and (contactChat.contactId="
+		params.setSearch("contactChat.textId='" + TextId.engagement_ai.name() + "' and (contactChat.contactId="
 				+ contactChat.getContactId() + " or contactChat.contactId2=" + contactChat.getContactId() + ")");
 		if (repository.list(params).size() > 40)
 			return;
@@ -75,7 +79,7 @@ public class ChatService {
 		final ContactChat chat = new ContactChat();
 		chat.setContactId(adminId);
 		chat.setContactId2(contactChat.getContactId());
-		chat.setTextId(Text.engagement_ai);
+		chat.setTextId(TextId.engagement_ai);
 		chat.setNote(externalService.chatGpt(contactChat.getNote()));
 		if (chat.getNote().contains("\n\n")) {
 			final String s = chat.getNote().substring(0, chat.getNote().indexOf("\n\n"));
@@ -92,18 +96,18 @@ public class ChatService {
 		final Contact contactTo = repository.one(Contact.class, contactChat.getContactId2());
 		String s = null;
 		if (contactChat.getNote() == null)
-			s = Text.notification_sentImg.getText(contactTo.getLanguage());
+			s = text.getText(contactTo, TextId.notification_sentImg);
 		else {
 			s = contactChat.getNote();
 			if (s.indexOf(Attachment.SEPARATOR) > -1)
 				s = new String(Repository.Attachment.getFile(s), StandardCharsets.UTF_8);
 			if (s.indexOf(" :openPos(") == 0)
-				s = (contactFrom.getGender() == null || contactFrom.getGender() == 2 ? Text.notification_sentPos2
-						: Text.notification_sentPos1)
-						.getText(contactTo.getLanguage());
+				s = text.getText(contactTo,
+						contactFrom.getGender() == null || contactFrom.getGender() == 2 ? TextId.notification_sentPos2
+								: TextId.notification_sentPos1);
 			else if (s.indexOf(" :open(") == 0)
-				s = (s.lastIndexOf(" :open(") == 0 ? Text.notification_sentEntry : Text.notification_sentEntries)
-						.getText(contactTo.getLanguage());
+				s = text.getText(contactTo, s.lastIndexOf(" :open(") == 0 ? TextId.notification_sentEntry
+						: TextId.notification_sentEntries);
 		}
 		notificationService.sendNotification(contactFrom, contactTo, ContactNotificationTextType.chatNew,
 				"chat=" + contactFrom.getId(), s);
