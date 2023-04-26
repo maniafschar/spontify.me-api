@@ -295,34 +295,37 @@ public class EngagementService {
 			final long DAY = 86400000;
 			String value = "", failedEmails = "";
 			params.setQuery(Query.misc_setting);
-			for (int i = 0; i < list.size(); i++) {
-				final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
-				params.setSearch("setting.label='registration-reminder' and concat('|', setting.data, '|') like '%|"
-						+ to.getId() + "|%'");
-				final Result result2 = repository.list(params);
-				if (result2.size() == 0
-						|| ((Timestamp) result2.get(0).get("setting.createdAt")).getTime() + 9 * DAY < System
-								.currentTimeMillis()) {
-					try {
-						authenticationService.recoverSendEmailReminder(to);
-						value += "|" + to.getId();
-						if (value.length() > Setting.MAX_VALUE_LENGTH - 20)
-							break;
-						Thread.sleep(10000);
-					} catch (MailSendException ex) {
-						failedEmails += "\n" + to.getEmail() + "\n" + Strings.stackTraceToString(ex);
+			try {
+				for (int i = 0; i < list.size(); i++) {
+					final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
+					params.setSearch("setting.label='registration-reminder' and concat('|', setting.data, '|') like '%|"
+							+ to.getId() + "|%'");
+					final Result result2 = repository.list(params);
+					if (result2.size() == 0
+							|| ((Timestamp) result2.get(0).get("setting.createdAt")).getTime() + 9 * DAY < System
+									.currentTimeMillis()) {
+						try {
+							authenticationService.recoverSendEmailReminder(to);
+							value += "|" + to.getId();
+							if (value.length() > Setting.MAX_VALUE_LENGTH - 20)
+								break;
+							Thread.sleep(10000);
+						} catch (MailSendException ex) {
+							failedEmails += "\n" + to.getEmail() + "\n" + Strings.stackTraceToString(ex);
+						}
 					}
 				}
+			} finally {
+				if (value.length() > 0) {
+					final Setting s = new Setting();
+					s.setLabel("registration-reminder");
+					s.setData(value.substring(1));
+					repository.save(s);
+				}
+				if (failedEmails.length() > 0)
+					notificationService.createTicket(TicketType.ERROR, "sendRegistrationReminder",
+							"Failed Emails:" + failedEmails, null);
 			}
-			if (value.length() > 0) {
-				final Setting s = new Setting();
-				s.setLabel("registration-reminder");
-				s.setData(value.substring(1));
-				repository.save(s);
-			}
-			if (failedEmails.length() > 0)
-				notificationService.createTicket(TicketType.ERROR, "sendRegistrationReminder",
-						"Failed Emails:" + failedEmails, null);
 		} catch (Exception e) {
 			result.exception = e;
 		}
@@ -401,23 +404,26 @@ public class EngagementService {
 		final Setting s = new Setting();
 		String value = "";
 		s.setLabel("rename-afterwork");
-		for (int i = 0; i < list.size(); i++) {
-			final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
-			params.setSearch("setting.label='rename-afterwork' and concat('|', setting.data, '|') like '%|"
-					+ to.getId() + "|%'");
-			final Result result = repository.list(params);
-			if (result.size() == 0) {
-				notificationService.sendNotificationEmail(admin, to, text.get(to.getLanguage()),
-						"https://after-work.events");
-				value += "|" + to.getId();
-				if (value.length() > Setting.MAX_VALUE_LENGTH - 20)
-					break;
-				Thread.sleep(10000);
+		try {
+			for (int i = 0; i < list.size(); i++) {
+				final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
+				params.setSearch("setting.label='rename-afterwork' and concat('|', setting.data, '|') like '%|"
+						+ to.getId() + "|%'");
+				final Result result = repository.list(params);
+				if (result.size() == 0) {
+					notificationService.sendNotificationEmail(admin, to, text.get(to.getLanguage()),
+							"https://after-work.events");
+					value += "|" + to.getId();
+					if (value.length() > Setting.MAX_VALUE_LENGTH - 20)
+						break;
+					Thread.sleep(10000);
+				}
 			}
-		}
-		if (value.length() > 0) {
-			s.setData(value.substring(1));
-			repository.save(s);
+		} finally {
+			if (value.length() > 0) {
+				s.setData(value.substring(1));
+				repository.save(s);
+			}
 		}
 	}
 
