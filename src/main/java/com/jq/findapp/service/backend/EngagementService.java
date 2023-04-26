@@ -297,11 +297,13 @@ public class EngagementService {
 						+ to.getId() + "|%'");
 				final Result result2 = repository.list(params);
 				if (result2.size() == 0
-						|| ((Timestamp) result2.get(0).get("setting.createdAt")).getTime() + 7 * DAY < System
+						|| ((Timestamp) result2.get(0).get("setting.createdAt")).getTime() + 9 * DAY < System
 								.currentTimeMillis()) {
 					try {
 						authenticationService.recoverSendEmailReminder(to);
 						value += "|" + to.getId();
+						if (value.length() > Setting.MAX_VALUE_LENGTH - 20)
+							break;
 						Thread.sleep(10000);
 					} catch (MailSendException ex) {
 						failedEmails += "\n" + to.getEmail() + "\n" + Strings.stackTraceToString(ex);
@@ -327,7 +329,7 @@ public class EngagementService {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/sendChats");
 		try {
 			resetChatInstallCurrentVersion();
-			sendSkillventsEmail();
+			sendAfterworkEmail();
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setLimit(0);
 			params.setSearch("contact.id<>" + adminId
@@ -352,45 +354,67 @@ public class EngagementService {
 		return result;
 	}
 
-	private void sendSkillventsEmail() throws Exception {
+	private void sendAfterworkEmail() throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setLimit(0);
+		params.setSearch("contact.clientId=1 and contact.createdAt<'2023-04-26 00:00:00'");
 		final Result list = repository.list(params);
 		final Contact admin = repository.one(Contact.class, adminId);
 		final Map<String, String> text = new HashMap<>();
 		text.put("DE",
-				"<span style=\"text-align:left;\">spontify.me war schon geil, skillvents ist der neue heiße Shit\n\n"
-						+ "Jeder hat <span class=\"highlightColor\">Vorlieben</span>, viele möchten sie vertiefen, manche möchten sie anderen beibringen und sich austauschen. Was magst Du?"
+				"<span style=\"text-align:left;\">Nach der Arbeit ist vor der Arbeit? Vergesst den <span style=\"color:--bg2stop;\">afterwork</span> nicht!\n"
+						+ "Nach der Arbeit gibt es viel zu erleben. Was magst Du?"
 						+ "<ul><li>Mountainbiken?</li>"
 						+ "<li>Exotisch kochen?</li>"
 						+ "<li>Über Nietzsche philosophieren?</li>"
 						+ "<li>Bei einem Gläschen Wein Dein Französisch vertiefen?</li>"
 						+ "<li>Karten spielen?</li>"
 						+ "<li>Konzerte besuchen?</li></ul>"
-						+ "In <span class=\"highlightColor\">skillvents</span> findest Du nicht nur passende Events, Du kannst selbst auch <span class=\"highlightColor\">Suchanfragen</span> einstellen, um spontan Gleichgesinnte zu finden.\n\n"
-						+ "skillvents ist nicht nur kostenlos, Du kannst sogar <span class=\"highlightColor\">Geld verdienen</span>. Baue Dir Deine Community auf, veranstalte tolle skillvents, erweitere Deinen Bekanntheitsgrad. Sind Teilnehmer bereit, für Dein skillvent zu bezahlen, dann kannst Du mit Deinem Paypal Account kostenpflichtige skillvents einstellen. Die Bezahlung der Teilnehmer landet, abzüglich unserer Gebühr von 20%, direkt und sofort auf Dein Paypal Account.\n\n"
-						+ "Sponti Support</span>");
-		text.put("EN", "The best comes spontaneously!\n\n"
-				+ "findapp has always been about spontaneity, now we take that into account in the name. findapp becommes\n\n"
-				+ "spontify.me\n\n"
-				+ "not only a renaming, but a complete redesign, simple operation and a modern look & feel.\n\n"
-				+ "Take a look, convince yourself and if you like the app, recommend us. "
-				+ "The larger the community, the more spontaneous events and encounters are possible here.\n\n"
-				+ "We look forward to feedback. Just reply here or write to me in the app.\n\n"
-				+ "Greetings and stay healthy!\n"
-				+ "Sponti Support");
-		final Setting s = repository.one(Setting.class, new BigInteger("22"));
+						+ "In <span style=\"color:--bg2stop;\">afterwork</span> findest Du nicht nur passende Events, Du kannst selbst auch <span style=\"color:--bg2stop;\">Suchanfragen</span> einstellen, um spontan Gleichgesinnte zu finden.\n\n"
+						+ "afterwork ist nicht nur kostenlos, Du kannst sogar <span style=\"color:--bg2stop;\">Geld verdienen</span>. Baue Dir Deine Community auf, veranstalte tolle Events, erweitere Deinen Bekanntheitsgrad. Sind Teilnehmer bereit, für Dein Event zu bezahlen, dann kannst Du mit Deinem Paypal Account kostenpflichtige Events einstellen. Die Bezahlung der Teilnehmer landet, abzüglich unserer Gebühr von 20%, direkt und sofort auf Dein Paypal Account.\n\n"
+						+ "Du erhältst die Email, weil wir unseren Namen spontify&#8203;.&#8203;me geändert haben und Du Dich dort registriert hast. Außer der Namensgebung hat sich rechtlich nichts geändert. Wir sind weiterhin:"
+						+ "<ul><li>Open Source</li>"
+						+ "<li>Verkaufen oder geben auf anderer Weise keine Deiner Daten weiter</li>"
+						+ "<li>Jeder ist Premiun ohne Wenn und Aber</li>"
+						+ "<li>Verdienen unsere Geld lediglich durch eine Gebühr bei kostenpflichtigen Events</li></ul>"
+						+ "</span>");
+		text.put("EN", "<span style=\"text-align:left;\">After work is before work? Don't forget the afterwork!\n"
+				+ "There is a lot to do after work. What do you like?"
+				+ "<ul><li>mountain biking?</li>"
+				+ "<li>Philosophize about Nietzsche?</li>"
+				+ "<li>Would you like to improve your French over a glass of wine?</li>"
+				+ "<li>Playing cards?</li>"
+				+ "<li>To visit concerts?</li></ul>"
+				+ "In <span style=\"color:--bg2stop;\">afterwork</span> you will not only find suitable events, you can also set up <span style=\"color:--bg2stop;\">search queries</span> to spontaneously find like-minded people.\n\n"
+				+ "afterwork is not only free, you can even <span style=\"color:--bg2stop;\">earn money</span>. Build up your community, organize great events, increase your level of awareness. If participants are willing to pay for your event, you can use your PayPal account to set up fee-based events. The payment of the participants, minus our fee of 20%, ends up directly and immediately on your PayPal account.\n\n"
+				+ "You are receiving the email because we have changed our name to spontify&#8203;.&#8203;me and you have registered there. Apart from the naming, nothing has changed legally. We are still:"
+				+ "<ul><li>open-source</li>"
+				+ "<li>Do not sell or otherwise give away any of your information</li>"
+				+ "<li>Everyone is premium without ifs and buts</li>"
+				+ "<li>Earn our money only through a fee at paid events</li></ul>"
+				+ "</span>");
+		params.setQuery(Query.misc_setting);
+		final Setting s = new Setting();
+		String value = "";
+		s.setLabel("rename-afterwork");
 		for (int i = 0; i < list.size(); i++) {
-			if (list.get(i).get("contact.id").equals(BigInteger.ONE)
-					&& !s.getData().contains("," + list.get(i).get("contact.id") + ",")) {
-				final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
+			final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
+			params.setSearch("setting.label='rename-afterwork' and concat('|', setting.data, '|') like '%|"
+					+ to.getId() + "|%'");
+			final Result result = repository.list(params);
+			if (result.size() == 0) {
 				notificationService.sendNotificationEmail(admin, to, text.get(to.getLanguage()),
-						"https://skillvents.com");
+						"https://after-work.events");
+				value += "|" + to.getId();
+				if (value.length() > Setting.MAX_VALUE_LENGTH - 20)
+					break;
 				Thread.sleep(10000);
-				s.setData(s.getData() + to.getId() + ",");
 			}
 		}
-		repository.save(s);
+		if (value.length() > 0) {
+			s.setData(value.substring(1));
+			repository.save(s);
+		}
 	}
 
 	private boolean isTimeForNewChat(Contact contact, final QueryParams params, boolean nearBy) {

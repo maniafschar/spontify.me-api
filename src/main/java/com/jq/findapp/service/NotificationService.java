@@ -48,7 +48,6 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.push.Android;
 import com.jq.findapp.service.push.Ios;
 import com.jq.findapp.util.Strings;
@@ -323,11 +322,7 @@ public class NotificationService {
 		final StringBuilder text = new StringBuilder(
 				IOUtils.toString(getClass().getResourceAsStream("/template/email.txt"), StandardCharsets.UTF_8));
 		final String url = repository.one(Client.class, contactTo.getClientId()).getUrl();
-		final Map<String, String> css = (Map<String, String>) new ObjectMapper()
-				.readValue(repository.one(Client.class, contactTo.getClientId()).getCss(), Map.class);
 		String s2;
-		for (String key : css.keySet())
-			Strings.replaceString(html, "--" + key, css.get(key));
 		Strings.replaceString(html, "<jq:logo />", url + "/images/logo.png");
 		Strings.replaceString(html, "<jq:pseudonym />", contactTo.getPseudonym());
 		Strings.replaceString(text, "<jq:pseudonym />", contactTo.getPseudonym());
@@ -354,9 +349,7 @@ public class NotificationService {
 					contactFrom.getPseudonym());
 		Strings.replaceString(html, "<jq:newsTitle />", s2);
 		Strings.replaceString(text, "<jq:newsTitle />", s2);
-		byte[] imgProfile = null;
 		if (contactFrom != null && contactFrom.getImage() != null) {
-			imgProfile = Attachment.getFile(contactFrom.getImage());
 			final QueryParams params = new QueryParams(Query.contact_list);
 			params.setUser(contactFrom);
 			params.setSearch("contact.id=" + contactFrom.getId());
@@ -365,6 +358,11 @@ public class NotificationService {
 							+ "\" width=\"150\" height=\"150\" style=\"height:150px;min-height:150px;max-height:150px;width:150px;min-width:150px;max-width:150px;border-radius:75px;\" />");
 		} else
 			Strings.replaceString(html, "<jq:image />", "");
+		final Map<String, String> css = (Map<String, String>) new ObjectMapper()
+				.readValue(repository.one(Client.class, contactTo.getClientId()).getCss(), Map.class);
+		for (String key : css.keySet())
+			Strings.replaceString(html, "--" + key, css.get(key));
+		message = sanatizeHtml(message);
 		if (message.indexOf("\n") > 0)
 			message = message.substring(0, message.indexOf("\n"));
 		if (message.indexOf("\r") > 0)
@@ -383,7 +381,7 @@ public class NotificationService {
 				message = message.substring(0, 77);
 			message += "...";
 		}
-		sendEmail(contactTo, message, imgProfile, text.toString(), html.toString());
+		sendEmail(contactTo, message, text.toString(), html.toString());
 	}
 
 	private String sanatizeHtml(String s) {
@@ -394,8 +392,7 @@ public class NotificationService {
 		return s.replaceAll("<[^>]*>", "");
 	}
 
-	private void sendEmail(final Contact to, final String subject,
-			final byte[] imgProfile, final String text, String html) throws Exception {
+	private void sendEmail(final Contact to, final String subject, final String text, String html) throws Exception {
 		final String from = to == null ? repository.one(Contact.class, adminId).getEmail()
 				: repository.one(Client.class, to.getClientId()).getEmail();
 		final ImageHtmlEmail email = mailCreateor.create();
@@ -441,10 +438,10 @@ public class NotificationService {
 			ticket.setContactId(user);
 			repository.save(ticket);
 			if (type == TicketType.BLOCK)
-				sendEmail(null, "Block", null, text, null);
+				sendEmail(null, "Block", text, null);
 		} catch (Exception ex) {
 			try {
-				sendEmail(null, type + ": " + subject, null, text, null);
+				sendEmail(null, type + ": " + subject, text, null);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

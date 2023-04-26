@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 
 @Entity
 public class Setting extends BaseEntity {
+	public static transient final int MAX_VALUE_LENGTH = 2000;
 	private String label;
 	private String data;
 
