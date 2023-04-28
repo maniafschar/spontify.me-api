@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,12 +35,13 @@ public class StatisticsApi {
 	@Autowired
 	private AuthenticationService authenticationService;
 
-	@GetMapping("contact")
-	public List<Object[]> contact(@RequestHeader BigInteger user, @RequestHeader String password,
-			@RequestHeader String salt) throws Exception {
+	@GetMapping("contact/{query}")
+	public List<Object[]> contact(@PathVariable final String query, @RequestHeader BigInteger user,
+			@RequestHeader String password, @RequestHeader String salt) throws Exception {
 		final Contact contact = authenticationService.verify(user, password, salt);
 		if (contact.getType() == ContactType.adminContent) {
-			final QueryParams params = new QueryParams(Query.contact_list);
+			final QueryParams params = new QueryParams(Query.valueOf("misc_stats" + query));
+			params.setLimit(0);
 			params.setUser(contact);
 			return repository.list(params).getList();
 		}

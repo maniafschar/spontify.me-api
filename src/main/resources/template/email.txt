@@ -1,5 +1,3 @@
-afterwork
-
 <jq:newsTitle />
 <jq:pseudonym />
 
