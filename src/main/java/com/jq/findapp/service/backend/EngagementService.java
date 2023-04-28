@@ -385,21 +385,22 @@ public class EngagementService {
 						+ "<li>Jeder ist Premiun ohne Wenn und Aber</li>"
 						+ "<li>Verdienen unsere Geld lediglich durch eine Gebühr bei kostenpflichtigen Events</li></ul>"
 						+ "</span>");
-		text.put("EN", "<span style=\"text-align:left;\">After work is before work? Don't forget the afterwork!\n"
-				+ "There is a lot to do after work. What do you like?"
-				+ "<ul><li>mountain biking?</li>"
-				+ "<li>Philosophize about Nietzsche?</li>"
-				+ "<li>Would you like to improve your French over a glass of wine?</li>"
-				+ "<li>Playing cards?</li>"
-				+ "<li>To visit concerts?</li></ul>"
-				+ "In <span style=\"color:--bg2stop;\">afterwork</span> you will not only find suitable events, you can also set up <span style=\"color:--bg2stop;\">search queries</span> to spontaneously find like-minded people.\n\n"
-				+ "afterwork is not only free, you can even <span style=\"color:--bg2stop;\">earn money</span>. Build up your community, organize great events, increase your level of awareness. If participants are willing to pay for your event, you can use your PayPal account to set up fee-based events. The payment of the participants, minus our fee of 20%, ends up directly and immediately on your PayPal account.\n\n"
-				+ "You are receiving the email because we have changed our name to spontify&#8203;.&#8203;me and you have registered there. Apart from the naming, nothing has changed legally. We are still:"
-				+ "<ul><li>open-source</li>"
-				+ "<li>Do not sell or otherwise give away any of your information</li>"
-				+ "<li>Everyone is premium without ifs and buts</li>"
-				+ "<li>Earn our money only through a fee at paid events</li></ul>"
-				+ "</span>");
+		text.put("EN",
+				"<span style=\"text-align:left;\">After work is before work? Don't forget the afterwork!\n"
+						+ "There is a lot to do after work. What do you like?"
+						+ "<ul><li>mountain biking?</li>"
+						+ "<li>Philosophize about Nietzsche?</li>"
+						+ "<li>Would you like to improve your French over a glass of wine?</li>"
+						+ "<li>Playing cards?</li>"
+						+ "<li>To visit concerts?</li></ul>"
+						+ "In <span style=\"color:--bg2stop;\">afterwork</span> you will not only find suitable events, you can also set up <span style=\"color:--bg2stop;\">search queries</span> to spontaneously find like-minded people.\n\n"
+						+ "afterwork is not only free, you can even <span style=\"color:--bg2stop;\">earn money</span>. Build up your community, organize great events, increase your level of awareness. If participants are willing to pay for your event, you can use your PayPal account to set up fee-based events. The payment of the participants, minus our fee of 20%, ends up directly and immediately on your PayPal account.\n\n"
+						+ "You are receiving the email because we have changed our name to spontify&#8203;.&#8203;me and you have registered there. Apart from the naming, nothing has changed legally. We are still:"
+						+ "<ul><li>open-source</li>"
+						+ "<li>Do not sell or otherwise give away any of your information</li>"
+						+ "<li>Everyone is premium without ifs and buts</li>"
+						+ "<li>Earn our money only through a fee at paid events</li></ul>"
+						+ "</span>");
 		params.setQuery(Query.misc_setting);
 		final Setting s = new Setting();
 		String value = "";

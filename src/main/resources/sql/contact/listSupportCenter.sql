@@ -4,6 +4,7 @@ SELECT
 	contact.ageFemale,
 	contact.ageMale,
 	contact.authenticate,
+	contact.clientId,
 	contact.description,
 	contact.skills,
 	contact.skillsText,
