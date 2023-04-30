@@ -61,6 +61,7 @@ public enum Query {
 	misc_statsApi,
 	misc_statsLocations,
 	misc_statsLog,
+	misc_statsLogin,
 	misc_statsUser;
 
 	@Value("${app.admin.id}")
