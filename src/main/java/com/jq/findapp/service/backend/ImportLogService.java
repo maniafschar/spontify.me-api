@@ -1,6 +1,7 @@
 package com.jq.findapp.service.backend;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.URLDecoder;
@@ -33,10 +34,11 @@ public class ImportLogService {
 	public SchedulerResult importLog() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importLog");
 		try {
-			importLog("logAd1");
-			importLog("logAd");
-			importLog("logWeb1");
-			importLog("logWeb");
+			final String[] files = new File(".").list();
+			for (String file : files) {
+				if (file.startsWith("log") && !file.contains(".") && !new File(file).isDirectory())
+					importLog(file);
+			}
 			ipService.lookupLogIps();
 		} catch (Exception e) {
 			result.exception = e;
@@ -51,6 +53,7 @@ public class ImportLogService {
 		try (final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(name)))) {
 			final QueryParams params = new QueryParams(Query.misc_listLog);
 			String line;
+			final String uri = name.substring(3).replaceAll("\\d", "").toLowerCase();
 			while ((line = reader.readLine()) != null) {
 				Matcher m = pattern.matcher(line.replaceAll("\\\\\"", ""));
 				if (m.find()) {
@@ -69,11 +72,12 @@ public class ImportLogService {
 					if (log.getBody().length() > 255)
 						log.setBody(log.getBody().substring(0, 255));
 					log.setPort(80);
-					if ("/stats.html".equals(path) || (!path.contains(".")
-							&& !path.contains("apple-app-site-association")
-							&& !path.startsWith("/rest/")
-							&& log.getStatus() < 400)) {
-						log.setUri(name.contains("Ad") ? "ad" : "web");
+					if (log.getStatus() < 400 &&
+							((path.endsWith(".html") && !path.startsWith("/js/")) || path.endsWith(".pdf") ||
+									(!path.contains(".")
+											&& !path.contains("apple-app-site-association")
+											&& !path.startsWith("/rest/")))) {
+						log.setUri(uri);
 						if (path.length() > 2) {
 							final String[] s = path.split("\\?");
 							if (s[0].length() > 1)
