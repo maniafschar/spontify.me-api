@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.ContactType;
 import com.jq.findapp.repository.Query;
@@ -65,6 +66,15 @@ public class StatisticsApi {
 			}
 			return latLng;
 		}
+		return null;
+	}
+
+	@GetMapping("marketing")
+	public String marketing(@RequestHeader BigInteger user, @RequestHeader String password,
+			@RequestHeader String salt) throws Exception {
+		final Contact contact = authenticationService.verify(user, password, salt);
+		if (contact.getType() == ContactType.adminContent)
+			return repository.one(Client.class, contact.getClientId()).getStorage();
 		return null;
 	}
 }

@@ -52,10 +52,10 @@ public class ImportLogService {
 				"([\\d.]+) (\\S) (\\S) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"(\\w+) ([^ ]*) ([^\"]*)\" (\\d+) (\\d+) \"([^\"]*)\" \"([^\"]*)\"");
 		try (final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(name)))) {
 			final QueryParams params = new QueryParams(Query.misc_listLog);
-			String line;
 			final String uri = name.substring(3).replaceAll("\\d", "").toLowerCase();
+			String line;
 			while ((line = reader.readLine()) != null) {
-				Matcher m = pattern.matcher(line.replaceAll("\\\\\"", ""));
+				final Matcher m = pattern.matcher(line.replaceAll("\\\\\"", ""));
 				if (m.find()) {
 					final String path = m.group(6);
 					final Log log = new Log();
