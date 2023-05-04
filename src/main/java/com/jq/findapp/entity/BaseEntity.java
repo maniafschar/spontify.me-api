@@ -67,7 +67,7 @@ public class BaseEntity {
 								old = new HashMap<>();
 							old.put(name, valueOld);
 						}
-						if (value instanceof String)
+						if (value instanceof String && ((String) value).contains("<"))
 							value = ((String) value).replace("<", "&lt;");
 						getClass()
 								.getDeclaredMethod("set" + name.substring(0, 1).toUpperCase() + name.substring(1),

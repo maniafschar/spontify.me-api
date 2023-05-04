@@ -2,7 +2,6 @@ package com.jq.findapp.entity;
 
 import java.math.BigInteger;
 
-import com.jq.findapp.util.Text;
 import com.jq.findapp.util.Text.TextId;
 
 import jakarta.persistence.Entity;

@@ -1,12 +1,6 @@
 package com.jq.findapp.entity;
 
-import java.math.BigInteger;
-
-import com.jq.findapp.entity.Contact.ContactType;
-import com.jq.findapp.repository.Repository;
-
 import jakarta.persistence.Entity;
-import jakarta.persistence.Transient;
 
 @Entity
 public class Client extends BaseEntity {
@@ -14,7 +8,6 @@ public class Client extends BaseEntity {
 	private String name;
 	private String email;
 	private String url;
-	private String storage;
 
 	public String getName() {
 		return name;
@@ -46,19 +39,5 @@ public class Client extends BaseEntity {
 
 	public void setCss(String css) {
 		this.css = css;
-	}
-
-	public String getStorage() {
-		return storage;
-	}
-
-	public void setStorage(String storage) {
-		this.storage = storage;
-	}
-
-	@Transient
-	@Override
-	public boolean writeAccess(BigInteger user, Repository repository) {
-		return repository.one(Contact.class, user).getType() == ContactType.adminContent;
 	}
 }

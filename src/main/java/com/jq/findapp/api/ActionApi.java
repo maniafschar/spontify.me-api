@@ -30,6 +30,7 @@ import com.jq.findapp.api.model.Position;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
+import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.ContactVideoCall;
 import com.jq.findapp.entity.ContactVisit;
@@ -424,6 +425,57 @@ public class ActionApi {
 			}
 		}
 		return paypalConfig;
+	}
+
+	@GetMapping("marketing")
+	public List<Object[]> marketing(@RequestHeader BigInteger user, @RequestHeader String password,
+			@RequestHeader String salt) throws Exception {
+		final Contact contact = authenticationService.verify(user, password, salt);
+		final QueryParams params = new QueryParams(Query.contact_listGeoLocationHistory);
+		params.setSearch("contactGeoLocationHistory.contactId=" + contact.getId());
+		final Result result = repository.list(params);
+		final GeoLocation geoLocation;
+		if (result.size() > 0)
+			geoLocation = repository.one(GeoLocation.class,
+					(BigInteger) result.get(0).get("contactGeoLocationHistory.geoLocationId"));
+		else
+			geoLocation = null;
+		params.setQuery(Query.misc_listMarketing);
+		final String today = Instant.now().toString().substring(0, 10);
+		String s = "clientMarketing.clientId=" + contact.getClientId()
+				+ " and clientMarketing.startDate<='" + today + "' and clientMarketing.endDate>='" + today
+				+ "' and clientMarketing.language='" + contact.getLanguage() + "' and ";
+		if (contact.getGender() == null)
+			s += "length(clientMarketing.gender)=0 and ";
+		else
+			s += "(length(clientMarketing.gender)=0 or clientMarketing.gender like '%" + contact.getGender()
+					+ "%') and ";
+		if (contact.getAge() == null)
+			s += "clientMarketing.age='18,99' and ";
+		else
+			s += "substring(clientMarketing.age,1,2)<=" + contact.getAge() + " and substring(clientMarketing.age,4,2)>="
+					+ contact.getAge() + " and ";
+		if (geoLocation == null)
+			s += "length(clientMarketing.region)=0";
+		else {
+			s += "(length(clientMarketing.region)=0 or clientMarketing.region like '%" + geoLocation.getTown()
+					+ "%' or concat(' ',clientMarketing.region,' ') like '% " + geoLocation.getCountry() + " %' or ";
+			final String s2 = geoLocation.getZipCode();
+			for (int i = 1; i <= s2.length(); i++) {
+				s += "concat(' ',clientMarketing.region,' ') like '% " + geoLocation.getCountry() + "-"
+						+ s2.substring(0, i) + " %' or ";
+			}
+			s = s.substring(0, s.length() - 4) + ")";
+		}
+		params.setSearch(s);
+		final List<Object[]> list = repository.list(params).getList();
+		params.setQuery(Query.contact_listMarketing);
+		return list.stream().filter(e -> {
+			if (e[0] instanceof String)
+				return true;
+			params.setSearch("contactMarketing.clientMarketingId=" + e[0]);
+			return repository.list(params).size() == 0;
+		}).toList();
 	}
 
 	@GetMapping("ping")

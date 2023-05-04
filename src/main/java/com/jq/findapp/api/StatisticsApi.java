@@ -1,6 +1,7 @@
 package com.jq.findapp.api;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,10 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jq.findapp.entity.Client;
+import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.ContactType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
+import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
@@ -70,11 +73,14 @@ public class StatisticsApi {
 	}
 
 	@GetMapping("marketing")
-	public String marketing(@RequestHeader BigInteger user, @RequestHeader String password,
+	public List<Object[]> marketing(@RequestHeader BigInteger user, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
 		final Contact contact = authenticationService.verify(user, password, salt);
-		if (contact.getType() == ContactType.adminContent)
-			return repository.one(Client.class, contact.getClientId()).getStorage();
+		if (contact.getType() == ContactType.adminContent) {
+			final QueryParams params = new QueryParams(Query.misc_listMarketing);
+			params.setSearch("clientId=" + contact.getClientId());
+			return repository.list(params).getList();
+		}
 		return null;
 	}
 }
