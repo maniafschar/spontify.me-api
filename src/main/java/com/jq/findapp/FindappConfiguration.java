@@ -31,6 +31,7 @@ public class FindappConfiguration implements AsyncConfigurer, WebSocketMessageBr
 	private static final String[] allowedOrigins = {
 			"https://after-work.events",
 			"https://*.fan-club.online",
+			"https://fan-club.online",
 			"https://skills.community",
 			"https://skillvents.com",
 			"https://localhost",

@@ -53,7 +53,7 @@ public class StatisticsApi {
 	}
 
 	@GetMapping("contact/location")
-	public List<Float[]> contactLocation(@RequestHeader BigInteger user, @RequestHeader String password,
+	public List<Object[]> contactLocation(@RequestHeader BigInteger user, @RequestHeader String password,
 			@RequestHeader String salt) throws Exception {
 		final Contact contact = authenticationService.verify(user, password, salt);
 		if (contact.getType() == ContactType.adminContent) {
@@ -62,7 +62,8 @@ public class StatisticsApi {
 			// + " and contactGeoLocationHistory.manual=false and contact.clientId=" +
 			// contact.getClientId());
 			final Result result = repository.list(params);
-			final List<Float[]> latLng = new ArrayList<>();
+			final List<Object[]> latLng = new ArrayList<>();
+			latLng.add(new Object[] { "contact.latitude", "contact.longitude" });
 			for (int i = 0; i < result.size(); i++) {
 				latLng.add(new Float[] { (Float) result.get(i).get("geoLocation.latitude"),
 						(Float) result.get(i).get("geoLocation.longitude") });

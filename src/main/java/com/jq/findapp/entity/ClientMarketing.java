@@ -1,7 +1,7 @@
 package com.jq.findapp.entity;
 
 import java.math.BigInteger;
-import java.sql.Date;
+import java.sql.Timestamp;
 
 import com.jq.findapp.entity.Contact.ContactType;
 import com.jq.findapp.repository.Repository;
@@ -12,13 +12,14 @@ import jakarta.persistence.Transient;
 @Entity
 public class ClientMarketing extends BaseEntity {
 	private BigInteger clientId;
-	private Date startDate;
-	private Date endDate;
+	private Boolean share;
 	private String age;
 	private String gender;
 	private String language;
 	private String region;
 	private String storage;
+	private Timestamp endDate;
+	private Timestamp startDate;
 
 	public BigInteger getClientId() {
 		return clientId;
@@ -28,19 +29,19 @@ public class ClientMarketing extends BaseEntity {
 		this.clientId = clientId;
 	}
 
-	public Date getStartDate() {
+	public Timestamp getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(Date startDate) {
+	public void setStartDate(Timestamp startDate) {
 		this.startDate = startDate;
 	}
 
-	public Date getEndDate() {
+	public Timestamp getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(Date endDate) {
+	public void setEndDate(Timestamp endDate) {
 		this.endDate = endDate;
 	}
 
@@ -82,6 +83,14 @@ public class ClientMarketing extends BaseEntity {
 
 	public void setStorage(String storage) {
 		this.storage = storage;
+	}
+
+	public Boolean getShare() {
+		return share;
+	}
+
+	public void setShare(Boolean share) {
+		this.share = share;
 	}
 
 	@Transient
