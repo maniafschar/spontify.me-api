@@ -473,9 +473,11 @@ public class ActionApi {
 			s += "(length(clientMarketing.region)=0 or clientMarketing.region like '%" + geoLocation.getTown()
 					+ "%' or concat(' ',clientMarketing.region,' ') like '% " + geoLocation.getCountry() + " %' or ";
 			final String s2 = geoLocation.getZipCode();
-			for (int i = 1; i <= s2.length(); i++) {
-				s += "concat(' ',clientMarketing.region,' ') like '% " + geoLocation.getCountry() + "-"
-						+ s2.substring(0, i) + " %' or ";
+			if (s2 != null) {
+				for (int i = 1; i <= s2.length(); i++) {
+					s += "concat(' ',clientMarketing.region,' ') like '% " + geoLocation.getCountry() + "-"
+							+ s2.substring(0, i) + " %' or ";
+				}
 			}
 			s = s.substring(0, s.length() - 4) + ")";
 		}
