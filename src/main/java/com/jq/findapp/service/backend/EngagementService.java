@@ -70,18 +70,18 @@ public class EngagementService {
 			boolean isTrue(Contact contact);
 		}
 
-		private ChatTemplate(TextId textId, String action, Condition condition) {
+		private ChatTemplate(final TextId textId, final String action, final Condition condition) {
 			this.textId = textId;
 			this.condition = condition;
 			this.action = action;
 		}
 
-		boolean eligible(Contact contact) {
+		boolean eligible(final Contact contact) {
 			return condition == null ? true : condition.isTrue(contact);
 		}
 	}
 
-	private List<ChatTemplate> chatTemplates = new ArrayList<>();
+	private final List<ChatTemplate> chatTemplates = new ArrayList<>();
 	private final QueryParams paramsAdminBlocked = new QueryParams(Query.contact_block);
 
 	enum REPLACMENT {
@@ -98,7 +98,7 @@ public class EngagementService {
 				return externalService.getAddress(contact.getLatitude(), contact.getLongitude(), null).getTown();
 			} catch (
 
-		Exception e) {
+		final Exception e) {
 				throw new RuntimeException(e);
 			}
 		}),
@@ -156,12 +156,13 @@ public class EngagementService {
 
 		private final Exec exec;
 
-		private REPLACMENT(Exec exec) {
+		private REPLACMENT(final Exec exec) {
 			this.exec = exec;
 		}
 
-		String replace(String s, Contact contact, Location location, ExternalService externalService,
-				Repository repository) {
+		String replace(final String s, final Contact contact, final Location location,
+				final ExternalService externalService,
+				final Repository repository) {
 			return s.contains(name())
 					? s.replaceAll(name(), exec.replace(contact, location, externalService, repository))
 					: s;
@@ -310,7 +311,7 @@ public class EngagementService {
 							if (value.length() > Setting.MAX_VALUE_LENGTH - 20)
 								break;
 							Thread.sleep(10000);
-						} catch (MailSendException ex) {
+						} catch (final MailSendException ex) {
 							failedEmails += "\n" + to.getEmail() + "\n" + Strings.stackTraceToString(ex);
 						}
 					}
@@ -321,12 +322,14 @@ public class EngagementService {
 					s.setLabel("registration-reminder");
 					s.setData(value.substring(1));
 					repository.save(s);
-				}
+					result.result = "" + value.split("|").length;
+				} else
+					result.result = "0";
 				if (failedEmails.length() > 0)
 					notificationService.createTicket(TicketType.ERROR, "sendRegistrationReminder",
 							"Failed Emails:" + failedEmails, null);
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			result.exception = e;
 		}
 		return result;
@@ -343,19 +346,25 @@ public class EngagementService {
 					+ " and contact.verified=true and contact.version is not null");
 			final Result ids = repository.list(params);
 			params.setQuery(Query.contact_chat);
+			int count = 0;
 			for (int i = 0; i < ids.size(); i++) {
 				params.setSearch("contactChat.contactId=" + adminId + " and contactChat.contactId2="
 						+ ids.get(i).get("contact.id"));
-				if (repository.list(params).size() == 0)
+				if (repository.list(params).size() == 0) {
 					sendChat(TextId.engagement_welcome,
 							repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id")), null, null);
+					count++;
+				}
 			}
+			result.result += "welcome: " + count;
+			count = 0;
 			for (int i = 0; i < ids.size(); i++) {
 				final Contact contact = repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id"));
-				if (isTimeForNewChat(contact, params, false))
-					sendChatTemplate(contact);
+				if (isTimeForNewChat(contact, params, false) && sendChatTemplate(contact))
+					count++;
 			}
-		} catch (Exception e) {
+			result.result += "\ntemplate: " + count;
+		} catch (final Exception e) {
 			result.exception = e;
 		}
 		return result;
@@ -428,7 +437,7 @@ public class EngagementService {
 		}
 	}
 
-	private boolean isTimeForNewChat(Contact contact, final QueryParams params, boolean nearBy) {
+	private boolean isTimeForNewChat(final Contact contact, final QueryParams params, final boolean nearBy) {
 		final int hour = Instant.now().atZone(TimeZone.getTimeZone(contact.getTimezone()).toZoneId()).getHour();
 		if (hour > 6 && hour < 22) {
 			paramsAdminBlocked.setSearch("block.contactId=" + adminId + " and block.contactId2="
@@ -493,15 +502,17 @@ public class EngagementService {
 			params.setLimit(0);
 			final Result ids = repository.list(params);
 			params.setQuery(Query.contact_chat);
+			int count = 0;
 			for (int i = 0; i < ids.size(); i++) {
 				final Contact contact = repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id"));
 				if (isTimeForNewChat(contact, params, true)) {
 					final String action = getLastNearByAction(params, (BigInteger) ids.get(i).get("contact.id"));
-					if (!action.startsWith("p="))
-						sendContact(contact);
+					if (!action.startsWith("p=") && sendContact(contact))
+						count++;
 				}
 			}
-		} catch (Exception e) {
+			result.result = "" + count;
+		} catch (final Exception e) {
 			result.exception = e;
 		}
 		return result;
@@ -525,8 +536,8 @@ public class EngagementService {
 		return new String(Base64.getDecoder().decode(action), StandardCharsets.UTF_8);
 	}
 
-	private boolean sendChatTemplate(Contact contact) throws Exception {
-		for (ChatTemplate chatTemplate : chatTemplates) {
+	private boolean sendChatTemplate(final Contact contact) throws Exception {
+		for (final ChatTemplate chatTemplate : chatTemplates) {
 			if (chatTemplate.eligible(contact) &&
 					sendChat(chatTemplate.textId, contact, null, chatTemplate.action))
 				return true;
@@ -534,7 +545,7 @@ public class EngagementService {
 		return false;
 	}
 
-	private boolean sendContact(Contact contact) throws Exception {
+	private boolean sendContact(final Contact contact) throws Exception {
 		final String search = Score.getSearchContact(contact);
 		if (search.length() > 0) {
 			final QueryParams params = new QueryParams(Query.contact_list);
@@ -574,13 +585,14 @@ public class EngagementService {
 		return false;
 	}
 
-	public boolean sendChat(TextId textId, Contact contact, Location location, String action) throws Exception {
+	public boolean sendChat(final TextId textId, final Contact contact, final Location location, final String action)
+			throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_chat);
 		params.setSearch("contactChat.contactId=" + adminId + " and contactChat.contactId2=" + contact.getId()
 				+ " and contactChat.textId='" + textId.name() + '\'');
 		if (repository.list(params).size() == 0) {
 			String s = text.getText(contact, textId);
-			for (REPLACMENT rep : REPLACMENT.values())
+			for (final REPLACMENT rep : REPLACMENT.values())
 				s = rep.replace(s, contact, location, externalService, repository);
 			final ContactChat contactChat = new ContactChat();
 			contactChat.setContactId(adminId);
@@ -592,7 +604,7 @@ public class EngagementService {
 			try {
 				repository.save(contactChat);
 				return true;
-			} catch (IllegalArgumentException ex) {
+			} catch (final IllegalArgumentException ex) {
 				if (!"duplicate chat".equals(ex.getMessage()))
 					throw new RuntimeException(ex);
 			}

@@ -111,15 +111,15 @@ public class SupportCenterApi {
 	private static final ExecutorService executorService = Executors.newCachedThreadPool();
 
 	@DeleteMapping("user/{id}")
-	public void userDelete(@PathVariable final BigInteger id, @RequestHeader String password,
-			@RequestHeader String salt, @RequestHeader String secret) throws Exception {
+	public void userDelete(@PathVariable final BigInteger id, @RequestHeader final String password,
+			@RequestHeader final String salt, @RequestHeader final String secret) throws Exception {
 		if (supportCenterSecret.equals(secret) && authenticationService.verify(adminId, password, salt) != null)
 			authenticationService.deleteAccount(repository.one(Contact.class, id));
 	}
 
 	@GetMapping("user")
-	public List<Object[]> user(@RequestHeader String password, @RequestHeader String salt,
-			@RequestHeader String secret) {
+	public List<Object[]> user(@RequestHeader final String password, @RequestHeader final String salt,
+			@RequestHeader final String secret) {
 		if (supportCenterSecret.equals(secret)) {
 			final QueryParams params = new QueryParams(Query.contact_listSupportCenter);
 			params.setUser(authenticationService.verify(adminId, password, salt));
@@ -130,8 +130,9 @@ public class SupportCenterApi {
 	}
 
 	@GetMapping("ticket")
-	public List<Object[]> ticket(String search, @RequestHeader String password, @RequestHeader String salt,
-			@RequestHeader String secret) {
+	public List<Object[]> ticket(final String search, @RequestHeader final String password,
+			@RequestHeader final String salt,
+			@RequestHeader final String secret) {
 		if (supportCenterSecret.equals(secret)) {
 			final QueryParams params = new QueryParams(Query.misc_listTicket);
 			params.setUser(authenticationService.verify(adminId, password, salt));
@@ -143,15 +144,16 @@ public class SupportCenterApi {
 	}
 
 	@DeleteMapping("ticket/{id}")
-	public void ticketDelete(@PathVariable final BigInteger id, @RequestHeader String password,
-			@RequestHeader String salt, @RequestHeader String secret) throws Exception {
+	public void ticketDelete(@PathVariable final BigInteger id, @RequestHeader final String password,
+			@RequestHeader final String salt, @RequestHeader final String secret) throws Exception {
 		if (supportCenterSecret.equals(secret) && authenticationService.verify(adminId, password, salt) != null)
 			repository.delete(repository.one(Ticket.class, id));
 	}
 
 	@GetMapping("log")
-	public List<Object[]> log(String search, @RequestHeader String password, @RequestHeader String salt,
-			@RequestHeader String secret) {
+	public List<Object[]> log(final String search, @RequestHeader final String password,
+			@RequestHeader final String salt,
+			@RequestHeader final String secret) {
 		if (supportCenterSecret.equals(secret)) {
 			final QueryParams params = new QueryParams(Query.misc_listLog);
 			params.setUser(authenticationService.verify(adminId, password, salt));
@@ -165,15 +167,17 @@ public class SupportCenterApi {
 	@PostMapping("email")
 	@Produces(MediaType.TEXT_PLAIN)
 	public void email(final BigInteger id, final String text, final String action,
-			@RequestHeader String password, @RequestHeader String salt, @RequestHeader String secret) throws Exception {
+			@RequestHeader final String password, @RequestHeader final String salt, @RequestHeader final String secret)
+			throws Exception {
 		if (supportCenterSecret.equals(secret))
 			notificationService.sendNotificationEmail(authenticationService.verify(adminId, password, salt),
 					repository.one(Contact.class, id), text, action);
 	}
 
 	@PutMapping("resend/{id}")
-	public void resend(@PathVariable final BigInteger id, @RequestHeader String password, @RequestHeader String salt,
-			@RequestHeader String secret)
+	public void resend(@PathVariable final BigInteger id, @RequestHeader final String password,
+			@RequestHeader final String salt,
+			@RequestHeader final String secret)
 			throws Exception {
 		if (supportCenterSecret.equals(secret) && authenticationService.verify(adminId, password, salt) != null)
 			authenticationService.recoverSendEmailReminder(repository.one(Contact.class, id));
@@ -181,15 +185,17 @@ public class SupportCenterApi {
 
 	@PostMapping("import/location/{id}/{category}")
 	public String importLocation(@PathVariable final BigInteger id, @PathVariable final String category,
-			@RequestHeader String password, @RequestHeader String salt, @RequestHeader String secret) throws Exception {
+			@RequestHeader final String password, @RequestHeader final String salt, @RequestHeader final String secret)
+			throws Exception {
 		if (supportCenterSecret.equals(secret) && authenticationService.verify(adminId, password, salt) != null)
 			return importLocationsService.importLocation(id, category);
 		return null;
 	}
 
 	@PostMapping("authenticate/{id}")
-	public void authenticate(@PathVariable final BigInteger id, String image, @RequestHeader String password,
-			@RequestHeader String salt, @RequestHeader String secret) throws Exception {
+	public void authenticate(@PathVariable final BigInteger id, final String image,
+			@RequestHeader final String password,
+			@RequestHeader final String salt, @RequestHeader final String secret) throws Exception {
 		if (supportCenterSecret.equals(secret)) {
 			final Contact contact = authenticationService.verify(adminId, password, salt);
 			contact.setImageAuthenticate(image);
@@ -199,8 +205,8 @@ public class SupportCenterApi {
 	}
 
 	@PutMapping("client/{id}")
-	public void client(@PathVariable final BigInteger id, String data, @RequestHeader String password,
-			@RequestHeader String salt, @RequestHeader String secret) throws Exception {
+	public void client(@PathVariable final BigInteger id, final String data, @RequestHeader final String password,
+			@RequestHeader final String salt, @RequestHeader final String secret) throws Exception {
 		if (supportCenterSecret.equals(secret) && authenticationService.verify(adminId, password, salt) != null) {
 			final Client client = repository.one(Client.class, id);
 			final JsonNode json = new ObjectMapper().readTree(data);
@@ -243,8 +249,8 @@ public class SupportCenterApi {
 	}
 
 	@GetMapping("metrics")
-	public Map<String, Object> metrics(@RequestHeader String password, @RequestHeader String salt,
-			@RequestHeader String secret) throws Exception {
+	public Map<String, Object> metrics(@RequestHeader final String password, @RequestHeader final String salt,
+			@RequestHeader final String secret) throws Exception {
 		if (supportCenterSecret.equals(secret) && authenticationService.verify(adminId, password, salt) != null) {
 			final Map<String, Object> result = new HashMap<>();
 			final Set<String> names = metricsEndpoint.listNames().getNames();
@@ -257,7 +263,7 @@ public class SupportCenterApi {
 	}
 
 	@PutMapping("scheduler")
-	public void scheduler(@RequestHeader String secret) throws Exception {
+	public void scheduler(@RequestHeader final String secret) throws Exception {
 		if (schedulerSecret.equals(secret)) {
 			if (schedulerRunning.size() == 0) {
 				// last job is backup, even after importLog
@@ -274,7 +280,6 @@ public class SupportCenterApi {
 				runLast(engagementService::sendNearBy);
 				runLast(engagementService::sendChats);
 				run(eventService::findMatchingSpontis);
-				run(eventService::notifyParticipation);
 				run(eventService::notifyParticipation);
 			} else
 				throw new RuntimeException("Scheduler already running " + schedulerRunning.size() + " processes");
@@ -300,7 +305,7 @@ public class SupportCenterApi {
 					do {
 						try {
 							Thread.sleep(100);
-						} catch (InterruptedException e) {
+						} catch (final InterruptedException e) {
 							throw new RuntimeException(e);
 						}
 					} while (schedulerRunning.stream().anyMatch(e -> e > id));
@@ -313,7 +318,7 @@ public class SupportCenterApi {
 					final SchedulerResult result = scheduler.run();
 					log.setUri("/support/scheduler/" + result.name);
 					log.setStatus(Strings.isEmpty(result.exception) ? 200 : 500);
-					if (result.result != null)
+					if (!Strings.isEmpty(result.result))
 						log.setBody(result.result.length() > 255 ? result.result.substring(0, 255) : result.result);
 					if (result.exception != null)
 						notificationService.createTicket(TicketType.ERROR, "scheduler",
@@ -323,7 +328,7 @@ public class SupportCenterApi {
 					log.setTime((int) (System.currentTimeMillis() - time));
 					try {
 						repository.save(log);
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						throw new RuntimeException(e);
 					}
 				}
@@ -337,16 +342,16 @@ public class SupportCenterApi {
 
 	public static class SchedulerResult {
 		private final String name;
-		public String result;
+		public String result = "";
 		public Exception exception;
 
-		public SchedulerResult(String name) {
+		public SchedulerResult(final String name) {
 			this.name = name;
 		}
 	}
 
 	@GetMapping("healthcheck")
-	public void healthcheck(@RequestHeader String secret) throws Exception {
+	public void healthcheck(@RequestHeader final String secret) throws Exception {
 		if (schedulerSecret.equals(secret))
 			repository.one(Contact.class, adminId);
 	}

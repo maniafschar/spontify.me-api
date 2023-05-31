@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.entity.Contact;
@@ -43,26 +41,37 @@ public class DBApi {
 	private NotificationService notificationService;
 
 	@GetMapping("one")
-	public Map<String, Object> one(final QueryParams params, @RequestHeader(required = false) BigInteger user,
-			@RequestHeader(required = false) String password, @RequestHeader(required = false) String salt)
-			throws JsonMappingException, JsonProcessingException, IllegalArgumentException {
-		params.setUser(authenticationService.verify(user, password, salt));
-		return repository.one(params);
+	public Map<String, Object> one(final QueryParams params,
+			@RequestHeader(defaultValue = "1") final BigInteger clientId,
+			@RequestHeader final BigInteger user, @RequestHeader final String password,
+			@RequestHeader final String salt) throws Exception {
+		final Contact contact = authenticationService.verify(user, password, salt);
+		if (clientId.equals(contact.getClientId())) {
+			params.setUser(contact);
+			return repository.one(params);
+		}
+		return null;
 	}
 
 	@GetMapping("list")
-	public List<Object[]> list(final QueryParams params, @RequestHeader(required = false) BigInteger user,
-			@RequestHeader(required = false) String password, @RequestHeader(required = false) String salt)
-			throws JsonMappingException, JsonProcessingException, IllegalArgumentException {
-		params.setUser(authenticationService.verify(user, password, salt));
-		return repository.list(params).getList();
+	public List<Object[]> list(final QueryParams params, @RequestHeader(defaultValue = "1") final BigInteger clientId,
+			@RequestHeader final BigInteger user, @RequestHeader final String password,
+			@RequestHeader final String salt) throws Exception {
+		final Contact contact = authenticationService.verify(user, password, salt);
+		if (clientId.equals(contact.getClientId())) {
+			params.setUser(contact);
+			return repository.list(params).getList();
+		}
+		return null;
 	}
 
 	@PutMapping("one")
-	public void save(@RequestBody final WriteEntity entity, @RequestHeader BigInteger user,
-			@RequestHeader String password, @RequestHeader String salt) throws Exception {
-		authenticationService.verify(user, password, salt);
-		if (entity.getValues().containsKey("contactId"))
+	public void save(@RequestBody final WriteEntity entity,
+			@RequestHeader(defaultValue = "1") final BigInteger clientId,
+			@RequestHeader final BigInteger user, @RequestHeader final String password,
+			@RequestHeader final String salt) throws Exception {
+		final Contact contact = authenticationService.verify(user, password, salt);
+		if (!clientId.equals(contact.getClientId()) || entity.getValues().containsKey("contactId"))
 			return;
 		final BaseEntity e = repository.one(entity.getClazz(), entity.getId());
 		if (checkWriteAuthorisation(e, user)) {
@@ -78,26 +87,36 @@ public class DBApi {
 	}
 
 	@PostMapping("one")
-	public BigInteger create(@RequestBody final WriteEntity entity, @RequestHeader BigInteger user,
-			@RequestHeader String password, @RequestHeader String salt) throws Exception {
-		final BaseEntity e = EntityUtil.createEntity(entity, authenticationService.verify(user, password, salt));
-		repository.save(e);
-		return e.getId();
+	public BigInteger create(@RequestBody final WriteEntity entity,
+			@RequestHeader(defaultValue = "1") final BigInteger clientId,
+			@RequestHeader final BigInteger user, @RequestHeader final String password,
+			@RequestHeader final String salt) throws Exception {
+		final Contact contact = authenticationService.verify(user, password, salt);
+		if (clientId.equals(contact.getClientId())) {
+			final BaseEntity e = EntityUtil.createEntity(entity, contact);
+			repository.save(e);
+			return e.getId();
+		}
+		return null;
 	}
 
 	@DeleteMapping("one")
-	public void delete(@RequestBody final WriteEntity entity, @RequestHeader BigInteger user,
-			@RequestHeader String password, @RequestHeader String salt) throws Exception {
-		authenticationService.verify(user, password, salt);
-		final BaseEntity e = repository.one(entity.getClazz(), entity.getId());
-		if (e instanceof Contact)
-			notificationService.createTicket(TicketType.ERROR, "Contact Deletion",
-					"tried to delete contact " + e.getId(), user);
-		else if (checkWriteAuthorisation(e, user))
-			repository.delete(e);
+	public void delete(@RequestBody final WriteEntity entity,
+			@RequestHeader(defaultValue = "1") final BigInteger clientId,
+			@RequestHeader final BigInteger user, @RequestHeader final String password,
+			@RequestHeader final String salt) throws Exception {
+		final Contact contact = authenticationService.verify(user, password, salt);
+		if (clientId.equals(contact.getClientId())) {
+			final BaseEntity e = repository.one(entity.getClazz(), entity.getId());
+			if (e instanceof Contact)
+				notificationService.createTicket(TicketType.ERROR, "Contact Deletion",
+						"tried to delete contact " + e.getId(), user);
+			else if (checkWriteAuthorisation(e, user))
+				repository.delete(e);
+		}
 	}
 
-	private boolean checkWriteAuthorisation(BaseEntity e, BigInteger user) throws Exception {
+	private boolean checkWriteAuthorisation(final BaseEntity e, final BigInteger user) throws Exception {
 		if (e == null)
 			return false;
 		if (e.writeAccess(user, repository))

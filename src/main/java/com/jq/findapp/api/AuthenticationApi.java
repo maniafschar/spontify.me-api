@@ -52,22 +52,22 @@ public class AuthenticationApi {
 	private BigInteger adminId;
 
 	@GetMapping("logoff")
-	public void logoff(String token, @RequestHeader BigInteger user, @RequestHeader String password,
-			@RequestHeader String salt) throws Exception {
+	public void logoff(final String token, @RequestHeader final BigInteger user, @RequestHeader final String password,
+			@RequestHeader final String salt) throws Exception {
 		authenticationService.logoff(authenticationService.verify(user, password, salt), token);
 	}
 
 	@PostMapping("register")
 	public void register(@RequestBody final InternalRegistration registration,
-			@RequestHeader(defaultValue = "1") BigInteger clientId) throws Exception {
+			@RequestHeader(defaultValue = "1") final BigInteger clientId) throws Exception {
 		registration.setClientId(clientId);
 		authenticationService.register(registration);
 	}
 
 	@GetMapping("login")
-	public Map<String, Object> login(Contact contact, String publicKey,
-			@RequestHeader(defaultValue = "1") BigInteger clientId,
-			@RequestHeader String password, @RequestHeader String salt) throws Exception {
+	public Map<String, Object> login(final Contact contact, final String publicKey,
+			@RequestHeader(defaultValue = "1") final BigInteger clientId,
+			@RequestHeader final String password, @RequestHeader final String salt) throws Exception {
 		contact.setEmail(Encryption.decryptBrowser(contact.getEmail()));
 		contact.setClientId(clientId);
 		final Map<String, Object> user = authenticationService.login(contact, password, salt);
@@ -114,7 +114,7 @@ public class AuthenticationApi {
 		return user;
 	}
 
-	private Boolean getVideoTimeSlot(BigInteger id) {
+	private Boolean getVideoTimeSlot(final BigInteger id) {
 		if (adminId.equals(id))
 			return true;
 		final QueryParams params = new QueryParams(Query.contact_listVideoCalls);
@@ -128,14 +128,16 @@ public class AuthenticationApi {
 	}
 
 	@DeleteMapping("one")
-	public void one(@RequestHeader BigInteger user, @RequestHeader String password, @RequestHeader String salt)
-			throws Exception {
-		authenticationService.deleteAccount(authenticationService.verify(user, password, salt));
+	public void one(@RequestHeader(defaultValue = "1") final BigInteger clientId, @RequestHeader final BigInteger user,
+			@RequestHeader final String password, @RequestHeader final String salt) throws Exception {
+		final Contact contact = authenticationService.verify(user, password, salt);
+		if (clientId.equals(contact.getClientId()))
+			authenticationService.deleteAccount(contact);
 	}
 
 	@PutMapping("loginExternal")
 	public String loginExternal(@RequestBody final ExternalRegistration registration,
-			@RequestHeader(defaultValue = "1") BigInteger clientId) throws Exception {
+			@RequestHeader(defaultValue = "1") final BigInteger clientId) throws Exception {
 		registration.setClientId(clientId);
 		registration.getUser().put("id", Encryption.decryptBrowser(registration.getUser().get("id")));
 		final Contact contact = authenticationExternalService.register(registration);
@@ -145,12 +147,12 @@ public class AuthenticationApi {
 	}
 
 	@GetMapping("loginAuto")
-	public String autoLogin(String publicKey, String token) throws IllegalAccessException {
+	public String autoLogin(final String publicKey, final String token) throws IllegalAccessException {
 		return authenticationService.getAutoLogin(publicKey, token);
 	}
 
 	@GetMapping("recoverSendEmail")
-	public String recoverSendEmail(String email, @Context HttpHeaders httpHeaders) throws Exception {
+	public String recoverSendEmail(final String email, @Context final HttpHeaders httpHeaders) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_listLog);
 		params.setSearch("log.ip='" + httpHeaders.get("X-Forwarded-For")
 				+ "' and log.createdAt>'" + Instant.now().minus(Duration.ofDays(1)).toString()
@@ -161,7 +163,7 @@ public class AuthenticationApi {
 	}
 
 	@GetMapping("recoverVerifyEmail")
-	public String recoverVerifyEmail(String publicKey, String token) throws Exception {
+	public String recoverVerifyEmail(final String publicKey, final String token) throws Exception {
 		final Contact contact = authenticationService.recoverVerifyEmail(Encryption.decryptBrowser(token));
 		return contact == null ? null
 				: Encryption.encrypt(

@@ -12,6 +12,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Ip;
+import com.jq.findapp.entity.Ticket;
+import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -29,14 +31,21 @@ public class IpService {
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
 
+	public static String sanatizeIp(final String ip) {
+		if (ip != null && ip.contains(","))
+			return ip.substring(ip.lastIndexOf(",") + 1).trim();
+		return ip;
+	}
+
 	public SchedulerResult lookupIps() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/lookupIps");
-		final QueryParams params2 = new QueryParams(Query.misc_listIp);
-		params2.setSearch("ip.longitude=0 and ip.latitude=0");
-		final Result result2 = repository.list(params2);
-		for (int i = 0; i < result2.size(); i++) {
+		final QueryParams params = new QueryParams(Query.misc_listIp);
+		params.setSearch("ip.longitude=0 and ip.latitude=0");
+		final Result list = repository.list(params);
+		int count = 0;
+		for (int i = 0; i < list.size(); i++) {
 			try {
-				final Ip ip = repository.one(Ip.class, (BigInteger) result2.get(i).get("ip.id"));
+				final Ip ip = repository.one(Ip.class, (BigInteger) list.get(i).get("ip.id"));
 				final String json = WebClient.create(lookupIp.replace("{ip}", ip.getIp())).get().retrieve()
 						.toEntity(String.class).block().getBody();
 				final Ip ip2 = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -53,40 +62,53 @@ public class IpService {
 				ip.setLatitude(Float.parseFloat(location.split(",")[0]));
 				ip.setLongitude(Float.parseFloat(location.split(",")[1]));
 				save(ip);
-			} catch (Exception ex) {
+				count++;
+			} catch (final Exception ex) {
 				result.exception = ex;
 			}
 		}
+		result.result = "" + count;
 		return result;
 	}
 
-	public void lookupLogIps() throws Exception {
+	public int lookupLogIps() throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_listLog);
 		params.setLimit(0);
-		params.setSearch("(log.uri like 'ad%' or log.uri like 'web%') and ip.org is null");
+		params.setSearch("ip.org is null and length(log.ip)>0");
 		final Result result = repository.list(params);
 		params.setQuery(Query.misc_listIp);
+		int count = 0;
 		for (int i = 0; i < result.size(); i++) {
 			params.setSearch("ip.ip='" + result.get(i).get("log.ip") + "'");
 			if (repository.list(params).size() == 0) {
 				final String json = WebClient
 						.create(lookupIp.replace("{ip}", (String) result.get(i).get("log.ip"))).get()
 						.retrieve().toEntity(String.class).block().getBody();
-				final Ip ip2 = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-						.readValue(json, Ip.class);
-				final String location = new ObjectMapper().readTree(json.getBytes(StandardCharsets.UTF_8)).get("loc")
-						.asText();
-				ip2.setLatitude(Float.parseFloat(location.split(",")[0]));
-				ip2.setLongitude(Float.parseFloat(location.split(",")[1]));
-				save(ip2);
+				try {
+					final Ip ip2 = new ObjectMapper()
+							.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+							.readValue(json, Ip.class);
+					final String location = new ObjectMapper().readTree(json).get("loc").asText();
+					ip2.setLatitude(Float.parseFloat(location.split(",")[0]));
+					ip2.setLongitude(Float.parseFloat(location.split(",")[1]));
+					save(ip2);
+					count++;
+				} catch (final Exception ex) {
+					final Ticket ticket = new Ticket();
+					ticket.setSubject("failed ip lookup");
+					ticket.setNote(json);
+					ticket.setType(TicketType.ERROR);
+					repository.save(ticket);
+				}
 			}
 		}
+		return count;
 	}
 
-	private void save(Ip ip) throws Exception {
+	private void save(final Ip ip) throws Exception {
 		try {
 			repository.save(ip);
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			if (!Strings.stackTraceToString(ex).contains("Duplicate entry"))
 				throw ex;
 			final QueryParams params = new QueryParams(Query.misc_listLog);

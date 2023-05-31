@@ -40,7 +40,7 @@ public class ChatService {
 	protected BigInteger adminId;
 
 	@Async
-	public void createGptAnswer(ContactChat contactChat) throws Exception {
+	public void createGptAnswer(final ContactChat contactChat) throws Exception {
 		createGptAnswerIntern(contactChat);
 	}
 
@@ -51,6 +51,7 @@ public class ChatService {
 				+ "' and contactChat.createdAt>'"
 				+ Instant.now().minus(Duration.ofDays(3)) + "'");
 		final Result result2 = repository.list(params);
+		int count = 0;
 		for (int i = 0; i < result2.size(); i++) {
 			params.setSearch(
 					"contactChat.contactId=" + adminId + " and contactChat.id>" + result2.get(i).get("contactChat.id"));
@@ -58,17 +59,19 @@ public class ChatService {
 				try {
 					createGptAnswer(
 							repository.one(ContactChat.class, (BigInteger) result2.get(i).get("contactChat.id")));
-				} catch (Exception ex) {
+					count++;
+				} catch (final Exception ex) {
 					if (result.exception == null)
 						result.exception = ex;
 					break;
 				}
 			}
 		}
+		result.result = "" + count;
 		return result;
 	}
 
-	private void createGptAnswerIntern(ContactChat contactChat) throws Exception {
+	private void createGptAnswerIntern(final ContactChat contactChat) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_chat);
 		params.setSearch("contactChat.textId='" + TextId.engagement_ai.name() + "' and (contactChat.contactId="
 				+ contactChat.getContactId() + " or contactChat.contactId2=" + contactChat.getContactId() + ")");
@@ -91,7 +94,7 @@ public class ChatService {
 	}
 
 	@Async
-	public void notifyContact(ContactChat contactChat) throws Exception {
+	public void notifyContact(final ContactChat contactChat) throws Exception {
 		final Contact contactFrom = repository.one(Contact.class, contactChat.getContactId());
 		final Contact contactTo = repository.one(Contact.class, contactChat.getContactId2());
 		String s = null;

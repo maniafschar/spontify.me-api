@@ -14,6 +14,7 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import com.jq.findapp.entity.Log;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.backend.IpService;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -30,7 +31,7 @@ public class LogFilter implements Filter {
 	private Repository repository;
 
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+	public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
 			throws IOException, ServletException {
 		final ContentCachingRequestWrapper req = new ContentCachingRequestWrapper((HttpServletRequest) request);
 		final HttpServletResponse res = (HttpServletResponse) response;
@@ -45,7 +46,7 @@ public class LogFilter implements Filter {
 				if (log.getReferer().length() > 255)
 					log.setReferer(log.getReferer().substring(0, 255));
 			}
-			log.setIp(req.getHeader("X-Forwarded-For"));
+			log.setIp(IpService.sanatizeIp(req.getHeader("X-Forwarded-For")));
 			log.setPort(req.getLocalPort());
 			if (req.getHeader("user") != null)
 				log.setContactId(new BigInteger(req.getHeader("user")));
@@ -76,7 +77,7 @@ public class LogFilter implements Filter {
 				}
 				try {
 					repository.save(log);
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					e.printStackTrace();
 				}
 			}

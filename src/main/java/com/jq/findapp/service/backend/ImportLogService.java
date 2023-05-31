@@ -35,18 +35,19 @@ public class ImportLogService {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importLog");
 		try {
 			final String[] files = new File(".").list();
-			for (String file : files) {
+			for (final String file : files) {
 				if (file.startsWith("log") && !file.contains(".") && !new File(file).isDirectory())
-					importLog(file);
+					result.result += file + ": " + importLog(file) + "\n";
 			}
-			ipService.lookupLogIps();
-		} catch (Exception e) {
+			result.result += "updated " + ipService.lookupLogIps() + " ips";
+		} catch (final Exception e) {
 			result.exception = e;
 		}
 		return result;
 	}
 
-	private void importLog(final String name) throws Exception {
+	private int importLog(final String name) throws Exception {
+		int count = 0;
 		final DateFormat dateParser = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss", Locale.ENGLISH);
 		final Pattern pattern = Pattern.compile(
 				"([\\d.]+) (\\S) (\\S) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"(\\w+) ([^ ]*) ([^\"]*)\" (\\d+) (\\d+) \"([^\"]*)\" \"([^\"]*)\"");
@@ -59,7 +60,7 @@ public class ImportLogService {
 				if (m.find()) {
 					final String path = m.group(6);
 					final Log log = new Log();
-					log.setIp(m.group(1));
+					log.setIp(IpService.sanatizeIp(m.group(1)));
 					log.setMethod(m.group(5));
 					log.setStatus(Integer.parseInt(m.group(8)));
 					if (!"-".equals(m.group(10))) {
@@ -88,11 +89,14 @@ public class ImportLogService {
 						params.setSearch("log.ip='" + log.getIp() + "' and log.uri='" + log.getUri()
 								+ "' and log.createdAt='" + Instant.ofEpochMilli(log.getCreatedAt().getTime())
 								+ "' and log.body like '" + log.getBody().replace("'", "''") + "'");
-						if (repository.list(params).size() == 0)
+						if (repository.list(params).size() == 0) {
 							repository.save(log);
+							count++;
+						}
 					}
 				}
 			}
 		}
+		return count;
 	}
 }

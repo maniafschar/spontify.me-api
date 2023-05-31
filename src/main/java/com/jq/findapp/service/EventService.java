@@ -56,6 +56,7 @@ public class EventService {
 			params.setSearch(
 					"event.startDate>=current_timestamp and TO_DAYS(event.startDate)-1<=TO_DAYS(current_timestamp)");
 			final LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+			int count = 0;
 			for (int i = 0; i < ids.size(); i++) {
 				params.setUser(repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id")));
 				params.setLatitude(params.getUser().getLatitude());
@@ -73,13 +74,13 @@ public class EventService {
 							final ZonedDateTime t = realDate
 									.atZone(TimeZone.getTimeZone(params.getUser().getTimezone()).toZoneId());
 							final String time = t.getHour() + ":" + (t.getMinute() < 10 ? "0" : "") + t.getMinute();
-							if (event.getLocationId() == null) {
+							if (event.getLocationId() == null)
 								notificationService.sendNotification(contactEvent,
 										params.getUser(), ContactNotificationTextType.eventNotifyWithoutLocation,
 										Strings.encodeParam("e=" + event.getId() + "_" + realDate.toLocalDate()),
 										time,
 										event.getDescription());
-							} else
+							else
 								notificationService.sendNotification(contactEvent,
 										params.getUser(), ContactNotificationTextType.eventNotify,
 										Strings.encodeParam("e=" + event.getId() + "_" + realDate.toLocalDate()),
@@ -87,12 +88,14 @@ public class EventService {
 												? text.getText(params.getUser(), TextId.today)
 												: text.getText(params.getUser(), TextId.tomorrow)) + " " + time,
 										(String) events.get(i2).get("location.name"));
+							count++;
 							break;
 						}
 					}
 				}
 			}
-		} catch (Exception e) {
+			result.result = "" + count;
+		} catch (final Exception e) {
 			result.exception = e;
 		}
 		return result;
@@ -109,6 +112,7 @@ public class EventService {
 			params.setLimit(0);
 			final Result ids = repository.list(params);
 			final ZonedDateTime now = Instant.now().atZone(ZoneOffset.UTC);
+			int count = 0;
 			for (int i = 0; i < ids.size(); i++) {
 				final EventParticipate eventParticipate = repository.one(EventParticipate.class,
 						(BigInteger) ids.get(i).get("eventParticipate.id"));
@@ -135,22 +139,24 @@ public class EventService {
 												"e=" + event.getId() + "_" + eventParticipate.getEventDate()),
 										repository.one(Location.class, event.getLocationId()).getName(),
 										t.getHour() + ":" + (t.getMinute() < 10 ? "0" : "") + t.getMinute());
+								count++;
 							}
 						}
 					}
 				}
 			}
-		} catch (Exception e) {
+			result.result = "" + count;
+		} catch (final Exception e) {
 			result.exception = e;
 		}
 		return result;
 	}
 
-	public LocalDateTime getRealDate(Event event) {
+	public LocalDateTime getRealDate(final Event event) {
 		return getRealDate(event, LocalDateTime.now(ZoneId.systemDefault()));
 	}
 
-	private LocalDateTime getRealDate(Event event, LocalDateTime now) {
+	private LocalDateTime getRealDate(final Event event, final LocalDateTime now) {
 		LocalDateTime realDate = Instant.ofEpochMilli(event.getStartDate().getTime())
 				.atZone(ZoneId.systemDefault()).toLocalDateTime();
 		if (!"o".equals(event.getType())) {
@@ -168,7 +174,7 @@ public class EventService {
 		return realDate;
 	}
 
-	private boolean isMaxParticipants(Event event, LocalDateTime date, Contact contact) {
+	private boolean isMaxParticipants(final Event event, final LocalDateTime date, final Contact contact) {
 		if (event.getMaxParticipants() == null)
 			return false;
 		final QueryParams params = new QueryParams(Query.event_listParticipateRaw);

@@ -60,7 +60,7 @@ public class Screenshots {
 		screenshots(openBrowser(2048, 2732)); // iPad 3. gen
 	}
 
-	private String openBrowser(int width, int height) {
+	private String openBrowser(final int width, final int height) {
 		deviceMetrics.put("width", width);
 		deviceMetrics.put("height", height);
 		if (Util.driver != null)
@@ -71,9 +71,9 @@ public class Screenshots {
 		return width + "x" + height;
 	}
 
-	private void screenshots(String name) throws Exception {
-		// Util.driver.get("https://after-work.events/");
-		Util.driver.get("https://demo.fan-club.online/");
+	private void screenshots(final String name) throws Exception {
+		Util.driver.get("https://after-work.events/");
+		// Util.driver.get("https://demo.fan-club.online/");
 		Util.sleep(3000);
 		js.executeScript(
 				"var p={},e=ui.qa('card img');for(var i=0;i<e.length;i++)if(p[e[i].src])ui.parents(e[i],'card').outerHTML='';else p[e[i].src]=true;");
@@ -132,7 +132,7 @@ public class Screenshots {
 		js.executeScript("geoData.save({latitude:48.119335544742256,longitude:11.564400465904775})");
 	}
 
-	private void screenshot(String name) throws Exception {
+	private void screenshot(final String name) throws Exception {
 		IOUtils.write(((ChromeDriver) Util.driver).getScreenshotAs(OutputType.BYTES),
 				new FileOutputStream(dir + name + ".png"));
 	}

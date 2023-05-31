@@ -49,6 +49,7 @@ import com.jq.findapp.service.AuthenticationService.Unique;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.NotificationService.Ping;
+import com.jq.findapp.service.backend.IpService;
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
@@ -165,8 +166,10 @@ public class ActionApi {
 	}
 
 	@GetMapping("one")
-	public Map<String, Object> one(final QueryParams params, @RequestHeader(defaultValue = "1") final BigInteger clientId,
-			@RequestHeader(required = false) final BigInteger user, @RequestHeader(required = false) final String password,
+	public Map<String, Object> one(final QueryParams params,
+			@RequestHeader(defaultValue = "1") final BigInteger clientId,
+			@RequestHeader(required = false) final BigInteger user,
+			@RequestHeader(required = false) final String password,
 			@RequestHeader(required = false) final String salt) throws Exception {
 		if (user == null) {
 			if (params.getQuery() != Query.contact_listTeaser && params.getQuery() != Query.event_listTeaser)
@@ -239,7 +242,8 @@ public class ActionApi {
 	@GetMapping("teaser/{type}")
 	public List<Object[]> teaser(@PathVariable final String type,
 			@RequestHeader(defaultValue = "1") final BigInteger clientId,
-			@RequestHeader(required = false) final BigInteger user, @RequestHeader(required = false) final String password,
+			@RequestHeader(required = false) final BigInteger user,
+			@RequestHeader(required = false) final String password,
 			@RequestHeader(required = false) final String salt,
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
 		final QueryParams params = new QueryParams(
@@ -261,7 +265,7 @@ public class ActionApi {
 						final Ip ip2 = new Ip();
 						ip2.setLatitude(0f);
 						ip2.setLongitude(0f);
-						ip2.setIp(ip);
+						ip2.setIp(IpService.sanatizeIp(ip));
 						repository.save(ip2);
 					} catch (final PersistenceException ex) {
 						// most probably added meanwhile, just continue
@@ -321,55 +325,61 @@ public class ActionApi {
 
 	@PostMapping("position")
 	public Map<String, Object> position(@RequestBody final Position position,
-			@RequestHeader final BigInteger user, @RequestHeader final String password, @RequestHeader final String salt)
-			throws Exception {
+			@RequestHeader(defaultValue = "1") final BigInteger clientId, @RequestHeader final BigInteger user,
+			@RequestHeader final String password, @RequestHeader final String salt) throws Exception {
 		final Contact contact = authenticationService.verify(user, password, salt);
-		contact.setLatitude(position.getLatitude());
-		contact.setLongitude(position.getLongitude());
-		repository.save(contact);
-		final QueryParams params = new QueryParams(Query.contact_listGeoLocationHistory);
-		params.setSearch("contactGeoLocationHistory.createdAt>'" + Instant.now().minus(Duration.ofSeconds(5))
-				+ "' and contactGeoLocationHistory.contactId=" + contact.getId());
-		if (repository.list(params).size() == 0) {
-			final GeoLocation geoLocation = externalService.getAddress(position.getLatitude(),
-					position.getLongitude(), user);
-			if (geoLocation != null) {
-				final Map<String, Object> result = new HashMap<>();
-				if (geoLocation.getStreet() != null && geoLocation.getNumber() != null)
-					result.put("street", geoLocation.getStreet() + ' ' + geoLocation.getNumber());
-				else
-					result.put("street", geoLocation.getStreet());
-				result.put("town", geoLocation.getTown() != null ? geoLocation.getTown() : geoLocation.getCountry());
-				final ContactGeoLocationHistory contactGeoLocationHistory = new ContactGeoLocationHistory();
-				contactGeoLocationHistory.setContactId(contact.getId());
-				contactGeoLocationHistory.setGeoLocationId(geoLocation.getId());
-				contactGeoLocationHistory.setAccuracy(position.getAccuracy());
-				contactGeoLocationHistory.setAltitude(position.getAltitude());
-				contactGeoLocationHistory.setHeading(position.getHeading());
-				contactGeoLocationHistory.setSpeed(position.getSpeed());
-				contactGeoLocationHistory.setManual(position.isManual());
-				repository.save(contactGeoLocationHistory);
-				return result;
+		if (clientId.equals(contact.getClientId())) {
+			contact.setLatitude(position.getLatitude());
+			contact.setLongitude(position.getLongitude());
+			repository.save(contact);
+			final QueryParams params = new QueryParams(Query.contact_listGeoLocationHistory);
+			params.setSearch("contactGeoLocationHistory.createdAt>'" + Instant.now().minus(Duration.ofSeconds(5))
+					+ "' and contactGeoLocationHistory.contactId=" + contact.getId());
+			if (repository.list(params).size() == 0) {
+				final GeoLocation geoLocation = externalService.getAddress(position.getLatitude(),
+						position.getLongitude(), user);
+				if (geoLocation != null) {
+					final Map<String, Object> result = new HashMap<>();
+					if (geoLocation.getStreet() != null && geoLocation.getNumber() != null)
+						result.put("street", geoLocation.getStreet() + ' ' + geoLocation.getNumber());
+					else
+						result.put("street", geoLocation.getStreet());
+					result.put("town",
+							geoLocation.getTown() != null ? geoLocation.getTown() : geoLocation.getCountry());
+					final ContactGeoLocationHistory contactGeoLocationHistory = new ContactGeoLocationHistory();
+					contactGeoLocationHistory.setContactId(contact.getId());
+					contactGeoLocationHistory.setGeoLocationId(geoLocation.getId());
+					contactGeoLocationHistory.setAccuracy(position.getAccuracy());
+					contactGeoLocationHistory.setAltitude(position.getAltitude());
+					contactGeoLocationHistory.setHeading(position.getHeading());
+					contactGeoLocationHistory.setSpeed(position.getSpeed());
+					contactGeoLocationHistory.setManual(position.isManual());
+					repository.save(contactGeoLocationHistory);
+					return result;
+				}
 			}
 		}
 		return null;
 	}
 
 	@PostMapping("appointment")
-	public void appointment(@RequestBody final ContactVideoCall videoCall, @RequestHeader final BigInteger user,
+	public void appointment(@RequestBody final ContactVideoCall videoCall,
+			@RequestHeader(defaultValue = "1") final BigInteger clientId, @RequestHeader final BigInteger user,
 			@RequestHeader final String password, @RequestHeader final String salt) throws Exception {
 		final Contact contact = authenticationService.verify(user, password, salt);
-		videoCall.setContactId(user);
-		repository.save(videoCall);
-		final String note = text.getText(contact, TextId.notification_authenticate)
-				.replace("{0}", Strings.formatDate(null, videoCall.getTime(), contact.getTimezone()));
-		final ContactChat chat = new ContactChat();
-		chat.setContactId(adminId);
-		chat.setContactId2(user);
-		chat.setTextId(TextId.notification_authenticate);
-		chat.setNote(note);
-		chat.setAction("video.startAdminCall()");
-		repository.save(chat);
+		if (clientId.equals(contact.getClientId())) {
+			videoCall.setContactId(user);
+			repository.save(videoCall);
+			final String note = text.getText(contact, TextId.notification_authenticate)
+					.replace("{0}", Strings.formatDate(null, videoCall.getTime(), contact.getTimezone()));
+			final ContactChat chat = new ContactChat();
+			chat.setContactId(adminId);
+			chat.setContactId2(user);
+			chat.setTextId(TextId.notification_authenticate);
+			chat.setNote(note);
+			chat.setAction("video.startAdminCall()");
+			repository.save(chat);
+		}
 	}
 
 	@PostMapping("paypal")
@@ -396,16 +406,19 @@ public class ActionApi {
 
 	@Async
 	@PostMapping("videocall/{id}")
-	public void videocall(@PathVariable final BigInteger id, @RequestHeader final BigInteger user,
+	public void videocall(@PathVariable final BigInteger id,
+			@RequestHeader(defaultValue = "1") final BigInteger clientId, @RequestHeader final BigInteger user,
 			@RequestHeader final String password, @RequestHeader final String salt) throws Exception {
 		final Contact contact = authenticationService.verify(user, password, salt);
-		notificationService.sendNotification(contact, repository.one(Contact.class, id),
-				ContactNotificationTextType.contactVideoCall, "video=" + user);
+		if (clientId.equals(contact.getClientId()))
+			notificationService.sendNotification(contact, repository.one(Contact.class, id),
+					ContactNotificationTextType.contactVideoCall, "video=" + user);
 	}
 
 	@GetMapping("paypalKey")
 	public Map<String, Object> paypalKey(final BigInteger id, final String publicKey,
-			@RequestHeader(required = false) final BigInteger user, @RequestHeader(required = false) final String password,
+			@RequestHeader(required = false) final BigInteger user,
+			@RequestHeader(required = false) final String password,
 			@RequestHeader(required = false) final String salt) throws Exception {
 		final int fee = 20;
 		final Map<String, Object> paypalConfig = new HashMap<>(3);
