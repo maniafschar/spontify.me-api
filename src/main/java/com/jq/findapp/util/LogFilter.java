@@ -101,22 +101,24 @@ public class LogFilter implements Filter {
 	}
 
 	private void authenticate(final ContentCachingRequestWrapper req) {
-		if (req.getHeader("user") != null) {
-			final BigInteger user = new BigInteger(req.getHeader("user"));
-			if (!BigInteger.ZERO.equals(user)) {
-				final Contact contact = authenticationService.verify(user,
-						req.getHeader("password"), req.getHeader("salt"));
-				if (contact.getClientId().intValue() != Integer.parseInt(req.getHeader("clientId")))
-					throw new RuntimeException("Invalid client header " + req.getHeader("clientId")
-							+ ", expected in contact: " + contact.getClientId());
+		if (!"OPTIONS".equals(req.getMethod())) {
+			if (req.getHeader("user") != null) {
+				final BigInteger user = new BigInteger(req.getHeader("user"));
+				if (!BigInteger.ZERO.equals(user)) {
+					final Contact contact = authenticationService.verify(user,
+							req.getHeader("password"), req.getHeader("salt"));
+					if (contact.getClientId().intValue() != Integer.parseInt(req.getHeader("clientId")))
+						throw new RuntimeException("Invalid client header " + req.getHeader("clientId")
+								+ ", expected in contact: " + contact.getClientId());
+				}
+			} else if (req.getRequestURI().startsWith("/support/")) {
+				if (supportCenterSecret.equals(req.getHeader("secret")))
+					authenticationService.verify(adminId, req.getHeader("password"), req.getHeader("salt"));
+				else if (!schedulerSecret.equals(req.getHeader("secret")) ||
+						!req.getRequestURI().equals("/support/scheduler") &&
+								!req.getRequestURI().equals("/support/healthcheck"))
+					throw new RuntimeException("Invalid access to " + req.getRequestURI());
 			}
-		} else if (!"OPTIONS".equals(req.getMethod()) && req.getRequestURI().startsWith("/support/")) {
-			if (supportCenterSecret.equals(req.getHeader("secret")))
-				authenticationService.verify(adminId, req.getHeader("password"), req.getHeader("salt"));
-			else if (!schedulerSecret.equals(req.getHeader("secret")) ||
-					!req.getRequestURI().equals("/support/scheduler") &&
-							!req.getRequestURI().equals("/support/healthcheck"))
-				throw new RuntimeException("Invalid access to " + req.getRequestURI());
 		}
 	}
 }
