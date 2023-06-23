@@ -43,9 +43,8 @@ public class DBApi {
 	@GetMapping("one")
 	public Map<String, Object> one(final QueryParams params,
 			@RequestHeader(defaultValue = "1") final BigInteger clientId,
-			@RequestHeader final BigInteger user, @RequestHeader final String password,
-			@RequestHeader final String salt) throws Exception {
-		final Contact contact = authenticationService.verify(user, password, salt);
+			@RequestHeader final BigInteger user) throws Exception {
+		final Contact contact = repository.one(Contact.class, user);
 		if (clientId.equals(contact.getClientId())) {
 			params.setUser(contact);
 			return repository.one(params);
@@ -55,9 +54,8 @@ public class DBApi {
 
 	@GetMapping("list")
 	public List<Object[]> list(final QueryParams params, @RequestHeader(defaultValue = "1") final BigInteger clientId,
-			@RequestHeader final BigInteger user, @RequestHeader final String password,
-			@RequestHeader final String salt) throws Exception {
-		final Contact contact = authenticationService.verify(user, password, salt);
+			@RequestHeader final BigInteger user) throws Exception {
+		final Contact contact = repository.one(Contact.class, user);
 		if (clientId.equals(contact.getClientId())) {
 			params.setUser(contact);
 			return repository.list(params).getList();
@@ -68,9 +66,8 @@ public class DBApi {
 	@PutMapping("one")
 	public void save(@RequestBody final WriteEntity entity,
 			@RequestHeader(defaultValue = "1") final BigInteger clientId,
-			@RequestHeader final BigInteger user, @RequestHeader final String password,
-			@RequestHeader final String salt) throws Exception {
-		final Contact contact = authenticationService.verify(user, password, salt);
+			@RequestHeader final BigInteger user) throws Exception {
+		final Contact contact = repository.one(Contact.class, user);
 		if (!clientId.equals(contact.getClientId()) || entity.getValues().containsKey("contactId"))
 			return;
 		final BaseEntity e = repository.one(entity.getClazz(), entity.getId());
@@ -89,9 +86,8 @@ public class DBApi {
 	@PostMapping("one")
 	public BigInteger create(@RequestBody final WriteEntity entity,
 			@RequestHeader(defaultValue = "1") final BigInteger clientId,
-			@RequestHeader final BigInteger user, @RequestHeader final String password,
-			@RequestHeader final String salt) throws Exception {
-		final Contact contact = authenticationService.verify(user, password, salt);
+			@RequestHeader final BigInteger user) throws Exception {
+		final Contact contact = repository.one(Contact.class, user);
 		if (clientId.equals(contact.getClientId())) {
 			final BaseEntity e = EntityUtil.createEntity(entity, contact);
 			repository.save(e);
@@ -103,9 +99,8 @@ public class DBApi {
 	@DeleteMapping("one")
 	public void delete(@RequestBody final WriteEntity entity,
 			@RequestHeader(defaultValue = "1") final BigInteger clientId,
-			@RequestHeader final BigInteger user, @RequestHeader final String password,
-			@RequestHeader final String salt) throws Exception {
-		final Contact contact = authenticationService.verify(user, password, salt);
+			@RequestHeader final BigInteger user) throws Exception {
+		final Contact contact = repository.one(Contact.class, user);
 		if (clientId.equals(contact.getClientId())) {
 			final BaseEntity e = repository.one(entity.getClazz(), entity.getId());
 			if (e instanceof Contact)

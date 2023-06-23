@@ -19,8 +19,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.safari.SafariDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -65,7 +67,7 @@ public class IntegrationTest {
 			addRating();
 			addLocation("location 1", "Melchiorstr. 9\n81479 München", true);
 			addFriend();
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			ex.printStackTrace();
 			Util.sleep(10000);
 			throw ex;
@@ -82,19 +84,19 @@ public class IntegrationTest {
 			try {
 				Util.get("navigation item.events");
 				break;
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				// wait
 			}
 		}
 	}
 
-	private void register(String pseudonym, String email) {
+	private void register(final String pseudonym, final String email) {
 		Util.click("navigation item.events");
 		Util.click("hint buttontext");
 		Util.sendKeys("login input[name=\"email\"]", email);
 		Util.click("login tab:nth-of-type(3)");
 		Util.sendKeys("login input[name=\"pseudonym\"]", pseudonym);
-		Util.click("login input[name=\"agb\"]");
+		Util.click("login input-checkbox[name=\"agb\"]");
 		Util.sleep(5000);
 		Util.click("login buttontext[onclick*=\"register\"]");
 		final String s = Util.email(0).lines().reduce(
@@ -104,7 +106,7 @@ public class IntegrationTest {
 		Util.click("popup buttontext");
 	}
 
-	private void addLocation(String name, String address, boolean duplicate) {
+	private void addLocation(final String name, final String address, final boolean duplicate) {
 		Util.click("navigation item.events");
 		Util.click("menu a[onclick*=\"pageEvent.edit\"]");
 		Util.sleep(600);
@@ -136,9 +138,11 @@ public class IntegrationTest {
 		if (!Util.get("popup .unpaid").getAttribute("style").contains("none"))
 			throw new RuntimeException("Event .unpaid should be invisible!");
 		Util.get("popup input[name=\"price\"]").clear();
-		Util.click("popup hashtags category");
 		Util.click("popup dialogButtons buttontext[onclick*=\"save\"]");
-		Util.click("popup hashtags div label[onclick*=\"Architektur\"]");
+		Util.get("popup input[name=\"startDate\"]").sendKeys("");
+		final Actions act = new Actions(Util.driver);
+		act.keyDown(Keys.SHIFT).sendKeys("\t").keyUp(Keys.SHIFT).build().perform();
+		Util.get("popup input-hashtags").sendKeys("textabc");
 		Util.sendKeys("popup textarea[name=\"description\"]", "mega sex");
 		Util.click("popup dialogButtons buttontext[onclick*=\"save\"]");
 		Util.click("popup dialogButtons buttontext[onclick*=\"save\"]");
@@ -148,26 +152,27 @@ public class IntegrationTest {
 	private void addRating() throws Exception {
 		Util.click("navigation item.events");
 		Util.click("menu a[onclick*=\"ui.query.eventMy()\"]");
-		final String id = Util.get("events row.participate").getAttribute("i").split("_")[0];
+		final String id = Util.get("events list-row.participate").getAttribute("i").split("_")[0];
 		utils.setEventDate(new BigInteger(id), new Timestamp(System.currentTimeMillis() - 86460000));
 		Util.click("menu a[onclick*=\"ui.query.eventTickets()\"]");
-		Util.click("events row.participate");
+		Util.click("events list-row.participate");
 		Util.click("detail buttontext[onclick*=\"ratings.\"]");
 		Util.click("popup buttontext[onclick*=\"ratings.\"]");
 		Util.click("navigation item.search");
 		Util.click("search tabHeader tab[i=\"locations\"]");
 		Util.click("search tabBody div.locations buttontext[onclick*=\"pageSearch\"]");
-		if (!Util.get("search tabBody div.locations row:last-child div text title").getText().contains("location 1"))
+		if (!Util.get("search tabBody div.locations list-row:last-child div text title").getText()
+				.contains("location 1"))
 			throw new RuntimeException("New location not in list!");
-		Util.click("search tabBody div.locations row:last-child");
+		Util.click("search tabBody div.locations list-row:last-child");
 		Util.click("detail ratingSelection");
 		Util.click("search tabHeader tab[i=\"contacts\"]");
 		Util.click("search tabBody div.contacts buttontext[onclick*=\"pageSearch\"]");
-		Util.click("search tabBody div.contacts row:first-child");
+		Util.click("search tabBody div.contacts list-row:first-child");
 		Util.click("detail ratingSelection");
 		Util.click("navigation item.events");
 		Util.click("menu a[onclick*=\"ui.query.eventTickets()\"]");
-		Util.click("events row.participate");
+		Util.click("events list-row.participate");
 		Util.click("detail ratingSelection");
 		Util.click("navigation item.home");
 	}
@@ -178,11 +183,11 @@ public class IntegrationTest {
 		Util.sendKeys("search tabBody div.contacts input[name=\"keywords\"]", "pseudonym");
 		Util.click("search tabBody div.contacts buttontext[onclick*=\"pageSearch.\"]");
 		Util.sleep(1500);
-		Util.click("search tabBody div.contacts row:nth-of-type(1)");
+		Util.click("search tabBody div.contacts list-row:nth-of-type(1)");
 		Util.click("detail buttontext[name=\"buttonFriend\"]");
 		Util.click("detail buttontext[onclick*=\"sendRequestForFriendship\"]");
 		Util.click("navigation item.search");
-		Util.click("search tabBody div.contacts row:nth-of-type(1)");
+		Util.click("search tabBody div.contacts list-row:nth-of-type(1)");
 		Util.click("detail buttontext[name=\"buttonFriend\"]");
 		Util.get("detail text[name=\"friend\"]>div>span");
 		Util.click("navigation item.home");
@@ -191,7 +196,7 @@ public class IntegrationTest {
 	static class Util {
 		static WebDriver driver;
 
-		private static String email(int i) {
+		private static String email(final int i) {
 			sleep(1000);
 			final List<String> files = Arrays.asList(new File("target/email").list());
 			files.sort((e1, e2) -> e1.compareTo(e2));
@@ -199,20 +204,20 @@ public class IntegrationTest {
 				return IOUtils.toString(
 						new FileInputStream(new File("target/email/" + files.get(files.size() - 1 - i))),
 						StandardCharsets.UTF_8);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				throw new RuntimeException(e);
 			}
 		}
 
-		static void sleep(long ms) {
+		static void sleep(final long ms) {
 			try {
 				Thread.sleep(ms);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				throw new RuntimeException(e);
 			}
 		}
 
-		static WebElement get(String path) {
+		static WebElement get(final String path) {
 			final int maxWait = 20;
 			int i = 0;
 			while (driver.findElements(By.cssSelector("main [toggle]")).size() > 0 ||
@@ -232,18 +237,18 @@ public class IntegrationTest {
 			return list.get(0);
 		}
 
-		static void click(String id) {
+		static void click(final String id) {
 			((JavascriptExecutor) driver).executeScript("arguments[0].click()", get(id));
 		}
 
-		static void sendKeys(String path, String keys) {
+		static void sendKeys(final String path, final String keys) {
 			for (int i = 0; i < 5; i++) {
 				try {
 					final WebElement e = get(path);
 					e.clear();
 					e.sendKeys(keys);
 					return;
-				} catch (ElementNotInteractableException e) {
+				} catch (final ElementNotInteractableException e) {
 					sleep(250);
 				}
 			}

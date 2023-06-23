@@ -8,12 +8,15 @@ import java.sql.Timestamp;
 import java.time.Instant;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
+import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Log;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.backend.IpService;
 
 import jakarta.servlet.Filter;
@@ -30,6 +33,15 @@ public class LogFilter implements Filter {
 	@Autowired
 	private Repository repository;
 
+	@Autowired
+	private AuthenticationService authenticationService;
+
+	@Value("${app.admin.id}")
+	private BigInteger adminId;
+
+	@Value("${app.supportCenter.secret}")
+	private String supportCenterSecret;
+
 	@Override
 	public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
 			throws IOException, ServletException {
@@ -37,6 +49,7 @@ public class LogFilter implements Filter {
 		final HttpServletResponse res = (HttpServletResponse) response;
 		final Log log = new Log();
 		log.setWebCall(req.getHeader("webCall"));
+		authenticate(req);
 		final boolean loggable = !"OPTIONS".equals(req.getMethod()) && !"/action/ping".equals(req.getRequestURI());
 		if (loggable) {
 			log.setUri(req.getRequestURI());
@@ -81,6 +94,24 @@ public class LogFilter implements Filter {
 					e.printStackTrace();
 				}
 			}
+		}
+	}
+
+	private void authenticate(final ContentCachingRequestWrapper req) {
+		if (req.getHeader("user") != null) {
+			final BigInteger user = new BigInteger(req.getHeader("user"));
+			if (!BigInteger.ZERO.equals(user)) {
+				final Contact contact = authenticationService.verify(user,
+						req.getHeader("password"), req.getHeader("salt"));
+				if (contact.getClientId().intValue() != Integer.parseInt(req.getHeader("clientId")))
+					throw new RuntimeException("Invalid client header " + req.getHeader("clientId")
+							+ ", expected in contact: " + contact.getClientId());
+			}
+		} else if (!"OPTIONS".equals(req.getMethod()) && req.getRequestURI().startsWith("/support/")) {
+			if (supportCenterSecret.equals(req.getHeader("secret")))
+				authenticationService.verify(adminId, req.getHeader("password"), req.getHeader("salt"));
+			else
+				throw new RuntimeException("Invalid access to /support/");
 		}
 	}
 }

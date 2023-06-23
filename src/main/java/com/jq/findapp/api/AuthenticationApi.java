@@ -52,9 +52,8 @@ public class AuthenticationApi {
 	private BigInteger adminId;
 
 	@GetMapping("logoff")
-	public void logoff(final String token, @RequestHeader final BigInteger user, @RequestHeader final String password,
-			@RequestHeader final String salt) throws Exception {
-		authenticationService.logoff(authenticationService.verify(user, password, salt), token);
+	public void logoff(final String token, @RequestHeader final BigInteger user) throws Exception {
+		authenticationService.logoff(repository.one(Contact.class, user), token);
 	}
 
 	@PostMapping("register")
@@ -128,9 +127,9 @@ public class AuthenticationApi {
 	}
 
 	@DeleteMapping("one")
-	public void one(@RequestHeader(defaultValue = "1") final BigInteger clientId, @RequestHeader final BigInteger user,
-			@RequestHeader final String password, @RequestHeader final String salt) throws Exception {
-		final Contact contact = authenticationService.verify(user, password, salt);
+	public void one(@RequestHeader(defaultValue = "1") final BigInteger clientId, @RequestHeader final BigInteger user)
+			throws Exception {
+		final Contact contact = repository.one(Contact.class, user);
 		if (clientId.equals(contact.getClientId()))
 			authenticationService.deleteAccount(contact);
 	}

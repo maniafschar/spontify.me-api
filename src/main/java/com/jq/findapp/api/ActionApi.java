@@ -121,16 +121,16 @@ public class ActionApi {
 	}
 
 	@GetMapping("quotation")
-	public String quotation(@RequestHeader final BigInteger user, @RequestHeader final String password,
-			@RequestHeader final String salt) {
-		authenticationService.verify(user, password, salt);
+	public String quotation(@RequestHeader final BigInteger user) {
+		if (repository.one(Contact.class, user) == null)
+			return null;
 		return QUOTATION.get((int) (Math.random() * (QUOTATION.size() - 1)));
 	}
 
 	@GetMapping("birthday")
-	public Map<String, String> birthday(@RequestHeader final BigInteger user, @RequestHeader final String password,
-			@RequestHeader final String salt) {
-		authenticationService.verify(user, password, salt);
+	public Map<String, String> birthday(@RequestHeader final BigInteger user) {
+		if (repository.one(Contact.class, user) == null)
+			return null;
 		final Map<String, String> map = new HashMap<>(2);
 		map.put("text", QUOTATION.get((int) (Math.random() * (QUOTATION.size() - 1))));
 		map.put("image", "images/happyBirthday.png");
@@ -139,10 +139,9 @@ public class ActionApi {
 
 	@GetMapping("chat/{id}/{all}")
 	public List<Object[]> chat(@PathVariable final BigInteger id,
-			@PathVariable final boolean all, @RequestHeader final BigInteger user, @RequestHeader final String password,
-			@RequestHeader final String salt) throws Exception {
+			@PathVariable final boolean all, @RequestHeader final BigInteger user) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_chat);
-		params.setUser(authenticationService.verify(user, password, salt));
+		params.setUser(repository.one(Contact.class, user));
 		if (all)
 			params.setSearch("contactChat.contactId=" + user + " and contactChat.contactId2=" + id
 					+ " or contactChat.contactId=" + id + " and contactChat.contactId2=" + user);
@@ -168,9 +167,7 @@ public class ActionApi {
 	@GetMapping("one")
 	public Map<String, Object> one(final QueryParams params,
 			@RequestHeader(defaultValue = "1") final BigInteger clientId,
-			@RequestHeader(required = false) final BigInteger user,
-			@RequestHeader(required = false) final String password,
-			@RequestHeader(required = false) final String salt) throws Exception {
+			@RequestHeader(required = false) final BigInteger user) throws Exception {
 		if (user == null) {
 			if (params.getQuery() != Query.contact_listTeaser && params.getQuery() != Query.event_listTeaser)
 				throw new RuntimeException("unauthenticated request");
@@ -179,7 +176,7 @@ public class ActionApi {
 			contact.setId(BigInteger.ZERO);
 			params.setUser(contact);
 		} else
-			params.setUser(authenticationService.verify(user, password, salt));
+			params.setUser(repository.one(Contact.class, user));
 		final Map<String, Object> one = repository.one(params);
 		if (one != null) {
 			if (user != null) {
@@ -217,17 +214,16 @@ public class ActionApi {
 	}
 
 	@GetMapping("map")
-	public String map(final String source, final String destination, @RequestHeader final BigInteger user,
-			@RequestHeader final String password, @RequestHeader final String salt)
+	public String map(final String source, final String destination, @RequestHeader final BigInteger user)
 			throws Exception {
-		return externalService.map(source, destination, authenticationService.verify(user, password, salt));
+		return externalService.map(source, destination, repository.one(Contact.class, user));
 	}
 
 	@GetMapping("google")
-	public Object google(final String param, @RequestHeader final BigInteger user,
-			@RequestHeader final String password, @RequestHeader final String salt)
+	public Object google(final String param, @RequestHeader final BigInteger user)
 			throws Exception {
-		authenticationService.verify(user, password, salt);
+		if (repository.one(Contact.class, user) == null)
+			return null;
 		if ("js".equals(param))
 			return "https://maps.googleapis.com/maps/api/js?key=" + googleKeyJS;
 		if (param.startsWith("latlng=")) {
@@ -243,8 +239,6 @@ public class ActionApi {
 	public List<Object[]> teaser(@PathVariable final String type,
 			@RequestHeader(defaultValue = "1") final BigInteger clientId,
 			@RequestHeader(required = false) final BigInteger user,
-			@RequestHeader(required = false) final String password,
-			@RequestHeader(required = false) final String salt,
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
 		final QueryParams params = new QueryParams(
 				"contacts".equals(type) ? Query.contact_listTeaser : Query.event_listTeaser);
@@ -278,7 +272,7 @@ public class ActionApi {
 			params.setUser(contact);
 			params.setSearch("contact.teaser=true");
 		} else {
-			params.setUser(authenticationService.verify(user, password, salt));
+			params.setUser(repository.one(Contact.class, user));
 			if (params.getUser().getLatitude() != null) {
 				params.setLatitude(params.getUser().getLatitude());
 				params.setLongitude(params.getUser().getLongitude());
@@ -292,9 +286,9 @@ public class ActionApi {
 	}
 
 	@GetMapping("searchLocation")
-	public List<Map<String, Object>> searchLocation(final String search, @RequestHeader final BigInteger user,
-			@RequestHeader final String password, @RequestHeader final String salt) throws Exception {
-		final Contact contact = authenticationService.verify(user, password, salt);
+	public List<Map<String, Object>> searchLocation(final String search, @RequestHeader final BigInteger user)
+			throws Exception {
+		final Contact contact = repository.one(Contact.class, user);
 		if (Strings.isEmpty(search))
 			return null;
 		final QueryParams params = new QueryParams(Query.location_listId);
@@ -325,9 +319,9 @@ public class ActionApi {
 
 	@PostMapping("position")
 	public Map<String, Object> position(@RequestBody final Position position,
-			@RequestHeader(defaultValue = "1") final BigInteger clientId, @RequestHeader final BigInteger user,
-			@RequestHeader final String password, @RequestHeader final String salt) throws Exception {
-		final Contact contact = authenticationService.verify(user, password, salt);
+			@RequestHeader(defaultValue = "1") final BigInteger clientId, @RequestHeader final BigInteger user)
+			throws Exception {
+		final Contact contact = repository.one(Contact.class, user);
 		if (clientId.equals(contact.getClientId())) {
 			contact.setLatitude(position.getLatitude());
 			contact.setLongitude(position.getLongitude());
@@ -364,9 +358,9 @@ public class ActionApi {
 
 	@PostMapping("appointment")
 	public void appointment(@RequestBody final ContactVideoCall videoCall,
-			@RequestHeader(defaultValue = "1") final BigInteger clientId, @RequestHeader final BigInteger user,
-			@RequestHeader final String password, @RequestHeader final String salt) throws Exception {
-		final Contact contact = authenticationService.verify(user, password, salt);
+			@RequestHeader(defaultValue = "1") final BigInteger clientId, @RequestHeader final BigInteger user)
+			throws Exception {
+		final Contact contact = repository.one(Contact.class, user);
 		if (clientId.equals(contact.getClientId())) {
 			videoCall.setContactId(user);
 			repository.save(videoCall);
@@ -407,9 +401,9 @@ public class ActionApi {
 	@Async
 	@PostMapping("videocall/{id}")
 	public void videocall(@PathVariable final BigInteger id,
-			@RequestHeader(defaultValue = "1") final BigInteger clientId, @RequestHeader final BigInteger user,
-			@RequestHeader final String password, @RequestHeader final String salt) throws Exception {
-		final Contact contact = authenticationService.verify(user, password, salt);
+			@RequestHeader(defaultValue = "1") final BigInteger clientId, @RequestHeader final BigInteger user)
+			throws Exception {
+		final Contact contact = repository.one(Contact.class, user);
 		if (clientId.equals(contact.getClientId()))
 			notificationService.sendNotification(contact, repository.one(Contact.class, id),
 					ContactNotificationTextType.contactVideoCall, "video=" + user);
@@ -417,14 +411,12 @@ public class ActionApi {
 
 	@GetMapping("paypalKey")
 	public Map<String, Object> paypalKey(final BigInteger id, final String publicKey,
-			@RequestHeader(required = false) final BigInteger user,
-			@RequestHeader(required = false) final String password,
-			@RequestHeader(required = false) final String salt) throws Exception {
+			@RequestHeader(required = false) final BigInteger user) throws Exception {
 		final int fee = 20;
 		final Map<String, Object> paypalConfig = new HashMap<>(3);
 		paypalConfig.put("fee", fee);
 		if (user != null) {
-			final Contact contact = authenticationService.verify(user, password, salt);
+			final Contact contact = repository.one(Contact.class, user);
 			final String s = getPaypalKey(user);
 			paypalConfig.put("key", s.substring(0, s.indexOf(':')));
 			paypalConfig.put("currency", "EUR");
@@ -440,9 +432,8 @@ public class ActionApi {
 	}
 
 	@GetMapping("marketing")
-	public List<Object[]> marketing(@RequestHeader final BigInteger user, @RequestHeader final String password,
-			@RequestHeader final String salt) throws Exception {
-		final Contact contact = authenticationService.verify(user, password, salt);
+	public List<Object[]> marketing(@RequestHeader final BigInteger user) throws Exception {
+		final Contact contact = repository.one(Contact.class, user);
 		final QueryParams params = new QueryParams(Query.contact_listGeoLocationHistory);
 		params.setSearch("contactGeoLocationHistory.contactId=" + contact.getId());
 		final Result result = repository.list(params);
@@ -493,9 +484,8 @@ public class ActionApi {
 	}
 
 	@GetMapping("ping")
-	public Ping ping(@RequestHeader final BigInteger user, @RequestHeader final String password,
-			@RequestHeader final String salt) throws Exception {
-		final Contact contact = authenticationService.verify(user, password, salt);
+	public Ping ping(@RequestHeader final BigInteger user) throws Exception {
+		final Contact contact = repository.one(Contact.class, user);
 		contact.setActive(true);
 		repository.save(contact);
 		return notificationService.getPingValues(contact);

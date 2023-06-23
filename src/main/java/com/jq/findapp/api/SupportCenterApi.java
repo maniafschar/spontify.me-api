@@ -105,161 +105,119 @@ public class SupportCenterApi {
 	@Value("${app.scheduler.secret}")
 	private String schedulerSecret;
 
-	@Value("${app.supportCenter.secret}")
-	private String supportCenterSecret;
-
 	private static final ExecutorService executorService = Executors.newCachedThreadPool();
 
 	@DeleteMapping("user/{id}")
-	public void userDelete(@PathVariable final BigInteger id, @RequestHeader final String password,
-			@RequestHeader final String salt, @RequestHeader final String secret) throws Exception {
-		if (supportCenterSecret.equals(secret) && authenticationService.verify(adminId, password, salt) != null)
-			authenticationService.deleteAccount(repository.one(Contact.class, id));
+	public void userDelete(@PathVariable final BigInteger id) throws Exception {
+		authenticationService.deleteAccount(repository.one(Contact.class, id));
 	}
 
 	@GetMapping("user")
-	public List<Object[]> user(@RequestHeader final String password, @RequestHeader final String salt,
-			@RequestHeader final String secret) {
-		if (supportCenterSecret.equals(secret)) {
-			final QueryParams params = new QueryParams(Query.contact_listSupportCenter);
-			params.setUser(authenticationService.verify(adminId, password, salt));
-			params.setLimit(Integer.MAX_VALUE);
-			return repository.list(params).getList();
-		}
-		return null;
+	public List<Object[]> user() {
+		final QueryParams params = new QueryParams(Query.contact_listSupportCenter);
+		params.setUser(repository.one(Contact.class, adminId));
+		params.setLimit(Integer.MAX_VALUE);
+		return repository.list(params).getList();
 	}
 
 	@GetMapping("ticket")
-	public List<Object[]> ticket(final String search, @RequestHeader final String password,
-			@RequestHeader final String salt,
-			@RequestHeader final String secret) {
-		if (supportCenterSecret.equals(secret)) {
-			final QueryParams params = new QueryParams(Query.misc_listTicket);
-			params.setUser(authenticationService.verify(adminId, password, salt));
-			params.setSearch(search);
-			params.setLimit(Integer.MAX_VALUE);
-			return repository.list(params).getList();
-		}
-		return null;
+	public List<Object[]> ticket(final String search) {
+		final QueryParams params = new QueryParams(Query.misc_listTicket);
+		params.setUser(repository.one(Contact.class, adminId));
+		params.setSearch(search);
+		params.setLimit(Integer.MAX_VALUE);
+		return repository.list(params).getList();
 	}
 
 	@DeleteMapping("ticket/{id}")
-	public void ticketDelete(@PathVariable final BigInteger id, @RequestHeader final String password,
-			@RequestHeader final String salt, @RequestHeader final String secret) throws Exception {
-		if (supportCenterSecret.equals(secret) && authenticationService.verify(adminId, password, salt) != null)
-			repository.delete(repository.one(Ticket.class, id));
+	public void ticketDelete(@PathVariable final BigInteger id) throws Exception {
+		repository.delete(repository.one(Ticket.class, id));
 	}
 
 	@GetMapping("log")
-	public List<Object[]> log(final String search, @RequestHeader final String password,
-			@RequestHeader final String salt,
-			@RequestHeader final String secret) {
-		if (supportCenterSecret.equals(secret)) {
-			final QueryParams params = new QueryParams(Query.misc_listLog);
-			params.setUser(authenticationService.verify(adminId, password, salt));
-			params.setSearch(search);
-			params.setLimit(Integer.MAX_VALUE);
-			return repository.list(params).getList();
-		}
-		return null;
+	public List<Object[]> log(final String search) {
+		final QueryParams params = new QueryParams(Query.misc_listLog);
+		params.setUser(repository.one(Contact.class, adminId));
+		params.setSearch(search);
+		params.setLimit(Integer.MAX_VALUE);
+		return repository.list(params).getList();
 	}
 
 	@PostMapping("email")
 	@Produces(MediaType.TEXT_PLAIN)
-	public void email(final BigInteger id, final String text, final String action,
-			@RequestHeader final String password, @RequestHeader final String salt, @RequestHeader final String secret)
-			throws Exception {
-		if (supportCenterSecret.equals(secret))
-			notificationService.sendNotificationEmail(authenticationService.verify(adminId, password, salt),
-					repository.one(Contact.class, id), text, action);
+	public void email(final BigInteger id, final String text, final String action) throws Exception {
+		notificationService.sendNotificationEmail(repository.one(Contact.class, adminId),
+				repository.one(Contact.class, id), text, action);
 	}
 
 	@PutMapping("resend/{id}")
-	public void resend(@PathVariable final BigInteger id, @RequestHeader final String password,
-			@RequestHeader final String salt,
-			@RequestHeader final String secret)
-			throws Exception {
-		if (supportCenterSecret.equals(secret) && authenticationService.verify(adminId, password, salt) != null)
-			authenticationService.recoverSendEmailReminder(repository.one(Contact.class, id));
+	public void resend(@PathVariable final BigInteger id) throws Exception {
+		authenticationService.recoverSendEmailReminder(repository.one(Contact.class, id));
 	}
 
 	@PostMapping("import/location/{id}/{category}")
-	public String importLocation(@PathVariable final BigInteger id, @PathVariable final String category,
-			@RequestHeader final String password, @RequestHeader final String salt, @RequestHeader final String secret)
+	public String importLocation(@PathVariable final BigInteger id, @PathVariable final String category)
 			throws Exception {
-		if (supportCenterSecret.equals(secret) && authenticationService.verify(adminId, password, salt) != null)
-			return importLocationsService.importLocation(id, category);
-		return null;
+		return importLocationsService.importLocation(id, category);
 	}
 
 	@PostMapping("authenticate/{id}")
-	public void authenticate(@PathVariable final BigInteger id, final String image,
-			@RequestHeader final String password,
-			@RequestHeader final String salt, @RequestHeader final String secret) throws Exception {
-		if (supportCenterSecret.equals(secret)) {
-			final Contact contact = authenticationService.verify(adminId, password, salt);
-			contact.setImageAuthenticate(image);
-			contact.setAuthenticate(Boolean.TRUE);
-			repository.save(contact);
-		}
+	public void authenticate(@PathVariable final BigInteger id, final String image) throws Exception {
+		final Contact contact = repository.one(Contact.class, adminId);
+		contact.setImageAuthenticate(image);
+		contact.setAuthenticate(Boolean.TRUE);
+		repository.save(contact);
 	}
 
 	@PutMapping("client/{id}")
-	public void client(@PathVariable final BigInteger id, final String data, @RequestHeader final String password,
-			@RequestHeader final String salt, @RequestHeader final String secret) throws Exception {
-		if (supportCenterSecret.equals(secret) && authenticationService.verify(adminId, password, salt) != null) {
-			final Client client = repository.one(Client.class, id);
-			final JsonNode json = new ObjectMapper().readTree(data);
-			boolean modified = false;
-			String field = "email";
-			if (json.has(field) && !json.get(field).asText().equals(client.getEmail())) {
-				client.setEmail(json.get(field).asText());
+	public void client(@PathVariable final BigInteger id, final String data) throws Exception {
+		final Client client = repository.one(Client.class, id);
+		final JsonNode json = new ObjectMapper().readTree(data);
+		boolean modified = false;
+		String field = "email";
+		if (json.has(field) && !json.get(field).asText().equals(client.getEmail())) {
+			client.setEmail(json.get(field).asText());
+			modified = true;
+		}
+		field = "name";
+		if (json.has(field) && !json.get(field).asText().equals(client.getName())) {
+			client.setName(json.get(field).asText());
+			modified = true;
+		}
+		field = "url";
+		if (json.has(field)) {
+			if (!json.get(field).asText().equals(client.getUrl())) {
+				client.setUrl(json.get(field).asText());
 				modified = true;
 			}
-			field = "name";
-			if (json.has(field) && !json.get(field).asText().equals(client.getName())) {
-				client.setName(json.get(field).asText());
-				modified = true;
-			}
-			field = "url";
-			if (json.has(field)) {
-				if (!json.get(field).asText().equals(client.getUrl())) {
-					client.setUrl(json.get(field).asText());
+			String css = IOUtils.toString(new URL(client.getUrl() + "/css/style.css").openStream(),
+					StandardCharsets.UTF_8);
+			Matcher matcher = Pattern.compile(":root \\{([^}])*").matcher(css);
+			if (matcher.find()) {
+				css = matcher.group();
+				matcher = Pattern.compile("--([^:].*): (.*);").matcher(css);
+				css = "{";
+				while (matcher.find())
+					css += "\"" + matcher.group(1) + "\":\"" + matcher.group(2) + "\",";
+				css = css.substring(0, css.length() - 1) + "}";
+				if (!css.equals(client.getCss())) {
+					client.setCss(css);
 					modified = true;
 				}
-				String css = IOUtils.toString(new URL(client.getUrl() + "/css/style.css").openStream(),
-						StandardCharsets.UTF_8);
-				Matcher matcher = Pattern.compile(":root \\{([^}])*").matcher(css);
-				if (matcher.find()) {
-					css = matcher.group();
-					matcher = Pattern.compile("--([^:].*): (.*);").matcher(css);
-					css = "{";
-					while (matcher.find())
-						css += "\"" + matcher.group(1) + "\":\"" + matcher.group(2) + "\",";
-					css = css.substring(0, css.length() - 1) + "}";
-					if (!css.equals(client.getCss())) {
-						client.setCss(css);
-						modified = true;
-					}
-				}
 			}
-			if (modified)
-				repository.save(client);
 		}
+		if (modified)
+			repository.save(client);
 	}
 
 	@GetMapping("metrics")
-	public Map<String, Object> metrics(@RequestHeader final String password, @RequestHeader final String salt,
-			@RequestHeader final String secret) throws Exception {
-		if (supportCenterSecret.equals(secret) && authenticationService.verify(adminId, password, salt) != null) {
-			final Map<String, Object> result = new HashMap<>();
-			final Set<String> names = metricsEndpoint.listNames().getNames();
-			names.forEach(e -> {
-				result.put(e, metricsEndpoint.metric(e, null));
-			});
-			return result;
-		}
-		return null;
+	public Map<String, Object> metrics() throws Exception {
+		final Map<String, Object> result = new HashMap<>();
+		final Set<String> names = metricsEndpoint.listNames().getNames();
+		names.forEach(e -> {
+			result.put(e, metricsEndpoint.metric(e, null));
+		});
+		return result;
 	}
 
 	@PutMapping("scheduler")
