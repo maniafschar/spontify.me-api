@@ -42,6 +42,9 @@ public class LogFilter implements Filter {
 	@Value("${app.supportCenter.secret}")
 	private String supportCenterSecret;
 
+	@Value("${app.scheduler.secret}")
+	private String schedulerSecret;
+
 	@Override
 	public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
 			throws IOException, ServletException {
@@ -110,8 +113,10 @@ public class LogFilter implements Filter {
 		} else if (!"OPTIONS".equals(req.getMethod()) && req.getRequestURI().startsWith("/support/")) {
 			if (supportCenterSecret.equals(req.getHeader("secret")))
 				authenticationService.verify(adminId, req.getHeader("password"), req.getHeader("salt"));
-			else
-				throw new RuntimeException("Invalid access to /support/");
+			else if (!schedulerSecret.equals(req.getHeader("secret")) ||
+					!req.getRequestURI().equals("/support/scheduler") &&
+							!req.getRequestURI().equals("/support/healthcheck"))
+				throw new RuntimeException("Invalid access to " + req.getRequestURI());
 		}
 	}
 }

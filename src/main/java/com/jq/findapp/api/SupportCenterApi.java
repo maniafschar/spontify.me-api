@@ -102,9 +102,6 @@ public class SupportCenterApi {
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
 
-	@Value("${app.scheduler.secret}")
-	private String schedulerSecret;
-
 	private static final ExecutorService executorService = Executors.newCachedThreadPool();
 
 	@DeleteMapping("user/{id}")
@@ -222,27 +219,24 @@ public class SupportCenterApi {
 
 	@PutMapping("scheduler")
 	public void scheduler(@RequestHeader final String secret) throws Exception {
-		if (schedulerSecret.equals(secret)) {
-			if (schedulerRunning.size() == 0) {
-				// last job is backup, even after importLog
-				runLast(dbService::backup);
-				// importLog paralell to the rest, does not interfere
-				run(importLogService::importLog);
-				run(chatService::answerAi);
-				run(dbService::update);
-				run(ipService::lookupIps);
-				run(statisticsService::update);
-				run(engagementService::sendRegistrationReminder);
-				// sendNearBy and sendChats after all event services
-				// to avoid multiple chat at the same time
-				runLast(engagementService::sendNearBy);
-				runLast(engagementService::sendChats);
-				run(eventService::findMatchingSpontis);
-				run(eventService::notifyParticipation);
-			} else
-				throw new RuntimeException("Scheduler already running " + schedulerRunning.size() + " processes");
+		if (schedulerRunning.size() == 0) {
+			// last job is backup, even after importLog
+			runLast(dbService::backup);
+			// importLog paralell to the rest, does not interfere
+			run(importLogService::importLog);
+			run(chatService::answerAi);
+			run(dbService::update);
+			run(ipService::lookupIps);
+			run(statisticsService::update);
+			run(engagementService::sendRegistrationReminder);
+			// sendNearBy and sendChats after all event services
+			// to avoid multiple chat at the same time
+			runLast(engagementService::sendNearBy);
+			runLast(engagementService::sendChats);
+			run(eventService::findMatchingSpontis);
+			run(eventService::notifyParticipation);
 		} else
-			throw new RuntimeException("Scheduler secret incorrect: " + secret);
+			throw new RuntimeException("Scheduler already running " + schedulerRunning.size() + " processes");
 	}
 
 	private void runLast(final Scheduler scheduler) {
@@ -310,7 +304,6 @@ public class SupportCenterApi {
 
 	@GetMapping("healthcheck")
 	public void healthcheck(@RequestHeader final String secret) throws Exception {
-		if (schedulerSecret.equals(secret))
-			repository.one(Contact.class, adminId);
+		repository.one(Contact.class, adminId);
 	}
 }
