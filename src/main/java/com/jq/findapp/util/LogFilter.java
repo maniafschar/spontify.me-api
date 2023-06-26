@@ -52,7 +52,6 @@ public class LogFilter implements Filter {
 		final HttpServletResponse res = (HttpServletResponse) response;
 		final Log log = new Log();
 		log.setWebCall(req.getHeader("webCall"));
-		authenticate(req);
 		final boolean loggable = !"OPTIONS".equals(req.getMethod()) && !"/action/ping".equals(req.getRequestURI());
 		if (loggable) {
 			log.setUri(req.getRequestURI());
@@ -79,6 +78,7 @@ public class LogFilter implements Filter {
 		}
 		final long time = System.currentTimeMillis();
 		try {
+			authenticate(req);
 			chain.doFilter(req, res);
 		} finally {
 			if (loggable && (!"/support/healthcheck".equals(log.getUri()) || res.getStatus() >= 400)) {

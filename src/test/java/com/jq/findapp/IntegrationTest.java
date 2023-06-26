@@ -92,29 +92,30 @@ public class IntegrationTest {
 
 	private void register(final String pseudonym, final String email) {
 		Util.click("navigation item.events");
-		Util.click("hint buttontext");
+		Util.click("hint button-text");
 		Util.sendKeys("login input[name=\"email\"]", email);
 		Util.click("login tab:nth-of-type(3)");
 		Util.sendKeys("login input[name=\"pseudonym\"]", pseudonym);
 		Util.click("login input-checkbox[name=\"agb\"]");
 		Util.sleep(5000);
-		Util.click("login buttontext[onclick*=\"register\"]");
+		Util.click("login button-text[onclick*=\"register\"]");
+		Util.sleep(1000);
 		final String s = Util.email(0).lines().reduce(
 				(e, e2) -> e.startsWith("https://") ? e : e2.startsWith("https://") ? e2 : "").get();
 		Util.driver.navigate().to(url + s.substring(s.indexOf('?')));
 		Util.sendKeys("popup input[name=\"passwd\"]", "qwer1234");
-		Util.click("popup buttontext");
+		Util.click("popup button-text");
 	}
 
 	private void addLocation(final String name, final String address, final boolean duplicate) {
 		Util.click("navigation item.events");
 		Util.click("menu a[onclick*=\"pageEvent.edit\"]");
 		Util.sleep(600);
-		Util.click("popup buttontext[onclick*=\"pageLocation.edit\"]");
+		Util.click("popup button-text[onclick*=\"pageLocation.edit\"]");
 		Util.sendKeys("popup input[name=\"name\"]", name);
 		Util.get("popup textarea[name=\"address\"]").clear();
 		Util.sendKeys("popup textarea[name=\"address\"]", address);
-		Util.click("popup dialogButtons buttontext");
+		Util.click("popup dialogButtons button-text");
 		if (duplicate) {
 			Util.get("popup popupHint").getText().toLowerCase().contains("location");
 			Util.click("popupTitle");
@@ -138,14 +139,13 @@ public class IntegrationTest {
 		if (!Util.get("popup .unpaid").getAttribute("style").contains("none"))
 			throw new RuntimeException("Event .unpaid should be invisible!");
 		Util.get("popup input[name=\"price\"]").clear();
-		Util.click("popup dialogButtons buttontext[onclick*=\"save\"]");
+		Util.click("popup dialogButtons button-text[onclick*=\"save\"]");
 		Util.get("popup input[name=\"startDate\"]").sendKeys("");
-		final Actions act = new Actions(Util.driver);
-		act.keyDown(Keys.SHIFT).sendKeys("\t").keyUp(Keys.SHIFT).build().perform();
+		new Actions(Util.driver).keyDown(Keys.SHIFT).sendKeys("\t\t\t\t\t\t").keyUp(Keys.SHIFT).build().perform();
 		Util.get("popup input-hashtags").sendKeys("textabc");
 		Util.sendKeys("popup textarea[name=\"description\"]", "mega sex");
-		Util.click("popup dialogButtons buttontext[onclick*=\"save\"]");
-		Util.click("popup dialogButtons buttontext[onclick*=\"save\"]");
+		Util.click("popup dialogButtons button-text[onclick*=\"save\"]");
+		Util.click("popup dialogButtons button-text[onclick*=\"save\"]");
 		Util.click("navigation item.home");
 	}
 
@@ -156,18 +156,18 @@ public class IntegrationTest {
 		utils.setEventDate(new BigInteger(id), new Timestamp(System.currentTimeMillis() - 86460000));
 		Util.click("menu a[onclick*=\"ui.query.eventTickets()\"]");
 		Util.click("events list-row.participate");
-		Util.click("detail buttontext[onclick*=\"ratings.\"]");
-		Util.click("popup buttontext[onclick*=\"ratings.\"]");
+		Util.click("detail button-text[onclick*=\"ratings.\"]");
+		Util.click("popup button-text[onclick*=\"ratings.\"]");
 		Util.click("navigation item.search");
 		Util.click("search tabHeader tab[i=\"locations\"]");
-		Util.click("search tabBody div.locations buttontext[onclick*=\"pageSearch\"]");
-		if (!Util.get("search tabBody div.locations list-row:last-child div text title").getText()
+		Util.click("search tabBody div.locations button-text[onclick*=\"pageSearch\"]");
+		Util.click("search tabBody div.locations list-row:last-child");
+		if (!Util.get("detail title").getText()
 				.contains("location 1"))
 			throw new RuntimeException("New location not in list!");
-		Util.click("search tabBody div.locations list-row:last-child");
 		Util.click("detail ratingSelection");
 		Util.click("search tabHeader tab[i=\"contacts\"]");
-		Util.click("search tabBody div.contacts buttontext[onclick*=\"pageSearch\"]");
+		Util.click("search tabBody div.contacts button-text[onclick*=\"pageSearch\"]");
 		Util.click("search tabBody div.contacts list-row:first-child");
 		Util.click("detail ratingSelection");
 		Util.click("navigation item.events");
@@ -180,15 +180,16 @@ public class IntegrationTest {
 	private void addFriend() {
 		Util.click("navigation item.search");
 		Util.click("search tabHeader tab[i=\"contacts\"]");
-		Util.sendKeys("search tabBody div.contacts input[name=\"keywords\"]", "pseudonym");
-		Util.click("search tabBody div.contacts buttontext[onclick*=\"pageSearch.\"]");
+		Util.get("search tabBody div.contacts input-checkbox").sendKeys("\t");
+		Util.get("search tabBody div.contacts input-hashtags").sendKeys("pseudonym");
+		Util.click("search tabBody div.contacts button-text[onclick*=\"pageSearch.\"]");
 		Util.sleep(1500);
 		Util.click("search tabBody div.contacts list-row:nth-of-type(1)");
-		Util.click("detail buttontext[name=\"buttonFriend\"]");
-		Util.click("detail buttontext[onclick*=\"sendRequestForFriendship\"]");
+		Util.click("detail button-text[name=\"buttonFriend\"]");
+		Util.click("detail button-text[onclick*=\"sendRequestForFriendship\"]");
 		Util.click("navigation item.search");
 		Util.click("search tabBody div.contacts list-row:nth-of-type(1)");
-		Util.click("detail buttontext[name=\"buttonFriend\"]");
+		Util.click("detail button-text[name=\"buttonFriend\"]");
 		Util.get("detail text[name=\"friend\"]>div>span");
 		Util.click("navigation item.home");
 	}
