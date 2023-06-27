@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jq.findapp.api.model.ExternalRegistration;
 import com.jq.findapp.api.model.InternalRegistration;
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactToken;
 import com.jq.findapp.entity.GeoLocation;
@@ -109,6 +110,7 @@ public class AuthenticationApi {
 				repository.save(t);
 				user.put("auto_login_token", Encryption.encrypt(t.getToken(), publicKey));
 			}
+			user.put("is_club", repository.one(Client.class, clientId).getClub());
 		}
 		return user;
 	}
