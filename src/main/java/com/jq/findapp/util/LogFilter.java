@@ -107,7 +107,8 @@ public class LogFilter implements Filter {
 				if (!BigInteger.ZERO.equals(user)) {
 					final Contact contact = authenticationService.verify(user,
 							req.getHeader("password"), req.getHeader("salt"));
-					if (contact.getClientId().intValue() != Integer.parseInt(req.getHeader("clientId")))
+					if (!user.equals(adminId)
+							&& !contact.getClientId().equals(new BigInteger(req.getHeader("clientId"))))
 						throw new RuntimeException("Invalid client header " + req.getHeader("clientId")
 								+ ", expected in contact: " + contact.getClientId());
 				}

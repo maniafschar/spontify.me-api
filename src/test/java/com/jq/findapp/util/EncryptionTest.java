@@ -19,11 +19,11 @@ public class EncryptionTest {
 		try {
 			final String algorithm = "RSA";
 			final KeyFactory kf = KeyFactory.getInstance(algorithm);
-			byte[] key = Base64.getDecoder()
+			final byte[] key = Base64.getDecoder()
 					.decode(IOUtils.toByteArray(EncryptionTest.class.getResourceAsStream("/keys/publicBrowser.key")));
 			ENCRYPT_BROWSER = Cipher.getInstance(algorithm);
 			ENCRYPT_BROWSER.init(Cipher.ENCRYPT_MODE, kf.generatePublic(new X509EncodedKeySpec(key)));
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new RuntimeException("Failed to init encryption keys", e);
 		}
 	}
@@ -31,7 +31,7 @@ public class EncryptionTest {
 	public static String encryptBrowser(final String s) {
 		try {
 			return new String(Base64.getEncoder().encode(ENCRYPT_BROWSER.doFinal(s.getBytes(StandardCharsets.UTF_8))));
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new RuntimeException("Failed to decrypt", e);
 		}
 	}

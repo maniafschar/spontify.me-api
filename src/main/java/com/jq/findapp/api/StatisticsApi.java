@@ -18,7 +18,6 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.AuthenticationService;
 
 import jakarta.transaction.Transactional;
 
@@ -31,9 +30,6 @@ public class StatisticsApi {
 
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
-
-	@Autowired
-	private AuthenticationService authenticationService;
 
 	@GetMapping("contact/{query}")
 	public List<Object[]> contact(@PathVariable final String query, @RequestHeader final BigInteger user)

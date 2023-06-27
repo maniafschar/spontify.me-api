@@ -32,6 +32,7 @@ public class FindappConfiguration implements AsyncConfigurer, WebSocketMessageBr
 			"https://after-work.events",
 			"https://*.fan-club.online",
 			"https://fan-club.online",
+			"https://offline-poker.com",
 			"https://skills.community",
 			"https://skillvents.com",
 			"https://localhost",
@@ -53,7 +54,7 @@ public class FindappConfiguration implements AsyncConfigurer, WebSocketMessageBr
 	public WebMvcConfigurer corsConfigurer() {
 		return new WebMvcConfigurer() {
 			@Override
-			public void addCorsMappings(CorsRegistry registry) {
+			public void addCorsMappings(final CorsRegistry registry) {
 				registry.addMapping("/**").allowedOriginPatterns(allowedOrigins).allowedHeaders("*")
 						.allowedMethods("GET", "PUT", "POST", "ORIGINS", "DELETE");
 			}
@@ -64,7 +65,7 @@ public class FindappConfiguration implements AsyncConfigurer, WebSocketMessageBr
 	public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
 		return new AsyncUncaughtExceptionHandler() {
 			@Override
-			public void handleUncaughtException(Throwable ex, Method method, Object... params) {
+			public void handleUncaughtException(final Throwable ex, final Method method, final Object... params) {
 				String msg = method.getName() + "\n\n" + Strings.stackTraceToString(ex);
 				final Integer hash = msg.hashCode();
 				boolean send = false;
@@ -78,7 +79,7 @@ public class FindappConfiguration implements AsyncConfigurer, WebSocketMessageBr
 						msg += "\n\nParameter " + (i + 1) + ":\n" + params[i];
 					try {
 						notificationService.createTicket(TicketType.ERROR, "async", msg, null);
-					} catch (Exception e1) {
+					} catch (final Exception e1) {
 						// never happend in 20 years...
 					}
 				}
@@ -87,14 +88,14 @@ public class FindappConfiguration implements AsyncConfigurer, WebSocketMessageBr
 	}
 
 	@Override
-	public void configureMessageBroker(MessageBrokerRegistry config) {
+	public void configureMessageBroker(final MessageBrokerRegistry config) {
 		config.enableSimpleBroker("/user");
 		config.setApplicationDestinationPrefixes("/ws");
 		config.setUserDestinationPrefix("/user");
 	}
 
 	@Override
-	public void registerStompEndpoints(StompEndpointRegistry registry) {
+	public void registerStompEndpoints(final StompEndpointRegistry registry) {
 		registry.addEndpoint("/ws/init").setAllowedOriginPatterns(allowedOrigins).withSockJS();
 	}
 }

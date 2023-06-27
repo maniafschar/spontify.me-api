@@ -187,20 +187,20 @@ public class SupportCenterApi {
 				client.setUrl(json.get(field).asText());
 				modified = true;
 			}
-			String css = IOUtils.toString(new URL(client.getUrl() + "/css/style.css").openStream(),
-					StandardCharsets.UTF_8);
-			Matcher matcher = Pattern.compile(":root \\{([^}])*").matcher(css);
-			if (matcher.find()) {
-				css = matcher.group();
-				matcher = Pattern.compile("--([^:].*): (.*);").matcher(css);
-				css = "{";
-				while (matcher.find())
-					css += "\"" + matcher.group(1) + "\":\"" + matcher.group(2) + "\",";
-				css = css.substring(0, css.length() - 1) + "}";
-				if (!css.equals(client.getCss())) {
-					client.setCss(css);
-					modified = true;
-				}
+		}
+		String css = IOUtils.toString(new URL(client.getUrl() + "/css/style.css").openStream(),
+				StandardCharsets.UTF_8);
+		Matcher matcher = Pattern.compile(":root \\{([^}])*").matcher(css);
+		if (matcher.find()) {
+			css = matcher.group();
+			matcher = Pattern.compile("--([^:].*): (.*);").matcher(css);
+			css = "{";
+			while (matcher.find())
+				css += "\"" + matcher.group(1) + "\":\"" + matcher.group(2) + "\",";
+			css = css.substring(0, css.length() - 1) + "}";
+			if (!css.equals(client.getCss())) {
+				client.setCss(css);
+				modified = true;
 			}
 		}
 		if (modified)

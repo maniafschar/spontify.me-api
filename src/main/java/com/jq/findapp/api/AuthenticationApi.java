@@ -57,16 +57,16 @@ public class AuthenticationApi {
 	}
 
 	@PostMapping("register")
-	public void register(@RequestBody final InternalRegistration registration,
-			@RequestHeader(defaultValue = "1") final BigInteger clientId) throws Exception {
+	public void register(@RequestBody final InternalRegistration registration, @RequestHeader final BigInteger clientId)
+			throws Exception {
 		registration.setClientId(clientId);
 		authenticationService.register(registration);
 	}
 
 	@GetMapping("login")
 	public Map<String, Object> login(final Contact contact, final String publicKey,
-			@RequestHeader(defaultValue = "1") final BigInteger clientId,
-			@RequestHeader final String password, @RequestHeader final String salt) throws Exception {
+			@RequestHeader final BigInteger clientId, @RequestHeader final String password,
+			@RequestHeader final String salt) throws Exception {
 		contact.setEmail(Encryption.decryptBrowser(contact.getEmail()));
 		contact.setClientId(clientId);
 		final Map<String, Object> user = authenticationService.login(contact, password, salt);
@@ -127,16 +127,14 @@ public class AuthenticationApi {
 	}
 
 	@DeleteMapping("one")
-	public void one(@RequestHeader(defaultValue = "1") final BigInteger clientId, @RequestHeader final BigInteger user)
+	public void one(@RequestHeader final BigInteger user)
 			throws Exception {
-		final Contact contact = repository.one(Contact.class, user);
-		if (clientId.equals(contact.getClientId()))
-			authenticationService.deleteAccount(contact);
+		authenticationService.deleteAccount(repository.one(Contact.class, user));
 	}
 
 	@PutMapping("loginExternal")
 	public String loginExternal(@RequestBody final ExternalRegistration registration,
-			@RequestHeader(defaultValue = "1") final BigInteger clientId) throws Exception {
+			@RequestHeader final BigInteger clientId) throws Exception {
 		registration.setClientId(clientId);
 		registration.getUser().put("id", Encryption.decryptBrowser(registration.getUser().get("id")));
 		final Contact contact = authenticationExternalService.register(registration);

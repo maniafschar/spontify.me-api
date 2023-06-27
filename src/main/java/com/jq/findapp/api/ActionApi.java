@@ -109,7 +109,7 @@ public class ActionApi {
 	private BigInteger adminId;
 
 	@GetMapping("unique")
-	public Unique unique(@RequestHeader(defaultValue = "1") final BigInteger clientId, final String email) {
+	public Unique unique(@RequestHeader final BigInteger clientId, final String email) {
 		return authenticationService.unique(clientId, email);
 	}
 
@@ -165,8 +165,7 @@ public class ActionApi {
 	}
 
 	@GetMapping("one")
-	public Map<String, Object> one(final QueryParams params,
-			@RequestHeader(defaultValue = "1") final BigInteger clientId,
+	public Map<String, Object> one(final QueryParams params, @RequestHeader final BigInteger clientId,
 			@RequestHeader(required = false) final BigInteger user) throws Exception {
 		if (user == null) {
 			if (params.getQuery() != Query.contact_listTeaser && params.getQuery() != Query.event_listTeaser)
@@ -175,7 +174,9 @@ public class ActionApi {
 			contact.setClientId(clientId);
 			contact.setId(BigInteger.ZERO);
 			params.setUser(contact);
-		} else
+		} else if (repository.one(Contact.class, user) == null)
+			return null;
+		else
 			params.setUser(repository.one(Contact.class, user));
 		final Map<String, Object> one = repository.one(params);
 		if (one != null) {
@@ -236,8 +237,7 @@ public class ActionApi {
 	}
 
 	@GetMapping("teaser/{type}")
-	public List<Object[]> teaser(@PathVariable final String type,
-			@RequestHeader(defaultValue = "1") final BigInteger clientId,
+	public List<Object[]> teaser(@PathVariable final String type, @RequestHeader final BigInteger clientId,
 			@RequestHeader(required = false) final BigInteger user,
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
 		final QueryParams params = new QueryParams(
@@ -271,7 +271,9 @@ public class ActionApi {
 			contact.setId(BigInteger.ZERO);
 			params.setUser(contact);
 			params.setSearch("contact.teaser=true");
-		} else {
+		} else if (repository.one(Contact.class, user) == null)
+			return null;
+		else {
 			params.setUser(repository.one(Contact.class, user));
 			if (params.getUser().getLatitude() != null) {
 				params.setLatitude(params.getUser().getLatitude());
@@ -288,9 +290,9 @@ public class ActionApi {
 	@GetMapping("searchLocation")
 	public List<Map<String, Object>> searchLocation(final String search, @RequestHeader final BigInteger user)
 			throws Exception {
-		final Contact contact = repository.one(Contact.class, user);
 		if (Strings.isEmpty(search))
 			return null;
+		final Contact contact = repository.one(Contact.class, user);
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setLatitude(
 				contact.getLatitude() == null ? GeoLocationProcessor.DEFAULT_LATITUDE : contact.getLatitude());
@@ -318,62 +320,56 @@ public class ActionApi {
 	}
 
 	@PostMapping("position")
-	public Map<String, Object> position(@RequestBody final Position position,
-			@RequestHeader(defaultValue = "1") final BigInteger clientId, @RequestHeader final BigInteger user)
+	public Map<String, Object> position(@RequestBody final Position position, @RequestHeader final BigInteger user)
 			throws Exception {
 		final Contact contact = repository.one(Contact.class, user);
-		if (clientId.equals(contact.getClientId())) {
-			contact.setLatitude(position.getLatitude());
-			contact.setLongitude(position.getLongitude());
-			repository.save(contact);
-			final QueryParams params = new QueryParams(Query.contact_listGeoLocationHistory);
-			params.setSearch("contactGeoLocationHistory.createdAt>'" + Instant.now().minus(Duration.ofSeconds(5))
-					+ "' and contactGeoLocationHistory.contactId=" + contact.getId());
-			if (repository.list(params).size() == 0) {
-				final GeoLocation geoLocation = externalService.getAddress(position.getLatitude(),
-						position.getLongitude(), user);
-				if (geoLocation != null) {
-					final Map<String, Object> result = new HashMap<>();
-					if (geoLocation.getStreet() != null && geoLocation.getNumber() != null)
-						result.put("street", geoLocation.getStreet() + ' ' + geoLocation.getNumber());
-					else
-						result.put("street", geoLocation.getStreet());
-					result.put("town",
-							geoLocation.getTown() != null ? geoLocation.getTown() : geoLocation.getCountry());
-					final ContactGeoLocationHistory contactGeoLocationHistory = new ContactGeoLocationHistory();
-					contactGeoLocationHistory.setContactId(contact.getId());
-					contactGeoLocationHistory.setGeoLocationId(geoLocation.getId());
-					contactGeoLocationHistory.setAccuracy(position.getAccuracy());
-					contactGeoLocationHistory.setAltitude(position.getAltitude());
-					contactGeoLocationHistory.setHeading(position.getHeading());
-					contactGeoLocationHistory.setSpeed(position.getSpeed());
-					contactGeoLocationHistory.setManual(position.isManual());
-					repository.save(contactGeoLocationHistory);
-					return result;
-				}
+		contact.setLatitude(position.getLatitude());
+		contact.setLongitude(position.getLongitude());
+		repository.save(contact);
+		final QueryParams params = new QueryParams(Query.contact_listGeoLocationHistory);
+		params.setSearch("contactGeoLocationHistory.createdAt>'" + Instant.now().minus(Duration.ofSeconds(5))
+				+ "' and contactGeoLocationHistory.contactId=" + contact.getId());
+		if (repository.list(params).size() == 0) {
+			final GeoLocation geoLocation = externalService.getAddress(position.getLatitude(),
+					position.getLongitude(), user);
+			if (geoLocation != null) {
+				final Map<String, Object> result = new HashMap<>();
+				if (geoLocation.getStreet() != null && geoLocation.getNumber() != null)
+					result.put("street", geoLocation.getStreet() + ' ' + geoLocation.getNumber());
+				else
+					result.put("street", geoLocation.getStreet());
+				result.put("town",
+						geoLocation.getTown() != null ? geoLocation.getTown() : geoLocation.getCountry());
+				final ContactGeoLocationHistory contactGeoLocationHistory = new ContactGeoLocationHistory();
+				contactGeoLocationHistory.setContactId(contact.getId());
+				contactGeoLocationHistory.setGeoLocationId(geoLocation.getId());
+				contactGeoLocationHistory.setAccuracy(position.getAccuracy());
+				contactGeoLocationHistory.setAltitude(position.getAltitude());
+				contactGeoLocationHistory.setHeading(position.getHeading());
+				contactGeoLocationHistory.setSpeed(position.getSpeed());
+				contactGeoLocationHistory.setManual(position.isManual());
+				repository.save(contactGeoLocationHistory);
+				return result;
 			}
 		}
 		return null;
 	}
 
 	@PostMapping("appointment")
-	public void appointment(@RequestBody final ContactVideoCall videoCall,
-			@RequestHeader(defaultValue = "1") final BigInteger clientId, @RequestHeader final BigInteger user)
+	public void appointment(@RequestBody final ContactVideoCall videoCall, @RequestHeader final BigInteger user)
 			throws Exception {
 		final Contact contact = repository.one(Contact.class, user);
-		if (clientId.equals(contact.getClientId())) {
-			videoCall.setContactId(user);
-			repository.save(videoCall);
-			final String note = text.getText(contact, TextId.notification_authenticate)
-					.replace("{0}", Strings.formatDate(null, videoCall.getTime(), contact.getTimezone()));
-			final ContactChat chat = new ContactChat();
-			chat.setContactId(adminId);
-			chat.setContactId2(user);
-			chat.setTextId(TextId.notification_authenticate);
-			chat.setNote(note);
-			chat.setAction("video.startAdminCall()");
-			repository.save(chat);
-		}
+		videoCall.setContactId(user);
+		repository.save(videoCall);
+		final String note = text.getText(contact, TextId.notification_authenticate)
+				.replace("{0}", Strings.formatDate(null, videoCall.getTime(), contact.getTimezone()));
+		final ContactChat chat = new ContactChat();
+		chat.setContactId(adminId);
+		chat.setContactId2(user);
+		chat.setTextId(TextId.notification_authenticate);
+		chat.setNote(note);
+		chat.setAction("video.startAdminCall()");
+		repository.save(chat);
 	}
 
 	@PostMapping("paypal")
@@ -400,13 +396,9 @@ public class ActionApi {
 
 	@Async
 	@PostMapping("videocall/{id}")
-	public void videocall(@PathVariable final BigInteger id,
-			@RequestHeader(defaultValue = "1") final BigInteger clientId, @RequestHeader final BigInteger user)
-			throws Exception {
-		final Contact contact = repository.one(Contact.class, user);
-		if (clientId.equals(contact.getClientId()))
-			notificationService.sendNotification(contact, repository.one(Contact.class, id),
-					ContactNotificationTextType.contactVideoCall, "video=" + user);
+	public void videocall(@PathVariable final BigInteger id, @RequestHeader final BigInteger user) throws Exception {
+		notificationService.sendNotification(repository.one(Contact.class, user), repository.one(Contact.class, id),
+				ContactNotificationTextType.contactVideoCall, "video=" + user);
 	}
 
 	@GetMapping("paypalKey")

@@ -20,7 +20,6 @@ import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.EntityUtil;
@@ -35,40 +34,27 @@ public class DBApi {
 	private Repository repository;
 
 	@Autowired
-	private AuthenticationService authenticationService;
-
-	@Autowired
 	private NotificationService notificationService;
 
 	@GetMapping("one")
-	public Map<String, Object> one(final QueryParams params,
-			@RequestHeader(defaultValue = "1") final BigInteger clientId,
-			@RequestHeader final BigInteger user) throws Exception {
-		final Contact contact = repository.one(Contact.class, user);
-		if (clientId.equals(contact.getClientId())) {
-			params.setUser(contact);
-			return repository.one(params);
-		}
-		return null;
+	public Map<String, Object> one(final QueryParams params, @RequestHeader final BigInteger user) throws Exception {
+		if (repository.one(Contact.class, user) == null)
+			return null;
+		params.setUser(repository.one(Contact.class, user));
+		return repository.one(params);
 	}
 
 	@GetMapping("list")
-	public List<Object[]> list(final QueryParams params, @RequestHeader(defaultValue = "1") final BigInteger clientId,
-			@RequestHeader final BigInteger user) throws Exception {
-		final Contact contact = repository.one(Contact.class, user);
-		if (clientId.equals(contact.getClientId())) {
-			params.setUser(contact);
-			return repository.list(params).getList();
-		}
-		return null;
+	public List<Object[]> list(final QueryParams params, @RequestHeader final BigInteger user) throws Exception {
+		if (repository.one(Contact.class, user) == null)
+			return null;
+		params.setUser(repository.one(Contact.class, user));
+		return repository.list(params).getList();
 	}
 
 	@PutMapping("one")
-	public void save(@RequestBody final WriteEntity entity,
-			@RequestHeader(defaultValue = "1") final BigInteger clientId,
-			@RequestHeader final BigInteger user) throws Exception {
-		final Contact contact = repository.one(Contact.class, user);
-		if (!clientId.equals(contact.getClientId()) || entity.getValues().containsKey("contactId"))
+	public void save(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger user) throws Exception {
+		if (repository.one(Contact.class, user) == null || entity.getValues().containsKey("contactId"))
 			return;
 		final BaseEntity e = repository.one(entity.getClazz(), entity.getId());
 		if (checkWriteAuthorisation(e, user)) {
@@ -84,30 +70,24 @@ public class DBApi {
 	}
 
 	@PostMapping("one")
-	public BigInteger create(@RequestBody final WriteEntity entity,
-			@RequestHeader(defaultValue = "1") final BigInteger clientId,
-			@RequestHeader final BigInteger user) throws Exception {
-		final Contact contact = repository.one(Contact.class, user);
-		if (clientId.equals(contact.getClientId())) {
-			final BaseEntity e = EntityUtil.createEntity(entity, contact);
-			repository.save(e);
-			return e.getId();
-		}
-		return null;
+	public BigInteger create(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger user)
+			throws Exception {
+		final BaseEntity e = EntityUtil.createEntity(entity, repository.one(Contact.class, user));
+		repository.save(e);
+		return e.getId();
 	}
 
 	@DeleteMapping("one")
-	public void delete(@RequestBody final WriteEntity entity,
-			@RequestHeader(defaultValue = "1") final BigInteger clientId,
-			@RequestHeader final BigInteger user) throws Exception {
-		final Contact contact = repository.one(Contact.class, user);
-		if (clientId.equals(contact.getClientId())) {
-			final BaseEntity e = repository.one(entity.getClazz(), entity.getId());
-			if (e instanceof Contact)
-				notificationService.createTicket(TicketType.ERROR, "Contact Deletion",
-						"tried to delete contact " + e.getId(), user);
-			else if (checkWriteAuthorisation(e, user))
-				repository.delete(e);
+	public void delete(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger user) throws Exception {
+		if (repository.one(Contact.class, user) == null)
+			return;
+		final BaseEntity e = repository.one(entity.getClazz(), entity.getId());
+		if (e instanceof Contact)
+			notificationService.createTicket(TicketType.ERROR, "Contact Deletion",
+					"tried to delete contact " + e.getId(), user);
+		else if (checkWriteAuthorisation(e, user)) {
+			repository.one(Contact.class, user);
+			repository.delete(e);
 		}
 	}
 
