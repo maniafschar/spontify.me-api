@@ -234,28 +234,6 @@ public class EngagementService {
 					return repository.list(params).size() > 9;
 				}));
 
-		chatTemplates.add(new ChatTemplate(TextId.engagement_bluetoothMatch,
-				"pageInfo.socialShare()",
-				contact -> {
-					final QueryParams params = new QueryParams(Query.contact_notification);
-					params.setUser(contact);
-					params.setSearch(
-							"contactNotification.textType='FindMe' and contactNotification.contactId="
-									+ contact.getId());
-					return repository.list(params).size() > 2;
-				}));
-
-		chatTemplates.add(new ChatTemplate(TextId.engagement_bluetoothNoMatch,
-				"pageInfo.socialShare()",
-				contact -> {
-					final QueryParams params = new QueryParams(Query.contact_notification);
-					params.setUser(contact);
-					params.setSearch(
-							"contactNotification.textType='FindMe' and contactNotification.contactId="
-									+ contact.getId());
-					return repository.list(params).size() == 0;
-				}));
-
 		chatTemplates.add(new ChatTemplate(TextId.engagement_addFriends,
 				"pageInfo.socialShare()",
 				null));
