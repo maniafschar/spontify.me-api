@@ -12,7 +12,6 @@ import com.jq.findapp.entity.Location;
 
 @Component
 public class EventRatingListener extends AbstractRepositoryListener<EventRating> {
-
 	@Async
 	@Override
 	public void postPersist(final EventRating eventRating) throws Exception {

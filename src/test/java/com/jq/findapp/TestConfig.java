@@ -75,7 +75,6 @@ public class TestConfig {
 			doAnswer(f -> {
 				imageHtmlEmail.buildMimeMessage();
 				new File("target/email/").mkdir();
-				System.out.println("m:" + imageHtmlEmail.getMimeMessage());
 				new FileOutputStream("target/email/" + System.currentTimeMillis() + Math.random())
 						.write(IOUtils.toByteArray(imageHtmlEmail.getMimeMessage().getInputStream()));
 				return "";
@@ -92,7 +91,7 @@ public class TestConfig {
 		private Repository repository;
 
 		@GetMapping("db/{hql}")
-		public List<BaseEntity> db(@PathVariable String hql) throws ClassNotFoundException {
+		public List<BaseEntity> db(@PathVariable final String hql) throws ClassNotFoundException {
 			return repository.list(hql);
 		}
 	}
@@ -101,7 +100,7 @@ public class TestConfig {
 	@Primary
 	public class ExternalServiceTest extends ExternalService {
 		@Override
-		public String google(String param, BigInteger user) {
+		public String google(final String param, final BigInteger user) {
 			try {
 				return IOUtils.toString(
 						getClass().getResourceAsStream(
@@ -109,23 +108,23 @@ public class TestConfig {
 										: param.startsWith("place/photo?") ? "/googlePhoto.html"
 												: "/googleResponse.json"),
 						StandardCharsets.UTF_8);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				throw new RuntimeException(e);
 			}
 		}
 	}
 
-	public static Timestamp toDays(Connection connection, Timestamp timestamp)
+	public static Timestamp toDays(final Connection connection, final Timestamp timestamp)
 			throws SQLException {
 		return timestamp;
 	}
 
-	public static int weekday(Connection connection, Timestamp timestamp)
+	public static int weekday(final Connection connection, final Timestamp timestamp)
 			throws SQLException {
 		return 1;
 	}
 
-	public static String substringIndex(Connection connection, String s, String s2, int i) {
+	public static String substringIndex(final Connection connection, final String s, final String s2, final int i) {
 		return s;
 	}
 }

@@ -156,24 +156,25 @@ public class IntegrationTest {
 		utils.setEventDate(new BigInteger(id), new Timestamp(System.currentTimeMillis() - 86460000));
 		Util.click("menu a[onclick*=\"ui.query.eventTickets()\"]");
 		Util.click("events list-row.participate");
-		Util.click("detail button-text[onclick*=\"ratings.\"]");
-		Util.click("popup button-text[onclick*=\"ratings.\"]");
+		Util.click("detail button-text[onclick*=\"ui.openRating\"]");
+		Util.sleep(500);
+		Util.get("detail button-text[onclick*=\"ui.openRating\"]").sendKeys("\t\t\t\t\t");
+		new Actions(Util.driver).sendKeys(" ").build().perform();
 		Util.click("navigation item.search");
 		Util.click("search tabHeader tab[i=\"locations\"]");
 		Util.click("search tabBody div.locations button-text[onclick*=\"pageSearch\"]");
 		Util.click("search tabBody div.locations list-row:last-child");
-		if (!Util.get("detail title").getText()
-				.contains("location 1"))
+		if (!Util.get("detail title").getText().contains("location 1"))
 			throw new RuntimeException("New location not in list!");
-		Util.click("detail ratingSelection");
+		Util.get("detail input-rating[type=\"location\"][rating=\"80\"]");
 		Util.click("search tabHeader tab[i=\"contacts\"]");
 		Util.click("search tabBody div.contacts button-text[onclick*=\"pageSearch\"]");
 		Util.click("search tabBody div.contacts list-row:first-child");
-		Util.click("detail ratingSelection");
+		Util.click("detail input-rating[type=\"contact\"][rating=\"80\"]");
 		Util.click("navigation item.events");
 		Util.click("menu a[onclick*=\"ui.query.eventTickets()\"]");
 		Util.click("events list-row.participate");
-		Util.click("detail ratingSelection");
+		Util.click("detail input-rating[type=\"event\"][rating=\"80\"]");
 		Util.click("navigation item.home");
 	}
 
