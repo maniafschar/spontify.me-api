@@ -24,7 +24,7 @@ public class EventRatingListener extends AbstractRepositoryListener<EventRating>
 		repository.executeUpdate(
 				"update Event event set rating=(select sum(eventRating.rating)/count(*) from EventRating eventRating, EventParticipate eventParticipate where eventParticipate.eventId=event.id and eventRating.eventParticipateId=eventParticipate.id) where event.id="
 						+ event.getId());
-		if (event.getLocationId() != null) {
+		if (event.getLocationId() != null && repository.one(Location.class, event.getLocationId()) != null) {
 			repository.executeUpdate(
 					"update Location location set rating=(select sum(eventRating.rating)/count(*) from EventRating eventRating, EventParticipate eventParticipate, Event event where event.locationId=location.id and eventParticipate.eventId=event.id and eventRating.eventParticipateId=eventParticipate.id) where location.id="
 							+ event.getLocationId());
