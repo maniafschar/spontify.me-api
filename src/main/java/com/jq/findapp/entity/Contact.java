@@ -83,14 +83,14 @@ public class Contact extends BaseEntity {
 	}
 
 	public enum ContactType {
-		admin, adminContent
+		admin, adminContent, demo
 	}
 
 	public BigInteger getClientId() {
 		return clientId;
 	}
 
-	public void setClientId(BigInteger clientId) {
+	public void setClientId(final BigInteger clientId) {
 		this.clientId = clientId;
 	}
 
@@ -98,7 +98,7 @@ public class Contact extends BaseEntity {
 		return os;
 	}
 
-	public void setOs(OS os) {
+	public void setOs(final OS os) {
 		this.os = os;
 	}
 
@@ -106,7 +106,7 @@ public class Contact extends BaseEntity {
 		return email;
 	}
 
-	public void setEmail(String email) {
+	public void setEmail(final String email) {
 		this.email = email;
 	}
 
@@ -114,7 +114,7 @@ public class Contact extends BaseEntity {
 		return emailVerified;
 	}
 
-	public void setEmailVerified(String emailVerified) {
+	public void setEmailVerified(final String emailVerified) {
 		this.emailVerified = emailVerified;
 	}
 
@@ -122,7 +122,7 @@ public class Contact extends BaseEntity {
 		return image;
 	}
 
-	public void setImage(String image) {
+	public void setImage(final String image) {
 		this.image = image;
 	}
 
@@ -130,7 +130,7 @@ public class Contact extends BaseEntity {
 		return imageAuthenticate;
 	}
 
-	public void setImageAuthenticate(String imageAuthenticate) {
+	public void setImageAuthenticate(final String imageAuthenticate) {
 		this.imageAuthenticate = imageAuthenticate;
 	}
 
@@ -138,7 +138,7 @@ public class Contact extends BaseEntity {
 		return imageList;
 	}
 
-	public void setImageList(String imageList) {
+	public void setImageList(final String imageList) {
 		this.imageList = imageList;
 	}
 
@@ -146,7 +146,7 @@ public class Contact extends BaseEntity {
 		return bluetooth;
 	}
 
-	public void setBluetooth(Boolean bluetooth) {
+	public void setBluetooth(final Boolean bluetooth) {
 		this.bluetooth = bluetooth;
 	}
 
@@ -154,7 +154,7 @@ public class Contact extends BaseEntity {
 		return fee;
 	}
 
-	public void setFee(Short fee) {
+	public void setFee(final Short fee) {
 		this.fee = fee;
 	}
 
@@ -162,7 +162,7 @@ public class Contact extends BaseEntity {
 		return feeDate;
 	}
 
-	public void setFeeDate(Date feeDate) {
+	public void setFeeDate(final Date feeDate) {
 		this.feeDate = feeDate;
 	}
 
@@ -170,7 +170,7 @@ public class Contact extends BaseEntity {
 		return birthday;
 	}
 
-	public void setBirthday(Date birthday) {
+	public void setBirthday(final Date birthday) {
 		this.birthday = birthday;
 	}
 
@@ -178,7 +178,7 @@ public class Contact extends BaseEntity {
 		return verified;
 	}
 
-	public void setVerified(Boolean verified) {
+	public void setVerified(final Boolean verified) {
 		this.verified = verified;
 	}
 
@@ -186,7 +186,7 @@ public class Contact extends BaseEntity {
 		return active;
 	}
 
-	public void setActive(Boolean active) {
+	public void setActive(final Boolean active) {
 		this.active = active;
 	}
 
@@ -194,7 +194,7 @@ public class Contact extends BaseEntity {
 		return authenticate;
 	}
 
-	public void setAuthenticate(Boolean authenticate) {
+	public void setAuthenticate(final Boolean authenticate) {
 		this.authenticate = authenticate;
 	}
 
@@ -202,7 +202,7 @@ public class Contact extends BaseEntity {
 		return language;
 	}
 
-	public void setLanguage(String language) {
+	public void setLanguage(final String language) {
 		this.language = language;
 	}
 
@@ -210,7 +210,7 @@ public class Contact extends BaseEntity {
 		return description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
@@ -218,7 +218,7 @@ public class Contact extends BaseEntity {
 		return idDisplay;
 	}
 
-	public void setIdDisplay(String idDisplay) {
+	public void setIdDisplay(final String idDisplay) {
 		this.idDisplay = idDisplay;
 	}
 
@@ -226,7 +226,7 @@ public class Contact extends BaseEntity {
 		return visitPage;
 	}
 
-	public void setVisitPage(Timestamp visitPage) {
+	public void setVisitPage(final Timestamp visitPage) {
 		this.visitPage = visitPage;
 	}
 
@@ -234,7 +234,7 @@ public class Contact extends BaseEntity {
 		return recommend;
 	}
 
-	public void setRecommend(Timestamp recommend) {
+	public void setRecommend(final Timestamp recommend) {
 		this.recommend = recommend;
 	}
 
@@ -242,7 +242,7 @@ public class Contact extends BaseEntity {
 		return age;
 	}
 
-	public void setAge(Short age) {
+	public void setAge(final Short age) {
 		this.age = age;
 	}
 
@@ -250,7 +250,7 @@ public class Contact extends BaseEntity {
 		return facebookId;
 	}
 
-	public void setFacebookId(String facebookId) {
+	public void setFacebookId(final String facebookId) {
 		this.facebookId = facebookId;
 	}
 
@@ -258,7 +258,7 @@ public class Contact extends BaseEntity {
 		return urls;
 	}
 
-	public void setUrls(String urls) {
+	public void setUrls(final String urls) {
 		this.urls = urls;
 	}
 
@@ -266,7 +266,7 @@ public class Contact extends BaseEntity {
 		return fbToken;
 	}
 
-	public void setFbToken(String fbToken) {
+	public void setFbToken(final String fbToken) {
 		this.fbToken = fbToken;
 	}
 
@@ -274,7 +274,7 @@ public class Contact extends BaseEntity {
 		return birthdayDisplay;
 	}
 
-	public void setBirthdayDisplay(Short birthdayDisplay) {
+	public void setBirthdayDisplay(final Short birthdayDisplay) {
 		this.birthdayDisplay = birthdayDisplay;
 	}
 
@@ -282,7 +282,7 @@ public class Contact extends BaseEntity {
 		return gender;
 	}
 
-	public void setGender(Short gender) {
+	public void setGender(final Short gender) {
 		this.gender = gender;
 	}
 
@@ -290,7 +290,7 @@ public class Contact extends BaseEntity {
 		return loginLink;
 	}
 
-	public void setLoginLink(String loginLink) {
+	public void setLoginLink(final String loginLink) {
 		this.loginLink = loginLink;
 	}
 
@@ -298,7 +298,7 @@ public class Contact extends BaseEntity {
 		return pushToken;
 	}
 
-	public void setPushToken(String pushToken) {
+	public void setPushToken(final String pushToken) {
 		this.pushToken = pushToken;
 	}
 
@@ -306,7 +306,7 @@ public class Contact extends BaseEntity {
 		return pushSystem;
 	}
 
-	public void setPushSystem(String pushSystem) {
+	public void setPushSystem(final String pushSystem) {
 		this.pushSystem = pushSystem;
 	}
 
@@ -314,7 +314,7 @@ public class Contact extends BaseEntity {
 		return notificationFriendRequest;
 	}
 
-	public void setNotificationFriendRequest(Boolean notificationFriendRequest) {
+	public void setNotificationFriendRequest(final Boolean notificationFriendRequest) {
 		this.notificationFriendRequest = notificationFriendRequest;
 	}
 
@@ -322,7 +322,7 @@ public class Contact extends BaseEntity {
 		return notificationChat;
 	}
 
-	public void setNotificationChat(Boolean notificationChat) {
+	public void setNotificationChat(final Boolean notificationChat) {
 		this.notificationChat = notificationChat;
 	}
 
@@ -330,7 +330,7 @@ public class Contact extends BaseEntity {
 		return notificationBirthday;
 	}
 
-	public void setNotificationBirthday(Boolean notificationBirthday) {
+	public void setNotificationBirthday(final Boolean notificationBirthday) {
 		this.notificationBirthday = notificationBirthday;
 	}
 
@@ -338,7 +338,7 @@ public class Contact extends BaseEntity {
 		return notificationVisitProfile;
 	}
 
-	public void setNotificationVisitProfile(Boolean notificationVisitProfile) {
+	public void setNotificationVisitProfile(final Boolean notificationVisitProfile) {
 		this.notificationVisitProfile = notificationVisitProfile;
 	}
 
@@ -346,7 +346,7 @@ public class Contact extends BaseEntity {
 		return notificationVisitLocation;
 	}
 
-	public void setNotificationVisitLocation(Boolean notificationVisitLocation) {
+	public void setNotificationVisitLocation(final Boolean notificationVisitLocation) {
 		this.notificationVisitLocation = notificationVisitLocation;
 	}
 
@@ -354,7 +354,7 @@ public class Contact extends BaseEntity {
 		return notificationMarkEvent;
 	}
 
-	public void setNotificationMarkEvent(Boolean notificationMarkEvent) {
+	public void setNotificationMarkEvent(final Boolean notificationMarkEvent) {
 		this.notificationMarkEvent = notificationMarkEvent;
 	}
 
@@ -362,7 +362,7 @@ public class Contact extends BaseEntity {
 		return ageMale;
 	}
 
-	public void setAgeMale(String ageMale) {
+	public void setAgeMale(final String ageMale) {
 		this.ageMale = ageMale;
 	}
 
@@ -370,7 +370,7 @@ public class Contact extends BaseEntity {
 		return ageFemale;
 	}
 
-	public void setAgeFemale(String ageFemale) {
+	public void setAgeFemale(final String ageFemale) {
 		this.ageFemale = ageFemale;
 	}
 
@@ -378,7 +378,7 @@ public class Contact extends BaseEntity {
 		return pseudonym;
 	}
 
-	public void setPseudonym(String pseudonym) {
+	public void setPseudonym(final String pseudonym) {
 		this.pseudonym = pseudonym;
 	}
 
@@ -386,7 +386,7 @@ public class Contact extends BaseEntity {
 		return search;
 	}
 
-	public void setSearch(Boolean search) {
+	public void setSearch(final Boolean search) {
 		this.search = search;
 	}
 
@@ -394,7 +394,7 @@ public class Contact extends BaseEntity {
 		return teaser;
 	}
 
-	public void setTeaser(Boolean teaser) {
+	public void setTeaser(final Boolean teaser) {
 		this.teaser = teaser;
 	}
 
@@ -402,7 +402,7 @@ public class Contact extends BaseEntity {
 		return storage;
 	}
 
-	public void setStorage(String storage) {
+	public void setStorage(final String storage) {
 		this.storage = storage;
 	}
 
@@ -410,15 +410,15 @@ public class Contact extends BaseEntity {
 		return rating;
 	}
 
-	public void setRating(Short rating) {
+	public void setRating(final Short rating) {
 		this.rating = rating;
 	}
 
-	public void setLongitude(Float longitude) {
+	public void setLongitude(final Float longitude) {
 		this.longitude = longitude;
 	}
 
-	public void setLatitude(Float latitude) {
+	public void setLatitude(final Float latitude) {
 		this.latitude = latitude;
 	}
 
@@ -426,7 +426,7 @@ public class Contact extends BaseEntity {
 		return appleId;
 	}
 
-	public void setAppleId(String appleId) {
+	public void setAppleId(final String appleId) {
 		this.appleId = appleId;
 	}
 
@@ -442,7 +442,7 @@ public class Contact extends BaseEntity {
 		return password;
 	}
 
-	public void setPassword(String password) {
+	public void setPassword(final String password) {
 		this.password = password;
 	}
 
@@ -450,7 +450,7 @@ public class Contact extends BaseEntity {
 		return ageDivers;
 	}
 
-	public void setAgeDivers(String ageDivers) {
+	public void setAgeDivers(final String ageDivers) {
 		this.ageDivers = ageDivers;
 	}
 
@@ -458,7 +458,7 @@ public class Contact extends BaseEntity {
 		return device;
 	}
 
-	public void setDevice(Device device) {
+	public void setDevice(final Device device) {
 		this.device = device;
 	}
 
@@ -466,11 +466,11 @@ public class Contact extends BaseEntity {
 		return version;
 	}
 
-	public void setVersion(String version) {
+	public void setVersion(final String version) {
 		this.version = version;
 	}
 
-	public void setPasswordReset(Long passwordReset) {
+	public void setPasswordReset(final Long passwordReset) {
 		this.passwordReset = passwordReset;
 	}
 
@@ -482,7 +482,7 @@ public class Contact extends BaseEntity {
 		return timezone;
 	}
 
-	public void setTimezone(String timezone) {
+	public void setTimezone(final String timezone) {
 		this.timezone = timezone;
 	}
 
@@ -490,7 +490,7 @@ public class Contact extends BaseEntity {
 		return lastLogin;
 	}
 
-	public void setLastLogin(Timestamp lastLogin) {
+	public void setLastLogin(final Timestamp lastLogin) {
 		this.lastLogin = lastLogin;
 	}
 
@@ -498,7 +498,7 @@ public class Contact extends BaseEntity {
 		return notificationEngagement;
 	}
 
-	public void setNotificationEngagement(Boolean notificationEngagement) {
+	public void setNotificationEngagement(final Boolean notificationEngagement) {
 		this.notificationEngagement = notificationEngagement;
 	}
 
@@ -506,7 +506,7 @@ public class Contact extends BaseEntity {
 		return skills;
 	}
 
-	public void setSkills(String skills) {
+	public void setSkills(final String skills) {
 		this.skills = skills;
 	}
 
@@ -514,7 +514,7 @@ public class Contact extends BaseEntity {
 		return skillsText;
 	}
 
-	public void setSkillsText(String skillsText) {
+	public void setSkillsText(final String skillsText) {
 		this.skillsText = skillsText;
 	}
 
@@ -522,13 +522,13 @@ public class Contact extends BaseEntity {
 		return type;
 	}
 
-	public void setType(ContactType type) {
+	public void setType(final ContactType type) {
 		this.type = type;
 	}
 
 	@Transient
 	@Override
-	public boolean writeAccess(BigInteger user, Repository repository) {
+	public boolean writeAccess(final BigInteger user, final Repository repository) {
 		return user.equals(getId());
 	}
 }

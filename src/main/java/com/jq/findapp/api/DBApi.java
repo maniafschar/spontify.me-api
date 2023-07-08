@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.Contact.ContactType;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
@@ -93,6 +94,8 @@ public class DBApi {
 
 	private boolean checkWriteAuthorisation(final BaseEntity e, final BigInteger user) throws Exception {
 		if (e == null)
+			return false;
+		if (repository.one(Contact.class, user).getType() == ContactType.demo)
 			return false;
 		if (e.writeAccess(user, repository))
 			return true;

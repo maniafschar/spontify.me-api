@@ -82,7 +82,7 @@ public class IntegrationTest {
 			Util.sleep(1000);
 			Util.driver.get(url);
 			try {
-				Util.get("navigation item.events");
+				Util.get("dialog-navigation item.events");
 				break;
 			} catch (final Exception ex) {
 				// wait
@@ -91,8 +91,9 @@ public class IntegrationTest {
 	}
 
 	private void register(final String pseudonym, final String email) {
-		Util.click("navigation item.events");
-		Util.click("hint button-text");
+		Util.click("dialog-navigation item.events");
+		Util.get("dialog-hint").sendKeys("\t");
+		new Actions(Util.driver).sendKeys(" ").build().perform();
 		Util.sendKeys("login input[name=\"email\"]", email);
 		Util.click("login tab:nth-of-type(3)");
 		Util.sendKeys("login input[name=\"pseudonym\"]", pseudonym);
@@ -103,64 +104,69 @@ public class IntegrationTest {
 		final String s = Util.email(0).lines().reduce(
 				(e, e2) -> e.startsWith("https://") ? e : e2.startsWith("https://") ? e2 : "").get();
 		Util.driver.navigate().to(url + s.substring(s.indexOf('?')));
-		Util.sendKeys("popup input[name=\"passwd\"]", "qwer1234");
-		Util.click("popup button-text");
+		Util.sendKeys("dialog-popup input[name=\"passwd\"]", "qwer1234");
+		Util.click("dialog-popup button-text");
 	}
 
 	private void addLocation(final String name, final String address, final boolean duplicate) {
-		Util.click("navigation item.events");
-		Util.click("menu a[onclick*=\"pageEvent.edit\"]");
+		Util.click("dialog-navigation item.events");
+		Util.click("dialog-menu a[onclick*=\"pageEvent.edit\"]");
 		Util.sleep(600);
-		Util.click("popup button-text[onclick*=\"pageLocation.edit\"]");
-		Util.sendKeys("popup input[name=\"name\"]", name);
-		Util.get("popup textarea[name=\"address\"]").clear();
-		Util.sendKeys("popup textarea[name=\"address\"]", address);
-		Util.click("popup dialogButtons button-text");
+		Util.click("dialog-popup button-text[onclick*=\"pageLocation.edit\"]");
+		Util.sendKeys("dialog-popup input[name=\"name\"]", name);
+		Util.get("dialog-popup textarea[name=\"address\"]").clear();
+		Util.sendKeys("dialog-popup textarea[name=\"address\"]", address);
+		Util.click("dialog-popup dialogButtons button-text");
 		if (duplicate) {
-			Util.get("popup popupHint").getText().toLowerCase().contains("location");
-			Util.click("popupTitle");
+			if (!Util.get("dialog-popup popupHint").getText().toLowerCase().contains("location"))
+				throw new RuntimeException("Expected duplicate location!");
+			Util.click("dialog-popup popupTitle");
 		}
-		Util.click("navigation item.home");
+		Util.click("dialog-navigation item.home");
 	}
 
 	private void addEvent() {
-		Util.click("navigation item.events");
-		Util.click("menu a[onclick*=\"pageEvent.edit\"]");
-		Util.sendKeys("popup input[name=\"location\"]", "loca");
+		Util.click("dialog-navigation item.events");
+		Util.click("dialog-menu a[onclick*=\"pageEvent.edit\"]");
+		Util.sendKeys("dialog-popup input[name=\"location\"]", "loca");
 		Util.sleep(1000);
-		Util.click("popup eventLocationInputHelper ul li");
-		if (!Util.get("popup .paid").getAttribute("style").contains("none"))
-			throw new RuntimeException("Event .paid should be invisible!");
-		if (Util.get("popup .unpaid").getAttribute("style").contains("none"))
-			throw new RuntimeException("Event .unpaid should be visible!");
-		Util.sendKeys("popup input[name=\"price\"]", "10");
-		if (Util.get("popup .paid").getAttribute("style").contains("none"))
-			throw new RuntimeException("Event .paid should be visible!");
-		if (!Util.get("popup .unpaid").getAttribute("style").contains("none"))
-			throw new RuntimeException("Event .unpaid should be invisible!");
-		Util.get("popup input[name=\"price\"]").clear();
-		Util.click("popup dialogButtons button-text[onclick*=\"save\"]");
-		Util.get("popup input[name=\"startDate\"]").sendKeys("");
+		Util.click("dialog-popup eventLocationInputHelper ul li");
+		if (!Util.get("dialog-popup .picture").getAttribute("style").contains("none"))
+			throw new RuntimeException("Event .picture should be invisible!");
+		if (!Util.get("dialog-popup .url").getAttribute("style").contains("none"))
+			throw new RuntimeException("Event .url should be invisible!");
+		if (Util.get("dialog-popup .confirm").getAttribute("style").contains("none"))
+			throw new RuntimeException("Event .confirm should be visible!");
+		Util.sendKeys("dialog-popup input[name=\"price\"]", "10");
+		if (Util.get("dialog-popup .picture").getAttribute("style").contains("none"))
+			throw new RuntimeException("Event .picture should be visible!");
+		if (Util.get("dialog-popup .url").getAttribute("style").contains("none"))
+			throw new RuntimeException("Event .url should be visible!");
+		if (!Util.get("dialog-popup .confirm").getAttribute("style").contains("none"))
+			throw new RuntimeException("Event .confirm should be invisible!");
+		Util.get("dialog-popup input[name=\"price\"]").clear();
+		Util.click("dialog-popup dialogButtons button-text[onclick*=\"save\"]");
+		Util.get("dialog-popup input[name=\"startDate\"]").sendKeys("");
 		new Actions(Util.driver).keyDown(Keys.SHIFT).sendKeys("\t\t\t\t\t\t").keyUp(Keys.SHIFT).build().perform();
-		Util.get("popup input-hashtags").sendKeys("textabc");
-		Util.sendKeys("popup textarea[name=\"description\"]", "mega sex");
-		Util.click("popup dialogButtons button-text[onclick*=\"save\"]");
-		Util.click("popup dialogButtons button-text[onclick*=\"save\"]");
-		Util.click("navigation item.home");
+		Util.get("dialog-popup input-hashtags").sendKeys("textabc");
+		Util.sendKeys("dialog-popup textarea[name=\"description\"]", "mega sex");
+		Util.click("dialog-popup dialogButtons button-text[onclick*=\"save\"]");
+		Util.click("dialog-popup dialogButtons button-text[onclick*=\"save\"]");
+		Util.click("dialog-navigation item.home");
 	}
 
 	private void addRating() throws Exception {
-		Util.click("navigation item.events");
-		Util.click("menu a[onclick*=\"ui.query.eventMy()\"]");
+		Util.click("dialog-navigation item.events");
+		Util.click("dialog-menu a[onclick*=\"ui.query.eventMy()\"]");
 		final String id = Util.get("events list-row.participate").getAttribute("i").split("_")[0];
 		utils.setEventDate(new BigInteger(id), new Timestamp(System.currentTimeMillis() - 86460000));
-		Util.click("menu a[onclick*=\"ui.query.eventTickets()\"]");
+		Util.click("dialog-menu a[onclick*=\"ui.query.eventTickets()\"]");
 		Util.click("events list-row.participate");
 		Util.click("detail button-text[onclick*=\"ui.openRating\"]");
 		Util.sleep(500);
 		Util.get("detail button-text[onclick*=\"ui.openRating\"]").sendKeys("\t\t\t\t\t");
 		new Actions(Util.driver).sendKeys(" ").build().perform();
-		Util.click("navigation item.search");
+		Util.click("dialog-navigation item.search");
 		Util.click("search tabHeader tab[i=\"locations\"]");
 		Util.click("search tabBody div.locations button-text[onclick*=\"pageSearch\"]");
 		Util.click("search tabBody div.locations list-row:last-child");
@@ -171,15 +177,15 @@ public class IntegrationTest {
 		Util.click("search tabBody div.contacts button-text[onclick*=\"pageSearch\"]");
 		Util.click("search tabBody div.contacts list-row:first-child");
 		Util.click("detail input-rating[type=\"contact\"][rating=\"80\"]");
-		Util.click("navigation item.events");
-		Util.click("menu a[onclick*=\"ui.query.eventTickets()\"]");
+		Util.click("dialog-navigation item.events");
+		Util.click("dialog-menu a[onclick*=\"ui.query.eventTickets()\"]");
 		Util.click("events list-row.participate");
 		Util.click("detail input-rating[type=\"event\"][rating=\"80\"]");
-		Util.click("navigation item.home");
+		Util.click("dialog-navigation item.home");
 	}
 
 	private void addFriend() {
-		Util.click("navigation item.search");
+		Util.click("dialog-navigation item.search");
 		Util.click("search tabHeader tab[i=\"contacts\"]");
 		Util.get("search tabBody div.contacts input-checkbox").sendKeys("\t");
 		Util.get("search tabBody div.contacts input-hashtags").sendKeys("pseudonym");
@@ -188,11 +194,11 @@ public class IntegrationTest {
 		Util.click("search tabBody div.contacts list-row:nth-of-type(1)");
 		Util.click("detail button-text[name=\"buttonFriend\"]");
 		Util.click("detail button-text[onclick*=\"sendRequestForFriendship\"]");
-		Util.click("navigation item.search");
+		Util.click("dialog-navigation item.search");
 		Util.click("search tabBody div.contacts list-row:nth-of-type(1)");
 		Util.click("detail button-text[name=\"buttonFriend\"]");
 		Util.get("detail text[name=\"friend\"]>div>span");
-		Util.click("navigation item.home");
+		Util.click("dialog-navigation item.home");
 	}
 
 	static class Util {
@@ -229,14 +235,17 @@ public class IntegrationTest {
 					throw new RuntimeException("Timeout during animation, tried to get " + path);
 				sleep(100);
 			}
-			List<WebElement> list;
+			List<?> list;
 			i = 0;
-			while ((list = driver.findElements(By.cssSelector(path))).size() == 0) {
-				if (i++ > maxWait)
-					throw new RuntimeException("Timeout during finding element " + path);
-				sleep(100);
+			while (true) {
+				list = (List<?>) ((JavascriptExecutor) driver).executeScript("return ui.qa('" + path + "')");
+				if (list == null || list.size() == 0) {
+					if (i++ > maxWait)
+						throw new RuntimeException("Timeout during finding element " + path);
+					sleep(100);
+				} else
+					return (WebElement) list.get(0);
 			}
-			return list.get(0);
 		}
 
 		static void click(final String id) {
