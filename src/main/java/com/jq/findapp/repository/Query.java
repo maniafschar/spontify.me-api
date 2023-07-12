@@ -45,6 +45,7 @@ public enum Query {
 	event_listParticipate(true),
 	event_listParticipateRaw,
 	event_listTeaser(true),
+	event_listTeaserMeta,
 	event_rating,
 
 	location_list(true),
@@ -70,13 +71,13 @@ public enum Query {
 	private static BigInteger adminId;
 
 	private final String sql;
-	private String[] header;
+	private final String[] header;
 	final boolean addBlock;
 
 	public static class Result {
 		private final List<Object[]> list = new ArrayList<>();
 
-		private Result(String[] header) {
+		private Result(final String[] header) {
 			list.add(header);
 		}
 
@@ -92,7 +93,7 @@ public enum Query {
 			return list.size() - 1;
 		}
 
-		public Map<String, Object> get(int index) {
+		public Map<String, Object> get(final int index) {
 			final Map<String, Object> one = new HashMap<>();
 			for (int i = 0; i < list.get(0).length; i++)
 				one.put(list.get(0)[i].toString(), list.get(index + 1)[i]);
@@ -108,7 +109,7 @@ public enum Query {
 		this(false);
 	}
 
-	private Query(boolean addBlock) {
+	private Query(final boolean addBlock) {
 		try {
 			sql = IOUtils.toString(getClass().getResourceAsStream("/sql/" + name().replace("_", "/") + ".sql"),
 					StandardCharsets.UTF_8);
@@ -132,7 +133,7 @@ public enum Query {
 		cols.toArray(header);
 	}
 
-	public static Query get(String id) {
+	public static Query get(final String id) {
 		return valueOf(Query.class, id.replace('/', '_'));
 	}
 

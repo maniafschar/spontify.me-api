@@ -26,6 +26,7 @@ import com.jq.findapp.api.model.AbstractRegistration;
 import com.jq.findapp.api.model.InternalRegistration;
 import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.Contact.ContactType;
 import com.jq.findapp.entity.ContactToken;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
@@ -83,7 +84,7 @@ public class AuthenticationService {
 		public final boolean unique;
 		public final boolean blocked;
 
-		private Unique(String email, boolean unique, boolean blocked) {
+		private Unique(final String email, final boolean unique, final boolean blocked) {
 			this.email = email;
 			this.unique = unique;
 			this.blocked = blocked;
@@ -91,7 +92,7 @@ public class AuthenticationService {
 	}
 
 	private static class FailedAttempts {
-		private long timestamp = System.currentTimeMillis();
+		private final long timestamp = System.currentTimeMillis();
 		private int attempts = 1;
 	}
 
@@ -103,7 +104,7 @@ public class AuthenticationService {
 
 		private final AuthenticationExceptionType type;
 
-		private AuthenticationException(AuthenticationExceptionType type) {
+		private AuthenticationException(final AuthenticationExceptionType type) {
 			this.type = type == null ? AuthenticationExceptionType.Unknown : type;
 		}
 
@@ -122,12 +123,12 @@ public class AuthenticationService {
 			BLOCKED_EMAIL_DOMAINS.addAll(Arrays.asList(new ObjectMapper().readValue(
 					AuthenticationService.class.getResourceAsStream("/blockedEmailDomains.json"),
 					String[].class)));
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw new RuntimeException(ex);
 		}
 	}
 
-	public Contact verify(BigInteger user, String password, String salt) {
+	public Contact verify(final BigInteger user, final String password, final String salt) {
 		if (user == null || user.compareTo(BigInteger.ONE) < 0)
 			throw new AuthenticationException(AuthenticationExceptionType.NoInputFromClient);
 		return verify(repository.one(Contact.class, user), password, salt, false);
@@ -159,7 +160,7 @@ public class AuthenticationService {
 			synchronized (FAILED_AUTHS) {
 				final long SIX_HOURS_BEFORE = System.currentTimeMillis() - 3600000L * 6L;
 				final Object[] keys = FAILED_AUTHS.keySet().toArray();
-				for (Object k : keys) {
+				for (final Object k : keys) {
 					if (FAILED_AUTHS.get(k).timestamp < SIX_HOURS_BEFORE)
 						FAILED_AUTHS.remove(k);
 				}
@@ -172,7 +173,7 @@ public class AuthenticationService {
 			if (x != null && x.attempts > 5) {
 				try {
 					Thread.sleep((long) Math.pow(x.attempts - 5, 3) * 1000L);
-				} catch (InterruptedException e) {
+				} catch (final InterruptedException e) {
 				}
 			}
 			throw new AuthenticationException(AuthenticationExceptionType.WrongPassword);
@@ -180,7 +181,7 @@ public class AuthenticationService {
 		return contact;
 	}
 
-	public void register(InternalRegistration registration) throws Exception {
+	public void register(final InternalRegistration registration) throws Exception {
 		if (!registration.isAgb())
 			throw new IllegalAccessException("legal");
 		final int minimum = 5000;
@@ -211,12 +212,12 @@ public class AuthenticationService {
 			notificationService.sendNotificationEmail(repository.one(Contact.class, adminId), contact,
 					text.getText(contact, TextId.mail_contactWelcomeEmail), "r=" + generateLoginParam(contact));
 			saveRegistration(contact, registration);
-		} catch (SendFailedException ex) {
+		} catch (final SendFailedException ex) {
 			throw new IllegalAccessException("email");
 		}
 	}
 
-	public Unique unique(BigInteger clientId, String email) {
+	public Unique unique(final BigInteger clientId, String email) {
 		email = email.toLowerCase();
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("LOWER(contact.email)='" + email + "' and contact.clientId=" + clientId);
@@ -224,7 +225,7 @@ public class AuthenticationService {
 				.contains(email.substring(email.indexOf('@') + 1)));
 	}
 
-	void saveRegistration(Contact contact, AbstractRegistration registration) throws Exception {
+	void saveRegistration(final Contact contact, final AbstractRegistration registration) throws Exception {
 		contact.setDevice(registration.getDevice());
 		contact.setLanguage(registration.getLanguage());
 		contact.setClientId(registration.getClientId());
@@ -239,13 +240,14 @@ public class AuthenticationService {
 		contact.setEmail(contact.getEmail().toLowerCase().trim());
 		if (contact.getIdDisplay() == null) {
 			final String[] name = contact.getPseudonym().split(" ");
-			int max = 100, i = 0;
+			final int max = 100;
+			int i = 0;
 			while (true) {
 				try {
 					contact.setIdDisplay(generateIdDisplay(name));
 					repository.save(contact);
 					break;
-				} catch (Throwable ex) {
+				} catch (final Throwable ex) {
 					if (isDuplicateIdDisplay(ex)) {
 						if (i++ > max)
 							throw new IllegalAccessException(
@@ -286,11 +288,13 @@ public class AuthenticationService {
 			if (contact.getTimezone() != null)
 				c2.setTimezone(contact.getTimezone());
 			repository.save(c2);
+			if (ContactType.demo == c2.getType())
+				user.put("contact.type", ContactType.adminContent.name());
 		}
 		return user;
 	}
 
-	private String generateLoginParam(Contact contact) {
+	private String generateLoginParam(final Contact contact) {
 		final String s = generatePin(42);
 		long x = 0;
 		for (int i = 0; i < s.length(); i++) {
@@ -309,9 +313,10 @@ public class AuthenticationService {
 		return s;
 	}
 
-	private String generateIdDisplay(String[] name) {
+	private String generateIdDisplay(final String[] name) {
 		String s = "";
-		int i = -1, max = 6;
+		int i = -1;
+		final int max = 6;
 		while (s.length() < max && name.length > ++i) {
 			s += name[i].replaceAll("[^a-zA-Z0-9]", "");
 			if (name[i].length() > 0)
@@ -326,7 +331,7 @@ public class AuthenticationService {
 		return s;
 	}
 
-	public String getAutoLogin(String publicKey, String token) {
+	public String getAutoLogin(final String publicKey, String token) {
 		try {
 			token = Encryption.decryptBrowser(token);
 			final QueryParams params = new QueryParams(Query.contact_token);
@@ -339,12 +344,12 @@ public class AuthenticationService {
 			t.setToken("");
 			repository.save(t);
 			return Encryption.encrypt(c.getEmail() + "\u0015" + getPassword(c), publicKey);
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			return null;
 		}
 	}
 
-	public void logoff(Contact contact, String token) throws Exception {
+	public void logoff(final Contact contact, final String token) throws Exception {
 		contact.setActive(false);
 		repository.save(contact);
 		if (token != null) {
@@ -356,7 +361,7 @@ public class AuthenticationService {
 		}
 	}
 
-	public void recoverSendEmailReminder(Contact contact) throws Exception {
+	public void recoverSendEmailReminder(final Contact contact) throws Exception {
 		final String s;
 		if (Strings.isEmpty(contact.getLoginLink())) {
 			s = generateLoginParam(contact);
@@ -370,7 +375,7 @@ public class AuthenticationService {
 				"r=" + s);
 	}
 
-	public String recoverSendEmail(String email) throws Exception {
+	public String recoverSendEmail(final String email) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.email='" + email + '\'');
 		final Map<String, Object> user = repository.one(params);
@@ -385,7 +390,7 @@ public class AuthenticationService {
 		return "nok:Email";
 	}
 
-	public Contact recoverVerifyEmail(String token) throws Exception {
+	public Contact recoverVerifyEmail(final String token) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.loginLink like '%" + token + "%'");
 		final Map<String, Object> user = repository.one(params);
@@ -412,7 +417,7 @@ public class AuthenticationService {
 				hexString.append(hex);
 			}
 			return hexString.toString();
-		} catch (NoSuchAlgorithmException e) {
+		} catch (final NoSuchAlgorithmException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -426,7 +431,7 @@ public class AuthenticationService {
 				try {
 					pw = new Password(Encryption.decryptDB(u.getPassword()), u.getPasswordReset());
 					PW.put(u.getId(), pw);
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					throw new RuntimeException(u.getId() + ": " + u.getPassword(), e);
 				}
 			}
@@ -443,11 +448,11 @@ public class AuthenticationService {
 				sql = sql.replaceAll("\\{ID}", "" + user.getId()).trim();
 				if (sql.startsWith("from ")) {
 					final List<?> list = repository.list(sql);
-					for (Object e : list)
+					for (final Object e : list)
 						repository.delete((BaseEntity) e);
 				} else
 					repository.executeUpdate(sql);
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				throw new RuntimeException("ERROR SQL on account delete: " + ex.getMessage() + "\n" + sql);
 			}
 		}

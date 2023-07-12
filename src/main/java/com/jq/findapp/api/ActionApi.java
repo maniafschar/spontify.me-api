@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -36,7 +37,6 @@ import com.jq.findapp.entity.ContactVisit;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Ip;
-import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.LocationVisit;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.GeoLocationProcessor;
@@ -236,14 +236,25 @@ public class ActionApi {
 		return externalService.google(param, user);
 	}
 
+	@GetMapping("teaser/meta")
+	public List<Object[]> teaserMeta(@RequestHeader final BigInteger clientId) throws Exception {
+		final QueryParams params = new QueryParams(Query.event_listTeaserMeta);
+		params.setLimit(-1);
+		params.setSearch(
+				"contact.clientId=" + clientId + " and event.startDate<='"
+						+ Instant.now().plus(Duration.ofDays(14)).atZone(ZoneOffset.UTC).toLocalDate()
+						+ "' and event.endDate>='" + Instant.now().atZone(ZoneOffset.UTC).toLocalDate() + "'");
+		return repository.list(params).getList();
+	}
+
 	@GetMapping("teaser/{type}")
-	public List<Object[]> teaser(@PathVariable final String type, @RequestHeader final BigInteger clientId,
-			@RequestHeader(required = false) final BigInteger user,
+	public List<Object[]> teaser(@PathVariable final String type, @RequestParam(required = false) final String search,
+			@RequestHeader final BigInteger clientId, @RequestHeader(required = false) final BigInteger user,
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
 		final QueryParams params = new QueryParams(
 				"contacts".equals(type) ? Query.contact_listTeaser : Query.event_listTeaser);
 		params.setLimit(20);
-		params.setDistance(100000);
+		params.setDistance(-1);
 		params.setLatitude(48.13684f);
 		params.setLongitude(11.57685f);
 		if (user == null) {
@@ -271,9 +282,7 @@ public class ActionApi {
 			contact.setId(BigInteger.ZERO);
 			params.setUser(contact);
 			params.setSearch("contact.teaser=true");
-		} else if (repository.one(Contact.class, user) == null)
-			return null;
-		else {
+		} else {
 			params.setUser(repository.one(Contact.class, user));
 			if (params.getUser().getLatitude() != null) {
 				params.setLatitude(params.getUser().getLatitude());
@@ -284,6 +293,7 @@ public class ActionApi {
 			else
 				params.setSearch("event.endDate>='" + Instant.now().atZone(ZoneOffset.UTC).toLocalDate() + "'");
 		}
+		params.setSearch(search);
 		return repository.list(params).getList();
 	}
 
@@ -293,27 +303,30 @@ public class ActionApi {
 		if (Strings.isEmpty(search))
 			return null;
 		final Contact contact = repository.one(Contact.class, user);
-		final QueryParams params = new QueryParams(Query.location_listId);
+		final QueryParams params = new QueryParams(Query.location_list);
+		params.setUser(contact);
+		params.setDistance(-1);
 		params.setLatitude(
 				contact.getLatitude() == null ? GeoLocationProcessor.DEFAULT_LATITUDE : contact.getLatitude());
 		params.setLongitude(
 				contact.getLongitude() == null ? GeoLocationProcessor.DEFAULT_LONGITUDE : contact.getLongitude());
-		final String[] s = search.replace('\'', '_').split(" ");
+		final String[] s = search.toLowerCase().replace('\'', '_').split(" ");
 		final StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < s.length; i++) {
 			if (!Strings.isEmpty(s[i]))
-				sb.append(" and (location.name like '%" + s[i] + "%' or location.address like '%" + s[i]
-						+ "%' or location.address2 like '%" + s[i] + "%' or location.telephone like '%" + s[i] + "%')");
+				sb.append(" and (LOWER(location.name) like '%" + s[i] + "%' or LOWER(location.address) like '%" + s[i]
+						+ "%' or LOWER(location.address2) like '%" + s[i] + "%' or LOWER(location.telephone) like '%"
+						+ s[i] + "%')");
 		}
 		params.setSearch(sb.substring(5));
+		params.setLimit(50);
 		final Result result = repository.list(params);
 		final List<Map<String, Object>> list = new ArrayList<>();
 		for (int i = 0; i < result.size(); i++) {
-			final Location location = repository.one(Location.class, (BigInteger) result.get(i).get("location.id"));
 			final Map<String, Object> m = new HashMap<>(4);
-			m.put("id", location.getId());
-			m.put("name", location.getName());
-			m.put("address", location.getAddress());
+			m.put("id", result.get(i).get("location.id"));
+			m.put("name", result.get(i).get("location.name"));
+			m.put("address", result.get(i).get("location.address"));
 			list.add(m);
 		}
 		return list;

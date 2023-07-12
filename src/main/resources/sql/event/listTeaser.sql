@@ -23,6 +23,7 @@ SELECT
 	location.imageList,
 	location.latitude,
 	location.longitude,
+	location.town,
 	'' as geolocationDistance
 FROM
 	Event event left join Location location on location.id=event.locationId,

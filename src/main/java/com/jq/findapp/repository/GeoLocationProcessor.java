@@ -27,10 +27,12 @@ public class GeoLocationProcessor {
 		super();
 	}
 
-	public GeoLocationProcessor(QueryParams params) {
+	public GeoLocationProcessor(final QueryParams params) {
 		if (params.getLatitude() != null && params.getLongitude() != null) {
 			if (params.getDistance() == null)
 				params.setDistance(100);
+			else if (params.getDistance() == -1)
+				params.setDistance(100000);
 			table = params.getQuery().name().split("_")[0];
 			if ("event".equals(table))
 				table = "location";
@@ -51,7 +53,7 @@ public class GeoLocationProcessor {
 			params.setSearchGeoLocation(null);
 	}
 
-	private String getSearch(String table, int distance) {
+	private String getSearch(final String table, final int distance) {
 		final Point[] boundingCoordinates = computeBoundingCoordinates(distance);
 		final boolean meridian180WithinDistance = boundingCoordinates[0].getY() > boundingCoordinates[1].getY();
 		return "((" + table + ".latitude >= " + boundingCoordinates[0].getX() + " and " + table + ".latitude <= "
@@ -63,7 +65,7 @@ public class GeoLocationProcessor {
 				+ radLon + ")) <= " + (distance / radius) + ')';
 	}
 
-	public List<Object[]> postProcessor(List<Object[]> list) {
+	public List<Object[]> postProcessor(final List<Object[]> list) {
 		if (table != null && list.size() > 0) {
 			final String[] header = (String[]) list.get(0);
 			int distance = -1, latitude = -1, longitude = -1, latitudeContact = -1, longitudeContact = -1;
@@ -101,7 +103,7 @@ public class GeoLocationProcessor {
 					final int d = distance;
 					Collections.sort(list, new Comparator<Object>() {
 						@Override
-						public int compare(Object o1, Object o2) {
+						public int compare(final Object o1, final Object o2) {
 							if (((Object[]) o1)[d] instanceof Number && ((Object[]) o2)[d] instanceof Number) {
 								return (int) (((Number) ((Object[]) o1)[d]).doubleValue() * 1000
 										- ((Number) ((Object[]) o2)[d]).doubleValue() * 1000);
@@ -126,18 +128,19 @@ public class GeoLocationProcessor {
 		return list;
 	}
 
-	private void checkBounds(double radLat, double radLon) {
+	private void checkBounds(final double radLat, final double radLon) {
 		if (radLat < MIN_LAT || radLat > MAX_LAT || radLon < MIN_LON || radLon > MAX_LON)
 			throw new IllegalArgumentException("out of bounds: " + radLat + "/" + radLon);
 	}
 
-	private double distanceTo(double latitude, double longitude) {
+	private double distanceTo(final double latitude, final double longitude) {
 		final double d = Math.toRadians(latitude);
 		return Math.acos(Math.sin(radLat) * Math.sin(d)
 				+ Math.cos(radLat) * Math.cos(d) * Math.cos(radLon - Math.toRadians(longitude))) * radius;
 	}
 
-	public static double distance(double latitude1, double longitude1, double latitude2, double longitude2) {
+	public static double distance(final double latitude1, final double longitude1, final double latitude2,
+			final double longitude2) {
 		final GeoLocationProcessor geoLocationProcessor = new GeoLocationProcessor();
 		geoLocationProcessor.radLat = Math.toRadians(latitude1);
 		geoLocationProcessor.radLon = Math.toRadians(longitude1);
@@ -180,17 +183,17 @@ public class GeoLocationProcessor {
 	 *         longitude of the second array element.</li>
 	 *         </ul>
 	 */
-	private Point[] computeBoundingCoordinates(double distance) {
+	private Point[] computeBoundingCoordinates(final double distance) {
 		if (distance < 0d)
 			throw new IllegalArgumentException("distance negative: " + distance);
 
 		// angular distance in radians on a great circle
-		double radDist = distance / radius;
+		final double radDist = distance / radius;
 		double minLat = radLat - radDist;
 		double maxLat = radLat + radDist;
 		double minLon, maxLon;
 		if (minLat > MIN_LAT && maxLat < MAX_LAT) {
-			double deltaLon = Math.asin(Math.sin(radDist) / Math.cos(radLat));
+			final double deltaLon = Math.asin(Math.sin(radDist) / Math.cos(radLat));
 			minLon = radLon - deltaLon;
 			if (minLon < MIN_LON)
 				minLon += 2d * Math.PI;
