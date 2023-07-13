@@ -248,7 +248,7 @@ public class ActionApi {
 	}
 
 	@GetMapping("teaser/{type}")
-	public List<Object[]> teaser(@PathVariable final String type, @RequestParam(required = false) final String search,
+	public List<Object[]> teaser(@PathVariable final String type, @RequestParam(required = false) String search,
 			@RequestHeader final BigInteger clientId, @RequestHeader(required = false) final BigInteger user,
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
 		final QueryParams params = new QueryParams(
@@ -281,7 +281,7 @@ public class ActionApi {
 			contact.setClientId(clientId);
 			contact.setId(BigInteger.ZERO);
 			params.setUser(contact);
-			params.setSearch("contact.teaser=true");
+			search = (search == null ? "" : "(" + search + ") and ") + "contact.teaser=true";
 		} else {
 			params.setUser(repository.one(Contact.class, user));
 			if (params.getUser().getLatitude() != null) {
@@ -289,10 +289,11 @@ public class ActionApi {
 				params.setLongitude(params.getUser().getLongitude());
 			}
 			if (params.getQuery() == Query.contact_listTeaser)
-				params.setSearch("contact.id<>" + user);
-			else
-				params.setSearch("event.endDate>='" + Instant.now().atZone(ZoneOffset.UTC).toLocalDate() + "'");
+				search = (search == null ? "" : "(" + search + ") and ") + "contact.id<>" + user;
 		}
+		if (params.getQuery() == Query.event_listTeaser)
+			search = (search == null ? "" : "(" + search + ") and ") + "event.endDate>='"
+					+ Instant.now().atZone(ZoneOffset.UTC).toLocalDate() + "'";
 		params.setSearch(search);
 		return repository.list(params).getList();
 	}
