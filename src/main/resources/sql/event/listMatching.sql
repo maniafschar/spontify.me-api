@@ -8,7 +8,6 @@ FROM
 	Event event left join Location location on event.locationId=location.id,
 	Contact contact
 WHERE
-	TO_DAYS(event.startDate)-14<=TO_DAYS(current_timestamp) and
 	TO_DAYS(event.endDate)>=TO_DAYS(current_timestamp) and
 	(
 		(REGEXP_LIKE(event.skills, '{USERSKILLS}')=true or REGEXP_LIKE(event.skillsText, '{USERSKILLSTEXT}')=true) and

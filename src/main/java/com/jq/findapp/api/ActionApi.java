@@ -241,9 +241,8 @@ public class ActionApi {
 		final QueryParams params = new QueryParams(Query.event_listTeaserMeta);
 		params.setLimit(-1);
 		params.setSearch(
-				"contact.clientId=" + clientId + " and event.startDate<='"
-						+ Instant.now().plus(Duration.ofDays(14)).atZone(ZoneOffset.UTC).toLocalDate()
-						+ "' and event.endDate>='" + Instant.now().atZone(ZoneOffset.UTC).toLocalDate() + "'");
+				"contact.clientId=" + clientId + " and event.endDate>='"
+						+ Instant.now().atZone(ZoneOffset.UTC).toLocalDate() + "'");
 		return repository.list(params).getList();
 	}
 
