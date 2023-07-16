@@ -110,7 +110,7 @@ public class AuthenticationApi {
 				repository.save(t);
 				user.put("auto_login_token", Encryption.encrypt(t.getToken(), publicKey));
 			}
-			user.put("is_club", repository.one(Client.class, clientId).getClub());
+			user.put("app_config", repository.one(Client.class, clientId).getAppConfig());
 		}
 		return user;
 	}

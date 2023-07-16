@@ -4,7 +4,7 @@ import jakarta.persistence.Entity;
 
 @Entity
 public class Client extends BaseEntity {
-	private Boolean club;
+	private String appConfig;
 	private String css;
 	private String name;
 	private String email;
@@ -42,11 +42,11 @@ public class Client extends BaseEntity {
 		this.css = css;
 	}
 
-	public Boolean getClub() {
-		return club;
+	public String getAppConfig() {
+		return appConfig;
 	}
 
-	public void setClub(final Boolean club) {
-		this.club = club;
+	public void setAppConfig(final String appConfig) {
+		this.appConfig = appConfig;
 	}
 }
