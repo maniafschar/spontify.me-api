@@ -31,6 +31,7 @@ public class Utils {
 			client.setEmail("abc@jq-consulting.de");
 			client.setUrl("https://fan-club.online");
 			client.setCss("{}");
+			client.setAppConfig("{}");
 			repository.save(client);
 		}
 		return client;
@@ -62,7 +63,7 @@ public class Utils {
 		return contact;
 	}
 
-	public void setEventDate(BigInteger id, Timestamp date) throws Exception {
+	public void setEventDate(final BigInteger id, final Timestamp date) throws Exception {
 		repository.executeUpdate("update Event set startDate=?1, endDate=?2, contactId=1 where id=" + id, date, date);
 		repository.executeUpdate("update EventParticipate set eventDate=?1 where eventId=" + id, date);
 		repository.executeUpdate("update Contact set latitude=2, longitude=-2 where id=1");
