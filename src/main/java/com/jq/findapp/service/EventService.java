@@ -159,13 +159,13 @@ public class EventService {
 	private LocalDateTime getRealDate(final Event event, final LocalDateTime now) {
 		LocalDateTime realDate = Instant.ofEpochMilli(event.getStartDate().getTime())
 				.atZone(ZoneId.systemDefault()).toLocalDateTime();
-		if (!"o".equals(event.getType())) {
+		if (!"o".equals(event.getRepetition())) {
 			while (realDate.isBefore(now)) {
-				if ("w1".equals(event.getType()))
+				if ("w1".equals(event.getRepetition()))
 					realDate = realDate.plusWeeks(1);
-				else if ("w2".equals(event.getType()))
+				else if ("w2".equals(event.getRepetition()))
 					realDate = realDate.plusWeeks(2);
-				else if ("m".equals(event.getType()))
+				else if ("m".equals(event.getRepetition()))
 					realDate = realDate.plusMonths(1);
 				else
 					realDate = realDate.plusYears(1);

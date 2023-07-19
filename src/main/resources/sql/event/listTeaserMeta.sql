@@ -1,7 +1,7 @@
 SELECT
 	event.endDate,
 	event.startDate,
-	event.type,
+	event.repetition,
 	location.country,
 	location.town
 FROM

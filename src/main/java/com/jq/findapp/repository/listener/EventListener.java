@@ -28,18 +28,18 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	private EventService eventService;
 
 	@Override
-	public void prePersist(Event event) throws Exception {
+	public void prePersist(final Event event) throws Exception {
 		preUpdate(event);
 	}
 
 	@Override
-	public void preUpdate(Event event) throws Exception {
-		if ("o".equals(event.getType()))
+	public void preUpdate(final Event event) throws Exception {
+		if ("o".equals(event.getRepetition()))
 			event.setEndDate(new Date(event.getStartDate().getTime()));
 	}
 
 	@Override
-	public void postPersist(Event event) throws Exception {
+	public void postPersist(final Event event) throws Exception {
 		final EventParticipate eventParticipate = new EventParticipate();
 		eventParticipate.setState((short) 1);
 		eventParticipate.setContactId(event.getContactId());
@@ -60,7 +60,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 				final EventParticipate eventParticipate = repository.one(EventParticipate.class,
 						(BigInteger) result.get(i).get("eventParticipate.id"));
 				if (event.old("startDate") != null) {
-					if ("o".equals(event.getType()))
+					if ("o".equals(event.getRepetition()))
 						eventParticipate.setEventDate(new java.sql.Date(event.getStartDate().getTime()));
 					else
 						eventParticipate

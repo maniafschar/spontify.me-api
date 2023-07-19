@@ -11,7 +11,7 @@ SELECT
 	event.skillsText,
 	event.startDate,
 	event.description,
-	event.type,
+	event.repetition,
 	location.description,
 	location.id,
 	location.imageList,

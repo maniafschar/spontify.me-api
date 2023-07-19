@@ -128,9 +128,6 @@ public class IntegrationTest {
 	private void addEvent() {
 		Util.click("dialog-navigation item.events");
 		Util.click("dialog-menu a[onclick*=\"pageEvent.edit\"]");
-		Util.sendKeys("dialog-popup input[name=\"location\"]", "loca");
-		Util.sleep(1000);
-		Util.click("dialog-popup eventLocationInputHelper ul li");
 		if (!Util.get("dialog-popup .picture").getAttribute("style").contains("none"))
 			throw new RuntimeException("Event .picture should be invisible!");
 		if (!Util.get("dialog-popup .url").getAttribute("style").contains("none"))
@@ -145,6 +142,11 @@ public class IntegrationTest {
 		if (!Util.get("dialog-popup .confirm").getAttribute("style").contains("none"))
 			throw new RuntimeException("Event .confirm should be invisible!");
 		Util.get("dialog-popup input[name=\"price\"]").clear();
+		Util.click("dialog-popup dialogButtons button-text[onclick*=\"selectLocation\"]");
+		Util.sendKeys("dialog-popup input[name=\"location\"]", "loca");
+		Util.sleep(1000);
+		Util.click("dialog-popup eventLocationInputHelper ul li");
+		Util.sleep(500);
 		Util.click("dialog-popup dialogButtons button-text[onclick*=\"save\"]");
 		Util.get("dialog-popup input[name=\"startDate\"]").sendKeys("");
 		new Actions(Util.driver).keyDown(Keys.SHIFT).sendKeys("\t\t\t\t\t\t").keyUp(Keys.SHIFT).build().perform();

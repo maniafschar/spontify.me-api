@@ -23,7 +23,7 @@ public class Event extends BaseEntity {
 	private String imageList;
 	private String skills;
 	private String skillsText;
-	private String type;
+	private String repetition;
 	private String url;
 	private Timestamp startDate;
 
@@ -31,7 +31,7 @@ public class Event extends BaseEntity {
 		return locationId;
 	}
 
-	public void setLocationId(BigInteger locationId) {
+	public void setLocationId(final BigInteger locationId) {
 		this.locationId = locationId;
 	}
 
@@ -39,23 +39,15 @@ public class Event extends BaseEntity {
 		return contactId;
 	}
 
-	public void setContactId(BigInteger contactId) {
+	public void setContactId(final BigInteger contactId) {
 		this.contactId = contactId;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
 	}
 
 	public Timestamp getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(Timestamp startDate) {
+	public void setStartDate(final Timestamp startDate) {
 		this.startDate = startDate;
 	}
 
@@ -63,7 +55,7 @@ public class Event extends BaseEntity {
 		return endDate;
 	}
 
-	public void setEndDate(Date endDate) {
+	public void setEndDate(final Date endDate) {
 		this.endDate = endDate;
 	}
 
@@ -71,7 +63,7 @@ public class Event extends BaseEntity {
 		return description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
@@ -79,7 +71,7 @@ public class Event extends BaseEntity {
 		return image;
 	}
 
-	public void setImage(String image) {
+	public void setImage(final String image) {
 		this.image = image;
 	}
 
@@ -87,19 +79,19 @@ public class Event extends BaseEntity {
 		return imageList;
 	}
 
-	public void setImageList(String imageList) {
+	public void setImageList(final String imageList) {
 		this.imageList = imageList;
 	}
 
-	public void setConfirm(Short confirm) {
+	public void setConfirm(final Short confirm) {
 		this.confirm = confirm;
 	}
 
-	public void setPrice(Double price) {
+	public void setPrice(final Double price) {
 		this.price = price;
 	}
 
-	public void setMaxParticipants(Short maxParticipants) {
+	public void setMaxParticipants(final Short maxParticipants) {
 		this.maxParticipants = maxParticipants;
 	}
 
@@ -119,7 +111,7 @@ public class Event extends BaseEntity {
 		return skills;
 	}
 
-	public void setSkills(String skills) {
+	public void setSkills(final String skills) {
 		this.skills = skills;
 	}
 
@@ -127,7 +119,7 @@ public class Event extends BaseEntity {
 		return skillsText;
 	}
 
-	public void setSkillsText(String skillsText) {
+	public void setSkillsText(final String skillsText) {
 		this.skillsText = skillsText;
 	}
 
@@ -135,7 +127,7 @@ public class Event extends BaseEntity {
 		return rating;
 	}
 
-	public void setRating(Short rating) {
+	public void setRating(final Short rating) {
 		this.rating = rating;
 	}
 
@@ -143,13 +135,21 @@ public class Event extends BaseEntity {
 		return url;
 	}
 
-	public void setUrl(String url) {
+	public void setUrl(final String url) {
 		this.url = url;
+	}
+
+	public String getRepetition() {
+		return repetition;
+	}
+
+	public void setRepetition(final String repetition) {
+		this.repetition = repetition;
 	}
 
 	@Transient
 	@Override
-	public boolean writeAccess(BigInteger user, Repository repository) {
+	public boolean writeAccess(final BigInteger user, final Repository repository) {
 		return user.equals(getContactId());
 	}
 }

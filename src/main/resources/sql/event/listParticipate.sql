@@ -17,7 +17,7 @@ select
 	event.skillsText,
 	event.startDate,
 	event.description,
-	event.type,
+	event.repetition,
 	event.url,
 	contact.age,
 	contact.authenticate,
