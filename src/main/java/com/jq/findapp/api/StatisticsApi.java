@@ -47,7 +47,7 @@ public class StatisticsApi {
 	@GetMapping("contact/location")
 	public List<Object[]> contactLocation(@RequestHeader final BigInteger user) throws Exception {
 		final Contact contact = repository.one(Contact.class, user);
-		if (contact.getType() == ContactType.adminContent) {
+		if (contact.getType() == ContactType.adminContent || contact.getType() == ContactType.demo) {
 			final QueryParams params = new QueryParams(Query.contact_statisticsGeoLocation);
 			params.setSearch("contact.longitude is not null and contact.id<>" + adminId);
 			// + " and contactGeoLocationHistory.manual=false and contact.clientId=" +

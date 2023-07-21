@@ -381,7 +381,7 @@ public class ActionApi {
 		chat.setContactId2(user);
 		chat.setTextId(TextId.notification_authenticate);
 		chat.setNote(note);
-		chat.setAction("video.startAdminCall()");
+		chat.setAction("ui.startAdminCall()");
 		repository.save(chat);
 	}
 
