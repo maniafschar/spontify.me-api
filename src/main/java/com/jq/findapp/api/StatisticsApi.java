@@ -35,7 +35,7 @@ public class StatisticsApi {
 	public List<Object[]> contact(@PathVariable final String query, @RequestHeader final BigInteger user)
 			throws Exception {
 		final Contact contact = repository.one(Contact.class, user);
-		if (contact.getType() == ContactType.adminContent) {
+		if (contact.getType() == ContactType.adminContent || contact.getType() == ContactType.demo) {
 			final QueryParams params = new QueryParams(Query.valueOf("misc_stats" + query));
 			params.setLimit(0);
 			params.setUser(contact);
@@ -67,7 +67,7 @@ public class StatisticsApi {
 	@GetMapping("marketing")
 	public List<Object[]> marketing(@RequestHeader final BigInteger user) throws Exception {
 		final Contact contact = repository.one(Contact.class, user);
-		if (contact.getType() == ContactType.adminContent) {
+		if (contact.getType() == ContactType.adminContent || contact.getType() == ContactType.demo) {
 			final QueryParams params = new QueryParams(Query.misc_listMarketing);
 			params.setSearch("clientId=" + contact.getClientId());
 			return repository.list(params).getList();
