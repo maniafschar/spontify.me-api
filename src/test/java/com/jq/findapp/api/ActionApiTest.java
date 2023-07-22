@@ -34,7 +34,7 @@ public class ActionApiTest {
 
 		// when
 		final JsonNode data = new ObjectMapper().readTree(response);
-		final GeoLocation address = externalService.convertAddress(data);
+		final GeoLocation address = externalService.convertAddress(data).get((0));
 
 		// then
 		assertEquals("OK", data.get("status").asText());

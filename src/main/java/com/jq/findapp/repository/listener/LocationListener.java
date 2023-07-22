@@ -55,7 +55,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		repository.save(locationFavorite);
 	}
 
-	private void lookupAddress(Location location)
+	private void lookupAddress(final Location location)
 			throws JsonMappingException, JsonProcessingException, IllegalArgumentException {
 		final JsonNode address = new ObjectMapper().readTree(
 				externalService.google("geocode/json?address="
@@ -67,7 +67,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		}
 		final JsonNode result = address.get("results").get(0);
 		JsonNode n = result.get("geometry").get("location");
-		final GeoLocation geoLocation = externalService.convertAddress(address);
+		final GeoLocation geoLocation = externalService.convertAddress(address).get(0);
 		location.setAddress(geoLocation.getFormatted());
 		location.setCountry(geoLocation.getCountry());
 		location.setTown(geoLocation.getTown());
@@ -94,7 +94,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		location.setAddress2(s.trim());
 	}
 
-	private boolean isNameMatch(String name1, String name2, boolean tryReverse) {
+	private boolean isNameMatch(String name1, String name2, final boolean tryReverse) {
 		name1 = name1.trim().toLowerCase();
 		name2 = name2.trim().toLowerCase();
 		while (name1.contains("  "))

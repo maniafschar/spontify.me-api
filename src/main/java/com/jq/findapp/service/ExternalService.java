@@ -3,7 +3,10 @@ package com.jq.findapp.service;
 import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
@@ -40,7 +43,7 @@ public class ExternalService {
 	@Value("${app.admin.id}")
 	protected BigInteger adminId;
 
-	public String google(String param, BigInteger user) {
+	public String google(final String param, final BigInteger user) {
 		final String result = WebClient
 				.create("https://maps.googleapis.com/maps/api/" + param + (param.contains("?") ? "&" : "?")
 						+ "key=" + googleKey)
@@ -49,62 +52,73 @@ public class ExternalService {
 			final ObjectMapper om = new ObjectMapper();
 			notificationService.createTicket(TicketType.GOOGLE, param,
 					om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(result)), user);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			notificationService.createTicket(TicketType.GOOGLE, param, result, user);
 		}
 		return result;
 	}
 
-	public GeoLocation convertAddress(JsonNode address) {
+	public List<GeoLocation> convertAddress(final JsonNode address) {
 		if ("OK".equals(address.get("status").asText()) && address.get("results") != null) {
-			JsonNode data = address.get("results").get(0).get("address_components");
-			final GeoLocation geoLocation = new GeoLocation();
-			for (int i = 0; i < data.size(); i++) {
-				if (geoLocation.getStreet() == null && "route".equals(data.get(i).get("types").get(0).asText()))
-					geoLocation.setStreet(data.get(i).get("long_name").asText());
-				else if (geoLocation.getNumber() == null
-						&& "street_number".equals(data.get(i).get("types").get(0).asText()))
-					geoLocation.setNumber(data.get(i).get("long_name").asText());
-				else if (geoLocation.getTown() == null &&
-						("locality".equals(data.get(i).get("types").get(0).asText()) ||
-								data.get(i).get("types").get(0).asText().startsWith("administrative_area_level_")))
-					geoLocation.setTown(data.get(i).get("long_name").asText());
-				else if (geoLocation.getZipCode() == null
-						&& "postal_code".equals(data.get(i).get("types").get(0).asText()))
-					geoLocation.setZipCode(data.get(i).get("long_name").asText());
-				else if (geoLocation.getCountry() == null && "country".equals(data.get(i).get("types").get(0).asText()))
-					geoLocation.setCountry(data.get(i).get("short_name").asText());
-			}
-			data = address.get("results").get(0).get("geometry");
-			if (data != null) {
-				data = data.get("location");
+			final List<GeoLocation> list = new ArrayList<>();
+			for (int i = 0; i < address.get("results").size(); i++) {
+				JsonNode data = address.get("results").get(i).get("address_components");
+				final GeoLocation geoLocation = new GeoLocation();
 				if (data != null) {
-					geoLocation.setLatitude((float) data.get("lat").asDouble());
-					geoLocation.setLongitude((float) data.get("lng").asDouble());
+					for (int i2 = 0; i2 < data.size(); i2++) {
+						if (data.get(i2) != null) {
+							final String type = data.get(i2).has("types") ? data.get(i2).get("types").get(0).asText()
+									: "";
+							if (geoLocation.getStreet() == null && "route".equals(type))
+								geoLocation.setStreet(data.get(i2).get("long_name").asText());
+							else if (geoLocation.getNumber() == null && "street_number".equals(type))
+								geoLocation.setNumber(data.get(i2).get("long_name").asText());
+							else if (geoLocation.getTown() == null
+									&& ("locality".equals(type) || type.startsWith("administrative_area_level_")))
+								geoLocation.setTown(data.get(i2).get("long_name").asText());
+							else if (geoLocation.getZipCode() == null && "postal_code".equals(type))
+								geoLocation.setZipCode(data.get(i2).get("long_name").asText());
+							else if (geoLocation.getCountry() == null && "country".equals(type))
+								geoLocation.setCountry(data.get(i2).get("short_name").asText());
+						}
+					}
+					data = address.get("results").get(0).get("geometry");
+					if (data != null) {
+						data = data.get("location");
+						if (data != null) {
+							geoLocation.setLatitude((float) data.get("lat").asDouble());
+							geoLocation.setLongitude((float) data.get("lng").asDouble());
+							if (geoLocation.getTown() != null)
+								try {
+									repository.save(geoLocation);
+								} catch (final Exception e) {
+								}
+						}
+					}
+					list.add(geoLocation);
 				}
 			}
-			return geoLocation;
+			return list.size() == 0 ? null : list;
 		}
 		return null;
 	}
 
-	public GeoLocation getLatLng(String town, BigInteger user) throws Exception {
+	public List<GeoLocation> getLatLng(final String town, final BigInteger user) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_geoLocation);
 		params.setSearch("geoLocation.town like '%" + town + "%'");
 		final Map<String, Object> persistedAddress = repository.one(params);
 		if (persistedAddress.get("_id") != null)
-			return repository.one(GeoLocation.class, (BigInteger) persistedAddress.get("_id"));
-		final GeoLocation geoLocation = convertAddress(
+			return Arrays.asList(repository.one(GeoLocation.class, (BigInteger) persistedAddress.get("_id")));
+		final List<GeoLocation> geoLocations = convertAddress(
 				new ObjectMapper().readTree(
-						google("geocode/json?address=" + URLEncoder.encode(town, StandardCharsets.UTF_8), user)));
-		if (geoLocation != null)
-			repository.save(geoLocation);
-		else
+						google("geocode/json?components=administrative_area:"
+								+ URLEncoder.encode(town, StandardCharsets.UTF_8), user)));
+		if (geoLocations == null)
 			notificationService.createTicket(TicketType.ERROR, "No google address", town, user);
-		return geoLocation;
+		return geoLocations;
 	}
 
-	public GeoLocation getAddress(float latitude, float longitude, BigInteger user) throws Exception {
+	public GeoLocation getAddress(final float latitude, final float longitude, final BigInteger user) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_geoLocation);
 		final float roundingFactor = 10000f;
 		params.setSearch("geoLocation.latitude like '" + ((int) (latitude * roundingFactor) / roundingFactor)
@@ -112,18 +126,15 @@ public class ExternalService {
 		final Map<String, Object> persistedAddress = repository.one(params);
 		if (persistedAddress.get("_id") != null)
 			return repository.one(GeoLocation.class, (BigInteger) persistedAddress.get("_id"));
-		final GeoLocation geoLocation = convertAddress(
+		final List<GeoLocation> geoLocations = convertAddress(
 				new ObjectMapper().readTree(google("geocode/json?latlng=" + latitude + ',' + longitude, user)));
-		if (geoLocation != null) {
-			geoLocation.setLongitude(longitude);
-			geoLocation.setLatitude(latitude);
-			repository.save(geoLocation);
-		} else
-			notificationService.createTicket(TicketType.ERROR, "No google address", latitude + "\n" + longitude, user);
-		return geoLocation;
+		if (geoLocations != null)
+			return geoLocations.get(0);
+		notificationService.createTicket(TicketType.ERROR, "No google address", latitude + "\n" + longitude, user);
+		return null;
 	}
 
-	public String map(String source, String destination, Contact contact) {
+	public String map(final String source, final String destination, final Contact contact) {
 		String url = repository.one(Client.class, contact.getClientId()).getUrl();
 		if (source == null || source.length() == 0)
 			url = "https://maps.googleapis.com/maps/api/staticmap?{destination}&markers=icon:" + url
@@ -140,7 +151,7 @@ public class ExternalService {
 				WebClient.create(url).get().retrieve().toEntity(byte[].class).block().getBody());
 	}
 
-	public String chatGpt(String prompt) throws Exception {
+	public String chatGpt(final String prompt) throws Exception {
 		final String s = WebClient
 				.create("https://api.openai.com/v1/completions")
 				.post().accept(MediaType.APPLICATION_JSON)
