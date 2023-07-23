@@ -272,7 +272,7 @@ public class AuthenticationService {
 
 	public Map<String, Object> login(final Contact contact, final String password, final String salt) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_list);
-		params.setSearch("contact.email='" + contact.getEmail() + "'");
+		params.setSearch("contact.email='" + contact.getEmail() + "' and contact.clientId=" + contact.getClientId());
 		params.setUser(new Contact());
 		params.getUser().setId(BigInteger.valueOf(0L));
 		params.getUser().setClientId(contact.getClientId());
