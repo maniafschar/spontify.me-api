@@ -1,8 +1,6 @@
 package com.jq.findapp.api;
 
 import java.math.BigInteger;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -13,8 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,9 +25,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Log;
 import com.jq.findapp.entity.Ticket;
@@ -51,7 +44,6 @@ import com.jq.findapp.service.backend.IpService;
 import com.jq.findapp.service.backend.StatisticsService;
 import com.jq.findapp.util.Strings;
 
-import io.micrometer.core.instrument.util.IOUtils;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
@@ -166,47 +158,6 @@ public class SupportCenterApi {
 		repository.save(contact);
 	}
 
-	@PutMapping("client/{id}")
-	public void client(@PathVariable final BigInteger id, final String data) throws Exception {
-		final Client client = repository.one(Client.class, id);
-		final JsonNode json = new ObjectMapper().readTree(data);
-		boolean modified = false;
-		String field = "email";
-		if (json.has(field) && !json.get(field).asText().equals(client.getEmail())) {
-			client.setEmail(json.get(field).asText());
-			modified = true;
-		}
-		field = "name";
-		if (json.has(field) && !json.get(field).asText().equals(client.getName())) {
-			client.setName(json.get(field).asText());
-			modified = true;
-		}
-		field = "url";
-		if (json.has(field)) {
-			if (!json.get(field).asText().equals(client.getUrl())) {
-				client.setUrl(json.get(field).asText());
-				modified = true;
-			}
-		}
-		String css = IOUtils.toString(new URL(client.getUrl() + "/css/style.css").openStream(),
-				StandardCharsets.UTF_8);
-		Matcher matcher = Pattern.compile(":root \\{([^}])*").matcher(css);
-		if (matcher.find()) {
-			css = matcher.group();
-			matcher = Pattern.compile("--([^:].*): (.*);").matcher(css);
-			css = "{";
-			while (matcher.find())
-				css += "\"" + matcher.group(1) + "\":\"" + matcher.group(2) + "\",";
-			css = css.substring(0, css.length() - 1) + "}";
-			if (!css.equals(client.getCss())) {
-				client.setCss(css);
-				modified = true;
-			}
-		}
-		if (modified)
-			repository.save(client);
-	}
-
 	@GetMapping("metrics")
 	public Map<String, Object> metrics() throws Exception {
 		final Map<String, Object> result = new HashMap<>();
@@ -253,7 +204,7 @@ public class SupportCenterApi {
 		executorService.submit(new Runnable() {
 			@Override
 			public void run() {
-				if (last) {
+				if (last)
 					do {
 						try {
 							Thread.sleep(100);
@@ -261,7 +212,6 @@ public class SupportCenterApi {
 							throw new RuntimeException(e);
 						}
 					} while (schedulerRunning.stream().anyMatch(e -> e > id));
-				}
 				final Log log = new Log();
 				final long time = System.currentTimeMillis();
 				try {
