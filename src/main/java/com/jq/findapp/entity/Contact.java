@@ -15,7 +15,6 @@ import jakarta.persistence.Transient;
 @Entity
 public class Contact extends BaseEntity {
 	private BigInteger clientId;
-	private Boolean active = true;
 	private Boolean authenticate = false;
 	private Boolean bluetooth = true;
 	private Boolean notificationEngagement = true;
@@ -180,14 +179,6 @@ public class Contact extends BaseEntity {
 
 	public void setVerified(final Boolean verified) {
 		this.verified = verified;
-	}
-
-	public Boolean getActive() {
-		return active;
-	}
-
-	public void setActive(final Boolean active) {
-		this.active = active;
 	}
 
 	public Boolean getAuthenticate() {

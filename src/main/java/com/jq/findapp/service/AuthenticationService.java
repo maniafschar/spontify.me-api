@@ -280,7 +280,6 @@ public class AuthenticationService {
 		if (user != null) {
 			final Contact c2 = repository.one(Contact.class, (BigInteger) user.get("contact.id"));
 			verify(c2, password, salt, true);
-			c2.setActive(true);
 			c2.setLastLogin(new Timestamp(Instant.now().toEpochMilli()));
 			c2.setOs(contact.getOs());
 			c2.setDevice(contact.getDevice());
@@ -350,8 +349,6 @@ public class AuthenticationService {
 	}
 
 	public void logoff(final Contact contact, final String token) throws Exception {
-		contact.setActive(false);
-		repository.save(contact);
 		if (token != null) {
 			final QueryParams params = new QueryParams(Query.contact_token);
 			params.setSearch("contactToken.token='" + Encryption.decryptBrowser(token) + "'");

@@ -54,7 +54,7 @@ public class WebSocket {
 						: message.offer != null ? "offer:" + message.offer : null);
 		if (log.getBody() != null && log.getBody().length() > 255)
 			log.setBody(log.getBody().substring(0, 255));
-		if (USERS.containsKey("" + message.getId())) {
+		if (isUserActive(message.getId())) {
 			message.setPassword(null);
 			message.setSalt(null);
 			log.setStatus(200);
@@ -73,7 +73,7 @@ public class WebSocket {
 
 	@PostMapping("refresh/{id}")
 	public boolean refresh(@RequestBody final Object payload, @PathVariable final BigInteger id) throws Exception {
-		if (USERS.containsKey("" + id)) {
+		if (isUserActive(id)) {
 			messagingTemplate.convertAndSendToUser("" + id, "/refresh", payload);
 			return true;
 		}
@@ -90,6 +90,10 @@ public class WebSocket {
 	@EventListener
 	public void handleSessionDisconnectEvent(final SessionDisconnectEvent event) {
 		USERS.values().remove(event.getMessage().getHeaders().get("simpSessionId"));
+	}
+
+	static public boolean isUserActive(final BigInteger user) {
+		return USERS.containsKey("" + user);
 	}
 
 	private static class VideoMessage {

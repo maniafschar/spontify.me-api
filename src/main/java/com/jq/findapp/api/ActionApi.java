@@ -410,8 +410,9 @@ public class ActionApi {
 	@Async
 	@PostMapping("videocall/{id}")
 	public void videocall(@PathVariable final BigInteger id, @RequestHeader final BigInteger user) throws Exception {
-		notificationService.sendNotification(repository.one(Contact.class, user), repository.one(Contact.class, id),
-				ContactNotificationTextType.contactVideoCall, "video=" + user);
+		if (!WebSocket.isUserActive(id))
+			notificationService.sendNotification(repository.one(Contact.class, user), repository.one(Contact.class, id),
+					ContactNotificationTextType.contactVideoCall, "video=" + user);
 	}
 
 	@GetMapping("paypalKey")
@@ -490,10 +491,7 @@ public class ActionApi {
 
 	@GetMapping("ping")
 	public Ping ping(@RequestHeader final BigInteger user) throws Exception {
-		final Contact contact = repository.one(Contact.class, user);
-		contact.setActive(true);
-		repository.save(contact);
-		return notificationService.getPingValues(contact);
+		return notificationService.getPingValues(repository.one(Contact.class, user));
 	}
 
 	private boolean isPaypalSandbox(final BigInteger user) {

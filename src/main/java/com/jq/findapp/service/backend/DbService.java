@@ -34,12 +34,8 @@ public class DbService {
 	public SchedulerResult update() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/update");
 		try {
-			final String modifiedAt = Instant.now().minus(Duration.ofSeconds(90)).toString();
 			repository.executeUpdate(
 					"update Contact set age=cast((YEAR(current_timestamp) - YEAR(birthday) - case when MONTH(current_timestamp) < MONTH(birthday) or MONTH(current_timestamp) = MONTH(birthday) and DAY(current_timestamp) < DAY(birthday) then 1 else 0 end) as short) where birthday is not null");
-			repository.executeUpdate(
-					"update Contact set active=false where modifiedAt is null or modifiedAt<'"
-							+ modifiedAt.substring(0, modifiedAt.indexOf('.')) + "'");
 			repository.executeUpdate(
 					"update Contact set version=null where (version='0.9.9' or version='0.9.3') and os='android' and language='EN'");
 			repository.executeUpdate(
@@ -86,7 +82,7 @@ public class DbService {
 				e -> client.setName(e)) || modified;
 		modified = updateField("<meta property=\\\"og:url\\\" content=\"([^\"].*)\"", html, client.getUrl(),
 				e -> client.setUrl(e)) || modified;
-		String css = IOUtils.toString(new FileInputStream(webDir + client.getId() + "/css/style.css"),
+		String css = IOUtils.toString(new FileInputStream(webDir + client.getId() + "/css/main.css"),
 				StandardCharsets.UTF_8);
 		Matcher matcher = Pattern.compile(":root \\{([^}])*").matcher(css);
 		if (matcher.find()) {

@@ -72,8 +72,9 @@ public class Screenshots {
 	}
 
 	private void screenshots(final String name) throws Exception {
-		Util.driver.get("https://after-work.events/");
-		// Util.driver.get("https://demo.fan-club.online/");
+		// Util.driver.get("https://after-work.events/");
+		// Util.driver.get("https://offline-poker.com/");
+		Util.driver.get("https://alpenherz.fan-club.online/");
 		Util.sleep(3000);
 		js.executeScript(
 				"var p={},e=ui.qa('card img');for(var i=0;i<e.length;i++)if(p[e[i].src])ui.parents(e[i],'card').outerHTML='';else p[e[i].src]=true;");
@@ -90,21 +91,21 @@ public class Screenshots {
 		}
 		js.executeScript("ui.navigation.goTo('search')");
 		Util.sleep(1000);
-		Util.sendKeys("search div.contacts input[name=\"keywords\"]", "");
+		Util.click("search tabHeader tab[i=\"contacts\"]");
 		Util.sleep(1000);
 		js.executeScript("pageSearch.contacts.search()");
 		Util.sleep(1000);
 		js.executeScript(
-				"var e=ui.qa('row img[src*=\"contact.svg\"]');for(var i=0;i<e.length;i++)ui.parents(e[i],'row').outerHTML='';");
+				"var e=ui.qa('search div list-row');for(var i=0;i<e.length;i++)if(ui.q('search div list-row[i=\"'+e[i].getAttribute('i')+'\"] img[src*=\"contacts.svg\"]'))e[i].outerHTML='';");
 		js.executeScript(
-				"var e=ui.qa('row[i=\"223\"],row[i=\"244\"],row[i=\"276\"],row[i=\"607\"],row[i=\"793\"]');for(var i=0;i<e.length;i++)ui.parents(e[i],'row').outerHTML='';");
+				"var e=ui.qa('search div list-row[i=\"223\"],search div list-row[i=\"244\"],search div list-row[i=\"276\"],search div list-row[i=\"607\"],search div list-row[i=\"793\"]');for(var i=0;i<e.length;i++)e[i].outerHTML='';");
 		screenshot(name + "-search");
 		js.executeScript(
-				"ui.classRemove('videoCall videochat', 'hidden');var e=ui.q('videoCall').style;e.display='block';e.background='url(https://fan-club.online/images/videoCall.jpg)';e.backgroundSize='"
+				"ui.classRemove('video-call videochat', 'hidden');var e=ui.q('video-call').style;e.display='block';e.background='url(https://fan-club.online/images/videoCall.jpg)';e.backgroundSize='"
 						+ ((double) 568 / 800 < Double.valueOf(name.split("x")[0]) / Double.valueOf(name.split("x")[1])
 								? "100% auto"
 								: "auto 100%")
-						+ "';e.backgroundPosition='center';ui.q('videoCall call').style.display='none';");
+						+ "';e.backgroundPosition='center';ui.q('video-call call').style.display='none';");
 		Util.sleep(2000);
 		screenshot(name + "-video");
 		if (Util.driver.getTitle().contains("Fanclub")) {

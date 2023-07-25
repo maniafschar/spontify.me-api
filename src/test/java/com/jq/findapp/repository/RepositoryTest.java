@@ -86,7 +86,6 @@ public class RepositoryTest {
 		final Timestamp visitPage = contact.getVisitPage();
 
 		// when
-		contact.setActive(true);
 		contact.setLoginLink(null);
 		contact.setOs(contact.getOs());
 		contact.setDevice(contact.getDevice());
@@ -118,7 +117,7 @@ public class RepositoryTest {
 		params.setUser(utils.createContact());
 
 		// when
-		for (Query query : Query.values()) {
+		for (final Query query : Query.values()) {
 			params.setQuery(query);
 			System.out.println(query);
 			final Result result = repository.list(params);
@@ -212,7 +211,7 @@ public class RepositoryTest {
 		try {
 			repository.save(contactChat2);
 			throw new RuntimeException("no exception thrown");
-		} catch (IllegalArgumentException ex) {
+		} catch (final IllegalArgumentException ex) {
 
 			// then
 			assertEquals("duplicate chat", ex.getMessage());
@@ -240,7 +239,7 @@ public class RepositoryTest {
 		try {
 			repository.save(contactChat2);
 			throw new RuntimeException("no exception thrown");
-		} catch (IllegalArgumentException ex) {
+		} catch (final IllegalArgumentException ex) {
 
 			// then
 			assertEquals("duplicate chat", ex.getMessage());
