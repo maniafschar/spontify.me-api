@@ -1,5 +1,8 @@
 select
-	location.id
+	location.id,
+	location.latitude,
+	location.longitude,
+	'' as geolocationDistance
 FROM
 	Location location
 WHERE

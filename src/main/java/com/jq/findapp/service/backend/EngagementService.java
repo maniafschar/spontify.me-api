@@ -210,12 +210,14 @@ public class EngagementService {
 				contact -> {
 					if (contact.getLongitude() == null)
 						return false;
-					final QueryParams params = new QueryParams(Query.location_list);
+					final QueryParams params = new QueryParams(Query.location_listId);
 					params.setUser(contact);
+					params.setDistance(20);
 					params.setLatitude(contact.getLatitude());
 					params.setLongitude(contact.getLongitude());
 					params.setSearch(
-							"location.createdAt>='" + Instant.ofEpochMilli(contact.getModifiedAt().getTime()) + "'");
+							"location.createdAt>='" + Instant.ofEpochMilli(contact.getModifiedAt().getTime())
+									+ "'");
 					return repository.list(params).size() > 1;
 				}));
 
@@ -322,6 +324,7 @@ public class EngagementService {
 			final Result ids = repository.list(params);
 			params.setQuery(Query.contact_chat);
 			int count = 0;
+			long t = System.currentTimeMillis();
 			for (int i = 0; i < ids.size(); i++) {
 				params.setSearch("contactChat.contactId=" + adminId + " and contactChat.contactId2="
 						+ ids.get(i).get("contact.id"));
@@ -331,14 +334,15 @@ public class EngagementService {
 					count++;
 				}
 			}
-			result.result += "welcome: " + count;
+			result.result += "welcome: " + count + ", time: " + (System.currentTimeMillis() - t);
 			count = 0;
+			t = System.currentTimeMillis();
 			for (int i = 0; i < ids.size(); i++) {
 				final Contact contact = repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id"));
 				if (isTimeForNewChat(contact, params, false) && sendChatTemplate(contact))
 					count++;
 			}
-			result.result += "\ntemplate: " + count;
+			result.result += "\ntemplate: " + count + ", time: " + (System.currentTimeMillis() - t);
 		} catch (final Exception e) {
 			result.exception = e;
 		}

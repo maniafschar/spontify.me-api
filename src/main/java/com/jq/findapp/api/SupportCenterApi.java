@@ -177,13 +177,13 @@ public class SupportCenterApi {
 			run(importLogService::importLog);
 			run(chatService::answerAi);
 			run(dbService::update);
-			run(ipService::lookupIps);
-			run(statisticsService::update);
+			// run(statisticsService::update);
 			run(engagementService::sendRegistrationReminder);
 			// sendNearBy and sendChats after all event services
 			// to avoid multiple chat at the same time
 			runLast(engagementService::sendNearBy);
 			runLast(engagementService::sendChats);
+			runLast(ipService::lookupIps);
 			run(eventService::findMatchingSpontis);
 			run(eventService::notifyParticipation);
 		} else
