@@ -116,7 +116,7 @@ public class IntegrationTest {
 		Util.sendKeys("dialog-popup input[name=\"name\"]", name);
 		Util.get("dialog-popup textarea[name=\"address\"]").clear();
 		Util.sendKeys("dialog-popup textarea[name=\"address\"]", address);
-		Util.click("dialog-popup dialogButtons button-text");
+		Util.click("dialog-popup dialogButtons button-text[onclick*=\"pageLocation.save\"]");
 		if (duplicate) {
 			if (!Util.get("dialog-popup popupHint").getText().toLowerCase().contains("location"))
 				throw new RuntimeException("Expected duplicate location!");

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -107,6 +108,9 @@ public class ActionApi {
 
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
+
+	@Value("${app.server.webSocket}")
+	private String serverWebSocket;
 
 	@GetMapping("unique")
 	public Unique unique(@RequestHeader final BigInteger clientId, final String email) {
@@ -410,7 +414,9 @@ public class ActionApi {
 	@Async
 	@PostMapping("videocall/{id}")
 	public void videocall(@PathVariable final BigInteger id, @RequestHeader final BigInteger user) throws Exception {
-		if (!WebSocket.isUserActive(id))
+		final Boolean active = WebClient.create(serverWebSocket + "active/" + id).get().retrieve()
+				.toEntity(Boolean.class).block().getBody();
+		if (active != null && !active)
 			notificationService.sendNotification(repository.one(Contact.class, user), repository.one(Contact.class, id),
 					ContactNotificationTextType.contactVideoCall, "video=" + user);
 	}

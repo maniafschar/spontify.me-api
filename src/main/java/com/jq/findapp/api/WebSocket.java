@@ -14,10 +14,12 @@ import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
@@ -25,7 +27,8 @@ import com.jq.findapp.entity.Log;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
 
-@Controller
+@RestController
+@RequestMapping("ws")
 public class WebSocket {
 	@Autowired
 	private AuthenticationService authenticationService;
@@ -38,7 +41,7 @@ public class WebSocket {
 
 	private final Pattern numbers = Pattern.compile("\\d+");
 
-	private static final Map<String, String> USERS = new Hashtable<>();
+	private final Map<BigInteger, String> USERS = new Hashtable<>();
 
 	@MessageMapping("video")
 	public void video(final VideoMessage message, @Header(name = "destination") final String destination)
@@ -54,7 +57,7 @@ public class WebSocket {
 						: message.offer != null ? "offer:" + message.offer : null);
 		if (log.getBody() != null && log.getBody().length() > 255)
 			log.setBody(log.getBody().substring(0, 255));
-		if (isUserActive(message.getId())) {
+		if (USERS.containsKey(message.getId())) {
 			message.setPassword(null);
 			message.setSalt(null);
 			log.setStatus(200);
@@ -73,7 +76,7 @@ public class WebSocket {
 
 	@PostMapping("refresh/{id}")
 	public boolean refresh(@RequestBody final Object payload, @PathVariable final BigInteger id) throws Exception {
-		if (isUserActive(id)) {
+		if (USERS.containsKey(id)) {
 			messagingTemplate.convertAndSendToUser("" + id, "/refresh", payload);
 			return true;
 		}
@@ -84,7 +87,7 @@ public class WebSocket {
 	public void handleSessionSubscribeEvent(final SessionSubscribeEvent event) {
 		final Matcher matcher = numbers.matcher((String) event.getMessage().getHeaders().get("simpDestination"));
 		if (matcher.find())
-			USERS.put(matcher.group(), (String) event.getMessage().getHeaders().get("simpSessionId"));
+			USERS.put(new BigInteger(matcher.group()), (String) event.getMessage().getHeaders().get("simpSessionId"));
 	}
 
 	@EventListener
@@ -92,8 +95,10 @@ public class WebSocket {
 		USERS.values().remove(event.getMessage().getHeaders().get("simpSessionId"));
 	}
 
-	static public boolean isUserActive(final BigInteger user) {
-		return USERS.containsKey("" + user);
+	@GetMapping("active/{user}")
+	public boolean active(@PathVariable final BigInteger user) {
+		System.out.println(user + ": " + USERS);
+		return USERS.containsKey(user);
 	}
 
 	private static class VideoMessage {

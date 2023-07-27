@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.NotificationService.Environment;
 import com.jq.findapp.util.Strings;
 
@@ -25,6 +26,9 @@ import jakarta.ws.rs.NotFoundException;
 
 @Component
 public class Ios {
+	@Autowired
+	private Repository repository;
+
 	@Autowired
 	private JwtGenerator jwtGenerator;
 
@@ -46,14 +50,16 @@ public class Ios {
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
 
-	public Environment send(Contact contactFrom, Contact contactTo, String text, String action, int badge,
-			String notificationId)
+	public Environment send(final Contact contactFrom, final Contact contactTo, final String text, final String action,
+			final int badge,
+			final String notificationId)
 			throws Exception {
 		try {
 			send(contactFrom, contactTo, url, text, action, badge, notificationId);
 			return Environment.Production;
-		} catch (NotFoundException ex) {
-			if (adminId.equals(contactTo.getId())) {
+		} catch (final NotFoundException ex) {
+			final String adminEmail = repository.one(Contact.class, adminId).getEmail();
+			if (contactTo.getEmail().contains(adminEmail.substring(adminEmail.indexOf("@")))) {
 				send(contactFrom, contactTo, urlTest, text, action, badge, notificationId);
 				return Environment.Development;
 			}
@@ -61,8 +67,9 @@ public class Ios {
 		}
 	}
 
-	private void send(Contact contactFrom, Contact contactTo, String url, String text, String action, int badge,
-			String notificationId)
+	private void send(final Contact contactFrom, final Contact contactTo, final String url, final String text,
+			final String action, final int badge,
+			final String notificationId)
 			throws Exception {
 		final HttpRequest request = HttpRequest.newBuilder()
 				.POST(BodyPublishers.ofString(

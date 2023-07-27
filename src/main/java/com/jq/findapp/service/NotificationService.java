@@ -94,7 +94,7 @@ public class NotificationService {
 
 	@Async
 	public void locationNotifyOnMatch(final Contact me, final BigInteger locationId,
-			final ContactNotificationTextType notificationTextType, String param) throws Exception {
+			final ContactNotificationTextType notificationTextType, final String param) throws Exception {
 		final QueryParams params = new QueryParams(Query.location_listFavorite);
 		params.setSearch("locationFavorite.locationId=" + locationId);
 		final Result favorites = repository.list(params);
@@ -106,8 +106,8 @@ public class NotificationService {
 	}
 
 	@Async
-	public void sendNotificationOnMatch(ContactNotificationTextType textID, final Contact me, final Contact other,
-			String... param) throws Exception {
+	public void sendNotificationOnMatch(final ContactNotificationTextType textID, final Contact me, final Contact other,
+			final String... param) throws Exception {
 		if (me != null && other != null && !me.getId().equals(other.getId()) && me.getAge() != null
 				&& me.getGender() != null) {
 			final String s2 = me.getGender().intValue() == 1 ? other.getAgeMale()
@@ -121,7 +121,7 @@ public class NotificationService {
 					final List<String> attribs = compareAttributes(me.getSkills(), other.getSkills());
 					final List<String> attribsEx = compareAttributes(me.getSkillsText(), other.getSkillsText());
 					if (attribs.size() > 0 || attribsEx.size() > 0) {
-						String[] param2 = new String[param == null ? 1 : param.length + 1];
+						final String[] param2 = new String[param == null ? 1 : param.length + 1];
 						param2[0] = "" + (attribs.size() + attribsEx.size());
 						if (param != null) {
 							for (int i = 0; i < param.length; i++)
@@ -134,9 +134,9 @@ public class NotificationService {
 		}
 	}
 
-	public boolean sendNotification(Contact contactFrom, Contact contactTo,
-			ContactNotificationTextType notificationTextType,
-			String action, String... param) throws Exception {
+	public boolean sendNotification(final Contact contactFrom, final Contact contactTo,
+			final ContactNotificationTextType notificationTextType,
+			final String action, final String... param) throws Exception {
 		if (!contactTo.getVerified())
 			return false;
 		if (contactTo.getId() != null) {
@@ -183,8 +183,9 @@ public class NotificationService {
 		return false;
 	}
 
-	private ContactNotification save(Contact contactTo, Contact contactFrom, String text, String action,
-			ContactNotificationTextType notificationTextType) throws Exception {
+	private ContactNotification save(final Contact contactTo, final Contact contactFrom, final String text,
+			final String action,
+			final ContactNotificationTextType notificationTextType) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_notification);
 		params.setSearch("contactNotification.contactId=" + contactTo.getId() +
 				" and contactNotification.contactId2=" + contactFrom.getId() +
@@ -203,7 +204,7 @@ public class NotificationService {
 		return notification;
 	}
 
-	public Ping getPingValues(Contact contact) {
+	public Ping getPingValues(final Contact contact) {
 		final QueryParams params = new QueryParams(Query.contact_pingNotification);
 		params.setUser(contact);
 		params.setLimit(0);
@@ -232,7 +233,7 @@ public class NotificationService {
 	}
 
 	private boolean sendNotificationDevice(final Contact contactFrom, final Contact contactTo, final StringBuilder text,
-			String action, ContactNotification notification) throws Exception {
+			final String action, final ContactNotification notification) throws Exception {
 		if (Strings.isEmpty(text) || Strings.isEmpty(contactTo.getPushSystem())
 				|| Strings.isEmpty(contactTo.getPushToken()))
 			return false;
@@ -262,7 +263,7 @@ public class NotificationService {
 			contactTo.setPushToken(null);
 			repository.save(contactTo);
 			return false;
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			final QueryParams params = new QueryParams(Query.misc_setting);
 			params.setSearch("setting.label like 'push.gen.%'");
 			final Result settings = repository.list(params);
@@ -288,7 +289,7 @@ public class NotificationService {
 		}
 	}
 
-	private List<String> compareAttributes(String attributes, String compareTo) {
+	private List<String> compareAttributes(final String attributes, String compareTo) {
 		final List<String> a = new ArrayList<>();
 		final String separator = "\u0015";
 		if (!Strings.isEmpty(attributes) && !Strings.isEmpty(compareTo)) {
@@ -302,7 +303,8 @@ public class NotificationService {
 		return a;
 	}
 
-	private boolean userWantsNotification(ContactNotificationTextType notificationTextType, Contact contact) {
+	private boolean userWantsNotification(final ContactNotificationTextType notificationTextType,
+			final Contact contact) {
 		if (ContactNotificationTextType.chatNew == notificationTextType)
 			return contact.getNotificationChat();
 		if (ContactNotificationTextType.contactFriendRequest == notificationTextType
@@ -319,7 +321,8 @@ public class NotificationService {
 		return true;
 	}
 
-	public void sendNotificationEmail(Contact contactFrom, Contact contactTo, String message, String action)
+	public void sendNotificationEmail(final Contact contactFrom, final Contact contactTo, String message,
+			final String action)
 			throws Exception {
 		final StringBuilder html = new StringBuilder(
 				IOUtils.toString(getClass().getResourceAsStream("/template/email.html"), StandardCharsets.UTF_8));
@@ -364,7 +367,7 @@ public class NotificationService {
 			Strings.replaceString(html, "<jq:image />", "");
 		final Map<String, String> css = (Map<String, String>) new ObjectMapper()
 				.readValue(repository.one(Client.class, contactTo.getClientId()).getCss(), Map.class);
-		for (String key : css.keySet())
+		for (final String key : css.keySet())
 			Strings.replaceString(html, "--" + key, css.get(key));
 		message = sanatizeHtml(message);
 		if (message.indexOf("\n") > 0)
@@ -396,7 +399,8 @@ public class NotificationService {
 		return s.replaceAll("<[^>]*>", "");
 	}
 
-	private void sendEmail(final Contact to, final String subject, final String text, String html) throws Exception {
+	private void sendEmail(final Contact to, final String subject, final String text, final String html)
+			throws Exception {
 		final String from = to == null ? repository.one(Contact.class, adminId).getEmail()
 				: repository.one(Client.class, to.getClientId()).getEmail();
 		final ImageHtmlEmail email = mailCreateor.create();
@@ -413,17 +417,18 @@ public class NotificationService {
 			email.setDataSourceResolver(
 					new DataSourceUrlResolver(new URL(repository.one(Client.class, to.getClientId()).getUrl())));
 			email.setHtmlMsg(html);
-		}
+		} else
+			email.setHtmlMsg(text);
 		if (to != null)
 			createTicket(TicketType.EMAIL, to.getEmail(), text, adminId);
 		email.send();
 	}
 
-	public void createTicket(TicketType type, String subject, String text, BigInteger user) {
+	public void createTicket(final TicketType type, String subject, String text, final BigInteger user) {
 		try {
 			if (subject == null)
 				subject = "no subject";
-			if (subject.length() > 255) {
+			else if (subject.length() > 255) {
 				text = "..." + subject.substring(252) + "\n\n" + text;
 				subject = subject.substring(0, 252) + "...";
 			}
@@ -443,16 +448,16 @@ public class NotificationService {
 			repository.save(ticket);
 			if (type == TicketType.BLOCK)
 				sendEmail(null, "Block", text, null);
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			try {
 				sendEmail(null, type + ": " + subject, text, null);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				e.printStackTrace();
 			}
 		}
 	}
 
-	private byte[] imageRound(byte[] img) throws IOException {
+	private byte[] imageRound(final byte[] img) throws IOException {
 		final BufferedImage image = ImageIO.read(new ByteArrayInputStream(img));
 		final int w = image.getWidth();
 		final int h = image.getHeight();
@@ -474,7 +479,7 @@ public class NotificationService {
 		private BigInteger userId;
 		private Boolean recommend;
 		private int notification;
-		private Map<String, Object> chat = new HashMap<>();
+		private final Map<String, Object> chat = new HashMap<>();
 
 		public BigInteger getUserId() {
 			return userId;
