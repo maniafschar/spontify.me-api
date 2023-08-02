@@ -184,7 +184,7 @@ public class SupportCenterApi {
 			runLast(engagementService::sendNearBy);
 			runLast(engagementService::sendChats);
 			runLast(ipService::lookupIps);
-			run(eventService::findMatchingSpontis);
+			run(eventService::findMatchingBuddies);
 			run(eventService::notifyParticipation);
 		} else
 			throw new RuntimeException("Scheduler already running " + schedulerRunning.size() + " processes");

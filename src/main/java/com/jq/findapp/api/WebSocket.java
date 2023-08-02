@@ -24,6 +24,9 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import com.jq.findapp.entity.Log;
+import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.Query.Result;
+import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
 
@@ -71,7 +74,22 @@ public class WebSocket {
 		}
 		log.setTime((int) (System.currentTimeMillis() - time));
 		log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
-		repository.save(log);
+		final QueryParams params = new QueryParams(Query.misc_listLog);
+		params.setSearch("log.createdAt='" + log.getCreatedAt()
+				+ "' and log.body like '" + log.getBody().replace('\n', '%').replace(';', '_')
+				+ "' and log.uri='" + log.getUri()
+				+ "' and log.method='WS'");
+		final Result list = repository.list(params);
+		if (list.size() > 0) {
+			final Log logOld = repository.one(Log.class, (BigInteger) list.get(0).get("log.id"));
+			if (logOld.getWebCall() == null)
+				logOld.setWebCall("2");
+			else
+				logOld.setWebCall("" + (Integer.parseInt(logOld.getWebCall()) + 1));
+			repository.save(logOld);
+		} else
+			repository.save(log);
+
 	}
 
 	@PostMapping("refresh/{id}")

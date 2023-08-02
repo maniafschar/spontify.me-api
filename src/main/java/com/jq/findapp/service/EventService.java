@@ -42,8 +42,8 @@ public class EventService {
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
 
-	public SchedulerResult findMatchingSpontis() {
-		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/findMatchingSpontis");
+	public SchedulerResult findMatchingBuddies() {
+		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/findMatchingBuddies");
 		try {
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setSearch(

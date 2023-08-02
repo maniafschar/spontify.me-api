@@ -1,5 +1,6 @@
 SELECT
 	log.body,
+	log.clientId,
 	log.contactId,
 	log.createdAt,
 	log.id,

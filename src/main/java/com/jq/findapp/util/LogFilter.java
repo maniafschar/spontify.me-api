@@ -65,6 +65,8 @@ public class LogFilter implements Filter {
 			log.setPort(req.getLocalPort());
 			if (req.getHeader("user") != null)
 				log.setContactId(new BigInteger(req.getHeader("user")));
+			if (req.getHeader("clientId") != null)
+				log.setClientId(new BigInteger(req.getHeader("clientId")));
 			final String query = req.getQueryString();
 			if (query != null) {
 				if (query.contains("&_="))

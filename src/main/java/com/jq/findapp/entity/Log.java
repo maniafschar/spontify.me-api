@@ -13,6 +13,7 @@ public class Log extends BaseEntity {
 	private String query;
 	private String ip;
 	private String uri;
+	private BigInteger clientId;
 	private BigInteger contactId;
 	private int time;
 	private int status;
@@ -22,7 +23,7 @@ public class Log extends BaseEntity {
 		return method;
 	}
 
-	public void setMethod(String method) {
+	public void setMethod(final String method) {
 		this.method = method;
 	}
 
@@ -30,7 +31,7 @@ public class Log extends BaseEntity {
 		return query;
 	}
 
-	public void setQuery(String query) {
+	public void setQuery(final String query) {
 		this.query = query;
 	}
 
@@ -38,7 +39,7 @@ public class Log extends BaseEntity {
 		return uri;
 	}
 
-	public void setUri(String uri) {
+	public void setUri(final String uri) {
 		this.uri = uri;
 	}
 
@@ -46,7 +47,7 @@ public class Log extends BaseEntity {
 		return contactId;
 	}
 
-	public void setContactId(BigInteger contactId) {
+	public void setContactId(final BigInteger contactId) {
 		this.contactId = contactId;
 	}
 
@@ -54,7 +55,7 @@ public class Log extends BaseEntity {
 		return time;
 	}
 
-	public void setTime(int time) {
+	public void setTime(final int time) {
 		this.time = time;
 	}
 
@@ -62,7 +63,7 @@ public class Log extends BaseEntity {
 		return status;
 	}
 
-	public void setStatus(int status) {
+	public void setStatus(final int status) {
 		this.status = status;
 	}
 
@@ -70,7 +71,7 @@ public class Log extends BaseEntity {
 		return port;
 	}
 
-	public void setPort(int port) {
+	public void setPort(final int port) {
 		this.port = port;
 	}
 
@@ -78,7 +79,7 @@ public class Log extends BaseEntity {
 		return body;
 	}
 
-	public void setBody(String body) {
+	public void setBody(final String body) {
 		this.body = body;
 	}
 
@@ -86,7 +87,7 @@ public class Log extends BaseEntity {
 		return ip;
 	}
 
-	public void setIp(String ip) {
+	public void setIp(final String ip) {
 		this.ip = ip;
 	}
 
@@ -94,7 +95,7 @@ public class Log extends BaseEntity {
 		return referer;
 	}
 
-	public void setReferer(String referer) {
+	public void setReferer(final String referer) {
 		this.referer = referer;
 	}
 
@@ -102,7 +103,15 @@ public class Log extends BaseEntity {
 		return webCall;
 	}
 
-	public void setWebCall(String webCall) {
+	public void setWebCall(final String webCall) {
 		this.webCall = webCall;
+	}
+
+	public BigInteger getClientId() {
+		return clientId;
+	}
+
+	public void setClientId(final BigInteger clientId) {
+		this.clientId = clientId;
 	}
 }
