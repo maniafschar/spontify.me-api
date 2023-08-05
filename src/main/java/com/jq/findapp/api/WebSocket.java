@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
+import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.ContactLink;
 import com.jq.findapp.entity.Log;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
@@ -49,7 +51,8 @@ public class WebSocket {
 	@MessageMapping("video")
 	public void video(final VideoMessage message, @Header(name = "destination") final String destination)
 			throws Exception {
-		authenticationService.verify(message.getUser(), message.getPassword(), message.getSalt());
+		final Contact contact = authenticationService.verify(message.getUser(), message.getPassword(),
+				message.getSalt());
 		final Log log = new Log();
 		final long time = System.currentTimeMillis();
 		log.setUri(destination);
@@ -60,26 +63,36 @@ public class WebSocket {
 						: message.offer != null ? "offer:" + message.offer : null);
 		if (log.getBody() != null && log.getBody().length() > 255)
 			log.setBody(log.getBody().substring(0, 255));
-		if (USERS.containsKey(message.getId())) {
-			message.setPassword(null);
-			message.setSalt(null);
-			log.setStatus(200);
-			messagingTemplate.convertAndSendToUser("" + message.getId(), "/video", message);
-		} else {
-			final VideoMessage answer = new VideoMessage();
-			answer.setAnswer(Collections.singletonMap("userState", "offline"));
-			answer.setId(message.getUser());
-			log.setStatus(204);
-			messagingTemplate.convertAndSendToUser("" + message.getUser(), "/video", answer);
-		}
+		final QueryParams params = new QueryParams(Query.contact_listFriends);
+		params.setUser(contact);
+		params.setId(message.getId());
+		Result list = repository.list(params);
+		if (list.size() > 0 &&
+				(ContactLink.Status.Friends.name().equals(list.get(0).get("contactLink.status")) ||
+						ContactLink.Status.Pending.name().equals(list.get(0).get("contactLink.status")) &&
+								!list.get(0).get("contactLink.contactId").equals(contact.getId()))) {
+			if (USERS.containsKey(message.getId())) {
+				message.setPassword(null);
+				message.setSalt(null);
+				log.setStatus(200);
+				messagingTemplate.convertAndSendToUser("" + message.getId(), "/video", message);
+			} else {
+				final VideoMessage answer = new VideoMessage();
+				answer.setAnswer(Collections.singletonMap("userState", "offline"));
+				answer.setId(message.getUser());
+				log.setStatus(204);
+				messagingTemplate.convertAndSendToUser("" + message.getUser(), "/video", answer);
+			}
+		} else
+			log.setStatus(500);
 		log.setTime((int) (System.currentTimeMillis() - time));
 		log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
-		final QueryParams params = new QueryParams(Query.misc_listLog);
+		params.setQuery(Query.misc_listLog);
 		params.setSearch("log.createdAt='" + log.getCreatedAt()
 				+ "' and log.body like '" + log.getBody().replace('\n', '%').replace(';', '_')
 				+ "' and log.uri='" + log.getUri()
 				+ "' and log.method='WS'");
-		final Result list = repository.list(params);
+		list = repository.list(params);
 		if (list.size() > 0) {
 			final Log logOld = repository.one(Log.class, (BigInteger) list.get(0).get("log.id"));
 			if (logOld.getWebCall() == null)
@@ -89,7 +102,6 @@ public class WebSocket {
 			repository.save(logOld);
 		} else
 			repository.save(log);
-
 	}
 
 	@PostMapping("refresh/{id}")
@@ -115,7 +127,6 @@ public class WebSocket {
 
 	@GetMapping("active/{user}")
 	public boolean active(@PathVariable final BigInteger user) {
-		System.out.println(user + ": " + USERS);
 		return USERS.containsKey(user);
 	}
 
