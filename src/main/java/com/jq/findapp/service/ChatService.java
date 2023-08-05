@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactChat;
+import com.jq.findapp.entity.ContactLink;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
@@ -42,6 +43,19 @@ public class ChatService {
 	@Async
 	public void createGptAnswer(final ContactChat contactChat) throws Exception {
 		createGptAnswerIntern(contactChat);
+	}
+
+	public boolean isVideoCallAllowed(final Contact contact, final BigInteger id) {
+		if (adminId.equals(contact.getId()))
+			return true;
+		final QueryParams params = new QueryParams(Query.contact_listFriends);
+		params.setUser(contact);
+		params.setId(id);
+		final Result list = repository.list(params);
+		return list.size() > 0 &&
+				(ContactLink.Status.Friends == list.get(0).get("contactLink.status") ||
+						ContactLink.Status.Pending == list.get(0).get("contactLink.status") &&
+								!list.get(0).get("contactLink.contactId").equals(contact.getId()));
 	}
 
 	public SchedulerResult answerAi() {

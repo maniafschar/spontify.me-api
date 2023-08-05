@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -24,13 +25,13 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.ContactLink;
 import com.jq.findapp.entity.Log;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
+import com.jq.findapp.service.ChatService;
 
 @RestController
 @RequestMapping("ws")
@@ -42,7 +43,13 @@ public class WebSocket {
 	private SimpMessagingTemplate messagingTemplate;
 
 	@Autowired
+	private ChatService chatService;
+
+	@Autowired
 	private Repository repository;
+
+	@Value("${app.admin.id}")
+	private BigInteger adminId;
 
 	private final Pattern numbers = Pattern.compile("\\d+");
 
@@ -63,14 +70,7 @@ public class WebSocket {
 						: message.offer != null ? "offer:" + message.offer : null);
 		if (log.getBody() != null && log.getBody().length() > 255)
 			log.setBody(log.getBody().substring(0, 255));
-		final QueryParams params = new QueryParams(Query.contact_listFriends);
-		params.setUser(contact);
-		params.setId(message.getId());
-		Result list = repository.list(params);
-		if (list.size() > 0 &&
-				(ContactLink.Status.Friends.name().equals(list.get(0).get("contactLink.status")) ||
-						ContactLink.Status.Pending.name().equals(list.get(0).get("contactLink.status")) &&
-								!list.get(0).get("contactLink.contactId").equals(contact.getId()))) {
+		if (chatService.isVideoCallAllowed(contact, message.getId())) {
 			if (USERS.containsKey(message.getId())) {
 				message.setPassword(null);
 				message.setSalt(null);
@@ -87,12 +87,13 @@ public class WebSocket {
 			log.setStatus(500);
 		log.setTime((int) (System.currentTimeMillis() - time));
 		log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
-		params.setQuery(Query.misc_listLog);
+		final QueryParams params = new QueryParams(Query.misc_listLog);
 		params.setSearch("log.createdAt='" + log.getCreatedAt()
-				+ "' and log.body like '" + log.getBody().replace('\n', '%').replace(';', '_')
+				+ "' and log.body like '"
+				+ (log.getBody() == null ? "" : log.getBody().replace('\n', '%').replace(';', '_'))
 				+ "' and log.uri='" + log.getUri()
 				+ "' and log.method='WS'");
-		list = repository.list(params);
+		final Result list = repository.list(params);
 		if (list.size() > 0) {
 			final Log logOld = repository.one(Log.class, (BigInteger) list.get(0).get("log.id"));
 			if (logOld.getWebCall() == null)

@@ -47,6 +47,7 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.AuthenticationService.Unique;
+import com.jq.findapp.service.ChatService;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.NotificationService.Ping;
@@ -87,6 +88,9 @@ public class ActionApi {
 
 	@Autowired
 	private AuthenticationService authenticationService;
+
+	@Autowired
+	private ChatService chatService;
 
 	@Autowired
 	private ExternalService externalService;
@@ -416,7 +420,7 @@ public class ActionApi {
 	public void videocall(@PathVariable final BigInteger id, @RequestHeader final BigInteger user) throws Exception {
 		final Boolean active = WebClient.create(serverWebSocket + "active/" + id).get().retrieve()
 				.toEntity(Boolean.class).block().getBody();
-		if (active != null && !active)
+		if ((active == null || !active) && chatService.isVideoCallAllowed(repository.one(Contact.class, user), id))
 			notificationService.sendNotification(repository.one(Contact.class, user), repository.one(Contact.class, id),
 					ContactNotificationTextType.contactVideoCall, "video=" + user);
 	}
