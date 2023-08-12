@@ -1,5 +1,6 @@
 package com.jq.findapp.api;
 
+import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +59,7 @@ public class DBApi {
 		if (repository.one(Contact.class, user) == null || entity.getValues().containsKey("contactId"))
 			return;
 		final BaseEntity e = repository.one(entity.getClazz(), entity.getId());
-		if (checkWriteAuthorisation(e, user)) {
+		if (checkWriteAuthorisation(e, user) && checkClient(user, e)) {
 			if (entity.getValues().containsKey("password")) {
 				final String pw = Encryption.decryptBrowser((String) entity.getValues().get("password"));
 				entity.getValues().put("password", Encryption.encryptDB(pw));
@@ -71,11 +72,15 @@ public class DBApi {
 	}
 
 	@PostMapping("one")
-	public BigInteger create(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger user)
-			throws Exception {
-		final BaseEntity e = EntityUtil.createEntity(entity, repository.one(Contact.class, user));
-		repository.save(e);
-		return e.getId();
+	public BigInteger create(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger user,
+			@RequestHeader final BigInteger clientId) throws Exception {
+		final Contact contact = repository.one(Contact.class, user);
+		if (clientId.equals(contact.getClientId())) {
+			final BaseEntity e = EntityUtil.createEntity(entity, contact);
+			repository.save(e);
+			return e.getId();
+		}
+		throw new IllegalAccessError("clientId mismatch, should be " + contact.getClientId() + " but was " + clientId);
 	}
 
 	@DeleteMapping("one")
@@ -86,10 +91,28 @@ public class DBApi {
 		if (e instanceof Contact)
 			notificationService.createTicket(TicketType.ERROR, "Contact Deletion",
 					"tried to delete contact " + e.getId(), user);
-		else if (checkWriteAuthorisation(e, user)) {
-			repository.one(Contact.class, user);
+		else if (checkWriteAuthorisation(e, user) && checkClient(user, e))
 			repository.delete(e);
-		}
+	}
+
+	private boolean checkClient(final BigInteger user, final BaseEntity entity) {
+		final Contact contact = repository.one(Contact.class, user);
+		if (contact != null)
+			try {
+				final Method clientId = entity.getClass().getMethod("getClientId");
+				if (clientId.invoke(entity).equals(contact.getClientId()))
+					return true;
+			} catch (final Exception ex) {
+				try {
+					final Method contactId = entity.getClass().getMethod("getContactId");
+					final Contact contact2 = repository.one(Contact.class, (BigInteger) contactId.invoke(entity));
+					if (contact.getClientId().equals(contact2.getClientId()))
+						return true;
+				} catch (final Exception ex2) {
+					throw new RuntimeException(ex2);
+				}
+			}
+		return false;
 	}
 
 	private boolean checkWriteAuthorisation(final BaseEntity e, final BigInteger user) throws Exception {

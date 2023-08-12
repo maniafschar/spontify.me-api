@@ -22,7 +22,7 @@ public class EntityUtil {
 	public static final int IMAGE_SIZE = 800;
 	public static final int IMAGE_THUMB_SIZE = 100;
 
-	public static void addImageList(WriteEntity entity) throws IOException {
+	public static void addImageList(final WriteEntity entity) throws IOException {
 		if (entity.getValues() != null && entity.getValues().containsKey("image")) {
 			try {
 				entity.getClazz().getDeclaredMethod("getImageList");
@@ -30,13 +30,13 @@ public class EntityUtil {
 				final byte[] b = scaleImage(Base64.getDecoder().decode(
 						data.substring(data.indexOf('\u0015') + 1)), IMAGE_THUMB_SIZE);
 				entity.getValues().put("imageList", Attachment.createImage(".jpg", b));
-			} catch (NoSuchMethodException e) {
+			} catch (final NoSuchMethodException e) {
 				// entity does not have imageList, no need to add it
 			}
 		}
 	}
 
-	public static byte[] scaleImage(byte[] data, int size) throws IOException {
+	public static byte[] scaleImage(final byte[] data, final int size) throws IOException {
 		final BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(data));
 		int width = originalImage.getWidth();
 		int height = originalImage.getHeight();
@@ -62,7 +62,7 @@ public class EntityUtil {
 		return result;
 	}
 
-	public static String getImage(String url, int size) {
+	public static String getImage(final String url, final int size) {
 		try {
 			final byte[] data = IOUtils.toByteArray(new URL(url));
 			final BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
@@ -70,17 +70,23 @@ public class EntityUtil {
 				return Repository.Attachment.createImage(".jpg", scaleImage(data, size));
 			throw new IllegalArgumentException(
 					"no image: [size " + img.getWidth() + "x" + img.getHeight() + " too small] " + url);
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw new IllegalArgumentException("no image: " + url, ex);
 		}
 	}
 
-	public static BaseEntity createEntity(WriteEntity entity, Contact contact) throws Exception {
+	public static BaseEntity createEntity(final WriteEntity entity, final Contact contact) throws Exception {
 		final BaseEntity e = entity.getClazz().newInstance();
 		try {
-			if (e.getClass().getDeclaredMethod("getContactId") != null)
+			if (e.getClass().getDeclaredMethod("setContactId") != null)
 				entity.getValues().put("contactId", contact.getId());
-		} catch (NoSuchMethodException ex) {
+		} catch (final NoSuchMethodException ex) {
+			// no need to handle
+		}
+		try {
+			if (e.getClass().getDeclaredMethod("setClientId") != null)
+				entity.getValues().put("clientId", contact.getClientId());
+		} catch (final NoSuchMethodException ex) {
 			// no need to handle
 		}
 		addImageList(entity);

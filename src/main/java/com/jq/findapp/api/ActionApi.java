@@ -19,6 +19,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +30,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.model.Position;
+import com.jq.findapp.api.model.WriteEntity;
+import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
@@ -447,8 +450,29 @@ public class ActionApi {
 		return paypalConfig;
 	}
 
+	@PostMapping("marketing")
+	public BigInteger marketingAnswerCreate(@RequestBody final WriteEntity entity) throws Exception {
+		final ClientMarketing clientMarketing = new ClientMarketing();
+		clientMarketing.populate(entity.getValues());
+		repository.save(clientMarketing);
+		return clientMarketing.getId();
+	}
+
+	@PutMapping("marketing")
+	public void marketingAnswerSave(@RequestBody final WriteEntity entity) throws Exception {
+		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, entity.getId());
+		clientMarketing.populate(entity.getValues());
+		repository.save(clientMarketing);
+	}
+
 	@GetMapping("marketing")
-	public List<Object[]> marketing(@RequestHeader final BigInteger user) throws Exception {
+	public List<Object[]> marketing(@RequestHeader final BigInteger user,
+			@RequestParam(name = "m", required = false) final BigInteger clientMarketing) throws Exception {
+		if (clientMarketing != null) {
+			final QueryParams params = new QueryParams(Query.misc_listMarketing);
+			params.setSearch("clientMarketing.id=" + clientMarketing);
+			return repository.list(params).getList();
+		}
 		final Contact contact = repository.one(Contact.class, user);
 		final QueryParams params = new QueryParams(Query.contact_listGeoLocationHistory);
 		params.setSearch("contactGeoLocationHistory.contactId=" + contact.getId());
