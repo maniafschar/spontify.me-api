@@ -2,6 +2,7 @@ package com.jq.findapp.api;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -31,10 +32,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.model.Position;
 import com.jq.findapp.api.model.WriteEntity;
-import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
+import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.ContactVideoCall;
 import com.jq.findapp.entity.ContactVisit;
@@ -270,7 +271,7 @@ public class ActionApi {
 		if (user == null) {
 			if (ip != null) {
 				final QueryParams params2 = new QueryParams(Query.misc_listIp);
-				params2.setSearch("ip.ip='" + ip + "'");
+				params2.setSearch("ip.ip='" + IpService.sanatizeIp(ip) + "'");
 				final Result result = repository.list(params2);
 				if (result.size() > 0) {
 					params.setLatitude(((Number) result.get(0).get("ip.latitude")).floatValue());
@@ -451,26 +452,46 @@ public class ActionApi {
 	}
 
 	@PostMapping("marketing")
-	public BigInteger marketingAnswerCreate(@RequestBody final WriteEntity entity) throws Exception {
-		final ClientMarketing clientMarketing = new ClientMarketing();
-		clientMarketing.populate(entity.getValues());
-		repository.save(clientMarketing);
-		return clientMarketing.getId();
+	public BigInteger marketingAnswerCreate(@RequestBody final WriteEntity entity,
+			@RequestHeader final BigInteger clientId,
+			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
+		final ContactMarketing contactMarketing = new ContactMarketing();
+		contactMarketing.populate(entity.getValues());
+		final QueryParams params = new QueryParams(Query.misc_listLog);
+		params.setSearch("log.ip='" + IpService.sanatizeIp(ip)
+				+ "' and log.createdAt>'" + Instant.now().minus(Duration.ofHours(6)).toString()
+				+ "' and log.uri='/action/marketing' and log.status=200 and log.method='POST' and log.clientId="
+				+ clientId);
+		Result list = repository.list(params);
+		if (list.size() > 0) {
+			final Instant time = Instant.ofEpochMilli(((Timestamp) list.get(0).get("log.createdAt")).getTime());
+			params.setQuery(Query.contact_listMarketing);
+			params.setSearch(
+					"contactMarketing.createdAt>='" + time +
+							"' and contactMarketing.createdAt<'"
+							+ time.plus(Duration.ofMinutes(2)).toString()
+							+ "' and contactMarketing.clientMarketingId=" + contactMarketing.getClientMarketingId());
+			list = repository.list(params);
+			if (list.size() > 0)
+				return (BigInteger) list.get(0).get("contactMarketing.id");
+		}
+		repository.save(contactMarketing);
+		return contactMarketing.getId();
 	}
 
 	@PutMapping("marketing")
 	public void marketingAnswerSave(@RequestBody final WriteEntity entity) throws Exception {
-		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, entity.getId());
-		clientMarketing.populate(entity.getValues());
-		repository.save(clientMarketing);
+		final ContactMarketing contactMarketing = repository.one(ContactMarketing.class, entity.getId());
+		contactMarketing.populate(entity.getValues());
+		repository.save(contactMarketing);
 	}
 
 	@GetMapping("marketing")
-	public List<Object[]> marketing(@RequestHeader final BigInteger user,
-			@RequestParam(name = "m", required = false) final BigInteger clientMarketing) throws Exception {
-		if (clientMarketing != null) {
+	public List<Object[]> marketing(@RequestHeader(required = false) final BigInteger user,
+			@RequestParam(name = "m", required = false) final BigInteger clientMarketingId) throws Exception {
+		if (clientMarketingId != null) {
 			final QueryParams params = new QueryParams(Query.misc_listMarketing);
-			params.setSearch("clientMarketing.id=" + clientMarketing);
+			params.setSearch("clientMarketing.id=" + clientMarketingId);
 			return repository.list(params).getList();
 		}
 		final Contact contact = repository.one(Contact.class, user);

@@ -9,7 +9,6 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,10 +30,10 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationExternalService;
 import com.jq.findapp.service.AuthenticationService;
+import com.jq.findapp.service.backend.IpService;
 import com.jq.findapp.util.Encryption;
 
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.core.Context;
 
 @RestController
 @Transactional
@@ -151,9 +150,10 @@ public class AuthenticationApi {
 	}
 
 	@GetMapping("recoverSendEmail")
-	public String recoverSendEmail(final String email, @Context final HttpHeaders httpHeaders) throws Exception {
+	public String recoverSendEmail(final String email,
+			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_listLog);
-		params.setSearch("log.ip='" + httpHeaders.get("X-Forwarded-For")
+		params.setSearch("log.ip='" + IpService.sanatizeIp(ip)
 				+ "' and log.createdAt>'" + Instant.now().minus(Duration.ofDays(1)).toString()
 				+ "' and log.uri like '%recoverSendEmail'");
 		if (repository.list(params).size() > 10)
