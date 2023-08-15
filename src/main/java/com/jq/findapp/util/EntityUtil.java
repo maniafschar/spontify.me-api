@@ -78,13 +78,13 @@ public class EntityUtil {
 	public static BaseEntity createEntity(final WriteEntity entity, final Contact contact) throws Exception {
 		final BaseEntity e = entity.getClazz().newInstance();
 		try {
-			if (e.getClass().getDeclaredMethod("setContactId") != null)
+			if (e.getClass().getDeclaredMethod("getContactId") != null)
 				entity.getValues().put("contactId", contact.getId());
 		} catch (final NoSuchMethodException ex) {
 			// no need to handle
 		}
 		try {
-			if (e.getClass().getDeclaredMethod("setClientId") != null)
+			if (e.getClass().getDeclaredMethod("getClientId") != null)
 				entity.getValues().put("clientId", contact.getClientId());
 		} catch (final NoSuchMethodException ex) {
 			// no need to handle

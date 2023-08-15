@@ -149,7 +149,7 @@ public class IntegrationTest {
 		Util.sleep(500);
 		Util.click("dialog-popup dialogButtons button-text[onclick*=\"save\"]");
 		Util.get("dialog-popup input[name=\"startDate\"]").sendKeys("");
-		new Actions(Util.driver).keyDown(Keys.SHIFT).sendKeys("\t\t\t\t\t\t").keyUp(Keys.SHIFT).build().perform();
+		new Actions(Util.driver).keyDown(Keys.SHIFT).sendKeys("\t\t\t\t\t").keyUp(Keys.SHIFT).build().perform();
 		Util.get("dialog-popup input-hashtags").sendKeys("textabc");
 		Util.sendKeys("dialog-popup textarea[name=\"description\"]", "mega sex");
 		Util.click("dialog-popup dialogButtons button-text[onclick*=\"save\"]");
