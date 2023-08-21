@@ -35,6 +35,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.reactive.function.client.WebClientResponseException.NotFound;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
@@ -365,10 +366,9 @@ public class NotificationService {
 							+ "\" width=\"150\" height=\"150\" style=\"height:150px;min-height:150px;max-height:150px;width:150px;min-width:150px;max-width:150px;border-radius:75px;\" />");
 		} else
 			Strings.replaceString(html, "<jq:image />", "");
-		final Map<String, String> css = (Map<String, String>) new ObjectMapper()
-				.readValue(repository.one(Client.class, contactTo.getClientId()).getCss(), Map.class);
-		for (final String key : css.keySet())
-			Strings.replaceString(html, "--" + key, css.get(key));
+		final JsonNode css = new ObjectMapper()
+				.readTree(repository.one(Client.class, contactTo.getClientId()).getStorage()).get("css");
+		css.fieldNames().forEachRemaining(key -> Strings.replaceString(html, "--" + key, css.get(key).asText()));
 		message = sanatizeHtml(message);
 		if (message.indexOf("\n") > 0)
 			message = message.substring(0, message.indexOf("\n"));

@@ -77,7 +77,7 @@ public class Repository {
 		return result;
 	}
 
-	private String prepareSql(QueryParams params) {
+	private String prepareSql(final QueryParams params) {
 		String search = Strings.isEmpty(params.getSearch()) ? "1=1" : sanatizeSearchToken(params);
 		if (params.getSearchGeoLocation() != null)
 			search += " and " + params.getSearchGeoLocation();
@@ -117,7 +117,7 @@ public class Repository {
 		return s;
 	}
 
-	private String sanatizeSearchToken(QueryParams params) {
+	private String sanatizeSearchToken(final QueryParams params) {
 		if (params.getSearch() == null)
 			return "";
 		final StringBuilder s = new StringBuilder(params.getSearch().toLowerCase());
@@ -139,7 +139,7 @@ public class Repository {
 		return params.getSearch();
 	}
 
-	public List<BaseEntity> list(String hql) throws ClassNotFoundException {
+	public List<BaseEntity> list(final String hql) throws ClassNotFoundException {
 		return (List<BaseEntity>) em.createQuery(hql,
 				Class.forName(BaseEntity.class.getPackage().getName() + "." + hql.split(" ")[1])).getResultList();
 	}
@@ -148,7 +148,7 @@ public class Repository {
 		return em.find(clazz, id);
 	}
 
-	public Map<String, Object> one(QueryParams params) {
+	public Map<String, Object> one(final QueryParams params) {
 		final Result result = list(params);
 		if (result.size() < 1)
 			return null;
@@ -182,7 +182,7 @@ public class Repository {
 		listeners.postRemove(entity);
 	}
 
-	public void executeUpdate(String hql, Object... params) {
+	public void executeUpdate(final String hql, final Object... params) {
 		final jakarta.persistence.Query query = em.createQuery(hql);
 		if (params != null) {
 			for (int i = 0; i < params.length; i++)
@@ -197,11 +197,11 @@ public class Repository {
 		public final static String PUBLIC = "PUBLIC/";
 		private final static Pattern RESOLVABLE_COLUMNS = Pattern.compile(".*(image|note|storage).*");
 
-		public static String createImage(String name, byte[] data) {
+		public static String createImage(final String name, final byte[] data) {
 			return name + SEPARATOR + Base64.getEncoder().encodeToString(data);
 		}
 
-		private static void resolve(List<Object[]> list) {
+		private static void resolve(final List<Object[]> list) {
 			for (int i = 0; i < list.get(0).length; i++) {
 				if (RESOLVABLE_COLUMNS.matcher((String) list.get(0)[i]).matches()) {
 					for (int i2 = 1; i2 < list.size(); i2++)
@@ -210,9 +210,9 @@ public class Repository {
 			}
 		}
 
-		static void delete(BaseEntity entity) {
+		static void delete(final BaseEntity entity) {
 			final Field[] fields = entity.getClass().getDeclaredFields();
-			for (Field field : fields) {
+			for (final Field field : fields) {
 				if (RESOLVABLE_COLUMNS.matcher(field.getName()).matches()) {
 					try {
 						field.setAccessible(true);
@@ -222,52 +222,54 @@ public class Repository {
 							if (f.exists())
 								f.delete();
 						}
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						throw new RuntimeException("Failed on " + field.getName(), e);
 					}
 				}
 			}
 		}
 
-		public static void save(BaseEntity entity) {
+		public static void save(final BaseEntity entity) {
 			final Field[] fields = entity.getClass().getDeclaredFields();
-			for (Field field : fields) {
+			for (final Field field : fields) {
 				if (RESOLVABLE_COLUMNS.matcher(field.getName()).matches()) {
 					try {
 						field.setAccessible(true);
 						field.set(entity,
 								save((String) field.get(entity), (String) entity.old(field.getName())));
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						throw new RuntimeException("Failed on " + field.getName(), e);
 					}
 				}
 			}
 		}
 
-		private static long getMax(String dir, long max) {
+		private static long getMax(final String dir, long max) {
 			final File f = new File(dir.replace('/', File.separatorChar));
 			if (f.exists() && !f.isFile()) {
 				final String[] s = f.list();
 				long t;
 				for (int i = 0; i < s.length; i++) {
 					if (!"deleted".equals(s[i]) && !"PUBLIC".equals(s[i])) {
-						if (s[i].indexOf('.') > -1)
-							s[i] = s[i].substring(0, s[i].indexOf('.'));
-						t = Long.parseLong(s[i]);
-						if (max < t)
-							max = t;
+						try {
+							t = Long.parseLong(s[i].indexOf('.') > -1 ? s[i].substring(0, s[i].indexOf('.')) : s[i]);
+							if (max < t)
+								max = t;
+						} catch (final NumberFormatException ex) {
+							throw new NumberFormatException("Failed to parse attachment " + dir + s[i]);
+						}
 					}
 				}
 			}
 			return max;
 		}
 
-		public static byte[] getFile(String id) throws Exception {
+		public static byte[] getFile(final String id) throws Exception {
 			return IOUtils.toByteArray(new FileInputStream(PATH + (id.contains(".") ? PUBLIC : "")
 					+ (id.contains(SEPARATOR) ? getFilename(id) : id)));
 		}
 
-		private static String getFilename(String id) {
+		private static String getFilename(final String id) {
 			final String[] ids = id.split(SEPARATOR);
 			final long i = Long.valueOf(ids[1]), diff = 10000;
 			long d = 0;
@@ -278,13 +280,14 @@ public class Repository {
 		}
 
 		private static final long getNextAttachmentID(final String dir) {
-			long subDir = getMax(dir, -1), max = -1;
+			final long subDir = getMax(dir, -1);
+			long max = -1;
 			if (subDir > -1)
 				max = getMax(dir + subDir, max);
 			return max + 1;
 		}
 
-		private static String resolve(String value) {
+		public static String resolve(String value) {
 			if (value != null && value.contains(SEPARATOR)) {
 				try {
 					final String n = getFilename(value);
@@ -293,14 +296,14 @@ public class Repository {
 					else
 						value = new String(IOUtils.toByteArray(new FileInputStream(PATH + n)),
 								StandardCharsets.UTF_8);
-				} catch (Exception ex) {
+				} catch (final Exception ex) {
 					throw new RuntimeException("Failed on " + value, ex);
 				}
 			}
 			return value;
 		}
 
-		private static synchronized String save(String value, String old) throws IOException {
+		private static synchronized String save(final String value, final String old) throws IOException {
 			if (value == null) {
 				if (old != null && old.contains(SEPARATOR))
 					new File(PATH + (old.contains(".") ? PUBLIC : "") + getFilename(old)).delete();

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.model.ExternalRegistration;
 import com.jq.findapp.api.model.InternalRegistration;
 import com.jq.findapp.entity.Client;
@@ -28,6 +29,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.AuthenticationExternalService;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.backend.IpService;
@@ -109,7 +111,10 @@ public class AuthenticationApi {
 				repository.save(t);
 				user.put("auto_login_token", Encryption.encrypt(t.getToken(), publicKey));
 			}
-			user.put("app_config", repository.one(Client.class, clientId).getAppConfig());
+			user.put("app_config",
+					new ObjectMapper().writeValueAsString(new ObjectMapper()
+							.readTree(Attachment.resolve(repository.one(Client.class, clientId).getStorage()))
+							.get("appConfig")));
 		}
 		return user;
 	}

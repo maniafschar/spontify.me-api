@@ -1,7 +1,6 @@
 SELECT
 	client.id,
-	client.appConfig,
-	client.css,
+	client.storage,
 	client.name,
 	client.email,
 	client.url

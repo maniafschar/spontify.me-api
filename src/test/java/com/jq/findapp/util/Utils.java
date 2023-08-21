@@ -30,8 +30,7 @@ public class Utils {
 			client.setName("abc");
 			client.setEmail("abc@jq-consulting.de");
 			client.setUrl("https://fan-club.online");
-			client.setCss("{}");
-			client.setAppConfig("{}");
+			client.setStorage("{\"css\":{},\"appConfig\":{}}");
 			repository.save(client);
 		}
 		return client;

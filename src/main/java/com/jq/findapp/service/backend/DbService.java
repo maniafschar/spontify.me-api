@@ -16,12 +16,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.repository.Repository.Attachment;
 
 @Service
 public class DbService {
@@ -42,6 +45,8 @@ public class DbService {
 					"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and (select modifiedAt from Contact contact where contact.id=contactNotification.contactId)>contactNotification.createdAt and TIMESTAMPDIFF(MINUTE,contactNotification.createdAt,current_timestamp)>30");
 			repository.executeUpdate(
 					"update Contact set timezone='Europe/Berlin' where timezone is null");
+			repository.executeUpdate(
+					"update Log set webCall=substring(webCall, 1, instr(webCall, '(')-1) where instr(webCall, '(')>0");
 			final LocalDate d = LocalDate.ofInstant(Instant.now().minus(Duration.ofDays(183)), ZoneId.systemDefault());
 			repository.executeUpdate(
 					"update ContactToken set token='' where modifiedAt is not null and modifiedAt<'" + d
@@ -91,9 +96,10 @@ public class DbService {
 			css = "{";
 			while (matcher.find())
 				css += "\"" + matcher.group(1) + "\":\"" + matcher.group(2) + "\",";
-			css = css.substring(0, css.length() - 1) + "}";
-			if (!css.equals(client.getCss())) {
-				client.setCss(css);
+			css = css.substring(0, css.length() - 1).replace("\"", "\\\"") + "}";
+			final JsonNode node = new ObjectMapper().readTree(Attachment.resolve(client.getStorage()));
+			if (!node.get("css").asText().equals(css)) {
+				client.setStorage(new ObjectMapper().writeValueAsString(node));
 				modified = true;
 			}
 		}

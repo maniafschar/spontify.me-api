@@ -4,8 +4,7 @@ import jakarta.persistence.Entity;
 
 @Entity
 public class Client extends BaseEntity {
-	private String appConfig;
-	private String css;
+	private String storage;
 	private String name;
 	private String email;
 	private String url;
@@ -34,19 +33,11 @@ public class Client extends BaseEntity {
 		this.email = email;
 	}
 
-	public String getCss() {
-		return css;
+	public String getStorage() {
+		return storage;
 	}
 
-	public void setCss(final String css) {
-		this.css = css;
-	}
-
-	public String getAppConfig() {
-		return appConfig;
-	}
-
-	public void setAppConfig(final String appConfig) {
-		this.appConfig = appConfig;
+	public void setStorage(final String storage) {
+		this.storage = storage;
 	}
 }

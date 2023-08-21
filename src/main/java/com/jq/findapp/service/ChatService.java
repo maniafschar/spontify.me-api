@@ -1,7 +1,6 @@
 package com.jq.findapp.service;
 
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -115,9 +114,7 @@ public class ChatService {
 		if (contactChat.getNote() == null)
 			s = text.getText(contactTo, TextId.notification_sentImg);
 		else {
-			s = contactChat.getNote();
-			if (s.indexOf(Attachment.SEPARATOR) > -1)
-				s = new String(Repository.Attachment.getFile(s), StandardCharsets.UTF_8);
+			s = Attachment.resolve(contactChat.getNote());
 			if (s.indexOf(" :openPos(") == 0)
 				s = text.getText(contactTo,
 						contactFrom.getGender() == null || contactFrom.getGender() == 2 ? TextId.notification_sentPos2
