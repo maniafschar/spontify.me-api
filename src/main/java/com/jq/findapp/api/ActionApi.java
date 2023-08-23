@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.model.Position;
 import com.jq.findapp.api.model.WriteEntity;
+import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
@@ -49,6 +50,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.AuthenticationService.Unique;
 import com.jq.findapp.service.ChatService;
@@ -481,10 +483,31 @@ public class ActionApi {
 	}
 
 	@PutMapping("marketing")
-	public void marketingAnswerSave(@RequestBody final WriteEntity entity) throws Exception {
+	public void marketingAnswerSave(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger clientId)
+			throws Exception {
 		final ContactMarketing contactMarketing = repository.one(ContactMarketing.class, entity.getId());
 		contactMarketing.populate(entity.getValues());
 		repository.save(contactMarketing);
+		if (contactMarketing.getFinished()) {
+			final JsonNode questions = new ObjectMapper().readTree(
+					Attachment.resolve(repository.one(ClientMarketing.class, contactMarketing.getClientMarketingId())
+							.getStorage()));
+			final JsonNode answers = new ObjectMapper().readTree(Attachment.resolve(contactMarketing.getStorage()));
+			final Contact to = new Contact();
+			to.setEmail(answers.get("q" + (questions.get("questions").size() - 1)).get("text").asText());
+			to.setPseudonym(to.getEmail());
+			to.setTimezone("Europe/Berlin");
+			to.setClientId(clientId);
+			to.setLanguage("DE");
+			final StringBuffer s = new StringBuffer(questions.get("prolog").asText().replaceAll("\n", "<br/>"));
+			s.append("<br/><br/>");
+			for (int i = 0; i < questions.get("questions").size(); i++) {
+				s.append(questions.get("questions").get(i).get("question"));
+				s.append("<br/><br/>");
+			}
+			s.append(questions.get("epilog").asText().replaceAll("\n", "<br/>"));
+			notificationService.sendNotificationEmail(null, to, s.toString(), null);
+		}
 	}
 
 	@GetMapping("marketing")

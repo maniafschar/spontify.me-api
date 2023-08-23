@@ -324,8 +324,7 @@ public class NotificationService {
 	}
 
 	public void sendNotificationEmail(final Contact contactFrom, final Contact contactTo, String message,
-			final String action)
-			throws Exception {
+			final String action) throws Exception {
 		final StringBuilder html = new StringBuilder(
 				IOUtils.toString(getClass().getResourceAsStream("/template/email.html"), StandardCharsets.UTF_8));
 		final StringBuilder s = new StringBuilder(
@@ -367,9 +366,9 @@ public class NotificationService {
 							+ "\" width=\"150\" height=\"150\" style=\"height:150px;min-height:150px;max-height:150px;width:150px;min-width:150px;max-width:150px;border-radius:75px;\" />");
 		} else
 			Strings.replaceString(html, "<jq:image />", "");
-		final JsonNode css = new ObjectMapper()
+		final JsonNode css = new ObjectMapper().readTree(new ObjectMapper()
 				.readTree(Attachment.resolve(repository.one(Client.class, contactTo.getClientId()).getStorage()))
-				.get("css");
+				.get("css").asText());
 		css.fieldNames().forEachRemaining(key -> Strings.replaceString(html, "--" + key, css.get(key).asText()));
 		message = sanatizeHtml(message);
 		if (message.indexOf("\n") > 0)
