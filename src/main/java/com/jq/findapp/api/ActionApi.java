@@ -463,13 +463,14 @@ public class ActionApi {
 				+ "' and log.uri='/action/marketing' and log.status=200 and log.method='POST' and log.clientId="
 				+ clientId);
 		Result list = repository.list(params);
-		if (list.size() > 0) {
-			final Instant time = Instant.ofEpochMilli(((Timestamp) list.get(0).get("log.createdAt")).getTime());
+		for (int i = 0; i < list.size(); i++) {
+			final Instant time = Instant.ofEpochMilli(((Timestamp) list.get(i).get("log.createdAt")).getTime());
 			params.setQuery(Query.contact_listMarketing);
 			params.setSearch(
-					"contactMarketing.createdAt>='" + time +
+					"contactMarketing.finished=false and contactMarketing.createdAt>='"
+							+ time.minus(Duration.ofSeconds(5)).toString() +
 							"' and contactMarketing.createdAt<'"
-							+ time.plus(Duration.ofMinutes(2)).toString()
+							+ time.plus(Duration.ofSeconds(30)).toString()
 							+ "' and contactMarketing.clientMarketingId=" + contactMarketing.getClientMarketingId());
 			list = repository.list(params);
 			if (list.size() > 0)
@@ -487,13 +488,16 @@ public class ActionApi {
 	}
 
 	@GetMapping("marketing")
-	public List<Object[]> marketing(@RequestHeader(required = false) final BigInteger user,
+	public List<Object[]> marketing(@RequestHeader final BigInteger clientId,
+			@RequestHeader(required = false) final BigInteger user,
 			@RequestParam(name = "m", required = false) final BigInteger clientMarketingId) throws Exception {
 		if (clientMarketingId != null) {
 			final QueryParams params = new QueryParams(Query.misc_listMarketing);
-			params.setSearch("clientMarketing.id=" + clientMarketingId);
+			params.setSearch("clientMarketing.id=" + clientMarketingId + " and clientMarketing.clientId=" + clientId);
 			return repository.list(params).getList();
 		}
+		if (user == null)
+			return null;
 		final Contact contact = repository.one(Contact.class, user);
 		final QueryParams params = new QueryParams(Query.contact_listGeoLocationHistory);
 		params.setSearch("contactGeoLocationHistory.contactId=" + contact.getId());
@@ -539,8 +543,8 @@ public class ActionApi {
 		return list.stream().filter(e -> {
 			if (e[0] instanceof String)
 				return true;
-			params.setSearch("contactMarketing.clientMarketingId=" + e[0]);
-			return repository.list(params).size() == 0;
+			params.setSearch("contactMarketing.clientMarketingId=" + e[0] + " and contactMarketing.finished=true");
+			return repository.list(params).size() > 0;
 		}).toList();
 	}
 

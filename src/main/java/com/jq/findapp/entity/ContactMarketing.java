@@ -9,12 +9,13 @@ public class ContactMarketing extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger clientMarketingId;
 	private String storage;
+	private Boolean finished = false;
 
 	public BigInteger getContactId() {
 		return contactId;
 	}
 
-	public void setContactId(BigInteger contactId) {
+	public void setContactId(final BigInteger contactId) {
 		this.contactId = contactId;
 	}
 
@@ -22,7 +23,7 @@ public class ContactMarketing extends BaseEntity {
 		return clientMarketingId;
 	}
 
-	public void setClientMarketingId(BigInteger clientMarketingId) {
+	public void setClientMarketingId(final BigInteger clientMarketingId) {
 		this.clientMarketingId = clientMarketingId;
 	}
 
@@ -30,7 +31,15 @@ public class ContactMarketing extends BaseEntity {
 		return storage;
 	}
 
-	public void setStorage(String storage) {
+	public void setStorage(final String storage) {
 		this.storage = storage;
+	}
+
+	public Boolean getFinished() {
+		return finished;
+	}
+
+	public void setFinished(final Boolean finished) {
+		this.finished = finished;
 	}
 }

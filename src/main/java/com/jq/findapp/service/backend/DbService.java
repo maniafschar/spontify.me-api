@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.repository.Query;
@@ -99,6 +100,7 @@ public class DbService {
 			css = css.substring(0, css.length() - 1).replace("\"", "\\\"") + "}";
 			final JsonNode node = new ObjectMapper().readTree(Attachment.resolve(client.getStorage()));
 			if (!node.get("css").asText().equals(css)) {
+				((ObjectNode) node).put("css", css);
 				client.setStorage(new ObjectMapper().writeValueAsString(node));
 				modified = true;
 			}

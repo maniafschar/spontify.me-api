@@ -49,6 +49,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.push.Android;
 import com.jq.findapp.service.push.Ios;
 import com.jq.findapp.util.Strings;
@@ -367,7 +368,8 @@ public class NotificationService {
 		} else
 			Strings.replaceString(html, "<jq:image />", "");
 		final JsonNode css = new ObjectMapper()
-				.readTree(repository.one(Client.class, contactTo.getClientId()).getStorage()).get("css");
+				.readTree(Attachment.resolve(repository.one(Client.class, contactTo.getClientId()).getStorage()))
+				.get("css");
 		css.fieldNames().forEachRemaining(key -> Strings.replaceString(html, "--" + key, css.get(key).asText()));
 		message = sanatizeHtml(message);
 		if (message.indexOf("\n") > 0)
