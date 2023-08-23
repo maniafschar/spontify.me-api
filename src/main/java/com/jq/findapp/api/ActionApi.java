@@ -462,19 +462,19 @@ public class ActionApi {
 				+ "' and log.createdAt>'" + Instant.now().minus(Duration.ofHours(6)).toString()
 				+ "' and log.uri='/action/marketing' and log.status=200 and log.method='POST' and log.clientId="
 				+ clientId);
-		Result list = repository.list(params);
+		final Result list = repository.list(params);
+		params.setQuery(Query.contact_listMarketing);
 		for (int i = 0; i < list.size(); i++) {
 			final Instant time = Instant.ofEpochMilli(((Timestamp) list.get(i).get("log.createdAt")).getTime());
-			params.setQuery(Query.contact_listMarketing);
 			params.setSearch(
 					"contactMarketing.finished=false and contactMarketing.createdAt>='"
 							+ time.minus(Duration.ofSeconds(5)).toString() +
 							"' and contactMarketing.createdAt<'"
 							+ time.plus(Duration.ofSeconds(30)).toString()
 							+ "' and contactMarketing.clientMarketingId=" + contactMarketing.getClientMarketingId());
-			list = repository.list(params);
-			if (list.size() > 0)
-				return (BigInteger) list.get(0).get("contactMarketing.id");
+			final Result list2 = repository.list(params);
+			if (list2.size() > 0)
+				return (BigInteger) list2.get(0).get("contactMarketing.id");
 		}
 		repository.save(contactMarketing);
 		return contactMarketing.getId();
