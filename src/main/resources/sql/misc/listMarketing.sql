@@ -10,6 +10,7 @@ SELECT
 FROM
 	ClientMarketing clientMarketing
 WHERE
+	clientMarketing.clientId={CLIENTID} AND
 	{search}
 ORDER BY
 	clientMarketing.startDate DESC
