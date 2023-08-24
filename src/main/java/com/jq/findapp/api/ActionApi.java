@@ -493,20 +493,23 @@ public class ActionApi {
 					Attachment.resolve(repository.one(ClientMarketing.class, contactMarketing.getClientMarketingId())
 							.getStorage()));
 			final JsonNode answers = new ObjectMapper().readTree(Attachment.resolve(contactMarketing.getStorage()));
-			final Contact to = new Contact();
-			to.setEmail(answers.get("q" + (questions.get("questions").size() - 1)).get("text").asText());
-			to.setPseudonym(to.getEmail());
-			to.setTimezone("Europe/Berlin");
-			to.setClientId(clientId);
-			to.setLanguage("DE");
-			final StringBuffer s = new StringBuffer(questions.get("prolog").asText().replaceAll("\n", "<br/>"));
-			s.append("<br/><br/>");
-			for (int i = 0; i < questions.get("questions").size(); i++) {
-				s.append(questions.get("questions").get(i).get("question"));
+			final JsonNode email = answers.get("q" + (questions.get("questions").size() - 1)).get("text");
+			if (email != null) {
+				final Contact to = new Contact();
+				to.setEmail(email.asText());
+				to.setPseudonym(to.getEmail());
+				to.setTimezone("Europe/Berlin");
+				to.setClientId(clientId);
+				to.setLanguage("DE");
+				final StringBuffer s = new StringBuffer(questions.get("prolog").asText().replaceAll("\n", "<br/>"));
 				s.append("<br/><br/>");
+				for (int i = 0; i < questions.get("questions").size(); i++) {
+					s.append(questions.get("questions").get(i).get("question"));
+					s.append("<br/><br/>");
+				}
+				s.append(questions.get("epilog").asText().replaceAll("\n", "<br/>"));
+				notificationService.sendNotificationEmail(null, to, s.toString(), null);
 			}
-			s.append(questions.get("epilog").asText().replaceAll("\n", "<br/>"));
-			notificationService.sendNotificationEmail(null, to, s.toString(), null);
 		}
 	}
 

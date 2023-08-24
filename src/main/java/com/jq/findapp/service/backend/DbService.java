@@ -97,7 +97,7 @@ public class DbService {
 			css = "{";
 			while (matcher.find())
 				css += "\"" + matcher.group(1) + "\":\"" + matcher.group(2) + "\",";
-			css = css.substring(0, css.length() - 1).replace("\"", "\\\"") + "}";
+			css = css.substring(0, css.length() - 1) + "}";
 			final JsonNode node = new ObjectMapper().readTree(Attachment.resolve(client.getStorage()));
 			if (!node.get("css").asText().equals(css)) {
 				((ObjectNode) node).put("css", css);

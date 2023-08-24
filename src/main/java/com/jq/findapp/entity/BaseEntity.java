@@ -32,7 +32,7 @@ public class BaseEntity {
 		return id;
 	}
 
-	public void setId(BigInteger id) {
+	public void setId(final BigInteger id) {
 		this.id = id;
 	}
 
@@ -40,7 +40,7 @@ public class BaseEntity {
 		return createdAt;
 	}
 
-	public void setCreatedAt(Timestamp createdAt) {
+	public void setCreatedAt(final Timestamp createdAt) {
 		this.createdAt = createdAt;
 	}
 
@@ -48,13 +48,27 @@ public class BaseEntity {
 		return modifiedAt;
 	}
 
-	public void setModifiedAt(Timestamp modifiedAt) {
+	public void setModifiedAt(final Timestamp modifiedAt) {
 		this.modifiedAt = modifiedAt;
 	}
 
 	@Transient
-	public boolean populate(Map<String, Object> values) {
+	public void history(final String name, final Object value) {
+		if (old == null)
+			old = new HashMap<>();
+		if (!old.containsKey(name))
+			old.put(name, value);
+	}
+
+	@Transient
+	public boolean populated() {
+		return old != null;
+	}
+
+	@Transient
+	public boolean populate(final Map<String, Object> values) {
 		final BaseEntity ref = new ObjectMapper().convertValue(values, this.getClass());
+		old = new HashMap<>();
 		values.forEach((name, value) -> {
 			if (!"id".equals(name) && !"createdAt".equals(name) && !"modifiedAt".equals(name)) {
 				try {
@@ -62,11 +76,8 @@ public class BaseEntity {
 							.getDeclaredMethod("get" + name.substring(0, 1).toUpperCase() + name.substring(1));
 					final Object valueOld = m.invoke(this), valueNew = m.invoke(ref);
 					if (!Objects.equals(valueOld, valueNew)) {
-						if (getId() != null) {
-							if (old == null)
-								old = new HashMap<>();
+						if (getId() != null)
 							old.put(name, valueOld);
-						}
 						if (value instanceof String && ((String) value).contains("<"))
 							value = ((String) value).replace("<", "&lt;");
 						getClass()
@@ -74,21 +85,21 @@ public class BaseEntity {
 										m.getReturnType())
 								.invoke(this, valueNew);
 					}
-				} catch (Exception ex) {
+				} catch (final Exception ex) {
 					throw new RuntimeException("Failed on " + name + ", value " + value, ex);
 				}
 			}
 		});
-		return old != null;
+		return old.size() > 0;
 	}
 
 	@Transient
-	public Object old(String name) {
+	public Object old(final String name) {
 		return old == null ? null : old.get(name);
 	}
 
 	@Transient
-	public boolean writeAccess(BigInteger user, Repository repository) {
+	public boolean writeAccess(final BigInteger user, final Repository repository) {
 		return false;
 	}
 }

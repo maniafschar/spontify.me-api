@@ -368,7 +368,7 @@ public class NotificationService {
 			Strings.replaceString(html, "<jq:image />", "");
 		final JsonNode css = new ObjectMapper().readTree(new ObjectMapper()
 				.readTree(Attachment.resolve(repository.one(Client.class, contactTo.getClientId()).getStorage()))
-				.get("css").asText());
+				.get("css").asText().replaceAll("\\\"", "\""));
 		css.fieldNames().forEachRemaining(key -> Strings.replaceString(html, "--" + key, css.get(key).asText()));
 		message = sanatizeHtml(message);
 		if (message.indexOf("\n") > 0)

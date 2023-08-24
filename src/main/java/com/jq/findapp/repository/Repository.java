@@ -159,7 +159,6 @@ public class Repository {
 	}
 
 	public void save(final BaseEntity entity) throws Exception {
-		Attachment.save(entity);
 		if (entity.getId() == null) {
 			if (entity.getCreatedAt() == null)
 				entity.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
@@ -167,12 +166,15 @@ public class Repository {
 			em.persist(entity);
 			listeners.postPersist(entity);
 		} else {
+			if (!entity.populated())
+				Attachment.historize(entity, one(entity.getClass(), entity.getId()));
 			entity.setModifiedAt(new Timestamp(Instant.now().toEpochMilli()));
 			listeners.preUpdate(entity);
 			em.merge(entity);
 			listeners.postUpdate(entity);
 		}
 		em.flush();
+		Attachment.save(entity);
 	}
 
 	public void delete(final BaseEntity entity) throws Exception {
@@ -222,6 +224,20 @@ public class Repository {
 							if (f.exists())
 								f.delete();
 						}
+					} catch (final Exception e) {
+						throw new RuntimeException("Failed on " + field.getName(), e);
+					}
+				}
+			}
+		}
+
+		public static void historize(final BaseEntity entity, final BaseEntity old) {
+			final Field[] fields = entity.getClass().getDeclaredFields();
+			for (final Field field : fields) {
+				if (RESOLVABLE_COLUMNS.matcher(field.getName()).matches()) {
+					try {
+						field.setAccessible(true);
+						entity.history(field.getName(), field.get(old));
 					} catch (final Exception e) {
 						throw new RuntimeException("Failed on " + field.getName(), e);
 					}
