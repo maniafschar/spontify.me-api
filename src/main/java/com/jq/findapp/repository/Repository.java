@@ -159,6 +159,7 @@ public class Repository {
 	}
 
 	public void save(final BaseEntity entity) throws Exception {
+		Attachment.save(entity);
 		if (entity.getId() == null) {
 			if (entity.getCreatedAt() == null)
 				entity.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
@@ -174,7 +175,6 @@ public class Repository {
 			listeners.postUpdate(entity);
 		}
 		em.flush();
-		Attachment.save(entity);
 	}
 
 	public void delete(final BaseEntity entity) throws Exception {

@@ -7,8 +7,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 public class Strings {
+	private static final Pattern EMAIL = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$",
+			Pattern.CASE_INSENSITIVE);
+
 	public static String encodeParam(final String param) {
 		int x = 0;
 		for (int i = 2; i < param.length(); i++) {
@@ -22,7 +26,11 @@ public class Strings {
 		return s == null || s.toString().trim().length() == 0;
 	}
 
-	public static String stackTraceToString(Throwable ex) {
+	public static boolean isEmail(final String email) {
+		return EMAIL.matcher(email).find();
+	}
+
+	public static String stackTraceToString(final Throwable ex) {
 		if (ex == null)
 			return "";
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -46,7 +54,7 @@ public class Strings {
 		return s;
 	}
 
-	public static String formatDate(String format, Date date, String zone) {
+	public static String formatDate(final String format, final Date date, final String zone) {
 		return date.toInstant().atZone(TimeZone.getTimeZone(zone).toZoneId())
 				.format(DateTimeFormatter.ofPattern(format == null ? "dd.MM.yyyy HH:mm" : format));
 	}

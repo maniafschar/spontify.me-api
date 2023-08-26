@@ -493,21 +493,45 @@ public class ActionApi {
 					Attachment.resolve(repository.one(ClientMarketing.class, contactMarketing.getClientMarketingId())
 							.getStorage()));
 			final JsonNode answers = new ObjectMapper().readTree(Attachment.resolve(contactMarketing.getStorage()));
-			final JsonNode email = answers.get("q" + (questions.get("questions").size() - 1)).get("text");
-			if (email != null) {
+			final JsonNode email = answers.get("q" + (questions.get("questions").size() - 1)).get("t");
+			if (email != null && Strings.isEmail(email.asText())) {
 				final Contact to = new Contact();
 				to.setEmail(email.asText());
 				to.setPseudonym(to.getEmail());
 				to.setTimezone("Europe/Berlin");
 				to.setClientId(clientId);
 				to.setLanguage("DE");
-				final StringBuffer s = new StringBuffer(questions.get("prolog").asText().replaceAll("\n", "<br/>"));
+				final StringBuffer s = new StringBuffer("<div style=\"text-align:left;\">"
+						+ questions.get("prolog").asText().replaceAll("\n", "<br/>"));
 				s.append("<br/><br/>");
 				for (int i = 0; i < questions.get("questions").size(); i++) {
-					s.append(questions.get("questions").get(i).get("question"));
-					s.append("<br/><br/>");
+					if (answers.has("q" + i)) {
+						final JsonNode question = questions.get("questions").get(i);
+						s.append(question.get("question").asText());
+						s.append("<ul>");
+						for (int i2 = 0; i2 < question.get("answers").size(); i2++) {
+							boolean selected = false;
+							for (int i3 = 0; i3 < answers.get("q" + i).get("a").size(); i3++) {
+								if (answers.get("q" + i).get("a").get(i3).intValue() == i2) {
+									selected = true;
+									break;
+								}
+							}
+							s.append("<li style=\"list-style-type:" + (selected ? "initial" : "circle") + ";\">");
+							if (selected)
+								s.append("<b>");
+							s.append(question.get("answers").get(i2).get("answer").asText());
+							if (selected)
+								s.append("</b>");
+							s.append("</li>");
+						}
+						s.append("</ul>");
+						if (answers.get("q" + i).has("t"))
+							s.append(answers.get("q" + i).get("t").asText());
+						s.append("<br/><br/>");
+					}
 				}
-				s.append(questions.get("epilog").asText().replaceAll("\n", "<br/>"));
+				s.append(questions.get("epilog").asText().replaceAll("\n", "<br/>") + "</div>");
 				notificationService.sendNotificationEmail(null, to, s.toString(), null);
 			}
 		}

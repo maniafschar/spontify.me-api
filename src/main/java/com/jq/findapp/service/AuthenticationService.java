@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,8 +50,6 @@ public class AuthenticationService {
 			'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4',
 			'5', '6', '7', '8', '9' };
 	private static long TIMEOUT = 3600000L;
-	private final Pattern EMAIL = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$",
-			Pattern.CASE_INSENSITIVE);
 
 	@Autowired
 	private Repository repository;
@@ -187,7 +184,7 @@ public class AuthenticationService {
 		final int minimum = 5000;
 		if (registration.getTime() < minimum)
 			throw new IllegalAccessException("time");
-		if (!EMAIL.matcher(registration.getEmail()).find())
+		if (!Strings.isEmail(registration.getEmail()))
 			throw new IllegalAccessException("email");
 		final Unique unique = unique(registration.getClientId(), registration.getEmail());
 		if (!unique.unique)

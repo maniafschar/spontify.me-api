@@ -393,6 +393,7 @@ public class NotificationService {
 	}
 
 	private String sanatizeHtml(String s) {
+		s = s.replace("<br/>", "\n");
 		s = s.replace("<ul>", "\n\n");
 		s = s.replace("<li>", "* ");
 		s = s.replace("</li>", "\n");
