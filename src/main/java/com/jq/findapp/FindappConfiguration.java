@@ -29,14 +29,14 @@ import com.jq.findapp.util.Strings;
 public class FindappConfiguration implements AsyncConfigurer, WebSocketMessageBrokerConfigurer {
 	private static final List<Integer> SENT_ERRORS = new ArrayList<>();
 	private static final String[] allowedOrigins = {
+			"https://localhost",
+			"app://localhost",
 			"https://after-work.events",
-			"https://*.fan-club.online",
 			"https://fan-club.online",
+			"https://*.fan-club.online",
 			"https://offline-poker.com",
 			"https://skills.community",
 			"https://skillvents.com",
-			"https://localhost",
-			"app://localhost",
 			"http://localhost:9000"
 	};
 
@@ -55,8 +55,9 @@ public class FindappConfiguration implements AsyncConfigurer, WebSocketMessageBr
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(final CorsRegistry registry) {
-				registry.addMapping("/**").allowedOriginPatterns(allowedOrigins).allowedHeaders("*")
-						.allowedMethods("GET", "PUT", "POST", "ORIGINS", "DELETE");
+				registry.addMapping("/**").allowedOriginPatterns(allowedOrigins)
+						.allowedHeaders("clientid", "password", "salt", "user", "webcall")
+						.allowedMethods("GET", "PUT", "POST", "OPTIONS", "DELETE");
 			}
 		};
 	}
