@@ -136,15 +136,11 @@ public class ActionApi {
 
 	@GetMapping("quotation")
 	public String quotation(@RequestHeader final BigInteger user) {
-		if (repository.one(Contact.class, user) == null)
-			return null;
 		return QUOTATION.get((int) (Math.random() * (QUOTATION.size() - 1)));
 	}
 
 	@GetMapping("birthday")
 	public Map<String, String> birthday(@RequestHeader final BigInteger user) {
-		if (repository.one(Contact.class, user) == null)
-			return null;
 		final Map<String, String> map = new HashMap<>(2);
 		map.put("text", QUOTATION.get((int) (Math.random() * (QUOTATION.size() - 1))));
 		map.put("image", "images/happyBirthday.png");
@@ -188,9 +184,7 @@ public class ActionApi {
 			contact.setClientId(clientId);
 			contact.setId(BigInteger.ZERO);
 			params.setUser(contact);
-		} else if (repository.one(Contact.class, user) == null)
-			return null;
-		else
+		} else
 			params.setUser(repository.one(Contact.class, user));
 		final Map<String, Object> one = repository.one(params);
 		if (one != null) {
@@ -237,8 +231,6 @@ public class ActionApi {
 	@GetMapping("google")
 	public Object google(final String param, @RequestHeader final BigInteger user)
 			throws Exception {
-		if (repository.one(Contact.class, user) == null)
-			return null;
 		if ("js".equals(param))
 			return "https://maps.googleapis.com/maps/api/js?key=" + googleKeyJS;
 		if (param.startsWith("latlng=")) {
