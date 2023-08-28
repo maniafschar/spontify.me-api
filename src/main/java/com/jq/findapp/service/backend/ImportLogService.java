@@ -101,9 +101,10 @@ public class ImportLogService {
 								if (s.length > 1)
 									log.setQuery(s[1]);
 							}
-							params.setSearch("log.ip='" + log.getIp() + "' and log.uri='" + log.getUri()
+							params.setSearch("log.ip='" + log.getIp() + "' and log.uri='"
+									+ log.getUri().replace("'", "''")
 									+ "' and log.createdAt='" + Instant.ofEpochMilli(log.getCreatedAt().getTime())
-									+ "' and log.body like '" + log.getBody().replace("'", "''") + "'");
+									+ "' and log.body='" + log.getBody().replace("'", "''") + "'");
 							if (repository.list(params).size() == 0) {
 								log.setPort(80);
 								log.setMethod(m.group(5));
