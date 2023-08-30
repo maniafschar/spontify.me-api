@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,9 +76,12 @@ public class Screenshots {
 		Util.driver.get("https://alpenherz.fan-club.online/");
 		Util.sleep(3000);
 		js.executeScript(
+				"ui.navigation.closeHint()");
+		js.executeScript(
 				"var p={},e=ui.qa('card img');for(var i=0;i<e.length;i++)if(p[e[i].src])ui.parents(e[i],'card').outerHTML='';else p[e[i].src]=true;");
 		js.executeScript(
 				"var e=ui.qa('card[onclick*=\"(223,\"],card[onclick*=\"(244,\"],card[onclick*=\"(245,\"],card[onclick*=\"(324,\"],card[onclick*=\"(435,\"],card[onclick*=\"(445,\"],card[onclick*=\"(459,\"],card[onclick*=\"(645,\"],card[onclick*=\"(723,\"],card[onclick*=\"(385,\"],card[onclick*=\"(276,\"],card[onclick*=\"(607,\"],card[onclick*=\"(793,\"]');for(var i=0;i<e.length;i++)e[i].outerHTML='';");
+		Util.sleep(1000);
 		screenshot(name);
 		login();
 		Util.sleep(1000);
@@ -100,6 +102,11 @@ public class Screenshots {
 		js.executeScript(
 				"var e=ui.qa('search div list-row[i=\"223\"],search div list-row[i=\"244\"],search div list-row[i=\"276\"],search div list-row[i=\"607\"],search div list-row[i=\"793\"]');for(var i=0;i<e.length;i++)e[i].outerHTML='';");
 		screenshot(name + "-search");
+		if (Util.driver.getTitle().contains("Fanclub")) {
+			Util.click("buttonIcon.statistics");
+			Util.sleep(2000);
+			screenshot(name + "-stats");
+		}
 		js.executeScript(
 				"ui.classRemove('video-call videochat', 'hidden');var e=ui.q('video-call').style;e.display='block';e.background='url(https://fan-club.online/images/videoCall.jpg)';e.backgroundSize='"
 						+ ((double) 568 / 800 < Double.valueOf(name.split("x")[0]) / Double.valueOf(name.split("x")[1])
@@ -108,16 +115,6 @@ public class Screenshots {
 						+ "';e.backgroundPosition='center';ui.q('video-call call').style.display='none';");
 		Util.sleep(2000);
 		screenshot(name + "-video");
-		if (Util.driver.getTitle().contains("Fanclub")) {
-			final String orgWindow = Util.driver.getWindowHandle();
-			js.executeScript("ui.navigation.openHTML('stats.html','stats')");
-			final Set<String> windowHandles = Util.driver.getWindowHandles();
-			Util.driver.switchTo().window((String) windowHandles.toArray()[1]);
-			Util.sleep(2000);
-			screenshot(name + "-stats");
-			js.executeScript("window.close()");
-			Util.driver.switchTo().window(orgWindow);
-		}
 		js.executeScript("pageLogin.logoff()");
 	}
 
@@ -130,6 +127,7 @@ public class Screenshots {
 		matcherUser.find();
 		matcherPassword.find();
 		js.executeScript("pageLogin.login('" + matcherUser.group(1) + "','" + matcherPassword.group(1) + "')");
+		System.out.println("pageLogin.login('" + matcherUser.group(1) + "','" + matcherPassword.group(1) + "')");
 		js.executeScript("geoData.save({latitude:48.119335544742256,longitude:11.564400465904775})");
 	}
 
