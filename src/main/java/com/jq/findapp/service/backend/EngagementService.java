@@ -10,7 +10,9 @@ import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +56,7 @@ public class EngagementService {
 	@Autowired
 	private Text text;
 
-	private static String currentVersion;
+	private static Map<BigInteger, String> currentVersion = new HashMap<>();
 
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
@@ -146,7 +148,7 @@ public class EngagementService {
 			return ""
 					+ (int) (((Number) result.get(result.size() - 1).get("_geolocationDistance")).doubleValue() + 0.5);
 		}),
-		VERSION((contact, location, externalService, repository) -> currentVersion);
+		VERSION((contact, location, externalService, repository) -> currentVersion.get(contact.getClientId()));
 
 		private static interface Exec {
 			String replace(Contact contact, Location location, ExternalService externalService, Repository repository);
@@ -243,7 +245,7 @@ public class EngagementService {
 		chatTemplates.add(new ChatTemplate(TextId.engagement_installCurrentVersion,
 				"global.openStore()",
 				contact -> !Strings.isEmpty(contact.getVersion()) && contact.getOs() != OS.web
-						&& currentVersion.compareTo(contact.getVersion()) > 0));
+						&& currentVersion.get(contact.getClientId()).compareTo(contact.getVersion()) > 0));
 
 		chatTemplates.add(new ChatTemplate(TextId.engagement_praise,
 				"",
@@ -385,10 +387,13 @@ public class EngagementService {
 	}
 
 	private void resetChatInstallCurrentVersion() throws Exception {
-		if (currentVersion == null) {
+		if (currentVersion.size() == 0) {
 			final QueryParams params = new QueryParams(Query.contact_maxAppVersion);
 			params.setUser(repository.one(Contact.class, adminId));
-			currentVersion = (String) repository.one(params).get("_c");
+			final Result result = repository.list(params);
+			for (int i = 0; i < result.size(); i++)
+				currentVersion.put((BigInteger) result.get(i).get("contact.clientId"),
+						(String) result.get(i).get("_c"));
 		}
 		final QueryParams params = new QueryParams(Query.contact_listChatFlat);
 		params.setLimit(0);
