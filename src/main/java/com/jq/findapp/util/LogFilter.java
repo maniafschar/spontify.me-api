@@ -10,6 +10,7 @@ import java.time.Instant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
@@ -17,6 +18,8 @@ import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Log;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
+import com.jq.findapp.service.AuthenticationService.AuthenticationException;
+import com.jq.findapp.service.AuthenticationService.AuthenticationException.AuthenticationExceptionType;
 import com.jq.findapp.service.backend.IpService;
 
 import jakarta.servlet.Filter;
@@ -82,6 +85,9 @@ public class LogFilter implements Filter {
 		try {
 			authenticate(req);
 			chain.doFilter(req, res);
+		} catch (final AuthenticationException ex) {
+			log.setStatus(HttpStatus.UNAUTHORIZED.value());
+			log.setBody(ex.getType().name());
 		} finally {
 			if (loggable && (!"/support/healthcheck".equals(log.getUri()) || res.getStatus() >= 400)) {
 				log.setTime((int) (System.currentTimeMillis() - time));
@@ -89,7 +95,8 @@ public class LogFilter implements Filter {
 				log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
 				final byte[] b = req.getContentAsByteArray();
 				if (b != null && b.length > 0) {
-					log.setBody(new String(b, StandardCharsets.UTF_8));
+					log.setBody((log.getBody() == null ? "" : log.getBody() + "\n")
+							+ new String(b, StandardCharsets.UTF_8));
 					if (log.getBody().length() > 255)
 						log.setBody(log.getBody().substring(0, 255));
 				}
@@ -111,8 +118,7 @@ public class LogFilter implements Filter {
 							req.getHeader("password"), req.getHeader("salt"));
 					if (!user.equals(adminId)
 							&& !contact.getClientId().equals(new BigInteger(req.getHeader("clientId"))))
-						throw new RuntimeException("Invalid client header " + req.getHeader("clientId")
-								+ ", expected in contact: " + contact.getClientId());
+						throw new AuthenticationException(AuthenticationExceptionType.WrongClient);
 				}
 			} else if (req.getRequestURI().startsWith("/support/")) {
 				if (supportCenterSecret.equals(req.getHeader("secret")))
@@ -120,7 +126,7 @@ public class LogFilter implements Filter {
 				else if (!schedulerSecret.equals(req.getHeader("secret")) ||
 						!req.getRequestURI().equals("/support/scheduler") &&
 								!req.getRequestURI().equals("/support/healthcheck"))
-					throw new RuntimeException("Invalid access to " + req.getRequestURI());
+					throw new AuthenticationException(AuthenticationExceptionType.ProtectetdArea);
 			}
 		}
 	}

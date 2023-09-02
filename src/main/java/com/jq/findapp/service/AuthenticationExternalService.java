@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jq.findapp.api.model.ExternalRegistration;
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
@@ -29,17 +30,17 @@ public class AuthenticationExternalService {
 		Apple
 	}
 
-	public Contact register(ExternalRegistration registration) throws Exception {
+	public Contact register(final ExternalRegistration registration) throws Exception {
 		Contact contact = findById(registration);
 		if (contact == null)
 			contact = findByEmail(registration);
 		return contact == null ? registerInternal(registration) : contact;
 	}
 
-	private Contact findById(ExternalRegistration registration) throws Exception {
+	private Contact findById(final ExternalRegistration registration) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact." + registration.getFrom().name().toLowerCase() + "Id='"
-				+ registration.getUser().get("id") + '\'');
+				+ registration.getUser().get("id") + "' and contact.clientId=" + registration.getClientId());
 		final Map<String, Object> contact = repository.one(params);
 		if (contact != null) {
 			final Contact c = repository.one(Contact.class, new BigInteger(contact.get("contact.id").toString()));
@@ -52,15 +53,18 @@ public class AuthenticationExternalService {
 		return null;
 	}
 
-	private Contact findByEmail(ExternalRegistration registration) throws Exception {
+	private Contact findByEmail(final ExternalRegistration registration) throws Exception {
 		if (registration.getUser().get("email") != null)
 			registration.getUser().put("email", Encryption.decryptBrowser(registration.getUser().get("email")));
-		if (registration.getUser().get("email") == null || !registration.getUser().get("email").contains("@"))
+		if (registration.getUser().get("email") == null || !registration.getUser().get("email").contains("@")) {
+			final Client client = repository.one(Client.class, registration.getClientId());
 			registration.getUser().put("email",
 					registration.getUser().get("id") + '.' + registration.getFrom().name().toLowerCase()
-							+ "@after-work.events");
+							+ client.getEmail().substring(client.getEmail().indexOf('@')));
+		}
 		final QueryParams params = new QueryParams(Query.contact_listId);
-		params.setSearch("contact.email='" + registration.getUser().get("email") + '\'');
+		params.setSearch("contact.email='" + registration.getUser().get("email") + "' and contact.clientId="
+				+ registration.getClientId());
 		final Map<String, Object> contact = repository.one(params);
 		if (contact != null) {
 			final Contact c = repository.one(Contact.class, new BigInteger(contact.get("contact.id").toString()));
@@ -74,7 +78,7 @@ public class AuthenticationExternalService {
 		return null;
 	}
 
-	private Contact registerInternal(ExternalRegistration registration) throws Exception {
+	private Contact registerInternal(final ExternalRegistration registration) throws Exception {
 		final Contact c = new Contact();
 		c.setVerified(true);
 		c.setEmail(registration.getUser().get("email"));
@@ -91,7 +95,7 @@ public class AuthenticationExternalService {
 		return c;
 	}
 
-	private void fillFacebookData(Map<String, String> facebookData, Contact contact)
+	private void fillFacebookData(final Map<String, String> facebookData, final Contact contact)
 			throws Exception {
 		contact.setFacebookId(facebookData.get("id"));
 		if (facebookData.get("accessToken") != null)
@@ -102,7 +106,7 @@ public class AuthenticationExternalService {
 				contact.setImage(EntityUtil.getImage(facebookData.get("picture"), EntityUtil.IMAGE_SIZE));
 				if (contact.getImage() != null)
 					contact.setImageList(EntityUtil.getImage(facebookData.get("picture"), EntityUtil.IMAGE_THUMB_SIZE));
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				// no pic for now, continue registration/login
 			}
 		}
