@@ -171,31 +171,24 @@ public class SupportCenterApi {
 	@PutMapping("scheduler")
 	public void scheduler(@RequestHeader final String secret) throws Exception {
 		if (schedulerRunning.size() == 0) {
+			final boolean LAST = true;
 			// last job is backup, even after importLog
-			runLast(dbService::backup);
+			run(dbService::backup, LAST);
 			// importLog paralell to the rest, does not interfere
-			run(importLogService::importLog);
-			run(chatService::answerAi);
-			run(dbService::update);
-			// run(statisticsService::update);
-			run(engagementService::sendRegistrationReminder);
+			run(importLogService::importLog, !LAST);
+			run(chatService::answerAi, !LAST);
+			run(dbService::update, !LAST);
+			// run(statisticsService::update, !LAST);
+			run(engagementService::sendRegistrationReminder, !LAST);
 			// sendNearBy and sendChats after all event services
 			// to avoid multiple chat at the same time
-			runLast(engagementService::sendNearBy);
-			runLast(engagementService::sendChats);
-			runLast(ipService::lookupIps);
-			run(eventService::findMatchingBuddies);
-			run(eventService::notifyParticipation);
+			run(engagementService::sendNearBy, LAST);
+			run(engagementService::sendChats, LAST);
+			run(ipService::lookupIps, LAST);
+			run(eventService::findMatchingBuddies, !LAST);
+			run(eventService::notifyParticipation, !LAST);
 		} else
 			throw new RuntimeException("Scheduler already running " + schedulerRunning.size() + " processes");
-	}
-
-	private void runLast(final Scheduler scheduler) {
-		run(scheduler, true);
-	}
-
-	private void run(final Scheduler scheduler) {
-		run(scheduler, false);
 	}
 
 	private void run(final Scheduler scheduler, final boolean last) {

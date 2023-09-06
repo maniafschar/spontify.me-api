@@ -34,6 +34,7 @@ import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith(SpringExtension.class)
@@ -275,5 +276,30 @@ public class RepositoryTest {
 		assertTrue(result.contains("abc"));
 		assertTrue(result.contains("about others"));
 		assertFalse(result.contains("xyz"));
+	}
+
+	@Test
+	public void replaceEmailInJson() {
+		// given
+		final String email = "man@work.de";
+		final String json = "{\"a\":1;\"email\":\"" + email + "\"}";
+
+		// when
+		final String result = Strings.EMAIL.matcher(json).replaceAll("");
+
+		// then
+		assertFalse(result.contains(email));
+	}
+
+	@Test
+	public void isEmail() {
+		// given
+		final String email = "man@work.de";
+
+		// when
+		final boolean result = Strings.isEmail(email);
+
+		// then
+		assertTrue(result);
 	}
 }

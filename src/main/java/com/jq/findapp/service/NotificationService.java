@@ -10,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -24,6 +25,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.mail.DefaultAuthenticator;
+import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.ImageHtmlEmail;
 import org.apache.commons.mail.resolver.DataSourceUrlResolver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -401,8 +403,7 @@ public class NotificationService {
 		return s.replaceAll("<[^>]*>", "");
 	}
 
-	private void sendEmail(final Contact to, final String subject, final String text, final String html)
-			throws Exception {
+	private void sendEmail(final Contact to, final String subject, final String text, final String html) {
 		final String from = to == null ? repository.one(Contact.class, adminId).getEmail()
 				: repository.one(Client.class, to.getClientId()).getEmail();
 		final ImageHtmlEmail email = mailCreateor.create();
@@ -411,19 +412,25 @@ public class NotificationService {
 		email.setCharset(StandardCharsets.UTF_8.name());
 		email.setAuthenticator(new DefaultAuthenticator(from, emailPassword));
 		email.setSSLOnConnect(true);
-		email.setFrom(from);
-		email.addTo(to == null ? from : to.getEmail());
-		email.setSubject(subject);
-		email.setTextMsg(text);
-		if (html != null && to != null) {
-			email.setDataSourceResolver(
-					new DataSourceUrlResolver(new URL(repository.one(Client.class, to.getClientId()).getUrl())));
-			email.setHtmlMsg(html);
-		} else
-			email.setHtmlMsg(text);
-		if (to != null)
-			createTicket(TicketType.EMAIL, to.getEmail(), text, adminId);
-		email.send();
+		try {
+			email.setFrom(from);
+			email.addTo(to == null ? from : to.getEmail());
+			email.setSubject(subject);
+			email.setTextMsg(text);
+			if (html != null && to != null) {
+				email.setDataSourceResolver(
+						new DataSourceUrlResolver(new URL(repository.one(Client.class, to.getClientId()).getUrl())));
+				email.setHtmlMsg(html);
+			} else
+				email.setHtmlMsg(text);
+			email.send();
+			if (to != null)
+				createTicket(TicketType.EMAIL, to.getEmail(), text, adminId);
+		} catch (final EmailException | MalformedURLException ex) {
+			if (to != null)
+				createTicket(TicketType.ERROR, "Email exception: " + to.getEmail(),
+						Strings.stackTraceToString(ex) + "\n\n" + text, to.getId());
+		}
 	}
 
 	public void createTicket(final TicketType type, String subject, String text, final BigInteger user) {

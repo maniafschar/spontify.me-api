@@ -10,7 +10,7 @@ import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 public class Strings {
-	private static final Pattern EMAIL = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$",
+	public static final Pattern EMAIL = Pattern.compile("([A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6})",
 			Pattern.CASE_INSENSITIVE);
 
 	public static String encodeParam(final String param) {
@@ -27,7 +27,7 @@ public class Strings {
 	}
 
 	public static boolean isEmail(final String email) {
-		return EMAIL.matcher(email).find();
+		return EMAIL.matcher(email).replaceAll("").length() == 0;
 	}
 
 	public static String stackTraceToString(final Throwable ex) {
