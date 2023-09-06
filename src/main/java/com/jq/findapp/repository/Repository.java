@@ -64,20 +64,19 @@ public class Repository {
 				for (int i = 0; i < max; i++)
 					result.getList().remove(params.getLimit() + 1);
 			}
+			Attachment.resolve(result.getList());
 			for (int i = 0; i < result.getHeader().length; i++) {
 				if ("contact.longitude".equals(result.getHeader()[i])
 						|| "contact.latitude".equals(result.getHeader()[i])
 						|| "contact.password".equals(result.getHeader()[i])) {
 					for (int i2 = 1; i2 < result.getList().size(); i2++)
 						result.getList().get(i2)[i] = null;
-				}
-				if ("contactMarketing.storage".equals(result.getHeader()[i])) {
+				} else if ("contactMarketing.storage".equals(result.getHeader()[i])) {
 					for (int i2 = 1; i2 < result.getList().size(); i2++)
 						result.getList().get(i2)[i] = Strings.EMAIL.matcher(result.getList().get(i2)[i].toString())
 								.replaceAll("");
 				}
 			}
-			Attachment.resolve(result.getList());
 		}
 		return result;
 	}

@@ -289,6 +289,7 @@ public class RepositoryTest {
 
 		// then
 		assertFalse(result.contains(email));
+		assertTrue(result.length() > 5);
 	}
 
 	@Test
