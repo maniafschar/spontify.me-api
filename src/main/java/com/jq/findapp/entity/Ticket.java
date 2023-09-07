@@ -9,6 +9,7 @@ import jakarta.persistence.Enumerated;
 @Entity
 public class Ticket extends BaseEntity {
 	private BigInteger contactId;
+	private BigInteger clientId;
 	private String subject;
 	private String note;
 	@Enumerated(EnumType.STRING)
@@ -22,7 +23,7 @@ public class Ticket extends BaseEntity {
 		return contactId;
 	}
 
-	public void setContactId(BigInteger contactId) {
+	public void setContactId(final BigInteger contactId) {
 		this.contactId = contactId;
 	}
 
@@ -30,7 +31,7 @@ public class Ticket extends BaseEntity {
 		return subject;
 	}
 
-	public void setSubject(String subject) {
+	public void setSubject(final String subject) {
 		this.subject = subject;
 	}
 
@@ -38,7 +39,7 @@ public class Ticket extends BaseEntity {
 		return note;
 	}
 
-	public void setNote(String note) {
+	public void setNote(final String note) {
 		this.note = note;
 	}
 
@@ -46,7 +47,15 @@ public class Ticket extends BaseEntity {
 		return type;
 	}
 
-	public void setType(TicketType type) {
+	public void setType(final TicketType type) {
 		this.type = type;
+	}
+
+	public BigInteger getClientId() {
+		return clientId;
+	}
+
+	public void setClientId(final BigInteger clientId) {
+		this.clientId = clientId;
 	}
 }

@@ -43,7 +43,7 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 	private Repository repository;
 
 	@ExceptionHandler(Exception.class)
-	public ResponseEntity<Object> handle(Exception ex, WebRequest request) {
+	public ResponseEntity<Object> handle(final Exception ex, final WebRequest request) {
 		final HttpStatus statusCode = ex instanceof AuthenticationException ? HttpStatus.UNAUTHORIZED
 				: HttpStatus.INTERNAL_SERVER_ERROR;
 		final Map<String, Object> body = new HashMap<>(3);
@@ -54,7 +54,7 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 		return createResponseEntity(body, null, statusCode, request);
 	}
 
-	private void report(HttpServletRequest request, Exception ex, HttpStatus status) {
+	private void report(final HttpServletRequest request, final Exception ex, final HttpStatus status) {
 		if (ex instanceof AuthenticationException
 				&& ((AuthenticationException) ex).getType() == AuthenticationExceptionType.WrongPassword)
 			return;
@@ -90,14 +90,14 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 		s.append("\nHEADER\n");
 		List<String> list = Collections.list(request.getHeaderNames());
 		Collections.sort(list);
-		for (String n : list)
+		for (final String n : list)
 			s.append(n + ": " + request.getHeader(n) + "\n");
 		s.append("\n");
 		if (request.getParameterMap().size() > 0) {
 			s.append("\nPARAM\n");
 			list = Collections.list(request.getParameterNames());
 			Collections.sort(list);
-			for (String n : list)
+			for (final String n : list)
 				s.append(n + ": " + request.getParameter(n) + "\n");
 			s.append("\n");
 		}
@@ -113,14 +113,14 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 			return;
 		msg = msg.replaceFirst(SUBSTITUTE, "" + request.getServerPort()).replaceFirst(SUBSTITUTE, s.toString());
 		try {
-			notificationService.createTicket(TicketType.ERROR, "uncaught exception", msg, userId);
-		} catch (Exception e1) {
+			notificationService.createTicket(TicketType.ERROR, "uncaught exception", msg, userId, null);
+		} catch (final Exception e1) {
 			notificationService.createTicket(TicketType.ERROR, "uncaught exception, error on creating report",
-					msg + "\n\n\n" + Strings.stackTraceToString(e1), userId);
+					msg + "\n\n\n" + Strings.stackTraceToString(e1), userId, null);
 		}
 	}
 
-	private String getQueryString(HttpServletRequest request) {
+	private String getQueryString(final HttpServletRequest request) {
 		String query = request.getQueryString();
 		if (query != null) {
 			try {
@@ -130,7 +130,7 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 							StandardCharsets.UTF_8.name());
 				if (!query.startsWith("_="))
 					return "?" + URLDecoder.decode(query, StandardCharsets.UTF_8.name());
-			} catch (UnsupportedEncodingException e) {
+			} catch (final UnsupportedEncodingException e) {
 				throw new RuntimeException(e);
 			}
 		}

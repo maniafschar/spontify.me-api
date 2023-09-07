@@ -307,7 +307,7 @@ public class EngagementService {
 					result.result = "0";
 				if (failedEmails.length() > 0)
 					notificationService.createTicket(TicketType.ERROR, "sendRegistrationReminder",
-							"Failed Emails:" + failedEmails, null);
+							"Failed Emails:" + failedEmails, null, null);
 			}
 		} catch (final Exception e) {
 			result.exception = e;

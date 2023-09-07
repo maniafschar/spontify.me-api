@@ -217,7 +217,7 @@ public class SupportCenterApi {
 						log.setBody(result.result.length() > 255 ? result.result.substring(0, 255) : result.result);
 					if (result.exception != null)
 						notificationService.createTicket(TicketType.ERROR, "scheduler",
-								Strings.stackTraceToString(result.exception), adminId);
+								Strings.stackTraceToString(result.exception), adminId, null);
 				} finally {
 					schedulerRunning.remove(id);
 					log.setTime((int) (System.currentTimeMillis() - time));

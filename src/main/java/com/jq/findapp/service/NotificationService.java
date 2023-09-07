@@ -288,7 +288,7 @@ public class NotificationService {
 									? "\n\n" + ((WebClientResponseException) ex).getResponseBodyAsString()
 									: "")
 							+ setting + Strings.stackTraceToString(ex),
-					notification == null ? null : notification.getContactId2());
+					notification == null ? null : notification.getContactId2(), null);
 			return false;
 		}
 	}
@@ -425,15 +425,16 @@ public class NotificationService {
 				email.setHtmlMsg(text);
 			email.send();
 			if (to != null)
-				createTicket(TicketType.EMAIL, to.getEmail(), text, adminId);
+				createTicket(TicketType.EMAIL, to.getEmail(), text, adminId, null);
 		} catch (final EmailException | MalformedURLException ex) {
 			if (to != null)
 				createTicket(TicketType.ERROR, "Email exception: " + to.getEmail(),
-						Strings.stackTraceToString(ex) + "\n\n" + text, to.getId());
+						Strings.stackTraceToString(ex) + "\n\n" + text, to.getId(), null);
 		}
 	}
 
-	public void createTicket(final TicketType type, String subject, String text, final BigInteger user) {
+	public void createTicket(final TicketType type, String subject, String text, final BigInteger user,
+			final BigInteger clientId) {
 		try {
 			if (subject == null)
 				subject = "no subject";
@@ -452,6 +453,10 @@ public class NotificationService {
 			final Ticket ticket = new Ticket();
 			ticket.setSubject(subject);
 			ticket.setNote(text);
+			if (clientId == null && user != null && !adminId.equals(user))
+				ticket.setClientId(repository.one(Contact.class, user).getClientId());
+			else
+				ticket.setClientId(clientId);
 			ticket.setType(type);
 			ticket.setContactId(user);
 			repository.save(ticket);

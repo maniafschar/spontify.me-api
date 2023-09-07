@@ -84,13 +84,14 @@ public class DBApi {
 	}
 
 	@DeleteMapping("one")
-	public void delete(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger user) throws Exception {
+	public void delete(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger clientId,
+			@RequestHeader final BigInteger user) throws Exception {
 		if (repository.one(Contact.class, user) == null)
 			return;
 		final BaseEntity e = repository.one(entity.getClazz(), entity.getId());
 		if (e instanceof Contact)
 			notificationService.createTicket(TicketType.ERROR, "Contact Deletion",
-					"tried to delete contact " + e.getId(), user);
+					"tried to delete contact " + e.getId(), user, clientId);
 		else if (checkWriteAuthorisation(e, user) && checkClient(user, e))
 			repository.delete(e);
 	}
@@ -118,12 +119,14 @@ public class DBApi {
 	private boolean checkWriteAuthorisation(final BaseEntity e, final BigInteger user) throws Exception {
 		if (e == null)
 			return false;
-		if (repository.one(Contact.class, user).getType() == ContactType.demo)
+		final Contact contact = repository.one(Contact.class, user);
+		if (contact.getType() == ContactType.demo)
 			return false;
 		if (e.writeAccess(user, repository))
 			return true;
 		notificationService.createTicket(TicketType.ERROR, "writeAuthentication",
-				"Failed for " + user + " on " + e.getClass().getName() + ", id " + e.getId(), user);
+				"Failed for " + user + " on " + e.getClass().getName() + ", id " + e.getId(), user,
+				contact.getClientId());
 		return false;
 	}
 }

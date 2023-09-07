@@ -149,11 +149,11 @@ public class ImportLocationsService {
 		private final Integer category;
 		private final Integer subCategory;
 
-		private LocationType(String google) {
+		private LocationType(final String google) {
 			this(google, null, null);
 		}
 
-		private LocationType(String google, Integer category, Integer subCategory) {
+		private LocationType(final String google, final Integer category, final Integer subCategory) {
 			this.google = google;
 			this.category = category;
 			this.subCategory = subCategory;
@@ -161,7 +161,7 @@ public class ImportLocationsService {
 	}
 
 	@Async
-	public void lookup(float latitude, float longitude) throws Exception {
+	public void lookup(final float latitude, final float longitude) throws Exception {
 		final float lat = ((int) (latitude * roundingFactor) / roundingFactor);
 		final float lon = ((int) (longitude * roundingFactor) / roundingFactor);
 		final QueryParams params = new QueryParams(Query.misc_listTicket);
@@ -171,25 +171,25 @@ public class ImportLocationsService {
 		if (repository.list(params).size() == 0) {
 			final String importResult = retrieveLocations(latitude, longitude);
 			notificationService.createTicket(TicketType.LOCATION, "import",
-					s + (importResult == null ? "" : "\n" + importResult), adminId);
+					s + (importResult == null ? "" : "\n" + importResult), adminId, null);
 		}
 	}
 
-	public String importLocation(BigInteger ticketId, String category) throws Exception {
+	public String importLocation(final BigInteger ticketId, final String category) throws Exception {
 		final Ticket ticket = repository.one(Ticket.class, ticketId);
 		String result = null;
 		try {
 			importLocation(new ObjectMapper().readTree(new String(Attachment.getFile(ticket.getNote()))), category);
 			repository.delete(ticket);
-		} catch (IllegalArgumentException ex) {
+		} catch (final IllegalArgumentException ex) {
 			result = ex.getMessage();
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			result = Strings.stackTraceToString(ex);
 		}
 		return result;
 	}
 
-	private String retrieveLocations(float latitude, float longitude) throws Exception {
+	private String retrieveLocations(final float latitude, final float longitude) throws Exception {
 		final ObjectMapper om = new ObjectMapper();
 		JsonNode json = om.readTree(externalService.google(
 				"place/nearbysearch/json?radius=600&sensor=false&location="
@@ -211,7 +211,7 @@ public class ImportLocationsService {
 		return null;
 	}
 
-	private String importLocations(Iterator<JsonNode> result) {
+	private String importLocations(final Iterator<JsonNode> result) {
 		final ObjectMapper om = new ObjectMapper();
 		int imported = 0, total = 0;
 		String town = null;
@@ -229,7 +229,7 @@ public class ImportLocationsService {
 						notificationService.createTicket(TicketType.LOCATION,
 								location.getCategory() + " " + location.getName(),
 								om.writerWithDefaultPrettyPrinter().writeValueAsString(json),
-								adminId);
+								adminId, null);
 					} else {
 						try {
 							if ((location = importLocation(json, null)) != null) {
@@ -238,7 +238,7 @@ public class ImportLocationsService {
 									town = location.getCountry() + " " + location.getTown() + " "
 											+ location.getZipCode();
 							}
-						} catch (Exception ex) {
+						} catch (final Exception ex) {
 							if (location != null && (ex.getMessage() == null
 									|| (!ex.getMessage().contains("no image")
 											// && !ex.getMessage().contains("invalid address")
@@ -248,11 +248,11 @@ public class ImportLocationsService {
 								notificationService.createTicket(TicketType.LOCATION,
 										location.getCategory() + " " + location.getName(),
 										om.writerWithDefaultPrettyPrinter().writeValueAsString(json),
-										adminId);
+										adminId, null);
 							}
 						}
 					}
-				} catch (Exception ex) {
+				} catch (final Exception ex) {
 					throw new RuntimeException(ex);
 				}
 			}
@@ -260,8 +260,8 @@ public class ImportLocationsService {
 		return imported + "/" + total + (town == null ? "" : "\n" + town);
 	}
 
-	private LocationType mapType(String typeGoogle) {
-		for (LocationType type : TYPES) {
+	private LocationType mapType(final String typeGoogle) {
+		for (final LocationType type : TYPES) {
 			if (typeGoogle.equals(type.google))
 				return type;
 		}
@@ -281,7 +281,7 @@ public class ImportLocationsService {
 		return null;
 	}
 
-	Location importLocation(JsonNode json, String category) throws Exception {
+	Location importLocation(final JsonNode json, final String category) throws Exception {
 		final Location location = json2location(json);
 		if (category != null)
 			location.setCategory(category);
@@ -315,7 +315,7 @@ public class ImportLocationsService {
 			if (!matcher.find())
 				throw new IllegalArgumentException("no image in html: " + html);
 			image = matcher.group(1);
-		} catch (JsonProcessingException e) {
+		} catch (final JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
 		location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE));
@@ -350,12 +350,12 @@ public class ImportLocationsService {
 			if (json.has("user_ratings_total"))
 				location.setGoogleRatingTotal(json.get("user_ratings_total").asInt());
 			return location;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private String guessSubcategory(int type, String name) {
+	private String guessSubcategory(final int type, String name) {
 		if (type == 2) {
 			name = name.toLowerCase();
 			final String[] cats = {
@@ -395,7 +395,7 @@ public class ImportLocationsService {
 		return null;
 	}
 
-	private BigInteger exists(Location location) {
+	private BigInteger exists(final Location location) {
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setSearch("LOWER(location.name) like '%"
 				+ location.getName().toLowerCase().replace("'", "''").replace(' ', '%')

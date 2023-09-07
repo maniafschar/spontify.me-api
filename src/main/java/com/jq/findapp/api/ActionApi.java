@@ -128,10 +128,12 @@ public class ActionApi {
 	}
 
 	@PostMapping("notify")
-	public void notify(final String text, @RequestHeader(required = false) final BigInteger user,
+	public void notify(final String text,
+			@RequestHeader final BigInteger clientId,
+			@RequestHeader(required = false) final BigInteger user,
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) {
 		if (text != null)
-			notificationService.createTicket(TicketType.ERROR, "client", "IP\n\t" + ip + "\n\n" + text, user);
+			notificationService.createTicket(TicketType.ERROR, "client", "IP\n\t" + ip + "\n\n" + text, user, clientId);
 	}
 
 	@GetMapping("quotation")
@@ -392,11 +394,11 @@ public class ActionApi {
 	}
 
 	@PostMapping("paypal")
-	public void paypal(@RequestBody final String data) throws Exception {
+	public void paypal(@RequestHeader final BigInteger clientId, @RequestBody final String data) throws Exception {
 		final ObjectMapper m = new ObjectMapper();
 		final JsonNode n = m.readTree(data);
 		notificationService.createTicket(TicketType.PAYPAL, "webhook",
-				m.writerWithDefaultPrettyPrinter().writeValueAsString(n), BigInteger.valueOf(3));
+				m.writerWithDefaultPrettyPrinter().writeValueAsString(n), adminId, clientId);
 		if ("PAYMENT.CAPTURE.REFUNDED".equals(n.get("event_type").asText())) {
 			String id = n.get("resource").get("links").get(1).get("href").asText();
 			id = id.substring(id.lastIndexOf('/') + 1);

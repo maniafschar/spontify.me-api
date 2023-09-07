@@ -51,9 +51,9 @@ public class ExternalService {
 		try {
 			final ObjectMapper om = new ObjectMapper();
 			notificationService.createTicket(TicketType.GOOGLE, param,
-					om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(result)), user);
+					om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(result)), user, null);
 		} catch (final Exception e) {
-			notificationService.createTicket(TicketType.GOOGLE, param, result, user);
+			notificationService.createTicket(TicketType.GOOGLE, param, result, user, null);
 		}
 		return result;
 	}
@@ -114,7 +114,7 @@ public class ExternalService {
 						google("geocode/json?components=administrative_area:"
 								+ URLEncoder.encode(town, StandardCharsets.UTF_8), user)));
 		if (geoLocations == null)
-			notificationService.createTicket(TicketType.ERROR, "No google address", town, user);
+			notificationService.createTicket(TicketType.ERROR, "No google address", town, user, null);
 		return geoLocations;
 	}
 
@@ -130,7 +130,8 @@ public class ExternalService {
 				new ObjectMapper().readTree(google("geocode/json?latlng=" + latitude + ',' + longitude, user)));
 		if (geoLocations != null)
 			return geoLocations.get(0);
-		notificationService.createTicket(TicketType.ERROR, "No google address", latitude + "\n" + longitude, user);
+		notificationService.createTicket(TicketType.ERROR, "No google address", latitude + "\n" + longitude, user,
+				null);
 		return null;
 	}
 
@@ -160,7 +161,7 @@ public class ExternalService {
 				.bodyValue(IOUtils.toString(getClass().getResourceAsStream("/template/gpt.json"),
 						StandardCharsets.UTF_8).replace("{prompt}", prompt))
 				.retrieve().toEntity(String.class).block().getBody();
-		notificationService.createTicket(TicketType.ERROR, "gpt", prompt + "\n\n" + s, adminId);
+		notificationService.createTicket(TicketType.ERROR, "gpt", prompt + "\n\n" + s, adminId, null);
 		return new ObjectMapper().readTree(s).get("choices").get(0).get("text").asText().trim();
 	}
 }
