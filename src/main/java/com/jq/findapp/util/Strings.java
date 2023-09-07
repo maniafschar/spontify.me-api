@@ -30,6 +30,13 @@ public class Strings {
 		return EMAIL.matcher(email).replaceAll("").length() == 0;
 	}
 
+	public static String removeSubdomain(final String url) {
+		final String[] u = url.split("\\.");
+		if (u.length > 2)
+			return u[0].substring(0, u[0].indexOf("://") + 3) + u[1] + "." + u[2];
+		return url;
+	}
+
 	public static String stackTraceToString(final Throwable ex) {
 		if (ex == null)
 			return "";

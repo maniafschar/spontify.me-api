@@ -25,6 +25,7 @@ import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.util.Strings;
 
 @Service
 public class ExternalService {
@@ -136,7 +137,7 @@ public class ExternalService {
 	}
 
 	public String map(final String source, final String destination, final Contact contact) {
-		String url = repository.one(Client.class, contact.getClientId()).getUrl();
+		String url = Strings.removeSubdomain(repository.one(Client.class, contact.getClientId()).getUrl());
 		if (source == null || source.length() == 0)
 			url = "https://maps.googleapis.com/maps/api/staticmap?{destination}&markers=icon:" + url
 					+ "/images/mapMe.png|shadow:false|{destination}&scale=2&size=200x200&maptype=roadmap&key=";

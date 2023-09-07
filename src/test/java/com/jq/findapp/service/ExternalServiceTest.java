@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Ip;
+import com.jq.findapp.util.Strings;
 
 public class ExternalServiceTest {
 	@Test
@@ -68,5 +69,17 @@ public class ExternalServiceTest {
 		// then
 		assertEquals("188.104.126.43", ip.getIp());
 		assertEquals(12.9811f, ip.getLatitude());
+	}
+
+	@Test
+	public void removeSubdomain() {
+		// given
+		final String url = "https://abc.def.gh";
+
+		// when
+		final String result = Strings.removeSubdomain(url);
+
+		// then
+		assertEquals("https://def.gh", result);
 	}
 }

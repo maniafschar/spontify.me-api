@@ -364,7 +364,7 @@ public class NotificationService {
 			params.setUser(contactFrom);
 			params.setSearch("contact.id=" + contactFrom.getId());
 			Strings.replaceString(html, "<jq:image />",
-					"<img src=\"" + url + "/med/" + repository.one(params).get("contact.image")
+					"<img src=\"" + Strings.removeSubdomain(url) + "/med/" + repository.one(params).get("contact.image")
 							+ "\" width=\"150\" height=\"150\" style=\"height:150px;min-height:150px;max-height:150px;width:150px;min-width:150px;max-width:150px;border-radius:75px;\" />");
 		} else
 			Strings.replaceString(html, "<jq:image />", "");
@@ -418,8 +418,8 @@ public class NotificationService {
 			email.setSubject(subject);
 			email.setTextMsg(text);
 			if (html != null && to != null) {
-				email.setDataSourceResolver(
-						new DataSourceUrlResolver(new URL(repository.one(Client.class, to.getClientId()).getUrl())));
+				email.setDataSourceResolver(new DataSourceUrlResolver(
+						new URL(Strings.removeSubdomain(repository.one(Client.class, to.getClientId()).getUrl()))));
 				email.setHtmlMsg(html);
 			} else
 				email.setHtmlMsg(text);

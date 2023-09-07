@@ -195,7 +195,8 @@ public class AuthenticationService {
 			throw new IllegalAccessException("domain");
 		}
 		final QueryParams params = new QueryParams(Query.contact_listId);
-		params.setSearch("contact.email='" + registration.getEmail().toLowerCase().trim() + '\'');
+		params.setSearch("contact.email='" + registration.getEmail().toLowerCase().trim() + "' and contact.clientId="
+				+ registration.getClientId());
 		final Map<String, Object> user = repository.one(params);
 		final Contact contact = user == null ? new Contact()
 				: repository.one(Contact.class, (BigInteger) user.get("contact.id"));
