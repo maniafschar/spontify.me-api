@@ -70,7 +70,7 @@ public class RssService {
 				final ContactNews contactNews = new ContactNews();
 				contactNews.setContactId(BigInteger.ONE);
 				contactNews.setDescription(rss.get(i).get("title").asText());
-				contactNews.setUrl(rss.get(i).get("guid").asText());
+				contactNews.setUrl(rss.get(i).get("guid").get("").asText());
 				final String html = IOUtils.toString(new URL(contactNews.getUrl()), StandardCharsets.UTF_8);
 				final Matcher matcher = img.matcher(html);
 				if (matcher.find())

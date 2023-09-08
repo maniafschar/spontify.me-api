@@ -1,6 +1,7 @@
 package com.jq.findapp.service.backend;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URL;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 public class RssServiceTest {
@@ -27,6 +29,7 @@ public class RssServiceTest {
 		// then
 		assertTrue(node instanceof ArrayNode);
 		assertTrue(node.get(0).has("title"));
+		assertNotNull(((ObjectNode) node.get(0).get("guid")).get("").asText());
 	}
 
 	@Test
