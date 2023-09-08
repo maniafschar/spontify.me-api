@@ -364,7 +364,8 @@ public class NotificationService {
 			params.setUser(contactFrom);
 			params.setSearch("contact.id=" + contactFrom.getId());
 			Strings.replaceString(html, "<jq:image />",
-					"<img src=\"" + Strings.removeSubdomain(url) + "/med/" + repository.one(params).get("contact.image")
+					"<br /><img src=\"" + Strings.removeSubdomain(url) + "/med/"
+							+ repository.one(params).get("contact.imageList")
 							+ "\" width=\"150\" height=\"150\" style=\"height:150px;min-height:150px;max-height:150px;width:150px;min-width:150px;max-width:150px;border-radius:75px;\" />");
 		} else
 			Strings.replaceString(html, "<jq:image />", "");
@@ -413,7 +414,10 @@ public class NotificationService {
 		email.setAuthenticator(new DefaultAuthenticator(from, emailPassword));
 		email.setSSLOnConnect(true);
 		try {
-			email.setFrom(from);
+			if (to == null)
+				email.setFrom(from);
+			else
+				email.setFrom(from, repository.one(Client.class, to.getClientId()).getName());
 			email.addTo(to == null ? from : to.getEmail());
 			email.setSubject(subject);
 			email.setTextMsg(text);

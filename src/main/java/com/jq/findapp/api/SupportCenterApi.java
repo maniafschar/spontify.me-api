@@ -41,7 +41,7 @@ import com.jq.findapp.service.backend.DbService;
 import com.jq.findapp.service.backend.EngagementService;
 import com.jq.findapp.service.backend.ImportLogService;
 import com.jq.findapp.service.backend.IpService;
-import com.jq.findapp.service.backend.StatisticsService;
+import com.jq.findapp.service.backend.RssService;
 import com.jq.findapp.util.Strings;
 
 import jakarta.transaction.Transactional;
@@ -74,10 +74,10 @@ public class SupportCenterApi {
 	private EventService eventService;
 
 	@Autowired
-	private DbService dbService;
+	private RssService rssService;
 
 	@Autowired
-	private StatisticsService statisticsService;
+	private DbService dbService;
 
 	@Autowired
 	private ImportLocationsService importLocationsService;
@@ -187,6 +187,7 @@ public class SupportCenterApi {
 			run(ipService::lookupIps, LAST);
 			run(eventService::findMatchingBuddies, !LAST);
 			run(eventService::notifyParticipation, !LAST);
+			run(rssService::update, !LAST);
 		} else
 			throw new RuntimeException("Scheduler already running " + schedulerRunning.size() + " processes");
 	}
@@ -213,8 +214,10 @@ public class SupportCenterApi {
 					final SchedulerResult result = scheduler.run();
 					log.setUri("/support/scheduler/" + result.name);
 					log.setStatus(Strings.isEmpty(result.exception) ? 200 : 500);
-					if (!Strings.isEmpty(result.result))
+					if (!Strings.isEmpty(result.result)) {
+						result.result = result.result.trim();
 						log.setBody(result.result.length() > 255 ? result.result.substring(0, 255) : result.result);
+					}
 					if (result.exception != null)
 						notificationService.createTicket(TicketType.ERROR, "scheduler",
 								Strings.stackTraceToString(result.exception), adminId, null);
