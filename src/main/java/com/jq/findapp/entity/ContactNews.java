@@ -16,6 +16,15 @@ public class ContactNews extends BaseEntity {
 	private String imgUrl;
 	private String url;
 	private Timestamp publish;
+	private Boolean notified = false;
+
+	public Boolean getNotified() {
+		return notified;
+	}
+
+	public void setNotified(final boolean notified) {
+		this.notified = notified;
+	}
 
 	public String getDescription() {
 		return description;

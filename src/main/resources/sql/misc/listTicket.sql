@@ -4,6 +4,7 @@ SELECT
 	ticket.id,
 	ticket.modifiedAt,
 	ticket.subject,
+	ticket.clientId,
 	ticket.contactId,
 	ticket.type
 FROM

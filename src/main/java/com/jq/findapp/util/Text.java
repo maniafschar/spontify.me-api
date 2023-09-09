@@ -57,6 +57,7 @@ public class Text {
 		notification_contactFindMe,
 		notification_contactFriendApproved,
 		notification_contactFriendRequest,
+		notification_contactNews,
 		notification_contactVideoCall,
 		notification_contactVisitLocation,
 		notification_contactVisitProfile,
@@ -101,18 +102,18 @@ public class Text {
 									.readTree(IOUtils.toString(zip.getInputStream(entry), StandardCharsets.UTF_8)));
 				}
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			try {
 				// Test environment, only german is tested
 				languages.put("DE", new ObjectMapper().readTree(
 						IOUtils.toString(Text.class.getResourceAsStream("/lang/DE.json"), StandardCharsets.UTF_8)));
-			} catch (Exception e1) {
+			} catch (final Exception e1) {
 				new RuntimeException(e);
 			}
 		}
 	}
 
-	public String getText(Contact contact, TextId textId) {
+	public String getText(final Contact contact, final TextId textId) {
 		final String label = textId.name();
 		String s;
 		if (label.contains("_"))
