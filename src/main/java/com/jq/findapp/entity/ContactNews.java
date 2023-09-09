@@ -13,6 +13,7 @@ public class ContactNews extends BaseEntity {
 	private BigInteger contactId;
 	private String description;
 	private String image;
+	private String imgUrl;
 	private String url;
 	private Timestamp publish;
 
@@ -20,7 +21,7 @@ public class ContactNews extends BaseEntity {
 		return description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
@@ -28,7 +29,7 @@ public class ContactNews extends BaseEntity {
 		return contactId;
 	}
 
-	public void setContactId(BigInteger contactId) {
+	public void setContactId(final BigInteger contactId) {
 		this.contactId = contactId;
 	}
 
@@ -36,7 +37,7 @@ public class ContactNews extends BaseEntity {
 		return publish;
 	}
 
-	public void setPublish(Timestamp publish) {
+	public void setPublish(final Timestamp publish) {
 		this.publish = publish;
 	}
 
@@ -44,7 +45,7 @@ public class ContactNews extends BaseEntity {
 		return image;
 	}
 
-	public void setImage(String image) {
+	public void setImage(final String image) {
 		this.image = image;
 	}
 
@@ -52,13 +53,21 @@ public class ContactNews extends BaseEntity {
 		return url;
 	}
 
-	public void setUrl(String url) {
+	public void setUrl(final String url) {
 		this.url = url;
+	}
+
+	public String getImgUrl() {
+		return imgUrl;
+	}
+
+	public void setImgUrl(final String imgUrl) {
+		this.imgUrl = imgUrl;
 	}
 
 	@Transient
 	@Override
-	public boolean writeAccess(BigInteger user, Repository repository) {
+	public boolean writeAccess(final BigInteger user, final Repository repository) {
 		return user.equals(getContactId());
 	}
 }

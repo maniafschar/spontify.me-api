@@ -6,6 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,5 +53,18 @@ public class RssServiceTest {
 		assertEquals(
 				"https://i0.wp.com/fcbayerntotal.com/wp-content/uploads/2022/11/Flick_PK-22.05.20.jpg?fit=799%2C597&amp;ssl=1",
 				matcher.group(1));
+	}
+
+	@Test
+	public void date() throws ParseException {
+		// given
+		final String date = "Fri, 08 Sep 2023 20:36:08 +0000";
+		final SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ROOT);
+
+		// when
+		final Date d = df.parse(date);
+
+		// then
+		assertEquals(new Date(1694205368000l), d);
 	}
 }

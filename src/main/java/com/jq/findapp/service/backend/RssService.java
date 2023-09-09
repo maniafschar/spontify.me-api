@@ -3,6 +3,9 @@ package com.jq.findapp.service.backend;
 import java.math.BigInteger;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,7 +44,7 @@ public class RssService {
 					final Result listContact = repository.list(params);
 					if (listContact.size() > 0) {
 						final int count = syncFeed(json.get("rss").asText(),
-								(BigInteger) listContact.get(0).get("contact.id"));
+								repository.one(Contact.class, (BigInteger) listContact.get(0).get("contact.id")));
 						if (count > 0)
 							result.result += list.get(i).get("client.id") + ": " + count + "\n";
 					} else
@@ -55,26 +58,29 @@ public class RssService {
 		return result;
 	}
 
-	private int syncFeed(final String url, final BigInteger contactId) throws Exception {
+	private int syncFeed(final String url, final Contact contact) throws Exception {
 		final ArrayNode rss = (ArrayNode) new XmlMapper().readTree(new URL(url)).get("channel").get("item");
 		if (rss == null || rss.size() == 0)
 			return 0;
 		final QueryParams params = new QueryParams(Query.contact_listNews);
-		params.setUser(repository.one(Contact.class, contactId));
+		params.setUser(contact);
 		final Pattern img = Pattern.compile("\\<article.*?\\<figure.*?\\<img .*?src=\\\"(.*?)\\\"");
+		final SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ROOT);
 		int count = 0;
 		for (int i = 0; i < rss.size(); i++) {
-			params.setSearch(
-					"contactNews.url='" + rss.get(i).get("guid").asText() + "'");
+			final String uid = rss.get(i).get("guid").get("").asText();
+			params.setSearch("contactNews.url='" + uid + "'");
 			if (repository.list(params).size() == 0) {
 				final ContactNews contactNews = new ContactNews();
-				contactNews.setContactId(BigInteger.ONE);
+				contactNews.setContactId(contact.getId());
 				contactNews.setDescription(rss.get(i).get("title").asText());
-				contactNews.setUrl(rss.get(i).get("guid").get("").asText());
-				final String html = IOUtils.toString(new URL(contactNews.getUrl()), StandardCharsets.UTF_8);
-				final Matcher matcher = img.matcher(html);
+				contactNews.setUrl(uid);
+				contactNews.setPublish(new Timestamp(df.parse(rss.get(i).get("pubDate").asText()).getTime()));
+				final Matcher matcher = img
+						.matcher(IOUtils.toString(new URL(rss.get(i).get("link").asText()), StandardCharsets.UTF_8)
+								.replace('\r', ' ').replace('\n', ' '));
 				if (matcher.find())
-					contactNews.setImage(matcher.group(1));
+					contactNews.setImgUrl(matcher.group(1));
 				repository.save(contactNews);
 				count++;
 			}
