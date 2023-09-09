@@ -34,6 +34,7 @@ public class ContactNotification extends BaseEntity {
 		contactFindMe,
 		contactFriendApproved,
 		contactFriendRequest,
+		contactNews,
 		contactVideoCall,
 		contactVisitLocation,
 		contactVisitProfile,
@@ -52,7 +53,7 @@ public class ContactNotification extends BaseEntity {
 		return text;
 	}
 
-	public void setText(String text) {
+	public void setText(final String text) {
 		this.text = text;
 	}
 
@@ -60,7 +61,7 @@ public class ContactNotification extends BaseEntity {
 		return action;
 	}
 
-	public void setAction(String action) {
+	public void setAction(final String action) {
 		this.action = action;
 	}
 
@@ -68,7 +69,7 @@ public class ContactNotification extends BaseEntity {
 		return textType;
 	}
 
-	public void setTextType(ContactNotificationTextType textType) {
+	public void setTextType(final ContactNotificationTextType textType) {
 		this.textType = textType;
 	}
 
@@ -76,7 +77,7 @@ public class ContactNotification extends BaseEntity {
 		return contactId;
 	}
 
-	public void setContactId(BigInteger contactId) {
+	public void setContactId(final BigInteger contactId) {
 		this.contactId = contactId;
 	}
 
@@ -84,7 +85,7 @@ public class ContactNotification extends BaseEntity {
 		return contactId2;
 	}
 
-	public void setContactId2(BigInteger contactId2) {
+	public void setContactId2(final BigInteger contactId2) {
 		this.contactId2 = contactId2;
 	}
 
@@ -92,7 +93,7 @@ public class ContactNotification extends BaseEntity {
 		return sentStatus;
 	}
 
-	public void setSentStatus(BigInteger sentStatus) {
+	public void setSentStatus(final BigInteger sentStatus) {
 		this.sentStatus = sentStatus;
 	}
 
@@ -100,7 +101,7 @@ public class ContactNotification extends BaseEntity {
 		return seen;
 	}
 
-	public void setSeen(Boolean seen) {
+	public void setSeen(final Boolean seen) {
 		this.seen = seen;
 	}
 
@@ -108,13 +109,13 @@ public class ContactNotification extends BaseEntity {
 		return type;
 	}
 
-	public void setType(ContactNotificationType type) {
+	public void setType(final ContactNotificationType type) {
 		this.type = type;
 	}
 
 	@Transient
 	@Override
-	public boolean writeAccess(BigInteger user, Repository repository) {
+	public boolean writeAccess(final BigInteger user, final Repository repository) {
 		return user.equals(getContactId());
 	}
 }

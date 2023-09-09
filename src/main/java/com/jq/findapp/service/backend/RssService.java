@@ -25,9 +25,13 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.NotificationService;
 
 @Service
 public class RssService {
+	@Autowired
+	private NotificationService notificationService;
+
 	@Autowired
 	private Repository repository;
 
