@@ -5,7 +5,9 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,13 +27,9 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.NotificationService;
 
 @Service
 public class RssService {
-	@Autowired
-	private NotificationService notificationService;
-
 	@Autowired
 	private Repository repository;
 
@@ -47,9 +45,9 @@ public class RssService {
 							+ "' and contact.clientId=" + list.get(i).get("client.id"));
 					final Result listContact = repository.list(params);
 					if (listContact.size() > 0) {
-						final int count = syncFeed(json.get("rss").asText(),
+						final String count = syncFeed(json.get("rss").asText(),
 								repository.one(Contact.class, (BigInteger) listContact.get(0).get("contact.id")));
-						if (count > 0)
+						if (count != null)
 							result.result += list.get(i).get("client.id") + ": " + count + "\n";
 					} else
 						result.result += list.get(i).get("client.id") + ": " + ContactType.adminContent.name()
@@ -62,33 +60,51 @@ public class RssService {
 		return result;
 	}
 
-	private int syncFeed(final String url, final Contact contact) throws Exception {
+	private String syncFeed(final String url, final Contact contact) throws Exception {
 		final ArrayNode rss = (ArrayNode) new XmlMapper().readTree(new URL(url)).get("channel").get("item");
 		if (rss == null || rss.size() == 0)
-			return 0;
+			return null;
 		final QueryParams params = new QueryParams(Query.contact_listNews);
 		params.setUser(contact);
 		final Pattern img = Pattern.compile("\\<article.*?\\<figure.*?\\<img .*?src=\\\"(.*?)\\\"");
 		final SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ROOT);
+		final Set<String> urls = new HashSet<>();
 		int count = 0;
+		Result result;
 		for (int i = 0; i < rss.size(); i++) {
 			final String uid = rss.get(i).get("guid").get("").asText();
 			params.setSearch("contactNews.url='" + uid + "'");
-			if (repository.list(params).size() == 0) {
-				final ContactNews contactNews = new ContactNews();
-				contactNews.setContactId(contact.getId());
-				contactNews.setDescription(rss.get(i).get("title").asText());
-				contactNews.setUrl(uid);
-				contactNews.setPublish(new Timestamp(df.parse(rss.get(i).get("pubDate").asText()).getTime()));
-				final Matcher matcher = img
-						.matcher(IOUtils.toString(new URL(rss.get(i).get("link").asText()), StandardCharsets.UTF_8)
-								.replace('\r', ' ').replace('\n', ' '));
-				if (matcher.find())
-					contactNews.setImgUrl(matcher.group(1));
-				repository.save(contactNews);
-				count++;
+			result = repository.list(params);
+			final ContactNews contactNews = result.size() == 0 ? new ContactNews()
+					: repository.one(ContactNews.class, (BigInteger) result.get(0).get("contactNews.id"));
+			contactNews.setContactId(contact.getId());
+			contactNews.setDescription(rss.get(i).get("title").asText());
+			contactNews.setUrl(uid);
+			contactNews.setPublish(new Timestamp(df.parse(rss.get(i).get("pubDate").asText()).getTime()));
+			final Matcher matcher = img
+					.matcher(IOUtils.toString(new URL(rss.get(i).get("link").asText()), StandardCharsets.UTF_8)
+							.replace('\r', ' ').replace('\n', ' '));
+			if (matcher.find())
+				contactNews.setImgUrl(matcher.group(1));
+			else
+				contactNews.setImgUrl(null);
+			repository.save(contactNews);
+			urls.add(contactNews.getUrl());
+			count++;
+		}
+		params.setSearch("contactNews.publish>'"
+				+ new Timestamp(df.parse(rss.get(rss.size() - 1).get("pubDate").asText()).getTime())
+				+ "' and contactNews.contactId=" + contact.getId());
+		result = repository.list(params);
+		int deleted = 0;
+		for (int i = 0; i < result.size(); i++) {
+			if (!urls.contains(result.get(i).get("contactNews.url"))) {
+				repository.delete(repository.one(ContactNews.class, (BigInteger) result.get(i).get("contactNews.id")));
+				deleted++;
 			}
 		}
-		return count;
+		if (count == 0 && deleted == 0)
+			return null;
+		return count + (deleted > 0 ? "/" + deleted : "");
 	}
 }
