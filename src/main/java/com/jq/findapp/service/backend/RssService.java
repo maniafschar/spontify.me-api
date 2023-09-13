@@ -88,9 +88,10 @@ public class RssService {
 				contactNews.setImgUrl(matcher.group(1));
 			else
 				contactNews.setImgUrl(null);
+			if (contactNews.getId() == null)
+				count++;
 			repository.save(contactNews);
 			urls.add(contactNews.getUrl());
-			count++;
 		}
 		params.setSearch("contactNews.publish>'"
 				+ new Timestamp(df.parse(rss.get(rss.size() - 1).get("pubDate").asText()).getTime())

@@ -17,6 +17,16 @@ public class ContactNewsListener extends AbstractRepositoryListener<ContactNews>
 	@Async
 	@Override
 	public void postPersist(final ContactNews contactNews) throws Exception {
+		execute(contactNews);
+	}
+
+	@Async
+	@Override
+	public void postUpdate(final ContactNews contactNews) throws Exception {
+		execute(contactNews);
+	}
+
+	private void execute(final ContactNews contactNews) throws Exception {
 		if (contactNews.getPublish() != null && contactNews.getPublish().getTime() <= System.currentTimeMillis()
 				&& (contactNews.getNotified() == null || !contactNews.getNotified())) {
 			final Contact contact = repository.one(Contact.class, contactNews.getContactId());

@@ -11,6 +11,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -395,16 +396,20 @@ public class EngagementService {
 				currentVersion.put((BigInteger) result.get(i).get("contact.clientId"),
 						(String) result.get(i).get("_c"));
 		}
-		final QueryParams params = new QueryParams(Query.contact_listChatFlat);
-		params.setLimit(0);
-		params.setSearch("contactChat.textId='" + TextId.engagement_installCurrentVersion.name() +
-				"' and contact.version='" + currentVersion + "'");
-		final Result ids = repository.list(params);
-		for (int i = 0; i < ids.size(); i++) {
-			final ContactChat contactChat = repository.one(ContactChat.class,
-					(BigInteger) ids.get(i).get("contactChat.id"));
-			contactChat.setTextId(null);
-			repository.save(contactChat);
+		final Iterator<BigInteger> it = currentVersion.keySet().iterator();
+		while (it.hasNext()) {
+			final BigInteger clientId = it.next();
+			final QueryParams params = new QueryParams(Query.contact_listChatFlat);
+			params.setLimit(0);
+			params.setSearch("contactChat.textId='" + TextId.engagement_installCurrentVersion.name() +
+					"' and contact.version='" + currentVersion.get(clientId) + "' and contact.clientId=" + clientId);
+			final Result ids = repository.list(params);
+			for (int i = 0; i < ids.size(); i++) {
+				final ContactChat contactChat = repository.one(ContactChat.class,
+						(BigInteger) ids.get(i).get("contactChat.id"));
+				contactChat.setTextId(null);
+				repository.save(contactChat);
+			}
 		}
 	}
 
