@@ -190,14 +190,16 @@ public class NotificationService {
 	private ContactNotification save(final Contact contactTo, final Contact contactFrom, final String text,
 			final String action,
 			final ContactNotificationTextType notificationTextType) throws Exception {
-		final QueryParams params = new QueryParams(Query.contact_notification);
-		params.setSearch("contactNotification.contactId=" + contactTo.getId() +
-				" and contactNotification.contactId2=" + contactFrom.getId() +
-				" and TIMESTAMPDIFF(HOUR,contactNotification.createdAt,current_timestamp)<24" +
-				" and contactNotification.action='" + (action == null ? "" : action) +
-				"' and contactNotification.textType='" + notificationTextType.name() + "'");
-		if (repository.list(params).size() > 0)
-			return null;
+		if (notificationTextType != ContactNotificationTextType.contactNews) {
+			final QueryParams params = new QueryParams(Query.contact_notification);
+			params.setSearch("contactNotification.contactId=" + contactTo.getId() +
+					" and contactNotification.contactId2=" + contactFrom.getId() +
+					" and TIMESTAMPDIFF(HOUR,contactNotification.createdAt,current_timestamp)<24" +
+					" and contactNotification.action='" + (action == null ? "" : action) +
+					"' and contactNotification.textType='" + notificationTextType.name() + "'");
+			if (repository.list(params).size() > 0)
+				return null;
+		}
 		final ContactNotification notification = new ContactNotification();
 		notification.setAction(action);
 		notification.setContactId(contactTo.getId());

@@ -71,7 +71,7 @@ public class DbService {
 				params.getUser().setClientId(client.getId());
 				final Result news = repository.list(params);
 				for (int i2 = 0; i2 < news.size(); i2++)
-					contactNewsListener.postPersist(
+					contactNewsListener.execute(
 							repository.one(ContactNews.class, (BigInteger) news.get(i2).get("contactNews.id")));
 			}
 			if (clientUpdates.length() > 0)

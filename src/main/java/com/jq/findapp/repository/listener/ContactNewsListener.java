@@ -1,6 +1,8 @@
 package com.jq.findapp.repository.listener;
 
 import java.math.BigInteger;
+import java.time.Instant;
+import java.time.ZoneOffset;
 
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -14,20 +16,20 @@ import com.jq.findapp.repository.QueryParams;
 
 @Component
 public class ContactNewsListener extends AbstractRepositoryListener<ContactNews> {
-	@Async
 	@Override
 	public void postPersist(final ContactNews contactNews) throws Exception {
 		execute(contactNews);
 	}
 
-	@Async
 	@Override
 	public void postUpdate(final ContactNews contactNews) throws Exception {
 		execute(contactNews);
 	}
 
-	private void execute(final ContactNews contactNews) throws Exception {
-		if (contactNews.getPublish() != null && contactNews.getPublish().getTime() <= System.currentTimeMillis()
+	@Async
+	public void execute(final ContactNews contactNews) throws Exception {
+		if (contactNews.getPublish() != null
+				&& contactNews.getPublish().getTime() <= Instant.now().atZone(ZoneOffset.UTC).toEpochSecond() * 1000
 				&& (contactNews.getNotified() == null || !contactNews.getNotified())) {
 			final Contact contact = repository.one(Contact.class, contactNews.getContactId());
 			final QueryParams params = new QueryParams(Query.contact_listId);
