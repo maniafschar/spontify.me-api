@@ -27,20 +27,30 @@ public class ContactNewsListener extends AbstractRepositoryListener<ContactNews>
 	}
 
 	@Async
-	public void execute(final ContactNews contactNews) throws Exception {
+	public void execute(final ContactNews contactNews) {
 		if (contactNews.getPublish() != null
 				&& contactNews.getPublish().getTime() <= Instant.now().atZone(ZoneOffset.UTC).toEpochSecond() * 1000
 				&& (contactNews.getNotified() == null || !contactNews.getNotified())) {
-			final Contact contact = repository.one(Contact.class, contactNews.getContactId());
-			final QueryParams params = new QueryParams(Query.contact_listId);
-			params.setSearch("contact.clientId=" + contact.getClientId() + " and contact.verified=true");
-			final Result users = repository.list(params);
-			for (int i2 = 0; i2 < users.size(); i2++)
-				notificationService.sendNotification(contact,
-						repository.one(Contact.class, (BigInteger) users.get(i2).get("contact.id")),
-						ContactNotificationTextType.contactNews, "news", contactNews.getDescription());
-			contactNews.setNotified(true);
-			repository.save(contactNews);
+			try {
+				contactNews.setNotified(true);
+				repository.save(contactNews);
+				final Contact contact = repository.one(Contact.class, contactNews.getContactId());
+				final QueryParams params = new QueryParams(Query.contact_listId);
+				params.setSearch("contact.clientId=" + contact.getClientId() + " and contact.verified=true");
+				final Result users = repository.list(params);
+				for (int i2 = 0; i2 < users.size(); i2++)
+					notificationService.sendNotification(contact,
+							repository.one(Contact.class, (BigInteger) users.get(i2).get("contact.id")),
+							ContactNotificationTextType.contactNews, "news=" + contactNews.getId(),
+							contactNews.getDescription());
+			} catch (final Exception e) {
+				try {
+					contactNews.setNotified(false);
+					repository.save(contactNews);
+				} catch (final Exception e1) {
+				}
+				throw new RuntimeException(e);
+			}
 		}
 	}
 }

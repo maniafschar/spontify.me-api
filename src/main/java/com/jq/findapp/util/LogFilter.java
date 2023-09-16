@@ -66,10 +66,6 @@ public class LogFilter implements Filter {
 			}
 			log.setIp(IpService.sanatizeIp(req.getHeader("X-Forwarded-For")));
 			log.setPort(req.getLocalPort());
-			if (req.getHeader("user") != null)
-				log.setContactId(new BigInteger(req.getHeader("user")));
-			if (req.getHeader("clientId") != null)
-				log.setClientId(new BigInteger(req.getHeader("clientId")));
 			final String query = req.getQueryString();
 			if (query != null) {
 				if (query.contains("&_="))
@@ -85,6 +81,12 @@ public class LogFilter implements Filter {
 		try {
 			authenticate(req);
 			chain.doFilter(req, res);
+			if (req.getHeader("clientId") != null)
+				log.setClientId(new BigInteger(req.getHeader("clientId")));
+			if (req.getHeader("user") != null)
+				log.setContactId(new BigInteger(req.getHeader("user")));
+			else if (req.getRequestURI().startsWith("/support/"))
+				log.setContactId(adminId);
 		} catch (final AuthenticationException ex) {
 			log.setStatus(HttpStatus.UNAUTHORIZED.value());
 			log.setBody(ex.getType().name());
