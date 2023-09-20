@@ -359,15 +359,12 @@ public class NotificationService {
 					contactFrom.getPseudonym());
 		Strings.replaceString(html, "<jq:newsTitle />", s2);
 		Strings.replaceString(s, "<jq:newsTitle />", s2);
-		if (contactFrom != null && contactFrom.getImage() != null) {
-			final QueryParams params = new QueryParams(Query.contact_list);
-			params.setUser(contactFrom);
-			params.setSearch("contact.id=" + contactFrom.getId());
+		if (contactFrom != null && contactFrom.getImageList() != null)
 			Strings.replaceString(html, "<jq:image />",
 					"<br /><img src=\"" + Strings.removeSubdomain(url) + "/med/"
-							+ repository.one(params).get("contact.imageList")
+							+ Attachment.resolve(contactFrom.getImageList())
 							+ "\" width=\"150\" height=\"150\" style=\"height:150px;min-height:150px;max-height:150px;width:150px;min-width:150px;max-width:150px;border-radius:75px;\" />");
-		} else
+		else
 			Strings.replaceString(html, "<jq:image />", "");
 		final JsonNode css = new ObjectMapper().readTree(new ObjectMapper()
 				.readTree(Attachment.resolve(repository.one(Client.class, contactTo.getClientId()).getStorage()))

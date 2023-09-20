@@ -51,9 +51,9 @@ public class Repository {
 		final List<Object> data = em.createQuery(sql).getResultList();
 		if (data != null && data.size() > 0) {
 			if (params.getLimit() > 0 && params.getSearchGeoLocation() == null) {
-				final int max = result.size() - params.getLimit();
+				final int max = data.size() - params.getLimit();
 				for (int i = 0; i < max; i++)
-					data.remove(params.getLimit() + 1);
+					data.remove(params.getLimit());
 			}
 			data.stream().forEach(e -> {
 				result.getList().add(e instanceof Object[] ? (Object[]) e : new Object[] { e });
