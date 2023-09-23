@@ -40,12 +40,12 @@ public class RssService {
 			final Result list = repository.list(new QueryParams(Query.misc_listClient));
 			for (int i = 0; i < list.size(); i++) {
 				final JsonNode json = new ObjectMapper().readTree(list.get(i).get("client.storage").toString());
-				if (json.has("rss")) {
+				if (json.get("appConfig").has("rss")) {
 					params.setSearch("contact.type='" + ContactType.adminContent.name()
 							+ "' and contact.clientId=" + list.get(i).get("client.id"));
 					final Result listContact = repository.list(params);
 					if (listContact.size() > 0) {
-						final String count = syncFeed(json.get("rss").asText(),
+						final String count = syncFeed(json.get("appConfig").get("rss").asText(),
 								repository.one(Contact.class, (BigInteger) listContact.get(0).get("contact.id")));
 						if (count != null)
 							result.result += list.get(i).get("client.id") + ": " + count + "\n";

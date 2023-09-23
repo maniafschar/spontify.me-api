@@ -31,7 +31,7 @@
 	},
 	"mail": {
 		"contactPasswordReset": "Dein Passwort wurde zurück gesetzt. Klicke auf den Link, Du wirst anschließend aufgefordert, ein neues Passwort einzugeben.",
-		"contactRegistrationReminder": "Das Beste kommt spontan!\n\nDazu zählt vielleicht nicht diese spontane Email. Trotzdem würden wir uns freuen, wenn Du Deine Registrierung vom <jq:EXTRA_1 /> auf APP_TITLE (früher spontify.me) abschließt.\n\nWar die Registrierung ein Versehen und möchtest Du sie rückgängig machen, so antworte einfach auf diese Email. Wir löschen dann Deine Registrierung für Dich.\n\nLiebe Grüße und bleib gesund!\nSponti Support",
+		"contactRegistrationReminder": "Das Beste kommt spontan!\n\nDazu zählt vielleicht nicht diese spontane Email. Trotzdem würden wir uns freuen, wenn Du Deine Registrierung vom <jq:EXTRA_1 /> auf APP_TITLE abschließt.\n\nWar die Registrierung ein Versehen und möchtest Du sie rückgängig machen, so antworte einfach auf diese Email. Wir löschen dann Deine Registrierung für Dich.\n\nLiebe Grüße und bleib gesund!\nSponti Support",
 		"contactWelcomeEmail": "Vielen Dank für die Registrierung auf APP_TITLE. Bitte bestätige Deine Anmeldung, in dem Du auf den Link klickst.",
 		"title": "eine Nachricht für",
 		"titleFrom": "eine Nachricht von <jq:pseudonymFrom /> für"
