@@ -41,6 +41,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.Contact.ContactType;
 import com.jq.findapp.entity.ContactNotification;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationType;
@@ -352,7 +353,8 @@ public class NotificationService {
 		Strings.replaceString(s, "<jq:link />", s2);
 		Strings.replaceString(html, "<jq:url />", url);
 		Strings.replaceString(s, "<jq:url />", url);
-		if (contactFrom == null || contactTo.getId() != null && contactFrom.getId().equals(contactTo.getId()))
+		if (contactFrom == null || contactFrom.getType() == ContactType.adminContent
+				|| contactTo.getId() != null && contactFrom.getId().equals(contactTo.getId()))
 			s2 = text.getText(contactTo, TextId.mail_title);
 		else
 			s2 = text.getText(contactTo, TextId.mail_titleFrom).replaceAll("<jq:pseudonymFrom />",
