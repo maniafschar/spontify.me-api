@@ -132,15 +132,11 @@ public class IntegrationTest {
 			throw new RuntimeException("Event .picture should be invisible!");
 		if (!Util.get("dialog-popup .url").getAttribute("style").contains("none"))
 			throw new RuntimeException("Event .url should be invisible!");
-		if (Util.get("dialog-popup .confirm").getAttribute("style").contains("none"))
-			throw new RuntimeException("Event .confirm should be visible!");
 		Util.sendKeys("dialog-popup input[name=\"price\"]", "10");
 		if (Util.get("dialog-popup .picture").getAttribute("style").contains("none"))
 			throw new RuntimeException("Event .picture should be visible!");
 		if (Util.get("dialog-popup .url").getAttribute("style").contains("none"))
 			throw new RuntimeException("Event .url should be visible!");
-		if (!Util.get("dialog-popup .confirm").getAttribute("style").contains("none"))
-			throw new RuntimeException("Event .confirm should be invisible!");
 		Util.get("dialog-popup input[name=\"price\"]").clear();
 		Util.click("dialog-popup dialogButtons button-text[onclick*=\"selectLocation\"]");
 		Util.sendKeys("dialog-popup input[name=\"location\"]", "loca");

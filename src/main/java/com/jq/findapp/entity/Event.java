@@ -15,6 +15,7 @@ public class Event extends BaseEntity {
 	private BigInteger locationId;
 	private Date endDate;
 	private Double price;
+	// TODO rm 0.6
 	private Short confirm;
 	private Short maxParticipants;
 	private Short rating;

@@ -170,26 +170,28 @@ public class SupportCenterApi {
 
 	@PutMapping("scheduler")
 	public void scheduler(@RequestHeader final String secret) throws Exception {
-		if (schedulerRunning.size() == 0) {
-			final boolean LAST = true;
-			// last job is backup, even after importLog
-			run(dbService::backup, LAST);
-			// importLog paralell to the rest, does not interfere
-			run(importLogService::importLog, !LAST);
-			run(chatService::answerAi, !LAST);
-			run(dbService::update, !LAST);
-			// run(statisticsService::update, !LAST);
-			run(engagementService::sendRegistrationReminder, !LAST);
-			// sendNearBy and sendChats after all event services
-			// to avoid multiple chat at the same time
-			run(engagementService::sendNearBy, LAST);
-			run(engagementService::sendChats, LAST);
-			run(ipService::lookupIps, LAST);
-			run(eventService::findMatchingBuddies, !LAST);
-			run(eventService::notifyParticipation, !LAST);
-			run(rssService::update, !LAST);
-		} else
-			throw new RuntimeException("Scheduler already running " + schedulerRunning.size() + " processes");
+		synchronized (schedulerRunning) {
+			if (schedulerRunning.size() == 0) {
+				final boolean LAST = true;
+				// last job is backup, even after importLog
+				run(dbService::backup, LAST);
+				// importLog paralell to the rest, does not interfere
+				run(importLogService::importLog, !LAST);
+				run(chatService::answerAi, !LAST);
+				run(dbService::update, !LAST);
+				// run(statisticsService::update, !LAST);
+				run(engagementService::sendRegistrationReminder, !LAST);
+				// sendNearBy and sendChats after all event services
+				// to avoid multiple chat at the same time
+				run(engagementService::sendNearBy, LAST);
+				run(engagementService::sendChats, LAST);
+				run(ipService::lookupIps, LAST);
+				run(eventService::findMatchingBuddies, !LAST);
+				run(eventService::notifyParticipation, !LAST);
+				run(rssService::update, !LAST);
+			} else
+				throw new RuntimeException("Scheduler already running " + schedulerRunning.size() + " processes");
+		}
 	}
 
 	private void run(final Scheduler scheduler, final boolean last) {
