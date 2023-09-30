@@ -11,7 +11,6 @@ select
 	event.contactId,
 	event.locationId,
 	event.maxParticipants,
-	event.confirm,
 	event.price,
 	event.skills,
 	event.skillsText,

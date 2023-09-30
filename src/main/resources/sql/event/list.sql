@@ -1,5 +1,4 @@
 SELECT
-	event.confirm,
 	event.contactId,
 	event.endDate,
 	event.id,
