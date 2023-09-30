@@ -361,7 +361,8 @@ public class NotificationService {
 					contactFrom.getPseudonym());
 		Strings.replaceString(html, "<jq:newsTitle />", s2);
 		Strings.replaceString(s, "<jq:newsTitle />", s2);
-		if (contactFrom != null && contactFrom.getImageList() != null)
+		if (contactFrom != null && contactFrom.getType() != ContactType.adminContent
+				&& contactFrom.getImageList() != null)
 			Strings.replaceString(html, "<jq:image />",
 					"<br /><img src=\"" + Strings.removeSubdomain(url) + "/med/"
 							+ Attachment.resolve(contactFrom.getImageList())
