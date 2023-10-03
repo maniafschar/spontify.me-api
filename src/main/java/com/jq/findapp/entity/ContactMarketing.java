@@ -2,7 +2,10 @@ package com.jq.findapp.entity;
 
 import java.math.BigInteger;
 
+import com.jq.findapp.repository.Repository;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.Transient;
 
 @Entity
 public class ContactMarketing extends BaseEntity {
@@ -41,5 +44,11 @@ public class ContactMarketing extends BaseEntity {
 
 	public void setFinished(final Boolean finished) {
 		this.finished = finished;
+	}
+
+	@Transient
+	@Override
+	public boolean writeAccess(final BigInteger user, final Repository repository) {
+		return user.equals(getContactId());
 	}
 }

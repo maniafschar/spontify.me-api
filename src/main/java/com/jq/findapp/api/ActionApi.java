@@ -450,27 +450,40 @@ public class ActionApi {
 	@PostMapping("marketing")
 	public BigInteger marketingAnswerCreate(@RequestBody final WriteEntity entity,
 			@RequestHeader final BigInteger clientId,
+			@RequestHeader(required = false) final BigInteger user,
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
 		final ContactMarketing contactMarketing = new ContactMarketing();
 		contactMarketing.populate(entity.getValues());
-		final QueryParams params = new QueryParams(Query.misc_listLog);
-		params.setSearch("log.ip='" + IpService.sanatizeIp(ip)
-				+ "' and log.createdAt>'" + Instant.now().minus(Duration.ofHours(6)).toString()
-				+ "' and log.uri='/action/marketing' and log.status=200 and log.method='POST' and log.clientId="
-				+ clientId);
-		final Result list = repository.list(params);
-		params.setQuery(Query.contact_listMarketing);
-		for (int i = 0; i < list.size(); i++) {
-			final Instant time = Instant.ofEpochMilli(((Timestamp) list.get(i).get("log.createdAt")).getTime());
-			params.setSearch(
-					"contactMarketing.finished=false and contactMarketing.createdAt>='"
-							+ time.minus(Duration.ofSeconds(5)).toString() +
-							"' and contactMarketing.createdAt<'"
-							+ time.plus(Duration.ofSeconds(30)).toString()
-							+ "' and contactMarketing.clientMarketingId=" + contactMarketing.getClientMarketingId());
-			final Result list2 = repository.list(params);
-			if (list2.size() > 0)
-				return (BigInteger) list2.get(0).get("contactMarketing.id");
+		if (user == null) {
+			final QueryParams params = new QueryParams(Query.misc_listLog);
+			params.setSearch("log.ip='" + IpService.sanatizeIp(ip)
+					+ "' and log.createdAt>'" + Instant.now().minus(Duration.ofHours(6)).toString()
+					+ "' and log.uri='/action/marketing' and log.status=200 and log.method='POST' and log.clientId="
+					+ clientId);
+			final Result list = repository.list(params);
+			params.setQuery(Query.contact_listMarketing);
+			for (int i = 0; i < list.size(); i++) {
+				final Instant time = Instant.ofEpochMilli(((Timestamp) list.get(i).get("log.createdAt")).getTime());
+				params.setSearch(
+						"contactMarketing.createdAt>='"
+								+ time.minus(Duration.ofSeconds(5)).toString() +
+								"' and contactMarketing.createdAt<'"
+								+ time.plus(Duration.ofSeconds(30)).toString()
+								+ "' and contactMarketing.clientMarketingId="
+								+ contactMarketing.getClientMarketingId());
+				final Result list2 = repository.list(params);
+				if (list2.size() > 0)
+					return (BigInteger) list2.get(0).get("contactMarketing.id");
+			}
+		} else {
+			final QueryParams params = new QueryParams(Query.contact_listMarketing);
+			params.setSearch("contactMarketing.finished=false and contactMarketing.contactId=" + user
+					+ " and contactMarketing.clientMarketingId="
+					+ contactMarketing.getClientMarketingId());
+			final Result list = repository.list(params);
+			if (list.size() > 0)
+				return (BigInteger) list.get(0).get("contactMarketing.id");
+			contactMarketing.setContactId(user);
 		}
 		repository.save(contactMarketing);
 		return contactMarketing.getId();
@@ -538,7 +551,23 @@ public class ActionApi {
 		if (clientMarketingId != null) {
 			final QueryParams params = new QueryParams(Query.misc_listMarketing);
 			params.setSearch("clientMarketing.id=" + clientMarketingId + " and clientMarketing.clientId=" + clientId);
-			return repository.list(params).getList();
+			final Result result = repository.list(params);
+			if (result.size() > 0) {
+				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
+						(BigInteger) result.get(0).get("clientMarketing.id"));
+				if (clientMarketing.getEndDate() != null
+						&& clientMarketing.getEndDate().getTime() < Instant.now().getEpochSecond() * 1000)
+					return null;
+			}
+			if (user != null) {
+				params.setQuery(Query.contact_listMarketing);
+				params.setSearch("contactMarketing.finished=true and contactMarketing.contactId=" + user
+						+ " and contactMarketing.clientMarketingId="
+						+ clientMarketingId);
+				if (repository.list(params).size() > 0)
+					return null;
+			}
+			return result.getList();
 		}
 		if (user == null)
 			return null;
@@ -553,24 +582,31 @@ public class ActionApi {
 		else
 			geoLocation = null;
 		params.setQuery(Query.misc_listMarketing);
-		final String today = Instant.now().toString().substring(0, 10);
+		final String today = Instant.now().toString().substring(0, 19);
 		String s = "clientMarketing.clientId=" + contact.getClientId()
 				+ " and clientMarketing.startDate<='" + today + "' and clientMarketing.endDate>='" + today
-				+ "' and clientMarketing.language='" + contact.getLanguage() + "' and ";
-		if (contact.getGender() == null)
-			s += "length(clientMarketing.gender)=0 and ";
-		else
-			s += "(length(clientMarketing.gender)=0 or clientMarketing.gender like '%" + contact.getGender()
-					+ "%') and ";
+				+ "' and ";
+
+		s += "(clientMarketing.language is null or length(clientMarketing.language)=0 or clientMarketing.language='"
+				+ contact.getLanguage() + "'";
+
+		s += ") and (clientMarketing.gender is null or length(clientMarketing.gender)=0";
+		if (contact.getGender() != null)
+			s += " or clientMarketing.gender like '%" + contact.getGender() + "%'";
+
+		s += ") and (clientMarketing.age is null or length(clientMarketing.age)=0 or ";
 		if (contact.getAge() == null)
-			s += "clientMarketing.age='18,99' and ";
+			s += "clientMarketing.age='18,99'";
 		else
-			s += "substring(clientMarketing.age,1,2)<=" + contact.getAge() + " and substring(clientMarketing.age,4,2)>="
-					+ contact.getAge() + " and ";
+			s += "substring(clientMarketing.age,1,2)<=" + contact.getAge()
+					+ " and substring(clientMarketing.age,4,2)>="
+					+ contact.getAge();
+
+		s += ") and (clientMarketing.region is null or length(clientMarketing.region)=0";
 		if (geoLocation == null)
-			s += "length(clientMarketing.region)=0";
+			s += ")";
 		else {
-			s += "(length(clientMarketing.region)=0 or clientMarketing.region like '%" + geoLocation.getTown()
+			s += " or (length(clientMarketing.region)=0 or clientMarketing.region like '%" + geoLocation.getTown()
 					+ "%' or concat(' ',clientMarketing.region,' ') like '% " + geoLocation.getCountry() + " %' or ";
 			final String s2 = geoLocation.getZipCode();
 			if (s2 != null) {
@@ -579,7 +615,7 @@ public class ActionApi {
 							+ s2.substring(0, i) + " %' or ";
 				}
 			}
-			s = s.substring(0, s.length() - 4) + ")";
+			s = s.substring(0, s.length() - 4) + "))";
 		}
 		params.setSearch(s);
 		final List<Object[]> list = repository.list(params).getList();
@@ -587,8 +623,10 @@ public class ActionApi {
 		return list.stream().filter(e -> {
 			if (e[0] instanceof String)
 				return true;
-			params.setSearch("contactMarketing.clientMarketingId=" + e[0] + " and contactMarketing.finished=true");
-			return repository.list(params).size() > 0;
+			params.setSearch(
+					"contactMarketing.contactId=" + contact.getId() + " and contactMarketing.clientMarketingId="
+							+ e[0] + " and contactMarketing.finished=true");
+			return repository.list(params).size() == 0;
 		}).toList();
 	}
 
