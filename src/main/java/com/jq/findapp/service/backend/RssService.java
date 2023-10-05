@@ -27,6 +27,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.util.EntityUtil;
 
 @Service
 public class RssService {
@@ -40,12 +41,12 @@ public class RssService {
 			final Result list = repository.list(new QueryParams(Query.misc_listClient));
 			for (int i = 0; i < list.size(); i++) {
 				final JsonNode json = new ObjectMapper().readTree(list.get(i).get("client.storage").toString());
-				if (json.get("appConfig").has("rss")) {
+				if (json.has("rss")) {
 					params.setSearch("contact.type='" + ContactType.adminContent.name()
 							+ "' and contact.clientId=" + list.get(i).get("client.id"));
 					final Result listContact = repository.list(params);
 					if (listContact.size() > 0) {
-						final String count = syncFeed(json.get("appConfig").get("rss").asText(),
+						final String count = syncFeed(json.get("rss").asText(),
 								repository.one(Contact.class, (BigInteger) listContact.get(0).get("contact.id")));
 						if (count != null)
 							result.result += list.get(i).get("client.id") + ": " + count + "\n";
@@ -85,9 +86,9 @@ public class RssService {
 					.matcher(IOUtils.toString(new URL(rss.get(i).get("link").asText()), StandardCharsets.UTF_8)
 							.replace('\r', ' ').replace('\n', ' '));
 			if (matcher.find())
-				contactNews.setImgUrl(matcher.group(1));
+				contactNews.setImage(EntityUtil.getImage(matcher.group(1), EntityUtil.IMAGE_THUMB_SIZE));
 			else
-				contactNews.setImgUrl(null);
+				contactNews.setImage(null);
 			if (contactNews.getId() == null)
 				count++;
 			repository.save(contactNews);

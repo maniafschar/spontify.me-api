@@ -3,7 +3,6 @@ SELECT
 	contactNews.contactId,
 	contactNews.publish,
 	contactNews.image,
-	contactNews.imgUrl,
 	contactNews.url,
 	contactNews.createdAt,
 	contactNews.modifiedAt,

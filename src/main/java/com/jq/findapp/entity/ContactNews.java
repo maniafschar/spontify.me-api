@@ -13,7 +13,6 @@ public class ContactNews extends BaseEntity {
 	private BigInteger contactId;
 	private String description;
 	private String image;
-	private String imgUrl;
 	private String url;
 	private Timestamp publish;
 	private Boolean notified = false;
@@ -64,14 +63,6 @@ public class ContactNews extends BaseEntity {
 
 	public void setUrl(final String url) {
 		this.url = url;
-	}
-
-	public String getImgUrl() {
-		return imgUrl;
-	}
-
-	public void setImgUrl(final String imgUrl) {
-		this.imgUrl = imgUrl;
 	}
 
 	@Transient
