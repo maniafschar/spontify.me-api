@@ -86,12 +86,6 @@ public class Screenshots {
 		screenshot(name);
 		login();
 		Util.sleep(1000);
-		if (Util.driver.getTitle().contains("Fanclub")) {
-			js.executeScript("pageHome.openNews()");
-			Util.sleep(2000);
-			screenshot(name + "-news");
-			Util.sleep(1000);
-		}
 		js.executeScript("ui.navigation.goTo('search')");
 		Util.sleep(1000);
 		Util.click("search tabHeader tab[i=\"contacts\"]");
@@ -104,7 +98,7 @@ public class Screenshots {
 				"var e=ui.qa('search div list-row[i=\"223\"],search div list-row[i=\"244\"],search div list-row[i=\"276\"],search div list-row[i=\"607\"],search div list-row[i=\"793\"]');for(var i=0;i<e.length;i++)e[i].outerHTML='';");
 		screenshot(name + "-search");
 		if (Util.driver.getTitle().contains("Fanclub")) {
-			Util.click("buttonIcon.statistics");
+			js.executeScript("ui.navigation.goTo(\"statistics\")");
 			Util.sleep(2000);
 			screenshot(name + "-stats");
 		}

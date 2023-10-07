@@ -79,7 +79,7 @@ public class ActionApi {
 			for (String q : t) {
 				q = q.trim();
 				if (q.length() > 0 && !QUOTATION.contains(q))
-					QUOTATION.add(q.replaceAll("\\n", "\n"));
+					QUOTATION.add(q.replace("\\n", "\n"));
 			}
 		} catch (final Exception ex) {
 			throw new RuntimeException(ex);
