@@ -7,10 +7,8 @@ SELECT
 	contactNotification.seen,
 	contactNotification.createdAt
 FROM
-	Contact contact,
-	ContactNotification contactNotification
+	ContactNotification contactNotification left join Contact contact on contactNotification.contactId2=contact.id
 WHERE
-	contact.id=contactNotification.contactId2 and
 	contactNotification.contactId={USERID} and
 	{search}
 ORDER BY
