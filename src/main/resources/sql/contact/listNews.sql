@@ -1,20 +1,16 @@
 SELECT
 	contactNews.id,
-	contactNews.contactId,
+	contactNews.clientId,
 	contactNews.publish,
 	contactNews.image,
 	contactNews.url,
 	contactNews.createdAt,
 	contactNews.modifiedAt,
-	contactNews.description,
-	contact.pseudonym,
-	contact.imageList
+	contactNews.description
 FROM
-	ContactNews contactNews,
-	Contact contact
+	ContactNews contactNews
 WHERE
-	contactNews.contactId=contact.id and
-	contact.clientId={CLIENTID} and
+	contactNews.clientId={CLIENTID} and
 	{search}
 ORDER BY
 	contactNews.publish DESC

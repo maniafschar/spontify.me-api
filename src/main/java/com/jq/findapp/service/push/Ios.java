@@ -50,24 +50,24 @@ public class Ios {
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
 
-	public Environment send(final Contact contactFrom, final Contact contactTo, final String text, final String action,
+	public Environment send(final String from, final Contact contactTo, final String text, final String action,
 			final int badge,
 			final String notificationId)
 			throws Exception {
 		try {
-			send(contactFrom, contactTo, url, text, action, badge, notificationId);
+			send(from, contactTo, url, text, action, badge, notificationId);
 			return Environment.Production;
 		} catch (final NotFoundException ex) {
 			final String adminEmail = repository.one(Contact.class, adminId).getEmail();
 			if (contactTo.getEmail().contains(adminEmail.substring(adminEmail.indexOf("@")))) {
-				send(contactFrom, contactTo, urlTest, text, action, badge, notificationId);
+				send(from, contactTo, urlTest, text, action, badge, notificationId);
 				return Environment.Development;
 			}
 			throw ex;
 		}
 	}
 
-	private void send(final Contact contactFrom, final Contact contactTo, final String url, final String text,
+	private void send(final String from, final Contact contactTo, final String url, final String text,
 			final String action, final int badge,
 			final String notificationId)
 			throws Exception {
@@ -76,7 +76,7 @@ public class Ios {
 						IOUtils
 								.toString(getClass().getResourceAsStream("/template/push.ios"), StandardCharsets.UTF_8)
 								.replace("{text}", text)
-								.replace("{from}", contactFrom.getPseudonym())
+								.replace("{from}", from)
 								.replace("{badge}", "" + badge)
 								.replace("{notificationId}", notificationId)
 								.replace("{exec}", Strings.isEmpty(action) ? "" : action)))

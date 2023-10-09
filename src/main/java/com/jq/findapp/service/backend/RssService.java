@@ -44,15 +44,10 @@ public class RssService {
 				if (json.has("rss")) {
 					params.setSearch("contact.type='" + ContactType.adminContent.name()
 							+ "' and contact.clientId=" + list.get(i).get("client.id"));
-					final Result listContact = repository.list(params);
-					if (listContact.size() > 0) {
-						final String count = syncFeed(json.get("rss").asText(),
-								repository.one(Contact.class, (BigInteger) listContact.get(0).get("contact.id")));
-						if (count != null)
-							result.result += list.get(i).get("client.id") + ": " + count + "\n";
-					} else
-						result.result += list.get(i).get("client.id") + ": " + ContactType.adminContent.name()
-								+ " not found\n";
+					final String count = syncFeed(json.get("rss").asText(),
+							(BigInteger) list.get(i).get("clientt.id"));
+					if (count != null)
+						result.result += list.get(i).get("client.id") + ": " + count + "\n";
 				}
 			}
 		} catch (final Exception e) {
@@ -61,11 +56,13 @@ public class RssService {
 		return result;
 	}
 
-	private String syncFeed(final String url, final Contact contact) throws Exception {
+	private String syncFeed(final String url, final BigInteger clientId) throws Exception {
 		final ArrayNode rss = (ArrayNode) new XmlMapper().readTree(new URL(url)).get("channel").get("item");
 		if (rss == null || rss.size() == 0)
 			return null;
 		final QueryParams params = new QueryParams(Query.contact_listNews);
+		final Contact contact = new Contact();
+		contact.setClientId(clientId);
 		params.setUser(contact);
 		final Pattern img = Pattern.compile("\\<article.*?\\<figure.*?\\<img .*?src=\\\"(.*?)\\\"");
 		final SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ROOT);
@@ -78,7 +75,7 @@ public class RssService {
 			result = repository.list(params);
 			final ContactNews contactNews = result.size() == 0 ? new ContactNews()
 					: repository.one(ContactNews.class, (BigInteger) result.get(0).get("contactNews.id"));
-			contactNews.setContactId(contact.getId());
+			contactNews.setClientId(clientId);
 			contactNews.setDescription(rss.get(i).get("title").asText());
 			contactNews.setUrl(uid);
 			contactNews.setPublish(new Timestamp(df.parse(rss.get(i).get("pubDate").asText()).getTime()));
@@ -86,7 +83,7 @@ public class RssService {
 					.matcher(IOUtils.toString(new URL(rss.get(i).get("link").asText()), StandardCharsets.UTF_8)
 							.replace('\r', ' ').replace('\n', ' '));
 			if (matcher.find())
-				contactNews.setImage(EntityUtil.getImage(matcher.group(1), EntityUtil.IMAGE_THUMB_SIZE));
+				contactNews.setImage(EntityUtil.getImage(matcher.group(1), EntityUtil.IMAGE_SIZE));
 			else
 				contactNews.setImage(null);
 			if (contactNews.getId() == null)
@@ -96,7 +93,7 @@ public class RssService {
 		}
 		params.setSearch("contactNews.publish>'"
 				+ new Timestamp(df.parse(rss.get(rss.size() - 1).get("pubDate").asText()).getTime())
-				+ "' and contactNews.contactId=" + contact.getId());
+				+ "' and contactNews.clientId=" + clientId);
 		result = repository.list(params);
 		int deleted = 0;
 		for (int i = 0; i < result.size(); i++) {

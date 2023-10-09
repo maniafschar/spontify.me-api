@@ -144,7 +144,7 @@ public class NotificationService {
 			final String action, final String... param) throws Exception {
 		if (!contactTo.getVerified())
 			return false;
-		if (contactTo.getId() != null) {
+		if (contactFrom != null && contactTo.getId() != null) {
 			final QueryParams params = new QueryParams(Query.contact_block);
 			params.setUser(contactFrom);
 			params.setSearch("block.contactId=" + contactFrom.getId() + " and block.contactId2="
@@ -191,9 +191,10 @@ public class NotificationService {
 	private ContactNotification save(final Contact contactTo, final Contact contactFrom, final String text,
 			final String action,
 			final ContactNotificationTextType notificationTextType) throws Exception {
+		final BigInteger fromId = contactFrom == null ? null : contactFrom.getId();
 		final QueryParams params = new QueryParams(Query.contact_notification);
 		params.setSearch("contactNotification.contactId=" + contactTo.getId() +
-				" and contactNotification.contactId2=" + contactFrom.getId() +
+				" and contactNotification.contactId2=" + fromId +
 				" and TIMESTAMPDIFF(HOUR,contactNotification.createdAt,current_timestamp)<24" +
 				" and contactNotification.action='" + (action == null ? "" : action) +
 				"' and contactNotification.textType='" + notificationTextType.name() + "'");
@@ -202,7 +203,7 @@ public class NotificationService {
 		final ContactNotification notification = new ContactNotification();
 		notification.setAction(action);
 		notification.setContactId(contactTo.getId());
-		notification.setContactId2(contactFrom.getId());
+		notification.setContactId2(fromId);
 		notification.setText(text);
 		notification.setTextType(notificationTextType);
 		repository.save(notification);
@@ -254,12 +255,15 @@ public class NotificationService {
 		try {
 			final String notificationId = notification == null ? "" : notification.getId().toString();
 			final String s = text.toString().replace("\"", "\\\"");
+			final String from = contactFrom == null ? repository.one(Client.class, contactFrom.getClientId()).getName()
+					: contactFrom.getPseudonym();
 			if ("ios".equals(contactTo.getPushSystem())) {
 				final Ping p = getPingValues(contactTo);
-				ios.send(contactFrom, contactTo, s, action, ((Map<?, ?>) p.chat.get("new")).size() + p.notification,
+				ios.send(from, contactTo, s, action,
+						((Map<?, ?>) p.chat.get("new")).size() + p.notification,
 						notificationId);
 			} else if ("android".equals(contactTo.getPushSystem()))
-				android.send(contactFrom, contactTo, s, action, notificationId);
+				android.send(from, contactTo, s, action, notificationId);
 			if (notification != null)
 				notification.setType(ContactNotificationType.valueOf(contactTo.getPushSystem()));
 			return true;

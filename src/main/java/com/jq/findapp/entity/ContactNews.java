@@ -3,6 +3,7 @@ package com.jq.findapp.entity;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 
+import com.jq.findapp.entity.Contact.ContactType;
 import com.jq.findapp.repository.Repository;
 
 import jakarta.persistence.Entity;
@@ -10,7 +11,7 @@ import jakarta.persistence.Transient;
 
 @Entity
 public class ContactNews extends BaseEntity {
-	private BigInteger contactId;
+	private BigInteger clientId;
 	private String description;
 	private String image;
 	private String url;
@@ -33,12 +34,12 @@ public class ContactNews extends BaseEntity {
 		this.description = description;
 	}
 
-	public BigInteger getContactId() {
-		return contactId;
+	public BigInteger getClientId() {
+		return clientId;
 	}
 
-	public void setContactId(final BigInteger contactId) {
-		this.contactId = contactId;
+	public void setClientId(final BigInteger clientId) {
+		this.clientId = clientId;
 	}
 
 	public Timestamp getPublish() {
@@ -68,6 +69,7 @@ public class ContactNews extends BaseEntity {
 	@Transient
 	@Override
 	public boolean writeAccess(final BigInteger user, final Repository repository) {
-		return user.equals(getContactId());
+		final Contact contact = repository.one(Contact.class, user);
+		return contact.getClientId().equals(getClientId()) && contact.getType() == ContactType.adminContent;
 	}
 }

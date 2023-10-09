@@ -34,12 +34,11 @@ public class ContactNewsListener extends AbstractRepositoryListener<ContactNews>
 			try {
 				contactNews.setNotified(true);
 				repository.save(contactNews);
-				final Contact contact = repository.one(Contact.class, contactNews.getContactId());
 				final QueryParams params = new QueryParams(Query.contact_listId);
-				params.setSearch("contact.clientId=" + contact.getClientId() + " and contact.verified=true");
+				params.setSearch("contact.clientId=" + contactNews.getClientId() + " and contact.verified=true");
 				final Result users = repository.list(params);
 				for (int i2 = 0; i2 < users.size(); i2++)
-					notificationService.sendNotification(contact,
+					notificationService.sendNotification(null,
 							repository.one(Contact.class, (BigInteger) users.get(i2).get("contact.id")),
 							ContactNotificationTextType.contactNews, "news=" + contactNews.getId(),
 							contactNews.getDescription());

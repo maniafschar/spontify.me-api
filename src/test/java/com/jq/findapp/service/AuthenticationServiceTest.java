@@ -125,7 +125,7 @@ public class AuthenticationServiceTest {
 		try {
 			authenticationService.register(registration);
 			throw new RuntimeException("no exception thrown");
-		} catch (IllegalAccessException ex) {
+		} catch (final IllegalAccessException ex) {
 
 			// then
 			assertEquals("domain", ex.getMessage());
@@ -146,7 +146,7 @@ public class AuthenticationServiceTest {
 		try {
 			authenticationService.register(registration);
 			throw new RuntimeException("no exception thrown");
-		} catch (IllegalAccessException ex) {
+		} catch (final IllegalAccessException ex) {
 
 			// then
 			assertEquals("email", ex.getMessage());
@@ -167,7 +167,7 @@ public class AuthenticationServiceTest {
 		try {
 			authenticationService.register(registration);
 			throw new RuntimeException("no exception thrown");
-		} catch (IllegalAccessException ex) {
+		} catch (final IllegalAccessException ex) {
 
 			// then
 			assertEquals("time", ex.getMessage());
@@ -188,7 +188,7 @@ public class AuthenticationServiceTest {
 		try {
 			authenticationService.register(registration);
 			throw new RuntimeException("no exception thrown");
-		} catch (IllegalAccessException ex) {
+		} catch (final IllegalAccessException ex) {
 
 			// then
 			assertEquals("legal", ex.getMessage());
@@ -252,7 +252,7 @@ public class AuthenticationServiceTest {
 		System.setProperty("javax.net.debug", "all");
 
 		// when
-		final Environment environmet = ios.send(contact, contact, "uzgku", "chat=12", 12, "1");
+		final Environment environmet = ios.send(contact.getPseudonym(), contact, "uzgku", "chat=12", 12, "1");
 
 		// then
 		assertEquals(Environment.Development, environmet);
@@ -266,7 +266,7 @@ public class AuthenticationServiceTest {
 				"dHFZR7_iWnc:APA91bF7Z9NsdMRN0nX5C2il8dOqbmJ8DFtAdqb4_2thbOGB0LJK_2m1zjtyXyHD1tmdog6TQsTXbHvKPyv-EuqNik4vM1VlGSY-h6wG6JdM4k9h8es7duf08pfSEYezwuUyGcDkWkQd");
 
 		// when
-		android.send(contact, contact, "text", "action", "");
+		android.send(contact.getPseudonym(), contact, "text", "action", "");
 
 		// then no exception
 	}
@@ -282,7 +282,7 @@ public class AuthenticationServiceTest {
 
 		// when
 		final Object[] keys = FAILED_AUTHS.keySet().toArray();
-		for (Object k : keys) {
+		for (final Object k : keys) {
 			if (FAILED_AUTHS.get(k) < 5)
 				FAILED_AUTHS.remove(k);
 		}
@@ -304,7 +304,7 @@ public class AuthenticationServiceTest {
 	@Test
 	public void encodeToken() {
 		// given
-		String s = "CMY1hiWPWOTVuouoyjT6SPrnjrZWeNfuWTSpgRGDwe";
+		final String s = "CMY1hiWPWOTVuouoyjT6SPrnjrZWeNfuWTSpgRGDwe";
 
 		// when
 		long x = 0;

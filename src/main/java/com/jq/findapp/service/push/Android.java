@@ -30,18 +30,20 @@ public class Android {
 	@Value("${push.fcm.url}")
 	private String url;
 
-	public Environment send(Contact contactFrom, Contact contactTo, String text, String action, String notificationId)
+	public Environment send(final String from, final Contact contactTo, final String text, final String action,
+			final String notificationId)
 			throws Exception {
 		try {
-			send(contactFrom, contactTo, text, action, notificationId, false);
-		} catch (Unauthorized ex) {
-			send(contactFrom, contactTo, text, action, notificationId, true);
+			send(from, contactTo, text, action, notificationId, false);
+		} catch (final Unauthorized ex) {
+			send(from, contactTo, text, action, notificationId, true);
 		}
 		return Environment.Production;
 	}
 
-	private void send(Contact contactFrom, Contact contactTo, String text, String action, String notificationId,
-			boolean reset)
+	private void send(final String from, final Contact contactTo, final String text, final String action,
+			final String notificationId,
+			final boolean reset)
 			throws Exception {
 		WebClient.create(url)
 				.post()
@@ -51,7 +53,7 @@ public class Android {
 				.bodyValue(
 						IOUtils.toString(getClass().getResourceAsStream("/template/push.android"),
 								StandardCharsets.UTF_8)
-								.replace("{from}", contactFrom.getPseudonym())
+								.replace("{from}", from)
 								.replace("{to}", contactTo.getPushToken())
 								.replace("{text}", text)
 								.replace("{notificationId}", notificationId)
@@ -68,7 +70,7 @@ public class Android {
 		return map;
 	}
 
-	private Map<String, String> getClaims(boolean reset) throws Exception {
+	private Map<String, String> getClaims(final boolean reset) throws Exception {
 		final long lastGeneration = jwtGenerator.getLastGeneration(keyId, reset);
 		final Map<String, String> map = new HashMap<>(5);
 		map.put("iss", clientEmail);
