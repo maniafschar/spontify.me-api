@@ -1,6 +1,5 @@
 package com.jq.findapp.util;
 
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -28,32 +27,29 @@ public class TextTest {
 	@Autowired
 	private Text text;
 
+	@Autowired
+	private Utils utils;
+
 	@Test
-	public void notificationToId() {
+	public void notificationToId() throws Exception {
 		// given
-		final Contact contact = new Contact();
-		contact.setLanguage("DE");
-		contact.setClientId(BigInteger.ONE);
+		final Contact contact = utils.createContact();
 
 		// when
-		for (ContactNotificationTextType id : ContactNotificationTextType.values())
+		for (final ContactNotificationTextType id : ContactNotificationTextType.values())
 			text.getText(contact, TextId.valueOf("notification_" + id));
 
 		// then no exceptions
 	}
 
 	@Test
-	public void ids() {
+	public void ids() throws Exception {
 		// given
-		final Contact contact = new Contact();
-		contact.setLanguage("DE");
-		contact.setClientId(BigInteger.ONE);
+		final Contact contact = utils.createContact();
 
 		// when
-		for (TextId id : TextId.values()) {
-			System.out.println(id);
+		for (final TextId id : TextId.values())
 			text.getText(contact, id);
-		}
 
 		// then no exceptions
 	}
@@ -73,7 +69,7 @@ public class TextTest {
 		// then no exceptions
 	}
 
-	private void iterate(Iterator<Entry<String, JsonNode>> iterator, JsonNode compare) {
+	private void iterate(final Iterator<Entry<String, JsonNode>> iterator, final JsonNode compare) {
 		while (iterator.hasNext()) {
 			final Entry<String, JsonNode> entry = iterator.next();
 			if (compare.get(entry.getKey()) == null)

@@ -20,9 +20,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
+import com.jq.findapp.entity.ClientNews;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.ContactType;
-import com.jq.findapp.entity.ContactNews;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -45,7 +45,7 @@ public class RssService {
 					params.setSearch("contact.type='" + ContactType.adminContent.name()
 							+ "' and contact.clientId=" + list.get(i).get("client.id"));
 					final String count = syncFeed(json.get("rss").asText(),
-							(BigInteger) list.get(i).get("clientt.id"));
+							(BigInteger) list.get(i).get("client.id"));
 					if (count != null)
 						result.result += list.get(i).get("client.id") + ": " + count + "\n";
 				}
@@ -60,7 +60,7 @@ public class RssService {
 		final ArrayNode rss = (ArrayNode) new XmlMapper().readTree(new URL(url)).get("channel").get("item");
 		if (rss == null || rss.size() == 0)
 			return null;
-		final QueryParams params = new QueryParams(Query.contact_listNews);
+		final QueryParams params = new QueryParams(Query.misc_listNews);
 		final Contact contact = new Contact();
 		contact.setClientId(clientId);
 		params.setUser(contact);
@@ -71,34 +71,34 @@ public class RssService {
 		Result result;
 		for (int i = 0; i < rss.size(); i++) {
 			final String uid = rss.get(i).get("guid").get("").asText();
-			params.setSearch("contactNews.url='" + uid + "'");
+			params.setSearch("clientNews.url='" + uid + "'");
 			result = repository.list(params);
-			final ContactNews contactNews = result.size() == 0 ? new ContactNews()
-					: repository.one(ContactNews.class, (BigInteger) result.get(0).get("contactNews.id"));
-			contactNews.setClientId(clientId);
-			contactNews.setDescription(rss.get(i).get("title").asText());
-			contactNews.setUrl(uid);
-			contactNews.setPublish(new Timestamp(df.parse(rss.get(i).get("pubDate").asText()).getTime()));
+			final ClientNews clientNews = result.size() == 0 ? new ClientNews()
+					: repository.one(ClientNews.class, (BigInteger) result.get(0).get("clientNews.id"));
+			clientNews.setClientId(clientId);
+			clientNews.setDescription(rss.get(i).get("title").asText());
+			clientNews.setUrl(uid);
+			clientNews.setPublish(new Timestamp(df.parse(rss.get(i).get("pubDate").asText()).getTime()));
 			final Matcher matcher = img
 					.matcher(IOUtils.toString(new URL(rss.get(i).get("link").asText()), StandardCharsets.UTF_8)
 							.replace('\r', ' ').replace('\n', ' '));
 			if (matcher.find())
-				contactNews.setImage(EntityUtil.getImage(matcher.group(1), EntityUtil.IMAGE_SIZE));
+				clientNews.setImage(EntityUtil.getImage(matcher.group(1), EntityUtil.IMAGE_SIZE));
 			else
-				contactNews.setImage(null);
-			if (contactNews.getId() == null)
+				clientNews.setImage(null);
+			if (clientNews.getId() == null)
 				count++;
-			repository.save(contactNews);
-			urls.add(contactNews.getUrl());
+			repository.save(clientNews);
+			urls.add(clientNews.getUrl());
 		}
-		params.setSearch("contactNews.publish>'"
+		params.setSearch("clientNews.publish>'"
 				+ new Timestamp(df.parse(rss.get(rss.size() - 1).get("pubDate").asText()).getTime())
-				+ "' and contactNews.clientId=" + clientId);
+				+ "' and clientNews.clientId=" + clientId);
 		result = repository.list(params);
 		int deleted = 0;
 		for (int i = 0; i < result.size(); i++) {
-			if (!urls.contains(result.get(i).get("contactNews.url"))) {
-				repository.delete(repository.one(ContactNews.class, (BigInteger) result.get(i).get("contactNews.id")));
+			if (!urls.contains(result.get(i).get("clientNews.url"))) {
+				repository.delete(repository.one(ClientNews.class, (BigInteger) result.get(i).get("clientNews.id")));
 				deleted++;
 			}
 		}

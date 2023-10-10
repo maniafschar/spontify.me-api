@@ -21,19 +21,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
+import com.jq.findapp.entity.ClientNews;
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.ContactNews;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
-import com.jq.findapp.repository.listener.ContactNewsListener;
+import com.jq.findapp.repository.listener.ClientNewsListener;
 
 @Service
 public class DbService {
 	@Autowired
-	private ContactNewsListener contactNewsListener;
+	private ClientNewsListener clientNewsListener;
 
 	@Autowired
 	private Repository repository;
@@ -61,8 +61,8 @@ public class DbService {
 			final QueryParams params = new QueryParams(Query.misc_listClient);
 			final Result list = repository.list(params);
 			params.setUser(new Contact());
-			params.setQuery(Query.contact_listNews);
-			params.setSearch("contactNews.notified=false and contactNews.publish<='" + Instant.now() + "'");
+			params.setQuery(Query.misc_listNews);
+			params.setSearch("clientNews.notified=false and clientNews.publish<='" + Instant.now() + "'");
 			String clientUpdates = "";
 			for (int i = 0; i < list.size(); i++) {
 				final Client client = repository.one(Client.class, (BigInteger) list.get(i).get("client.id"));
@@ -71,8 +71,8 @@ public class DbService {
 				params.getUser().setClientId(client.getId());
 				final Result news = repository.list(params);
 				for (int i2 = 0; i2 < news.size(); i2++)
-					contactNewsListener.execute(
-							repository.one(ContactNews.class, (BigInteger) news.get(i2).get("contactNews.id")));
+					clientNewsListener.execute(
+							repository.one(ClientNews.class, (BigInteger) news.get(i2).get("clientNews.id")));
 			}
 			if (clientUpdates.length() > 0)
 				result.result += (result.result.length() > 0 ? "\n" : "") + "ClientUpdate:"

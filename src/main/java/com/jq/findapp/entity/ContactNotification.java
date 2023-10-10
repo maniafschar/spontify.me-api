@@ -29,12 +29,12 @@ public class ContactNotification extends BaseEntity {
 	public enum ContactNotificationTextType {
 		chatNew,
 		chatSeen,
+		clientNews,
 		contactBirthday,
 		contactDelete,
 		contactFindMe,
 		contactFriendApproved,
 		contactFriendRequest,
-		contactNews,
 		contactVideoCall,
 		contactVisitLocation,
 		contactVisitProfile,

@@ -10,7 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Transient;
 
 @Entity
-public class ContactNews extends BaseEntity {
+public class ClientNews extends BaseEntity {
 	private BigInteger clientId;
 	private String description;
 	private String image;

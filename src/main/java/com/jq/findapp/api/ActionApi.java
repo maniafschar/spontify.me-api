@@ -260,13 +260,13 @@ public class ActionApi {
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
 		final QueryParams params = new QueryParams(
 				"contacts".equals(type) ? Query.contact_listTeaser
-						: "events".equals(type) ? Query.event_listTeaser : Query.contact_listNews);
+						: "events".equals(type) ? Query.event_listTeaser : Query.misc_listNews);
 		params.setLimit(25);
 		params.setDistance(-1);
 		params.setLatitude(48.13684f);
 		params.setLongitude(11.57685f);
 		if (user == null) {
-			if (ip != null && params.getQuery() != Query.contact_listNews) {
+			if (ip != null && params.getQuery() != Query.misc_listNews) {
 				final QueryParams params2 = new QueryParams(Query.misc_listIp);
 				params2.setSearch("ip.ip='" + IpService.sanatizeIp(ip) + "'");
 				final Result result = repository.list(params2);
@@ -302,8 +302,8 @@ public class ActionApi {
 		if (params.getQuery() == Query.event_listTeaser)
 			search = (search == null ? "" : "(" + search + ") and ") + "event.endDate>='"
 					+ Instant.now().atZone(ZoneOffset.UTC).toLocalDate() + "'";
-		else if (params.getQuery() == Query.contact_listNews)
-			search = "contactNews.publish<'" + Instant.now().toString() + "'";
+		else if (params.getQuery() == Query.misc_listNews)
+			search = "clientNews.publish<'" + Instant.now().toString() + "'";
 		params.setSearch(search);
 		return repository.list(params).getList();
 	}
