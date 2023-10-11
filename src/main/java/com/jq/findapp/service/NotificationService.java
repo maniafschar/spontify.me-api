@@ -255,7 +255,7 @@ public class NotificationService {
 		try {
 			final String notificationId = notification == null ? "" : notification.getId().toString();
 			final String s = text.toString().replace("\"", "\\\"");
-			final String from = contactFrom == null ? repository.one(Client.class, contactFrom.getClientId()).getName()
+			final String from = contactFrom == null ? repository.one(Client.class, contactTo.getClientId()).getName()
 					: contactFrom.getPseudonym();
 			if ("ios".equals(contactTo.getPushSystem())) {
 				final Ping p = getPingValues(contactTo);

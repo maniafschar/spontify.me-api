@@ -259,8 +259,7 @@ public class ActionApi {
 			@RequestHeader final BigInteger clientId, @RequestHeader(required = false) final BigInteger user,
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
 		final QueryParams params = new QueryParams(
-				"contacts".equals(type) ? Query.contact_listTeaser
-						: "events".equals(type) ? Query.event_listTeaser : Query.misc_listNews);
+				"contacts".equals(type) ? Query.contact_listTeaser : Query.event_listTeaser);
 		params.setLimit(25);
 		params.setDistance(-1);
 		params.setLatitude(48.13684f);
