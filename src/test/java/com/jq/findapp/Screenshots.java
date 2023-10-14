@@ -86,6 +86,12 @@ public class Screenshots {
 		screenshot(name);
 		login();
 		Util.sleep(1000);
+		if (Util.driver.getTitle().contains("Fanclub")) {
+			js.executeScript("pageHome.openNews()");
+			Util.sleep(2000);
+			screenshot(name + "-news");
+			Util.sleep(1000);
+		}
 		js.executeScript("ui.navigation.goTo('search')");
 		Util.sleep(1000);
 		Util.click("search tabHeader tab[i=\"contacts\"]");
