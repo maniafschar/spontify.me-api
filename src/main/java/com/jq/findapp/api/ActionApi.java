@@ -251,8 +251,7 @@ public class ActionApi {
 		final Contact contact = new Contact();
 		contact.setClientId(clientId);
 		params.setUser(contact);
-		params.setSearch("clientNews.publish<='"
-				+ Instant.now().toString() + "'");
+		params.setSearch("clientNews.publish<='" + Instant.now().toString() + "'");
 		return repository.list(params).getList();
 	}
 
