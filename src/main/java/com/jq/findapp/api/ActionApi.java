@@ -244,6 +244,18 @@ public class ActionApi {
 		return externalService.google(param, user);
 	}
 
+	@GetMapping("news")
+	public List<Object[]> news(@RequestHeader final BigInteger clientId) throws Exception {
+		final QueryParams params = new QueryParams(Query.misc_listNews);
+		params.setLimit(25);
+		final Contact contact = new Contact();
+		contact.setClientId(clientId);
+		params.setUser(contact);
+		params.setSearch("clientNews.publish<='"
+				+ Instant.now().toString() + "'");
+		return repository.list(params).getList();
+	}
+
 	@GetMapping("teaser/meta")
 	public List<Object[]> teaserMeta(@RequestHeader final BigInteger clientId) throws Exception {
 		final QueryParams params = new QueryParams(Query.event_listTeaserMeta);
@@ -265,7 +277,7 @@ public class ActionApi {
 		params.setLatitude(48.13684f);
 		params.setLongitude(11.57685f);
 		if (user == null) {
-			if (ip != null && params.getQuery() != Query.misc_listNews) {
+			if (ip != null) {
 				final QueryParams params2 = new QueryParams(Query.misc_listIp);
 				params2.setSearch("ip.ip='" + IpService.sanatizeIp(ip) + "'");
 				final Result result = repository.list(params2);
@@ -301,8 +313,6 @@ public class ActionApi {
 		if (params.getQuery() == Query.event_listTeaser)
 			search = (search == null ? "" : "(" + search + ") and ") + "event.endDate>='"
 					+ Instant.now().atZone(ZoneOffset.UTC).toLocalDate() + "'";
-		else if (params.getQuery() == Query.misc_listNews)
-			search = "clientNews.publish<'" + Instant.now().toString() + "'";
 		params.setSearch(search);
 		return repository.list(params).getList();
 	}
