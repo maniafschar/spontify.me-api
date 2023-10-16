@@ -17,11 +17,12 @@ public class Contact extends BaseEntity {
 	private BigInteger clientId;
 	private Boolean authenticate = false;
 	private Boolean bluetooth = true;
-	private Boolean notificationEngagement = true;
 	private Boolean notificationBirthday = true;
 	private Boolean notificationChat = true;
+	private Boolean notificationEngagement = true;
 	private Boolean notificationFriendRequest = true;
 	private Boolean notificationMarkEvent = true;
+	private Boolean notificationNews = true;
 	private Boolean notificationVisitLocation = true;
 	private Boolean notificationVisitProfile = true;
 	private Boolean search = true;
@@ -347,6 +348,14 @@ public class Contact extends BaseEntity {
 
 	public void setNotificationMarkEvent(final Boolean notificationMarkEvent) {
 		this.notificationMarkEvent = notificationMarkEvent;
+	}
+
+	public Boolean getNotificationNews() {
+		return notificationNews;
+	}
+
+	public void setNotificationNews(final Boolean notificationNews) {
+		this.notificationNews = notificationNews;
 	}
 
 	public String getAgeMale() {

@@ -23,6 +23,7 @@ SELECT
 	contact.notificationEngagement,
 	contact.notificationFriendRequest,
 	contact.notificationMarkEvent,
+	contact.notificationNews,
 	contact.notificationVisitLocation,
 	contact.notificationVisitProfile,
 	contact.pseudonym,

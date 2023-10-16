@@ -327,6 +327,8 @@ public class NotificationService {
 			return contact.getNotificationMarkEvent();
 		if (ContactNotificationTextType.contactBirthday == notificationTextType)
 			return contact.getNotificationBirthday();
+		if (ContactNotificationTextType.clientNews == notificationTextType)
+			return contact.getNotificationNews();
 		return true;
 	}
 
