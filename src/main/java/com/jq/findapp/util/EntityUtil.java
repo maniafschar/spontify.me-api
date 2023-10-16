@@ -62,11 +62,13 @@ public class EntityUtil {
 		return result;
 	}
 
-	public static String getImage(final String url, final int size) {
+	public static String getImage(final String url, final int size, int minimum) {
 		try {
 			final byte[] data = IOUtils.toByteArray(new URL(url));
 			final BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
-			if (img.getWidth() > 400 && img.getHeight() > 400)
+			if (minimum == 0)
+				minimum = 400;
+			if (img.getWidth() > minimum && img.getHeight() > minimum)
 				return Repository.Attachment.createImage(".jpg", scaleImage(data, size));
 			throw new IllegalArgumentException(
 					"no image: [size " + img.getWidth() + "x" + img.getHeight() + " too small] " + url);

@@ -83,7 +83,7 @@ public class RssService {
 					.matcher(IOUtils.toString(new URL(rss.get(i).get("link").asText()), StandardCharsets.UTF_8)
 							.replace('\r', ' ').replace('\n', ' '));
 			if (matcher.find())
-				clientNews.setImage(EntityUtil.getImage(matcher.group(1), EntityUtil.IMAGE_SIZE));
+				clientNews.setImage(EntityUtil.getImage(matcher.group(1), EntityUtil.IMAGE_SIZE, 200));
 			else
 				clientNews.setImage(null);
 			if (clientNews.getId() == null)

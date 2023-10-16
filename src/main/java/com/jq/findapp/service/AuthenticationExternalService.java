@@ -103,9 +103,10 @@ public class AuthenticationExternalService {
 		if (contact.getImage() == null && facebookData.containsKey("picture")
 				&& facebookData.get("picture") != null && facebookData.get("picture").startsWith("http")) {
 			try {
-				contact.setImage(EntityUtil.getImage(facebookData.get("picture"), EntityUtil.IMAGE_SIZE));
+				contact.setImage(EntityUtil.getImage(facebookData.get("picture"), EntityUtil.IMAGE_SIZE, 0));
 				if (contact.getImage() != null)
-					contact.setImageList(EntityUtil.getImage(facebookData.get("picture"), EntityUtil.IMAGE_THUMB_SIZE));
+					contact.setImageList(
+							EntityUtil.getImage(facebookData.get("picture"), EntityUtil.IMAGE_THUMB_SIZE, 0));
 			} catch (final Exception ex) {
 				// no pic for now, continue registration/login
 			}

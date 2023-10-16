@@ -318,9 +318,9 @@ public class ImportLocationsService {
 		} catch (final JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
-		location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE));
+		location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, 0));
 		if (location.getImage() != null)
-			location.setImageList(EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE));
+			location.setImageList(EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
 		repository.save(location);
 		return location;
 	}
