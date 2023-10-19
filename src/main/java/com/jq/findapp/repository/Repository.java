@@ -171,8 +171,6 @@ public class Repository {
 			em.persist(entity);
 			listeners.postPersist(entity);
 		} else {
-			if (!entity.populated())
-				Attachment.historize(entity, one(entity.getClass(), entity.getId()));
 			entity.setModifiedAt(new Timestamp(Instant.now().toEpochMilli()));
 			listeners.preUpdate(entity);
 			em.merge(entity);
