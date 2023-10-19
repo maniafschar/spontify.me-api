@@ -53,17 +53,21 @@ public class BaseEntity {
 	}
 
 	@Transient
-	public void history(final String name, final Object value) {
+	public void historize() {
 		if (old == null)
 			old = new HashMap<>();
-		if (!old.containsKey(name))
-			old.put(name, value);
+		final Field[] fields = getClass().getDeclaredFields();
+		for (final Field field : fields) {
+			try {
+				field.setAccessible(true);
+				old.put(field.getName(), field.get(this));
+			} catch (final Exception e) {
+				throw new RuntimeException("Failed to historize on " + field.getName(), e);
+			}
+		}
+		return entity;
 	}
 
-	@Transient
-	public boolean populated() {
-		return old != null;
-	}
 
 	@Transient
 	public boolean populate(final Map<String, Object> values) {
