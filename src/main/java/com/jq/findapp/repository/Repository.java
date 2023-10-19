@@ -318,12 +318,17 @@ public class Repository {
 			// value = "some text";
 			final String[] s = value.contains(SEPARATOR) ? value.split(SEPARATOR) : new String[] { "", value };
 			if (s[0].contains(".") && s[1].length() > 20) {
+				final byte[] data = Base64.getDecoder().decode(s[1]);
+				if (old != null) {
+					final Path path = Paths.get(PATH + PUBLIC + getFilename(old));
+					if (Files.exists(path))
+				}
 				// new image, we need a new id because of browser caching
 				id = s[0] + SEPARATOR + getNextAttachmentID(PATH + PUBLIC);
 				final Path path = Paths.get(PATH + PUBLIC + getFilename(id));
 				if (!Files.exists(path.getParent()))
 					Files.createDirectory(path.getParent());
-				IOUtils.write(Base64.getDecoder().decode(s[1]), new FileOutputStream(path.toFile()));
+				IOUtils.write(data, new FileOutputStream(path.toFile()));
 				if (old != null)
 					new File(PATH + PUBLIC + getFilename(old)).delete();
 			} else if (s[1].length() > 255) {
