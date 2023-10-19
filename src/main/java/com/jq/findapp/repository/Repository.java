@@ -149,17 +149,7 @@ public class Repository {
 	}
 
 	public <T extends BaseEntity> T one(final Class<T> clazz, final BigInteger id) {
-		final T entity = em.find(clazz, id);
-		final Field[] fields = entity.getClass().getDeclaredFields();
-		for (final Field field : fields) {
-			try {
-				field.setAccessible(true);
-				entity.history(field.getName(), field.get(entity));
-			} catch (final Exception e) {
-				throw new RuntimeException("Failed to historize on " + field.getName(), e);
-			}
-		}
-		return entity;
+		return em.find(clazz, id);
 	}
 
 	public Map<String, Object> one(final QueryParams params) {
