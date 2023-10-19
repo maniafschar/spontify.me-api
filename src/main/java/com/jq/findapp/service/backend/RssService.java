@@ -73,8 +73,13 @@ public class RssService {
 			final String uid = rss.get(i).get("guid").get("").asText();
 			params.setSearch("clientNews.url='" + uid + "'");
 			result = repository.list(params);
-			final ClientNews clientNews = result.size() == 0 ? new ClientNews()
-					: repository.one(ClientNews.class, (BigInteger) result.get(0).get("clientNews.id"));
+			final ClientNews clientNews;
+			if (result.size() == 0)
+				clientNews = new ClientNews();
+			else {
+				clientNews = repository.one(ClientNews.class, (BigInteger) result.get(0).get("clientNews.id"));
+				clientNews.historize();
+			}
 			clientNews.setClientId(clientId);
 			clientNews.setDescription(rss.get(i).get("title").asText());
 			clientNews.setUrl(uid);
