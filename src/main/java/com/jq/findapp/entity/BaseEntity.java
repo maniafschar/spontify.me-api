@@ -1,5 +1,6 @@
 package com.jq.findapp.entity;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.sql.Timestamp;
@@ -56,8 +57,7 @@ public class BaseEntity {
 	public void historize() {
 		if (old == null)
 			old = new HashMap<>();
-		final Field[] fields = getClass().getDeclaredFields();
-		for (final Field field : fields) {
+		for (final Field field : getClass().getDeclaredFields()) {
 			try {
 				field.setAccessible(true);
 				old.put(field.getName(), field.get(this));
@@ -65,9 +65,7 @@ public class BaseEntity {
 				throw new RuntimeException("Failed to historize on " + field.getName(), e);
 			}
 		}
-		return entity;
 	}
-
 
 	@Transient
 	public boolean populate(final Map<String, Object> values) {

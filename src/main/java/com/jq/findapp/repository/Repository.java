@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -321,7 +322,9 @@ public class Repository {
 				final byte[] data = Base64.getDecoder().decode(s[1]);
 				if (old != null) {
 					final Path path = Paths.get(PATH + PUBLIC + getFilename(old));
-					if (Files.exists(path))
+					if (Files.exists(path)
+							&& Arrays.equals(IOUtils.toByteArray(new FileInputStream(path.toFile())), data))
+						return old;
 				}
 				// new image, we need a new id because of browser caching
 				id = s[0] + SEPARATOR + getNextAttachmentID(PATH + PUBLIC);
