@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -12,11 +13,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -196,11 +203,36 @@ public class Repository {
 		query.executeUpdate();
 	}
 
+	public void cleanUpAttachments() throws Exception {
+		final List<String> ids = new ArrayList<>();
+		final Map<String, List<String>> attachmentEntities = Attachment.getAttachmentEntities();
+		for (final String entity : attachmentEntities.keySet()) {
+			final List<BaseEntity> list = list("from " + entity + attachmentEntities.get(entity).stream()
+					.collect(Collectors.joining(" like '%" + Attachment.SEPARATOR + "%' or ", " where ",
+							" like '%" + Attachment.SEPARATOR + "%'")));
+			list.stream().forEach(e -> {
+				attachmentEntities.get(entity).stream().forEach(field -> {
+					try {
+						final Method m = e.getClass()
+								.getDeclaredMethod("get" + field.substring(0, 1).toUpperCase() + field.substring(1));
+						m.setAccessible(true);
+						final Object o = m.invoke(e);
+						if (o != null && o.toString().contains("" + Attachment.SEPARATOR))
+							ids.add(Attachment.getFilename(o.toString()));
+					} catch (Exception ex) {
+						throw new RuntimeException(ex);
+					}
+				});
+			});
+		}
+	}
+
 	public static class Attachment {
 		public final static String SEPARATOR = "\u0015";
 		public final static String PATH = "attachments/";
 		public final static String PUBLIC = "PUBLIC/";
 		private final static Pattern RESOLVABLE_COLUMNS = Pattern.compile(".*(image|note|storage).*");
+		private final static Map<String, List<String>> resolvableEntities = new HashMap<>();
 
 		public static String createImage(final String name, final byte[] data) {
 			return name + SEPARATOR + Base64.getEncoder().encodeToString(data);
@@ -255,7 +287,7 @@ public class Repository {
 				final String[] s = f.list();
 				long t;
 				for (int i = 0; i < s.length; i++) {
-					if (!"deleted".equals(s[i]) && !"PUBLIC".equals(s[i])) {
+					if (!"PUBLIC".equals(s[i])) {
 						try {
 							t = Long.parseLong(s[i].indexOf('.') > -1 ? s[i].substring(0, s[i].indexOf('.')) : s[i]);
 							if (max < t)
@@ -285,8 +317,8 @@ public class Repository {
 		}
 
 		private static final long getNextAttachmentID(final String dir) {
-			final long subDir = getMax(dir, -1);
 			long max = -1;
+			final long subDir = getMax(dir, max);
 			if (subDir > -1)
 				max = getMax(dir + subDir, max);
 			return max + 1;
@@ -351,6 +383,34 @@ public class Repository {
 			} else
 				id = value;
 			return id;
+		}
+
+		private static Map<String, List<String>> getAttachmentEntities() throws Exception {
+			if (resolvableEntities.size() == 0) {
+				final String src = BaseEntity.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+				try (ZipFile zip = new ZipFile(src.substring(src.indexOf(':') + 1, src.indexOf('!')))) {
+					final Enumeration<? extends ZipEntry> zipEntries = zip.entries();
+					while (zipEntries.hasMoreElements()) {
+						final ZipEntry entry = zipEntries.nextElement();
+						if (entry.getName().contains(BaseEntity.class.getPackageName().replace('.', '/'))
+								&& entry.getName().endsWith(".class") && !entry.getName().contains("$")) {
+							final Class<?> entity = Class
+									.forName(BaseEntity.class.getPackageName() + '.'
+											+ entry.getName().substring(entry.getName().lastIndexOf("/") + 1)
+													.replace(".class", ""));
+							final Field[] fields = entity.getDeclaredFields();
+							for (int i = 0; i < fields.length; i++) {
+								if (RESOLVABLE_COLUMNS.matcher(fields[i].getName()).matches()) {
+									if (!resolvableEntities.containsKey(entity.getSimpleName()))
+										resolvableEntities.put(entity.getSimpleName(), new ArrayList<>());
+									resolvableEntities.get(entity.getSimpleName()).add(fields[i].getName());
+								}
+							}
+						}
+					}
+				}
+			}
+			return resolvableEntities;
 		}
 	}
 }
