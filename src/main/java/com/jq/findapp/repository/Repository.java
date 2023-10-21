@@ -322,9 +322,11 @@ public class Repository {
 				final byte[] data = Base64.getDecoder().decode(s[1]);
 				if (old != null) {
 					final Path path = Paths.get(PATH + PUBLIC + getFilename(old));
-					if (Files.exists(path)
-							&& Arrays.equals(IOUtils.toByteArray(new FileInputStream(path.toFile())), data))
-						return old;
+					if (Files.exists(path)) {
+						if (Arrays.equals(IOUtils.toByteArray(new FileInputStream(path.toFile())), data))
+							return old;
+						new File(PATH + PUBLIC + getFilename(old)).delete();
+					}
 				}
 				// new image, we need a new id because of browser caching
 				id = s[0] + SEPARATOR + getNextAttachmentID(PATH + PUBLIC);
@@ -332,8 +334,6 @@ public class Repository {
 				if (!Files.exists(path.getParent()))
 					Files.createDirectory(path.getParent());
 				IOUtils.write(data, new FileOutputStream(path.toFile()));
-				if (old != null)
-					new File(PATH + PUBLIC + getFilename(old)).delete();
 			} else if (s[1].length() > 255) {
 				// it's a text bigger than 255, store in file
 				if (old != null && old.startsWith(SEPARATOR)) {
