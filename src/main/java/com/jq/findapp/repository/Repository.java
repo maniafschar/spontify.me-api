@@ -8,9 +8,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -245,7 +247,8 @@ public class Repository {
 					if (!ids.contains(dirs[i] + '/' + files[i2])) {
 						path = Path.of(dir + dirs[i] + '/' + files[i2]);
 						if (path.toFile().isFile() && path.toFile().lastModified() < time) {
-							Files.move(path, Path.of(dir + dirs[i] + '/' + deleted + '/' + files[i2]));
+							Files.move(path, Path.of(dir + dirs[i] + '/' + deleted + '/' + files[i2]),
+									StandardCopyOption.ATOMIC_MOVE);
 							count++;
 						}
 					}

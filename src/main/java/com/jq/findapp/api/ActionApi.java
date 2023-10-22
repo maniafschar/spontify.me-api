@@ -244,6 +244,11 @@ public class ActionApi {
 		return externalService.google(param, user);
 	}
 
+	@GetMapping("script/{version}")
+	public String script(@PathVariable final String version) throws Exception {
+		return null;
+	}
+
 	@GetMapping("news")
 	public List<Object[]> news(@RequestHeader final BigInteger clientId) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_listNews);
