@@ -77,7 +77,7 @@ public class DbService {
 			if (clientUpdates.length() > 0)
 				result.result += (result.result.length() > 0 ? "\n" : "") + "ClientUpdate:"
 						+ clientUpdates.substring(1);
-			repository.cleanUpAttachments();
+			result.result += (result.result.length() > 0 ? "\n" : "") + repository.cleanUpAttachments();
 		} catch (final Exception e) {
 			result.exception = e;
 		}

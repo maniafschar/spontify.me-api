@@ -203,7 +203,7 @@ public class Repository {
 		query.executeUpdate();
 	}
 
-	public void cleanUpAttachments() throws Exception {
+	public String cleanUpAttachments() throws Exception {
 		final long time = System.currentTimeMillis();
 		final List<String> ids = new ArrayList<>();
 		final Map<String, List<String>> attachmentEntities = Attachment.getAttachmentEntities();
@@ -226,28 +226,33 @@ public class Repository {
 				});
 			});
 		}
-		cleanUpAttachmentDir(Attachment.PATH, time, ids);
-		cleanUpAttachmentDir(Attachment.PATH + Attachment.PUBLIC, time, ids);
+		return cleanUpAttachmentDir(Attachment.PATH, time, ids) +
+				cleanUpAttachmentDir(Attachment.PATH + Attachment.PUBLIC, time, ids);
 	}
 
-	private void cleanUpAttachmentDir(final String dir, final long time, final List<String> ids) throws Exception {
+	private String cleanUpAttachmentDir(final String dir, final long time, final List<String> ids) throws Exception {
 		final String[] dirs = new File(dir).list();
 		final String deleted = "deleted";
-		final Path path = Paths.get(dir + deleted);
+		Path path = Paths.get(dir + deleted);
 		if (!Files.exists(path))
 			Files.createDirectory(path);
+		int count = 0;
 		for (int i = 0; i < dirs.length; i++) {
-			if (!dirs[i].equals(deleted)) {
+			if (!dirs[i].equals(deleted)
+					&& !Attachment.PUBLIC.equals(dirs[i] + '/')) {
 				final String[] files = new File(dir + dirs[i]).list();
 				for (int i2 = 0; i2 < files.length; i2++) {
 					if (!ids.contains(dirs[i] + '/' + files[i2])) {
-						final File file = new File(dir + dirs[i] + '/' + files[i2]);
-						if (file.isFile() && file.lastModified() < time)
-							file.renameTo(new File(dir + dirs[i] + '/' + deleted + '/' + files[i2]));
+						path = Path.of(dir + dirs[i] + '/' + files[i2]);
+						if (path.toFile().isFile() && path.toFile().lastModified() < time) {
+							Files.move(path, Path.of(dir + dirs[i] + '/' + deleted + '/' + files[i2]));
+							count++;
+						}
 					}
 				}
 			}
 		}
+		return count > 0 ? dir + ": " + count + '\n' : "";
 	}
 
 	public static class Attachment {
@@ -310,7 +315,7 @@ public class Repository {
 				final String[] s = f.list();
 				long t;
 				for (int i = 0; i < s.length; i++) {
-					if (!"PUBLIC".equals(s[i])) {
+					if (!PUBLIC.equals(s[i] + '/')) {
 						try {
 							t = Long.parseLong(s[i].indexOf('.') > -1 ? s[i].substring(0, s[i].indexOf('.')) : s[i]);
 							if (max < t)
