@@ -22,7 +22,6 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.ClientNews;
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.Contact.ContactType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -36,21 +35,20 @@ public class RssService {
 
 	public SchedulerResult update() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/update");
-		final QueryParams params = new QueryParams(Query.contact_listId);
 		final Result list = repository.list(new QueryParams(Query.misc_listClient));
 		for (int i = 0; i < list.size(); i++) {
-			final JsonNode json = new ObjectMapper().readTree(list.get(i).get("client.storage").toString());
-			if (json.has("rss")) {
-				try {
+			try {
+				final JsonNode json = new ObjectMapper().readTree(list.get(i).get("client.storage").toString());
+				if (json.has("rss")) {
 					final String count = syncFeed(json.get("rss").asText(),
 							(BigInteger) list.get(i).get("client.id"));
 					if (count != null)
 						result.result += list.get(i).get("client.id") + ": " + count + "\n";
-				} catch (final Exception e) {
-					result.result += "Error " + e.getMessage() + " on client " + list.get(i).get("client.id") + "\n";
-					if (result.exception == null)
-						result.exception = e;
 				}
+			} catch (final Exception e) {
+				result.result += "Error " + e.getMessage() + " on client " + list.get(i).get("client.id") + "\n";
+				if (result.exception == null)
+					result.exception = e;
 			}
 		}
 		return result;

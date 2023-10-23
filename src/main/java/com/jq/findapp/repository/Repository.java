@@ -8,7 +8,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -247,7 +246,7 @@ public class Repository {
 					if (!ids.contains(dirs[i] + '/' + files[i2])) {
 						path = Path.of(dir + dirs[i] + '/' + files[i2]);
 						if (path.toFile().isFile() && path.toFile().lastModified() < time) {
-							Files.move(path, Path.of(dir + dirs[i] + '/' + deleted + '/' + files[i2]),
+							Files.move(path, Path.of(dir + '/' + deleted + '/' + files[i2]),
 									StandardCopyOption.ATOMIC_MOVE);
 							count++;
 						}
@@ -306,6 +305,7 @@ public class Repository {
 						field.set(entity,
 								save((String) field.get(entity), (String) entity.old(field.getName())));
 					} catch (final Exception e) {
+						e.printStackTrace();
 						throw new RuntimeException("Failed on " + field.getName(), e);
 					}
 				}
@@ -316,9 +316,10 @@ public class Repository {
 			final File f = new File(dir.replace('/', File.separatorChar));
 			if (f.exists() && !f.isFile()) {
 				final String[] s = f.list();
+				final Pattern number = Pattern.compile("^\\d+(\\.[a-zA-Z0-9]{2,5})?$");
 				long t;
 				for (int i = 0; i < s.length; i++) {
-					if (!PUBLIC.equals(s[i] + '/')) {
+					if (number.matcher(s[i]).matches()) {
 						try {
 							t = Long.parseLong(s[i].indexOf('.') > -1 ? s[i].substring(0, s[i].indexOf('.')) : s[i]);
 							if (max < t)

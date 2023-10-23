@@ -94,6 +94,9 @@ public class SupportCenterApi {
 	@Value("${app.admin.id}")
 	private BigInteger adminId;
 
+	@Value("${app.scheduler.secret}")
+	private String schedulerSecret;
+
 	private static final ExecutorService executorService = Executors.newCachedThreadPool();
 
 	@DeleteMapping("user/{id}")
@@ -170,27 +173,29 @@ public class SupportCenterApi {
 
 	@PutMapping("scheduler")
 	public void scheduler(@RequestHeader final String secret) throws Exception {
-		synchronized (schedulerRunning) {
-			if (schedulerRunning.size() == 0) {
-				final boolean LAST = true;
-				// last job is backup, even after importLog
-				run(dbService::backup, LAST);
-				// importLog paralell to the rest, does not interfere
-				run(importLogService::importLog, !LAST);
-				run(chatService::answerAi, !LAST);
-				run(dbService::update, !LAST);
-				// run(statisticsService::update, !LAST);
-				run(engagementService::sendRegistrationReminder, !LAST);
-				// sendNearBy and sendChats after all event services
-				// to avoid multiple chat at the same time
-				run(engagementService::sendNearBy, LAST);
-				run(engagementService::sendChats, LAST);
-				run(ipService::lookupIps, LAST);
-				run(eventService::findMatchingBuddies, !LAST);
-				run(eventService::notifyParticipation, !LAST);
-				run(rssService::update, !LAST);
-			} else
-				throw new RuntimeException("Scheduler already running " + schedulerRunning.size() + " processes");
+		if (schedulerSecret.equals(secret)) {
+			synchronized (schedulerRunning) {
+				if (schedulerRunning.size() == 0) {
+					final boolean LAST = true;
+					// last job is backup, even after importLog
+					run(dbService::backup, LAST);
+					// importLog paralell to the rest, does not interfere
+					run(importLogService::importLog, !LAST);
+					run(chatService::answerAi, !LAST);
+					run(dbService::update, !LAST);
+					// run(statisticsService::update, !LAST);
+					run(engagementService::sendRegistrationReminder, !LAST);
+					// sendNearBy and sendChats after all event services
+					// to avoid multiple chat at the same time
+					run(engagementService::sendNearBy, LAST);
+					run(engagementService::sendChats, LAST);
+					run(ipService::lookupIps, LAST);
+					run(eventService::findMatchingBuddies, !LAST);
+					run(eventService::notifyParticipation, !LAST);
+					run(rssService::update, !LAST);
+				} else
+					throw new RuntimeException("Scheduler already running " + schedulerRunning.size() + " processes");
+			}
 		}
 	}
 
@@ -200,6 +205,10 @@ public class SupportCenterApi {
 		executorService.submit(new Runnable() {
 			@Override
 			public void run() {
+				final Log log = new Log();
+				final long time = System.currentTimeMillis();
+				log.setContactId(adminId);
+				log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
 				try {
 					if (last)
 						do {
@@ -209,24 +218,20 @@ public class SupportCenterApi {
 								throw new RuntimeException(e);
 							}
 						} while (schedulerRunning.stream().anyMatch(e -> e > id));
-					final Log log = new Log();
-					final long time = System.currentTimeMillis();
-					log.setContactId(adminId);
-					log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
 					final SchedulerResult result = scheduler.run();
 					log.setUri("/support/scheduler/" + result.name);
 					log.setStatus(Strings.isEmpty(result.exception) ? 200 : 500);
 					if (result.result != null)
 						log.setBody(result.result.trim());
 					if (result.exception != null) {
-						log.setBody(result.exception.class.getName() + ": " + result.exception.getMessage() +
-							    (log.getBody() == null ? "" : "\n" + log.getBody()));
+						log.setBody(result.exception.getClass().getName() + ": " + result.exception.getMessage() +
+								(log.getBody() == null ? "" : "\n" + log.getBody()));
 						notificationService.createTicket(TicketType.ERROR, "scheduler",
 								Strings.stackTraceToString(result.exception), adminId, null);
 					}
 				} catch (Throwable ex) {
-					log.setBody("uncatched exception " + ex.class.getName() + ": " + ex.getMessage() +
-							    (log.getBody() == null ? "" : "\n" + log.getBody()));
+					log.setBody("uncaught exception " + ex.getClass().getName() + ": " + ex.getMessage() +
+							(log.getBody() == null ? "" : "\n" + log.getBody()));
 					notificationService.createTicket(TicketType.ERROR, "scheduler",
 							"uncatched exception:\n" + Strings.stackTraceToString(ex), adminId, null);
 				} finally {
