@@ -200,17 +200,17 @@ public class SupportCenterApi {
 		executorService.submit(new Runnable() {
 			@Override
 			public void run() {
-				if (last)
-					do {
-						try {
-							Thread.sleep(100);
-						} catch (final InterruptedException e) {
-							throw new RuntimeException(e);
-						}
-					} while (schedulerRunning.stream().anyMatch(e -> e > id));
-				final Log log = new Log();
-				final long time = System.currentTimeMillis();
 				try {
+					if (last)
+						do {
+							try {
+								Thread.sleep(100);
+							} catch (final InterruptedException e) {
+								throw new RuntimeException(e);
+							}
+						} while (schedulerRunning.stream().anyMatch(e -> e > id));
+					final Log log = new Log();
+					final long time = System.currentTimeMillis();
 					log.setContactId(adminId);
 					log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
 					final SchedulerResult result = scheduler.run();
@@ -223,6 +223,9 @@ public class SupportCenterApi {
 					if (result.exception != null)
 						notificationService.createTicket(TicketType.ERROR, "scheduler",
 								Strings.stackTraceToString(result.exception), adminId, null);
+				} catch (Throwable ex) {
+					notificationService.createTicket(TicketType.ERROR, "scheduler",
+							"uncatched exception:\n" + Strings.stackTraceToString(ex), adminId, null);
 				} finally {
 					schedulerRunning.remove(id);
 					log.setTime((int) (System.currentTimeMillis() - time));
