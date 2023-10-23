@@ -84,14 +84,14 @@ public class Screenshots {
 				"var e=ui.qa('card[onclick*=\"(223,\"],card[onclick*=\"(244,\"],card[onclick*=\"(245,\"],card[onclick*=\"(324,\"],card[onclick*=\"(435,\"],card[onclick*=\"(445,\"],card[onclick*=\"(459,\"],card[onclick*=\"(645,\"],card[onclick*=\"(723,\"],card[onclick*=\"(385,\"],card[onclick*=\"(276,\"],card[onclick*=\"(607,\"],card[onclick*=\"(793,\"]');for(var i=0;i<e.length;i++)e[i].outerHTML='';");
 		Util.sleep(1000);
 		screenshot(name);
-		login();
-		Util.sleep(1000);
 		if (Util.driver.getTitle().contains("Fanclub")) {
 			js.executeScript("pageHome.openNews()");
 			Util.sleep(2000);
 			screenshot(name + "-news");
 			Util.sleep(1000);
 		}
+		login();
+		Util.sleep(1000);
 		js.executeScript("ui.navigation.goTo('search')");
 		Util.sleep(1000);
 		Util.click("search tabHeader tab[i=\"contacts\"]");
