@@ -216,19 +216,24 @@ public class SupportCenterApi {
 					final SchedulerResult result = scheduler.run();
 					log.setUri("/support/scheduler/" + result.name);
 					log.setStatus(Strings.isEmpty(result.exception) ? 200 : 500);
-					if (!Strings.isEmpty(result.result)) {
-						result.result = result.result.trim();
-						log.setBody(result.result.length() > 255 ? result.result.substring(0, 255) : result.result);
-					}
-					if (result.exception != null)
+					if (result.result != null)
+						log.setBody(result.result.trim());
+					if (result.exception != null) {
+						log.setBody(result.exception.class.getName() + ": " + result.exception.getMessage() +
+							    (log.getBody() == null ? "" : "\n" + log.getBody()));
 						notificationService.createTicket(TicketType.ERROR, "scheduler",
 								Strings.stackTraceToString(result.exception), adminId, null);
+					}
 				} catch (Throwable ex) {
+					log.setBody("uncatched exception " + ex.class.getName() + ": " + ex.getMessage() +
+							    (log.getBody() == null ? "" : "\n" + log.getBody()));
 					notificationService.createTicket(TicketType.ERROR, "scheduler",
 							"uncatched exception:\n" + Strings.stackTraceToString(ex), adminId, null);
 				} finally {
 					schedulerRunning.remove(id);
 					log.setTime((int) (System.currentTimeMillis() - time));
+					if (log.getBody() != null && log.getBody().length() > 255)
+						log.setBody(log.getBody().substring(0, 252) + "...");
 					try {
 						repository.save(log);
 					} catch (final Exception e) {
