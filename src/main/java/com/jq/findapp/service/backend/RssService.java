@@ -36,22 +36,22 @@ public class RssService {
 
 	public SchedulerResult update() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/update");
-		try {
-			final QueryParams params = new QueryParams(Query.contact_listId);
-			final Result list = repository.list(new QueryParams(Query.misc_listClient));
-			for (int i = 0; i < list.size(); i++) {
-				final JsonNode json = new ObjectMapper().readTree(list.get(i).get("client.storage").toString());
-				if (json.has("rss")) {
-					params.setSearch("contact.type='" + ContactType.adminContent.name()
-							+ "' and contact.clientId=" + list.get(i).get("client.id"));
+		final QueryParams params = new QueryParams(Query.contact_listId);
+		final Result list = repository.list(new QueryParams(Query.misc_listClient));
+		for (int i = 0; i < list.size(); i++) {
+			final JsonNode json = new ObjectMapper().readTree(list.get(i).get("client.storage").toString());
+			if (json.has("rss")) {
+				try {
 					final String count = syncFeed(json.get("rss").asText(),
 							(BigInteger) list.get(i).get("client.id"));
 					if (count != null)
 						result.result += list.get(i).get("client.id") + ": " + count + "\n";
+				} catch (final Exception e) {
+					result.result += "Error " + e.getMessage() + " on client " + list.get(i).get("client.id") + "\n";
+					if (result.exception == null)
+						result.exception = e;
 				}
 			}
-		} catch (final Exception e) {
-			result.exception = e;
 		}
 		return result;
 	}
