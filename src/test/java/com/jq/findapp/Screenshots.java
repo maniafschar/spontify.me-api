@@ -128,7 +128,6 @@ public class Screenshots {
 		matcherUser.find();
 		matcherPassword.find();
 		js.executeScript("pageLogin.login('" + matcherUser.group(1) + "','" + matcherPassword.group(1) + "')");
-		System.out.println("pageLogin.login('" + matcherUser.group(1) + "','" + matcherPassword.group(1) + "')");
 		js.executeScript("geoData.save({latitude:48.119335544742256,longitude:11.564400465904775})");
 	}
 

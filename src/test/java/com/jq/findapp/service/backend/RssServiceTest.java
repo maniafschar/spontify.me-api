@@ -49,7 +49,6 @@ public class RssServiceTest {
 
 		// then
 		assertTrue(found);
-		System.out.println(matcher.group(1));
 		assertEquals(
 				"https://i0.wp.com/fcbayerntotal.com/wp-content/uploads/2022/11/Flick_PK-22.05.20.jpg?fit=799%2C597&amp;ssl=1",
 				matcher.group(1));
