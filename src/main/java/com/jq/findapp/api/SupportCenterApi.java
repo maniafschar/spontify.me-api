@@ -174,28 +174,26 @@ public class SupportCenterApi {
 	@PutMapping("scheduler")
 	public void scheduler(@RequestHeader final String secret) throws Exception {
 		if (schedulerSecret.equals(secret)) {
-			synchronized (schedulerRunning) {
-				if (schedulerRunning.size() == 0) {
-					final boolean LAST = true;
-					// last job is backup, even after importLog
-					run(dbService::backup, LAST);
-					// importLog paralell to the rest, does not interfere
-					run(importLogService::importLog, !LAST);
-					run(chatService::answerAi, !LAST);
-					run(dbService::update, !LAST);
-					// run(statisticsService::update, !LAST);
-					run(engagementService::sendRegistrationReminder, !LAST);
-					// sendNearBy and sendChats after all event services
-					// to avoid multiple chat at the same time
-					run(engagementService::sendNearBy, LAST);
-					run(engagementService::sendChats, LAST);
-					run(ipService::lookupIps, LAST);
-					run(eventService::findMatchingBuddies, !LAST);
-					run(eventService::notifyParticipation, !LAST);
-					run(rssService::update, !LAST);
-				} else
-					throw new RuntimeException("Scheduler already running " + schedulerRunning.size() + " processes");
-			}
+			if (schedulerRunning.size() == 0) {
+				final boolean LAST = true;
+				// last job is backup, even after importLog
+				run(dbService::backup, LAST);
+				// importLog paralell to the rest, does not interfere
+				run(importLogService::importLog, !LAST);
+				run(chatService::answerAi, !LAST);
+				run(dbService::update, !LAST);
+				// run(statisticsService::update, !LAST);
+				run(engagementService::sendRegistrationReminder, !LAST);
+				// sendNearBy and sendChats after all event services
+				// to avoid multiple chat at the same time
+				run(engagementService::sendNearBy, LAST);
+				run(engagementService::sendChats, LAST);
+				run(ipService::lookupIps, LAST);
+				run(eventService::findMatchingBuddies, !LAST);
+				run(eventService::notifyParticipation, !LAST);
+				run(rssService::update, !LAST);
+			} else
+				throw new RuntimeException("Scheduler already running " + schedulerRunning.size() + " processes");
 		}
 	}
 
@@ -210,14 +208,19 @@ public class SupportCenterApi {
 				log.setContactId(adminId);
 				log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
 				try {
-					if (last)
+					if (last) {
+						boolean execute = false;
 						do {
 							try {
 								Thread.sleep(100);
 							} catch (final InterruptedException e) {
 								throw new RuntimeException(e);
 							}
-						} while (schedulerRunning.stream().anyMatch(e -> e > id));
+							synchronized (schedulerRunning) {
+								execute = schedulerRunning.stream().anyMatch(e -> e > id);
+							}
+						} while (execute);
+					}
 					final SchedulerResult result = scheduler.run();
 					log.setUri("/support/scheduler/" + result.name);
 					log.setStatus(Strings.isEmpty(result.exception) ? 200 : 500);
