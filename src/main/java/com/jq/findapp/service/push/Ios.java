@@ -51,9 +51,7 @@ public class Ios {
 	private BigInteger adminId;
 
 	public Environment send(final String from, final Contact contactTo, final String text, final String action,
-			final int badge,
-			final String notificationId)
-			throws Exception {
+			final int badge, final String notificationId) throws Exception {
 		try {
 			send(from, contactTo, url, text, action, badge, notificationId);
 			return Environment.Production;
@@ -68,9 +66,7 @@ public class Ios {
 	}
 
 	private void send(final String from, final Contact contactTo, final String url, final String text,
-			final String action, final int badge,
-			final String notificationId)
-			throws Exception {
+			final String action, final int badge, final String notificationId) throws Exception {
 		final HttpRequest request = HttpRequest.newBuilder()
 				.POST(BodyPublishers.ofString(
 						IOUtils

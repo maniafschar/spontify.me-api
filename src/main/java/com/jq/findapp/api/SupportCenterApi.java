@@ -204,9 +204,7 @@ public class SupportCenterApi {
 			@Override
 			public void run() {
 				final Log log = new Log();
-				final long time = System.currentTimeMillis();
 				log.setContactId(adminId);
-				log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
 				try {
 					if (last) {
 						boolean execute = false;
@@ -221,6 +219,7 @@ public class SupportCenterApi {
 							}
 						} while (execute);
 					}
+					log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
 					final SchedulerResult result = scheduler.run();
 					log.setUri("/support/scheduler/" + result.name);
 					log.setStatus(Strings.isEmpty(result.exception) ? 200 : 500);
@@ -239,7 +238,7 @@ public class SupportCenterApi {
 							"uncatched exception:\n" + Strings.stackTraceToString(ex), adminId, null);
 				} finally {
 					schedulerRunning.remove(id);
-					log.setTime((int) (System.currentTimeMillis() - time));
+					log.setTime((int) (System.currentTimeMillis() - log.getCreatedAt().getTime()));
 					if (log.getBody() != null && log.getBody().length() > 255)
 						log.setBody(log.getBody().substring(0, 252) + "...");
 					try {

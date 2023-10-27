@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -77,7 +78,8 @@ public class DbService {
 			if (clientUpdates.length() > 0)
 				result.result += (result.result.length() > 0 ? "\n" : "") + "ClientUpdate:"
 						+ clientUpdates.substring(1);
-			result.result += (result.result.length() > 0 ? "\n" : "") + repository.cleanUpAttachments();
+			if (LocalDateTime.now().getHour() == 0 && LocalDateTime.now().getMinute() == 0)
+				result.result += (result.result.length() > 0 ? "\n" : "") + repository.cleanUpAttachments();
 		} catch (final Exception e) {
 			result.exception = e;
 		}
