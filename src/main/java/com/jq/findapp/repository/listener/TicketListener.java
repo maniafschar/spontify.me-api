@@ -19,8 +19,9 @@ public class TicketListener extends AbstractRepositoryListener<Ticket> {
 			final JsonNode contact = new ObjectMapper().convertValue(
 					repository.one(Contact.class, ticket.getContactId()), JsonNode.class);
 			((ObjectNode) contact).put("password", "");
-			ticket.setNote(ticket.getNote() + "\n" + new ObjectMapper().writerWithDefaultPrettyPrinter()
-					.writeValueAsString(contact));
+			ticket.setNote(
+					Attachment.resolve(ticket.getNote()) + "\n" + new ObjectMapper().writerWithDefaultPrettyPrinter()
+							.writeValueAsString(contact));
 			Attachment.save(ticket);
 		}
 	}
