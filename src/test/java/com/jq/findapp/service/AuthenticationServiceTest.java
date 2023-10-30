@@ -244,15 +244,16 @@ public class AuthenticationServiceTest {
 		assertTrue(result);
 	}
 
+	@Test
 	public void ios() throws Exception {
 		// given
 		final Contact contact = utils.createContact();
-		contact.setPushToken("5c9479d45126fa0f99e8f7692c4cb1bad18d0c71bfb34d4298abd93e48cf419d");
-		contact.setClientId(new BigInteger("7"));
-		System.setProperty("javax.net.debug", "all");
+		contact.setPushToken("722fb09cd97250a33d0046fbd0612045a06e463de8d098158fbe4c80321cfcf9");
+		contact.setClientId(new BigInteger("4"));
+		// System.setProperty("javax.net.debug", "all");
 
 		// when
-		final Environment environmet = ios.send(contact.getPseudonym(), contact, "uzgku", "chat=12", 12, "1");
+		final Environment environmet = ios.send(contact.getPseudonym(), contact, "uzgku", "news=823", 12, "1");
 
 		// then
 		assertEquals(Environment.Development, environmet);
