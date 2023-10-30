@@ -289,9 +289,8 @@ public class AuthenticationService {
 			if (ContactType.demo == c2.getType())
 				user.put("contact.type", ContactType.adminContent.name());
 			// TODO rm 0.6
-			if (c2.getVersion().compareTo("0.6.0") < 0)
-				user.put("script_correction",
-						"setInterval(function(){var e=ui.q('chatList');if(parseInt(e.style.height)==0){e.removeAttribute('toggle');e.removeAttribute('h');e.setAttribute('style','display:none;')}},1000)");
+			user.put("script_correction",
+					"setInterval(function(){var e=ui.q('chatList');if(parseInt(e.style.height)==0&&parseInt(e.getAttribute('toggle'))<new Date().getTime()-500){var e2=document.createElement('chatList');e2.style.display='none';e.parentElement.replaceChild(e2,e);communication.ping()}},1000)");
 		}
 		return user;
 	}

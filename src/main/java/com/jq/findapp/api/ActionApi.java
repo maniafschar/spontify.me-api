@@ -246,17 +246,21 @@ public class ActionApi {
 
 	@GetMapping("script/{version}")
 	public String script(@PathVariable final String version) throws Exception {
-		return null;
+		return "setInterval(function(){var e=ui.q('chatList');if(parseInt(e.style.height)==0&&parseInt(e.getAttribute('toggle'))<new Date().getTime()-500){var e2=document.createElement('chatList');e2.style.display='none';e.parentElement.replaceChild(e2,e);communication.ping()}},1000)";
 	}
 
 	@GetMapping("news")
-	public List<Object[]> news(@RequestHeader final BigInteger clientId) throws Exception {
+	public List<Object[]> news(@RequestHeader final BigInteger clientId,
+			@RequestParam(required = false) final BigInteger id) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_listNews);
 		params.setLimit(25);
 		final Contact contact = new Contact();
 		contact.setClientId(clientId);
 		params.setUser(contact);
-		params.setSearch("clientNews.publish<='" + Instant.now().toString() + "'");
+		if (id == null)
+			params.setSearch("clientNews.publish<='" + Instant.now().toString() + "'");
+		else
+			params.setSearch("clientNews.id=" + id);
 		return repository.list(params).getList();
 	}
 
@@ -447,7 +451,7 @@ public class ActionApi {
 		final int fee = 20;
 		final Map<String, Object> paypalConfig = new HashMap<>(3);
 		paypalConfig.put("fee", fee);
-		if (user != null) {
+		if (user != null && !BigInteger.ZERO.equals(user)) {
 			final Contact contact = repository.one(Contact.class, user);
 			final String s = getPaypalKey(user);
 			paypalConfig.put("key", s.substring(0, s.indexOf(':')));
