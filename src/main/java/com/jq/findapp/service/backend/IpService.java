@@ -28,9 +28,6 @@ public class IpService {
 	@Value("${app.url.lookupip}")
 	private String lookupIp;
 
-	@Value("${app.admin.id}")
-	private BigInteger adminId;
-
 	public static String sanatizeIp(final String ip) {
 		if (ip != null && ip.contains(","))
 			return ip.substring(ip.lastIndexOf(",") + 1).trim();

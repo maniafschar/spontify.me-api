@@ -10,7 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -47,9 +46,6 @@ public class WebSocket {
 
 	@Autowired
 	private Repository repository;
-
-	@Value("${app.admin.id}")
-	private BigInteger adminId;
 
 	private final Pattern numbers = Pattern.compile("\\d+");
 

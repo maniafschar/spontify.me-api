@@ -41,9 +41,6 @@ public class ExternalService {
 	@Value("${app.chatGPT.key}")
 	private String chatGpt;
 
-	@Value("${app.admin.id}")
-	protected BigInteger adminId;
-
 	public String google(final String param, final BigInteger user) {
 		final String result = WebClient
 				.create("https://maps.googleapis.com/maps/api/" + param + (param.contains("?") ? "&" : "?")
@@ -162,7 +159,6 @@ public class ExternalService {
 				.bodyValue(IOUtils.toString(getClass().getResourceAsStream("/template/gpt.json"),
 						StandardCharsets.UTF_8).replace("{prompt}", prompt))
 				.retrieve().toEntity(String.class).block().getBody();
-		notificationService.createTicket(TicketType.ERROR, "gpt", prompt + "\n\n" + s, adminId, null);
 		return new ObjectMapper().readTree(s).get("choices").get(0).get("text").asText().trim();
 	}
 }

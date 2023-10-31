@@ -10,7 +10,6 @@ import java.time.ZonedDateTime;
 import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
@@ -38,9 +37,6 @@ public class EventService {
 
 	@Autowired
 	private Text text;
-
-	@Value("${app.admin.id}")
-	private BigInteger adminId;
 
 	public SchedulerResult findMatchingBuddies() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/findMatchingBuddies");

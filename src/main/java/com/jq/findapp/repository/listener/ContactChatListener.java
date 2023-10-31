@@ -1,9 +1,11 @@
 package com.jq.findapp.repository.listener;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.ContactChat;
@@ -18,6 +20,9 @@ import com.jq.findapp.util.Text.TextId;
 public class ContactChatListener extends AbstractRepositoryListener<ContactChat> {
 	@Autowired
 	private ChatService chatService;
+
+	@Value("${app.admin.id}")
+	protected BigInteger adminId;
 
 	@Override
 	public void prePersist(final ContactChat contactChat) throws Exception {
@@ -39,7 +44,7 @@ public class ContactChatListener extends AbstractRepositoryListener<ContactChat>
 			chatService.createGptAnswer(contactChat);
 	}
 
-	private boolean duplicateCheck(ContactChat contactChat) throws Exception {
+	private boolean duplicateCheck(final ContactChat contactChat) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_chat);
 		params.setLimit(1);
 		params.setSearch("contactChat.contactId=" + contactChat.getContactId() + " and contactChat.contactId2="
