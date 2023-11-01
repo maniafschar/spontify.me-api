@@ -182,7 +182,6 @@ public class SupportCenterApi {
 				run(importLogService::importLog, !LAST);
 				run(chatService::answerAi, !LAST);
 				run(dbService::update, !LAST);
-				// run(statisticsService::update, !LAST);
 				run(engagementService::sendRegistrationReminder, !LAST);
 				// sendNearBy and sendChats after all event services
 				// to avoid multiple chat at the same time
@@ -231,7 +230,7 @@ public class SupportCenterApi {
 						notificationService.createTicket(TicketType.ERROR, "scheduler",
 								Strings.stackTraceToString(result.exception), adminId, null);
 					}
-				} catch (Throwable ex) {
+				} catch (final Throwable ex) {
 					log.setBody("uncaught exception " + ex.getClass().getName() + ": " + ex.getMessage() +
 							(log.getBody() == null ? "" : "\n" + log.getBody()));
 					notificationService.createTicket(TicketType.ERROR, "scheduler",

@@ -1,6 +1,7 @@
 package com.jq.findapp.service.backend;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -8,6 +9,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -80,6 +83,7 @@ public class DbService {
 						+ clientUpdates.substring(1);
 			if (LocalDateTime.now().getHour() == 0 && LocalDateTime.now().getMinute() == 0)
 				result.result += (result.result.length() > 0 ? "\n" : "") + repository.cleanUpAttachments();
+			statistics(BigInteger.valueOf(4l));
 		} catch (final Exception e) {
 			result.exception = e;
 		}
@@ -137,5 +141,24 @@ public class DbService {
 			return true;
 		}
 		return false;
+	}
+
+	private void statistics(final BigInteger clientId) throws Exception {
+		final Map<String, Object> data = new HashMap<>();
+		final QueryParams params = new QueryParams(Query.misc_statsUser);
+		params.setUser(new Contact());
+		params.getUser().setClientId(clientId);
+		params.setLimit(0);
+		data.put("user", repository.list(params).getList());
+		params.setQuery(Query.misc_statsLog);
+		data.put("log", repository.list(params).getList());
+		params.setQuery(Query.misc_statsApi);
+		data.put("api", repository.list(params).getList());
+		params.setQuery(Query.misc_statsLocations);
+		params.setLimit(15);
+		data.put("locations", repository.list(params).getList());
+		data.put("update", Instant.now().toString());
+		IOUtils.write(new ObjectMapper().writeValueAsString(data),
+				new FileOutputStream("statistics" + clientId + ".json"), StandardCharsets.UTF_8);
 	}
 }
