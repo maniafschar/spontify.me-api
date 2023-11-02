@@ -1,7 +1,6 @@
 package com.jq.findapp.repository;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Value;
 
 public enum Query {
 	contact_block,
@@ -65,11 +63,7 @@ public enum Query {
 	misc_statsApi,
 	misc_statsLocations,
 	misc_statsLog,
-	misc_statsLogin,
 	misc_statsUser;
-
-	@Value("${app.admin.id}")
-	private static BigInteger adminId;
 
 	private final String sql;
 	private final String[] header;

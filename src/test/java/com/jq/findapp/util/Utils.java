@@ -6,7 +6,6 @@ import java.sql.Timestamp;
 import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.Client;
@@ -20,9 +19,6 @@ public class Utils {
 	@Autowired
 	private Repository repository;
 
-	@Value("${app.admin.id}")
-	private BigInteger adminId;
-
 	public Client createClient() throws Exception {
 		Client client = repository.one(Client.class, BigInteger.ONE);
 		if (client == null) {
@@ -31,33 +27,32 @@ public class Utils {
 			client.setEmail("abc@jq-consulting.de");
 			client.setUrl("https://fan-club.online");
 			client.setStorage("{\"css\":{}}");
+			client.setAdminId(BigInteger.ONE);
 			repository.save(client);
 		}
 		return client;
 	}
 
 	public Contact createContact() throws Exception {
-		Contact contact = repository.one(Contact.class, adminId);
+		Contact contact = repository.one(Contact.class, BigInteger.ONE);
 		if (contact == null) {
 			int i = 1;
 			createClient();
-			do {
-				contact = new Contact();
-				contact.setClientId(BigInteger.ONE);
-				contact.setEmail("test" + i + "@jq-consulting.de");
-				contact.setLanguage("DE");
-				contact.setIdDisplay("123456" + i++);
-				contact.setFacebookId("1234567890");
-				contact.setBirthday(new Date(3000000000L));
-				contact.setVisitPage(new Timestamp(System.currentTimeMillis() - 3000000L));
-				contact.setGender((short) 1);
-				contact.setTimezone(TimeZone.getDefault().getID());
-				contact.setPseudonym("pseudonym");
-				contact.setVerified(true);
-				contact.setPassword(Encryption.encryptDB("secret_password"));
-				contact.setPasswordReset(System.currentTimeMillis());
-				repository.save(contact);
-			} while (contact.getId().intValue() < adminId.intValue());
+			contact = new Contact();
+			contact.setClientId(BigInteger.ONE);
+			contact.setEmail("test" + i + "@jq-consulting.de");
+			contact.setLanguage("DE");
+			contact.setIdDisplay("123456" + i++);
+			contact.setFacebookId("1234567890");
+			contact.setBirthday(new Date(3000000000L));
+			contact.setVisitPage(new Timestamp(System.currentTimeMillis() - 3000000L));
+			contact.setGender((short) 1);
+			contact.setTimezone(TimeZone.getDefault().getID());
+			contact.setPseudonym("pseudonym");
+			contact.setVerified(true);
+			contact.setPassword(Encryption.encryptDB("secret_password"));
+			contact.setPasswordReset(System.currentTimeMillis());
+			repository.save(contact);
 		}
 		return contact;
 	}

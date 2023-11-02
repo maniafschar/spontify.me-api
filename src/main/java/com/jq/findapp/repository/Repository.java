@@ -28,12 +28,12 @@ import java.util.zip.ZipFile;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jq.findapp.entity.BaseEntity;
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.util.Strings;
 
@@ -49,9 +49,6 @@ public class Repository {
 
 	@Autowired
 	private Listeners listeners;
-
-	@Value("${app.admin.id}")
-	private BigInteger adminId;
 
 	public Result list(final QueryParams params) {
 		final GeoLocationProcessor geo = new GeoLocationProcessor(params);
@@ -108,7 +105,7 @@ public class Repository {
 		if (s.contains("{CLIENTID}"))
 			s = s.replaceAll("\\{CLIENTID}", "" + params.getUser().getClientId());
 		if (s.contains("{ADMINID}"))
-			s = s.replaceAll("\\{ADMINID}", "" + adminId);
+			s = s.replaceAll("\\{ADMINID}", "" + one(Client.class, params.getUser().getClientId()).getAdminId());
 		if (s.contains("{USERAGE}"))
 			s = s.replaceAll("\\{USERAGE}",
 					"" + (params.getUser().getAge() == null ? 0 : params.getUser().getAge()));
@@ -221,7 +218,7 @@ public class Repository {
 						final Object o = m.invoke(e);
 						if (o != null && o.toString().contains("" + Attachment.SEPARATOR))
 							ids.add(Attachment.getFilename(o.toString()));
-					} catch (Exception ex) {
+					} catch (final Exception ex) {
 						throw new RuntimeException(ex);
 					}
 				});

@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.model.AbstractRegistration;
 import com.jq.findapp.api.model.InternalRegistration;
 import com.jq.findapp.entity.BaseEntity;
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.ContactType;
 import com.jq.findapp.entity.ContactToken;
@@ -59,9 +60,6 @@ public class AuthenticationService {
 
 	@Autowired
 	private Text text;
-
-	@Value("${app.admin.id}")
-	private BigInteger adminId;
 
 	@Value("${account.delete.sql}")
 	private String accountDeleteSql;
@@ -190,8 +188,7 @@ public class AuthenticationService {
 		if (!unique.unique)
 			throw new IllegalAccessException("email");
 		if (unique.blocked) {
-			notificationService.createTicket(TicketType.ERROR, "denied email blocked", registration.toString(), null,
-					null);
+			notificationService.createTicket(TicketType.ERROR, "denied email blocked", registration.toString(), null);
 			throw new IllegalAccessException("domain");
 		}
 		final QueryParams params = new QueryParams(Query.contact_listId);
@@ -208,7 +205,10 @@ public class AuthenticationService {
 		contact.setTimezone(registration.getTimezone());
 		contact.setClientId(registration.getClientId());
 		try {
-			notificationService.sendNotificationEmail(repository.one(Contact.class, adminId), contact,
+			notificationService.sendNotificationEmail(
+					repository.one(Contact.class,
+							repository.one(Client.class, registration.getClientId()).getAdminId()),
+					contact,
 					text.getText(contact, TextId.mail_contactWelcomeEmail), "r=" + generateLoginParam(contact));
 			saveRegistration(contact, registration);
 		} catch (final SendFailedException ex) {
@@ -257,8 +257,8 @@ public class AuthenticationService {
 			}
 		} else
 			repository.save(contact);
-		notificationService.createTicket(TicketType.REGISTRATION, contact.getEmail(),
-				registration.toString(), contact.getId(), contact.getClientId());
+		notificationService.createTicket(TicketType.REGISTRATION, contact.getEmail(), registration.toString(),
+				contact.getId());
 	}
 
 	private boolean isDuplicateIdDisplay(Throwable ex) {
@@ -367,9 +367,9 @@ public class AuthenticationService {
 			repository.save(contact);
 		} else
 			s = contact.getLoginLink().substring(0, 10) + contact.getLoginLink().substring(20);
-		notificationService.sendNotificationEmail(repository.one(Contact.class, adminId),
-				contact,
-				text.getText(contact, TextId.mail_contactRegistrationReminder).replace("<jq:EXTRA_1 />",
+		notificationService.sendNotificationEmail(
+				repository.one(Contact.class, repository.one(Client.class, contact.getClientId()).getAdminId()),
+				contact, text.getText(contact, TextId.mail_contactRegistrationReminder).replace("<jq:EXTRA_1 />",
 						Strings.formatDate(null, contact.getCreatedAt(), contact.getTimezone())),
 				"r=" + s);
 	}
@@ -438,13 +438,13 @@ public class AuthenticationService {
 		}
 	}
 
-	public void deleteAccount(final Contact user) throws Exception {
-		if (user.getId() == adminId)
+	public void deleteAccount(final Contact contact) throws Exception {
+		if (contact.getId() == repository.one(Client.class, contact.getClientId()).getAdminId())
 			return;
 		final String[] sqls = accountDeleteSql.split(";");
 		for (String sql : sqls) {
 			try {
-				sql = sql.replaceAll("\\{ID}", "" + user.getId()).trim();
+				sql = sql.replaceAll("\\{ID}", "" + contact.getId()).trim();
 				if (sql.startsWith("from ")) {
 					final List<?> list = repository.list(sql);
 					for (final Object e : list)

@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.model.Position;
 import com.jq.findapp.api.model.WriteEntity;
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactChat;
@@ -116,9 +117,6 @@ public class ActionApi {
 	@Value("${app.paypal.sandbox.key}")
 	private String paypalSandboxKey;
 
-	@Value("${app.admin.id}")
-	private BigInteger adminId;
-
 	@Value("${app.server.webSocket}")
 	private String serverWebSocket;
 
@@ -129,11 +127,10 @@ public class ActionApi {
 
 	@PostMapping("notify")
 	public void notify(final String text,
-			@RequestHeader final BigInteger clientId,
 			@RequestHeader(required = false) final BigInteger user,
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) {
 		if (text != null)
-			notificationService.createTicket(TicketType.ERROR, "client", "IP\n\t" + ip + "\n\n" + text, user, clientId);
+			notificationService.createTicket(TicketType.ERROR, "client", "IP\n\t" + ip + "\n\n" + text, user);
 	}
 
 	@GetMapping("quotation")
@@ -237,11 +234,11 @@ public class ActionApi {
 			return "https://maps.googleapis.com/maps/api/js?key=" + googleKeyJS;
 		if (param.startsWith("latlng=")) {
 			final String[] l = param.substring(7).split(",");
-			return externalService.getAddress(Float.parseFloat(l[0]), Float.parseFloat(l[1]), user);
+			return externalService.getAddress(Float.parseFloat(l[0]), Float.parseFloat(l[1]));
 		}
 		if (param.startsWith("town="))
-			return externalService.getLatLng(param.substring(5), user);
-		return externalService.google(param, user);
+			return externalService.getLatLng(param.substring(5));
+		return externalService.google(param);
 	}
 
 	@GetMapping("script/{version}")
@@ -371,8 +368,7 @@ public class ActionApi {
 		params.setSearch("contactGeoLocationHistory.createdAt>'" + Instant.now().minus(Duration.ofSeconds(5))
 				+ "' and contactGeoLocationHistory.contactId=" + contact.getId());
 		if (repository.list(params).size() == 0) {
-			final GeoLocation geoLocation = externalService.getAddress(position.getLatitude(),
-					position.getLongitude(), user);
+			final GeoLocation geoLocation = externalService.getAddress(position.getLatitude(), position.getLongitude());
 			if (geoLocation != null) {
 				final Map<String, Object> result = new HashMap<>();
 				if (geoLocation.getStreet() != null && geoLocation.getNumber() != null)
@@ -405,7 +401,7 @@ public class ActionApi {
 		final String note = text.getText(contact, TextId.notification_authenticate)
 				.replace("{0}", Strings.formatDate(null, videoCall.getTime(), contact.getTimezone()));
 		final ContactChat chat = new ContactChat();
-		chat.setContactId(adminId);
+		chat.setContactId(repository.one(Client.class, contact.getClientId()).getAdminId());
 		chat.setContactId2(user);
 		chat.setTextId(TextId.notification_authenticate);
 		chat.setNote(note);
@@ -418,7 +414,8 @@ public class ActionApi {
 		final ObjectMapper m = new ObjectMapper();
 		final JsonNode n = m.readTree(data);
 		notificationService.createTicket(TicketType.PAYPAL, "webhook",
-				m.writerWithDefaultPrettyPrinter().writeValueAsString(n), adminId, clientId);
+				m.writerWithDefaultPrettyPrinter().writeValueAsString(n),
+				repository.one(Client.class, clientId).getAdminId());
 		if ("PAYMENT.CAPTURE.REFUNDED".equals(n.get("event_type").asText())) {
 			String id = n.get("resource").get("links").get(1).get("href").asText();
 			id = id.substring(id.lastIndexOf('/') + 1);

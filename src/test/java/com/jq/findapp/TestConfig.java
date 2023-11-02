@@ -7,7 +7,6 @@ import static org.mockito.Mockito.spy;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -100,7 +99,7 @@ public class TestConfig {
 	@Primary
 	public class ExternalServiceTest extends ExternalService {
 		@Override
-		public String google(final String param, final BigInteger user) {
+		public String google(final String param) {
 			try {
 				return IOUtils.toString(
 						getClass().getResourceAsStream(

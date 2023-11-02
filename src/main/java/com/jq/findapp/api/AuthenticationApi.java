@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jq.findapp.api.model.ExternalRegistration;
 import com.jq.findapp.api.model.InternalRegistration;
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactToken;
 import com.jq.findapp.entity.GeoLocation;
@@ -46,9 +46,6 @@ public class AuthenticationApi {
 
 	@Autowired
 	private AuthenticationExternalService authenticationExternalService;
-
-	@Value("${app.admin.id}")
-	private BigInteger adminId;
 
 	@GetMapping("logoff")
 	public void logoff(final String token, @RequestHeader final BigInteger user) throws Exception {
@@ -113,7 +110,7 @@ public class AuthenticationApi {
 	}
 
 	private Boolean getVideoTimeSlot(final BigInteger id) {
-		if (adminId.equals(id))
+		if (repository.one(Client.class, repository.one(Contact.class, id).getClientId()).getAdminId().equals(id))
 			return true;
 		final QueryParams params = new QueryParams(Query.contact_listVideoCalls);
 		params.setUser(repository.one(Contact.class, id));

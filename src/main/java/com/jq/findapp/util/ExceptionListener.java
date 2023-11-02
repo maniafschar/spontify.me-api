@@ -113,10 +113,10 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 			return;
 		msg = msg.replaceFirst(SUBSTITUTE, "" + request.getServerPort()).replaceFirst(SUBSTITUTE, s.toString());
 		try {
-			notificationService.createTicket(TicketType.ERROR, "uncaught exception", msg, userId, null);
+			notificationService.createTicket(TicketType.ERROR, "uncaught exception", msg, userId);
 		} catch (final Exception e1) {
 			notificationService.createTicket(TicketType.ERROR, "uncaught exception, error on creating report",
-					msg + "\n\n\n" + Strings.stackTraceToString(e1), userId, null);
+					msg + "\n\n\n" + Strings.stackTraceToString(e1), userId);
 		}
 	}
 

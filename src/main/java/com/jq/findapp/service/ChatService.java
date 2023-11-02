@@ -5,11 +5,11 @@ import java.time.Duration;
 import java.time.Instant;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.ContactLink;
@@ -36,16 +36,13 @@ public class ChatService {
 	@Autowired
 	private Text text;
 
-	@Value("${app.admin.id}")
-	protected BigInteger adminId;
-
 	@Async
 	public void createGptAnswer(final ContactChat contactChat) throws Exception {
 		createGptAnswerIntern(contactChat);
 	}
 
 	public boolean isVideoCallAllowed(final Contact contact, final BigInteger id) {
-		if (adminId.equals(contact.getId()))
+		if (repository.one(Client.class, contact.getClientId()).getAdminId().equals(contact.getId()))
 			return true;
 		final QueryParams params = new QueryParams(Query.contact_listFriends);
 		params.setUser(contact);
@@ -60,14 +57,17 @@ public class ChatService {
 	public SchedulerResult answerAi() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/answerAi");
 		final QueryParams params = new QueryParams(Query.contact_chat);
-		params.setSearch("contactChat.contactId<>" + adminId + " and contactChat.textId='" + TextId.engagement_ai.name()
-				+ "' and contactChat.createdAt>'"
-				+ Instant.now().minus(Duration.ofDays(3)) + "'");
+		params.setSearch(
+				"contactChat.contactId<>(select adminId from Client client, Contact contact where client.id=contact.clientId and contact.id=contactChat.contactId) and contactChat.textId='"
+						+ TextId.engagement_ai.name()
+						+ "' and contactChat.createdAt>'"
+						+ Instant.now().minus(Duration.ofDays(3)) + "'");
 		final Result result2 = repository.list(params);
 		int count = 0;
 		for (int i = 0; i < result2.size(); i++) {
 			params.setSearch(
-					"contactChat.contactId=" + adminId + " and contactChat.id>" + result2.get(i).get("contactChat.id"));
+					"contactChat.contactId=(select adminId from Client client, Contact contact where client.id=contact.clientId and contact.id=contactChat.contactId) and contactChat.id>"
+							+ result2.get(i).get("contactChat.id"));
 			if (repository.list(params).size() == 0) {
 				try {
 					createGptAnswer(
@@ -93,7 +93,9 @@ public class ChatService {
 		contactChat.setSeen(Boolean.TRUE);
 		repository.save(contactChat);
 		final ContactChat chat = new ContactChat();
-		chat.setContactId(adminId);
+		chat.setContactId(
+				repository.one(Client.class, repository.one(Contact.class, contactChat.getContactId()).getClientId())
+						.getAdminId());
 		chat.setContactId2(contactChat.getContactId());
 		chat.setTextId(TextId.engagement_ai);
 		chat.setNote(externalService.chatGpt(contactChat.getNote()));

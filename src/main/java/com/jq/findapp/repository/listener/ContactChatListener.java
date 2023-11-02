@@ -1,13 +1,13 @@
 package com.jq.findapp.repository.listener;
 
-import java.math.BigInteger;
 import java.util.Arrays;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.jq.findapp.entity.Client;
+import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
@@ -20,9 +20,6 @@ import com.jq.findapp.util.Text.TextId;
 public class ContactChatListener extends AbstractRepositoryListener<ContactChat> {
 	@Autowired
 	private ChatService chatService;
-
-	@Value("${app.admin.id}")
-	protected BigInteger adminId;
 
 	@Override
 	public void prePersist(final ContactChat contactChat) throws Exception {
@@ -38,7 +35,11 @@ public class ContactChatListener extends AbstractRepositoryListener<ContactChat>
 		}
 		chatService.notifyContact(contactChat);
 		if (contactChat.getTextId() == TextId.engagement_ai
-				&& contactChat.getContactId2().equals(adminId)
+				&& contactChat.getContactId2()
+						.equals(repository
+								.one(Client.class,
+										repository.one(Contact.class, contactChat.getContactId()).getClientId())
+								.getAdminId())
 				&& contactChat.getNote() != null
 				&& contactChat.getNote().indexOf(Attachment.SEPARATOR) < 0)
 			chatService.createGptAnswer(contactChat);

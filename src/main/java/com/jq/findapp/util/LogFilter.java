@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Log;
 import com.jq.findapp.repository.Repository;
@@ -38,9 +39,6 @@ public class LogFilter implements Filter {
 
 	@Autowired
 	private AuthenticationService authenticationService;
-
-	@Value("${app.admin.id}")
-	private BigInteger adminId;
 
 	@Value("${app.supportCenter.secret}")
 	private String supportCenterSecret;
@@ -86,7 +84,7 @@ public class LogFilter implements Filter {
 			if (req.getHeader("user") != null)
 				log.setContactId(new BigInteger(req.getHeader("user")));
 			else if (req.getRequestURI().startsWith("/support/"))
-				log.setContactId(adminId);
+				log.setContactId(BigInteger.ZERO);
 		} catch (final AuthenticationException ex) {
 			log.setStatus(HttpStatus.UNAUTHORIZED.value());
 			log.setBody(ex.getType().name());
@@ -118,13 +116,13 @@ public class LogFilter implements Filter {
 				if (!BigInteger.ZERO.equals(user)) {
 					final Contact contact = authenticationService.verify(user,
 							req.getHeader("password"), req.getHeader("salt"));
-					if (!user.equals(adminId)
-							&& !contact.getClientId().equals(new BigInteger(req.getHeader("clientId"))))
+					if (!contact.getClientId().equals(new BigInteger(req.getHeader("clientId"))))
 						throw new AuthenticationException(AuthenticationExceptionType.WrongClient);
 				}
 			} else if (req.getRequestURI().startsWith("/support/")) {
 				if (supportCenterSecret.equals(req.getHeader("secret")))
-					authenticationService.verify(adminId, req.getHeader("password"), req.getHeader("salt"));
+					authenticationService.verify(repository.one(Client.class, BigInteger.ONE).getAdminId(),
+							req.getHeader("password"), req.getHeader("salt"));
 				else if (!schedulerSecret.equals(req.getHeader("secret")) ||
 						!req.getRequestURI().equals("/support/scheduler") &&
 								!req.getRequestURI().equals("/support/healthcheck"))

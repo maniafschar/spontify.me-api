@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -26,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactBluetooth;
 import com.jq.findapp.entity.ContactChat;
@@ -47,14 +47,11 @@ public class RepositoryTest {
 	@Autowired
 	private Utils utils;
 
-	@Value("${app.admin.id}")
-	private BigInteger adminId;
-
 	private ContactChat createChat(final Contact contact) throws Exception {
 		final ContactChat contactChat = new ContactChat();
 		contactChat.setNote("Hi");
 		contactChat.setContactId(contact.getId());
-		contactChat.setContactId2(adminId);
+		contactChat.setContactId2(repository.one(Client.class, contact.getClientId()).getAdminId());
 		repository.save(contactChat);
 		return contactChat;
 	}
@@ -229,7 +226,7 @@ public class RepositoryTest {
 		final ContactChat contactChat = new ContactChat();
 		contactChat.setImage(Attachment.createImage(".jpg", b));
 		contactChat.setContactId(contact.getId());
-		contactChat.setContactId2(adminId);
+		contactChat.setContactId2(repository.one(Client.class, contact.getClientId()).getAdminId());
 		final ContactChat contactChat2 = new ContactChat();
 		contactChat2.setImage(Attachment.createImage(".jpg", b));
 		contactChat2.setContactId(contactChat.getContactId());

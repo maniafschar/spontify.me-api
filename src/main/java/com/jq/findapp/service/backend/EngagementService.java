@@ -17,11 +17,11 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailSendException;
 import org.springframework.stereotype.Service;
 
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.OS;
 import com.jq.findapp.entity.ContactChat;
@@ -59,9 +59,6 @@ public class EngagementService {
 
 	private static Map<BigInteger, String> currentVersion = new HashMap<>();
 
-	@Value("${app.admin.id}")
-	private BigInteger adminId;
-
 	private static class ChatTemplate {
 		private final TextId textId;
 		private final String action;
@@ -83,7 +80,6 @@ public class EngagementService {
 	}
 
 	private final List<ChatTemplate> chatTemplates = new ArrayList<>();
-	private final QueryParams paramsAdminBlocked = new QueryParams(Query.contact_block);
 
 	enum REPLACMENT {
 		EMOJI_DANCING((contact, location, externalService,
@@ -96,7 +92,7 @@ public class EngagementService {
 		CONTACT_PSEUDONYM((contact, location, externalService, repository) -> contact.getPseudonym()),
 		CONTACT_CURRENT_TOWN((contact, location, externalService, repository) -> {
 			try {
-				return externalService.getAddress(contact.getLatitude(), contact.getLongitude(), null).getTown();
+				return externalService.getAddress(contact.getLatitude(), contact.getLongitude()).getTown();
 			} catch (
 
 		final Exception e) {
@@ -308,7 +304,7 @@ public class EngagementService {
 					result.result = "0";
 				if (failedEmails.length() > 0)
 					notificationService.createTicket(TicketType.ERROR, "sendRegistrationReminder",
-							"Failed Emails:" + failedEmails, null, null);
+							"Failed Emails:" + failedEmails, null);
 			}
 		} catch (final Exception e) {
 			result.exception = e;
@@ -322,19 +318,23 @@ public class EngagementService {
 			resetChatInstallCurrentVersion();
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setLimit(0);
-			params.setSearch("contact.id<>" + adminId
-					+ " and contact.verified=true and contact.version is not null");
+			params.setSearch("contact.verified=true and contact.version is not null");
 			final Result ids = repository.list(params);
 			params.setQuery(Query.contact_chat);
 			int count = 0;
 			long t = System.currentTimeMillis();
 			for (int i = 0; i < ids.size(); i++) {
-				params.setSearch("contactChat.contactId=" + adminId + " and contactChat.contactId2="
-						+ ids.get(i).get("contact.id"));
-				if (repository.list(params).size() == 0) {
-					sendChat(TextId.engagement_welcome,
-							repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id")), null, null);
-					count++;
+				final BigInteger contactId = (BigInteger) ids.get(i).get("contact.id");
+				final BigInteger adminId = repository
+						.one(Client.class, repository.one(Contact.class, contactId).getClientId())
+						.getAdminId();
+				if (!contactId.equals(adminId)) {
+					params.setSearch("contactChat.contactId=" + adminId + " and contactChat.contactId2=" + contactId);
+					if (repository.list(params).size() == 0) {
+						sendChat(TextId.engagement_welcome,
+								repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id")), null, null);
+						count++;
+					}
 				}
 			}
 			result.result += "welcome: " + count + ", time: " + (System.currentTimeMillis() - t);
@@ -355,6 +355,8 @@ public class EngagementService {
 	private boolean isTimeForNewChat(final Contact contact, final QueryParams params, final boolean nearBy) {
 		final int hour = Instant.now().atZone(TimeZone.getTimeZone(contact.getTimezone()).toZoneId()).getHour();
 		if (hour > 6 && hour < 22) {
+			final QueryParams paramsAdminBlocked = new QueryParams(Query.contact_block);
+			final BigInteger adminId = repository.one(Client.class, contact.getClientId()).getAdminId();
 			paramsAdminBlocked.setSearch("block.contactId=" + adminId + " and block.contactId2="
 					+ contact.getId()
 					+ " or block.contactId=" + contact.getId() + " and block.contactId2=" + adminId);
@@ -390,7 +392,8 @@ public class EngagementService {
 	private void resetChatInstallCurrentVersion() throws Exception {
 		if (currentVersion.size() == 0) {
 			final QueryParams params = new QueryParams(Query.contact_maxAppVersion);
-			params.setUser(repository.one(Contact.class, adminId));
+			params.setUser(new Contact());
+			params.getUser().setId(BigInteger.ZERO);
 			final Result result = repository.list(params);
 			for (int i = 0; i < result.size(); i++)
 				currentVersion.put((BigInteger) result.get(i).get("contact.clientId"),
@@ -417,17 +420,17 @@ public class EngagementService {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/sendNearBy");
 		try {
 			final QueryParams params = new QueryParams(Query.contact_listId);
-			params.setSearch(
-					"contact.id<>" + adminId + " and contact.verified=true and contact.notificationEngagement=true and "
-							+ "contact.version is not null and contact.longitude is not null and "
-							+ "(length(contact.skills)>0 or length(contact.skillsText)>0)");
+			params.setSearch("contact.verified=true and contact.notificationEngagement=true and "
+					+ "contact.version is not null and contact.longitude is not null and "
+					+ "(length(contact.skills)>0 or length(contact.skillsText)>0)");
 			params.setLimit(0);
 			final Result ids = repository.list(params);
 			params.setQuery(Query.contact_chat);
 			int count = 0;
 			for (int i = 0; i < ids.size(); i++) {
 				final Contact contact = repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id"));
-				if (isTimeForNewChat(contact, params, true)) {
+				if (!contact.getId().equals(repository.one(Client.class, contact.getClientId()).getAdminId())
+						&& isTimeForNewChat(contact, params, true)) {
 					final String action = getLastNearByAction(params, (BigInteger) ids.get(i).get("contact.id"));
 					if (!action.startsWith("p=") && sendContact(contact))
 						count++;
@@ -444,7 +447,9 @@ public class EngagementService {
 		params.setSearch("contactChat.action is not null and contactChat.textId like '"
 				+ TextId.engagement_nearByLocation.name().substring(0,
 						TextId.engagement_nearByLocation.name().indexOf('L'))
-				+ "%' and contactChat.contactId=" + adminId + " and contactChat.contactId2=" + id);
+				+ "%' and contactChat.contactId="
+				+ repository.one(Client.class, repository.one(Contact.class, id).getClientId()).getAdminId()
+				+ " and contactChat.contactId2=" + id);
 		final Result chats = repository.list(params);
 		if (chats.size() == 0)
 			return "";
@@ -483,10 +488,12 @@ public class EngagementService {
 			Contact contact2 = null;
 			for (int i = 0; i < result.size(); i++) {
 				final Contact c = repository.one(Contact.class, (BigInteger) result.get(i).get("contact.id"));
-				params.setSearch("contactChat.contactId=" + adminId + " and contactChat.contactId2=" + contact.getId()
-						+ " and contactChat.textId='" + TextId.engagement_nearByContact.name()
-						+ "' and contactChat.action like '%"
-						+ Strings.encodeParam("p=" + c.getId()) + "%'");
+				params.setSearch(
+						"contactChat.contactId=" + repository.one(Client.class, contact.getClientId()).getAdminId()
+								+ " and contactChat.contactId2=" + contact.getId()
+								+ " and contactChat.textId='" + TextId.engagement_nearByContact.name()
+								+ "' and contactChat.action like '%"
+								+ Strings.encodeParam("p=" + c.getId()) + "%'");
 				if (repository.list(params).size() == 0) {
 					final double s = Score.getContact(contact, c);
 					if (s > score) {
@@ -509,6 +516,7 @@ public class EngagementService {
 
 	public boolean sendChat(final TextId textId, final Contact contact, final Location location, final String action)
 			throws Exception {
+		final BigInteger adminId = repository.one(Client.class, contact.getClientId()).getAdminId();
 		final QueryParams params = new QueryParams(Query.contact_chat);
 		params.setSearch("contactChat.contactId=" + adminId + " and contactChat.contactId2=" + contact.getId()
 				+ " and contactChat.textId='" + textId.name() + '\'');

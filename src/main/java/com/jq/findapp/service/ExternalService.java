@@ -41,7 +41,7 @@ public class ExternalService {
 	@Value("${app.chatGPT.key}")
 	private String chatGpt;
 
-	public String google(final String param, final BigInteger user) {
+	public String google(final String param) {
 		final String result = WebClient
 				.create("https://maps.googleapis.com/maps/api/" + param + (param.contains("?") ? "&" : "?")
 						+ "key=" + googleKey)
@@ -49,9 +49,9 @@ public class ExternalService {
 		try {
 			final ObjectMapper om = new ObjectMapper();
 			notificationService.createTicket(TicketType.GOOGLE, param,
-					om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(result)), user, null);
+					om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(result)), null);
 		} catch (final Exception e) {
-			notificationService.createTicket(TicketType.GOOGLE, param, result, user, null);
+			notificationService.createTicket(TicketType.GOOGLE, param, result, null);
 		}
 		return result;
 	}
@@ -101,7 +101,7 @@ public class ExternalService {
 		return null;
 	}
 
-	public List<GeoLocation> getLatLng(final String town, final BigInteger user) throws Exception {
+	public List<GeoLocation> getLatLng(final String town) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_geoLocation);
 		params.setSearch("geoLocation.town like '%" + town + "%'");
 		final Map<String, Object> persistedAddress = repository.one(params);
@@ -110,13 +110,13 @@ public class ExternalService {
 		final List<GeoLocation> geoLocations = convertAddress(
 				new ObjectMapper().readTree(
 						google("geocode/json?components=administrative_area:"
-								+ URLEncoder.encode(town, StandardCharsets.UTF_8), user)));
+								+ URLEncoder.encode(town, StandardCharsets.UTF_8))));
 		if (geoLocations == null)
-			notificationService.createTicket(TicketType.ERROR, "No google address", town, user, null);
+			notificationService.createTicket(TicketType.ERROR, "No google address", town, null);
 		return geoLocations;
 	}
 
-	public GeoLocation getAddress(final float latitude, final float longitude, final BigInteger user) throws Exception {
+	public GeoLocation getAddress(final float latitude, final float longitude) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_geoLocation);
 		final float roundingFactor = 10000f;
 		params.setSearch("geoLocation.latitude like '" + ((int) (latitude * roundingFactor) / roundingFactor)
@@ -125,11 +125,10 @@ public class ExternalService {
 		if (persistedAddress.get("_id") != null)
 			return repository.one(GeoLocation.class, (BigInteger) persistedAddress.get("_id"));
 		final List<GeoLocation> geoLocations = convertAddress(
-				new ObjectMapper().readTree(google("geocode/json?latlng=" + latitude + ',' + longitude, user)));
+				new ObjectMapper().readTree(google("geocode/json?latlng=" + latitude + ',' + longitude)));
 		if (geoLocations != null)
 			return geoLocations.get(0);
-		notificationService.createTicket(TicketType.ERROR, "No google address", latitude + "\n" + longitude, user,
-				null);
+		notificationService.createTicket(TicketType.ERROR, "No google address", latitude + "\n" + longitude, null);
 		return null;
 	}
 

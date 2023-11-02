@@ -22,7 +22,7 @@ public class BlockListener extends AbstractRepositoryListener<Block> {
 							"\neventtId: " + block.getEventId() +
 							"\nreason: " + block.getReason() +
 							"\nnote: " + block.getNote(),
-					block.getContactId(), null);
+					block.getContactId());
 		}
 	}
 }

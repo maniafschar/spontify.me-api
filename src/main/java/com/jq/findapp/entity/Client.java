@@ -1,13 +1,24 @@
 package com.jq.findapp.entity;
 
+import java.math.BigInteger;
+
 import jakarta.persistence.Entity;
 
 @Entity
 public class Client extends BaseEntity {
+	private BigInteger adminId;
 	private String storage;
 	private String name;
 	private String email;
 	private String url;
+
+	public BigInteger getAdminId() {
+		return adminId;
+	}
+
+	public void setAdminId(final BigInteger adminId) {
+		this.adminId = adminId;
+	}
 
 	public String getName() {
 		return name;

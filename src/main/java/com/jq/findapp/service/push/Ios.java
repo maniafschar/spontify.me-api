@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.NotificationService.Environment;
@@ -47,16 +48,15 @@ public class Ios {
 	@Value("${push.apns.url.test}")
 	private String urlTest;
 
-	@Value("${app.admin.id}")
-	private BigInteger adminId;
-
 	public Environment send(final String from, final Contact contactTo, final String text, final String action,
 			final int badge, final String notificationId) throws Exception {
 		try {
 			send(from, contactTo, url, text, action, badge, notificationId);
 			return Environment.Production;
 		} catch (final NotFoundException ex) {
-			final String adminEmail = repository.one(Contact.class, adminId).getEmail();
+			final String adminEmail = repository
+					.one(Contact.class, repository.one(Client.class, contactTo.getClientId()).getAdminId())
+					.getEmail();
 			if (contactTo.getEmail().contains(adminEmail.substring(adminEmail.indexOf("@")))) {
 				send(from, contactTo, urlTest, text, action, badge, notificationId);
 				return Environment.Development;

@@ -91,9 +91,6 @@ public class SupportCenterApi {
 	@Autowired
 	private MetricsEndpoint metricsEndpoint;
 
-	@Value("${app.admin.id}")
-	private BigInteger adminId;
-
 	@Value("${app.scheduler.secret}")
 	private String schedulerSecret;
 
@@ -107,7 +104,6 @@ public class SupportCenterApi {
 	@GetMapping("user")
 	public List<Object[]> user() {
 		final QueryParams params = new QueryParams(Query.contact_listSupportCenter);
-		params.setUser(repository.one(Contact.class, adminId));
 		params.setLimit(Integer.MAX_VALUE);
 		return repository.list(params).getList();
 	}
@@ -115,7 +111,6 @@ public class SupportCenterApi {
 	@GetMapping("ticket")
 	public List<Object[]> ticket(final String search) {
 		final QueryParams params = new QueryParams(Query.misc_listTicket);
-		params.setUser(repository.one(Contact.class, adminId));
 		params.setSearch(search);
 		params.setLimit(Integer.MAX_VALUE);
 		return repository.list(params).getList();
@@ -129,7 +124,6 @@ public class SupportCenterApi {
 	@GetMapping("log")
 	public List<Object[]> log(final String search) {
 		final QueryParams params = new QueryParams(Query.misc_listLog);
-		params.setUser(repository.one(Contact.class, adminId));
 		params.setSearch(search);
 		params.setLimit(Integer.MAX_VALUE);
 		return repository.list(params).getList();
@@ -138,8 +132,7 @@ public class SupportCenterApi {
 	@PostMapping("email")
 	@Produces(MediaType.TEXT_PLAIN)
 	public void email(final BigInteger id, final String text, final String action) throws Exception {
-		notificationService.sendNotificationEmail(repository.one(Contact.class, adminId),
-				repository.one(Contact.class, id), text, action);
+		notificationService.sendNotificationEmail(null, repository.one(Contact.class, id), text, action);
 	}
 
 	@PutMapping("resend/{id}")
@@ -155,7 +148,7 @@ public class SupportCenterApi {
 
 	@PostMapping("authenticate/{id}")
 	public void authenticate(@PathVariable final BigInteger id, final String image) throws Exception {
-		final Contact contact = repository.one(Contact.class, adminId);
+		final Contact contact = repository.one(Contact.class, id);
 		contact.setImageAuthenticate(image);
 		contact.setAuthenticate(Boolean.TRUE);
 		repository.save(contact);
@@ -203,7 +196,7 @@ public class SupportCenterApi {
 			@Override
 			public void run() {
 				final Log log = new Log();
-				log.setContactId(adminId);
+				log.setContactId(BigInteger.ZERO);
 				try {
 					if (last) {
 						boolean execute = false;
@@ -228,13 +221,13 @@ public class SupportCenterApi {
 						log.setBody(result.exception.getClass().getName() + ": " + result.exception.getMessage() +
 								(log.getBody() == null ? "" : "\n" + log.getBody()));
 						notificationService.createTicket(TicketType.ERROR, "scheduler",
-								Strings.stackTraceToString(result.exception), adminId, null);
+								Strings.stackTraceToString(result.exception), null);
 					}
 				} catch (final Throwable ex) {
 					log.setBody("uncaught exception " + ex.getClass().getName() + ": " + ex.getMessage() +
 							(log.getBody() == null ? "" : "\n" + log.getBody()));
 					notificationService.createTicket(TicketType.ERROR, "scheduler",
-							"uncatched exception:\n" + Strings.stackTraceToString(ex), adminId, null);
+							"uncatched exception:\n" + Strings.stackTraceToString(ex), null);
 				} finally {
 					schedulerRunning.remove(id);
 					log.setTime((int) (System.currentTimeMillis() - log.getCreatedAt().getTime()));
@@ -266,6 +259,6 @@ public class SupportCenterApi {
 
 	@GetMapping("healthcheck")
 	public void healthcheck(@RequestHeader final String secret) throws Exception {
-		repository.one(Contact.class, adminId);
+		repository.one(Contact.class, BigInteger.ONE);
 	}
 }

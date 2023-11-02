@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.ContactType;
 import com.jq.findapp.repository.Query;
@@ -27,9 +27,6 @@ import jakarta.transaction.Transactional;
 public class StatisticsApi {
 	@Autowired
 	private Repository repository;
-
-	@Value("${app.admin.id}")
-	private BigInteger adminId;
 
 	@GetMapping("contact/{query}")
 	public List<Object[]> contact(@PathVariable final String query, @RequestHeader final BigInteger user)
@@ -49,7 +46,8 @@ public class StatisticsApi {
 		final Contact contact = repository.one(Contact.class, user);
 		if (contact.getType() == ContactType.adminContent || contact.getType() == ContactType.demo) {
 			final QueryParams params = new QueryParams(Query.contact_statisticsGeoLocation);
-			params.setSearch("contact.longitude is not null and contact.id<>" + adminId);
+			params.setSearch("contact.longitude is not null and contact.id<>"
+					+ repository.one(Client.class, contact.getClientId()).getAdminId());
 			// + " and contactGeoLocationHistory.manual=false and contact.clientId=" +
 			// contact.getClientId());
 			final Result result = repository.list(params);

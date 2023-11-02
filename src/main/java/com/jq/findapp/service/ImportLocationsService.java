@@ -6,7 +6,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -37,9 +36,6 @@ public class ImportLocationsService {
 
 	@Autowired
 	Repository repository;
-
-	@Value("${app.admin.id}")
-	private BigInteger adminId;
 
 	private static final LocationType[] TYPES = {
 			new LocationType("accounting"),
@@ -171,7 +167,7 @@ public class ImportLocationsService {
 		if (repository.list(params).size() == 0) {
 			final String importResult = retrieveLocations(latitude, longitude);
 			notificationService.createTicket(TicketType.LOCATION, "import",
-					s + (importResult == null ? "" : "\n" + importResult), adminId, null);
+					s + (importResult == null ? "" : "\n" + importResult), null);
 		}
 	}
 
@@ -193,14 +189,12 @@ public class ImportLocationsService {
 		final ObjectMapper om = new ObjectMapper();
 		JsonNode json = om.readTree(externalService.google(
 				"place/nearbysearch/json?radius=600&sensor=false&location="
-						+ latitude + "," + longitude,
-				adminId));
+						+ latitude + "," + longitude));
 		if ("OK".equals(json.get("status").asText())) {
 			String result = importLocations(json.get("results").elements());
 			while (json.has("next_page_token")) {
 				json = om.readTree(externalService.google(
-						"place/nearbysearch/json?pagetoken=" + json.get("next_page_token").asText(),
-						adminId));
+						"place/nearbysearch/json?pagetoken=" + json.get("next_page_token").asText()));
 				if ("OK".equals(json.get("status").asText()))
 					result += "\n" + importLocations(json.get("results").elements());
 				else
@@ -228,8 +222,7 @@ public class ImportLocationsService {
 					if (jsonLower.contains("sex") || jsonLower.contains("domina") || jsonLower.contains("bordel")) {
 						notificationService.createTicket(TicketType.LOCATION,
 								location.getCategory() + " " + location.getName(),
-								om.writerWithDefaultPrettyPrinter().writeValueAsString(json),
-								adminId, null);
+								om.writerWithDefaultPrettyPrinter().writeValueAsString(json), null);
 					} else {
 						try {
 							if ((location = importLocation(json, null)) != null) {
@@ -247,8 +240,7 @@ public class ImportLocationsService {
 													.contains("duplicate entry")))) {
 								notificationService.createTicket(TicketType.LOCATION,
 										location.getCategory() + " " + location.getName(),
-										om.writerWithDefaultPrettyPrinter().writeValueAsString(json),
-										adminId, null);
+										om.writerWithDefaultPrettyPrinter().writeValueAsString(json), null);
 							}
 						}
 					}
@@ -309,8 +301,8 @@ public class ImportLocationsService {
 			}
 			final String html = externalService.google(
 					"place/photo?maxheight=1200&photoreference="
-							+ json.get("photos").get(0).get("photo_reference").asText(),
-					adminId).replace("<A HREF=", "<a href=");
+							+ json.get("photos").get(0).get("photo_reference").asText())
+					.replace("<A HREF=", "<a href=");
 			final Matcher matcher = href.matcher(html);
 			if (!matcher.find())
 				throw new IllegalArgumentException("no image in html: " + html);
@@ -328,7 +320,6 @@ public class ImportLocationsService {
 	private Location json2location(final JsonNode json) {
 		try {
 			final Location location = new Location();
-			location.setContactId(adminId);
 			String name = json.get("name").asText();
 			final LocationType type = mapFirstRelevantType(json);
 			if (type != null) {

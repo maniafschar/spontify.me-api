@@ -81,9 +81,6 @@ public class NotificationService {
 	@Value("${app.server.webSocket}")
 	private String serverWebSocket;
 
-	@Value("${app.admin.id}")
-	private BigInteger adminId;
-
 	@Value("${app.mail.host}")
 	private String emailHost;
 
@@ -293,7 +290,7 @@ public class NotificationService {
 									? "\n\n" + ((WebClientResponseException) ex).getResponseBodyAsString()
 									: "")
 							+ setting + Strings.stackTraceToString(ex),
-					notification == null ? null : notification.getContactId2(), null);
+					notification == null ? null : notification.getContactId2());
 			return false;
 		}
 	}
@@ -411,8 +408,7 @@ public class NotificationService {
 	}
 
 	private void sendEmail(final Contact to, final String subject, final String text, final String html) {
-		final String from = to == null ? repository.one(Contact.class, adminId).getEmail()
-				: repository.one(Client.class, to.getClientId()).getEmail();
+		final String from = repository.one(Client.class, to.getClientId()).getEmail();
 		final ImageHtmlEmail email = mailCreateor.create();
 		email.setHostName(emailHost);
 		email.setSmtpPort(emailPort);
@@ -420,10 +416,7 @@ public class NotificationService {
 		email.setAuthenticator(new DefaultAuthenticator(from, emailPassword));
 		email.setSSLOnConnect(true);
 		try {
-			if (to == null)
-				email.setFrom(from);
-			else
-				email.setFrom(from, repository.one(Client.class, to.getClientId()).getName());
+			email.setFrom(from, repository.one(Client.class, to.getClientId()).getName());
 			email.addTo(to == null ? from : to.getEmail());
 			email.setSubject(subject);
 			email.setTextMsg(text);
@@ -435,16 +428,26 @@ public class NotificationService {
 				email.setHtmlMsg(text);
 			email.send();
 			if (to != null)
-				createTicket(TicketType.EMAIL, to.getEmail(), text, adminId, null);
+				createTicket(TicketType.EMAIL, to.getEmail(), text, repository.one(Client.class, to.getClientId())
+						.getAdminId());
 		} catch (final EmailException | MalformedURLException ex) {
 			if (to != null)
 				createTicket(TicketType.ERROR, "Email exception: " + to.getEmail(),
-						Strings.stackTraceToString(ex) + "\n\n" + text, to.getId(), null);
+						Strings.stackTraceToString(ex) + "\n\n" + text, to.getId());
 		}
 	}
 
-	public void createTicket(final TicketType type, String subject, String text, final BigInteger user,
-			final BigInteger clientId) {
+	public void createTicket(final TicketType type, String subject, String text, BigInteger user) {
+		final Contact contact;
+		final BigInteger adminId;
+		if (user == null) {
+			user = BigInteger.ZERO;
+			adminId = BigInteger.ZERO;
+			contact = null;
+		} else {
+			contact = repository.one(Contact.class, user);
+			adminId = repository.one(Client.class, contact.getClientId()).getAdminId();
+		}
 		try {
 			if (subject == null)
 				subject = "no subject";
@@ -463,18 +466,17 @@ public class NotificationService {
 			final Ticket ticket = new Ticket();
 			ticket.setSubject(subject);
 			ticket.setNote(text);
-			if (clientId == null && user != null && !adminId.equals(user))
-				ticket.setClientId(repository.one(Contact.class, user).getClientId());
-			else
-				ticket.setClientId(clientId);
+			if (contact != null)
+				ticket.setClientId(contact.getClientId());
 			ticket.setType(type);
 			ticket.setContactId(user);
 			repository.save(ticket);
 			if (type == TicketType.BLOCK)
-				sendEmail(null, "Block", text, null);
+				sendEmail(repository.one(Contact.class, adminId), "Block", text, null);
 		} catch (final Exception ex) {
 			try {
-				sendEmail(null, type + ": " + subject, text, null);
+				sendEmail(repository.one(Contact.class, adminId), type + ": " + subject, text,
+						null);
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}
