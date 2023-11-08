@@ -31,11 +31,12 @@ public class SurveyService {
 	public SchedulerResult sync() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/sync");
 		if (LocalDateTime.now().getHour() == 0 && LocalDateTime.now().getMinute() < 10)
-			syncMatchdays();
+			result.result = "Matchdays update: " + syncMatchdays();
 		return result;
 	}
 
-	private void syncMatchdays() {
+	private int syncMatchdays() {
+		int count = 0;
 		final BigInteger clientId = BigInteger.valueOf(4);
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
 		params.setSearch("clientMarketing.startDate>'" + Instant.now() + "' and clientMarketing.clientId=" + clientId + 
@@ -51,17 +52,19 @@ public class SurveyService {
 					.toEntity(JsonNode.class).block().getBody();
 			if (matchDays != null) {
 				for (int i = 0; i < matchDays.length; i++) {
-					if (matchDays[i].fixture.date.getTime() > System.currenTimeMillis()) {
+					if ("NS".equals(matchDays.get(i).get("fixture").get("status").get("short"))) {
 						final ClientMarketing clientMarketing = new ClientMarketing();
-						clientMarketing.setStartDate(new Timestamp(matchDays[i].fixture.date.getTime() + (2 * 60 * 60 * 1000)));
+						clientMarketing.setStartDate(new Timestamp(matchDays.get(i).get("fixture").get("date") + (2 * 60 * 60 * 1000)));
 						clientMarketing.setEndDate(new Timestamp(clientMarketing.getStartDate().getTime() + (24 * 60 * 60 * 1000)));
 						clientMarketing.setClientId(clientId);
-						clientMarketing.setStorage("" + matchDays[i].fixture.id);
+						clientMarketing.setStorage(matchDays.get(i).get("fixture").get("id").asText());
 						repository.save(clientMarketing);
+						count++;
 					}
 				}
 			}
 		}
+		return count;
 	}
 
 	private void syncMatch() {
@@ -82,29 +85,25 @@ public class SurveyService {
 			if (matchDay != null) {
 				JsonNode e = matchDay.findPath("players");
 				e = e.get(e.get(0).get("team").get("id").asInt() == 157 ? 0 : 1).get("players");
+				String s = "";
 				for (int i = 0; i < e.size(); i++) {
-					e.get(i).get("player").get("name").asText() +
-						"<desc>" + e.get(i).get("statistics").get(0).get("games").get("minutes").asText() + "</desc>";
+					final JsonNode statistics = e.get(i).get("statistics").get(0);
+					if (!statistics.get("games").get("minutes").isNull()) {
+						s += e.get(i).get("player").get("name").asText() +
+							"<desc>Gespielte Minuten: " + statistics.get("games").get("minutes").asInt();
+						if (!statistics.get("shots").get("total").isNull())
+							s += "<br/>Torschüsse ingesamt/aufs Tor: " + statistics.get("shots").get("total").asInt() + "/" + statistics.get("shots").get("on").asInt();
+						if (!statistics.get("goals").get("total").isNull() || !statistics.get("goals").get("assists").isNull())
+							s += "<br/>Tore/Assists: " + statistics.get("goals").get("total").asInt() + "/" + statistics.get("goals").get("assists").asInt();
+						if (!statistics.get("passes").get("total").isNull())
+							s += "<br/>Pässe/davon angekommen: " + statistics.get("passes").get("total").asInt() + "/" + statistics.get("passes").get("accuracy").asInt();
+						if (!statistics.get("duels").get("total").isNull())
+							s += "<br/>Duelle/davon gewonnen: " + statistics.get("duels").get("total").asInt() + "/" + statistics.get("duels").get("won").asInt();
+						if (!statistics.get("cards").get("yellow").isNull() || !statistics.get("cards").get("red").isNull())
+							s += "<br/>Gelb/Rot: " + statistics.get("cards").get("yellow").asInt() + "/" + statistics.get("cards").get("red").asInt();
+						s += "</desc>";
+					}
 				}
-            + matchDay.get("players")
-                .get(i)
-                .get("players")
-                .get(i2)
-                .get("statistics")
-                .get(0)
-                .get("games")
-                .get("rating")
-                .asText()
-            + " " + matchDay.get("players")
-                .get(i)
-                .get("players")
-                .get(i2)
-                .get("statistics")
-                .get(0)
-                .get("games")
-                .get("minutes")
-                .asText());
-
 			}
 		}
 	}
