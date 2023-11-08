@@ -18,6 +18,7 @@ import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.repository.Repository.Attachment;
 
 @Service
 public class SurveyService {
@@ -37,7 +38,7 @@ public class SurveyService {
 		final BigInteger clientId = BigInteger.valueOf(4);
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
 		params.setSearch("clientMarketing.endDate>'" + Instant.now() + "' and clientMarketing.clientId=" + clientId + 
-				 " and clientMarketing.storage not like '" + Attachment.separator + "%'"):
+				 " and clientMarketing.storage not like '%" + Attachment.SEPARATOR + "%'"):
 		final JsonNode matchDays = WebClient
 				.create("https://v3.football.api-sports.io/fixtures?team=157&season="
 						+ Instant.now().atZone(ZoneId.systemDefault()).getYear())
