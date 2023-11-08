@@ -15,6 +15,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import spinjar.com.fasterxml.jackson.databind.JsonNode;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.ClientMarketing;
+import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 
 @Service
@@ -33,6 +35,9 @@ public class SurveyService {
 
 	private void syncMatchdays() {
 		final BigInteger clientId = BigInteger.valueOf(4);
+		final QueryParams params = new QueryParams(Query.misc_listMarketing);
+		params.setSearch("clientMarketing.endDate>'" + Instant.now() + "' and clientMarketing.clientId=" + clientId + 
+				 " and clientMarketing.storage not like '" + Attachment.separator + "%'"):
 		final JsonNode matchDays = WebClient
 				.create("https://v3.football.api-sports.io/fixtures?team=157&season="
 						+ Instant.now().atZone(ZoneId.systemDefault()).getYear())
@@ -45,8 +50,7 @@ public class SurveyService {
 			for (int i = 0; i < matchDays.length; i++) {
 				final ClientMarketing clientMarketing = new ClientMarketing();
 				clientMarketing.setStartDate(new Timestamp(matchDays[i].fixture.date.getTime() + (2 * 60 * 60 * 1000)));
-				clientMarketing
-						.setEndDate(new Timestamp(clientMarketing.getStartDate().getTime() + (24 * 60 * 60 * 1000)));
+				clientMarketing.setEndDate(new Timestamp(clientMarketing.getStartDate().getTime() + (24 * 60 * 60 * 1000)));
 				clientMarketing.setClientId(clientId);
 				clientMarketing.setStorage("" + matchDays[i].fixture.id);
 			}
