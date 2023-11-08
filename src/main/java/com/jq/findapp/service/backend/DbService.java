@@ -81,7 +81,7 @@ public class DbService {
 			if (clientUpdates.length() > 0)
 				result.result += (result.result.length() > 0 ? "\n" : "") + "ClientUpdate:"
 						+ clientUpdates.substring(1);
-			if (LocalDateTime.now().getHour() == 0 && LocalDateTime.now().getMinute() == 0)
+			if (LocalDateTime.now().getHour() == 0 && LocalDateTime.now().getMinute() < 10)
 				result.result += (result.result.length() > 0 ? "\n" : "") + repository.cleanUpAttachments();
 			statistics(BigInteger.valueOf(4l));
 		} catch (final Exception e) {
