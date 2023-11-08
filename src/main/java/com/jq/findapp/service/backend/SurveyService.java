@@ -54,7 +54,7 @@ public class SurveyService {
 				for (int i = 0; i < matchDays.length; i++) {
 					if ("NS".equals(matchDays.get(i).get("fixture").get("status").get("short"))) {
 						final ClientMarketing clientMarketing = new ClientMarketing();
-						clientMarketing.setStartDate(new Timestamp(matchDays.get(i).get("fixture").get("date") + (2 * 60 * 60 * 1000)));
+						clientMarketing.setStartDate(new Timestamp(matchDays.get(i).get("fixture").get("timestamp").asLong() * 1000 + (2 * 60 * 60 * 1000)));
 						clientMarketing.setEndDate(new Timestamp(clientMarketing.getStartDate().getTime() + (24 * 60 * 60 * 1000)));
 						clientMarketing.setClientId(clientId);
 						clientMarketing.setStorage(matchDays.get(i).get("fixture").get("id").asText());
