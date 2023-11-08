@@ -32,6 +32,9 @@ public class SurveyService {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/sync");
 		if (LocalDateTime.now().getHour() == 0 && LocalDateTime.now().getMinute() < 10)
 			result.result = "Matchdays update: " + syncMatchdays();
+		final BigInteger id = syncLastMatch();
+		if (id != null)
+			result.result = (Strings.isEmpty(result.result) ? "" : result.result + "\n") + "syncLastMatchId: " + id;
 		return result;
 	}
 
@@ -67,7 +70,7 @@ public class SurveyService {
 		return count;
 	}
 
-	private void syncMatch() {
+	private BigInteger syncLastMatch() {
 		final BigInteger clientId = BigInteger.valueOf(4);
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
 		params.setSearch("clientMarketing.startDate<='" + Instant.now() + "' and clientMarketing.endDate>'" + Instant.now() +
@@ -105,6 +108,8 @@ public class SurveyService {
 					}
 				}
 			}
+			return (BigInteger) list.get(0).get("clientMarketing.id");
 		}
+		return null;
 	}
 }
