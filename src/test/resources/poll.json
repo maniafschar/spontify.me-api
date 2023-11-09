@@ -1,0 +1,776 @@
+{
+	"questions": [
+		{
+			"question": "Verwendest Du soziale Netzwerke?",
+			"multiple": null,
+			"textField": null,
+			"answers": [
+				{
+					"answer": "Ja",
+					"next": "2"
+				},
+				{
+					"answer": "Nein",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Warum verwendest Du keine soziale Netzwerke?",
+			"multiple": null,
+			"textField": null,
+			"answers": [
+				{
+					"answer": "Ich habe Bedenken wegen meiner Daten",
+					"next": "22"
+				},
+				{
+					"answer": "Für mich ist es Zeitverschwendung, ich habe genügend andere Themen und Aufgaben",
+					"next": "22"
+				},
+				{
+					"answer": "Ich treffe Menschen lieber im realen Leben als virtuell",
+					"next": "22"
+				}
+			]
+		},
+		{
+			"question": "Würdest Du Deinem Freund oder Kollegen empfehlen, sich Dir in den sozialen Netzwerken anzuschließen?",
+			"multiple": null,
+			"textField": null,
+			"answers": [
+				{
+					"answer": "Sehr wahrscheinlich",
+					"next": ""
+				},
+				{
+					"answer": "Eher wahrscheinlich",
+					"next": ""
+				},
+				{
+					"answer": "Eher unwahrscheinlich",
+					"next": ""
+				},
+				{
+					"answer": "Kaum wahrscheinlich",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Welche sozialen Netzwerke nutzt Du am häufigsten?",
+			"multiple": "true",
+			"textField": null,
+			"answers": [
+				{
+					"answer": "Facebook",
+					"next": ""
+				},
+				{
+					"answer": "LinkedIn",
+					"next": ""
+				},
+				{
+					"answer": "Youtube",
+					"next": ""
+				},
+				{
+					"answer": "Twitter",
+					"next": ""
+				},
+				{
+					"answer": "Instagram",
+					"next": ""
+				},
+				{
+					"answer": "Snapchat",
+					"next": ""
+				},
+				{
+					"answer": "Andere",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Auf welchen Geräten checkst Du Deine sozialen Netzwerke?",
+			"multiple": "true",
+			"textField": null,
+			"answers": [
+				{
+					"answer": "Desktop",
+					"next": ""
+				},
+				{
+					"answer": "Notebook",
+					"next": ""
+				},
+				{
+					"answer": "Tablet wie Ipad",
+					"next": ""
+				},
+				{
+					"answer": "Mobiltelefon",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Wann bist Du in sozialen Netzwerken am aktivsten?",
+			"multiple": "true",
+			"textField": null,
+			"answers": [
+				{
+					"answer": "Vor 5 Uhr morgens",
+					"next": ""
+				},
+				{
+					"answer": "5-7 Uhr",
+					"next": ""
+				},
+				{
+					"answer": "8-10 Uhr",
+					"next": ""
+				},
+				{
+					"answer": "11-12 Uhr",
+					"next": ""
+				},
+				{
+					"answer": "13-15 Uhr",
+					"next": ""
+				},
+				{
+					"answer": "16-18 Uhr",
+					"next": ""
+				},
+				{
+					"answer": "19-21 Uhr",
+					"next": ""
+				},
+				{
+					"answer": "Nach 21 Uhr",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Wie lange nutzt Du schon soziale Netzwerke?",
+			"multiple": null,
+			"textField": null,
+			"answers": [
+				{
+					"answer": "Weniger als ein Jahr",
+					"next": ""
+				},
+				{
+					"answer": "1-2 Jahre",
+					"next": ""
+				},
+				{
+					"answer": "3-5 Jahre",
+					"next": ""
+				},
+				{
+					"answer": "Mehr als 5 Jahre",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Wie viele Stunden am Tag verbringst Du ungefähr in sozialen Netzwerken?",
+			"multiple": null,
+			"textField": null,
+			"answers": [
+				{
+					"answer": "Weniger als eine Stunde",
+					"next": ""
+				},
+				{
+					"answer": "1-2 Stunden",
+					"next": ""
+				},
+				{
+					"answer": "2-4 Stunden",
+					"next": ""
+				},
+				{
+					"answer": "Mehr als 4 Stunden",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Welche Informationen teilst Du in den sozialen Netzwerken?",
+			"multiple": "true",
+			"textField": null,
+			"answers": [
+				{
+					"answer": "E-Mail-Addresse",
+					"next": ""
+				},
+				{
+					"answer": "Alter",
+					"next": ""
+				},
+				{
+					"answer": "Beziehungsstatus",
+					"next": ""
+				},
+				{
+					"answer": "Arbeitgeber",
+					"next": ""
+				},
+				{
+					"answer": "Berufsbezeichnung",
+					"next": ""
+				},
+				{
+					"answer": "Wohnort",
+					"next": ""
+				},
+				{
+					"answer": "Persönliche Fotos",
+					"next": ""
+				},
+				{
+					"answer": "Handynummer",
+					"next": ""
+				},
+				{
+					"answer": "Sexuelle Orientierung",
+					"next": ""
+				},
+				{
+					"answer": "Politische Sichten",
+					"next": ""
+				},
+				{
+					"answer": "Andere",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Wie viele Verbindungen/Follower/Freunde/Abonnenten hast Du auf allen in den sozialen Netzwerken?",
+			"multiple": null,
+			"textField": null,
+			"answers": [
+				{
+					"answer": "0-50",
+					"next": ""
+				},
+				{
+					"answer": "51-100",
+					"next": ""
+				},
+				{
+					"answer": "101-500",
+					"next": ""
+				},
+				{
+					"answer": "501-1000",
+					"next": ""
+				},
+				{
+					"answer": "1001-2000",
+					"next": ""
+				},
+				{
+					"answer": "2001-3000",
+					"next": ""
+				},
+				{
+					"answer": "3001-5000",
+					"next": ""
+				},
+				{
+					"answer": "Mehr als 5000",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Teilst Du authentische Informationen in den sozialen Netzwerken?",
+			"multiple": null,
+			"textField": null,
+			"answers": [
+				{
+					"answer": "Immer",
+					"next": ""
+				},
+				{
+					"answer": "Sehr oft",
+					"next": ""
+				},
+				{
+					"answer": "Manchmal",
+					"next": ""
+				},
+				{
+					"answer": "Selten",
+					"next": ""
+				},
+				{
+					"answer": "Nie",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Wie viele Freunde von Deinen sozialen Netzwerken hast Du persönlich getroffen?",
+			"multiple": null,
+			"textField": null,
+			"answers": [
+				{
+					"answer": "Alle",
+					"next": ""
+				},
+				{
+					"answer": "Die meisten",
+					"next": ""
+				},
+				{
+					"answer": "Etwa die Hälfte",
+					"next": ""
+				},
+				{
+					"answer": "Einige",
+					"next": ""
+				},
+				{
+					"answer": "Keine",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Wie oft veröffentlichst Du an einem normalen Tag Bilder, Kommentare usw. in Deinen sozialen Netzwerken?",
+			"multiple": null,
+			"textField": null,
+			"answers": [
+				{
+					"answer": "Mehr als 20 mal",
+					"next": ""
+				},
+				{
+					"answer": "11-20 mal",
+					"next": ""
+				},
+				{
+					"answer": "0-10 mal",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Wie oft chattest Du in den sozialen Medien?",
+			"multiple": null,
+			"textField": null,
+			"answers": [
+				{
+					"answer": "Oft",
+					"next": ""
+				},
+				{
+					"answer": "Immer wieder mal",
+					"next": ""
+				},
+				{
+					"answer": "Kaum",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Wie besorgt bist Du über den Datenschutz in den sozialen Netzwerken?",
+			"multiple": null,
+			"textField": null,
+			"answers": [
+				{
+					"answer": "Überhaupt nicht",
+					"next": ""
+				},
+				{
+					"answer": "Etwas",
+					"next": ""
+				},
+				{
+					"answer": "Schon sehr",
+					"next": ""
+				},
+				{
+					"answer": "Extrem",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Wofür benutzt Du soziale Netzwerke?",
+			"multiple": "true",
+			"textField": null,
+			"answers": [
+				{
+					"answer": "Um mit Freunden in Verbindung zu bleiben",
+					"next": ""
+				},
+				{
+					"answer": "Um mit der Familie in Verbindung zu bleiben",
+					"next": ""
+				},
+				{
+					"answer": "Um mit Arbeitskollegen in Verbindung zu bleiben",
+					"next": ""
+				},
+				{
+					"answer": "Um mit Menschen aus anderen Ländern/Kontinenten in Verbindung zu kommen/bleiben",
+					"next": ""
+				},
+				{
+					"answer": "Um mit neuen Leuten in Kontakt zu kommen",
+					"next": ""
+				},
+				{
+					"answer": "Um einen neuen Job zu finden",
+					"next": ""
+				},
+				{
+					"answer": "Um eine professionelles Netzwerk aufzubauen",
+					"next": ""
+				},
+				{
+					"answer": "Um Deine Firma/Dein Produkt/Deine Dienstleistungen zu bewerben",
+					"next": ""
+				},
+				{
+					"answer": "Um Marktstudien durchzuführen",
+					"next": ""
+				},
+				{
+					"answer": "Um Neuigkeiten zu erfahren",
+					"next": ""
+				},
+				{
+					"answer": "Um Dich weiterzubilden",
+					"next": ""
+				},
+				{
+					"answer": "Um einzukaufen",
+					"next": ""
+				},
+				{
+					"answer": "Um Dich zu unterhalten",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Wie vielen Gruppen/Seiten/Foren gehörst Du in den sozialen Netzwerken an oder folgst diesen?",
+			"multiple": null,
+			"textField": null,
+			"answers": [
+				{
+					"answer": "0-5",
+					"next": ""
+				},
+				{
+					"answer": "6-10",
+					"next": ""
+				},
+				{
+					"answer": "11-20",
+					"next": ""
+				},
+				{
+					"answer": "21-40",
+					"next": ""
+				},
+				{
+					"answer": "41-60",
+					"next": ""
+				},
+				{
+					"answer": "61-80",
+					"next": ""
+				},
+				{
+					"answer": "81-100",
+					"next": ""
+				},
+				{
+					"answer": "100+",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Wenn Du neue Leute in den sozialen Netwerken kennenlernen kannst, welche primären Zwecke wären für Dich wichtig?",
+			"multiple": true,
+			"textField": true,
+			"answers": [
+				{
+					"answer": "Freizeitgestaltung",
+					"next": ""
+				},
+				{
+					"answer": "Sport",
+					"next": ""
+				},
+				{
+					"answer": "Kulinarik, gemeinsam essen gehen",
+					"next": ""
+				},
+				{
+					"answer": "Fortbildung",
+					"next": ""
+				},
+				{
+					"answer": "Kontaktaufnahme in der Ferne, z.B. nach einem Umzug oder auf Geschäftsreise",
+					"next": ""
+				},
+				{
+					"answer": "Philanthropie, ich helfe gerne anderen Menschen, zeige z.B. neu hergezogenen meine Stadt",
+					"next": ""
+				},
+				{
+					"answer": "Partnersuche",
+					"next": ""
+				},
+				{
+					"answer": "Keine davon, ich möchte keine neuen Leute kennenlernen",
+					"next": ""
+				},
+				{
+					"answer": "Andere Gründe (nutze bitte das Freitextfeld, um diese zu beschreiben)",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Wie baust Du Vertrauen zu neuen Kontakten in den sozialen Netzwerken auf?",
+			"multiple": null,
+			"textField": null,
+			"answers": [
+				{
+					"answer": "Chatten, das reicht",
+					"next": ""
+				},
+				{
+					"answer": "Chatten und bei Sympathie gebe ich meine Telefonnummer",
+					"next": ""
+				},
+				{
+					"answer": "Verabreden, dann sehen wir weiter",
+					"next": ""
+				},
+				{
+					"answer": "Video-Call, dazu würde ich auch meine Telefonnummer ausgeben",
+					"next": ""
+				},
+				{
+					"answer": "Video-Call, aber ohne das ich Email oder Telefonnummer hergeben muss",
+					"next": ""
+				},
+				{
+					"answer": "Ich mache mir hierzu keine Gedanken",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Was interessiert Dich bei der Nutzung sozialer Netzwerke?",
+			"multiple": null,
+			"textField": null,
+			"answers": [
+				{
+					"answer": "Produkte",
+					"next": ""
+				},
+				{
+					"answer": "Dienstleistungen",
+					"next": ""
+				},
+				{
+					"answer": "Rat",
+					"next": ""
+				},
+				{
+					"answer": "Selbsthilfegruppen",
+					"next": ""
+				},
+				{
+					"answer": "Promotions und Anzeigen",
+					"next": ""
+				},
+				{
+					"answer": "Chatten",
+					"next": ""
+				},
+				{
+					"answer": "Videos",
+					"next": ""
+				},
+				{
+					"answer": "Andere",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Welche Art von Inhalten möchtest Du in den sozialen Netzwerken sehen?",
+			"multiple": null,
+			"textField": null,
+			"answers": [
+				{
+					"answer": "Gesundheit und Fitness",
+					"next": ""
+				},
+				{
+					"answer": "Mode und Kleidung",
+					"next": ""
+				},
+				{
+					"answer": "Sport und Sportnachrichten",
+					"next": ""
+				},
+				{
+					"answer": "Arbeitsplätze",
+					"next": ""
+				},
+				{
+					"answer": "Unterhaltungsindustrie",
+					"next": ""
+				},
+				{
+					"answer": "Lifestyle",
+					"next": ""
+				},
+				{
+					"answer": "Wirtschaftsnachrichten",
+					"next": ""
+				},
+				{
+					"answer": "Einführung neuer Produkte und Innovationen",
+					"next": ""
+				},
+				{
+					"answer": "Andere",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Wie möchteset Du den Inhalt, den Du magst, in den sozialen Netzwerken sehen?",
+			"multiple": "true",
+			"textField": null,
+			"answers": [
+				{
+					"answer": "Videos",
+					"next": ""
+				},
+				{
+					"answer": "Bilder",
+					"next": ""
+				},
+				{
+					"answer": "Artikel",
+					"next": ""
+				},
+				{
+					"answer": "Blogs",
+					"next": ""
+				},
+				{
+					"answer": "Andere",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Wie alt bist du?",
+			"multiple": null,
+			"textField": null,
+			"answers": [
+				{
+					"answer": "Unter 18",
+					"next": ""
+				},
+				{
+					"answer": "18-24",
+					"next": ""
+				},
+				{
+					"answer": "25-34",
+					"next": ""
+				},
+				{
+					"answer": "35-44",
+					"next": ""
+				},
+				{
+					"answer": "45-54",
+					"next": ""
+				},
+				{
+					"answer": "55-64",
+					"next": ""
+				},
+				{
+					"answer": "Über 64",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Was ist dein Geschlecht?",
+			"multiple": null,
+			"textField": null,
+			"answers": [
+				{
+					"answer": "Männlich",
+					"next": ""
+				},
+				{
+					"answer": "Weiblich",
+					"next": ""
+				},
+				{
+					"answer": "Divers",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Möchtest Du die Fragen und Deine Antworten per Email zugesendet bekommen?",
+			"multiple": null,
+			"textField": true,
+			"answers": [
+				{
+					"answer": "Gerne, meine Email schreibe ich ins Textfeld",
+					"next": ""
+				},
+				{
+					"answer": "Nein Danke",
+					"next": ""
+				}
+			]
+		},
+		{
+			"question": "Möchtest Du diese Umfrage an Deine Freunde senden, so dass wir noch mehr qualifiziertes Feedback erhalten?",
+			"multiple": null,
+			"textField": true,
+			"answers": [
+				{
+					"answer": "Gerne, Email Adressen schreibe ich ins Textfeld",
+					"next": ""
+				},
+				{
+					"answer": "Nein",
+					"next": ""
+				}
+			]
+		}
+	],
+	"prolog": "Die Begegnungen im realen Leben sind und bleiben die schönsten.\n\nWir möchten eine App entwickeln, die ganz ohne Werbung und Kosten primär dazu dient, neue Begegnungen im realen Leben zu fördern.\n\nMöchtest Du uns helfen und kurz an der Umfrage teilnehmen?",
+	"epilog": "Lieben Dank für die Teilnahme, Du hast uns geholfen!\n\nWenn Du möchtest, kannst Du Dich anschließend als Beta-Tester für die App registrieren. Auch dort kannst Du dem Support jederzeit Feedback geben."
+}
