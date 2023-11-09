@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.imageio.ImageIO;
 
+import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -183,6 +184,12 @@ public class SurveyService {
 		g2.drawString("Umfrage", 30, 300);
 		g2.setFont(customFont.deriveFont(18f));
 		g2.drawString("Spieler des Spiels", 30, 400);
+		BufferedImageTranscoder imageTranscoder = new BufferedImageTranscoder();
+		imageTranscoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, width);
+		imageTranscoder.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, height);
+		TranscoderInput input = new TranscoderInput(svgFile);
+		imageTranscoder.transcode(input, null);
+		g2.drawImage(imageTranscoder.getBufferedImage(), 770 - image.getWidth(), 470 - image.getHeight(), null);
 		g2.dispose();
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		ImageIO.write(output, "png", out);
