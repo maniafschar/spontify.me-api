@@ -43,4 +43,17 @@ public class SurveyServiceTest {
     assertEquals("Matchdays update: 7\nsyncLastMatchId: 5", result.result);
     assertNotNull(clientMarketing.getStorage());
   }
+
+  @Test
+  public void test() throws Exception {
+    // given
+    surveyService.sync();
+
+    // when
+    final SchedulerResult result = surveyService.sync();
+
+    // then
+    assertNull(result.exception);
+    assertEquals("Matchdays already run in last 24 hours\nsyncLastMatchId: null", result.result);
+  }
 }
