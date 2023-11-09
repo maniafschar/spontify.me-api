@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.repository.Query;
@@ -85,11 +88,19 @@ public class SurveyService {
 			if (matchDay != null) {
 				JsonNode e = matchDay.findPath("players");
 				e = e.get(e.get(0).get("team").get("id").asInt() == 157 ? 0 : 1).get("players");
-				String s = "";
+				final ObjectNode poll = new ObjectNode();
+				poll.put("prolog", "Möchtest Du an der Umfrage Spieler des Spiels zum " + matchDay.findPath("league").get("name").asText() +
+					" Spiel " + matchDay.findPath("teams").get("home").asText() + " - " + matchDay.findPath("teams").get("away").asText() + 
+					" am " + new SimpleDateFormatter("d.M.yyyy H:mm").format(LocalDateTime.ofInstant(Instant.ofEpochMilli(matchDay.findPath("fixture").get("timestamp").asLong()),
+					TimeZone.getTimeZone("Europe/Berlin").toZoneId())) + " teilnehmen?");
+				poll.put("epilog", "Lieben Dank für die Teilnahme!\n\nÜbrigens, Bayern Fans treffen sich neuerdings zum gemeinsam Spiele anschauen und feiern in dieser coolen, neuen App.\n\nKlicke auf weiter und auch Du kannst mit ein paar Klicks dabei sein.");
+				final ObjectNode question = poll.putArray("questions").addObject();
+				question.put("question", "Wer war für Dich Spieler des Spiels?");
+				final ArrayNode answers = question.addArray("answers");
 				for (int i = 0; i < e.size(); i++) {
 					final JsonNode statistics = e.get(i).get("statistics").get(0);
 					if (!statistics.get("games").get("minutes").isNull()) {
-						s += e.get(i).get("player").get("name").asText() +
+						String s = e.get(i).get("player").get("name").asText() +
 								"<desc>Gespielte Minuten: " + statistics.get("games").get("minutes").asInt();
 						if (!statistics.get("shots").get("total").isNull())
 							s += "<br/>Torschüsse ingesamt/aufs Tor: " + statistics.get("shots").get("total").asInt()
@@ -109,8 +120,12 @@ public class SurveyService {
 							s += "<br/>Gelb/Rot: " + statistics.get("cards").get("yellow").asInt() + "/"
 									+ statistics.get("cards").get("red").asInt();
 						s += "</desc>";
+						answers.addObject().put("answer", s);
 					}
 				}
+				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, (BigInteger) list.get(0).get("clientMarketing.id"));
+				clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
+				repository.save(clientMarketing);
 			}
 			return (BigInteger) list.get(0).get("clientMarketing.id");
 		}
