@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.RenderingHints;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
@@ -160,6 +161,8 @@ public class SurveyService {
 	}
 
 	private void createImage(String urlLeague, String urlHome, String urlAway) throws IOException {
+		final Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("custom_font.ttf")).deriveFont(36f);
+		GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(customFont);
 		final BufferedImage output = new BufferedImage(800, 500, BufferedImage.TYPE_INT_ARGB);
 		final Graphics2D g2 = output.createGraphics();
 		g2.setComposite(AlphaComposite.Src);
@@ -174,11 +177,11 @@ public class SurveyService {
 		g2.drawImage(image, 30, 30, null);
 		g2.drawImage(image, 770 - image.getWidth(), 30, null);
 		g2.drawImage(image, 770 - image.getWidth(), 470 - image.getHeight(), null);
-		g2.setFont(new Font("TimesRoman", Font.PLAIN, 36));
+		g2.setFont(customFont);
 		g2.setColor(Color.BLACK);
 		g2.drawString(":", 398, 100);
 		g2.drawString("Umfrage", 30, 300);
-		g2.setFont(new Font("TimesRoman", Font.PLAIN, 18));
+		g2.setFont(customFont.deriveFont(18f));
 		g2.drawString("Spieler des Spiels", 30, 400);
 		g2.dispose();
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
