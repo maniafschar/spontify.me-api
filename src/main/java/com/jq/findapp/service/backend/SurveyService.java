@@ -3,11 +3,10 @@ package com.jq.findapp.service.backend;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.RenderingHints;
-import java.awt.geom.RoundRectangle2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
@@ -16,11 +15,13 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.imageio.ImageIO;
 
-import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.ext.awt.RadialGradientPaint;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,16 +50,20 @@ public class SurveyService {
 
 	private static final AtomicLong lastRun = new AtomicLong(0);
 
-	public SchedulerResult sync() throws Exception {
+	public SchedulerResult update() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/sync");
-		result.result = syncMatchdays();
-		final BigInteger id = syncLastMatch();
-		if (id != null)
-			result.result += "\n" + "syncLastMatchId: " + id;
+		try {
+			result.result = updateMatchdays();
+			final BigInteger id = updateLastMatch();
+			if (id != null)
+				result.result += "\n" + "updateLastMatchId: " + id;
+		} catch (final Exception ex) {
+			result.exception = ex;
+		}
 		return result;
 	}
 
-	private String syncMatchdays() throws Exception {
+	private String updateMatchdays() throws Exception {
 		if (System.currentTimeMillis() - lastRun.get() < 24 * 60 * 60 * 1000)
 			return "Matchdays already run in last 24 hours";
 		lastRun.set(System.currentTimeMillis());
@@ -90,7 +95,7 @@ public class SurveyService {
 		return "Matchdays update: " + count;
 	}
 
-	private BigInteger syncLastMatch() {
+	private BigInteger updateLastMatch() throws Exception {
 		final BigInteger clientId = BigInteger.valueOf(4);
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
 		params.setSearch(
@@ -104,51 +109,76 @@ public class SurveyService {
 			if (matchDay != null) {
 				JsonNode e = matchDay.findPath("players");
 				e = e.get(e.get(0).get("team").get("id").asInt() == 157 ? 0 : 1).get("players");
-				final ObjectNode poll = new ObjectNode();
-				poll.put("prolog", "Möchtest Du an der Umfrage Spieler des Spiels zum " + matchDay.findPath("league").get("name").asText() +
-					" Spiel " + matchDay.findPath("teams").get("home").asText() + " - " + matchDay.findPath("teams").get("away").asText() + 
-					" am " + new SimpleDateFormatter("d.M.yyyy H:mm").format(LocalDateTime.ofInstant(Instant.ofEpochMilli(matchDay.findPath("fixture").get("timestamp").asLong()),
-					TimeZone.getTimeZone("Europe/Berlin").toZoneId())) + " teilnehmen?");
-				poll.put("epilog", "Lieben Dank für die Teilnahme!\n\nÜbrigens, Bayern Fans treffen sich neuerdings zum gemeinsam Spiele anschauen und feiern in dieser coolen, neuen App.\n\nKlicke auf weiter und auch Du kannst mit ein paar Klicks dabei sein.");
+				final ObjectNode poll = new ObjectMapper().createObjectNode();
+				poll.put("prolog",
+						"Umfrage <b>Spieler des Spiels</b> zum "
+								+ matchDay.findPath("league").get("name").asText() +
+								" Spiel<div style=\"padding:1em 0;font-weight:bold;\">"
+								+ matchDay
+										.findPath("teams").get("home").get("name").asText().replace("Munich", "München")
+								+ " - "
+								+ matchDay.findPath("teams").get("away").get("name").asText().replace("Munich",
+										"München")
+								+
+								"</div>vom <b>"
+								+ LocalDateTime.ofInstant(
+										Instant.ofEpochMilli(
+												matchDay.findPath("fixture").get("timestamp").asLong() * 1000),
+										TimeZone.getTimeZone("Europe/Berlin").toZoneId())
+										.format(DateTimeFormatter.ofPattern("d.M.yyyy HH:mm"))
+								+ "</b>. Möchtest Du teilnehmen?");
+				poll.put("epilog",
+						"Lieben Dank für die Teilnahme!\n\nÜbrigens, Bayern Fans treffen sich neuerdings zum gemeinsam Spiele anschauen und feiern in dieser coolen, neuen App.\n\nKlicke auf weiter und auch Du kannst mit ein paar Klicks dabei sein.");
 				final ObjectNode question = poll.putArray("questions").addObject();
 				question.put("question", "Wer war für Dich Spieler des Spiels?");
-				final ArrayNode answers = question.addArray("answers");
+				final ArrayNode answers = question.putArray("answers");
 				for (int i = 0; i < e.size(); i++) {
 					final JsonNode statistics = e.get(i).get("statistics").get(0);
 					if (!statistics.get("games").get("minutes").isNull()) {
 						String s = e.get(i).get("player").get("name").asText() +
-								"<desc>Gespielte Minuten: " + statistics.get("games").get("minutes").asInt();
+								"<explain>" + statistics.get("games").get("minutes").asInt() + " gespielte Minuten";
+						if (!statistics.get("goals").get("total").isNull())
+							s += getLine(statistics.get("goals").get("total").asInt(), " Tor", " Tore");
 						if (!statistics.get("shots").get("total").isNull())
-							s += "<br/>Torschüsse ingesamt/aufs Tor: " + statistics.get("shots").get("total").asInt()
-									+ "/" + statistics.get("shots").get("on").asInt();
-						if (!statistics.get("goals").get("total").isNull()
-								|| !statistics.get("goals").get("assists").isNull())
-							s += "<br/>Tore/Assists: " + statistics.get("goals").get("total").asInt() + "/"
-									+ statistics.get("goals").get("assists").asInt();
+							s += getLine(statistics.get("shots").get("total").asInt(), " Torschuss, ", " Torschüsse, ")
+									+ (statistics.get("shots").get("on").isNull() ? 0
+											: statistics.get("shots").get("on").asInt())
+									+ " aufs Tor";
+						if (!statistics.get("goals").get("assists").isNull())
+							s += getLine(statistics.get("goals").get("assists").asInt(), " Assist", " Assists");
 						if (!statistics.get("passes").get("total").isNull())
-							s += "<br/>Pässe/davon angekommen: " + statistics.get("passes").get("total").asInt() + "/"
-									+ statistics.get("passes").get("accuracy").asInt();
+							s += getLine(statistics.get("passes").get("total").asInt(), " Pass, ", " Pässe, ")
+									+ statistics.get("passes").get("accuracy").asInt() + " angekommen";
 						if (!statistics.get("duels").get("total").isNull())
-							s += "<br/>Duelle/davon gewonnen: " + statistics.get("duels").get("total").asInt() + "/"
-									+ statistics.get("duels").get("won").asInt();
-						if (!statistics.get("cards").get("yellow").isNull()
-								|| !statistics.get("cards").get("red").isNull())
-							s += "<br/>Gelb/Rot: " + statistics.get("cards").get("yellow").asInt() + "/"
-									+ statistics.get("cards").get("red").asInt();
-						s += "</desc>";
+							s += getLine(statistics.get("duels").get("total").asInt(), " Duell, ", " Duelle, ")
+									+ statistics.get("duels").get("won").asInt() + " gewonnen";
+						if (statistics.get("cards").get("yellow").asInt() > 0
+								&& statistics.get("cards").get("red").asInt() > 0)
+							s += "<br/>Gelberote Karte erhalten";
+						else if (statistics.get("cards").get("yellow").asInt() > 0)
+							s += "<br/>Gelbe Karte erhalten";
+						if (statistics.get("cards").get("red").asInt() > 0)
+							s += "<br/>Rote Karte erhalten";
+						s += "</explain>";
 						answers.addObject().put("answer", s);
 					}
 				}
-				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, (BigInteger) list.get(0).get("clientMarketing.id"));
+				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
+						(BigInteger) list.get(0).get("clientMarketing.id"));
 				clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
 				repository.save(clientMarketing);
 				createImage(matchDay.findPath("league").get("logo").asText(),
-					    matchDay.findPath("teams").get("home").get("logo").asText(),
-					    matchDay.findPath("teams").get("away").get("logo").asText());
+						matchDay.findPath("teams").get("home").get("logo").asText(),
+						matchDay.findPath("teams").get("away").get("logo").asText(),
+						matchDay.findPath("teams").get("home").get("id").asInt() == 157);
 			}
 			return (BigInteger) list.get(0).get("clientMarketing.id");
 		}
 		return null;
+	}
+
+	private String getLine(int x, String singular, String plural) {
+		return "<br/>" + x + (x > 1 ? plural : singular);
 	}
 
 	protected JsonNode get(final String url) {
@@ -161,38 +191,58 @@ public class SurveyService {
 				.toEntity(JsonNode.class).block().getBody();
 	}
 
-	private void createImage(String urlLeague, String urlHome, String urlAway) throws IOException {
-		final Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("custom_font.ttf")).deriveFont(36f);
+	private void createImage(final String urlLeague, final String urlHome, final String urlAway,
+			final boolean homeMatch) throws Exception {
+		final Font customFont = Font
+				.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"))
+				.deriveFont(66f);
 		GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(customFont);
-		final BufferedImage output = new BufferedImage(800, 500, BufferedImage.TYPE_INT_ARGB);
+		final int width = 800, height = 500, padding = 30;
+		final BufferedImage output = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		final Graphics2D g2 = output.createGraphics();
 		g2.setComposite(AlphaComposite.Src);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		Color startColor = Color.red;
-		Color endColor = Color.blue;
-		GradientPaint gradient = new GradientPaint(0, 0, startColor, 800, 500, endColor);
+		final RadialGradientPaint gradient = new RadialGradientPaint(width / 2 - 2 * padding, height / 2 - 2 * padding,
+				height,
+				new float[] { .3f, 1f },
+				new Color[] { new Color(245, 239, 232), new Color(246, 194, 166) });
 		g2.setPaint(gradient);
-		g2.fill(new Rectangle2D.Float(0, 0, 800, 500));
+		g2.fill(new Rectangle2D.Float(0, 0, width, height));
 		g2.setComposite(AlphaComposite.SrcAtop);
-		BufferedImage image = ImageIO.read(getClass().getResourceAsStream("/157.png"));
-		g2.drawImage(image, 30, 30, null);
-		g2.drawImage(image, 770 - image.getWidth(), 30, null);
-		g2.drawImage(image, 770 - image.getWidth(), 470 - image.getHeight(), null);
+		if (!homeMatch)
+			drawImage(urlHome, g2, width / 2, padding, height / 2, -1);
+		drawImage(urlAway, g2, width / 2, padding, height / 2, 1);
+		if (homeMatch)
+			drawImage(urlHome, g2, width / 2, padding, height / 2, -1);
+		drawImage(urlLeague, g2, width - padding, padding, height / 6, 0);
 		g2.setFont(customFont);
 		g2.setColor(Color.BLACK);
-		g2.drawString(":", 398, 100);
-		g2.drawString("Umfrage", 30, 300);
-		g2.setFont(customFont.deriveFont(18f));
-		g2.drawString("Spieler des Spiels", 30, 400);
-		BufferedImageTranscoder imageTranscoder = new BufferedImageTranscoder();
-		imageTranscoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, width);
-		imageTranscoder.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, height);
-		TranscoderInput input = new TranscoderInput(svgFile);
-		imageTranscoder.transcode(input, null);
-		g2.drawImage(imageTranscoder.getBufferedImage(), 770 - image.getWidth(), 470 - image.getHeight(), null);
+		String s = "Umfrage";
+		g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 15);
+		g2.setFont(customFont.deriveFont(40f));
+		s = "Spieler des Spiels";
+		g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 17.5f);
+		// final BufferedImageTranscoder imageTranscoder = new
+		// BufferedImageTranscoder();
+		// imageTranscoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, width);
+		// imageTranscoder.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, height);
+		// final TranscoderInput input = new TranscoderInput(svgFile);
+		// imageTranscoder.transcode(input, null);
+		// g2.drawImage(imageTranscoder.getBufferedImage(), 770 - image.getWidth(), 470
+		// - image.getHeight(), null);
 		g2.dispose();
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		ImageIO.write(output, "png", out);
 		IOUtils.write(out.toByteArray(), new FileOutputStream("test.png"));
+	}
+
+	private void drawImage(final String url, final Graphics2D g, final int x, final int y, final int height,
+			final int pos) throws Exception {
+		final BufferedImage image = ImageIO.read(new URL(url).openStream());
+		final int paddingLogos = -10;
+		final int w = image.getWidth() / image.getHeight() * height;
+		g.drawImage(image, x - (pos == 1 ? 0 : w) + pos * paddingLogos, y,
+				x + (pos == 1 ? w : 0) + pos * paddingLogos,
+				height + y, 0, 0, image.getWidth(), image.getHeight(), null);
 	}
 }

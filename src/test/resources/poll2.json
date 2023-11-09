@@ -1,0 +1,34 @@
+{
+	"prolog": "<b>Mini-FCB-Fan-Umfrage zu Boateng</b>\n\nMöchtest Du mitmachen?",
+	"questions": [
+		{
+			"id": "",
+			"question": "Soll Boateng kommen?",
+			"multiple": null,
+			"textField": true,
+			"answers": [
+				{
+					"answer": "Er soll kommen, er hilft uns mit seiner Mentalität auch auf der Bank weiter!",
+					"next": ""
+				},
+				{
+					"answer": "Wenn er billig ist, warum nicht.",
+					"next": ""
+				},
+				{
+					"answer": "Den brauchen wir nicht, der nimmt den jungen nur den Platz weg",
+					"next": ""
+				},
+				{
+					"answer": "Der bringt durch seinen Lebenstil nur Unruhe rein!",
+					"next": ""
+				},
+				{
+					"answer": "Ich habe eine ganz andere Idee:",
+					"next": ""
+				}
+			]
+		}
+	],
+	"epilog": "Lieben Dank für die Teilnahme.\n\nIm übrigen ist das meine neue App, in der Ihr nicht nur meine News <b>gepusht</b> bekommt, sondern Euch auch untereinander venetzen und <b>feiern</b> könnt.\n\nDu kannst Dich gerne Vorab registrieren.\nFür konstruktives Feedback habe stets ein offenes Ohr."
+}
