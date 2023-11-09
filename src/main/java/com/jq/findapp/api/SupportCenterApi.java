@@ -42,6 +42,7 @@ import com.jq.findapp.service.backend.EngagementService;
 import com.jq.findapp.service.backend.ImportLogService;
 import com.jq.findapp.service.backend.IpService;
 import com.jq.findapp.service.backend.RssService;
+import com.jq.findapp.service.backend.SurveyService;
 import com.jq.findapp.util.Strings;
 
 import jakarta.transaction.Transactional;
@@ -75,6 +76,9 @@ public class SupportCenterApi {
 
 	@Autowired
 	private RssService rssService;
+
+	@Autowired
+	private SurveyService surveyService;
 
 	@Autowired
 	private DbService dbService;
@@ -184,6 +188,7 @@ public class SupportCenterApi {
 				run(eventService::findMatchingBuddies, !LAST);
 				run(eventService::notifyParticipation, !LAST);
 				run(rssService::update, !LAST);
+				run(surveyService::update, !LAST);
 			} else
 				throw new RuntimeException("Scheduler already running " + schedulerRunning.size() + " processes");
 		}
