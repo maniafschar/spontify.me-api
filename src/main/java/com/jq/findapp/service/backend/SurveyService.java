@@ -1,11 +1,22 @@
 package com.jq.findapp.service.backend;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.FileOutputStream;
 import java.math.BigInteger;
+import java.net.URL;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.imageio.ImageIO;
+
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -126,6 +137,9 @@ public class SurveyService {
 				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, (BigInteger) list.get(0).get("clientMarketing.id"));
 				clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
 				repository.save(clientMarketing);
+				createImage(matchDay.findPath("league").get("logo").asText(),
+					    matchDay.findPath("teams").get("home").get("logo").asText(),
+					    matchDay.findPath("teams").get("away").get("logo").asText());
 			}
 			return (BigInteger) list.get(0).get("clientMarketing.id");
 		}
@@ -140,5 +154,21 @@ public class SurveyService {
 				.header("x-rapidapi-host", "v3.football.api-sports.io")
 				.retrieve()
 				.toEntity(JsonNode.class).block().getBody();
+	}
+
+	private void createImage(String urlLeague, String urlHome, String urlAway) throws IOException {
+		final BufferedImage output = new BufferedImage(800, 500, BufferedImage.TYPE_INT_ARGB);
+		final Graphics2D g2 = output.createGraphics();
+		g2.setComposite(AlphaComposite.Src);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2.setColor(Color.WHITE);
+		g2.fill(new RoundRectangle2D.Float(0, 0, w, h, w, h));
+		g2.setComposite(AlphaComposite.SrcAtop);
+		g2.drawImage(image, 0, 0, null);
+		BufferedImage image = ImageIO.read(new URL(urlLeague).openStream());
+		g2.dispose();
+		final ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ImageIO.write(output, "png", out);
+		IOUtils.write(out,toByteArray(), new FileOutputStream(""));
 	}
 }
