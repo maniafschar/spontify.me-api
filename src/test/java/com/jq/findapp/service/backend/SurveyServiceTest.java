@@ -1,64 +1,46 @@
 package com.jq.findapp.service.backend;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import java.math.BigInteger;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import spinjar.com.fasterxml.jackson.databind.DeserializationFeature;
-import spinjar.com.fasterxml.jackson.databind.JsonNode;
-import spinjar.com.fasterxml.jackson.databind.ObjectMapper;
+import com.jq.findapp.FindappApplication;
+import com.jq.findapp.TestConfig;
+import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
+import com.jq.findapp.entity.ClientMarketing;
+import com.jq.findapp.repository.Repository;
 
-public class JsonTest {
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = { FindappApplication.class, TestConfig.class })
+@ActiveProfiles("test")
+public class SurveyServiceTest {
+  @Autowired
+  private SurveyService surveyService;
+
+  @Autowired
+  private Repository repository;
+
   @Test
-  public void test() throws Exception
-  {
-    JsonNode matchDay =
-        new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .readTree(JsonTest.class.getResourceAsStream("/test.json"));
-    System.out.println(matchDay.get("fixture")
-        .get("referee")
-        .asText());
-    for (int i = 0; i < matchDay.get("lineups")
-        .size(); i++)
-      for (int i2 = 0; i2 < matchDay.get("lineups")
-          .get(i)
-          .get("startXI")
-          .size(); i2++)
-        System.out.println(matchDay.get("lineups")
-            .get(i)
-            .get("startXI")
-            .get(i2)
-            .get("player")
-            .get("name")
-            .asText());
-    for (int i = 0; i < matchDay.get("players")
-        .size(); i++)
-      for (int i2 = 0; i2 < matchDay.get("players")
-          .get(i)
-          .get("players")
-          .size(); i2++)
-        System.out.println(matchDay.get("players")
-            .get(i)
-            .get("players")
-            .get(i2)
-            .get("player")
-            .get("name")
-            .asText() + " "
-            + matchDay.get("players")
-                .get(i)
-                .get("players")
-                .get(i2)
-                .get("statistics")
-                .get(0)
-                .get("games")
-                .get("rating")
-                .asText()
-            + " " + matchDay.get("players")
-                .get(i)
-                .get("players")
-                .get(i2)
-                .get("statistics")
-                .get(0)
-                .get("games")
-                .get("minutes")
-                .asText());
+  public void test() throws Exception {
+    // given
+
+    // when
+    final SchedulerResult result = surveyService.sync();
+    final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
+        new BigInteger(result.result.substring(result.result.lastIndexOf(" ") + 1)));
+
+    // then
+    assertNull(result.exception);
+    assertEquals("Matchdays update: 7\nsyncLastMatchId: 5", result.result);
+    assertNotNull(clientMarketing.getStorage());
   }
 }

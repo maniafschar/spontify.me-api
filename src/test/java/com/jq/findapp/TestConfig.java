@@ -33,11 +33,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService.MailCreateor;
+import com.jq.findapp.service.backend.SurveyService;
 
 @Profile("test")
 @TestConfiguration
@@ -113,6 +116,23 @@ public class TestConfig {
 		}
 	}
 
+	@Service
+	@Primary
+	public class SurveyServiceTest extends SurveyService {
+		@Override
+		protected JsonNode get(final String url) {
+			try {
+				return new ObjectMapper().readTree(IOUtils
+						.toString(
+								getClass().getResourceAsStream(
+										url.contains("?id=") ? "/io-sports-fixture.json" : "/io-sports-team.json"),
+								StandardCharsets.UTF_8));
+			} catch (final Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
 	public static Timestamp toDays(final Connection connection, final Timestamp timestamp)
 			throws SQLException {
 		return timestamp;
@@ -125,5 +145,6 @@ public class TestConfig {
 
 	public static String substringIndex(final Connection connection, final String s, final String s2, final int i) {
 		return s;
+
 	}
 }
