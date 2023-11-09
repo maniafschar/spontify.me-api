@@ -602,7 +602,7 @@ public class ActionApi {
 		final String today = Instant.now().toString().substring(0, 19);
 		String s = "clientMarketing.clientId=" + contact.getClientId()
 				+ " and clientMarketing.startDate<='" + today + "' and clientMarketing.endDate>='" + today
-				+ "' and ";
+				+ "' and clientMarketing.storage like '%" + Attachment.SEPARATOR + "%'";
 
 		s += "(clientMarketing.language is null or length(clientMarketing.language)=0 or clientMarketing.language='"
 				+ contact.getLanguage() + "'";
