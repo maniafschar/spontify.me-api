@@ -2,10 +2,13 @@ package com.jq.findapp.service.backend;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.net.URL;
@@ -161,14 +164,25 @@ public class SurveyService {
 		final Graphics2D g2 = output.createGraphics();
 		g2.setComposite(AlphaComposite.Src);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2.setColor(Color.WHITE);
-		g2.fill(new RoundRectangle2D.Float(0, 0, w, h, w, h));
+		Color startColor = Color.red;
+		Color endColor = Color.blue;
+		GradientPaint gradient = new GradientPaint(0, 0, startColor, 800, 500, endColor);
+		g2.setPaint(gradient);
+		g2.fill(new Rectangle2D.Float(0, 0, 800, 500));
 		g2.setComposite(AlphaComposite.SrcAtop);
-		g2.drawImage(image, 0, 0, null);
-		BufferedImage image = ImageIO.read(new URL(urlLeague).openStream());
+		BufferedImage image = ImageIO.read(getClass().getResourceAsStream("/157.png"));
+		g2.drawImage(image, 30, 30, null);
+		g2.drawImage(image, 770 - image.getWidth(), 30, null);
+		g2.drawImage(image, 770 - image.getWidth(), 470 - image.getHeight(), null);
+		g2.setFont(new Font("TimesRoman", Font.PLAIN, 36));
+		g2.setColor(Color.BLACK);
+		g2.drawString(":", 398, 100);
+		g2.drawString("Umfrage", 30, 300);
+		g2.setFont(new Font("TimesRoman", Font.PLAIN, 18));
+		g2.drawString("Spieler des Spiels", 30, 400);
 		g2.dispose();
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		ImageIO.write(output, "png", out);
-		IOUtils.write(out,toByteArray(), new FileOutputStream(""));
+		IOUtils.write(out.toByteArray(), new FileOutputStream("test.png"));
 	}
 }
