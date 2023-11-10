@@ -168,10 +168,10 @@ public class SurveyService {
 						(BigInteger) list.get(0).get("clientMarketing.id"));
 				clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
 				repository.save(clientMarketing);
-				createImage(matchDay.findPath("league").get("logo").asText(),
+				publish(createImage(matchDay.findPath("league").get("logo").asText(),
 						matchDay.findPath("teams").get("home").get("logo").asText(),
 						matchDay.findPath("teams").get("away").get("logo").asText(),
-						matchDay.findPath("teams").get("home").get("id").asInt() == 157);
+						matchDay.findPath("teams").get("home").get("id").asInt() == 157));
 			}
 			return (BigInteger) list.get(0).get("clientMarketing.id");
 		}
@@ -180,6 +180,10 @@ public class SurveyService {
 
 	private String getLine(int x, String singular, String plural) {
 		return "<br/>" + x + (x > 1 ? plural : singular);
+	}
+
+	private void publish(byte[] image) {
+		// https://developers.facebook.com/docs/facebook-login/guides/access-tokens/#pagetokens
 	}
 
 	protected JsonNode get(final String url) {
@@ -192,7 +196,7 @@ public class SurveyService {
 				.toEntity(JsonNode.class).block().getBody();
 	}
 
-	private void createImage(final String urlLeague, final String urlHome, final String urlAway,
+	private byte[] createImage(final String urlLeague, final String urlHome, final String urlAway,
 			final boolean homeMatch) throws Exception {
 		final Font customFont = Font
 				.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"))
@@ -234,7 +238,7 @@ public class SurveyService {
 		g2.dispose();
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		ImageIO.write(output, "png", out);
-		IOUtils.write(out.toByteArray(), new FileOutputStream("test.png"));
+		return out.toByteArray();
 	}
 
 	private void drawImage(final String url, final Graphics2D g, final int x, final int y, final int height,
