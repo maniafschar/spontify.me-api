@@ -136,7 +136,8 @@ public class SurveyService {
 					final JsonNode statistics = e.get(i).get("statistics").get(0);
 					if (!statistics.get("games").get("minutes").isNull()) {
 						String s = e.get(i).get("player").get("name").asText() +
-								"<explain>" + statistics.get("games").get("minutes").asInt() + " gespielte Minuten";
+								"<explain>" + statistics.get("games").get("minutes").asInt() +
+								(statistics.get("games").get("minutes").asInt() > 1 ? " gespielte Minuten" : " gespielte Minute");
 						if (!statistics.get("goals").get("total").isNull())
 							s += getLine(statistics.get("goals").get("total").asInt(), " Tor", " Tore");
 						if (!statistics.get("shots").get("total").isNull())
