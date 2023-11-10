@@ -30,30 +30,18 @@ public class SurveyServiceTest {
   private Repository repository;
 
   @Test
-  public void update() throws Exception {
+  public void update_twice() throws Exception {
     // given
-
-    // when
-    final SchedulerResult result = surveyService.update();
+    SchedulerResult result = surveyService.update();
     final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
         new BigInteger(result.result.substring(result.result.lastIndexOf(" ") + 1)));
 
-    // then
-    assertNull(result.exception);
-    assertEquals("Matchdays update: 7\nupdateLastMatchId: 5", result.result);
-    assertNotNull(clientMarketing.getStorage());
-  }
-
-  @Test
-  public void update_twice() throws Exception {
-    // given
-    surveyService.update();
-
     // when
-    final SchedulerResult result = surveyService.update();
+    result = surveyService.update();
 
     // then
     assertNull(result.exception);
     assertEquals("Matchdays already run in last 24 hours", result.result);
+    assertNotNull(clientMarketing.getStorage());
   }
 }

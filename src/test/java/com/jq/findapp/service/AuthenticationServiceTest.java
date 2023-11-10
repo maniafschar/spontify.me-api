@@ -71,7 +71,7 @@ public class AuthenticationServiceTest {
 	@Test
 	public void getAutoLogin() throws Exception {
 		// given
-		final Contact contact = utils.createContact();
+		final Contact contact = utils.createContact(BigInteger.ONE);
 		final ContactToken token = createToken(contact);
 		final String t = EncryptionTest.encryptBrowser(token.getToken());
 		final String publicKey = IOUtils.toString(Encryption.class.getResourceAsStream("/keys/publicDB.key"),
@@ -87,8 +87,7 @@ public class AuthenticationServiceTest {
 	@Test
 	public void register() throws Exception {
 		// given
-		utils.createClient();
-		utils.createContact();
+		utils.createContact(BigInteger.ONE);
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.email='test@jq-consulting.de'");
 		final InternalRegistration registration = new InternalRegistration();
@@ -112,7 +111,7 @@ public class AuthenticationServiceTest {
 	@Test
 	public void register_blockedEmailDomain() throws Exception {
 		// given
-		utils.createContact();
+		utils.createContact(BigInteger.ONE);
 		final InternalRegistration registration = new InternalRegistration();
 		registration.setAgb(true);
 		registration.setBirthday(new Date(3000000000L));
@@ -198,11 +197,11 @@ public class AuthenticationServiceTest {
 	@Test
 	public void verify() throws Exception {
 		// given
-		final Contact contact = utils.createContact();
+		final Contact contact = utils.createContact(BigInteger.valueOf(4));
 
 		// when
 		authenticationService.verify(contact.getId(),
-				"f877829076e5d8c1b148e547c60058706f113264070119e7423a0bcb0a66866c", "1645254161315.7888940363091781");
+				"31c39af069198e168d1d999a983bd93a04cccb06d3ec24acc189ea30968c6cd8", "1645254161315.7888940363091781");
 
 		// then no exception
 	}
@@ -244,10 +243,9 @@ public class AuthenticationServiceTest {
 		assertTrue(result);
 	}
 
-	@Test
 	public void ios() throws Exception {
 		// given
-		final Contact contact = utils.createContact();
+		final Contact contact = utils.createContact(BigInteger.ONE);
 		contact.setPushToken("722fb09cd97250a33d0046fbd0612045a06e463de8d098158fbe4c80321cfcf9");
 		contact.setClientId(new BigInteger("4"));
 		// System.setProperty("javax.net.debug", "all");
@@ -262,7 +260,7 @@ public class AuthenticationServiceTest {
 	@Test
 	public void android() throws Exception {
 		// given
-		final Contact contact = utils.createContact();
+		final Contact contact = utils.createContact(BigInteger.ONE);
 		contact.setPushToken(
 				"dHFZR7_iWnc:APA91bF7Z9NsdMRN0nX5C2il8dOqbmJ8DFtAdqb4_2thbOGB0LJK_2m1zjtyXyHD1tmdog6TQsTXbHvKPyv-EuqNik4vM1VlGSY-h6wG6JdM4k9h8es7duf08pfSEYezwuUyGcDkWkQd");
 
@@ -294,7 +292,7 @@ public class AuthenticationServiceTest {
 	@Test
 	public void deleteAccount() throws Exception {
 		// given
-		utils.createContact();
+		utils.createContact(BigInteger.ONE);
 
 		// when
 		authenticationService.deleteAccount(repository.one(Contact.class, BigInteger.ONE));

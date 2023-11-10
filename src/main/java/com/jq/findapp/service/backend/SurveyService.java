@@ -9,9 +9,9 @@ import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -22,7 +22,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.imageio.ImageIO;
 
 import org.apache.batik.ext.awt.RadialGradientPaint;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.mail.DefaultAuthenticator;
+import org.apache.commons.mail.ImageHtmlEmail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -39,14 +40,27 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.NotificationService.MailCreateor;
 
 @Service
 public class SurveyService {
 	@Autowired
 	private Repository repository;
 
+	@Autowired
+	private MailCreateor mailCreateor;
+
 	@Value("${app.sports.api.token}")
 	private String token;
+
+	@Value("${app.mail.host}")
+	private String emailHost;
+
+	@Value("${app.mail.port}")
+	private int emailPort;
+
+	@Value("${app.mail.password}")
+	private String emailPassword;
 
 	private static final AtomicLong lastRun = new AtomicLong(0);
 
@@ -137,7 +151,8 @@ public class SurveyService {
 					if (!statistics.get("games").get("minutes").isNull()) {
 						String s = e.get(i).get("player").get("name").asText() +
 								"<explain>" + statistics.get("games").get("minutes").asInt() +
-								(statistics.get("games").get("minutes").asInt() > 1 ? " gespielte Minuten" : " gespielte Minute");
+								(statistics.get("games").get("minutes").asInt() > 1 ? " gespielte Minuten"
+										: " gespielte Minute");
 						if (!statistics.get("goals").get("total").isNull())
 							s += getLine(statistics.get("goals").get("total").asInt(), " Tor", " Tore");
 						if (!statistics.get("shots").get("total").isNull())
@@ -167,23 +182,37 @@ public class SurveyService {
 				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 						(BigInteger) list.get(0).get("clientMarketing.id"));
 				clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
+				clientMarketing.setImage(Attachment.createImage(".png",
+						createImage(matchDay.findPath("league").get("logo").asText(),
+								matchDay.findPath("teams").get("home").get("logo").asText(),
+								matchDay.findPath("teams").get("away").get("logo").asText(),
+								matchDay.findPath("teams").get("home").get("id").asInt() == 157)));
 				repository.save(clientMarketing);
-				publish(createImage(matchDay.findPath("league").get("logo").asText(),
-						matchDay.findPath("teams").get("home").get("logo").asText(),
-						matchDay.findPath("teams").get("away").get("logo").asText(),
-						matchDay.findPath("teams").get("home").get("id").asInt() == 157));
+				publish(Attachment.resolve(clientMarketing.getImage()));
 			}
 			return (BigInteger) list.get(0).get("clientMarketing.id");
 		}
 		return null;
 	}
 
-	private String getLine(int x, String singular, String plural) {
+	private String getLine(final int x, final String singular, final String plural) {
 		return "<br/>" + x + (x > 1 ? plural : singular);
 	}
 
-	private void publish(byte[] image) {
+	private void publish(final String image) throws Exception {
 		// https://developers.facebook.com/docs/facebook-login/guides/access-tokens/#pagetokens
+		final ImageHtmlEmail email = mailCreateor.create();
+		email.setHostName(emailHost);
+		email.setSmtpPort(emailPort);
+		email.setCharset(StandardCharsets.UTF_8.name());
+		email.setAuthenticator(new DefaultAuthenticator("support@fan-club.online", emailPassword));
+		email.setSSLOnConnect(true);
+		email.setFrom("support@fan-club.online");
+		email.addTo("mani.afschar@jq-consulting.de");
+		email.setSubject("Survey");
+		email.setTextMsg("Survey");
+		email.attach(new URL("https://fan-club.online/med/" + image), "pic", "pic");
+		email.send();
 	}
 
 	protected JsonNode get(final String url) {

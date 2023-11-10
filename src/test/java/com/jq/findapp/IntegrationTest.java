@@ -11,8 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
@@ -43,16 +43,17 @@ public class IntegrationTest {
 	@Autowired
 	private Utils utils;
 
-	@BeforeAll
-	public static void start() throws Exception {
+	@BeforeEach
+	public void start() throws Exception {
 		new ProcessBuilder("./web.sh start".split(" ")).start();
 		Util.driver = new SafariDriver();
 		Util.driver.manage().timeouts().implicitlyWait(Duration.ofMillis(50));
 		Util.driver.manage().window().setSize(new Dimension(450, 800));
+		init();
 	}
 
-	@AfterAll
-	public static void stop() throws Exception {
+	@AfterEach
+	public void stop() throws Exception {
 		Util.driver.close();
 		new ProcessBuilder("./web.sh stop".split(" ")).start();
 	}
@@ -60,7 +61,6 @@ public class IntegrationTest {
 	@Test
 	public void run() throws Exception {
 		try {
-			init();
 			register("testabcd", "test@jq-consulting.de");
 			addLocation("location 1", "Melchiorstr. 9\n81479 München", false);
 			addEvent();
@@ -74,8 +74,7 @@ public class IntegrationTest {
 	}
 
 	private void init() throws Exception {
-		utils.createClient();
-		utils.createContact();
+		utils.createContact(BigInteger.valueOf(8));
 		utils.initPaypalSandbox();
 		for (int i = 0; i < 20; i++) {
 			Util.sleep(1000);

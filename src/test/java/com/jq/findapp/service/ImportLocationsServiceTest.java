@@ -43,7 +43,7 @@ public class ImportLocationsServiceTest {
 	@Test
 	public void importLocation() throws Exception {
 		// given
-		utils.createContact();
+		utils.createContact(BigInteger.ONE);
 		importLocationsService.lookup(48, 11);
 		BigInteger ticketId = BigInteger.ZERO;
 		while (BigInteger.ZERO.equals(ticketId)) {
@@ -76,7 +76,7 @@ public class ImportLocationsServiceTest {
 	@Test
 	public void importLocationJSON() throws Exception {
 		// given
-		utils.createContact();
+		utils.createContact(BigInteger.ONE);
 		final String json = IOUtils.toString(getClass().getResourceAsStream("/googleNearByError.json"),
 				StandardCharsets.UTF_8);
 

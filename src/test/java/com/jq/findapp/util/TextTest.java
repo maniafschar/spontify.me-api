@@ -1,5 +1,6 @@
 package com.jq.findapp.util;
 
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -33,7 +34,7 @@ public class TextTest {
 	@Test
 	public void notificationToId() throws Exception {
 		// given
-		final Contact contact = utils.createContact();
+		final Contact contact = utils.createContact(BigInteger.ONE);
 
 		// when
 		for (final ContactNotificationTextType id : ContactNotificationTextType.values())
@@ -45,7 +46,7 @@ public class TextTest {
 	@Test
 	public void ids() throws Exception {
 		// given
-		final Contact contact = utils.createContact();
+		final Contact contact = utils.createContact(BigInteger.ONE);
 
 		// when
 		for (final TextId id : TextId.values())

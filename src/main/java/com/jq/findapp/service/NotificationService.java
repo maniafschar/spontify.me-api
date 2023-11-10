@@ -428,8 +428,8 @@ public class NotificationService {
 				email.setHtmlMsg(text);
 			email.send();
 			if (to != null)
-				createTicket(TicketType.EMAIL, to.getEmail(), text, repository.one(Client.class, to.getClientId())
-						.getAdminId());
+				createTicket(TicketType.EMAIL, to.getEmail(), text,
+						repository.one(Client.class, to.getClientId()).getAdminId());
 		} catch (final EmailException | MalformedURLException ex) {
 			if (to != null)
 				createTicket(TicketType.ERROR, "Email exception: " + to.getEmail(),
@@ -437,17 +437,12 @@ public class NotificationService {
 		}
 	}
 
-	public void createTicket(final TicketType type, String subject, String text, BigInteger user) {
-		final Contact contact;
+	public void createTicket(final TicketType type, String subject, String text, final BigInteger contactId) {
 		final BigInteger adminId;
-		if (user == null) {
-			user = BigInteger.ZERO;
+		if (contactId == null)
 			adminId = BigInteger.ZERO;
-			contact = null;
-		} else {
-			contact = repository.one(Contact.class, user);
-			adminId = repository.one(Client.class, contact.getClientId()).getAdminId();
-		}
+		else
+			adminId = repository.one(Client.class, repository.one(Contact.class, contactId).getClientId()).getAdminId();
 		try {
 			if (subject == null)
 				subject = "no subject";
@@ -457,7 +452,8 @@ public class NotificationService {
 			}
 			final QueryParams params = new QueryParams(Query.misc_listTicket);
 			params.setSearch("subject='" + subject + "' and type='" + type.name() + "' and createdAt>'"
-					+ Instant.now().minus(Duration.ofDays(1)) + "' and contactId=" + user);
+					+ Instant.now().minus(Duration.ofDays(1)) + "'"
+					+ (contactId == null ? "" : " and contactId=" + contactId));
 			final Result result = repository.list(params);
 			for (int i = 0; i < result.size(); i++) {
 				if (text.equals(result.get(i).get("ticket.note")))
@@ -466,10 +462,11 @@ public class NotificationService {
 			final Ticket ticket = new Ticket();
 			ticket.setSubject(subject);
 			ticket.setNote(text);
-			if (contact != null)
-				ticket.setClientId(contact.getClientId());
+			if (contactId != null)
+				ticket.setClientId(repository.one(Contact.class, contactId).getClientId());
 			ticket.setType(type);
-			ticket.setContactId(user);
+			if (contactId != null)
+				ticket.setContactId(contactId);
 			repository.save(ticket);
 			if (type == TicketType.BLOCK)
 				sendEmail(repository.one(Contact.class, adminId), "Block", text, null);

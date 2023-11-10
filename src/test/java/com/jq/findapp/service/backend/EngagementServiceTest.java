@@ -2,6 +2,7 @@ package com.jq.findapp.service.backend;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.math.BigInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,7 +30,7 @@ public class EngagementServiceTest {
 	@Test
 	public void sendChats() throws Exception {
 		// given
-		utils.createContact();
+		utils.createContact(BigInteger.ONE);
 
 		// when
 		engagementService.sendChats();

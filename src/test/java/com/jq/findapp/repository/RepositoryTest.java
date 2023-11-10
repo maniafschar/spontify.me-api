@@ -59,7 +59,7 @@ public class RepositoryTest {
 	@Test
 	public void saveChat() throws Exception {
 		// given
-		final Contact contact = utils.createContact();
+		final Contact contact = utils.createContact(BigInteger.ONE);
 		final ContactChat contactChat = createChat(contact);
 		final long created = contactChat.getCreatedAt().getTime();
 		final byte[] b = new byte[500];
@@ -80,7 +80,7 @@ public class RepositoryTest {
 	@Test
 	public void saveContact() throws Exception {
 		// given
-		final Contact contact = utils.createContact();
+		final Contact contact = utils.createContact(BigInteger.ONE);
 		final Timestamp visitPage = contact.getVisitPage();
 
 		// when
@@ -112,7 +112,7 @@ public class RepositoryTest {
 	public void queries() throws Exception {
 		// given
 		final QueryParams params = new QueryParams(null);
-		params.setUser(utils.createContact());
+		params.setUser(utils.createContact(BigInteger.ONE));
 
 		// when
 		for (final Query query : Query.values()) {
@@ -130,7 +130,7 @@ public class RepositoryTest {
 	public void list() throws Exception {
 		// given
 		final QueryParams params = new QueryParams(Query.contact_list);
-		params.setUser(utils.createContact());
+		params.setUser(utils.createContact(BigInteger.ONE));
 		params.setSearch("contact.id=" + params.getUser().getId());
 
 		// when
@@ -148,7 +148,7 @@ public class RepositoryTest {
 		params.setDistance(100);
 		params.setLatitude(12.0f);
 		params.setLongitude(49.8f);
-		params.setUser(utils.createContact());
+		params.setUser(utils.createContact(BigInteger.ONE));
 
 		// when
 		final Result result = repository.list(params);
@@ -178,7 +178,7 @@ public class RepositoryTest {
 	@Test
 	public void repositoryListener() throws Exception {
 		// given
-		utils.createContact();
+		utils.createContact(BigInteger.ONE);
 		final Ticket ticket = new Ticket();
 		ticket.setSubject("abc");
 		ticket.setNote("123");
@@ -198,7 +198,7 @@ public class RepositoryTest {
 	@Test
 	public void chat_duplicateNote() throws Exception {
 		// given
-		final Contact contact = utils.createContact();
+		final Contact contact = utils.createContact(BigInteger.ONE);
 		final ContactChat contactChat = createChat(contact);
 		final ContactChat contactChat2 = new ContactChat();
 		contactChat2.setNote(contactChat.getNote());
@@ -222,7 +222,7 @@ public class RepositoryTest {
 		final byte[] b = new byte[500];
 		for (int i = 0; i < b.length; i++)
 			b[i] = 23;
-		final Contact contact = utils.createContact();
+		final Contact contact = utils.createContact(BigInteger.ONE);
 		final ContactChat contactChat = new ContactChat();
 		contactChat.setImage(Attachment.createImage(".jpg", b));
 		contactChat.setContactId(contact.getId());

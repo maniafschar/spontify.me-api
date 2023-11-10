@@ -18,6 +18,7 @@ public class ClientMarketing extends BaseEntity {
 	private String language;
 	private String region;
 	private String storage;
+	private String image;
 	private Timestamp endDate;
 	private Timestamp startDate;
 
@@ -25,7 +26,7 @@ public class ClientMarketing extends BaseEntity {
 		return clientId;
 	}
 
-	public void setClientId(BigInteger clientId) {
+	public void setClientId(final BigInteger clientId) {
 		this.clientId = clientId;
 	}
 
@@ -33,7 +34,7 @@ public class ClientMarketing extends BaseEntity {
 		return startDate;
 	}
 
-	public void setStartDate(Timestamp startDate) {
+	public void setStartDate(final Timestamp startDate) {
 		this.startDate = startDate;
 	}
 
@@ -41,7 +42,7 @@ public class ClientMarketing extends BaseEntity {
 		return endDate;
 	}
 
-	public void setEndDate(Timestamp endDate) {
+	public void setEndDate(final Timestamp endDate) {
 		this.endDate = endDate;
 	}
 
@@ -49,7 +50,7 @@ public class ClientMarketing extends BaseEntity {
 		return age;
 	}
 
-	public void setAge(String age) {
+	public void setAge(final String age) {
 		this.age = age;
 	}
 
@@ -57,7 +58,7 @@ public class ClientMarketing extends BaseEntity {
 		return gender;
 	}
 
-	public void setGender(String gender) {
+	public void setGender(final String gender) {
 		this.gender = gender;
 	}
 
@@ -65,7 +66,7 @@ public class ClientMarketing extends BaseEntity {
 		return language;
 	}
 
-	public void setLanguage(String language) {
+	public void setLanguage(final String language) {
 		this.language = language;
 	}
 
@@ -73,7 +74,7 @@ public class ClientMarketing extends BaseEntity {
 		return region;
 	}
 
-	public void setRegion(String region) {
+	public void setRegion(final String region) {
 		this.region = region;
 	}
 
@@ -81,7 +82,7 @@ public class ClientMarketing extends BaseEntity {
 		return storage;
 	}
 
-	public void setStorage(String storage) {
+	public void setStorage(final String storage) {
 		this.storage = storage;
 	}
 
@@ -89,13 +90,21 @@ public class ClientMarketing extends BaseEntity {
 		return share;
 	}
 
-	public void setShare(Boolean share) {
+	public void setShare(final Boolean share) {
 		this.share = share;
+	}
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(final String image) {
+		this.image = image;
 	}
 
 	@Transient
 	@Override
-	public boolean writeAccess(BigInteger user, Repository repository) {
+	public boolean writeAccess(final BigInteger user, final Repository repository) {
 		return repository.one(Contact.class, user).getType() == ContactType.adminContent;
 	}
 }

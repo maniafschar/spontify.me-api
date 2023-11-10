@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.Contact.ContactType;
 import com.jq.findapp.entity.Setting;
 import com.jq.findapp.repository.Repository;
 
@@ -19,40 +20,44 @@ public class Utils {
 	@Autowired
 	private Repository repository;
 
-	public Client createClient() throws Exception {
-		Client client = repository.one(Client.class, BigInteger.ONE);
+	private Client createClient(final BigInteger id) throws Exception {
+		Client client = repository.one(Client.class, id);
 		if (client == null) {
-			client = new Client();
-			client.setName("abc");
-			client.setEmail("abc@jq-consulting.de");
-			client.setUrl("https://fan-club.online");
-			client.setStorage("{\"css\":{}}");
-			client.setAdminId(BigInteger.ONE);
-			repository.save(client);
+			do {
+				client = new Client();
+				client.setName("abc");
+				client.setEmail("abc@jq-consulting.de");
+				client.setUrl("https://fan-club.online");
+				client.setStorage("{\"css\":{}}");
+				client.setAdminId(id);
+				repository.save(client);
+			} while (client.getId().compareTo(id) < 0);
 		}
 		return client;
 	}
 
-	public Contact createContact() throws Exception {
-		Contact contact = repository.one(Contact.class, BigInteger.ONE);
+	public Contact createContact(final BigInteger id) throws Exception {
+		Contact contact = repository.one(Contact.class, id);
 		if (contact == null) {
-			int i = 1;
-			createClient();
-			contact = new Contact();
-			contact.setClientId(BigInteger.ONE);
-			contact.setEmail("test" + i + "@jq-consulting.de");
-			contact.setLanguage("DE");
-			contact.setIdDisplay("123456" + i++);
-			contact.setFacebookId("1234567890");
-			contact.setBirthday(new Date(3000000000L));
-			contact.setVisitPage(new Timestamp(System.currentTimeMillis() - 3000000L));
-			contact.setGender((short) 1);
-			contact.setTimezone(TimeZone.getDefault().getID());
-			contact.setPseudonym("pseudonym");
-			contact.setVerified(true);
-			contact.setPassword(Encryption.encryptDB("secret_password"));
-			contact.setPasswordReset(System.currentTimeMillis());
-			repository.save(contact);
+			do {
+				createClient(id);
+				contact = new Contact();
+				contact.setClientId(id);
+				contact.setEmail("test1@jq-consulting.de");
+				contact.setLanguage("DE");
+				contact.setIdDisplay("1234561");
+				contact.setFacebookId("1234567890");
+				contact.setBirthday(new Date(3000000000L));
+				contact.setVisitPage(new Timestamp(System.currentTimeMillis() - 3000000L));
+				contact.setGender((short) 1);
+				contact.setType(ContactType.admin);
+				contact.setTimezone(TimeZone.getDefault().getID());
+				contact.setPseudonym("pseudonym");
+				contact.setVerified(true);
+				contact.setPassword(Encryption.encryptDB("secret_password"));
+				contact.setPasswordReset(System.currentTimeMillis());
+				repository.save(contact);
+			} while (contact.getId().compareTo(id) < 0);
 		}
 		return contact;
 	}

@@ -333,6 +333,7 @@ public class ImportLocationsService {
 					name = name.substring(0, name.lastIndexOf(" "));
 			}
 			location.setName(name);
+			location.setContactId(BigInteger.ONE);
 			location.setLatitude((float) json.get("geometry").get("location").get("lat").asDouble());
 			location.setLongitude((float) json.get("geometry").get("location").get("lng").asDouble());
 			location.setAddress(json.get("vicinity").asText().replace(", ", "\n"));
