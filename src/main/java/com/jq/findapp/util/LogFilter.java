@@ -121,7 +121,8 @@ public class LogFilter implements Filter {
 				}
 			} else if (req.getRequestURI().startsWith("/support/")) {
 				if (supportCenterSecret.equals(req.getHeader("secret")))
-					authenticationService.verify(repository.one(Client.class, BigInteger.ONE).getAdminId(),
+					authenticationService.verify(
+							repository.one(Client.class, new BigInteger(req.getHeader("clientId"))).getAdminId(),
 							req.getHeader("password"), req.getHeader("salt"));
 				else if (!schedulerSecret.equals(req.getHeader("secret")) ||
 						!req.getRequestURI().equals("/support/scheduler") &&

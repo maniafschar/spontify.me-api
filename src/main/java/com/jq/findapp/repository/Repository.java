@@ -142,7 +142,7 @@ public class Repository {
 						"Invalid quote in " + params.getQuery().name() + " search: " + params.getSearch());
 			s.delete(p, p2 + 1);
 		}
-		if (s.indexOf(";") > -1 || s.indexOf("union") > -1 || s.indexOf("select") > -1 || s.indexOf("update") > -1
+		if (s.indexOf(";") > -1 || s.indexOf("union") > -1 || s.indexOf("update") > -1
 				|| s.indexOf("insert") > -1 || s.indexOf("delete") > -1)
 			throw new IllegalArgumentException(
 					"Invalid expression in " + params.getQuery().name() + " search: " + params.getSearch());

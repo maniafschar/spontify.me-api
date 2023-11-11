@@ -125,7 +125,7 @@ public class TestConfig {
 				return new ObjectMapper().readTree(IOUtils
 						.toString(
 								getClass().getResourceAsStream(
-										url.contains("?id=") ? "/io-sports-fixture.json" : "/io-sports-team.json"),
+										url.contains("?id=") ? "/surveyLastMatch.json" : "/surveyMatchdays.json"),
 								StandardCharsets.UTF_8));
 			} catch (final Exception e) {
 				throw new RuntimeException(e);

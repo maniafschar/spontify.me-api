@@ -87,9 +87,10 @@ public class SurveyService {
 		params.setSearch("clientMarketing.startDate>'" + Instant.now() + "' and clientMarketing.clientId=" + clientId +
 				" and clientMarketing.storage not like '%" + Attachment.SEPARATOR + "%'");
 		if (repository.list(params).size() == 0) {
-			final JsonNode matchDays = get("https://v3.football.api-sports.io/fixtures?team=157&season="
+			JsonNode matchDays = get("https://v3.football.api-sports.io/fixtures?team=157&season="
 					+ LocalDateTime.now().getYear());
 			if (matchDays != null) {
+				matchDays = matchDays.get("response");
 				for (int i = 0; i < matchDays.size(); i++) {
 					if ("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())) {
 						final ClientMarketing clientMarketing = new ClientMarketing();
@@ -118,9 +119,10 @@ public class SurveyService {
 						" and clientMarketing.storage not like '%" + Attachment.SEPARATOR + "%'");
 		final Result list = repository.list(params);
 		if (list.size() > 0) {
-			final JsonNode matchDay = get("https://v3.football.api-sports.io/fixtures?id="
+			JsonNode matchDay = get("https://v3.football.api-sports.io/fixtures?id="
 					+ list.get(0).get("clientMarketing.storage"));
 			if (matchDay != null) {
+				matchDay = matchDay.get("response");
 				JsonNode e = matchDay.findPath("players");
 				e = e.get(e.get(0).get("team").get("id").asInt() == 157 ? 0 : 1).get("players");
 				final ObjectNode poll = new ObjectMapper().createObjectNode();
