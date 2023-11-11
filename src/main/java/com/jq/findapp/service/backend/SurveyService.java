@@ -190,7 +190,7 @@ public class SurveyService {
 								matchDay.findPath("teams").get("away").get("logo").asText(),
 								matchDay.findPath("teams").get("home").get("id").asInt() == 157)));
 				repository.save(clientMarketing);
-				publish(Attachment.resolve(clientMarketing.getImage()));
+				publish(clientMarketing);
 			}
 			return (BigInteger) list.get(0).get("clientMarketing.id");
 		}
@@ -201,7 +201,7 @@ public class SurveyService {
 		return "<br/>" + x + (x > 1 ? plural : singular);
 	}
 
-	private void publish(final String image) throws Exception {
+	private void publish(final ClientMarketing clientMarketing) throws Exception {
 		// https://developers.facebook.com/docs/facebook-login/guides/access-tokens/#pagetokens
 		final ImageHtmlEmail email = mailCreateor.create();
 		email.setHostName(emailHost);
@@ -212,8 +212,9 @@ public class SurveyService {
 		email.setFrom("support@fan-club.online");
 		email.addTo("mani.afschar@jq-consulting.de");
 		email.setSubject("Survey");
-		email.setTextMsg("Survey");
-		email.attach(new URL("https://fan-club.online/med/" + image), "pic", "pic");
+		email.setTextMsg("Survey: https://fcbayerntotal.fan-club.online/?m=" + clientMarketing.getId());
+		email.attach(new URL("https://fan-club.online/med/" + Attachment.resolve(clientMarketing.getImage())),
+				"pic.png", "pic");
 		email.send();
 	}
 

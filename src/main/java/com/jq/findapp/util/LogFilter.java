@@ -120,11 +120,13 @@ public class LogFilter implements Filter {
 						throw new AuthenticationException(AuthenticationExceptionType.WrongClient);
 				}
 			} else if (req.getRequestURI().startsWith("/support/")) {
-				if (supportCenterSecret.equals(req.getHeader("secret")))
+				if (supportCenterSecret.equals(req.getHeader("secret"))) {
+					if (req.getHeader("clientId") == null)
+						throw new AuthenticationException(AuthenticationExceptionType.NoInputFromClient);
 					authenticationService.verify(
 							repository.one(Client.class, new BigInteger(req.getHeader("clientId"))).getAdminId(),
 							req.getHeader("password"), req.getHeader("salt"));
-				else if (!schedulerSecret.equals(req.getHeader("secret")) ||
+				} else if (!schedulerSecret.equals(req.getHeader("secret")) ||
 						!req.getRequestURI().equals("/support/scheduler") &&
 								!req.getRequestURI().equals("/support/healthcheck"))
 					throw new AuthenticationException(AuthenticationExceptionType.ProtectetdArea);
