@@ -604,7 +604,7 @@ public class ActionApi {
 				+ " and clientMarketing.startDate<='" + today + "' and clientMarketing.endDate>='" + today
 				+ "' and clientMarketing.storage like '%" + Attachment.SEPARATOR + "%'";
 
-		s += "(clientMarketing.language is null or length(clientMarketing.language)=0 or clientMarketing.language='"
+		s += " and (clientMarketing.language is null or length(clientMarketing.language)=0 or clientMarketing.language='"
 				+ contact.getLanguage() + "'";
 
 		s += ") and (clientMarketing.gender is null or length(clientMarketing.gender)=0";
