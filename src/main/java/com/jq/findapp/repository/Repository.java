@@ -361,7 +361,8 @@ public class Repository {
 		}
 
 		public static String resolve(String value) {
-			if (value != null && value.contains(SEPARATOR)) {
+			if (value != null && value.contains(SEPARATOR) && value.indexOf(SEPARATOR) < 8
+					&& value.indexOf(SEPARATOR) == value.lastIndexOf(SEPARATOR)) {
 				try {
 					final String n = getFilename(value);
 					if (n.contains("."))

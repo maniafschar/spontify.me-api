@@ -407,7 +407,7 @@ public class NotificationService {
 		return s.replaceAll("<[^>]*>", "");
 	}
 
-	private void sendEmail(final Contact to, final String subject, final String text, final String html) {
+	public void sendEmail(final Contact to, final String subject, final String text, final String html) {
 		final String from = repository.one(Client.class, to.getClientId()).getEmail();
 		final ImageHtmlEmail email = mailCreateor.create();
 		email.setHostName(emailHost);
@@ -438,11 +438,6 @@ public class NotificationService {
 	}
 
 	public void createTicket(final TicketType type, String subject, String text, final BigInteger contactId) {
-		final BigInteger adminId;
-		if (contactId == null)
-			adminId = BigInteger.ZERO;
-		else
-			adminId = repository.one(Client.class, repository.one(Contact.class, contactId).getClientId()).getAdminId();
 		try {
 			if (subject == null)
 				subject = "no subject";
@@ -468,15 +463,8 @@ public class NotificationService {
 			if (contactId != null)
 				ticket.setContactId(contactId);
 			repository.save(ticket);
-			if (type == TicketType.BLOCK)
-				sendEmail(repository.one(Contact.class, adminId), "Block", text, null);
 		} catch (final Exception ex) {
-			try {
-				sendEmail(repository.one(Contact.class, adminId), type + ": " + subject, text,
-						null);
-			} catch (final Exception e) {
-				e.printStackTrace();
-			}
+			ex.printStackTrace();
 		}
 	}
 

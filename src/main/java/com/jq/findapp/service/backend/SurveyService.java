@@ -77,6 +77,7 @@ public class SurveyService {
 			final BigInteger id = updateLastMatch();
 			if (id != null)
 				result.result += "\n" + "updateLastMatchId: " + id;
+			updateResult();
 		} catch (final Exception ex) {
 			result.exception = ex;
 		}
@@ -203,6 +204,23 @@ public class SurveyService {
 		return null;
 	}
 
+	private BigInteger updateResult() throws Exception {
+		final BigInteger clientId = BigInteger.valueOf(4);
+		final QueryParams params = new QueryParams(Query.misc_listMarketing);
+		params.setSearch(
+				"clientMarketing.endDate<='" + Instant.now() + "' and clientMarketing.clientId=" + clientId +
+						" and clientMarketing.resultPublished=false");
+		final Result list = repository.list(params);
+		if (list.size() > 0) {
+			final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
+					(BigInteger) list.get(0).get("clientMarketing.id"));
+			clientMarketing.setResultPublished(Boolean.TRUE);
+			sendNotifications(clientMarketing);
+			repository.save(clientMarketing);
+		}
+		return null;
+	}
+
 	private String getLine(final int x, final String singular, final String plural) {
 		return "<br/>" + x + (x > 1 ? plural : singular);
 	}
@@ -226,13 +244,26 @@ public class SurveyService {
 	}
 
 	private void sendNotifications(final ClientMarketing clientMarketing) throws Exception {
-		final QueryParams params = new QueryParams(Query.contact_listId);
-		params.setSearch("contact.clientId=" + clientMarketing.getClientId() + " and contact.verified=true");
+		final QueryParams params;
+		if (clientMarketing.getResultPublished() != null && clientMarketing.getResultPublished().booleanValue()) {
+			params = new QueryParams(Query.contact_listMarketing);
+			params.setSearch(
+					"contactMarketing.finished=true and contactMarketing.clientMarketingId=" + clientMarketing.getId());
+		} else {
+			params = new QueryParams(Query.contact_listId);
+			params.setSearch("contact.verified=true and contact.clientId=" + clientMarketing.getClientId());
+		}
 		final Result users = repository.list(params);
+		final ContactNotificationTextType type = params.getQuery() == Query.contact_listId
+				? ContactNotificationTextType.clientMarketing
+				: ContactNotificationTextType.clientMarketingResult;
 		for (int i2 = 0; i2 < users.size(); i2++)
 			notificationService.sendNotification(null,
-					repository.one(Contact.class, (BigInteger) users.get(i2).get("contact.id")),
-					ContactNotificationTextType.clientMarketing, "m=" + clientMarketing.getId());
+					repository.one(Contact.class,
+							(BigInteger) users.get(i2)
+									.get(params.getQuery() == Query.contact_listId ? "contact.id"
+											: "contactMarketing.contactId")),
+					type, "m=" + clientMarketing.getId());
 	}
 
 	protected JsonNode get(final String url) {

@@ -514,8 +514,9 @@ public class ActionApi {
 		repository.save(contactMarketing);
 		if (contactMarketing.getFinished()) {
 			final JsonNode questions = new ObjectMapper().readTree(
-					Attachment.resolve(repository.one(ClientMarketing.class, contactMarketing.getClientMarketingId())
-							.getStorage()));
+					Attachment.resolve(
+							repository.one(ClientMarketing.class, contactMarketing.getClientMarketingId())
+									.getStorage()));
 			final JsonNode answers = new ObjectMapper().readTree(Attachment.resolve(contactMarketing.getStorage()));
 			final JsonNode email = answers.get("q" + (questions.get("questions").size() - 1)).get("t");
 			if (email != null && Strings.isEmail(email.asText())) {
@@ -573,8 +574,16 @@ public class ActionApi {
 				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 						(BigInteger) result.get(0).get("clientMarketing.id"));
 				if (clientMarketing.getEndDate() != null
-						&& clientMarketing.getEndDate().getTime() < Instant.now().getEpochSecond() * 1000)
+						&& clientMarketing.getEndDate().getTime() < Instant.now().getEpochSecond() * 1000) {
+					if (user != null) {
+						params.setQuery(Query.contact_listGeoLocationHistory);
+						params.setSearch("contactMarketing.finished=true and contactMarketing.contactId=" + user
+								+ " and contactMarketing.clientMarketingId=" + clientMarketing.getId());
+						if (repository.list(params).size() > 0)
+							return result.getList();
+					}
 					return null;
+				}
 			}
 			if (user != null) {
 				params.setQuery(Query.contact_listMarketing);

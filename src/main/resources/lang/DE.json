@@ -41,6 +41,7 @@
 		"chatNew": "<jq:EXTRA_1 />",
 		"chatSeen": "hat Deine Chatnachricht gelesen.",
 		"clientMarketing": "Umfrage Spieler des Spiels",
+		"clientMarketingResult": "Ergebnis der Umfrage",
 		"clientNews": "neuer Artikel: <jq:EXTRA_1 />",
 		"contactBirthday": "wird heute <jq:EXTRA_1 /> Jahre jung.",
 		"contactDelete": "hat APP_TITLE verlassen 😢",

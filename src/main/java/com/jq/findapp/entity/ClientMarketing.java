@@ -12,6 +12,7 @@ import jakarta.persistence.Transient;
 @Entity
 public class ClientMarketing extends BaseEntity {
 	private BigInteger clientId;
+	private Boolean resultPublished;
 	private Boolean share;
 	private String age;
 	private String gender;
@@ -92,6 +93,14 @@ public class ClientMarketing extends BaseEntity {
 
 	public void setShare(final Boolean share) {
 		this.share = share;
+	}
+
+	public Boolean getResultPublished() {
+		return resultPublished;
+	}
+
+	public void setResultPublished(final Boolean resultPublished) {
+		this.resultPublished = resultPublished;
 	}
 
 	public String getImage() {
