@@ -27,6 +27,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.IOUtils;
+import org.hibernate.query.sqm.ParsingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -54,7 +55,12 @@ public class Repository {
 		final GeoLocationProcessor geo = new GeoLocationProcessor(params);
 		final Result result = params.getQuery().createResult();
 		final String sql = prepareSql(params);
-		final List<Object> data = em.createQuery(sql).getResultList();
+		final List<Object> data;
+		try {
+			data = em.createQuery(sql).getResultList();
+		} catch (final Exception ex) {
+			throw new ParsingException(ex.getMessage() + "\n" + sql);
+		}
 		if (data != null && data.size() > 0) {
 			if (params.getLimit() > 0 && params.getSearchGeoLocation() == null) {
 				final int max = data.size() - params.getLimit();
@@ -300,7 +306,8 @@ public class Repository {
 					try {
 						field.setAccessible(true);
 						field.set(entity,
-								save((String) field.get(entity), (String) entity.old(field.getName())));
+								save(field.getName().contains("image"), (String) field.get(entity),
+										(String) entity.old(field.getName())));
 					} catch (final Exception e) {
 						e.printStackTrace();
 						throw new RuntimeException("Failed on " + field.getName(), e);
@@ -369,7 +376,8 @@ public class Repository {
 			return value;
 		}
 
-		private static synchronized String save(final String value, final String old) throws IOException {
+		private static synchronized String save(final boolean publicDir, final String value, final String old)
+				throws IOException {
 			if (value == null) {
 				if (old != null && old.contains(SEPARATOR))
 					new File(PATH + (old.contains(".") ? PUBLIC : "") + getFilename(old)).delete();
@@ -378,8 +386,8 @@ public class Repository {
 			final String id;
 			// value = ".jpg" + SEPARATOR + "base64data";
 			// value = "some text";
-			final String[] s = value.contains(SEPARATOR) ? value.split(SEPARATOR) : new String[] { "", value };
-			if (s[0].contains(".") && s[1].length() > 20) {
+			final String[] s = publicDir ? value.split(SEPARATOR) : new String[] { "", value };
+			if (publicDir && s[1].length() > 20) {
 				final byte[] data = Base64.getDecoder().decode(s[1]);
 				if (old != null) {
 					final Path path = Paths.get(PATH + PUBLIC + getFilename(old));

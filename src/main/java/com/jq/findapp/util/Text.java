@@ -52,6 +52,7 @@ public class Text {
 		notification_authenticate,
 		notification_chatNew,
 		notification_chatSeen,
+		notification_clientMarketing,
 		notification_clientNews,
 		notification_contactBirthday,
 		notification_contactDelete,

@@ -35,17 +35,23 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.ClientMarketing;
+import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.NotificationService.MailCreateor;
 
 @Service
 public class SurveyService {
 	@Autowired
 	private Repository repository;
+
+	@Autowired
+	private NotificationService notificationService;
 
 	@Autowired
 	private MailCreateor mailCreateor;
@@ -203,6 +209,7 @@ public class SurveyService {
 
 	private void publish(final ClientMarketing clientMarketing) throws Exception {
 		// https://developers.facebook.com/docs/facebook-login/guides/access-tokens/#pagetokens
+		sendNotifications(clientMarketing);
 		final ImageHtmlEmail email = mailCreateor.create();
 		email.setHostName(emailHost);
 		email.setSmtpPort(emailPort);
@@ -211,11 +218,21 @@ public class SurveyService {
 		email.setSSLOnConnect(true);
 		email.setFrom("support@fan-club.online");
 		email.addTo("mani.afschar@jq-consulting.de");
+		email.addTo("fcbayerntotal@web.de");
 		email.setSubject("Survey");
-		email.setTextMsg("Survey: https://fcbayerntotal.fan-club.online/?m=" + clientMarketing.getId());
-		email.attach(new URL("https://fan-club.online/med/" + Attachment.resolve(clientMarketing.getImage())),
-				"pic.png", "pic");
+		email.setTextMsg("Survey\n\nhttps://fcbayerntotal.fan-club.online/?m=" + clientMarketing.getId()
+				+ "\n\nhttps://fan-club.online/med/" + Attachment.resolve(clientMarketing.getImage()));
 		email.send();
+	}
+
+	private void sendNotifications(final ClientMarketing clientMarketing) throws Exception {
+		final QueryParams params = new QueryParams(Query.contact_listId);
+		params.setSearch("contact.clientId=" + clientMarketing.getClientId() + " and contact.verified=true");
+		final Result users = repository.list(params);
+		for (int i2 = 0; i2 < users.size(); i2++)
+			notificationService.sendNotification(null,
+					repository.one(Contact.class, (BigInteger) users.get(i2).get("contact.id")),
+					ContactNotificationTextType.clientMarketing, "m=" + clientMarketing.getId());
 	}
 
 	protected JsonNode get(final String url) {
