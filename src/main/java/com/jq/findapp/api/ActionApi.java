@@ -576,11 +576,14 @@ public class ActionApi {
 				if (clientMarketing.getEndDate() != null
 						&& clientMarketing.getEndDate().getTime() < Instant.now().getEpochSecond() * 1000) {
 					if (user != null) {
-						params.setQuery(Query.contact_listGeoLocationHistory);
+						params.setQuery(Query.contact_listMarketing);
 						params.setSearch("contactMarketing.finished=true and contactMarketing.contactId=" + user
 								+ " and contactMarketing.clientMarketingId=" + clientMarketing.getId());
-						if (repository.list(params).size() > 0)
-							return result.getList();
+						if (repository.list(params).size() > 0) {
+							params.setQuery(Query.misc_listMarketingResult);
+							params.setSearch("contactMarketingResult.clientMarketingId=" + clientMarketing.getId());
+							return repository.list(params).getList();
+						}
 					}
 					return null;
 				}

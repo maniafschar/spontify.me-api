@@ -16,6 +16,8 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -35,6 +37,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.ClientMarketing;
+import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.repository.Query;
@@ -72,29 +75,32 @@ public class SurveyService {
 
 	public SchedulerResult update() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/sync");
-		try {
-			result.result = updateMatchdays();
-			final BigInteger id = updateLastMatch();
-			if (id != null)
-				result.result += "\n" + "updateLastMatchId: " + id;
-			updateResult();
-		} catch (final Exception ex) {
-			result.exception = ex;
-		}
+		final Map<BigInteger, Integer> clients = new HashMap<>();
+		clients.put(BigInteger.valueOf(4), 157);
+		clients.keySet().forEach(e -> {
+			try {
+				result.result = updateMatchdays(e, clients.get(e));
+				final BigInteger id = updateLastMatch(e, clients.get(e));
+				if (id != null)
+					result.result += "\n" + "updateLastMatchId: " + id;
+				updateResult(e);
+			} catch (final Exception ex) {
+				result.exception = ex;
+			}
+		});
 		return result;
 	}
 
-	private String updateMatchdays() throws Exception {
+	private String updateMatchdays(final BigInteger clientId, final int teamId) throws Exception {
 		if (System.currentTimeMillis() - lastRun.get() < 24 * 60 * 60 * 1000)
 			return "Matchdays already run in last 24 hours";
 		lastRun.set(System.currentTimeMillis());
 		int count = 0;
-		final BigInteger clientId = BigInteger.valueOf(4);
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
 		params.setSearch("clientMarketing.startDate>'" + Instant.now() + "' and clientMarketing.clientId=" + clientId +
 				" and clientMarketing.storage not like '%" + Attachment.SEPARATOR + "%'");
 		if (repository.list(params).size() == 0) {
-			JsonNode matchDays = get("https://v3.football.api-sports.io/fixtures?team=157&season="
+			JsonNode matchDays = get("https://v3.football.api-sports.io/fixtures?team=" + teamId + "&season="
 					+ LocalDateTime.now().getYear());
 			if (matchDays != null) {
 				matchDays = matchDays.get("response");
@@ -117,8 +123,7 @@ public class SurveyService {
 		return "Matchdays update: " + count;
 	}
 
-	private BigInteger updateLastMatch() throws Exception {
-		final BigInteger clientId = BigInteger.valueOf(4);
+	private BigInteger updateLastMatch(final BigInteger clientId, final int teamId) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
 		params.setSearch(
 				"clientMarketing.startDate<='" + Instant.now() + "' and clientMarketing.endDate>'" + Instant.now() +
@@ -131,7 +136,7 @@ public class SurveyService {
 			if (matchDay != null) {
 				matchDay = matchDay.get("response");
 				JsonNode e = matchDay.findPath("players");
-				e = e.get(e.get(0).get("team").get("id").asInt() == 157 ? 0 : 1).get("players");
+				e = e.get(e.get(0).get("team").get("id").asInt() == teamId ? 0 : 1).get("players");
 				final ObjectNode poll = new ObjectMapper().createObjectNode();
 				poll.put("prolog",
 						"Umfrage <b>Spieler des Spiels</b> zum "
@@ -195,7 +200,7 @@ public class SurveyService {
 						createImage(matchDay.findPath("league").get("logo").asText(),
 								matchDay.findPath("teams").get("home").get("logo").asText(),
 								matchDay.findPath("teams").get("away").get("logo").asText(),
-								matchDay.findPath("teams").get("home").get("id").asInt() == 157)));
+								matchDay.findPath("teams").get("home").get("id").asInt() == teamId)));
 				repository.save(clientMarketing);
 				publish(clientMarketing);
 			}
@@ -204,19 +209,76 @@ public class SurveyService {
 		return null;
 	}
 
-	private BigInteger updateResult() throws Exception {
-		final BigInteger clientId = BigInteger.valueOf(4);
+	private BigInteger updateResult(final BigInteger clientId) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
-		params.setSearch(
-				"clientMarketing.endDate<='" + Instant.now() + "' and clientMarketing.clientId=" + clientId +
-						" and clientMarketing.resultPublished=false");
+		params.setSearch("clientMarketing.endDate<='" + Instant.now() + "' and clientMarketing.clientId=" + clientId);
 		final Result list = repository.list(params);
-		if (list.size() > 0) {
+		for (int i = 0; i < list.size(); i++) {
 			final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 					(BigInteger) list.get(0).get("clientMarketing.id"));
-			clientMarketing.setResultPublished(Boolean.TRUE);
-			sendNotifications(clientMarketing);
-			repository.save(clientMarketing);
+			params.setQuery(Query.misc_listMarketingResult);
+			params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketing.getId());
+			if (repository.list(params).size() == 0) {
+				final ClientMarketingResult clientMarketingResult = new ClientMarketingResult();
+				clientMarketingResult.setClientMarketingId(clientMarketing.getId());
+				params.setQuery(Query.contact_listMarketing);
+				params.setSearch("contactMarketing.clientMarketingId=" + clientMarketing.getId());
+				final Result result = repository.list(params);
+				final ObjectNode json = new ObjectMapper().createObjectNode();
+				/*
+				 * var v = { ...ContentAdminMarketing.data[i] }, answers = [];
+				 * for (var i = 1; i < r.length; i++) {
+				 * var m = model.convert(new ContactMarketing(), r, i);
+				 * if (m.finished)
+				 * answers.push(JSON.parse(m.storage));
+				 * }
+				 * v.participants = r.length - 1;
+				 * v.terminated = answers.length;
+				 * v.answers = '';
+				 * for (var i = 0; i < v.storage.questions.length; i++) {
+				 * var answersAverage = [], text = '', total = 0;
+				 * for (var i2 = 0; i2 < v.storage.questions[i].answers.length; i2++)
+				 * answersAverage.push(0);
+				 * for (var i2 = 0; i2 < answers.length; i2++) {
+				 * if (answers[i2]['q' + i]) {
+				 * for (var i3 = 0; i3 < answers[i2]['q' + i].a.length; i3++)
+				 * answersAverage[answers[i2]['q' + i].a[i3]]++;
+				 * if (answers[i2]['q' + i].t)
+				 * text += '<div>' + answers[i2]['q' + i].t + '</div>';
+				 * total++;
+				 * }
+				 * }
+				 * v.answers += '<question>' + v.storage.questions[i].question + '<span>' +
+				 * total + '/' + answers.length + '</span></question><answers>';
+				 * v.share = v.share ? 'auf soziale Netzwerke veröffentlichen' : '-';
+				 * for (var i2 = 0; i2 < v.storage.questions[i].answers.length; i2++)
+				 * v.answers += '<answer><percentage>' + (answersAverage[i2] ?
+				 * Math.round(answersAverage[i2] / total * 100) : 0) + '</percentage>' +
+				 * v.storage.questions[i].answers[i2].answer + '</answer>';
+				 * v.answers += (text ? '<freetexttitle
+				 * onclick="ui.q(&quot;content-admin-marketing&quot;).toggle(this)"
+				 * class="collapsible closed">Freitext</freetexttitle><freetext>' + text +
+				 * '</freetext>' : '') + '</answers>';
+				 * }
+				 * if (v.startDate)
+				 * v.startDate = global.date.formatDate(v.startDate);
+				 * if (v.endDate)
+				 * v.endDate = global.date.formatDate(v.endDate);
+				 */
+				for (int i2 = 0; i2 < result.size(); i2++) {
+					new ObjectMapper()
+							.readTree((String) result.get(i2).get("contactMarketing.storage")).fields()
+							.forEachRemaining(e -> {
+								json.put(e.getKey(), "");
+							});
+				}
+				json.put("participants", result.size());
+				json.put("terminated", result.size());
+				System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(json));
+				clientMarketingResult.setStorage(new ObjectMapper().writeValueAsString(json));
+				// repository.save(clientMarketingResult);
+				// sendNotifications(clientMarketing);
+			}
 		}
 		return null;
 	}
@@ -245,7 +307,7 @@ public class SurveyService {
 
 	private void sendNotifications(final ClientMarketing clientMarketing) throws Exception {
 		final QueryParams params;
-		if (clientMarketing.getResultPublished() != null && clientMarketing.getResultPublished().booleanValue()) {
+		if (clientMarketing.getEndDate().getTime() < Instant.now().getEpochSecond() * 1000) {
 			params = new QueryParams(Query.contact_listMarketing);
 			params.setSearch(
 					"contactMarketing.finished=true and contactMarketing.clientMarketingId=" + clientMarketing.getId());

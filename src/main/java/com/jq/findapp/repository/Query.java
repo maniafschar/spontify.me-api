@@ -57,6 +57,7 @@ public enum Query {
 	misc_listIp,
 	misc_listLog,
 	misc_listMarketing,
+	misc_listMarketingResult,
 	misc_listNews,
 	misc_listTicket,
 	misc_setting,

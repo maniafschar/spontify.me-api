@@ -328,13 +328,11 @@ public class EngagementService {
 				final BigInteger adminId = repository
 						.one(Client.class, repository.one(Contact.class, contactId).getClientId())
 						.getAdminId();
-				if (!contactId.equals(adminId)) {
-					params.setSearch("contactChat.contactId=" + adminId + " and contactChat.contactId2=" + contactId);
-					if (repository.list(params).size() == 0) {
-						sendChat(TextId.engagement_welcome,
-								repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id")), null, null);
-						count++;
-					}
+				params.setSearch("contactChat.contactId=" + adminId + " and contactChat.contactId2=" + contactId);
+				if (repository.list(params).size() == 0) {
+					sendChat(TextId.engagement_welcome,
+							repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id")), null, null);
+					count++;
 				}
 			}
 			result.result += "welcome: " + count + ", time: " + (System.currentTimeMillis() - t);
@@ -517,6 +515,8 @@ public class EngagementService {
 	public boolean sendChat(final TextId textId, final Contact contact, final Location location, final String action)
 			throws Exception {
 		final BigInteger adminId = repository.one(Client.class, contact.getClientId()).getAdminId();
+		if (contact.getId().equals(adminId))
+			return false;
 		final QueryParams params = new QueryParams(Query.contact_chat);
 		params.setSearch("contactChat.contactId=" + adminId + " and contactChat.contactId2=" + contact.getId()
 				+ " and contactChat.textId='" + textId.name() + '\'');
