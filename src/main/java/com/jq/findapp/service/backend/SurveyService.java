@@ -47,6 +47,7 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.NotificationService.MailCreateor;
+import com.jq.findapp.util.Strings;
 
 @Service
 public class SurveyService {
@@ -74,7 +75,7 @@ public class SurveyService {
 	private static final AtomicLong lastRun = new AtomicLong(0);
 
 	public SchedulerResult update() {
-		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/sync");
+		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/update");
 		final Map<BigInteger, Integer> clients = new HashMap<>();
 		clients.put(BigInteger.valueOf(4), 157);
 		clients.keySet().forEach(e -> {
@@ -83,7 +84,7 @@ public class SurveyService {
 				final BigInteger id = updateLastMatch(e, clients.get(e));
 				if (id != null)
 					result.result += "\n" + "updateLastMatchId: " + id;
-				updateResult(e);
+				updateResultAndNotify(e);
 			} catch (final Exception ex) {
 				result.exception = ex;
 			}
@@ -209,80 +210,6 @@ public class SurveyService {
 		return null;
 	}
 
-	private BigInteger updateResult(final BigInteger clientId) throws Exception {
-		final QueryParams params = new QueryParams(Query.misc_listMarketing);
-		params.setSearch("clientMarketing.endDate<='" + Instant.now() + "' and clientMarketing.clientId=" + clientId);
-		final Result list = repository.list(params);
-		for (int i = 0; i < list.size(); i++) {
-			final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
-					(BigInteger) list.get(0).get("clientMarketing.id"));
-			params.setQuery(Query.misc_listMarketingResult);
-			params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketing.getId());
-			if (repository.list(params).size() == 0) {
-				final ClientMarketingResult clientMarketingResult = new ClientMarketingResult();
-				clientMarketingResult.setClientMarketingId(clientMarketing.getId());
-				params.setQuery(Query.contact_listMarketing);
-				params.setSearch("contactMarketing.clientMarketingId=" + clientMarketing.getId());
-				final Result result = repository.list(params);
-				final ObjectNode json = new ObjectMapper().createObjectNode();
-				/*
-				 * var v = { ...ContentAdminMarketing.data[i] }, answers = [];
-				 * for (var i = 1; i < r.length; i++) {
-				 * var m = model.convert(new ContactMarketing(), r, i);
-				 * if (m.finished)
-				 * answers.push(JSON.parse(m.storage));
-				 * }
-				 * v.participants = r.length - 1;
-				 * v.terminated = answers.length;
-				 * v.answers = '';
-				 * for (var i = 0; i < v.storage.questions.length; i++) {
-				 * var answersAverage = [], text = '', total = 0;
-				 * for (var i2 = 0; i2 < v.storage.questions[i].answers.length; i2++)
-				 * answersAverage.push(0);
-				 * for (var i2 = 0; i2 < answers.length; i2++) {
-				 * if (answers[i2]['q' + i]) {
-				 * for (var i3 = 0; i3 < answers[i2]['q' + i].a.length; i3++)
-				 * answersAverage[answers[i2]['q' + i].a[i3]]++;
-				 * if (answers[i2]['q' + i].t)
-				 * text += '<div>' + answers[i2]['q' + i].t + '</div>';
-				 * total++;
-				 * }
-				 * }
-				 * v.answers += '<question>' + v.storage.questions[i].question + '<span>' +
-				 * total + '/' + answers.length + '</span></question><answers>';
-				 * v.share = v.share ? 'auf soziale Netzwerke veröffentlichen' : '-';
-				 * for (var i2 = 0; i2 < v.storage.questions[i].answers.length; i2++)
-				 * v.answers += '<answer><percentage>' + (answersAverage[i2] ?
-				 * Math.round(answersAverage[i2] / total * 100) : 0) + '</percentage>' +
-				 * v.storage.questions[i].answers[i2].answer + '</answer>';
-				 * v.answers += (text ? '<freetexttitle
-				 * onclick="ui.q(&quot;content-admin-marketing&quot;).toggle(this)"
-				 * class="collapsible closed">Freitext</freetexttitle><freetext>' + text +
-				 * '</freetext>' : '') + '</answers>';
-				 * }
-				 * if (v.startDate)
-				 * v.startDate = global.date.formatDate(v.startDate);
-				 * if (v.endDate)
-				 * v.endDate = global.date.formatDate(v.endDate);
-				 */
-				for (int i2 = 0; i2 < result.size(); i2++) {
-					new ObjectMapper()
-							.readTree((String) result.get(i2).get("contactMarketing.storage")).fields()
-							.forEachRemaining(e -> {
-								json.put(e.getKey(), "");
-							});
-				}
-				json.put("participants", result.size());
-				json.put("terminated", result.size());
-				System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(json));
-				clientMarketingResult.setStorage(new ObjectMapper().writeValueAsString(json));
-				// repository.save(clientMarketingResult);
-				// sendNotifications(clientMarketing);
-			}
-		}
-		return null;
-	}
-
 	private String getLine(final int x, final String singular, final String plural) {
 		return "<br/>" + x + (x > 1 ? plural : singular);
 	}
@@ -303,6 +230,82 @@ public class SurveyService {
 		email.setTextMsg("Survey\n\nhttps://fcbayerntotal.fan-club.online/?m=" + clientMarketing.getId()
 				+ "\n\nhttps://fan-club.online/med/" + Attachment.resolve(clientMarketing.getImage()));
 		email.send();
+	}
+
+	private BigInteger updateResultAndNotify(final BigInteger clientId) throws Exception {
+		final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
+		params.setSearch("clientMarketingResult.published=false and clientMarketing.endDate<'" + Instant.now()
+				+ "' and clientMarketing.clientId=" + clientId);
+		final Result list = repository.list(params);
+		for (int i = 0; i < list.size(); i++) {
+			final ClientMarketingResult clientMarketingResult = updateResult(
+					(BigInteger) list.get(0).get("clientMarketing.id"));
+			// TODO create image
+			sendNotifications(
+					repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId()));
+			clientMarketingResult.setPublished(true);
+			repository.save(clientMarketingResult);
+		}
+		return null;
+	}
+
+	public synchronized ClientMarketingResult updateResult(final BigInteger clientMarketingId) throws Exception {
+		final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
+		params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketingId);
+		Result result = repository.list(params);
+		final ClientMarketingResult clientMarketingResult = result.size() == 0 ? new ClientMarketingResult()
+				: repository.one(ClientMarketingResult.class,
+						(BigInteger) result.get(0).get("clientMarketingResult.id"));
+		clientMarketingResult.setClientMarketingId(clientMarketingId);
+		params.setQuery(Query.contact_listMarketing);
+		params.setSearch("contactMarketing.clientMarketingId=" + clientMarketingId);
+		result = repository.list(params);
+		final ObjectMapper om = new ObjectMapper();
+		final ObjectNode json = om.createObjectNode();
+		/*
+		 * for (var i = 0; i < v.storage.questions.length; i++) {
+		 * var answersAverage = [], text = '', total = 0;
+		 * for (var i2 = 0; i2 < v.storage.questions[i].answers.length; i2++)
+		 * answersAverage.push(0);
+		 * for (var i2 = 0; i2 < answers.length; i2++) {
+		 * if (answers[i2]['q' + i]) {
+		 * for (var i3 = 0; i3 < answers[i2]['q' + i].a.length; i3++)
+		 * answersAverage[answers[i2]['q' + i].a[i3]]++;
+		 */
+		json.put("participants", result.size());
+		json.put("finished", 0);
+		for (int i2 = 0; i2 < result.size(); i2++) {
+			om.readTree((String) result.get(i2).get("contactMarketing.storage")).fields()
+					.forEachRemaining(e -> {
+						if ("finished".equals(e.getKey())) {
+							if (e.getValue().asBoolean())
+								json.put("finished", json.get("finished").asInt() + 1);
+						} else {
+							if (!json.has(e.getKey())) {
+								json.set(e.getKey(), om.createObjectNode());
+								((ObjectNode) json.get(e.getKey())).set("a", om.createArrayNode());
+							}
+							for (int i = 0; i < e.getValue().get("a").size(); i++) {
+								final int index = e.getValue().get("a").get(i).asInt();
+								final ArrayNode a = ((ArrayNode) json.get(e.getKey()).get("a"));
+								for (int i3 = a.size(); i3 < index; i3++)
+									a.add(0);
+								a.set(index, a.get(index).asInt() + 1);
+							}
+							if (e.getValue().has("t") && !Strings.isEmpty(e.getValue().get("t").asText())) {
+								final ObjectNode o = (ObjectNode) json.get(e.getKey());
+								if (!o.has("t"))
+									o.put("t", "");
+								o.put("t", o.get("t").asText() +
+										"<div>" + e.getValue().get("t").asText() + "</div>");
+							}
+						}
+					});
+		}
+		System.out.println(om.writerWithDefaultPrettyPrinter().writeValueAsString(json));
+		clientMarketingResult.setStorage(om.writeValueAsString(json));
+		repository.save(clientMarketingResult);
+		return clientMarketingResult;
 	}
 
 	private void sendNotifications(final ClientMarketing clientMarketing) throws Exception {

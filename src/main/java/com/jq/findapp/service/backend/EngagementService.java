@@ -361,7 +361,7 @@ public class EngagementService {
 			if (repository.list(paramsAdminBlocked).size() == 0) {
 				params.setSearch("contactChat.contactId=" + adminId + " and contactChat.contactId2=" + contact.getId()
 						+ " and contactChat.createdAt>'"
-						+ Instant.now().minus(Duration.ofDays(15 + (int) (Math.random() * 3)))
+						+ Instant.now().minus(Duration.ofDays(21 + (int) (Math.random() * 3)))
 								.minus(Duration.ofHours((int) (Math.random() * 12))).toString()
 						+ '\'');
 				if (repository.list(params).size() == 0) {

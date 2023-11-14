@@ -1,4 +1,4 @@
-package com.jq.findapp.service;
+package com.jq.findapp.service.backend;
 
 import java.math.BigInteger;
 import java.util.Iterator;
@@ -20,6 +20,8 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.ExternalService;
+import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.EntityUtil;
 import com.jq.findapp.util.Strings;
 

@@ -1,4 +1,4 @@
-package com.jq.findapp.service;
+package com.jq.findapp.service.backend;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
