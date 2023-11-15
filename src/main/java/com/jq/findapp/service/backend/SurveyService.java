@@ -198,7 +198,7 @@ public class SurveyService {
 						(BigInteger) list.get(0).get("clientMarketing.id"));
 				clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
 				clientMarketing.setImage(Attachment.createImage(".png",
-						createImage(matchDay.findPath("league").get("logo").asText(),
+						createImagePoll(matchDay.findPath("league").get("logo").asText(),
 								matchDay.findPath("teams").get("home").get("logo").asText(),
 								matchDay.findPath("teams").get("away").get("logo").asText(),
 								matchDay.findPath("teams").get("home").get("id").asInt() == teamId)));
@@ -240,7 +240,7 @@ public class SurveyService {
 		for (int i = 0; i < list.size(); i++) {
 			final ClientMarketingResult clientMarketingResult = updateResult(
 					(BigInteger) list.get(0).get("clientMarketing.id"));
-			// TODO create image
+			clientMarketing.setImage(Attachment.createImage(".png", createImageResult(clientMarketingResult)));
 			sendNotifications(
 					repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId()));
 			clientMarketingResult.setPublished(true);
@@ -302,7 +302,6 @@ public class SurveyService {
 						}
 					});
 		}
-		System.out.println(om.writerWithDefaultPrettyPrinter().writeValueAsString(json));
 		clientMarketingResult.setStorage(om.writeValueAsString(json));
 		repository.save(clientMarketingResult);
 		return clientMarketingResult;
@@ -341,7 +340,7 @@ public class SurveyService {
 				.toEntity(JsonNode.class).block().getBody();
 	}
 
-	private byte[] createImage(final String urlLeague, final String urlHome, final String urlAway,
+	private byte[] createImagePoll(final String urlLeague, final String urlHome, final String urlAway,
 			final boolean homeMatch) throws Exception {
 		final Font customFont = Font
 				.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"))
@@ -380,6 +379,42 @@ public class SurveyService {
 		// imageTranscoder.transcode(input, null);
 		// g2.drawImage(imageTranscoder.getBufferedImage(), 770 - image.getWidth(), 470
 		// - image.getHeight(), null);
+		g2.dispose();
+		final ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ImageIO.write(output, "png", out);
+		return out.toByteArray();
+	}
+
+	private byte[] createImageResult(final ClientMarketingResult clientMarketingResult) throws Exception {
+		final Font customFont = Font
+				.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"))
+				.deriveFont(66f);
+		GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(customFont);
+		final int width = 800, height = 500, padding = 30;
+		final BufferedImage output = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		final Graphics2D g2 = output.createGraphics();
+		g2.setComposite(AlphaComposite.Src);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		final RadialGradientPaint gradient = new RadialGradientPaint(width / 2 - 2 * padding, height / 2 - 2 * padding,
+				height,
+				new float[] { .3f, 1f },
+				new Color[] { new Color(245, 239, 232), new Color(246, 194, 166) });
+		g2.setPaint(gradient);
+		g2.fill(new Rectangle2D.Float(0, 0, width, height));
+		g2.setComposite(AlphaComposite.SrcAtop);
+		if (!homeMatch)
+			drawImage(urlHome, g2, width / 2, padding, height / 2, -1);
+		drawImage(urlAway, g2, width / 2, padding, height / 2, 1);
+		if (homeMatch)
+			drawImage(urlHome, g2, width / 2, padding, height / 2, -1);
+		drawImage(urlLeague, g2, width - padding, padding, height / 6, 0);
+		g2.setFont(customFont);
+		g2.setColor(Color.BLACK);
+		String s = "Umfrage";
+		g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 15);
+		g2.setFont(customFont.deriveFont(40f));
+		s = "Spieler des Spiels";
+		g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 17.5f);
 		g2.dispose();
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		ImageIO.write(output, "png", out);
