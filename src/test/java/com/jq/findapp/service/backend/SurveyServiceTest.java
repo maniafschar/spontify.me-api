@@ -20,7 +20,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketing;
+import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.repository.Repository;
 
 @ExtendWith(SpringExtension.class)
@@ -49,24 +51,29 @@ public class SurveyServiceTest {
 		assertNotNull(clientMarketing.getStorage());
 	}
 
-	@Test
-	public void publish() {
-		// given
-		SurveyService.clients.put(BigInteger.valueOf(4), 0);
-		final String fbPageId = "xxx";
-		final Map<String, String> body = new HashMap<>();
-		body.put("message", "Umfrage Spieler des Spiels");
-		body.put("image", "https://fcbayerntotal.fan-club.online/images/logo.png");
-		body.put("link", "https://fcbayerntotal.fan-club.online?m=4");
-		body.put("access_token", "yyy");
+	// @Test
+	public void manual() {
+		// generate survey
+		SurveyService.clients.clear();
+		SurveyService.clients.put(BigInteger.valueOf(1), 0);
+		final Client client = repository.one(Client.class, BigInteger.ONE);
+		client.setFbPageAccessToken("");
+		client.setFbPageId("");
+		repository.save(client);
+		surveyService.update();
 
-		// when
-		final String response = WebClient.create("https://graph.facebook.com/v18.0/" + fbPageId + "/feed")
-				.post().bodyValue(body).retrieve()
-				.toEntity(String.class).block().getBody();
+		// add answers
+		final ContactMarketing contactMarketing = new ContactMarketing();
+		contactMarketing.setClientMarketingId(BigInteger.ONE);
+		contactMarketing.setContactId(BigInteger.ONE);
+		contactMarketing.setFinished(Boolean.TRUE);
+		contactMarketing.setStorage("{\"q1\":{\"a\":[9],\"t\":\"abc\"}");
+		repository.save(contactMarketing);
 
-		// then: check on FB
-		assertNotNull(response);
-		assertTrue(response.contains("\"id\":"));
+		// result
+		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, BigInteger.ONE);
+		clientMarketing.setEndDate(new Timestamp(System.currentTimeMilis() - 1000));
+		repository.save(clientMarketing);
+		surveyService.update();
 	}
 }
