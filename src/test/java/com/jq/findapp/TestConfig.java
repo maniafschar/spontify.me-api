@@ -124,12 +124,12 @@ public class TestConfig {
 			try {
 				String json;
 				if (url.contains("?id="))
-					json = "/surveyLastMatch.json";
+					json = IOUtils.toString(getClass().getResourceAsStream("/surveyLastMatch.json"), StandardCharsets.UTF_8);
 				else if (url.contais("?teamId=0&"))
-					json = "/surveyMatchdaysOne.json";
+					json = IOUtils.toString(getClass().getResourceAsStream("/surveyMatchdaysOne.json"), StandardCharsets.UTF_8).replace("{date}", "" + (System.currentTimeMillis() + 1000));
 				else
-					json = "/surveyMatchdays.json";
-				return new ObjectMapper().readTree(IOUtils.toString(getClass().getResourceAsStream(json), StandardCharsets.UTF_8));
+					json = IOUtils.toString(getClass().getResourceAsStream("/surveyMatchdays.json"), StandardCharsets.UTF_8);
+				return new ObjectMapper().readTree(json);
 			} catch (final Exception e) {
 				throw new RuntimeException(e);
 			}
