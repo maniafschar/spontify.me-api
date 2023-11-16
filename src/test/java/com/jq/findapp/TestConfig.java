@@ -122,11 +122,14 @@ public class TestConfig {
 		@Override
 		protected JsonNode get(final String url) {
 			try {
-				return new ObjectMapper().readTree(IOUtils
-						.toString(
-								getClass().getResourceAsStream(
-										url.contains("?id=") ? "/surveyLastMatch.json" : "/surveyMatchdays.json"),
-								StandardCharsets.UTF_8));
+				String json;
+				if (url.contains("?id="))
+					json = "/surveyLastMatch.json";
+				else if (url.contais("?teamId=0&"))
+					json = "/surveyMatchdaysOne.json";
+				else
+					json = "/surveyMatchdays.json";
+				return new ObjectMapper().readTree(IOUtils.toString(getClass().getResourceAsStream(json), StandardCharsets.UTF_8));
 			} catch (final Exception e) {
 				throw new RuntimeException(e);
 			}
