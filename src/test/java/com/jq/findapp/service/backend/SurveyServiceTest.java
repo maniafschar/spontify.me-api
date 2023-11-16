@@ -52,7 +52,7 @@ public class SurveyServiceTest {
 	}
 
 	// @Test
-	public void manual() {
+	public void manualPostFB() {
 		// generate survey
 		SurveyService.clients.clear();
 		SurveyService.clients.put(BigInteger.valueOf(1), 0);
