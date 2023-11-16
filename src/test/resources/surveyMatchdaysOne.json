@@ -1,0 +1,83 @@
+{
+	"get": "fixtures",
+	"parameters": {
+		"team": "157",
+		"season": "2023"
+	},
+	"errors": [],
+	"results": 48,
+	"paging": {
+		"current": 1,
+		"total": 1
+	},
+	"response": [
+		{
+			"fixture": {
+				"id": 1049115,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "{date}T00:00:00+00:00",
+				"timestamp": 1711756800,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 700,
+					"name": "Allianz Arena",
+					"city": "München"
+				},
+				"status": {
+					"long": "Time to be defined",
+					"short": "TBD",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 78,
+				"name": "Bundesliga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/78.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 27"
+			},
+			"teams": {
+				"home": {
+					"id": 157,
+					"name": "Bayern Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/157.png",
+					"winner": null
+				},
+				"away": {
+					"id": 165,
+					"name": "Borussia Dortmund",
+					"logo": "https://media-4.api-sports.io/football/teams/165.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		}
+  ]
+}
