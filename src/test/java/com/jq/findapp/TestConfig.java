@@ -126,7 +126,7 @@ public class TestConfig {
 				if (url.contains("?id="))
 					json = IOUtils.toString(getClass().getResourceAsStream("/surveyLastMatch.json"), StandardCharsets.UTF_8);
 				else if (url.contais("?teamId=0&"))
-					json = IOUtils.toString(getClass().getResourceAsStream("/surveyMatchdaysOne.json"), StandardCharsets.UTF_8).replace("{date}", "" + (System.currentTimeMillis() + 1000));
+					json = IOUtils.toString(getClass().getResourceAsStream("/surveyMatchdaysOne.json"), StandardCharsets.UTF_8).replace("{date}", "" + (System.currentTimeMillis() + 5 * 1000));
 				else
 					json = IOUtils.toString(getClass().getResourceAsStream("/surveyMatchdays.json"), StandardCharsets.UTF_8);
 				return new ObjectMapper().readTree(json);
