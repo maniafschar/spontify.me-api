@@ -16,8 +16,8 @@
 				"id": 1049115,
 				"referee": null,
 				"timezone": "UTC",
-				"date": "{date}T00:00:00+00:00",
-				"timestamp": 1711756800,
+				"date": "2013-11-23T00:00:00+00:00",
+				"timestamp": {date},
 				"periods": {
 					"first": null,
 					"second": null
@@ -28,8 +28,8 @@
 					"city": "München"
 				},
 				"status": {
-					"long": "Time to be defined",
-					"short": "TBD",
+					"long": "Not Started",
+					"short": "NS",
 					"elapsed": null
 				}
 			},
@@ -79,5 +79,5 @@
 				}
 			}
 		}
-  ]
+	]
 }
