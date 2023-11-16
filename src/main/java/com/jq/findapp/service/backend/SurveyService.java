@@ -53,6 +53,8 @@ import com.jq.findapp.util.Strings;
 
 @Service
 public class SurveyService {
+	static final Map<BigInteger, Integer> clients = new HashMap<>();
+
 	@Autowired
 	private Repository repository;
 
@@ -76,10 +78,12 @@ public class SurveyService {
 
 	private static final AtomicLong lastRun = new AtomicLong(0);
 
+	static {
+		clients.put(BigInteger.valueOf(4), 157);
+	}
+
 	public SchedulerResult update() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/update");
-		final Map<BigInteger, Integer> clients = new HashMap<>();
-		clients.put(BigInteger.valueOf(4), 157);
 		clients.keySet().forEach(e -> {
 			try {
 				result.result = updateMatchdays(e, clients.get(e));
