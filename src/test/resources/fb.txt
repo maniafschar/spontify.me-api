@@ -8,11 +8,7 @@
 
 2.	Get Long-Lived User Access Token
 	https://developers.facebook.com/docs/facebook-login/access-tokens/refreshing#get-a-long-lived-user-access-token
-	curl -i -X GET "https://graph.facebook.com/{graph-api-version}/oauth/access_token?  
-    grant_type=fb_exchange_token&          
-    client_id={app-id}&
-    client_secret={app-secret}&
-    fb_exchange_token={Short-Lived User Access Token}"
+	curl -i -X GET "https://graph.facebook.com/{graph-api-version}/oauth/access_token?grant_type=fb_exchange_token&client_id={app-id}&client_secret={app-secret}&fb_exchange_token={Short-Lived User Access Token}"
 
 3.	Get User ID
 	curl -i -X GET "https://graph.facebook.com/{graph-api-version}/me?fields=id%2Cname&access_token={Long-Live User Access Token}"
@@ -23,7 +19,7 @@
 
 5,	Post Status
 	https://developers.facebook.com/docs/graph-api/reference/page/feed/#publish
-	curl -i -X POST "https://graph.facebook.com/{graph-api-version}/feed?message=This_Is_My_New_Status&access_token=LONGLIVEDPAGEACCESSTOKEN"
+	curl -i -X POST "https://graph.facebook.com/{graph-api-version}/(page-id)/feed?message=This_Is_My_New_Status&access_token=LONGLIVEDPAGEACCESSTOKEN"
 
 6.	Check Token Expired Time
 	https://developers.facebook.com/tools/debug/accesstoken/?access_token=LONGLIVEDPAGEACCESSTOKEN&version={graph-api-version}
