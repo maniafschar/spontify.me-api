@@ -36,10 +36,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
+import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -215,8 +217,21 @@ public class SurveyService {
 	}
 
 	private void publish(final ClientMarketing clientMarketing) throws Exception {
-		// https://developers.facebook.com/docs/facebook-login/guides/access-tokens/#pagetokens
-		sendNotifications(clientMarketing);
+		// sendNotifications(clientMarketing);
+		final Client client = repository.one(Client.class, clientMarketing.getClientId());
+		if (!Strings.isEmpty(client.getFbPageAccessToken())) {
+			final Map<String, String> body = new HashMap<>();
+			body.put("message", "Umfrage Spieler des Spiels");
+			body.put("image", client.getUrl() + "/med/" + Attachment.resolve(clientMarketing.getImage()));
+			body.put("link", client.getUrl() + "?m=" + clientMarketing.getId());
+			body.put("access_token", client.getFbPageAccessToken());
+			final String response = WebClient
+					.create("https://graph.facebook.com/v18.0/" + client.getFbPageId() + "/feed")
+					.post().bodyValue(body).retrieve()
+					.toEntity(String.class).block().getBody();
+			if (response == null || !response.contains("\"id\":"))
+				notificationService.createTicket(TicketType.ERROR, "FB", response, null);
+		}
 		final ImageHtmlEmail email = mailCreateor.create();
 		email.setHostName(emailHost);
 		email.setSmtpPort(emailPort);
@@ -240,9 +255,10 @@ public class SurveyService {
 		for (int i = 0; i < list.size(); i++) {
 			final ClientMarketingResult clientMarketingResult = updateResult(
 					(BigInteger) list.get(0).get("clientMarketing.id"));
-			clientMarketing.setImage(Attachment.createImage(".png", createImageResult(clientMarketingResult)));
-			sendNotifications(
-					repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId()));
+			clientMarketingResult.setImage(Attachment.createImage(".png", createImageResult(clientMarketingResult)));
+			// sendNotifications(
+			// repository.one(ClientMarketing.class,
+			// clientMarketingResult.getClientMarketingId()));
 			clientMarketingResult.setPublished(true);
 			repository.save(clientMarketingResult);
 		}
@@ -262,16 +278,6 @@ public class SurveyService {
 		result = repository.list(params);
 		final ObjectMapper om = new ObjectMapper();
 		final ObjectNode json = om.createObjectNode();
-		/*
-		 * for (var i = 0; i < v.storage.questions.length; i++) {
-		 * var answersAverage = [], text = '', total = 0;
-		 * for (var i2 = 0; i2 < v.storage.questions[i].answers.length; i2++)
-		 * answersAverage.push(0);
-		 * for (var i2 = 0; i2 < answers.length; i2++) {
-		 * if (answers[i2]['q' + i]) {
-		 * for (var i3 = 0; i3 < answers[i2]['q' + i].a.length; i3++)
-		 * answersAverage[answers[i2]['q' + i].a[i3]]++;
-		 */
 		json.put("participants", result.size());
 		json.put("finished", 0);
 		for (int i2 = 0; i2 < result.size(); i2++) {

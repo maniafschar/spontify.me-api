@@ -11,6 +11,8 @@ public class Client extends BaseEntity {
 	private String name;
 	private String email;
 	private String url;
+	private String fbPageAccessToken;
+	private String fbPageId;
 
 	public BigInteger getAdminId() {
 		return adminId;
@@ -50,5 +52,21 @@ public class Client extends BaseEntity {
 
 	public void setStorage(final String storage) {
 		this.storage = storage;
+	}
+
+	public String getFbPageAccessToken() {
+		return fbPageAccessToken;
+	}
+
+	public void setFbPageAccessToken(final String fbPageAccessToken) {
+		this.fbPageAccessToken = fbPageAccessToken;
+	}
+
+	public String getFbPageId() {
+		return fbPageId;
+	}
+
+	public void setFbPageId(final String fbPageId) {
+		this.fbPageId = fbPageId;
 	}
 }
