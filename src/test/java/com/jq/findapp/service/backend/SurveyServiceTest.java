@@ -52,6 +52,7 @@ public class SurveyServiceTest {
 	@Test
 	public void publish() {
 		// given
+		SurveyService.clients.put(BigInteger.valueOf(4), 0);
 		final String fbPageId = "xxx";
 		final Map<String, String> body = new HashMap<>();
 		body.put("message", "Umfrage Spieler des Spiels");
