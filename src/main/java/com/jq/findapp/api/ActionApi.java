@@ -72,6 +72,7 @@ import jakarta.transaction.Transactional;
 @RequestMapping("action")
 public class ActionApi {
 	private static final List<String> QUOTATION = new ArrayList<>();
+	private static final Map<BigInteger, String> INDEXES = new HashMap<>();
 
 	static {
 		try {
@@ -657,6 +658,20 @@ public class ActionApi {
 							+ e[0] + " and contactMarketing.finished=true");
 			return repository.list(params).size() == 0;
 		}).toList();
+	}
+
+	@GetMapping("marketing/init/{id}")
+	public String marketingInit(@PathVariable final BigInteger clientId,
+			@PathParam final BigInteger id) throws Exception {
+		final String s;
+		synchronized (INDEXES) {
+			if (!INDEXES.containsKey(clientId))
+				INDEXES.put(clientId, IOUtils.toString(new URL(repository.one(Client.class, clientId).getUrl()).openStream(), StandardCharsets.UTF_8));
+			s = INDEXES.get(clientId);
+		}
+		return s.replaceFirst("<meta property=\\\"og:image\\\" content=\"([^\"].*)\"",
+				Strings.removeSubdomain(repository.one(Client.class, clientId).getUrl()) + "/med/" +
+				Attachment.resolve(repository.one(ClientMarketing.class, id).getImage()));
 	}
 
 	@GetMapping("ping")
