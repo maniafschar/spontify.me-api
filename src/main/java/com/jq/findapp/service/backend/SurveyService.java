@@ -250,10 +250,12 @@ public class SurveyService {
 	private void publish(final ClientMarketing clientMarketing) throws Exception {
 		sendNotifications(clientMarketing);
 		final Client client = repository.one(Client.class, clientMarketing.getClientId());
+		final String link = Strings.removeSubdomain(client.getUrl()) + "/rest/action/marketing/init/"
+				+ clientMarketing.getId();
 		if (!Strings.isEmpty(client.getFbPageAccessToken())) {
 			final Map<String, String> body = new HashMap<>();
 			body.put("message", "Umfrage Spieler des Spiels");
-			body.put("link", client.getUrl() + "?m=" + clientMarketing.getId());
+			body.put("link", link);
 			body.put("access_token", client.getFbPageAccessToken());
 			final String response = WebClient
 					.create("https://graph.facebook.com/v18.0/" + client.getFbPageId() + "/feed")
@@ -271,8 +273,8 @@ public class SurveyService {
 		email.setFrom("support@fan-club.online");
 		email.addTo("mani.afschar@jq-consulting.de");
 		email.setSubject("Survey");
-		email.setMsg("Survey\n\n" + client.getUrl() + "/?m=" + clientMarketing.getId()
-				+ "\n\n" + client.getUrl() + "/med/" + Attachment.resolve(clientMarketing.getImage()));
+		email.setMsg("Survey\n\n" + link + "\n\n" + Strings.removeSubdomain(client.getUrl()) + "/med/"
+				+ Attachment.resolve(clientMarketing.getImage()));
 		email.send();
 	}
 

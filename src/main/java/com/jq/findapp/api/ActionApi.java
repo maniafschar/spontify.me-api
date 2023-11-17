@@ -664,22 +664,27 @@ public class ActionApi {
 		}).toList();
 	}
 
-	@GetMapping("marketing/init/{id}", produces = MediaType.TEXT_HTML_VALUE)
-	public String marketingInit(@PathParam final BigInteger id) throws Exception {
+	@GetMapping(value = "marketing/init/{id}", produces = MediaType.TEXT_HTML_VALUE)
+	public String marketingInit(@PathVariable final BigInteger id) throws Exception {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, id);
 		if (clientMarketing == null)
 			return "";
 		String s;
+		final Client client = repository.one(Client.class, clientMarketing.getClientId());
 		synchronized (INDEXES) {
-			if (!INDEXES.containsKey(clientId))
-				INDEXES.put(clientId, IOUtils.toString(new URL(repository.one(Client.class, clientId).getUrl()).openStream(), StandardCharsets.UTF_8));
-			s = INDEXES.get(clientId);
+			if (!INDEXES.containsKey(clientMarketing.getClientId()))
+				INDEXES.put(clientMarketing.getClientId(), IOUtils.toString(
+						new URL(client.getUrl()).openStream(),
+						StandardCharsets.UTF_8));
+			s = INDEXES.get(clientMarketing.getClientId());
 		}
 		final Matcher m = Pattern.compile("<meta property=\"og:image\" content=\"([^\"].*)\"").matcher(s);
-		if (m.find());
+		if (m.find())
 			s = s.replace(m.group(1),
-				Strings.removeSubdomain(repository.one(Client.class, clientMarketing.getClientId()).getUrl()) + "/med/" +
-				Attachment.resolve(clientMarketing.getImage()));
+					Strings.removeSubdomain(client.getUrl())
+							+ "/med/"
+							+ Attachment.resolve(clientMarketing.getImage())
+							+ "\"/><base href=\"" + client.getUrl() + "/");
 		return s;
 	}
 
