@@ -1,6 +1,7 @@
 package com.jq.findapp.api;
 
 import java.math.BigInteger;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Duration;
@@ -18,6 +19,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -662,9 +664,8 @@ public class ActionApi {
 		}).toList();
 	}
 
-	@GetMapping("marketing/init/{id}")
-	public String marketingInit(@PathVariable final BigInteger clientId,
-			@PathParam final BigInteger id) throws Exception {
+	@GetMapping("marketing/init/{id}", produces = MediaType.TEXT_HTML_VALUE)
+	public String marketingInit(@PathVariable final BigInteger clientId, @PathParam final BigInteger id) throws Exception {
 		String s;
 		synchronized (INDEXES) {
 			if (!INDEXES.containsKey(clientId))
