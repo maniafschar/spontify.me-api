@@ -665,7 +665,10 @@ public class ActionApi {
 	}
 
 	@GetMapping("marketing/init/{id}", produces = MediaType.TEXT_HTML_VALUE)
-	public String marketingInit(@PathVariable final BigInteger clientId, @PathParam final BigInteger id) throws Exception {
+	public String marketingInit(@PathParam final BigInteger id) throws Exception {
+		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, id);
+		if (clientMarketing == null)
+			return "";
 		String s;
 		synchronized (INDEXES) {
 			if (!INDEXES.containsKey(clientId))
@@ -675,8 +678,8 @@ public class ActionApi {
 		final Matcher m = Pattern.compile("<meta property=\"og:image\" content=\"([^\"].*)\"").matcher(s);
 		if (m.find());
 			s = s.replace(m.group(1),
-				Strings.removeSubdomain(repository.one(Client.class, clientId).getUrl()) + "/med/" +
-				Attachment.resolve(repository.one(ClientMarketing.class, id).getImage()));
+				Strings.removeSubdomain(repository.one(Client.class, clientMarketing.getClientId()).getUrl()) + "/med/" +
+				Attachment.resolve(clientMarketing.getImage()));
 		return s;
 	}
 
