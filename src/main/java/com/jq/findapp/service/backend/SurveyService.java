@@ -19,11 +19,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.imageio.ImageIO;
 
 import org.apache.batik.ext.awt.RadialGradientPaint;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.ImageHtmlEmail;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,7 @@ import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
@@ -53,7 +56,8 @@ import com.jq.findapp.util.Strings;
 
 @Service
 public class SurveyService {
-	static final Map<BigInteger, Integer> clients = new HashMap<>();
+	private static final Map<BigInteger, Integer> clients = new HashMap<>();
+	private static final AtomicBoolean testmode = new AtomicBoolean(false);
 
 	@Autowired
 	private Repository repository;
@@ -96,6 +100,28 @@ public class SurveyService {
 			}
 		});
 		return result;
+	}
+
+	public String updateTest() throws Exception {
+		testmode.set(true);
+		final BigInteger clientId = BigInteger.ONE;
+		final int teamId = 0;
+		lastRun.set(0);
+		String result = updateMatchdays(clientId, teamId);
+		final BigInteger clientMarketingId = updateLastMatch(clientId, teamId);
+		result += "\nupdateLastMatch: " + clientMarketingId;
+		Thread.sleep(6000);
+		final ContactMarketing contactMarketing = new ContactMarketing();
+		contactMarketing.setClientMarketingId(clientMarketingId);
+		contactMarketing.setContactId(clientId);
+		contactMarketing.setFinished(Boolean.TRUE);
+		contactMarketing.setStorage("{\"q1\":{\"a\":[9],\"t\":\"abc\"}}");
+		repository.save(contactMarketing);
+		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
+		clientMarketing.setEndDate(new Timestamp(System.currentTimeMillis() - 1000));
+		repository.save(clientMarketing);
+		testmode.set(false);
+		return result + "\nupdateResultAndNotify: " + updateResultAndNotify(clientId);
 	}
 
 	private String updateMatchdays(final BigInteger clientId, final int teamId) throws Exception {
@@ -221,12 +247,15 @@ public class SurveyService {
 	}
 
 	private void publish(final ClientMarketing clientMarketing) throws Exception {
-		// sendNotifications(clientMarketing);
+		sendNotifications(clientMarketing);
 		final Client client = repository.one(Client.class, clientMarketing.getClientId());
 		if (!Strings.isEmpty(client.getFbPageAccessToken())) {
 			final Map<String, String> body = new HashMap<>();
 			body.put("message", "Umfrage Spieler des Spiels");
-			body.put("image", client.getUrl() + "/med/" + Attachment.resolve(clientMarketing.getImage()));
+			body.put("image", client.getUrl().replace("fcbayerntotal.", "") + "/med/"
+					+ Attachment.resolve(clientMarketing.getImage()));
+			System.out.println(client.getUrl().replace("fcbayerntotal.", "") + "/med/"
+					+ Attachment.resolve(clientMarketing.getImage()));
 			body.put("link", client.getUrl() + "?m=" + clientMarketing.getId());
 			body.put("access_token", client.getFbPageAccessToken());
 			final String response = WebClient
@@ -244,10 +273,9 @@ public class SurveyService {
 		email.setSSLOnConnect(true);
 		email.setFrom("support@fan-club.online");
 		email.addTo("mani.afschar@jq-consulting.de");
-		email.addTo("fcbayerntotal@web.de");
 		email.setSubject("Survey");
-		email.setTextMsg("Survey\n\nhttps://fcbayerntotal.fan-club.online/?m=" + clientMarketing.getId()
-				+ "\n\nhttps://fan-club.online/med/" + Attachment.resolve(clientMarketing.getImage()));
+		email.setMsg("Survey\n\n" + client.getUrl() + "/?m=" + clientMarketing.getId()
+				+ "\n\n" + client.getUrl() + "/med/" + Attachment.resolve(clientMarketing.getImage()));
 		email.send();
 	}
 
@@ -260,9 +288,7 @@ public class SurveyService {
 			final ClientMarketingResult clientMarketingResult = updateResult(
 					(BigInteger) list.get(0).get("clientMarketing.id"));
 			clientMarketingResult.setImage(Attachment.createImage(".png", createImageResult(clientMarketingResult)));
-			// sendNotifications(
-			// repository.one(ClientMarketing.class,
-			// clientMarketingResult.getClientMarketingId()));
+			sendNotifications(repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId()));
 			clientMarketingResult.setPublished(true);
 			repository.save(clientMarketingResult);
 		}
@@ -273,10 +299,13 @@ public class SurveyService {
 		final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 		params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketingId);
 		Result result = repository.list(params);
-		final ClientMarketingResult clientMarketingResult = result.size() == 0 ? new ClientMarketingResult()
-				: repository.one(ClientMarketingResult.class,
-						(BigInteger) result.get(0).get("clientMarketingResult.id"));
-		clientMarketingResult.setClientMarketingId(clientMarketingId);
+		final ClientMarketingResult clientMarketingResult;
+		if (result.size() == 0) {
+			clientMarketingResult = new ClientMarketingResult();
+			clientMarketingResult.setClientMarketingId(clientMarketingId);
+		} else
+			clientMarketingResult = repository.one(ClientMarketingResult.class,
+					(BigInteger) result.get(0).get("clientMarketingResult.id"));
 		params.setQuery(Query.contact_listMarketing);
 		params.setSearch("contactMarketing.clientMarketingId=" + clientMarketingId);
 		result = repository.list(params);
@@ -285,32 +314,34 @@ public class SurveyService {
 		json.put("participants", result.size());
 		json.put("finished", 0);
 		for (int i2 = 0; i2 < result.size(); i2++) {
-			om.readTree((String) result.get(i2).get("contactMarketing.storage")).fields()
-					.forEachRemaining(e -> {
-						if ("finished".equals(e.getKey())) {
-							if (e.getValue().asBoolean())
-								json.put("finished", json.get("finished").asInt() + 1);
-						} else {
-							if (!json.has(e.getKey())) {
-								json.set(e.getKey(), om.createObjectNode());
-								((ObjectNode) json.get(e.getKey())).set("a", om.createArrayNode());
+			final String answers = (String) result.get(i2).get("contactMarketing.storage");
+			if (answers != null && answers.length() > 2)
+				om.readTree(answers).fields()
+						.forEachRemaining(e -> {
+							if ("finished".equals(e.getKey())) {
+								if (e.getValue().asBoolean())
+									json.put("finished", json.get("finished").asInt() + 1);
+							} else {
+								if (!json.has(e.getKey())) {
+									json.set(e.getKey(), om.createObjectNode());
+									((ObjectNode) json.get(e.getKey())).set("a", om.createArrayNode());
+								}
+								for (int i = 0; i < e.getValue().get("a").size(); i++) {
+									final int index = e.getValue().get("a").get(i).asInt();
+									final ArrayNode a = ((ArrayNode) json.get(e.getKey()).get("a"));
+									for (int i3 = a.size(); i3 <= index; i3++)
+										a.add(0);
+									a.set(index, a.get(index).asInt() + 1);
+								}
+								if (e.getValue().has("t") && !Strings.isEmpty(e.getValue().get("t").asText())) {
+									final ObjectNode o = (ObjectNode) json.get(e.getKey());
+									if (!o.has("t"))
+										o.put("t", "");
+									o.put("t", o.get("t").asText() +
+											"<div>" + e.getValue().get("t").asText() + "</div>");
+								}
 							}
-							for (int i = 0; i < e.getValue().get("a").size(); i++) {
-								final int index = e.getValue().get("a").get(i).asInt();
-								final ArrayNode a = ((ArrayNode) json.get(e.getKey()).get("a"));
-								for (int i3 = a.size(); i3 < index; i3++)
-									a.add(0);
-								a.set(index, a.get(index).asInt() + 1);
-							}
-							if (e.getValue().has("t") && !Strings.isEmpty(e.getValue().get("t").asText())) {
-								final ObjectNode o = (ObjectNode) json.get(e.getKey());
-								if (!o.has("t"))
-									o.put("t", "");
-								o.put("t", o.get("t").asText() +
-										"<div>" + e.getValue().get("t").asText() + "</div>");
-							}
-						}
-					});
+						});
 		}
 		clientMarketingResult.setStorage(om.writeValueAsString(json));
 		repository.save(clientMarketingResult);
@@ -318,6 +349,8 @@ public class SurveyService {
 	}
 
 	private void sendNotifications(final ClientMarketing clientMarketing) throws Exception {
+		if (testmode.get())
+			return;
 		final QueryParams params;
 		if (clientMarketing.getEndDate().getTime() < Instant.now().getEpochSecond() * 1000) {
 			params = new QueryParams(Query.contact_listMarketing);
@@ -340,7 +373,14 @@ public class SurveyService {
 					type, "m=" + clientMarketing.getId());
 	}
 
-	protected JsonNode get(final String url) {
+	protected JsonNode get(final String url) throws Exception {
+		if (url.contains("?team=0&"))
+			return new ObjectMapper().readTree(IOUtils
+					.toString(getClass().getResourceAsStream("/surveyMatchdaysOne.json"),
+							StandardCharsets.UTF_8)
+					.replace("\"{date}\"", "" + (Instant.now().getEpochSecond() - 60 * 60 * 2 - 5)));
+		if (url.endsWith("?id=0"))
+			return new ObjectMapper().readTree(getClass().getResourceAsStream("/surveyLastMatch.json"));
 		return WebClient
 				.create(url)
 				.get()
@@ -412,12 +452,6 @@ public class SurveyService {
 		g2.setPaint(gradient);
 		g2.fill(new Rectangle2D.Float(0, 0, width, height));
 		g2.setComposite(AlphaComposite.SrcAtop);
-		if (!homeMatch)
-			drawImage(urlHome, g2, width / 2, padding, height / 2, -1);
-		drawImage(urlAway, g2, width / 2, padding, height / 2, 1);
-		if (homeMatch)
-			drawImage(urlHome, g2, width / 2, padding, height / 2, -1);
-		drawImage(urlLeague, g2, width - padding, padding, height / 6, 0);
 		g2.setFont(customFont);
 		g2.setColor(Color.BLACK);
 		String s = "Umfrage";

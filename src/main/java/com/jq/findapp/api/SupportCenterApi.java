@@ -158,6 +158,11 @@ public class SupportCenterApi {
 		repository.save(contact);
 	}
 
+	@PostMapping("survey/test")
+	public String survey() throws Exception {
+		return surveyService.updateTest();
+	}
+
 	@GetMapping("metrics")
 	public Map<String, Object> metrics() throws Exception {
 		final Map<String, Object> result = new HashMap<>();

@@ -27,7 +27,7 @@ public class ClientMarketingListener extends AbstractRepositoryListener<ClientMa
 	@Override
 	public void postUpdate(final ClientMarketing clientMarketing) throws Exception {
 		if (clientMarketing.getStartDate().getTime() > Instant.now().toEpochMilli()
-				&& clientMarketing.getImage() != null)
+				&& clientMarketing.getImage() == null)
 			execute(clientMarketing);
 	}
 

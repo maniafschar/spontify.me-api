@@ -13,11 +13,11 @@
 	"response": [
 		{
 			"fixture": {
-				"id": 1049115,
+				"id": 0,
 				"referee": null,
 				"timezone": "UTC",
 				"date": "2013-11-23T00:00:00+00:00",
-				"timestamp": {date},
+				"timestamp": "{date}",
 				"periods": {
 					"first": null,
 					"second": null
