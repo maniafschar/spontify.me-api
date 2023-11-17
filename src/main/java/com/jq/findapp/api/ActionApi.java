@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -663,15 +665,18 @@ public class ActionApi {
 	@GetMapping("marketing/init/{id}")
 	public String marketingInit(@PathVariable final BigInteger clientId,
 			@PathParam final BigInteger id) throws Exception {
-		final String s;
+		String s;
 		synchronized (INDEXES) {
 			if (!INDEXES.containsKey(clientId))
 				INDEXES.put(clientId, IOUtils.toString(new URL(repository.one(Client.class, clientId).getUrl()).openStream(), StandardCharsets.UTF_8));
 			s = INDEXES.get(clientId);
 		}
-		return s.replaceFirst("<meta property=\\\"og:image\\\" content=\"([^\"].*)\"",
+		final Matcher m = Pattern.compile("<meta property=\"og:image\" content=\"([^\"].*)\"").matcher(s);
+		if (m.find());
+			s = s.replace(m.group(1),
 				Strings.removeSubdomain(repository.one(Client.class, clientId).getUrl()) + "/med/" +
 				Attachment.resolve(repository.one(ClientMarketing.class, id).getImage()));
+		return s;
 	}
 
 	@GetMapping("ping")
