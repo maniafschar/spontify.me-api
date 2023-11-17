@@ -58,6 +58,7 @@ import com.jq.findapp.util.Strings;
 public class SurveyService {
 	private static final Map<BigInteger, Integer> clients = new HashMap<>();
 	private static final AtomicBoolean testmode = new AtomicBoolean(true);
+	private static final int width = 600, height = 315, padding = 30;
 
 	@Autowired
 	private Repository repository;
@@ -393,7 +394,6 @@ public class SurveyService {
 				.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"))
 				.deriveFont(66f);
 		GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(customFont);
-		final int width = 800, height = 500, padding = 30;
 		final BufferedImage output = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		final Graphics2D g2 = output.createGraphics();
 		g2.setComposite(AlphaComposite.Src);
@@ -437,7 +437,6 @@ public class SurveyService {
 				.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"))
 				.deriveFont(66f);
 		GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(customFont);
-		final int width = 800, height = 500, padding = 30;
 		final BufferedImage output = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		final Graphics2D g2 = output.createGraphics();
 		g2.setComposite(AlphaComposite.Src);
