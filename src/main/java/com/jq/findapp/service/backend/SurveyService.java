@@ -57,7 +57,7 @@ import com.jq.findapp.util.Strings;
 @Service
 public class SurveyService {
 	private static final Map<BigInteger, Integer> clients = new HashMap<>();
-	private static final AtomicBoolean testmode = new AtomicBoolean(false);
+	private static final AtomicBoolean testmode = new AtomicBoolean(true);
 
 	@Autowired
 	private Repository repository;
@@ -252,10 +252,6 @@ public class SurveyService {
 		if (!Strings.isEmpty(client.getFbPageAccessToken())) {
 			final Map<String, String> body = new HashMap<>();
 			body.put("message", "Umfrage Spieler des Spiels");
-			body.put("image", client.getUrl().replace("fcbayerntotal.", "") + "/med/"
-					+ Attachment.resolve(clientMarketing.getImage()));
-			System.out.println(client.getUrl().replace("fcbayerntotal.", "") + "/med/"
-					+ Attachment.resolve(clientMarketing.getImage()));
 			body.put("link", client.getUrl() + "?m=" + clientMarketing.getId());
 			body.put("access_token", client.getFbPageAccessToken());
 			final String response = WebClient
@@ -355,7 +351,8 @@ public class SurveyService {
 		if (clientMarketing.getEndDate().getTime() < Instant.now().getEpochSecond() * 1000) {
 			params = new QueryParams(Query.contact_listMarketing);
 			params.setSearch(
-					"contactMarketing.finished=true and contactMarketing.clientMarketingId=" + clientMarketing.getId());
+					"contactMarketing.finished=true and contactMarketing.contactId is not null and contactMarketing.clientMarketingId="
+							+ clientMarketing.getId());
 		} else {
 			params = new QueryParams(Query.contact_listId);
 			params.setSearch("contact.verified=true and contact.clientId=" + clientMarketing.getClientId());
