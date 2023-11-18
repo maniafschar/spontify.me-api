@@ -55,7 +55,7 @@ import com.jq.findapp.util.Strings;
 @Service
 public class SurveyService {
 	private static final Map<BigInteger, Integer> clients = new HashMap<>();
-	private static final int width = 600, height = 315, padding = 30;
+	private static final int width = 600, height = 315, padding = 20;
 
 	@Autowired
 	private Repository repository;
@@ -114,7 +114,6 @@ public class SurveyService {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
 		clientMarketing.setEndDate(new Timestamp(System.currentTimeMillis() - 1000));
 		repository.save(clientMarketing);
-		System.out.println("result: " + clientMarketingId);
 		return updateResultAndNotify(clientMarketing.getClientId());
 	}
 
@@ -187,6 +186,11 @@ public class SurveyService {
 								+ "</b>. Möchtest Du teilnehmen?");
 				poll.put("epilog",
 						"Lieben Dank für die Teilnahme!\n\nÜbrigens, Bayern Fans treffen sich neuerdings zum gemeinsam Spiele anschauen und feiern in dieser coolen, neuen App.\n\nKlicke auf weiter und auch Du kannst mit ein paar Klicks dabei sein.");
+				poll.put("home", matchDay.findPath("home").get("logo").asText());
+				poll.put("away", matchDay.findPath("away").get("logo").asText());
+				poll.put("league", matchDay.findPath("league").get("logo").asText());
+				poll.put("location",
+						matchDay.findPath("teams").get("home").get("id").asInt() == teamId ? "home" : "away");
 				final ObjectNode question = poll.putArray("questions").addObject();
 				question.put("question", "Wer war für Dich Spieler des Spiels?");
 				final ArrayNode answers = question.putArray("answers");
@@ -227,10 +231,7 @@ public class SurveyService {
 						(BigInteger) list.get(0).get("clientMarketing.id"));
 				clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
 				clientMarketing.setImage(Attachment.createImage(".png",
-						createImagePoll(matchDay.findPath("league").get("logo").asText(),
-								matchDay.findPath("teams").get("home").get("logo").asText(),
-								matchDay.findPath("teams").get("away").get("logo").asText(),
-								matchDay.findPath("teams").get("home").get("id").asInt() == teamId)));
+						createImage(poll, repository.one(Client.class, clientId).getName(), null)));
 				repository.save(clientMarketing);
 				sendNotificationsPoll(clientMarketing);
 				publish(clientId, "Umfrage Spieler des Spiels",
@@ -256,7 +257,6 @@ public class SurveyService {
 					.create("https://graph.facebook.com/v18.0/" + client.getFbPageId() + "/feed")
 					.post().bodyValue(body).retrieve()
 					.toEntity(String.class).block().getBody();
-			System.out.println("response: " + response);
 			if (response == null || !response.contains("\"id\":"))
 				notificationService.createTicket(TicketType.ERROR, "FB", response, null);
 		}
@@ -271,8 +271,13 @@ public class SurveyService {
 		for (int i = 0; i < list.size(); i++) {
 			final ClientMarketingResult clientMarketingResult = updateResult(
 					(BigInteger) list.get(0).get("clientMarketing.id"));
-			System.out.println("clientMarketingResult: " + clientMarketingResult.getId());
-			clientMarketingResult.setImage(Attachment.createImage(".png", createImageResult(clientMarketingResult)));
+			clientMarketingResult.setImage(Attachment.createImage(".png",
+					createImage(
+							new ObjectMapper().readTree(
+									Attachment.resolve(repository
+											.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId())
+											.getStorage())),
+							repository.one(Client.class, clientId).getName(), clientMarketingResult)));
 			clientMarketingResult.setPublished(true);
 			repository.save(clientMarketingResult);
 			sendNotificationsResult(
@@ -407,7 +412,6 @@ public class SurveyService {
 		params.setSearch(
 				"contactMarketing.finished=true and contactMarketing.contactId is not null and contactMarketing.clientMarketingId="
 						+ clientMarketing.getId());
-		System.out.println("result: " + clientMarketing.getMode());
 		sendNotifications(repository.list(params), clientMarketing, ContactNotificationTextType.clientMarketingResult,
 				"contactMarketing.contactId");
 	}
@@ -429,8 +433,12 @@ public class SurveyService {
 				.toEntity(JsonNode.class).block().getBody();
 	}
 
-	private byte[] createImagePoll(final String urlLeague, final String urlHome, final String urlAway,
-			final boolean homeMatch) throws Exception {
+	private byte[] createImage(final JsonNode poll, final String name,
+			final ClientMarketingResult clientMarketingResult) throws Exception {
+		final String urlLeague = poll.get("league").asText();
+		final String urlHome = poll.findPath("home").asText();
+		final String urlAway = poll.findPath("away").asText();
+		final boolean homeMatch = "home".equals(poll.findPath("location").asText());
 		final BufferedImage output = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		final Graphics2D g2 = output.createGraphics();
 		g2.setComposite(AlphaComposite.Src);
@@ -441,14 +449,14 @@ public class SurveyService {
 				new Color[] { new Color(245, 239, 232), new Color(246, 194, 166) });
 		g2.setPaint(gradient);
 		g2.fill(new Rectangle2D.Float(0, 0, width, height));
-		g2.setComposite(AlphaComposite.SrcAtop);
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, clientMarketingResult == null ? 1 : 0.1f));
 		final int h = (int) (height * 0.4);
 		if (!homeMatch)
 			drawImage(urlHome, g2, width / 2, padding, h, -1);
 		drawImage(urlAway, g2, width / 2, padding, h, 1);
 		if (homeMatch)
 			drawImage(urlHome, g2, width / 2, padding, h, -1);
-		drawImage(urlLeague, g2, width - padding, padding, height / 5, 0);
+		drawImage(urlLeague, g2, width - padding, padding, height / 4, 0);
 		final Font customFont = Font
 				.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"))
 				.deriveFont(50f);
@@ -456,10 +464,19 @@ public class SurveyService {
 		g2.setFont(customFont);
 		g2.setColor(Color.BLACK);
 		String s = "Umfrage";
-		g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 15);
+		if (clientMarketingResult != null)
+			s += "ergebnis";
+		g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 14.5f);
 		g2.setFont(customFont.deriveFont(36f));
 		s = "Spieler des Spiels";
-		g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 19f);
+		g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 18);
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP));
+		g2.setFont(customFont.deriveFont(10f));
+		s = "© " + LocalDateTime.now().getYear() + " " + name;
+		g2.drawString(s, width - g2.getFontMetrics().stringWidth(s) - padding, height - padding);
+		if (clientMarketingResult != null)
+			createImageResult(g2, customFont, poll,
+					new ObjectMapper().readTree(Attachment.resolve(clientMarketingResult.getStorage())));
 		// final BufferedImageTranscoder imageTranscoder = new
 		// BufferedImageTranscoder();
 		// imageTranscoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, width);
@@ -474,33 +491,18 @@ public class SurveyService {
 		return out.toByteArray();
 	}
 
-	private byte[] createImageResult(final ClientMarketingResult clientMarketingResult) throws Exception {
-		final Font customFont = Font
-				.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"))
-				.deriveFont(66f);
-		GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(customFont);
-		final BufferedImage output = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-		final Graphics2D g2 = output.createGraphics();
-		g2.setComposite(AlphaComposite.Src);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		final RadialGradientPaint gradient = new RadialGradientPaint(width / 2 - 2 * padding, height / 2 - 2 * padding,
-				height,
-				new float[] { .3f, 1f },
-				new Color[] { new Color(245, 239, 232), new Color(246, 194, 166) });
-		g2.setPaint(gradient);
-		g2.fill(new Rectangle2D.Float(0, 0, width, height));
-		g2.setComposite(AlphaComposite.SrcAtop);
-		g2.setFont(customFont);
-		g2.setColor(Color.BLACK);
-		String s = "Umfrage";
-		g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 15);
-		g2.setFont(customFont.deriveFont(40f));
-		s = "Spieler des Spiels";
-		g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 17.5f);
-		g2.dispose();
-		final ByteArrayOutputStream out = new ByteArrayOutputStream();
-		ImageIO.write(output, "png", out);
-		return out.toByteArray();
+	private void createImageResult(final Graphics2D g2, final Font customFont,
+			final JsonNode poll, final JsonNode result) throws Exception {
+		g2.setFont(customFont.deriveFont(16f));
+		int h = g2.getFontMetrics().getHeight();
+		int y = padding;
+		g2.setColor(new Color(255, 100, 0, 95));
+		g2.fillRoundRect(padding, y, width - 4 * padding, h * 2, 10, 10);
+		g2.setColor(new Color(0, 0, 0));
+		String s = poll.get("questions").get(0).get("answers").get(9).get("answer").asText();
+		if (s.indexOf("<explain") > 0)
+			s = s.substring(0, s.indexOf("<explain")).trim();
+		g2.drawString(s, padding * 1.8f, y + h + 5);
 	}
 
 	private void drawImage(final String url, final Graphics2D g, final int x, final int y, final int height,

@@ -16,8 +16,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
-import com.jq.findapp.entity.ClientMarketing;
-import com.jq.findapp.repository.Repository;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith(SpringExtension.class)
