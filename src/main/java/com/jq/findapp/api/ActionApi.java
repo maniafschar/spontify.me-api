@@ -1,6 +1,8 @@
 package com.jq.findapp.api;
 
+import java.io.IOException;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
@@ -38,6 +40,7 @@ import com.jq.findapp.api.model.Position;
 import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketing;
+import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
@@ -669,21 +672,38 @@ public class ActionApi {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, id);
 		if (clientMarketing == null)
 			return "";
+		return getHtml(clientMarketing.getClientId(),
+				"/rest/action/marketing/init/" + clientMarketing.getId(), clientMarketing.getImage());
+	}
+
+	@GetMapping(value = "marketing/result/{id}", produces = MediaType.TEXT_HTML_VALUE)
+	public String marketingResult(@PathVariable final BigInteger id) throws Exception {
+		final ClientMarketingResult clientMarketingResult = repository.one(ClientMarketingResult.class, id);
+		if (clientMarketingResult == null)
+			return "";
+		return getHtml(
+				repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId()).getClientId(),
+				"/rest/action/marketing/result/" + clientMarketingResult.getId(), clientMarketingResult.getImage());
+	}
+
+	private String getHtml(BigInteger clientId, String postfix, String image) throws Exception {
 		String s;
-		final Client client = repository.one(Client.class, clientMarketing.getClientId());
+		final Client client = repository.one(Client.class, clientId);
 		synchronized (INDEXES) {
-			if (!INDEXES.containsKey(clientMarketing.getClientId()))
-				INDEXES.put(clientMarketing.getClientId(), IOUtils.toString(
+			if (!INDEXES.containsKey(clientId))
+				INDEXES.put(clientId, IOUtils.toString(
 						new URL(client.getUrl()).openStream(),
 						StandardCharsets.UTF_8));
-			s = INDEXES.get(clientMarketing.getClientId());
+			s = INDEXES.get(clientId);
 		}
-		final Matcher m = Pattern.compile("<meta property=\"og:image\" content=\"([^\"].*)\"").matcher(s);
+		final String url = Strings.removeSubdomain(client.getUrl());
+		Matcher m = Pattern.compile("<meta property=\"og:url\" content=\"([^\"].*)\"").matcher(s);
+		if (m.find())
+			s = s.replace(m.group(1), url + postfix);
+		m = Pattern.compile("<meta property=\"og:image\" content=\"([^\"].*)\"").matcher(s);
 		if (m.find())
 			s = s.replace(m.group(1),
-					Strings.removeSubdomain(client.getUrl())
-							+ "/med/"
-							+ Attachment.resolve(clientMarketing.getImage())
+					url + "/med/" + Attachment.resolve(image)
 							+ "\"/><base href=\"" + client.getUrl() + "/");
 		return s;
 	}

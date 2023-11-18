@@ -19,15 +19,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.imageio.ImageIO;
 
 import org.apache.batik.ext.awt.RadialGradientPaint;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.mail.DefaultAuthenticator;
-import org.apache.commons.mail.ImageHtmlEmail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -43,7 +40,9 @@ import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactMarketing;
+import com.jq.findapp.entity.ClientMarketing.ClientMarketingMode;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
+import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
@@ -51,13 +50,11 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.NotificationService;
-import com.jq.findapp.service.NotificationService.MailCreateor;
 import com.jq.findapp.util.Strings;
 
 @Service
 public class SurveyService {
 	private static final Map<BigInteger, Integer> clients = new HashMap<>();
-	private static final AtomicBoolean testmode = new AtomicBoolean(true);
 	private static final int width = 600, height = 315, padding = 30;
 
 	@Autowired
@@ -65,9 +62,6 @@ public class SurveyService {
 
 	@Autowired
 	private NotificationService notificationService;
-
-	@Autowired
-	private MailCreateor mailCreateor;
 
 	@Value("${app.sports.api.token}")
 	private String token;
@@ -103,29 +97,29 @@ public class SurveyService {
 		return result;
 	}
 
-	public String updateTest() throws Exception {
-		testmode.set(true);
-		final BigInteger clientId = BigInteger.ONE;
+	public BigInteger testPoll() throws Exception {
 		final int teamId = 0;
 		lastRun.set(0);
-		String result = updateMatchdays(clientId, teamId);
-		final BigInteger clientMarketingId = updateLastMatch(clientId, teamId);
-		result += "\nupdateLastMatch: " + clientMarketingId;
-		Thread.sleep(6000);
+		updateMatchdays(BigInteger.ONE, teamId);
+		return updateLastMatch(BigInteger.ONE, teamId);
+	}
+
+	public String testResult(BigInteger clientMarketingId) throws Exception {
 		final ContactMarketing contactMarketing = new ContactMarketing();
 		contactMarketing.setClientMarketingId(clientMarketingId);
-		contactMarketing.setContactId(clientId);
+		contactMarketing.setContactId(BigInteger.ONE);
 		contactMarketing.setFinished(Boolean.TRUE);
 		contactMarketing.setStorage("{\"q1\":{\"a\":[9],\"t\":\"abc\"}}");
 		repository.save(contactMarketing);
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
 		clientMarketing.setEndDate(new Timestamp(System.currentTimeMillis() - 1000));
 		repository.save(clientMarketing);
-		testmode.set(false);
-		return result + "\nupdateResultAndNotify: " + updateResultAndNotify(clientId);
+		System.out.println("result: " + clientMarketingId);
+		return updateResultAndNotify(clientMarketing.getClientId());
 	}
 
-	private String updateMatchdays(final BigInteger clientId, final int teamId) throws Exception {
+	private String updateMatchdays(final BigInteger clientId, final int teamId)
+			throws Exception {
 		if (System.currentTimeMillis() - lastRun.get() < 24 * 60 * 60 * 1000)
 			return "Matchdays already run in last 24 hours";
 		lastRun.set(System.currentTimeMillis());
@@ -148,6 +142,8 @@ public class SurveyService {
 								new Timestamp(clientMarketing.getStartDate().getTime() + (24 * 60 * 60 * 1000)));
 						clientMarketing.setClientId(clientId);
 						clientMarketing.setStorage(matchDays.get(i).get("fixture").get("id").asText());
+						clientMarketing.setMode(teamId == 0 ? ClientMarketingMode.Test
+								: ClientMarketingMode.Live);
 						repository.save(clientMarketing);
 						count++;
 					}
@@ -236,7 +232,9 @@ public class SurveyService {
 								matchDay.findPath("teams").get("away").get("logo").asText(),
 								matchDay.findPath("teams").get("home").get("id").asInt() == teamId)));
 				repository.save(clientMarketing);
-				publish(clientMarketing);
+				sendNotificationsPoll(clientMarketing);
+				publish(clientId, "Umfrage Spieler des Spiels",
+						"/rest/action/marketing/init/" + clientMarketing.getId());
 			}
 			return (BigInteger) list.get(0).get("clientMarketing.id");
 		}
@@ -247,51 +245,43 @@ public class SurveyService {
 		return "<br/>" + x + (x > 1 ? plural : singular);
 	}
 
-	private void publish(final ClientMarketing clientMarketing) throws Exception {
-		sendNotifications(clientMarketing);
-		final Client client = repository.one(Client.class, clientMarketing.getClientId());
-		final String link = Strings.removeSubdomain(client.getUrl()) + "/rest/action/marketing/init/"
-				+ clientMarketing.getId();
+	private void publish(final BigInteger clientId, String message, String link) throws Exception {
+		final Client client = repository.one(Client.class, clientId);
 		if (!Strings.isEmpty(client.getFbPageAccessToken())) {
 			final Map<String, String> body = new HashMap<>();
-			body.put("message", "Umfrage Spieler des Spiels");
-			body.put("link", link);
+			body.put("message", message);
+			body.put("link", Strings.removeSubdomain(client.getUrl()) + link);
 			body.put("access_token", client.getFbPageAccessToken());
 			final String response = WebClient
 					.create("https://graph.facebook.com/v18.0/" + client.getFbPageId() + "/feed")
 					.post().bodyValue(body).retrieve()
 					.toEntity(String.class).block().getBody();
+			System.out.println("response: " + response);
 			if (response == null || !response.contains("\"id\":"))
 				notificationService.createTicket(TicketType.ERROR, "FB", response, null);
 		}
-		final ImageHtmlEmail email = mailCreateor.create();
-		email.setHostName(emailHost);
-		email.setSmtpPort(emailPort);
-		email.setCharset(StandardCharsets.UTF_8.name());
-		email.setAuthenticator(new DefaultAuthenticator("support@fan-club.online", emailPassword));
-		email.setSSLOnConnect(true);
-		email.setFrom("support@fan-club.online");
-		email.addTo("mani.afschar@jq-consulting.de");
-		email.setSubject("Survey");
-		email.setMsg("Survey\n\n" + link + "\n\n" + Strings.removeSubdomain(client.getUrl()) + "/med/"
-				+ Attachment.resolve(clientMarketing.getImage()));
-		email.send();
 	}
 
-	private BigInteger updateResultAndNotify(final BigInteger clientId) throws Exception {
+	private String updateResultAndNotify(final BigInteger clientId) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
-		params.setSearch("clientMarketingResult.published=false and clientMarketing.endDate<'" + Instant.now()
+		params.setSearch("clientMarketingResult.published=false and clientMarketing.endDate<='" + Instant.now()
 				+ "' and clientMarketing.clientId=" + clientId);
 		final Result list = repository.list(params);
+		String result = "";
 		for (int i = 0; i < list.size(); i++) {
 			final ClientMarketingResult clientMarketingResult = updateResult(
 					(BigInteger) list.get(0).get("clientMarketing.id"));
+			System.out.println("clientMarketingResult: " + clientMarketingResult.getId());
 			clientMarketingResult.setImage(Attachment.createImage(".png", createImageResult(clientMarketingResult)));
-			sendNotifications(repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId()));
 			clientMarketingResult.setPublished(true);
 			repository.save(clientMarketingResult);
+			sendNotificationsResult(
+					repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId()));
+			publish(clientId, "Ergebnis der Umfrage Spieler des Spiels",
+					"/rest/action/marketing/result/" + clientMarketingResult.getId());
+			result += clientMarketingResult.getId() + "\n";
 		}
-		return null;
+		return result;
 	}
 
 	public synchronized ClientMarketingResult updateResult(final BigInteger clientMarketingId) throws Exception {
@@ -347,30 +337,79 @@ public class SurveyService {
 		return clientMarketingResult;
 	}
 
-	private void sendNotifications(final ClientMarketing clientMarketing) throws Exception {
-		if (testmode.get())
-			return;
-		final QueryParams params;
-		if (clientMarketing.getEndDate().getTime() < Instant.now().getEpochSecond() * 1000) {
-			params = new QueryParams(Query.contact_listMarketing);
-			params.setSearch(
-					"contactMarketing.finished=true and contactMarketing.contactId is not null and contactMarketing.clientMarketingId="
-							+ clientMarketing.getId());
-		} else {
-			params = new QueryParams(Query.contact_listId);
-			params.setSearch("contact.verified=true and contact.clientId=" + clientMarketing.getClientId());
+	private void sendNotificationsPoll(final ClientMarketing clientMarketing) throws Exception {
+		final QueryParams params = new QueryParams(Query.contact_listId);
+		String s = "contact.verified=true";
+		if (!Strings.isEmpty(clientMarketing.getLanguage())) {
+			String s2 = "";
+			String[] langs = clientMarketing.getLanguage().split(Attachment.SEPARATOR);
+			for (int i = 0; i < langs.length; i++)
+				s2 += " or contact.language='" + langs[i] + "'";
+			s += " and (" + s2.substring(4) + ")";
 		}
+		if (!Strings.isEmpty(clientMarketing.getGender())) {
+			String s2 = "";
+			String[] genders = clientMarketing.getGender().split(Attachment.SEPARATOR);
+			for (int i = 0; i < genders.length; i++)
+				s2 += " or contact.gender=" + genders[i];
+			s += " and (" + s2.substring(4) + ")";
+		}
+		if (!Strings.isEmpty(clientMarketing.getAge()))
+			s += " and (contact.age>=" + clientMarketing.getAge().split(",")[0] + " and contact.age<="
+					+ clientMarketing.getAge().split(",")[1] + ")";
+		params.setSearch(s);
 		final Result users = repository.list(params);
-		final ContactNotificationTextType type = params.getQuery() == Query.contact_listId
-				? ContactNotificationTextType.clientMarketing
-				: ContactNotificationTextType.clientMarketingResult;
-		for (int i2 = 0; i2 < users.size(); i2++)
+		if (!Strings.isEmpty(clientMarketing.getRegion())) {
+			for (int i = users.size() - 1; i >= 0; i--) {
+				params.setQuery(Query.contact_listGeoLocationHistory);
+				params.setSearch("contactGeoLocationHistory.contactId=" + users.get(i).get("contact.id"));
+				final Result result = repository.list(params);
+				if (result.size() > 0) {
+					final GeoLocation geoLocation = repository.one(GeoLocation.class,
+							(BigInteger) result.get(0).get("contactGeoLocationHistory.geoLocationId"));
+					if ((Strings.isEmpty(geoLocation.getTown())
+							&& Strings.isEmpty(geoLocation.getCountry())
+							&& Strings.isEmpty(geoLocation.getZipCode()))
+							|| (!clientMarketing.getRegion().contains(geoLocation.getTown())
+									&& !clientMarketing.getRegion()
+											.contains(" " + geoLocation.getCountry() + " ")))
+						users.getList().remove(i);
+					else {
+						boolean remove = true;
+						for (int i2 = geoLocation.getZipCode().length(); i2 > 1; i2--) {
+							if (clientMarketing.getRegion().contains(
+									geoLocation.getCountry() + "-" + geoLocation.getZipCode().substring(0, i))) {
+								remove = false;
+								break;
+							}
+						}
+						if (remove)
+							users.getList().remove(i);
+					}
+				}
+			}
+		}
+		sendNotifications(users, clientMarketing, ContactNotificationTextType.clientMarketing, "contact.id");
+	}
+
+	private void sendNotifications(Result users, ClientMarketing clientMarketing, ContactNotificationTextType type,
+			String field) throws Exception {
+		if (clientMarketing.getMode() == ClientMarketingMode.Test)
+			return;
+		for (int i = 0; i < users.size(); i++)
 			notificationService.sendNotification(null,
-					repository.one(Contact.class,
-							(BigInteger) users.get(i2)
-									.get(params.getQuery() == Query.contact_listId ? "contact.id"
-											: "contactMarketing.contactId")),
+					repository.one(Contact.class, (BigInteger) users.get(i).get(field)),
 					type, "m=" + clientMarketing.getId());
+	}
+
+	private void sendNotificationsResult(final ClientMarketing clientMarketing) throws Exception {
+		final QueryParams params = new QueryParams(Query.contact_listMarketing);
+		params.setSearch(
+				"contactMarketing.finished=true and contactMarketing.contactId is not null and contactMarketing.clientMarketingId="
+						+ clientMarketing.getId());
+		System.out.println("result: " + clientMarketing.getMode());
+		sendNotifications(repository.list(params), clientMarketing, ContactNotificationTextType.clientMarketingResult,
+				"contactMarketing.contactId");
 	}
 
 	protected JsonNode get(final String url) throws Exception {
@@ -392,10 +431,6 @@ public class SurveyService {
 
 	private byte[] createImagePoll(final String urlLeague, final String urlHome, final String urlAway,
 			final boolean homeMatch) throws Exception {
-		final Font customFont = Font
-				.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"))
-				.deriveFont(66f);
-		GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(customFont);
 		final BufferedImage output = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		final Graphics2D g2 = output.createGraphics();
 		g2.setComposite(AlphaComposite.Src);
@@ -407,19 +442,24 @@ public class SurveyService {
 		g2.setPaint(gradient);
 		g2.fill(new Rectangle2D.Float(0, 0, width, height));
 		g2.setComposite(AlphaComposite.SrcAtop);
+		final int h = (int) (height * 0.4);
 		if (!homeMatch)
-			drawImage(urlHome, g2, width / 2, padding, height / 2, -1);
-		drawImage(urlAway, g2, width / 2, padding, height / 2, 1);
+			drawImage(urlHome, g2, width / 2, padding, h, -1);
+		drawImage(urlAway, g2, width / 2, padding, h, 1);
 		if (homeMatch)
-			drawImage(urlHome, g2, width / 2, padding, height / 2, -1);
-		drawImage(urlLeague, g2, width - padding, padding, height / 6, 0);
+			drawImage(urlHome, g2, width / 2, padding, h, -1);
+		drawImage(urlLeague, g2, width - padding, padding, height / 5, 0);
+		final Font customFont = Font
+				.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"))
+				.deriveFont(50f);
+		GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(customFont);
 		g2.setFont(customFont);
 		g2.setColor(Color.BLACK);
 		String s = "Umfrage";
 		g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 15);
-		g2.setFont(customFont.deriveFont(40f));
+		g2.setFont(customFont.deriveFont(36f));
 		s = "Spieler des Spiels";
-		g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 17.5f);
+		g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 19f);
 		// final BufferedImageTranscoder imageTranscoder = new
 		// BufferedImageTranscoder();
 		// imageTranscoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, width);

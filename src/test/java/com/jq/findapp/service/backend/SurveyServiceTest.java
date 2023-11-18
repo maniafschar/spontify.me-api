@@ -28,17 +28,13 @@ public class SurveyServiceTest {
 	private SurveyService surveyService;
 
 	@Autowired
-	private Repository repository;
-
-	@Autowired
 	private Utils utils;
 
 	@Test
 	public void update_twice() throws Exception {
 		// given
+		utils.createContact(BigInteger.valueOf(4));
 		SchedulerResult result = surveyService.update();
-		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
-				new BigInteger(result.result.substring(result.result.lastIndexOf(" ") + 1)));
 
 		// when
 		result = surveyService.update();
@@ -46,6 +42,18 @@ public class SurveyServiceTest {
 		// then
 		assertNull(result.exception);
 		assertEquals("Matchdays already run in last 24 hours", result.result);
-		assertNotNull(clientMarketing.getStorage());
+	}
+
+	@Test
+	public void testPoll() throws Exception {
+		// given
+		utils.createContact(BigInteger.ONE);
+		final BigInteger clientMarketingId = surveyService.testPoll();
+
+		// when
+		final String result = surveyService.testResult(clientMarketingId);
+
+		// then
+		assertEquals("1\n", result);
 	}
 }

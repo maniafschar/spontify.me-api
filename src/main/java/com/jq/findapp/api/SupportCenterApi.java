@@ -158,9 +158,14 @@ public class SupportCenterApi {
 		repository.save(contact);
 	}
 
-	@PostMapping("survey/test")
-	public String survey() throws Exception {
-		return surveyService.updateTest();
+	@PostMapping("survey/test/poll")
+	public BigInteger survey() throws Exception {
+		return surveyService.testPoll();
+	}
+
+	@PostMapping("survey/test/result/{clientMarketingId}")
+	public void survey(@PathVariable final BigInteger clientMarketingId) throws Exception {
+		surveyService.testResult(clientMarketingId);
 	}
 
 	@GetMapping("metrics")

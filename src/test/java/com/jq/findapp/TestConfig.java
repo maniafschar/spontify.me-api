@@ -122,6 +122,8 @@ public class TestConfig {
 		@Override
 		protected JsonNode get(final String url) {
 			try {
+				if (url.contains("?team=0&"))
+					return super.get(url);
 				return new ObjectMapper().readTree(IOUtils.toString(
 						getClass().getResourceAsStream(
 								url.contains("?id=") ? "/surveyLastMatch.json" : "/surveyMatchdays.json"),
