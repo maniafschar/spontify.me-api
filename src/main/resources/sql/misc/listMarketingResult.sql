@@ -3,6 +3,7 @@ SELECT
 	clientMarketingResult.image,
 	clientMarketingResult.storage,
 	clientMarketing.id,
+	clientMarketing.storage,
 	clientMarketing.startDate,
 	clientMarketing.endDate
 FROM

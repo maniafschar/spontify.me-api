@@ -3,6 +3,7 @@ package com.jq.findapp.util;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.Date;
@@ -12,6 +13,7 @@ import java.util.regex.Pattern;
 public class Strings {
 	public static final Pattern EMAIL = Pattern.compile("([A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6})",
 			Pattern.CASE_INSENSITIVE);
+	public static final String TIME_OFFSET = "Europe/Berlin";
 
 	public static String encodeParam(final String param) {
 		int x = 0;

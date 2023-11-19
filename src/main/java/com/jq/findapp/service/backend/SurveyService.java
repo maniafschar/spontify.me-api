@@ -13,10 +13,15 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicLong;
@@ -105,12 +110,15 @@ public class SurveyService {
 	}
 
 	public String testResult(BigInteger clientMarketingId) throws Exception {
-		final ContactMarketing contactMarketing = new ContactMarketing();
-		contactMarketing.setClientMarketingId(clientMarketingId);
-		contactMarketing.setContactId(BigInteger.ONE);
-		contactMarketing.setFinished(Boolean.TRUE);
-		contactMarketing.setStorage("{\"q1\":{\"a\":[9],\"t\":\"abc\"}}");
-		repository.save(contactMarketing);
+		final int max = (int) (10 + Math.random() * 100);
+		for (int i = 0; i < max; i++) {
+			final ContactMarketing contactMarketing = new ContactMarketing();
+			contactMarketing.setClientMarketingId(clientMarketingId);
+			contactMarketing.setContactId(BigInteger.ONE);
+			contactMarketing.setFinished(Boolean.TRUE);
+			contactMarketing.setStorage("{\"q1\":{\"a\":[" + (int) (Math.random() * 11) + "]}}");
+			repository.save(contactMarketing);
+		}
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
 		clientMarketing.setEndDate(new Timestamp(System.currentTimeMillis() - 1000));
 		repository.save(clientMarketing);
@@ -181,7 +189,7 @@ public class SurveyService {
 								+ LocalDateTime.ofInstant(
 										Instant.ofEpochMilli(
 												matchDay.findPath("fixture").get("timestamp").asLong() * 1000),
-										TimeZone.getTimeZone("Europe/Berlin").toZoneId())
+										TimeZone.getTimeZone(Strings.TIME_OFFSET).toZoneId())
 										.format(DateTimeFormatter.ofPattern("d.M.yyyy HH:mm"))
 								+ "</b>. Möchtest Du teilnehmen?");
 				poll.put("epilog",
@@ -189,6 +197,9 @@ public class SurveyService {
 				poll.put("home", matchDay.findPath("home").get("logo").asText());
 				poll.put("away", matchDay.findPath("away").get("logo").asText());
 				poll.put("league", matchDay.findPath("league").get("logo").asText());
+				poll.put("timestamp", matchDay.findPath("fixture").get("timestamp").asLong());
+				poll.put("venue", matchDay.findPath("fixture").get("venue").get("name").asText());
+				poll.put("city", matchDay.findPath("fixture").get("venue").get("city").asText());
 				poll.put("location",
 						matchDay.findPath("teams").get("home").get("id").asInt() == teamId ? "home" : "away");
 				final ObjectNode question = poll.putArray("questions").addObject();
@@ -283,7 +294,7 @@ public class SurveyService {
 			sendNotificationsResult(
 					repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId()));
 			publish(clientId, "Ergebnis der Umfrage Spieler des Spiels",
-					"/rest/action/marketing/result/" + clientMarketingResult.getId());
+					"/rest/action/marketing/result/" + clientMarketingResult.getClientMarketingId());
 			result += clientMarketingResult.getId() + "\n";
 		}
 		return result;
@@ -467,11 +478,14 @@ public class SurveyService {
 		if (clientMarketingResult != null)
 			s += "ergebnis";
 		g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 14.5f);
-		g2.setFont(customFont.deriveFont(36f));
-		s = "Spieler des Spiels";
-		g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 18);
+		g2.setFont(customFont.deriveFont(24f));
+		s = "Spieler des Spiels vom " +
+				Instant.ofEpochMilli(poll.get("timestamp").asLong() * 1000)
+						.atZone(TimeZone.getTimeZone(Strings.TIME_OFFSET).toZoneId()).toLocalDateTime()
+						.format(DateTimeFormatter.ofPattern("d.M.yyyy H:mm"));
+		g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 17.5f);
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP));
-		g2.setFont(customFont.deriveFont(10f));
+		g2.setFont(customFont.deriveFont(12f));
 		s = "© " + LocalDateTime.now().getYear() + " " + name;
 		g2.drawString(s, width - g2.getFontMetrics().stringWidth(s) - padding, height - padding);
 		if (clientMarketingResult != null)
@@ -491,18 +505,36 @@ public class SurveyService {
 		return out.toByteArray();
 	}
 
-	private void createImageResult(final Graphics2D g2, final Font customFont,
-			final JsonNode poll, final JsonNode result) throws Exception {
+	private void createImageResult(final Graphics2D g2, final Font customFont, JsonNode poll, JsonNode result)
+			throws Exception {
 		g2.setFont(customFont.deriveFont(16f));
-		int h = g2.getFontMetrics().getHeight();
+		final int h = g2.getFontMetrics().getHeight();
+		final int total = result.get("participants").asInt();
 		int y = padding;
-		g2.setColor(new Color(255, 100, 0, 95));
-		g2.fillRoundRect(padding, y, width - 4 * padding, h * 2, 10, 10);
-		g2.setColor(new Color(0, 0, 0));
-		String s = poll.get("questions").get(0).get("answers").get(9).get("answer").asText();
-		if (s.indexOf("<explain") > 0)
-			s = s.substring(0, s.indexOf("<explain")).trim();
-		g2.drawString(s, padding * 1.8f, y + h + 5);
+		poll = poll.get("questions").get(0).get("answers");
+		result = result.get("q1").get("a");
+		final List<String> x = new ArrayList<>();
+		String leftPad = "000000000000000";
+		for (int i = 0; i < result.size(); i++)
+			x.add(leftPad.substring(result.get(i).asText().length()) + result.get(i).asText() + "_"
+					+ poll.get(i).get("answer").asText());
+		Collections.sort(x);
+		for (int i = x.size() - 1; i >= 0 && i > x.size() - 7; i--) {
+			String[] s = x.get(i).split("_");
+			if (s[1].indexOf("<explain") > 0)
+				s[1] = s[1].substring(0, s[1].indexOf("<explain")).trim();
+			int percent = (int) (100.0 * Integer.parseInt(s[0]) / total + 0.5);
+			if (percent < 1)
+				break;
+			g2.setColor(new Color(255, 100, 0, 50));
+			g2.fillRoundRect(padding, y, width - 2 * padding, h * 2, 10, 10);
+			g2.setColor(new Color(255, 100, 0, 120));
+			g2.fillRoundRect(padding, y, (width - 2 * padding) * percent / 100, h * 2, 10, 10);
+			g2.setColor(new Color(0, 0, 0));
+			g2.drawString(percent + "%", padding * 1.8f, y + h + 5);
+			g2.drawString(s[1], padding * 4.5f, y + h + 5);
+			y += 2.3 * padding;
+		}
 	}
 
 	private void drawImage(final String url, final Graphics2D g, final int x, final int y, final int height,

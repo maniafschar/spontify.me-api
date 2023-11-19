@@ -56,7 +56,7 @@ public class ExternalServiceTest {
 				+ "	\"loc\": \"47.8409,12.9811\",\n"
 				+ "	\"org\": \"AS3209 Vodafone GmbH\",\n"
 				+ "	\"postal\": \"83395\",\n"
-				+ "	\"timezone\": \"Europe/Berlin\"\n"
+				+ "	\"timezone\": \"" + Strings.TIME_OFFSET + "\"\n"
 				+ "}";
 		final Matcher loc = Pattern.compile("\"loc\": \"([^\"]*)\"").matcher(response);
 		loc.find();

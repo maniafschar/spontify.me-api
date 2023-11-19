@@ -33,6 +33,7 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.repository.listener.ClientNewsListener;
+import com.jq.findapp.util.Strings;
 
 @Service
 public class DbService {
@@ -55,7 +56,7 @@ public class DbService {
 			repository.executeUpdate(
 					"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and (select modifiedAt from Contact contact where contact.id=contactNotification.contactId)>contactNotification.createdAt and TIMESTAMPDIFF(MINUTE,contactNotification.createdAt,current_timestamp)>30");
 			repository.executeUpdate(
-					"update Contact set timezone='Europe/Berlin' where timezone is null");
+					"update Contact set timezone='" + Strings.TIME_OFFSET + "' where timezone is null");
 			repository.executeUpdate(
 					"update Log set webCall=substring(webCall, 1, instr(webCall, '(')-1) where instr(webCall, '(')>0");
 			final LocalDate d = LocalDate.ofInstant(Instant.now().minus(Duration.ofDays(183)), ZoneId.systemDefault());

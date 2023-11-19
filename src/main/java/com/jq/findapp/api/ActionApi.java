@@ -531,7 +531,7 @@ public class ActionApi {
 				final Contact to = new Contact();
 				to.setEmail(email.asText());
 				to.setPseudonym(to.getEmail());
-				to.setTimezone("Europe/Berlin");
+				to.setTimezone(Strings.TIME_OFFSET);
 				to.setClientId(clientId);
 				to.setLanguage("DE");
 				final StringBuffer s = new StringBuffer("<div style=\"text-align:left;\">"
@@ -575,36 +575,26 @@ public class ActionApi {
 			@RequestHeader(required = false) final BigInteger user,
 			@RequestParam(name = "m", required = false) final BigInteger clientMarketingId) throws Exception {
 		if (clientMarketingId != null) {
-			final QueryParams params = new QueryParams(Query.misc_listMarketing);
-			params.setSearch("clientMarketing.id=" + clientMarketingId + " and clientMarketing.clientId=" + clientId);
-			final Result result = repository.list(params);
-			if (result.size() > 0) {
-				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
-						(BigInteger) result.get(0).get("clientMarketing.id"));
+			final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
+			if (clientMarketing != null && clientId.equals(clientMarketing.getClientId())) {
 				if (clientMarketing.getEndDate() != null
 						&& clientMarketing.getEndDate().getTime() < Instant.now().getEpochSecond() * 1000) {
-					if (user != null) {
-						params.setQuery(Query.contact_listMarketing);
-						params.setSearch("contactMarketing.finished=true and contactMarketing.contactId=" + user
-								+ " and contactMarketing.clientMarketingId=" + clientMarketing.getId());
-						if (repository.list(params).size() > 0) {
-							params.setQuery(Query.misc_listMarketingResult);
-							params.setSearch("contactMarketingResult.clientMarketingId=" + clientMarketing.getId());
-							return repository.list(params).getList();
-						}
-					}
-					return null;
+					final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
+					params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketing.getId());
+					return repository.list(params).getList();
 				}
+				if (user != null) {
+					final QueryParams params = new QueryParams(Query.contact_listMarketing);
+					params.setSearch("contactMarketing.finished=true and contactMarketing.contactId=" + user
+							+ " and contactMarketing.clientMarketingId=" + clientMarketingId);
+					if (repository.list(params).size() > 0)
+						return null;
+				}
+				final QueryParams params = new QueryParams(Query.misc_listMarketing);
+				params.setSearch("clientMarketing.id=" + clientMarketingId);
+				return repository.list(params).getList();
 			}
-			if (user != null) {
-				params.setQuery(Query.contact_listMarketing);
-				params.setSearch("contactMarketing.finished=true and contactMarketing.contactId=" + user
-						+ " and contactMarketing.clientMarketingId="
-						+ clientMarketingId);
-				if (repository.list(params).size() > 0)
-					return null;
-			}
-			return result.getList();
+			return null;
 		}
 		if (user == null)
 			return null;
@@ -667,44 +657,43 @@ public class ActionApi {
 		}).toList();
 	}
 
+	@GetMapping(value = "marketing/result/{id}", produces = MediaType.TEXT_HTML_VALUE)
+	public String marketingResult(@PathVariable final BigInteger id) throws Exception {
+		return marketingInit(id);
+	}
+
 	@GetMapping(value = "marketing/init/{id}", produces = MediaType.TEXT_HTML_VALUE)
 	public String marketingInit(@PathVariable final BigInteger id) throws Exception {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, id);
 		if (clientMarketing == null)
 			return "";
-		return getHtml(clientMarketing.getClientId(),
-				"/rest/action/marketing/init/" + clientMarketing.getId(), clientMarketing.getImage());
-	}
-
-	@GetMapping(value = "marketing/result/{id}", produces = MediaType.TEXT_HTML_VALUE)
-	public String marketingResult(@PathVariable final BigInteger id) throws Exception {
-		final ClientMarketingResult clientMarketingResult = repository.one(ClientMarketingResult.class, id);
-		if (clientMarketingResult == null)
-			return "";
-		return getHtml(
-				repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId()).getClientId(),
-				"/rest/action/marketing/result/" + clientMarketingResult.getId(), clientMarketingResult.getImage());
-	}
-
-	private String getHtml(BigInteger clientId, String postfix, String image) throws Exception {
 		String s;
-		final Client client = repository.one(Client.class, clientId);
+		final Client client = repository.one(Client.class, clientMarketing.getClientId());
 		synchronized (INDEXES) {
-			if (!INDEXES.containsKey(clientId))
-				INDEXES.put(clientId, IOUtils.toString(
+			if (!INDEXES.containsKey(clientMarketing.getClientId()))
+				INDEXES.put(clientMarketing.getClientId(), IOUtils.toString(
 						new URL(client.getUrl()).openStream(),
 						StandardCharsets.UTF_8));
-			s = INDEXES.get(clientId);
+			s = INDEXES.get(clientMarketing.getClientId());
 		}
 		final String url = Strings.removeSubdomain(client.getUrl());
+		final boolean pollTerminated = clientMarketing.getEndDate() != null
+				&& clientMarketing.getEndDate().getTime() < Instant.now().getEpochSecond() * 1000;
 		Matcher m = Pattern.compile("<meta property=\"og:url\" content=\"([^\"].*)\"").matcher(s);
 		if (m.find())
-			s = s.replace(m.group(1), url + postfix);
-		m = Pattern.compile("<meta property=\"og:image\" content=\"([^\"].*)\"").matcher(s);
-		if (m.find())
 			s = s.replace(m.group(1),
-					url + "/med/" + Attachment.resolve(image)
-							+ "\"/><base href=\"" + client.getUrl() + "/");
+					url + "/rest/action/marketing/" + (pollTerminated ? "result/" : "init/") + clientMarketing.getId());
+		m = Pattern.compile("<meta property=\"og:image\" content=\"([^\"].*)\"").matcher(s);
+		if (m.find()) {
+			final String image;
+			if (pollTerminated) {
+				final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
+				params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketing.getId());
+				image = repository.list(params).get(0).get("clientMarketingResult.image").toString();
+			} else
+				image = Attachment.resolve(clientMarketing.getImage());
+			s = s.replace(m.group(1), url + "/med/" + image + "\"/><base href=\"" + client.getUrl() + "/");
+		}
 		return s;
 	}
 
