@@ -4,6 +4,7 @@ SELECT
 FROM
 	Contact contact
 WHERE
-	contact.os<>'web' and contact.id<>{USERID} and contact.version is not null
+	contact.os<>'web' and contact.version is not null
+	{search}
 GROUP By
 	contact.clientId
