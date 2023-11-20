@@ -697,6 +697,16 @@ public class ActionApi {
 		return s;
 	}
 
+	@GetMapping("version")
+	public String version(@RequestHeader final BigInteger clientId) throws Exception {
+		final QueryParams params = new QueryParams(Query.contact_maxAppVersion);
+		params.setSearch("contact.clientId=" + clientId);
+		final Result result = repository.list(params);
+		if (result.size() > 0)
+			return (String) result.get(0).get("_c"));
+		return "";
+	}
+
 	@GetMapping("ping")
 	public Ping ping(@RequestHeader final BigInteger user) throws Exception {
 		return notificationService.getPingValues(repository.one(Contact.class, user));
