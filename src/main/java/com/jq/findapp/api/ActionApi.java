@@ -702,9 +702,7 @@ public class ActionApi {
 		final QueryParams params = new QueryParams(Query.contact_maxAppVersion);
 		params.setSearch("contact.clientId=" + clientId);
 		final Result result = repository.list(params);
-		if (result.size() > 0)
-			return (String) result.get(0).get("_c"));
-		return "";
+		return result.size() > 0 ? (String) result.get(0).get("_c")) : "";
 	}
 
 	@GetMapping("ping")
