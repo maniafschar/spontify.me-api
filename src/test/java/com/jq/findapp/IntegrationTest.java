@@ -165,7 +165,7 @@ public class IntegrationTest {
 		Util.click("dialog-navigation item.search");
 		Util.click("search tabHeader tab[i=\"locations\"]");
 		Util.click("search tabBody div.locations button-text[onclick*=\"pageSearch\"]");
-		Util.click("search tabBody div.locations list-row:last-child");
+		Util.click("search tabBody div.locations list-row:first-child");
 		if (!Util.get("detail title").getText().contains("location 1"))
 			throw new RuntimeException("New location not in list!");
 		Util.get("detail input-rating[type=\"location\"][rating=\"80\"]");

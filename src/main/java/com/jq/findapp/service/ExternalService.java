@@ -103,7 +103,26 @@ public class ExternalService {
 
 	public List<GeoLocation> getLatLng(final String town) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_geoLocation);
-		params.setSearch("geoLocation.town like '%" + town + "%'");
+		if (town.contains("\n")) {
+			final String[] s = town.split("\n");
+			if (s[0].contains(" ")) {
+				final String s2 = s[0].trim();
+				params.setSearch("geoLocation.street like '%"
+						+ s2.substring(0, s2.lastIndexOf(" ")).trim()
+						+ "%' and geoLocation.number like '%"
+						+ s2.substring(s2.lastIndexOf(" ") + 1) + "%' and ");
+			} else
+				params.setSearch("geoLocation.street like '%" + s[0].trim() + "%' and ");
+			if (s[s.length - 1].contains(" ")) {
+				final String s2 = s[s.length - 1].trim();
+				params.setSearch(params.getSearch() + "geoLocation.zipCode like '%"
+						+ s2.substring(0, s2.indexOf(" "))
+						+ "%' and geoLocation.town like '%"
+						+ s2.substring(s2.indexOf(" ") + 1).trim() + "%'");
+			} else
+				params.setSearch(params.getSearch() + "geoLocation.town like '%" + s[s.length - 1].trim() + "%'");
+		} else
+			params.setSearch("geoLocation.town like '%" + town + "%'");
 		final Map<String, Object> persistedAddress = repository.one(params);
 		if (persistedAddress.get("_id") != null)
 			return Arrays.asList(repository.one(GeoLocation.class, (BigInteger) persistedAddress.get("_id")));

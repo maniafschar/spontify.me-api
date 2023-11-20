@@ -24,7 +24,8 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 	@Override
 	public void prePersist(final Location location)
 			throws JsonMappingException, JsonProcessingException, IllegalArgumentException {
-		lookupAddress(location);
+		if (location.getLatitude() == null || location.getLongitude() == null)
+			lookupAddress(location);
 		final QueryParams params = new QueryParams(Query.location_list);
 		params.setUser(repository.one(Contact.class, location.getContactId()));
 		params.setSearch(
@@ -42,7 +43,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 
 	@Override
 	public void preUpdate(final Location location) throws Exception {
-		if (location.old("address") != null)
+		if (location.old("address") != null && (location.getLatitude() == null || location.getLongitude() == null))
 			lookupAddress(location);
 	}
 
