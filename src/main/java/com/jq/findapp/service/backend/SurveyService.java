@@ -193,7 +193,7 @@ public class SurveyService {
 										.format(DateTimeFormatter.ofPattern("d.M.yyyy HH:mm"))
 								+ "</b>. Möchtest Du teilnehmen?");
 				poll.put("epilog",
-						"Lieben Dank für die Teilnahme!\n\nÜbrigens, Bayern Fans treffen sich neuerdings zum gemeinsam Spiele anschauen und feiern in dieser coolen, neuen App.\n\nKlicke auf weiter und auch Du kannst mit ein paar Klicks dabei sein.");
+						"Lieben Dank für die Teilnahme!\n\nLust auf mehr <b>Bayern Feeling</b>? In unserer neuen App bauen wir eine reine Bayern <b>Fan Community</b> auf.\n\nMit ein paar wenigen Klicks kannst auch Du dabei sein.");
 				poll.put("home", matchDay.findPath("home").get("logo").asText());
 				poll.put("away", matchDay.findPath("away").get("logo").asText());
 				poll.put("league", matchDay.findPath("league").get("logo").asText());
