@@ -44,7 +44,7 @@
 			},
 			"teams": {
 				"home": {
-					"id": 157,
+					"id": 0,
 					"name": "Bayern Munich",
 					"logo": "https://media-4.api-sports.io/football/teams/157.png",
 					"winner": null

@@ -158,9 +158,9 @@ public class SupportCenterApi {
 		repository.save(contact);
 	}
 
-	@PostMapping("survey/test/poll")
-	public BigInteger survey() throws Exception {
-		return surveyService.testPoll();
+	@PostMapping("survey/test/poll/{prediction}")
+	public BigInteger survey(@PathVariable final Boolean prediction) throws Exception {
+		return surveyService.testPoll(prediction);
 	}
 
 	@PostMapping("survey/test/result/{clientMarketingId}")

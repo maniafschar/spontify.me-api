@@ -273,7 +273,8 @@ public class Repository {
 
 		private static void resolve(final List<Object[]> list) {
 			for (int i = 0; i < list.get(0).length; i++) {
-				if (RESOLVABLE_COLUMNS.matcher((String) list.get(0)[i]).matches()) {
+				final String[] s = ((String) list.get(0)[i]).split("\\.");
+				if (s.length > 1 && RESOLVABLE_COLUMNS.matcher(s[1]).matches()) {
 					for (int i2 = 1; i2 < list.size(); i2++)
 						list.get(i2)[i] = resolve((String) list.get(i2)[i]);
 				}

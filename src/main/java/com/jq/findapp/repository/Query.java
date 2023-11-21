@@ -59,6 +59,7 @@ public enum Query {
 	misc_listMarketing,
 	misc_listMarketingResult,
 	misc_listNews,
+	misc_listStorage,
 	misc_listTicket,
 	misc_setting,
 	misc_statsApi,
