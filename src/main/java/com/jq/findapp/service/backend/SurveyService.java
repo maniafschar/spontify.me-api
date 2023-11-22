@@ -479,6 +479,21 @@ public class SurveyService {
 			repository.save(clientMarketingResult);
 			return clientMarketingResult;
 		}
+
+		private JsonNode getFixture(final int id) throws Exception {
+			final String label = "football-fixture-" + id;
+			final QueryParams params = new QueryParams(Query.misc_listStorage);
+			params.setSearch("storage.label='" + label + "'");
+			final Result result = repository.list(params);
+			if (result.size() > 0)
+				return new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
+			final JsonNode fixture = get("https://v3.football.api-sports.io/fixtures?id=" + id);
+			final Storage storage = new Storage();
+			storage.setLabel(label);
+			storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
+			repository.save(storage);
+			return fixture.get("response").get(0);
+		}
 	}
 
 	private class Image {
@@ -666,21 +681,6 @@ public class SurveyService {
 			send(repository.list(params), clientMarketing, ContactNotificationTextType.clientMarketingResult,
 					"contactMarketing.contactId");
 		}
-	}
-
-	private JsonNode getFixture(final int id) throws Exception {
-		final String label = "football-fixture-" + id;
-		final QueryParams params = new QueryParams(Query.misc_listStorage);
-		params.setSearch("storage.label='" + label + "'");
-		final Result result = repository.list(params);
-		if (result.size() > 0)
-			return new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
-		final JsonNode fixture = get("https://v3.football.api-sports.io/fixtures?id=" + id);
-		final Storage storage = new Storage();
-		storage.setLabel(label);
-		storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
-		repository.save(storage);
-		return fixture.get("response").get(0);
 	}
 
 	private void publish(final BigInteger clientId, final String message, final String link) throws Exception {
