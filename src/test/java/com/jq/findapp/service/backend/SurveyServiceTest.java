@@ -76,6 +76,6 @@ public class SurveyServiceTest {
 		final String result = surveyService.testResult(clientMarketingId);
 
 		// then
-		assertEquals("1\n", result);
+		assertEquals("1", result);
 	}
 }
