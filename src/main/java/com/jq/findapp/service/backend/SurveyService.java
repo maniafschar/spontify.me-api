@@ -396,6 +396,10 @@ public class SurveyService {
 			return null;
 		}
 
+		private String getLine(final int x, final String singular, final String plural) {
+			return "<br/>" + x + (x > 1 ? plural : singular);
+		}
+
 		private String resultAndNotify(final BigInteger clientId) throws Exception {
 			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 			params.setSearch("clientMarketingResult.published=false and clientMarketing.endDate<='" + Instant.now()
@@ -679,13 +683,9 @@ public class SurveyService {
 		return fixture.get("response").get(0);
 	}
 
-	private String getLine(final int x, final String singular, final String plural) {
-		return "<br/>" + x + (x > 1 ? plural : singular);
-	}
-
 	private void publish(final BigInteger clientId, final String message, final String link) throws Exception {
 		final Client client = repository.one(Client.class, clientId);
-		if (!Strings.isEmpty(client.getFbPageAccessToken())) {
+		if (!Strings.isEmpty(client.getFbPageAccessToken()) && !Strings.isEmpty(client.getFbPageId())) {
 			final Map<String, String> body = new HashMap<>();
 			body.put("message", message);
 			body.put("link", Strings.removeSubdomain(client.getUrl()) + link);
