@@ -59,8 +59,13 @@ import com.jq.findapp.util.Strings;
 
 @Service
 public class SurveyService {
-	private static final Map<BigInteger, Integer> clients = new HashMap<>();
-	private static final int width = 600, height = 315, padding = 20;
+	private final static Map<BigInteger, Integer> clients = new HashMap<>();
+	private final static AtomicLong lastRun = new AtomicLong(0);
+	private final static int FIRST_YEAR = 2010;
+	private final Synchonize synchronize = new Synchonize();
+	private final Image image = new Image();
+	private final Notification notification = new Notification();
+	public final Test test = new Test();
 
 	@Autowired
 	private Repository repository;
@@ -70,18 +75,6 @@ public class SurveyService {
 
 	@Value("${app.sports.api.token}")
 	private String token;
-
-	private static final AtomicLong lastRun = new AtomicLong(0);
-
-	private static final int FIRST_YEAR = 2010;
-
-	public final Test test = new Test();
-
-	private final Synchonize synchronize = new Synchonize();
-
-	private final Image image = new Image();
-
-	private final Notification notification = new Notification();
 
 	static {
 		clients.put(BigInteger.valueOf(4), 157);
@@ -215,7 +208,7 @@ public class SurveyService {
 							poll.put("city", json.get(i).findPath("fixture").get("venue").get("city").asText());
 							poll.put("location",
 									json.get(i).get("teams").get("home").get("id").asInt() == teamId ? "home" : "away");
-							return predictionCreateEntry(clientId, poll);
+							return predictionCreate(clientId, poll);
 						}
 						break;
 					}
@@ -224,7 +217,7 @@ public class SurveyService {
 			return null;
 		}
 	
-		private BigInteger predictionCreateEntry(final BigInteger clientId, final ObjectNode poll)
+		private BigInteger predictionCreate(final BigInteger clientId, final ObjectNode poll)
 				throws Exception {
 			final Instant end = Instant.ofEpochSecond(poll.get("timestamp").asLong())
 					.minus(Duration.ofDays(1).minus(Duration.ofHours(1)));
@@ -497,6 +490,8 @@ public class SurveyService {
 	}
 
 	private class Image {
+		private final int width = 600, height = 315, padding = 20;
+
 		private byte[] create(final JsonNode poll, final String subtitlePrefix, final String copyright,
 				final ClientMarketingResult clientMarketingResult) throws Exception {
 			final String urlLeague = poll.get("league").asText();
@@ -560,7 +555,24 @@ public class SurveyService {
 	
 		private void prediction(final Graphics2D g2, final Font customFont, final JsonNode poll)
 				throws Exception {
-			;
+			g2.setFont(customFont.deriveFont(12f));
+			final int h = g2.getFontMetrics().getHeight();
+			int y = padding, w = width / 4;
+			g2.setColor(new Color(0, 0, 0));
+			for (int i = 0; i < poll.get("matches").size(); i++) {
+				g2.drawString(poll.get("matches").get(i).asText(), width / 2 + padding, y + h);
+				y += 2.3 * padding;
+			}
+			for (int i = 0; i < poll.get("statistics").size(); i++) {
+				g2.setColor(new Color(255, 100, 0, 50));
+				g2.fillRect(w - poll.get("statistics").get(i).get("home").asDouble() * w, y, w, h * 2);
+				g2.setColor(new Color(0, 100, 255, 50));
+				g2.fillRect(w, y, w + poll.get("statistics").get(i).get("home").asDouble() * w, h * 2);
+				g2.setColor(new Color(0, 0, 0));
+				final String s = poll.get("statistics").get(i).get("label").asText();
+				g2.drawString(s, width / 4 - g2.getFontMetrics().stringWidth(s) / 2, y + h);
+				y += 2.3 * padding;
+			}
 		}
 	
 		private void result(final Graphics2D g2, final Font customFont, JsonNode poll, JsonNode result)
