@@ -158,14 +158,13 @@ public class SupportCenterApi {
 		repository.save(contact);
 	}
 
-	@PostMapping("survey/test/poll/{prediction}")
-	public BigInteger survey(@PathVariable final Boolean prediction) throws Exception {
-		return surveyService.testPoll(prediction);
-	}
-
-	@PostMapping("survey/test/result/{clientMarketingId}")
-	public void survey(@PathVariable final BigInteger clientMarketingId) throws Exception {
-		surveyService.testResult(clientMarketingId);
+	@PostMapping("survey/test/{type}")
+	public BigInteger survey(@PathVariable final String type) throws Exception {
+		if ("prediction".equals(type)
+			return surveyService.test.poll(true);
+		if ("poll".equals(type)
+			return surveyService.test.poll(false);
+		return surveyService.test.result(BigInteger.valueOf(type));
 	}
 
 	@GetMapping("metrics")
