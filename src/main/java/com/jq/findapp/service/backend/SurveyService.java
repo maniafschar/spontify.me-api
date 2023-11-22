@@ -200,6 +200,8 @@ public class SurveyService {
 							final ObjectNode poll = new ObjectMapper().createObjectNode();
 							poll.put("home", json.get(i).get("teams").get("home").get("logo").asText());
 							poll.put("away", json.get(i).get("teams").get("away").get("logo").asText());
+							poll.put("homeName", json.get(i).get("teams").get("home").get("name").asText());
+							poll.put("awayName", json.get(i).get("teams").get("away").get("name").asText());
 							poll.put("homeId", json.get(i).get("teams").get("home").get("id").asInt());
 							poll.put("awayId", json.get(i).get("teams").get("away").get("id").asInt());
 							poll.put("league", json.get(i).get("league").get("logo").asText());
@@ -294,7 +296,8 @@ public class SurveyService {
 					image.create(poll, "Prognose", repository.one(Client.class, clientId).getName(), null)));
 			repository.save(clientMarketing);
 			notification.sendPoll(clientMarketing);
-			publish(clientId, "Umfrage Prognose des Spiels",
+			publish(clientId, "Umfrage Prognose des Spiels " + poll.get("homeName").asText() + " - " + poll.get("awayName").asText()
+				+ " vom " + formatDate(poll.get("timestamp").asLong()),
 					"/rest/action/marketing/init/" + clientMarketing.getId());
 			System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(poll));
 			return clientMarketing.getId();
@@ -332,6 +335,8 @@ public class SurveyService {
 							"Lieben Dank für die Teilnahme!\n\nLust auf mehr <b>Bayern Feeling</b>? In unserer neuen App bauen wir eine reine Bayern <b>Fan Community</b> auf.\n\nMit ein paar wenigen Klicks kannst auch Du dabei sein.");
 					poll.put("home", matchDay.findPath("home").get("logo").asText());
 					poll.put("away", matchDay.findPath("away").get("logo").asText());
+					poll.put("homeName", matchDay.findPath("home").get("name").asText());
+					poll.put("awayName", matchDay.findPath("away").get("name").asText());
 					poll.put("league", matchDay.findPath("league").get("logo").asText());
 					poll.put("timestamp", matchDay.findPath("fixture").get("timestamp").asLong());
 					poll.put("venue", matchDay.findPath("fixture").get("venue").get("name").asText());
@@ -381,7 +386,8 @@ public class SurveyService {
 							image.create(poll, "Spieler", repository.one(Client.class, clientId).getName(), null)));
 					repository.save(clientMarketing);
 					notification.sendPoll(clientMarketing);
-					publish(clientId, "Umfrage Spieler des Spiels",
+					publish(clientId, "Umfrage Spieler des Spiels " + poll.get("homeName").asText() + " - " + poll.get("awayName").asText()
+						+ " vom " + formatDate(poll.get("timestamp").asLong()),
 							"/rest/action/marketing/init/" + clientMarketing.getId());
 				}
 				return (BigInteger) list.get(0).get("clientMarketing.id");
@@ -402,18 +408,16 @@ public class SurveyService {
 			for (int i = 0; i < list.size(); i++) {
 				final ClientMarketingResult clientMarketingResult = result(
 						(BigInteger) list.get(0).get("clientMarketing.id"));
+				final JsonNode poll = new ObjectMapper().readTree(Attachment.resolve(
+					repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId()).getStorage()))
 				clientMarketingResult.setImage(Attachment.createImage(".png",
-						image.create(
-								new ObjectMapper().readTree(
-										Attachment.resolve(repository
-												.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId())
-												.getStorage())),
-								"Spieler", repository.one(Client.class, clientId).getName(), clientMarketingResult)));
+						image.create(poll, "Spieler", repository.one(Client.class, clientId).getName(), clientMarketingResult)));
 				clientMarketingResult.setPublished(true);
 				repository.save(clientMarketingResult);
 				notification.sendResult(
 						repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId()));
-				publish(clientId, "Ergebnis der Umfrage Spieler des Spiels",
+				publish(clientId, "Ergebnis der Umfrage Spieler des Spiels " + poll.get("homeName").asText() + " - " + poll.get("awayName").asText()
+					+ " vom " + formatDate(poll.get("timestamp").asLong()),
 						"/rest/action/marketing/result/" + clientMarketingResult.getClientMarketingId());
 				result += clientMarketingResult.getId() + " ";
 			}
