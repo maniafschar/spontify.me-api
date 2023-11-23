@@ -319,7 +319,7 @@ public class SurveyService {
 					added += s + "|";
 				}
 				((ArrayNode) poll.get("matches"))
-						.add(s + " am " + formatDate(matches.get(i).get("timestamp").asLong()));
+						.add(s + "|" + formatDate(matches.get(i).get("timestamp").asLong()));
 			}
 			final ArrayNode statistics = om.createArrayNode();
 			for (int i = 0; i < labels.size(); i++) {
@@ -603,8 +603,9 @@ public class SurveyService {
 			final double w = width * 0.3, delta = 1.6;
 			g2.setColor(new Color(0, 0, 0));
 			for (int i = 0; i < poll.get("matches").size() && i < 8; i++) {
-				final String s = poll.get("matches").get(poll.get("matches").size() - i - 1).asText();
-				g2.drawString(s, width - padding - g2.getFontMetrics().stringWidth(s), y + h);
+				final String[] s = poll.get("matches").get(poll.get("matches").size() - i - 1).asText().split("|");
+				g2.drawString(s[0], width - padding - 150 - g2.getFontMetrics().stringWidth(s[0]) / 2, y + h);
+				g2.drawString(s[1], width - padding - g2.getFontMetrics().stringWidth(s[1]), y + h);
 				y += delta * padding;
 			}
 			y = padding;
@@ -615,6 +616,16 @@ public class SurveyService {
 					max = Math.max(max, poll.get("statistics").get(i).get("away").asDouble());
 				}
 			}
+			final Map<String, String> labels = new HashMap<>();
+			labels.put("Shots on Goal", "Schüsse auf das Tor");
+			labels.put("Shots off Goal", "Schüsse neben das Tor");
+			labels.put("Total Shots", "Schüsse insgesamt");
+			labels.put("Blocked Shots", "Geblockte Schüsse");
+			labels.put("Shots insidebox", "Schüsse innerhalb des 16er");
+			labels.put("Shots outsidebox", "Schüsse außerhalb des 16er");
+			labels.put("Fouls", "Fouls");
+			labels.put("Corner Kicks", "Ecken");
+			labels.put("Offsides", "Abseits");
 			for (int i = 0; i < poll.get("statistics").size() && i < 9; i++) {
 				final double w2 = poll.get("statistics").get(i).get("home").asDouble() / max * w;
 				g2.setColor(new Color(255, 100, 0, 50));
@@ -625,6 +636,8 @@ public class SurveyService {
 						h * 2);
 				g2.setColor(new Color(0, 0, 0));
 				String s = poll.get("statistics").get(i).get("label").asText();
+				if (labels.containsKey(s))
+					s = labels.get(s);
 				g2.drawString(s, padding + (int) w - g2.getFontMetrics().stringWidth(s) / 2, y + h);
 				s = poll.get("statistics").get(i).get("home").asText();
 				g2.drawString(s, padding + (int) w / 2 - g2.getFontMetrics().stringWidth(s), y + h);
@@ -782,12 +795,12 @@ public class SurveyService {
 	}
 
 	protected JsonNode get(final String url) throws Exception {
-		if (url.contains("?team=0&"))
+		if (url.contains("team=0&"))
 			return new ObjectMapper().readTree(IOUtils
 					.toString(getClass().getResourceAsStream("/surveyMatchdaysOne.json"),
 							StandardCharsets.UTF_8)
 					.replace("\"{date}\"", "" + (Instant.now().getEpochSecond() - 60 * 60 * 2 - 5)));
-		if (url.endsWith("?id=0"))
+		if (url.equals("id=0"))
 			return new ObjectMapper().readTree(getClass().getResourceAsStream("/surveyLastMatch.json"));
 		final String label = "football-fixture-" + url;
 		final QueryParams params = new QueryParams(Query.misc_listStorage);
