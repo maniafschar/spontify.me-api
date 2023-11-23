@@ -1,8 +1,6 @@
 package com.jq.findapp.api;
 
-import java.io.IOException;
 import java.math.BigInteger;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
@@ -40,7 +38,6 @@ import com.jq.findapp.api.model.Position;
 import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketing;
-import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.ContactGeoLocationHistory;

@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -127,7 +128,8 @@ public class TestConfig {
 				return new ObjectMapper().readTree(IOUtils.toString(
 						getClass().getResourceAsStream(
 								url.contains("?id=") ? "/surveyLastMatch.json" : "/surveyMatchdays.json"),
-						StandardCharsets.UTF_8));
+						StandardCharsets.UTF_8)
+						.replace("\"{date}\"", "" + (long) (Instant.now().toEpochMilli() / 1000)));
 			} catch (final Exception e) {
 				throw new RuntimeException(e);
 			}

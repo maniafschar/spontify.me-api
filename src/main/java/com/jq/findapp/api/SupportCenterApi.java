@@ -159,12 +159,12 @@ public class SupportCenterApi {
 	}
 
 	@PostMapping("survey/test/{type}")
-	public BigInteger survey(@PathVariable final String type) throws Exception {
-		if ("prediction".equals(type)
+	public Object survey(@PathVariable final String type) throws Exception {
+		if ("prediction".equals(type))
 			return surveyService.test.poll(true);
-		if ("poll".equals(type)
+		if ("poll".equals(type))
 			return surveyService.test.poll(false);
-		return surveyService.test.result(BigInteger.valueOf(type));
+		return surveyService.test.result(new BigInteger(type));
 	}
 
 	@GetMapping("metrics")

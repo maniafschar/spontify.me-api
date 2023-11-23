@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.math.BigInteger;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
@@ -39,6 +41,8 @@ public class SurveyServiceTest {
 		// given
 		utils.createContact(BigInteger.valueOf(4));
 		SchedulerResult result = surveyService.update();
+		assertNull(result.exception);
+		assertEquals("Matchdays: 7", result.result);
 
 		// when
 		result = surveyService.update();
@@ -52,10 +56,10 @@ public class SurveyServiceTest {
 	public void testPollPlayerOfTheMatch() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
-		final BigInteger clientMarketingId = surveyService.testPoll(false);
+		final BigInteger clientMarketingId = surveyService.test.poll(false);
 
 		// when
-		final String result = surveyService.testResult(clientMarketingId);
+		final String result = surveyService.test.result(clientMarketingId);
 
 		// then
 		assertEquals("1", result);
@@ -65,15 +69,28 @@ public class SurveyServiceTest {
 	public void testPollPrediction() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
-		final Storage storage = new Storage();
+		final String s = new ObjectMapper()
+				.writeValueAsString(surveyService.get("https://v3.football.api-sports.io/fixtures?team=0&"));
+		Storage storage = new Storage();
 		storage.setLabel("football-0-" + LocalDateTime.now().getYear());
-		storage.setStorage(new ObjectMapper()
-				.writeValueAsString(surveyService.get("https://v3.football.api-sports.io/fixtures?team=0&")));
+		storage.setStorage(s);
 		repository.save(storage);
-		final BigInteger clientMarketingId = surveyService.testPoll(true);
+		storage = new Storage();
+		storage.setLabel("football-0-" + (LocalDateTime.now().getYear() - 1));
+		storage.setStorage(s.replace("\"NS\"", "\"FT\"")
+				.replaceAll("\"timestamp\": \"(\\d*)\",",
+						"" + (Instant.now().minus(Duration.ofDays(280)).toEpochMilli() / 1000)));
+		repository.save(storage);
+		storage = new Storage();
+		storage.setLabel("football-0-" + (LocalDateTime.now().getYear() - 2));
+		storage.setStorage(s.replace("\"NS\"", "\"FT\"")
+				.replaceAll("\"timestamp\": \"(\\d*)\",",
+						"" + (Instant.now().minus(Duration.ofDays(720)).toEpochMilli() / 1000)));
+		repository.save(storage);
+		final BigInteger clientMarketingId = surveyService.test.poll(true);
 
 		// when
-		final String result = surveyService.testResult(clientMarketingId);
+		final String result = surveyService.test.result(clientMarketingId);
 
 		// then
 		assertEquals("1", result);

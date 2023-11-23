@@ -13,12 +13,12 @@ public class ContactMarketingListener extends AbstractRepositoryListener<Contact
 
 	@Override
 	public void postPersist(final ContactMarketing contactMarketing) throws Exception {
-		surveyService.updateResult(contactMarketing.getClientMarketingId());
+		surveyService.synchronizeResult(contactMarketing.getClientMarketingId());
 	}
 
 	@Override
 	public void postUpdate(final ContactMarketing contactMarketing) throws Exception {
-		surveyService.updateResult(contactMarketing.getClientMarketingId());
+		surveyService.synchronizeResult(contactMarketing.getClientMarketingId());
 	}
 
 }
