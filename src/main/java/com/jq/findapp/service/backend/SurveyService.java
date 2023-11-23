@@ -119,7 +119,7 @@ public class SurveyService {
 					final Storage storage = new Storage();
 					storage.setLabel("football-" + teamId + "-" + LocalDateTime.now().getYear());
 					storage.setStorage(new ObjectMapper().writeValueAsString(
-							get("https://v3.football.api-sports.io/fixtures?team=" + teamId + "&")));
+							get("team=" + teamId + "&")));
 					repository.save(storage);
 				}
 				return synchronize.prediction(BigInteger.ONE, teamId);
@@ -176,10 +176,8 @@ public class SurveyService {
 					"clientMarketing.startDate>'" + Instant.now() + "' and clientMarketing.clientId=" + clientId +
 							" and clientMarketing.storage not like '%" + Attachment.SEPARATOR + "%'");
 			if (repository.list(params).size() == 0) {
-				JsonNode matchDays = get("https://v3.football.api-sports.io/fixtures?team=" + teamId + "&season="
-						+ LocalDateTime.now().getYear());
+				final JsonNode matchDays = get("team=" + teamId + "&season=" + LocalDateTime.now().getYear());
 				if (matchDays != null) {
-					matchDays = matchDays.get("response");
 					for (int i = 0; i < matchDays.size(); i++) {
 						if ("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())) {
 							final ClientMarketing clientMarketing = new ClientMarketing();
@@ -281,7 +279,7 @@ public class SurveyService {
 								&& json.get(i2).get("teams").get("away").get("id").asInt() == poll.get("awayId")
 										.asInt()
 								&& "FT".equals(json.get(i2).get("fixture").get("status").get("short").asText())) {
-							final JsonNode fixture = getFixture(json.get(i2).get("fixture").get("id").asInt());
+							final JsonNode fixture = get("id=" + json.get(i2).get("fixture").get("id").asInt());
 							if (fixture.has("statistics") && fixture.get("statistics").size() > 1
 									&& fixture.get("statistics").get(0).has("statistics")) {
 								final ObjectNode match = om.createObjectNode();
@@ -363,10 +361,8 @@ public class SurveyService {
 							" and clientMarketing.storage not like '%" + Attachment.SEPARATOR + "%'");
 			final Result list = repository.list(params);
 			if (list.size() > 0) {
-				JsonNode matchDay = get("https://v3.football.api-sports.io/fixtures?id="
-						+ list.get(0).get("clientMarketing.storage"));
+				final JsonNode matchDay = get("id=" + list.get(0).get("clientMarketing.storage"));
 				if (matchDay != null) {
-					matchDay = matchDay.get("response");
 					JsonNode e = matchDay.findPath("players");
 					e = e.get(e.get(0).get("team").get("id").asInt() == teamId ? 0 : 1).get("players");
 					final ObjectNode poll = new ObjectMapper().createObjectNode();
@@ -534,24 +530,6 @@ public class SurveyService {
 			clientMarketingResult.setStorage(om.writeValueAsString(json));
 			repository.save(clientMarketingResult);
 			return clientMarketingResult;
-		}
-
-		private JsonNode getFixture(final int id) throws Exception {
-			final String label = "football-fixture-" + id;
-			final QueryParams params = new QueryParams(Query.misc_listStorage);
-			params.setSearch("storage.label='" + label + "'");
-			final Result result = repository.list(params);
-			final JsonNode fixture;
-			if (result.size() > 0)
-				fixture = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
-			else {
-				fixture = get("https://v3.football.api-sports.io/fixtures?id=" + id);
-				final Storage storage = new Storage();
-				storage.setLabel(label);
-				storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
-				repository.save(storage);
-			}
-			return fixture.get("response").get(0);
 		}
 	}
 
@@ -814,12 +792,26 @@ public class SurveyService {
 					.replace("\"{date}\"", "" + (Instant.now().getEpochSecond() - 60 * 60 * 2 - 5)));
 		if (url.endsWith("?id=0"))
 			return new ObjectMapper().readTree(getClass().getResourceAsStream("/surveyLastMatch.json"));
-		return WebClient
-				.create(url)
-				.get()
-				.header("x-rapidapi-key", token)
-				.header("x-rapidapi-host", "v3.football.api-sports.io")
-				.retrieve()
-				.toEntity(JsonNode.class).block().getBody();
+		final String label = "football-fixture-" + url;
+		final QueryParams params = new QueryParams(Query.misc_listStorage);
+		params.setSearch("storage.label='" + label + "'");
+		final Result result = repository.list(params);
+		final JsonNode fixture;
+		if (result.size() > 0)
+			fixture = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
+		else {
+			fixture = WebClient
+					.create("https://v3.football.api-sports.io/fixtures?" + url)
+					.get()
+					.header("x-rapidapi-key", token)
+					.header("x-rapidapi-host", "v3.football.api-sports.io")
+					.retrieve()
+					.toEntity(JsonNode.class).block().getBody();
+			final Storage storage = new Storage();
+			storage.setLabel(label);
+			storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
+			repository.save(storage);
+		}
+		return fixture.get("response").get(0);
 	}
 }
