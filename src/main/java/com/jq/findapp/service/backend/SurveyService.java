@@ -246,14 +246,14 @@ public class SurveyService {
 								clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
 								clientMarketing.setMode(ClientMarketingMode.Live);
 								clientMarketing.setImage(Attachment.createImage(".png",
-										image.create(poll, "Prognose", repository.one(Client.class, clientId).getName(),
+										image.create(poll, "Ergebnistipps", repository.one(Client.class, clientId).getName(),
 												null)));
 								repository.save(clientMarketing);
 								notification.sendPoll(clientMarketing);
 								publish(clientId,
-										"Umfrage Prognose des Spiels " + poll.get("homeName").asText() + " - "
+										"Ergebnistipps für das Spiels " + poll.get("homeName").asText() + " - "
 												+ poll.get("awayName").asText()
-												+ " vom " + formatDate(poll.get("timestamp").asLong()),
+												+ " am " + formatDate(poll.get("timestamp").asLong()),
 										"/rest/action/marketing/init/" + clientMarketing.getId());
 								return clientMarketing.getId();
 							}
@@ -340,7 +340,7 @@ public class SurveyService {
 			question.put("textField", true);
 			poll.set("questions", questions);
 			poll.put("prolog",
-					"Umfrage <b>Prognose</b> zum "
+					"<b>Ergebnistipps</b> zum "
 							+ poll.get("leagueName").asText() +
 							" Spiel<div style=\"padding:1em 0;font-weight:bold;\">"
 							+ poll.get("homeName").asText()
