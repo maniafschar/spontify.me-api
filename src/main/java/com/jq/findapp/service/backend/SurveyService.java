@@ -216,8 +216,8 @@ public class SurveyService {
 							final ObjectNode poll = new ObjectMapper().createObjectNode();
 							poll.put("home", json.get(i).get("teams").get("home").get("logo").asText());
 							poll.put("away", json.get(i).get("teams").get("away").get("logo").asText());
-							poll.put("homeName", json.get(i).get("teams").get("home").get("name").asText());
-							poll.put("awayName", json.get(i).get("teams").get("away").get("name").asText());
+							poll.put("homeName", json.get(i).get("teams").get("home").get("name").asText().replace("Munich", "München"));
+							poll.put("awayName", json.get(i).get("teams").get("away").get("name").asText().replace("Munich", "München"));
 							poll.put("homeId", json.get(i).get("teams").get("home").get("id").asInt());
 							poll.put("awayId", json.get(i).get("teams").get("away").get("id").asInt());
 							poll.put("league", json.get(i).get("league").get("logo").asText());
@@ -366,31 +366,28 @@ public class SurveyService {
 					JsonNode e = matchDay.findPath("players");
 					e = e.get(e.get(0).get("team").get("id").asInt() == teamId ? 0 : 1).get("players");
 					final ObjectNode poll = new ObjectMapper().createObjectNode();
-					poll.put("prolog",
-							"Umfrage <b>Spieler des Spiels</b> zum "
-									+ matchDay.findPath("league").get("name").asText() +
-									" Spiel<div style=\"padding:1em 0;font-weight:bold;\">"
-									+ matchDay
-											.findPath("teams").get("home").get("name").asText()
-											.replace("Munich", "München")
-									+ " - "
-									+ matchDay.findPath("teams").get("away").get("name").asText().replace("Munich",
-											"München")
-									+ "</div>vom <b>"
-									+ formatDate(matchDay.findPath("fixture").get("timestamp").asLong())
-									+ "</b>. Möchtest Du teilnehmen?");
-					poll.put("epilog",
-							"Lieben Dank für die Teilnahme!\n\nLust auf mehr <b>Bayern Feeling</b>? In unserer neuen App bauen wir eine reine Bayern <b>Fan Community</b> auf.\n\nMit ein paar wenigen Klicks kannst auch Du dabei sein.");
 					poll.put("home", matchDay.findPath("home").get("logo").asText());
 					poll.put("away", matchDay.findPath("away").get("logo").asText());
-					poll.put("homeName", matchDay.findPath("home").get("name").asText());
-					poll.put("awayName", matchDay.findPath("away").get("name").asText());
+					poll.put("homeName", matchDay.findPath("home").get("name").asText().replace("Munich", "München"));
+					poll.put("awayName", matchDay.findPath("away").get("name").asText().replace("Munich", "München"));
 					poll.put("league", matchDay.findPath("league").get("logo").asText());
 					poll.put("timestamp", matchDay.findPath("fixture").get("timestamp").asLong());
 					poll.put("venue", matchDay.findPath("fixture").get("venue").get("name").asText());
 					poll.put("city", matchDay.findPath("fixture").get("venue").get("city").asText());
 					poll.put("location",
 							matchDay.findPath("teams").get("home").get("id").asInt() == teamId ? "home" : "away");
+					poll.put("prolog",
+							"Umfrage <b>Spieler des Spiels</b> zum "
+									+ matchDay.findPath("league").get("name").asText() +
+									" Spiel<div style=\"padding:1em 0;font-weight:bold;\">"
+									+ poll.put("homeName").asText()
+									+ " - "
+									+ poll.get("awayName").asText()
+									+ "</div>vom <b>"
+									+ formatDate(matchDay.findPath("fixture").get("timestamp").asLong())
+									+ "</b>. Möchtest Du teilnehmen?");
+					poll.put("epilog",
+							"Lieben Dank für die Teilnahme!\n\nLust auf mehr <b>Bayern Feeling</b>? In unserer neuen App bauen wir eine reine Bayern <b>Fan Community</b> auf.\n\nMit ein paar wenigen Klicks kannst auch Du dabei sein.");
 					final ObjectNode question = poll.putArray("questions").addObject();
 					question.put("question", "Wer war für Dich Spieler des Spiels?");
 					final ArrayNode answers = question.putArray("answers");
