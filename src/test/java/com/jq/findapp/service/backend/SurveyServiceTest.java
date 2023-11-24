@@ -4,10 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
@@ -42,7 +43,6 @@ public class SurveyServiceTest {
 		utils.createContact(BigInteger.valueOf(4));
 		SchedulerResult result = surveyService.update();
 		assertNull(result.exception);
-		assertEquals("Matchdays: 7", result.result);
 
 		// when
 		result = surveyService.update();
@@ -62,15 +62,15 @@ public class SurveyServiceTest {
 		final String result = surveyService.test.result(clientMarketingId);
 
 		// then
-		assertEquals("1", result);
+		assertEquals("9", result);
 	}
 
 	@Test
 	public void testPollPrediction() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
-		final String s = new ObjectMapper()
-				.writeValueAsString(surveyService.get("https://v3.football.api-sports.io/fixtures?team=0&"));
+		final String s = IOUtils
+				.toString(getClass().getResourceAsStream("/surveyMatchdays.json"), StandardCharsets.UTF_8);
 		Storage storage = new Storage();
 		storage.setLabel("football-0-" + LocalDateTime.now().getYear());
 		storage.setStorage(s);

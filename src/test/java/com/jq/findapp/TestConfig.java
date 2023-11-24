@@ -123,13 +123,19 @@ public class TestConfig {
 		@Override
 		protected JsonNode get(final String url) {
 			try {
-				if (url.contains("?team=0&"))
-					return super.get(url);
+				if (url.contains("id="))
+					return new ObjectMapper().readTree(IOUtils.toString(
+							getClass().getResourceAsStream(
+									"/surveyLastMatch.json"),
+							StandardCharsets.UTF_8)
+							.replace("\"{date}\"", "" + (long) (Instant.now().getEpochSecond() - 2 * 60 * 60)))
+							.get("response");
 				return new ObjectMapper().readTree(IOUtils.toString(
 						getClass().getResourceAsStream(
-								url.contains("?id=") ? "/surveyLastMatch.json" : "/surveyMatchdays.json"),
+								"/surveyMatchdays.json"),
 						StandardCharsets.UTF_8)
-						.replace("\"{date}\"", "" + (long) (Instant.now().toEpochMilli() / 1000)));
+						.replace("\"{date}\"", "" + (long) (Instant.now().getEpochSecond() - 2 * 60 * 60)))
+						.get("response");
 			} catch (final Exception e) {
 				throw new RuntimeException(e);
 			}
