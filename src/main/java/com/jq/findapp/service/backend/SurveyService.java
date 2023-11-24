@@ -212,7 +212,7 @@ public class SurveyService {
 					if ("NS".equals(json.get(i).get("fixture").get("status").get("short").asText())) {
 						final Instant date = Instant
 								.ofEpochSecond(json.get(i).get("fixture").get("timestamp").asLong());
-						if (date.minus(Duration.ofDays(1)).minus(Duration.ofHours(12)).isBefore(Instant.now())) {
+						if (date.minus(Duration.ofDays(1))).isBefore(Instant.now())) {
 							final ObjectNode poll = new ObjectMapper().createObjectNode();
 							poll.put("home", json.get(i).get("teams").get("home").get("logo").asText());
 							poll.put("away", json.get(i).get("teams").get("away").get("logo").asText());
@@ -227,19 +227,16 @@ public class SurveyService {
 							poll.put("city", json.get(i).findPath("fixture").get("venue").get("city").asText());
 							poll.put("location",
 									json.get(i).get("teams").get("home").get("id").asInt() == teamId ? "home" : "away");
-							final Instant end = Instant.ofEpochSecond(poll.get("timestamp").asLong())
-									.minus(Duration.ofHours(1));
+							final Instant end = Instant.ofEpochSecond(poll.get("timestamp").asLong()));
 							params.setQuery(Query.misc_listMarketing);
-							params.setSearch(
-									"clientMarketing.endDate='" + end.toString() + "' and clientMarketing.clientId="
-											+ clientId);
+							params.setSearch("clientMarketing.endDate='" + end.toString()
+									 + "' and clientMarketing.clientId=" + clientId);
 							if (repository.list(params).size() == 0) {
 								predictionAddStatistics(clientId, poll);
 								final ClientMarketing clientMarketing = new ClientMarketing();
 								clientMarketing.setClientId(clientId);
-								clientMarketing
-										.setStartDate(new Timestamp(end
-												.minus(Duration.ofDays(1)).minus(Duration.ofHours(12)).toEpochMilli()));
+								clientMarketing.setStartDate(new Timestamp(end
+												.minus(Duration.ofDays(1))).toEpochMilli()));
 								clientMarketing.setEndDate(new Timestamp(end.toEpochMilli()));
 								clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
 								clientMarketing.setMode(ClientMarketingMode.Live);
