@@ -272,6 +272,8 @@ public class SurveyService {
 							match.set("goals", fixture.get("goals"));
 							match.set("statistics", fixture.get("statistics"));
 							matches.add(match);
+							if (matches.size() > 7)
+								break;
 						}
 					}
 				}
@@ -312,6 +314,13 @@ public class SurveyService {
 				row.put("away", awayList.get(labels.get(i)) / matches.size());
 				row.put("label", labels.get(i));
 				statistics.add(row);
+			}
+			String tips = "1 : 1|2 : 1|1 : 0|2 : 0|0 : 0|2 : 2|3 : 1|0 : 1|1 : 2";
+			for (int i = answers.size(); i < 8; i++) {
+				final String s = tips.substring(0, tips.indexOf('|'));
+				tips = tips.substring(tips.indexOf('|') + 1);
+				if (!added.contains("|" + s + "|"))
+					answers.addObject().put("answer", s);
 			}
 			poll.set("statistics", statistics);
 			answers.addObject().put("answer", "Oder erzielen wir ein anderes Ergebnis?");
@@ -476,33 +485,30 @@ public class SurveyService {
 			json.put("finished", 0);
 			for (int i2 = 0; i2 < result.size(); i2++) {
 				final String answers = (String) result.get(i2).get("contactMarketing.storage");
-				if (answers != null && answers.length() > 2)
+				if (answers != null && answers.length() > 2) {
+					json.put("finished", json.get("finished").asInt() + 1);
 					om.readTree(answers).fields()
 							.forEachRemaining(e -> {
-								if ("finished".equals(e.getKey())) {
-									if (e.getValue().asBoolean())
-										json.put("finished", json.get("finished").asInt() + 1);
-								} else {
-									if (!json.has(e.getKey())) {
-										json.set(e.getKey(), om.createObjectNode());
-										((ObjectNode) json.get(e.getKey())).set("a", om.createArrayNode());
-									}
-									for (int i = 0; i < e.getValue().get("a").size(); i++) {
-										final int index = e.getValue().get("a").get(i).asInt();
-										final ArrayNode a = ((ArrayNode) json.get(e.getKey()).get("a"));
-										for (int i3 = a.size(); i3 <= index; i3++)
-											a.add(0);
-										a.set(index, a.get(index).asInt() + 1);
-									}
-									if (e.getValue().has("t") && !Strings.isEmpty(e.getValue().get("t").asText())) {
-										final ObjectNode o = (ObjectNode) json.get(e.getKey());
-										if (!o.has("t"))
-											o.put("t", "");
-										o.put("t", o.get("t").asText() +
-												"<div>" + e.getValue().get("t").asText() + "</div>");
-									}
+								if (!json.has(e.getKey())) {
+									json.set(e.getKey(), om.createObjectNode());
+									((ObjectNode) json.get(e.getKey())).set("a", om.createArrayNode());
+								}
+								for (int i = 0; i < e.getValue().get("a").size(); i++) {
+									final int index = e.getValue().get("a").get(i).asInt();
+									final ArrayNode a = ((ArrayNode) json.get(e.getKey()).get("a"));
+									for (int i3 = a.size(); i3 <= index; i3++)
+										a.add(0);
+									a.set(index, a.get(index).asInt() + 1);
+								}
+								if (e.getValue().has("t") && !Strings.isEmpty(e.getValue().get("t").asText())) {
+									final ObjectNode o = (ObjectNode) json.get(e.getKey());
+									if (!o.has("t"))
+										o.put("t", "");
+									o.put("t", o.get("t").asText() +
+											"<div>" + e.getValue().get("t").asText() + "</div>");
 								}
 							});
+				}
 			}
 			clientMarketingResult.setStorage(om.writeValueAsString(json));
 			repository.save(clientMarketingResult);
@@ -559,7 +565,7 @@ public class SurveyService {
 			if (clientMarketingResult != null)
 				result(g2, customFont, poll,
 						new ObjectMapper().readTree(Attachment.resolve(clientMarketingResult.getStorage())));
-			else if (poll.has("homeId"))
+			else if ("prediction".equals(poll.get("type").asText()))
 				prediction(g2, customFont, poll);
 			// final BufferedImageTranscoder imageTranscoder = new
 			// BufferedImageTranscoder();
@@ -590,18 +596,20 @@ public class SurveyService {
 			}
 			y = padding;
 			if (poll.get("statistics").size() == 0) {
-				String s = "Unser erstes Spiel gegen";
+				g2.setFont(customFont.deriveFont(24f));
+				final double pad = g2.getFontMetrics().getHeight() * 1.8;
+				String s = "Unser erstes Spiel seit langem gegen";
+				y += pad;
 				g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, y + h);
 				s = poll.get("home".equals(poll.get("location").asText()) ? "awayName"
-						: "homeName")
-						.asText();
-				y += padding;
+						: "homeName").asText();
+				y += pad;
 				g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, y + h);
 				s = "in " + poll.get("city").asText() + " · " + poll.get("venue").asText();
-				y += padding;
+				y += pad;
 				g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, y + h);
-				s = "Wie geht das Spiel aus?";
-				y += padding;
+				s = "Was meinst Du, wie geht das Spiel aus?";
+				y += pad;
 				g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, y + h);
 			} else {
 				double max = 0;

@@ -96,4 +96,17 @@ public class SurveyServiceTest {
 		// then
 		assertEquals("1", result);
 	}
+
+	@Test
+	public void testPollPrediction_withoutHistory() throws Exception {
+		// given
+		utils.createContact(BigInteger.ONE);
+		final BigInteger clientMarketingId = surveyService.test.poll(true);
+
+		// when
+		final String result = surveyService.test.result(clientMarketingId);
+
+		// then
+		assertEquals("1", result);
+	}
 }
