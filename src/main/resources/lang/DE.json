@@ -41,6 +41,8 @@
 		"chatNew": "<jq:EXTRA_1 />",
 		"chatSeen": "hat Deine Chatnachricht gelesen.",
 		"clientMarketing": "Umfrage Spieler des Spiels",
+		"clientMarketingPlayerOfTheMatch": "Umfrage Spieler des Spiels für das Spiel gegen <jq:EXTRA_1 />",
+		"clientMarketingPrediction": "Umfrage Ergebnistipps für das Spiel gegen <jq:EXTRA_1 />",
 		"clientMarketingResult": "Ergebnis der Umfrage",
 		"clientNews": "neuer Artikel: <jq:EXTRA_1 />",
 		"contactBirthday": "wird heute <jq:EXTRA_1 /> Jahre jung.",

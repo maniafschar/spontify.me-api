@@ -30,6 +30,8 @@ public class ContactNotification extends BaseEntity {
 		chatNew,
 		chatSeen,
 		clientMarketing,
+		clientMarketingPlayerOfTheMatch,
+		clientMarketingPrediction,
 		clientMarketingResult,
 		clientNews,
 		contactBirthday,

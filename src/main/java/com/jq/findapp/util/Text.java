@@ -53,6 +53,8 @@ public class Text {
 		notification_chatNew,
 		notification_chatSeen,
 		notification_clientMarketing,
+		notification_clientMarketingPlayerOfTheMatch,
+		notification_clientMarketingPrediction,
 		notification_clientMarketingResult,
 		notification_clientNews,
 		notification_contactBirthday,

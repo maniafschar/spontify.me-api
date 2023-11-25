@@ -2,6 +2,7 @@ package com.jq.findapp.service.backend;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -49,7 +50,7 @@ public class SurveyServiceTest {
 
 		// then
 		assertNull(result.exception);
-		assertEquals("Matchdays already run in last 24 hours", result.result);
+		assertTrue(result.result.contains("Matchdays already run in last 24 hours"));
 	}
 
 	@Test
