@@ -166,7 +166,7 @@ public class SurveyService {
 											.plus(Duration.ofHours(2)).toEpochMilli()));
 							clientMarketing.setEndDate(
 									new Timestamp(Instant.ofEpochMilli(clientMarketing.getStartDate().getTime())
-											.plus(Duration.ofDays(1)).toEpochMilli()));
+											.plus(Duration.ofHours(18)).toEpochMilli()));
 							clientMarketing.setClientId(clientId);
 							clientMarketing.setStorage(matchDays.get(i).get("fixture").get("id").asText());
 							clientMarketing.setMode(teamId == 0 ? ClientMarketingMode.Test
