@@ -45,6 +45,7 @@ import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.ContactVideoCall;
 import com.jq.findapp.entity.ContactVisit;
+import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Ip;
@@ -654,9 +655,13 @@ public class ActionApi {
 		}).toList();
 	}
 
-	@GetMapping(value = "marketing/result/{id}", produces = MediaType.TEXT_HTML_VALUE)
-	public String marketingResult(@PathVariable final BigInteger id) throws Exception {
-		return marketingInit(id);
+	@GetMapping(value = "marketing/event/{id}", produces = MediaType.TEXT_HTML_VALUE)
+	public String marketingEvent(@PathVariable final BigInteger id) throws Exception {
+		final Event event = repository.one(Event.class, id);
+		if (event == null)
+			return "";
+		final Contact contact = repository.one(Contact.class, event.getContactId());
+		return getHtml(repository.one(Client.class, contact.getClientId()), "event", Attachment.resolve(event.getImage()));
 	}
 
 	@GetMapping(value = "marketing/init/{id}", produces = MediaType.TEXT_HTML_VALUE)
@@ -664,33 +669,39 @@ public class ActionApi {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, id);
 		if (clientMarketing == null)
 			return "";
+		final boolean pollTerminated = clientMarketing.getEndDate() != null
+				&& clientMarketing.getEndDate().getTime() / 1000 < Instant.now().getEpochSecond();
+		final String image;
+		if (pollTerminated) {
+			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
+			params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketing.getId());
+			image = repository.list(params).get(0).get("clientMarketingResult.image").toString();
+		} else
+			image = Attachment.resolve(clientMarketing.getImage());
+		return getHtml(repository.one(Client.class, clientMarketing.getClientId()), pollTerminated ? "result" : "init", image);
+	}
+
+	@GetMapping(value = "marketing/result/{id}", produces = MediaType.TEXT_HTML_VALUE)
+	public String marketingResult(@PathVariable final BigInteger id) throws Exception {
+		return marketingInit(id);
+	}
+
+	private String getHtml(final Client client, String path, String image) {
 		String s;
-		final Client client = repository.one(Client.class, clientMarketing.getClientId());
 		synchronized (INDEXES) {
-			if (!INDEXES.containsKey(clientMarketing.getClientId()))
-				INDEXES.put(clientMarketing.getClientId(), IOUtils.toString(
-						new URL(client.getUrl()).openStream(),
-						StandardCharsets.UTF_8));
-			s = INDEXES.get(clientMarketing.getClientId());
+			if (!INDEXES.containsKey(client.getId()))
+				INDEXES.put(client.getId(), IOUtils.toString(
+						new URL(client.getUrl()).openStream(), StandardCharsets.UTF_8));
+			s = INDEXES.get(client.getId());
 		}
 		final String url = Strings.removeSubdomain(client.getUrl());
-		final boolean pollTerminated = clientMarketing.getEndDate() != null
-				&& clientMarketing.getEndDate().getTime() < Instant.now().getEpochSecond() * 1000;
 		Matcher m = Pattern.compile("<meta property=\"og:url\" content=\"([^\"].*)\"").matcher(s);
 		if (m.find())
 			s = s.replace(m.group(1),
-					url + "/rest/action/marketing/" + (pollTerminated ? "result/" : "init/") + clientMarketing.getId());
+					url + "/rest/action/marketing/" + path + "/" + clientMarketing.getId());
 		m = Pattern.compile("<meta property=\"og:image\" content=\"([^\"].*)\"").matcher(s);
-		if (m.find()) {
-			final String image;
-			if (pollTerminated) {
-				final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
-				params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketing.getId());
-				image = repository.list(params).get(0).get("clientMarketingResult.image").toString();
-			} else
-				image = Attachment.resolve(clientMarketing.getImage());
+		if (m.find())
 			s = s.replace(m.group(1), url + "/med/" + image + "\"/><base href=\"" + client.getUrl() + "/");
-		}
 		return s;
 	}
 
