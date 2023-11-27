@@ -193,7 +193,7 @@ public class SurveyService {
 								.ofEpochSecond(json.get(i).get("fixture").get("timestamp").asLong());
 						if (date.minus(Duration.ofDays(1)).isBefore(Instant.now())) {
 							final ObjectNode poll = new ObjectMapper().createObjectNode();
-							poll.put("type", "prediction");
+							poll.put("type", "Prediction");
 							poll.put("home", json.get(i).get("teams").get("home").get("logo").asText());
 							poll.put("away", json.get(i).get("teams").get("away").get("logo").asText());
 							poll.put("homeName", json.get(i).get("teams").get("home").get("name").asText()
@@ -457,7 +457,7 @@ public class SurveyService {
 				notification.sendResult(
 						repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId()));
 				publish(clientId,
-						"Ergebnis der Umfrage \"" + ("prediction".equals(poll.get("type").asText()) ? "Ergebnistipps"
+						"Ergebnis der Umfrage \"" + ("Prediction".equals(poll.get("type").asText()) ? "Ergebnistipps"
 								: "Spieler des Spiels") + "\" unserer Bayern" + getOponent(poll),
 						"/rest/action/marketing/result/" + clientMarketingResult.getClientMarketingId());
 				result += clientMarketingResult.getId() + " ";
@@ -537,7 +537,7 @@ public class SurveyService {
 			g2.setPaint(gradient);
 			g2.fill(new Rectangle2D.Float(0, 0, width, height));
 			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
-					clientMarketingResult == null && !poll.has("homeId") ? 1 : 0.1f));
+					clientMarketingResult == null && "PlayerOfTheMatch".equals(poll.get("type").asText()) ? 1 : 0.1f));
 			final int h = (int) (height * 0.4);
 			if (!homeMatch)
 				draw(urlHome, g2, width / 2, padding, h, -1);
@@ -565,7 +565,7 @@ public class SurveyService {
 			if (clientMarketingResult != null)
 				result(g2, customFont, poll,
 						new ObjectMapper().readTree(Attachment.resolve(clientMarketingResult.getStorage())));
-			else if ("prediction".equals(poll.get("type").asText()))
+			else if ("Prediction".equals(poll.get("type").asText()))
 				prediction(g2, customFont, poll);
 			// final BufferedImageTranscoder imageTranscoder = new
 			// BufferedImageTranscoder();
