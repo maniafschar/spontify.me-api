@@ -179,4 +179,20 @@ public class ExternalService {
 				.retrieve().toEntity(String.class).block().getBody();
 		return new ObjectMapper().readTree(s).get("choices").get(0).get("text").asText().trim();
 	}
+
+	public void publishOnFacebook(final BigInteger clientId, final String message, final String link) throws Exception {
+		final Client client = repository.one(Client.class, clientId);
+		if (!Strings.isEmpty(client.getFbPageAccessToken()) && !Strings.isEmpty(client.getFbPageId())) {
+			final Map<String, String> body = new HashMap<>();
+			body.put("message", message);
+			body.put("link", Strings.removeSubdomain(client.getUrl()) + link);
+			body.put("access_token", client.getFbPageAccessToken());
+			final String response = WebClient
+					.create("https://graph.facebook.com/v18.0/" + client.getFbPageId() + "/feed")
+					.post().bodyValue(body).retrieve()
+					.toEntity(String.class).block().getBody();
+			if (response == null || !response.contains("\"id\":"))
+				notificationService.createTicket(TicketType.ERROR, "FB", response, null);
+		}
+	}
 }
