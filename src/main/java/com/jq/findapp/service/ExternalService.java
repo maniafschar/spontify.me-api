@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -180,7 +181,8 @@ public class ExternalService {
 		return new ObjectMapper().readTree(s).get("choices").get(0).get("text").asText().trim();
 	}
 
-	public String publishOnFacebook(final BigInteger clientId, final String message, final String link) throws Exception {
+	public String publishOnFacebook(final BigInteger clientId, final String message, final String link)
+			throws Exception {
 		final Client client = repository.one(Client.class, clientId);
 		if (!Strings.isEmpty(client.getFbPageAccessToken()) && !Strings.isEmpty(client.getFbPageId())) {
 			final Map<String, String> body = new HashMap<>();

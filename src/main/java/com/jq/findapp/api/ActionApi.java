@@ -1,5 +1,6 @@
 package com.jq.findapp.api;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -49,6 +50,7 @@ import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Ip;
+import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.LocationVisit;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.GeoLocationProcessor;
@@ -661,7 +663,13 @@ public class ActionApi {
 		if (event == null)
 			return "";
 		final Contact contact = repository.one(Contact.class, event.getContactId());
-		return getHtml(repository.one(Client.class, contact.getClientId()), "event", Attachment.resolve(event.getImage()));
+		String image = event.getImage();
+		if (image == null)
+			image = repository.one(Location.class, event.getLocationId()).getImage();
+		if (image == null)
+			image = repository.one(Contact.class, event.getContactId()).getImage();
+		return getHtml(repository.one(Client.class, contact.getClientId()), "event/" + event.getId(),
+				Attachment.resolve(image));
 	}
 
 	@GetMapping(value = "marketing/init/{id}", produces = MediaType.TEXT_HTML_VALUE)
@@ -675,10 +683,14 @@ public class ActionApi {
 		if (pollTerminated) {
 			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 			params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketing.getId());
-			image = repository.list(params).get(0).get("clientMarketingResult.image").toString();
+			final Result result = repository.list(params);
+			if (result.size() == 0 || result.get(0).get("clientMarketingResult.image") == null)
+				return "";
+			image = result.get(0).get("clientMarketingResult.image").toString();
 		} else
 			image = Attachment.resolve(clientMarketing.getImage());
-		return getHtml(repository.one(Client.class, clientMarketing.getClientId()), pollTerminated ? "result" : "init", image);
+		return getHtml(repository.one(Client.class, clientMarketing.getClientId()),
+				(pollTerminated ? "result/" : "init/") + clientMarketing.getId(), image);
 	}
 
 	@GetMapping(value = "marketing/result/{id}", produces = MediaType.TEXT_HTML_VALUE)
@@ -686,7 +698,7 @@ public class ActionApi {
 		return marketingInit(id);
 	}
 
-	private String getHtml(final Client client, String path, String image) {
+	private String getHtml(final Client client, final String path, final String image) throws IOException {
 		String s;
 		synchronized (INDEXES) {
 			if (!INDEXES.containsKey(client.getId()))
@@ -698,7 +710,7 @@ public class ActionApi {
 		Matcher m = Pattern.compile("<meta property=\"og:url\" content=\"([^\"].*)\"").matcher(s);
 		if (m.find())
 			s = s.replace(m.group(1),
-					url + "/rest/action/marketing/" + path + "/" + clientMarketing.getId());
+					url + "/rest/action/marketing/" + path);
 		m = Pattern.compile("<meta property=\"og:image\" content=\"([^\"].*)\"").matcher(s);
 		if (m.find())
 			s = s.replace(m.group(1), url + "/med/" + image + "\"/><base href=\"" + client.getUrl() + "/");

@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.Log;
 import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.entity.Ticket.TicketType;
@@ -35,6 +36,7 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.ChatService;
 import com.jq.findapp.service.EventService;
+import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.backend.DbService;
 import com.jq.findapp.service.backend.EngagementService;
@@ -73,6 +75,9 @@ public class SupportCenterApi {
 
 	@Autowired
 	private EventService eventService;
+
+	@Autowired
+	private ExternalService externalService;
 
 	@Autowired
 	private RssService rssService;
@@ -156,6 +161,14 @@ public class SupportCenterApi {
 		contact.setImageAuthenticate(image);
 		contact.setAuthenticate(Boolean.TRUE);
 		repository.save(contact);
+	}
+
+	@PostMapping("event/publish/{id}")
+	public void eventPublish(@PathVariable final BigInteger id) throws Exception {
+		final Event event = repository.one(Event.class, id);
+		final Contact contact = repository.one(Contact.class, event.getContactId());
+		externalService.publishOnFacebook(contact.getClientId(), event.getDescription(),
+				"/rest/action/marketing/event/" + event.getId());
 	}
 
 	@PostMapping("survey/test/{type}")

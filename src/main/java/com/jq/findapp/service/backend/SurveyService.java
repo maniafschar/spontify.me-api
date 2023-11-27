@@ -48,7 +48,6 @@ import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Storage;
-import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -195,7 +194,7 @@ public class SurveyService {
 					if ("NS".equals(json.get(i).get("fixture").get("status").get("short").asText())) {
 						final Instant date = Instant
 								.ofEpochSecond(json.get(i).get("fixture").get("timestamp").asLong());
-						if (date.minus(Duration.ofDays(1)).isBefore(Instant.now())) {
+						if (date.isAfter(Instant.now()) && date.minus(Duration.ofDays(1)).isBefore(Instant.now())) {
 							final ObjectNode poll = new ObjectMapper().createObjectNode();
 							poll.put("type", "Prediction");
 							poll.put("home", json.get(i).get("teams").get("home").get("logo").asText());
@@ -213,7 +212,8 @@ public class SurveyService {
 							poll.put("city", json.get(i).findPath("fixture").get("venue").get("city").asText());
 							poll.put("location",
 									json.get(i).get("teams").get("home").get("id").asInt() == teamId ? "home" : "away");
-							final Instant end = Instant.ofEpochSecond(poll.get("timestamp").asLong());
+							final Instant end = Instant.ofEpochSecond(poll.get("timestamp").asLong())
+									.minus(Duration.ofMinutes(15));
 							params.setQuery(Query.misc_listMarketing);
 							params.setSearch("clientMarketing.endDate='" + end.toString()
 									+ "' and clientMarketing.clientId=" + clientId);
@@ -428,7 +428,8 @@ public class SurveyService {
 							image.create(poll, "Spieler", repository.one(Client.class, clientId).getName(), null)));
 					repository.save(clientMarketing);
 					notification.sendPoll(clientMarketing, ContactNotificationTextType.clientMarketingPlayerOfTheMatch);
-					externalService.publishOnFacebook(clientId, "Umfrage Spieler des Spiels unserer Bayern" + getOponent(poll),
+					externalService.publishOnFacebook(clientId,
+							"Umfrage Spieler des Spiels unserer Bayern" + getOponent(poll),
 							"/rest/action/marketing/init/" + clientMarketing.getId());
 				}
 				return (BigInteger) list.get(0).get("clientMarketing.id");
@@ -453,18 +454,23 @@ public class SurveyService {
 				final JsonNode poll = new ObjectMapper().readTree(Attachment.resolve(
 						repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId())
 								.getStorage()));
-				clientMarketingResult.setImage(Attachment.createImage(".png",
-						image.create(poll, "Spieler", repository.one(Client.class, clientId).getName(),
-								clientMarketingResult)));
 				clientMarketingResult.setPublished(true);
-				repository.save(clientMarketingResult);
-				notification.sendResult(
-						repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId()));
-				externalService.publishOnFacebook(clientId,
-						"Ergebnis der Umfrage \"" + ("Prediction".equals(poll.get("type").asText()) ? "Ergebnistipps"
-								: "Spieler des Spiels") + "\" unserer Bayern" + getOponent(poll),
-						"/rest/action/marketing/result/" + clientMarketingResult.getClientMarketingId());
-				result += clientMarketingResult.getId() + " ";
+				if (poll.has("participants") && poll.get("participants").asInt() > 0) {
+					clientMarketingResult.setImage(Attachment.createImage(".png",
+							image.create(poll, "Spieler", repository.one(Client.class, clientId).getName(),
+									clientMarketingResult)));
+					repository.save(clientMarketingResult);
+					notification.sendResult(
+							repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId()));
+					externalService.publishOnFacebook(clientId,
+							"Resultat der \""
+									+ ("Prediction".equals(poll.get("type").asText()) ? "Ergebnistipps"
+											: "Umfrage Spieler des Spiels")
+									+ "\" unserer Bayern" + getOponent(poll),
+							"/rest/action/marketing/result/" + clientMarketingResult.getClientMarketingId());
+					result += clientMarketingResult.getId() + " ";
+				} else
+					repository.save(clientMarketingResult);
 			}
 			return result.trim();
 		}
