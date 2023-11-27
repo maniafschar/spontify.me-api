@@ -180,7 +180,7 @@ public class ExternalService {
 		return new ObjectMapper().readTree(s).get("choices").get(0).get("text").asText().trim();
 	}
 
-	public void publishOnFacebook(final BigInteger clientId, final String message, final String link) throws Exception {
+	public String publishOnFacebook(final BigInteger clientId, final String message, final String link) throws Exception {
 		final Client client = repository.one(Client.class, clientId);
 		if (!Strings.isEmpty(client.getFbPageAccessToken()) && !Strings.isEmpty(client.getFbPageId())) {
 			final Map<String, String> body = new HashMap<>();
@@ -193,6 +193,9 @@ public class ExternalService {
 					.toEntity(String.class).block().getBody();
 			if (response == null || !response.contains("\"id\":"))
 				notificationService.createTicket(TicketType.ERROR, "FB", response, null);
+			else
+				return new ObjectMapper().readTree(response).get("id").asText();
 		}
+		return null;
 	}
 }
