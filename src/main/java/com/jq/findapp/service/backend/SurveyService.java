@@ -54,6 +54,7 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Strings;
 
@@ -69,6 +70,9 @@ public class SurveyService {
 
 	@Autowired
 	private Repository repository;
+
+	@Autowired
+	private ExternalService externalService;
 
 	@Autowired
 	private NotificationService notificationService;
@@ -229,7 +233,7 @@ public class SurveyService {
 								repository.save(clientMarketing);
 								notification.sendPoll(clientMarketing,
 										ContactNotificationTextType.clientMarketingPrediction);
-								publish(clientId,
+								externalService.publishOnFacebook(clientId,
 										"Eure Ergebnistipps für unsere Bayern im Spiel" + getOponent(poll)
 												+ (poll.get("statistics").size() > 0
 														? "\n\nIm Bild seht ihr die zusammengefassten Statistiken zu den letzen Spielen."
@@ -424,7 +428,7 @@ public class SurveyService {
 							image.create(poll, "Spieler", repository.one(Client.class, clientId).getName(), null)));
 					repository.save(clientMarketing);
 					notification.sendPoll(clientMarketing, ContactNotificationTextType.clientMarketingPlayerOfTheMatch);
-					publish(clientId, "Umfrage Spieler des Spiels unserer Bayern" + getOponent(poll),
+					externalService.publishOnFacebook(clientId, "Umfrage Spieler des Spiels unserer Bayern" + getOponent(poll),
 							"/rest/action/marketing/init/" + clientMarketing.getId());
 				}
 				return (BigInteger) list.get(0).get("clientMarketing.id");
@@ -456,7 +460,7 @@ public class SurveyService {
 				repository.save(clientMarketingResult);
 				notification.sendResult(
 						repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId()));
-				publish(clientId,
+				externalService.publishOnFacebook(clientId,
 						"Ergebnis der Umfrage \"" + ("Prediction".equals(poll.get("type").asText()) ? "Ergebnistipps"
 								: "Spieler des Spiels") + "\" unserer Bayern" + getOponent(poll),
 						"/rest/action/marketing/result/" + clientMarketingResult.getClientMarketingId());
@@ -775,22 +779,6 @@ public class SurveyService {
 							+ clientMarketing.getId());
 			send(repository.list(params), clientMarketing, ContactNotificationTextType.clientMarketingResult,
 					"contactMarketing.contactId");
-		}
-	}
-
-	private void publish(final BigInteger clientId, final String message, final String link) throws Exception {
-		final Client client = repository.one(Client.class, clientId);
-		if (!Strings.isEmpty(client.getFbPageAccessToken()) && !Strings.isEmpty(client.getFbPageId())) {
-			final Map<String, String> body = new HashMap<>();
-			body.put("message", message);
-			body.put("link", Strings.removeSubdomain(client.getUrl()) + link);
-			body.put("access_token", client.getFbPageAccessToken());
-			final String response = WebClient
-					.create("https://graph.facebook.com/v18.0/" + client.getFbPageId() + "/feed")
-					.post().bodyValue(body).retrieve()
-					.toEntity(String.class).block().getBody();
-			if (response == null || !response.contains("\"id\":"))
-				notificationService.createTicket(TicketType.ERROR, "FB", response, null);
 		}
 	}
 
