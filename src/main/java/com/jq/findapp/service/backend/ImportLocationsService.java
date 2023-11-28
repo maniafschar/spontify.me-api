@@ -1,6 +1,7 @@
 package com.jq.findapp.service.backend;
 
 import java.math.BigInteger;
+import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -187,11 +188,19 @@ public class ImportLocationsService {
 		return result;
 	}
 
+	public String searchLocation(final String query) throws Exception {
+		return retrieveLocations("place/textsearch/json?query="
+				+ URLEncoder.encode(query, "UTF-8"));
+	}
+
 	private String retrieveLocations(final float latitude, final float longitude) throws Exception {
+		return retrieveLocations("place/nearbysearch/json?radius=600&sensor=false&location="
+				+ latitude + "," + longitude);
+	}
+	
+	private String retrieveLocations(final String query) throws Exception {
 		final ObjectMapper om = new ObjectMapper();
-		JsonNode json = om.readTree(externalService.google(
-				"place/nearbysearch/json?radius=600&sensor=false&location="
-						+ latitude + "," + longitude));
+		JsonNode json = om.readTree(externalService.google(query));
 		if ("OK".equals(json.get("status").asText())) {
 			String result = importLocations(json.get("results").elements());
 			while (json.has("next_page_token")) {
