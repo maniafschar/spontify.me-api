@@ -36,6 +36,9 @@ public class EventService {
 	private NotificationService notificationService;
 
 	@Autowired
+	private ExternalService externalService;
+
+	@Autowired
 	private Text text;
 
 	public SchedulerResult findMatchingBuddies() {
@@ -150,6 +153,13 @@ public class EventService {
 
 	public LocalDateTime getRealDate(final Event event) {
 		return getRealDate(event, LocalDateTime.now(ZoneId.systemDefault()));
+	}
+
+	public void publish(final BigInteger id) {
+		final Event event = repository.one(Event.class, id);
+		final Contact contact = repository.one(Contact.class, event.getContactId());
+		externalService.publishOnFacebook(contact.getClientId(), event.getDescription(),
+				"/rest/action/marketing/event/" + id);
 	}
 
 	private LocalDateTime getRealDate(final Event event, final LocalDateTime now) {
