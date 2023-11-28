@@ -161,8 +161,8 @@ public class SurveyService {
 						final Instant end = Instant.ofEpochSecond(poll.get("timestamp").asLong())
 								.minus(Duration.ofMinutes(15));
 						final QueryParams params = new QueryParams(Query.misc_listMarketing);
-						params.setSearch("clientMarketing.endDate='" + end.toString()
-								+ "' and clientMarketing.clientId=" + clientId);
+						params.setSearch(
+								"clientMarketing.endDate='" + end + "' and clientMarketing.clientId=" + clientId);
 						if (repository.list(params).size() == 0) {
 							predictionAddStatistics(clientId, poll);
 							final ClientMarketing clientMarketing = new ClientMarketing();
@@ -188,7 +188,6 @@ public class SurveyService {
 							return clientMarketing.getId();
 						}
 					}
-					break;
 				}
 			}
 			return null;
