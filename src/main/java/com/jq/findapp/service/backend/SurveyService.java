@@ -84,15 +84,15 @@ public class SurveyService {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/update");
 		clients.keySet().forEach(e -> {
 			try {
-				BigInteger id = synchronize.poll(e, clients.get(e));
+				BigInteger id = synchronize.prediction(e, clients.get(e));
+				if (id != null)
+					result.result += "\nprediction: " + id;
+				id = synchronize.poll(e, clients.get(e));
 				if (id != null)
 					result.result += "\npoll: " + id;
 				final String s = synchronize.resultAndNotify(e);
 				if (s.length() > 0)
 					result.result += "\nresultAndNotify: " + s;
-				id = synchronize.prediction(e, clients.get(e));
-				if (id != null)
-					result.result += "\nprediction: " + id;
 			} catch (final Exception ex) {
 				result.exception = ex;
 			}
