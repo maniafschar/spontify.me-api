@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.concurrent.atomic.AtomicLong;
 
 import javax.imageio.ImageIO;
 
@@ -60,8 +59,6 @@ import com.jq.findapp.util.Strings;
 @Service
 public class SurveyService {
 	private final static Map<BigInteger, Integer> clients = new HashMap<>();
-	private final static AtomicLong lastRun = new AtomicLong(0);
-	private final static int FIRST_YEAR = 2010;
 	private final Synchonize synchronize = new Synchonize();
 	private final Image image = new Image();
 	private final Notification notification = new Notification();
@@ -87,7 +84,6 @@ public class SurveyService {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/update");
 		clients.keySet().forEach(e -> {
 			try {
-				result.result = synchronize.matchdays(e, clients.get(e));
 				BigInteger id = synchronize.poll(e, clients.get(e));
 				if (id != null)
 					result.result += "\npoll: " + id;
@@ -110,22 +106,9 @@ public class SurveyService {
 
 	public class Test {
 		public BigInteger poll(final boolean prediction) throws Exception {
-			final int teamId = 0;
-			lastRun.set(0);
-			if (prediction) {
-				final QueryParams params = new QueryParams(Query.misc_listStorage);
-				params.setSearch("storage.label='football-" + teamId + "-" + LocalDateTime.now().getYear() + "'");
-				if (repository.list(params).size() == 0) {
-					final Storage storage = new Storage();
-					storage.setLabel("football-" + teamId + "-" + LocalDateTime.now().getYear());
-					storage.setStorage(IOUtils
-							.toString(getClass().getResourceAsStream("/surveyMatchdays.json"), StandardCharsets.UTF_8));
-					repository.save(storage);
-				}
-				return synchronize.prediction(BigInteger.ONE, teamId);
-			}
-			synchronize.matchdays(BigInteger.ONE, teamId);
-			return synchronize.poll(BigInteger.ONE, teamId);
+			if (prediction)
+				return synchronize.prediction(BigInteger.ONE, 0);
+			return synchronize.poll(BigInteger.ONE, 0);
 		}
 
 		public String result(final BigInteger clientMarketingId) throws Exception {
@@ -148,102 +131,64 @@ public class SurveyService {
 	}
 
 	private class Synchonize {
-		private String matchdays(final BigInteger clientId, final int teamId) throws Exception {
-			if (System.currentTimeMillis() - lastRun.get() < 24 * 60 * 60 * 1000)
-				return "Matchdays already run in last 24 hours";
-			lastRun.set(System.currentTimeMillis());
-			int count = 0;
-			final QueryParams params = new QueryParams(Query.misc_listMarketing);
-			params.setSearch(
-					"clientMarketing.startDate>'" + Instant.now() + "' and clientMarketing.clientId=" + clientId +
-							" and clientMarketing.storage not like '%" + Attachment.SEPARATOR + "%'");
-			if (repository.list(params).size() == 0) {
-				final JsonNode matchDays = get("team=" + teamId + "&season=" + LocalDateTime.now().getYear());
-				if (matchDays != null) {
-					for (int i = 0; i < matchDays.size(); i++) {
-						if ("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())) {
-							final ClientMarketing clientMarketing = new ClientMarketing();
-							clientMarketing.setStartDate(
-									new Timestamp(Instant
-											.ofEpochSecond(matchDays.get(i).get("fixture").get("timestamp").asLong())
-											.plus(Duration.ofHours(2)).toEpochMilli()));
-							clientMarketing.setEndDate(
-									new Timestamp(Instant.ofEpochMilli(clientMarketing.getStartDate().getTime())
-											.plus(Duration.ofHours(18)).toEpochMilli()));
-							clientMarketing.setClientId(clientId);
-							clientMarketing.setStorage(matchDays.get(i).get("fixture").get("id").asText());
-							clientMarketing.setMode(teamId == 0 ? ClientMarketingMode.Test
-									: ClientMarketingMode.Live);
-							repository.save(clientMarketing);
-							count++;
-						}
-					}
-				}
-			}
-			return "Matchdays: " + count;
-		}
+		private final static int FIRST_YEAR = 2010;
 
 		private BigInteger prediction(final BigInteger clientId, final int teamId) throws Exception {
-			final QueryParams params = new QueryParams(Query.misc_listStorage);
-			params.setSearch("storage.label='football-" + teamId + "-" + LocalDateTime.now().getYear() + "'");
-			final Result result = repository.list(params);
-			if (result.size() > 0) {
-				final JsonNode json = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString())
-						.get("response");
-				for (int i = 0; i < json.size(); i++) {
-					if ("NS".equals(json.get(i).get("fixture").get("status").get("short").asText())) {
-						final Instant date = Instant
-								.ofEpochSecond(json.get(i).get("fixture").get("timestamp").asLong());
-						if (date.isAfter(Instant.now()) && date.minus(Duration.ofDays(1)).isBefore(Instant.now())) {
-							final ObjectNode poll = new ObjectMapper().createObjectNode();
-							poll.put("type", "Prediction");
-							poll.put("home", json.get(i).get("teams").get("home").get("logo").asText());
-							poll.put("away", json.get(i).get("teams").get("away").get("logo").asText());
-							poll.put("homeName", json.get(i).get("teams").get("home").get("name").asText()
-									.replace("Munich", "München"));
-							poll.put("awayName", json.get(i).get("teams").get("away").get("name").asText()
-									.replace("Munich", "München"));
-							poll.put("homeId", json.get(i).get("teams").get("home").get("id").asInt());
-							poll.put("awayId", json.get(i).get("teams").get("away").get("id").asInt());
-							poll.put("league", json.get(i).get("league").get("logo").asText());
-							poll.put("leagueName", json.get(i).get("league").get("name").asText());
-							poll.put("timestamp", json.get(i).get("fixture").get("timestamp").asLong());
-							poll.put("venue", json.get(i).get("fixture").get("venue").get("name").asText());
-							poll.put("city", json.get(i).findPath("fixture").get("venue").get("city").asText());
-							poll.put("location",
-									json.get(i).get("teams").get("home").get("id").asInt() == teamId ? "home" : "away");
-							final Instant end = Instant.ofEpochSecond(poll.get("timestamp").asLong())
-									.minus(Duration.ofMinutes(15));
-							params.setQuery(Query.misc_listMarketing);
-							params.setSearch("clientMarketing.endDate='" + end.toString()
-									+ "' and clientMarketing.clientId=" + clientId);
-							if (repository.list(params).size() == 0) {
-								predictionAddStatistics(clientId, poll);
-								final ClientMarketing clientMarketing = new ClientMarketing();
-								clientMarketing.setClientId(clientId);
-								clientMarketing.setStartDate(new Timestamp(end
-										.minus(Duration.ofDays(1)).toEpochMilli()));
-								clientMarketing.setEndDate(new Timestamp(end.toEpochMilli()));
-								clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
-								clientMarketing.setMode(ClientMarketingMode.Live);
-								clientMarketing.setImage(Attachment.createImage(".png",
-										image.create(poll, "Ergebnistipps",
-												repository.one(Client.class, clientId).getName(),
-												null)));
-								repository.save(clientMarketing);
-								notification.sendPoll(clientMarketing,
-										ContactNotificationTextType.clientMarketingPrediction);
-								externalService.publishOnFacebook(clientId,
-										"Eure Ergebnistipps für unsere Bayern im Spiel" + getOponent(poll)
-												+ (poll.get("statistics").size() > 0
-														? "\n\nIm Bild seht ihr die zusammengefassten Statistiken zu den letzen Spielen."
-														: ""),
-										"/rest/action/marketing/init/" + clientMarketing.getId());
-								return clientMarketing.getId();
-							}
+			final long now = Instant.now().getEpochSecond();
+			final JsonNode json = get("team=" + teamId + "&season=" + LocalDateTime.now().getYear());
+			for (int i = 0; i < json.size(); i++) {
+				if ("NS".equals(json.get(i).get("fixture").get("status").get("short").asText())) {
+					final Instant date = Instant
+							.ofEpochSecond(json.get(i).get("fixture").get("timestamp").asLong());
+					if (date.getEpochSecond() >= now && date.minus(Duration.ofDays(1)).getEpochSecond() < now) {
+						final ObjectNode poll = new ObjectMapper().createObjectNode();
+						poll.put("type", "Prediction");
+						poll.put("home", json.get(i).get("teams").get("home").get("logo").asText());
+						poll.put("away", json.get(i).get("teams").get("away").get("logo").asText());
+						poll.put("homeName", json.get(i).get("teams").get("home").get("name").asText()
+								.replace("Munich", "München"));
+						poll.put("awayName", json.get(i).get("teams").get("away").get("name").asText()
+								.replace("Munich", "München"));
+						poll.put("homeId", json.get(i).get("teams").get("home").get("id").asInt());
+						poll.put("awayId", json.get(i).get("teams").get("away").get("id").asInt());
+						poll.put("league", json.get(i).get("league").get("logo").asText());
+						poll.put("leagueName", json.get(i).get("league").get("name").asText());
+						poll.put("timestamp", json.get(i).get("fixture").get("timestamp").asLong());
+						poll.put("venue", json.get(i).get("fixture").get("venue").get("name").asText());
+						poll.put("city", json.get(i).findPath("fixture").get("venue").get("city").asText());
+						poll.put("location",
+								json.get(i).get("teams").get("home").get("id").asInt() == teamId ? "home" : "away");
+						final Instant end = Instant.ofEpochSecond(poll.get("timestamp").asLong())
+								.minus(Duration.ofMinutes(15));
+						final QueryParams params = new QueryParams(Query.misc_listMarketing);
+						params.setSearch("clientMarketing.endDate='" + end.toString()
+								+ "' and clientMarketing.clientId=" + clientId);
+						if (repository.list(params).size() == 0) {
+							predictionAddStatistics(clientId, poll);
+							final ClientMarketing clientMarketing = new ClientMarketing();
+							clientMarketing.setClientId(clientId);
+							clientMarketing.setStartDate(new Timestamp(end
+									.minus(Duration.ofDays(1)).toEpochMilli()));
+							clientMarketing.setEndDate(new Timestamp(end.toEpochMilli()));
+							clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
+							clientMarketing.setMode(ClientMarketingMode.Live);
+							clientMarketing.setImage(Attachment.createImage(".png",
+									image.create(poll, "Ergebnistipps",
+											repository.one(Client.class, clientId).getName(),
+											null)));
+							repository.save(clientMarketing);
+							notification.sendPoll(clientMarketing,
+									ContactNotificationTextType.clientMarketingPrediction);
+							externalService.publishOnFacebook(clientId,
+									"Eure Ergebnistipps für unsere Bayern im Spiel" + getOponent(poll)
+											+ (poll.get("statistics").size() > 0
+													? "\n\nIm Bild seht ihr die zusammengefassten Statistiken zu den letzen Spielen."
+													: ""),
+									"/rest/action/marketing/init/" + clientMarketing.getId());
+							return clientMarketing.getId();
 						}
-						break;
 					}
+					break;
 				}
 			}
 			return null;
@@ -349,92 +294,119 @@ public class SurveyService {
 		}
 
 		private BigInteger poll(final BigInteger clientId, final int teamId) throws Exception {
-			final QueryParams params = new QueryParams(Query.misc_listMarketing);
-			params.setSearch(
-					"clientMarketing.startDate<='" + Instant.now() + "' and clientMarketing.endDate>'" + Instant.now() +
-							"' and clientMarketing.clientId=" + clientId +
-							" and clientMarketing.storage not like '%" + Attachment.SEPARATOR + "%'");
-			final Result list = repository.list(params);
-			if (list.size() > 0) {
-				final JsonNode matchDay = get("id=" + list.get(0).get("clientMarketing.storage")).get(0);
-				if (matchDay != null) {
-					JsonNode e = matchDay.findPath("players");
-					e = e.get(e.get(0).get("team").get("id").asInt() == teamId ? 0 : 1).get("players");
-					final ObjectNode poll = new ObjectMapper().createObjectNode();
-					poll.put("type", "PlayerOfTheMatch");
-					poll.put("home", matchDay.findPath("home").get("logo").asText());
-					poll.put("away", matchDay.findPath("away").get("logo").asText());
-					poll.put("homeName", matchDay.findPath("home").get("name").asText().replace("Munich", "München"));
-					poll.put("awayName", matchDay.findPath("away").get("name").asText().replace("Munich", "München"));
-					poll.put("league", matchDay.findPath("league").get("logo").asText());
-					poll.put("timestamp", matchDay.findPath("fixture").get("timestamp").asLong());
-					poll.put("venue", matchDay.findPath("fixture").get("venue").get("name").asText());
-					poll.put("city", matchDay.findPath("fixture").get("venue").get("city").asText());
-					poll.put("location",
-							matchDay.findPath("teams").get("home").get("id").asInt() == teamId ? "home" : "away");
-					poll.put("prolog",
-							"Umfrage <b>Spieler des Spiels</b> zum "
-									+ matchDay.findPath("league").get("name").asText() +
-									" Spiel<div style=\"padding:1em 0;font-weight:bold;\">"
-									+ poll.get("homeName").asText()
-									+ " - "
-									+ poll.get("awayName").asText()
-									+ "</div>vom <b>"
-									+ formatDate(matchDay.findPath("fixture").get("timestamp").asLong(), null)
-									+ "</b>. Möchtest Du teilnehmen?");
-					poll.put("epilog",
-							"Lieben Dank für die Teilnahme!\n\nLust auf mehr <b>Bayern Feeling</b>? In unserer neuen App bauen wir eine reine Bayern <b>Fan Community</b> auf.\n\nMit ein paar wenigen Klicks kannst auch Du dabei sein.");
-					final ObjectNode question = poll.putArray("questions").addObject();
-					question.put("question", "Wer war für Dich Spieler des Spiels?");
-					final ArrayNode answers = question.putArray("answers");
-					for (int i = 0; i < e.size(); i++) {
-						final JsonNode statistics = e.get(i).get("statistics").get(0);
-						if (!statistics.get("games").get("minutes").isNull()) {
-							String s = e.get(i).get("player").get("name").asText() +
-									"<explain>" + statistics.get("games").get("minutes").asInt() +
-									(statistics.get("games").get("minutes").asInt() > 1 ? " gespielte Minuten"
-											: " gespielte Minute");
-							if (!statistics.get("goals").get("total").isNull())
-								s += getLine(statistics.get("goals").get("total").asInt(), " Tor", " Tore");
-							if (!statistics.get("shots").get("total").isNull())
-								s += getLine(statistics.get("shots").get("total").asInt(), " Torschuss, ",
-										" Torschüsse, ")
-										+ (statistics.get("shots").get("on").isNull() ? 0
-												: statistics.get("shots").get("on").asInt())
-										+ " aufs Tor";
-							if (!statistics.get("goals").get("assists").isNull())
-								s += getLine(statistics.get("goals").get("assists").asInt(), " Assist", " Assists");
-							if (!statistics.get("passes").get("total").isNull())
-								s += getLine(statistics.get("passes").get("total").asInt(), " Pass, ", " Pässe, ")
-										+ statistics.get("passes").get("accuracy").asInt() + " angekommen";
-							if (!statistics.get("duels").get("total").isNull())
-								s += getLine(statistics.get("duels").get("total").asInt(), " Duell, ", " Duelle, ")
-										+ statistics.get("duels").get("won").asInt() + " gewonnen";
-							if (statistics.get("cards").get("yellow").asInt() > 0
-									&& statistics.get("cards").get("red").asInt() > 0)
-								s += "<br/>Gelberote Karte erhalten";
-							else if (statistics.get("cards").get("yellow").asInt() > 0)
-								s += "<br/>Gelbe Karte erhalten";
-							if (statistics.get("cards").get("red").asInt() > 0)
-								s += "<br/>Rote Karte erhalten";
-							s += "</explain>";
-							answers.addObject().put("answer", s);
+			final JsonNode matchDays = get("team=" + teamId + "&season=" + LocalDateTime.now().getYear());
+			if (matchDays != null) {
+				for (int i = 0; i < matchDays.size(); i++) {
+					if ("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())) {
+						final Instant startDate = Instant
+								.ofEpochSecond(matchDays.get(i).get("fixture").get("timestamp").asLong())
+								.plus(Duration.ofHours(2));
+						if (startDate.isAfter(Instant.now()))
+							break;
+						final QueryParams params = new QueryParams(Query.misc_listMarketing);
+						params.setSearch("clientMarketing.startDate='" + startDate + "' and clientMarketing.clientId="
+								+ clientId);
+						if (repository.list(params).size() > 0)
+							break;
+						final JsonNode matchDay = get("id=" + matchDays.get(i).get("fixture").get("id").asText())
+								.get(0);
+						if (matchDay != null) {
+							JsonNode players = matchDay.findPath("players");
+							players = players.get(players.get(0).get("team").get("id").asInt() == teamId ? 0 : 1)
+									.get("players");
+							final ObjectNode poll = new ObjectMapper().createObjectNode();
+							poll.put("type", "PlayerOfTheMatch");
+							poll.put("home", matchDay.findPath("home").get("logo").asText());
+							poll.put("away", matchDay.findPath("away").get("logo").asText());
+							poll.put("homeName",
+									matchDay.findPath("home").get("name").asText().replace("Munich", "München"));
+							poll.put("awayName",
+									matchDay.findPath("away").get("name").asText().replace("Munich", "München"));
+							poll.put("league", matchDay.findPath("league").get("logo").asText());
+							poll.put("timestamp", matchDay.findPath("fixture").get("timestamp").asLong());
+							poll.put("venue", matchDay.findPath("fixture").get("venue").get("name").asText());
+							poll.put("city", matchDay.findPath("fixture").get("venue").get("city").asText());
+							poll.put("location",
+									matchDay.findPath("teams").get("home").get("id").asInt() == teamId ? "home"
+											: "away");
+							poll.put("prolog",
+									"Umfrage <b>Spieler des Spiels</b> zum "
+											+ matchDay.findPath("league").get("name").asText() +
+											" Spiel<div style=\"padding:1em 0;font-weight:bold;\">"
+											+ poll.get("homeName").asText()
+											+ " - "
+											+ poll.get("awayName").asText()
+											+ "</div>vom <b>"
+											+ formatDate(matchDay.findPath("fixture").get("timestamp").asLong(), null)
+											+ "</b>. Möchtest Du teilnehmen?");
+							poll.put("epilog",
+									"Lieben Dank für die Teilnahme!\n\nLust auf mehr <b>Bayern Feeling</b>? In unserer neuen App bauen wir eine reine Bayern <b>Fan Community</b> auf.\n\nMit ein paar wenigen Klicks kannst auch Du dabei sein.");
+							final ObjectNode question = poll.putArray("questions").addObject();
+							question.put("question", "Wer war für Dich Spieler des Spiels?");
+							pollAddAnswers(question.putArray("answers"), players);
+							final ClientMarketing clientMarketing = new ClientMarketing();
+							clientMarketing.setStartDate(new Timestamp(startDate.toEpochMilli()));
+							clientMarketing
+									.setEndDate(new Timestamp(startDate.plus(Duration.ofHours(18)).toEpochMilli()));
+							clientMarketing.setClientId(clientId);
+							clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
+							clientMarketing.setImage(Attachment.createImage(".png",
+									image.create(poll, "Spieler", repository.one(Client.class, clientId).getName(),
+											null)));
+							clientMarketing.setMode(teamId == 0 ? ClientMarketingMode.Test : ClientMarketingMode.Live);
+							repository.save(clientMarketing);
+							notification.sendPoll(clientMarketing,
+									ContactNotificationTextType.clientMarketingPlayerOfTheMatch);
+							externalService.publishOnFacebook(clientId,
+									"Umfrage Spieler des Spiels unserer Bayern" + getOponent(poll),
+									"/rest/action/marketing/init/" + clientMarketing.getId());
+							return clientMarketing.getId();
 						}
+						break;
 					}
-					final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
-							(BigInteger) list.get(0).get("clientMarketing.id"));
-					clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
-					clientMarketing.setImage(Attachment.createImage(".png",
-							image.create(poll, "Spieler", repository.one(Client.class, clientId).getName(), null)));
-					repository.save(clientMarketing);
-					notification.sendPoll(clientMarketing, ContactNotificationTextType.clientMarketingPlayerOfTheMatch);
-					externalService.publishOnFacebook(clientId,
-							"Umfrage Spieler des Spiels unserer Bayern" + getOponent(poll),
-							"/rest/action/marketing/init/" + clientMarketing.getId());
 				}
-				return (BigInteger) list.get(0).get("clientMarketing.id");
 			}
 			return null;
+		}
+
+		private void pollAddAnswers(final ArrayNode answers, final JsonNode players) {
+			for (int i = 0; i < players.size(); i++) {
+				final JsonNode statistics = players.get(i).get("statistics").get(0);
+				if (!statistics.get("games").get("minutes").isNull()) {
+					String s = players.get(i).get("player").get("name").asText() +
+							"<explain>" + statistics.get("games").get("minutes").asInt() +
+							(statistics.get("games").get("minutes").asInt() > 1 ? " gespielte Minuten"
+									: " gespielte Minute");
+					if (!statistics.get("goals").get("total").isNull())
+						s += getLine(statistics.get("goals").get("total").asInt(), " Tor", " Tore");
+					if (!statistics.get("shots").get("total").isNull())
+						s += getLine(statistics.get("shots").get("total").asInt(), " Torschuss, ",
+								" Torschüsse, ")
+								+ (statistics.get("shots").get("on").isNull() ? 0
+										: statistics.get("shots").get("on").asInt())
+								+ " aufs Tor";
+					if (!statistics.get("goals").get("assists").isNull())
+						s += getLine(statistics.get("goals").get("assists").asInt(), " Assist",
+								" Assists");
+					if (!statistics.get("passes").get("total").isNull())
+						s += getLine(statistics.get("passes").get("total").asInt(), " Pass, ",
+								" Pässe, ")
+								+ statistics.get("passes").get("accuracy").asInt() + " angekommen";
+					if (!statistics.get("duels").get("total").isNull())
+						s += getLine(statistics.get("duels").get("total").asInt(), " Duell, ",
+								" Duelle, ")
+								+ statistics.get("duels").get("won").asInt() + " gewonnen";
+					if (statistics.get("cards").get("yellow").asInt() > 0
+							&& statistics.get("cards").get("red").asInt() > 0)
+						s += "<br/>Gelberote Karte erhalten";
+					else if (statistics.get("cards").get("yellow").asInt() > 0)
+						s += "<br/>Gelbe Karte erhalten";
+					if (statistics.get("cards").get("red").asInt() > 0)
+						s += "<br/>Rote Karte erhalten";
+					s += "</explain>";
+					answers.addObject().put("answer", s);
+				}
+			}
 		}
 
 		private String getLine(final int x, final String singular, final String plural) {
@@ -444,9 +416,8 @@ public class SurveyService {
 		private String resultAndNotify(final BigInteger clientId) throws Exception {
 			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 			params.setSearch("clientMarketingResult.published=false and clientMarketing.endDate<='" + Instant.now()
-					+ "' and clientMarketing.storage like '%" + Attachment.SEPARATOR
-					+ "%' and clientMarketing.clientId=" + clientId);
-			final Result list = repository.list(params);
+					+ "' and clientMarketing.clientId=" + clientId);
+			Result list = repository.list(params);
 			String result = "";
 			for (int i = 0; i < list.size(); i++) {
 				final ClientMarketingResult clientMarketingResult = result(
@@ -455,7 +426,8 @@ public class SurveyService {
 						repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId())
 								.getStorage()));
 				clientMarketingResult.setPublished(true);
-				if (poll.has("participants") && poll.get("participants").asInt() > 0) {
+				if (new ObjectMapper().readTree(Attachment.resolve(clientMarketingResult.getStorage()))
+						.get("participants").asInt() > 0) {
 					clientMarketingResult.setImage(Attachment.createImage(".png",
 							image.create(poll, "Spieler", repository.one(Client.class, clientId).getName(),
 									clientMarketingResult)));
@@ -471,6 +443,26 @@ public class SurveyService {
 					result += clientMarketingResult.getId() + " ";
 				} else
 					repository.save(clientMarketingResult);
+			}
+			final String label = "team=" + clients.get(clientId) + "&season=" + LocalDateTime.now().getYear();
+			final JsonNode matchDays = get(label);
+			if (matchDays != null) {
+				for (int i = 0; i < matchDays.size(); i++) {
+					if ("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())
+							&& Instant.ofEpochSecond(matchDays.get(i).get("fixture").get("timestamp").asLong())
+									.plus(Duration.ofHours(6)).isBefore(Instant.now())) {
+						params.setQuery(Query.misc_listStorage);
+						params.setSearch("storage.label='" + label + "'");
+						list = repository.list(params);
+						if (list.size() > 0) {
+							repository.delete(
+									repository.one(Storage.class,
+											(BigInteger) list.get(0).get("storage.id")));
+							get(label);
+						}
+						break;
+					}
+				}
 			}
 			return result.trim();
 		}
@@ -786,6 +778,7 @@ public class SurveyService {
 			send(repository.list(params), clientMarketing, ContactNotificationTextType.clientMarketingResult,
 					"contactMarketing.contactId");
 		}
+
 	}
 
 	private String formatDate(final long seconds, final String format) {
@@ -795,32 +788,34 @@ public class SurveyService {
 	}
 
 	protected JsonNode get(final String url) throws Exception {
+		final JsonNode fixture;
 		if (url.contains("team=0&"))
-			return new ObjectMapper().readTree(IOUtils
+			fixture = new ObjectMapper().readTree(IOUtils
 					.toString(getClass().getResourceAsStream("/surveyMatchdays.json"),
 							StandardCharsets.UTF_8)
-					.replace("\"{date}\"", "" + (Instant.now().getEpochSecond() - 60 * 60 * 2 - 5)));
-		if (url.equals("id=0"))
-			return new ObjectMapper().readTree(getClass().getResourceAsStream("/surveyLastMatch.json"));
-		final String label = "football-fixture-" + url;
-		final QueryParams params = new QueryParams(Query.misc_listStorage);
-		params.setSearch("storage.label='" + label + "'");
-		final Result result = repository.list(params);
-		final JsonNode fixture;
-		if (result.size() > 0)
-			fixture = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
+					.replace("\"{date}\"", "" + Instant.now().getEpochSecond()));
+		else if (url.equals("id=0"))
+			fixture = new ObjectMapper().readTree(getClass().getResourceAsStream("/surveyLastMatch.json"));
 		else {
-			fixture = WebClient
-					.create("https://v3.football.api-sports.io/fixtures?" + url)
-					.get()
-					.header("x-rapidapi-key", token)
-					.header("x-rapidapi-host", "v3.football.api-sports.io")
-					.retrieve()
-					.toEntity(JsonNode.class).block().getBody();
-			final Storage storage = new Storage();
-			storage.setLabel(label);
-			storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
-			repository.save(storage);
+			final String label = "football-fixture-" + url;
+			final QueryParams params = new QueryParams(Query.misc_listStorage);
+			params.setSearch("storage.label='" + label + "'");
+			final Result result = repository.list(params);
+			if (result.size() > 0)
+				fixture = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
+			else {
+				fixture = WebClient
+						.create("https://v3.football.api-sports.io/fixtures?" + url)
+						.get()
+						.header("x-rapidapi-key", token)
+						.header("x-rapidapi-host", "v3.football.api-sports.io")
+						.retrieve()
+						.toEntity(JsonNode.class).block().getBody();
+				final Storage storage = new Storage();
+				storage.setLabel(label);
+				storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
+				repository.save(storage);
+			}
 		}
 		if (fixture == null)
 			throw new RuntimeException(url + " not found");

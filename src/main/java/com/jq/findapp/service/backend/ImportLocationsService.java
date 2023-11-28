@@ -178,7 +178,7 @@ public class ImportLocationsService {
 		final Ticket ticket = repository.one(Ticket.class, ticketId);
 		String result = null;
 		try {
-			importLocation(new ObjectMapper().readTree(new String(Attachment.getFile(ticket.getNote()))), category);
+			importLocation(new ObjectMapper().readTree(Attachment.resolve(ticket.getNote())), category);
 			repository.delete(ticket);
 		} catch (final IllegalArgumentException ex) {
 			result = ex.getMessage();
@@ -197,7 +197,7 @@ public class ImportLocationsService {
 		return retrieveLocations("place/nearbysearch/json?radius=600&sensor=false&location="
 				+ latitude + "," + longitude);
 	}
-	
+
 	private String retrieveLocations(final String query) throws Exception {
 		final ObjectMapper om = new ObjectMapper();
 		JsonNode json = om.readTree(externalService.google(query));

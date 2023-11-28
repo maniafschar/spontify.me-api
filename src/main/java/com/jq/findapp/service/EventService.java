@@ -155,7 +155,7 @@ public class EventService {
 		return getRealDate(event, LocalDateTime.now(ZoneId.systemDefault()));
 	}
 
-	public void publish(final BigInteger id) {
+	public void publish(final BigInteger id) throws Exception {
 		final Event event = repository.one(Event.class, id);
 		final Contact contact = repository.one(Contact.class, event.getContactId());
 		externalService.publishOnFacebook(contact.getClientId(), event.getDescription(),

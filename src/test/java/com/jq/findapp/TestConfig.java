@@ -47,6 +47,8 @@ import com.jq.findapp.service.backend.SurveyService;
 @TestConfiguration
 @EnableTransactionManagement
 public class TestConfig {
+	public static int TIME_OFFSET = 0;
+
 	@Bean
 	public DataSource getDataSource() throws Exception {
 		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
@@ -121,24 +123,13 @@ public class TestConfig {
 	@Primary
 	public class SurveyServiceTest extends SurveyService {
 		@Override
-		protected JsonNode get(final String url) {
-			try {
-				if (url.contains("id="))
-					return new ObjectMapper().readTree(IOUtils.toString(
-							getClass().getResourceAsStream(
-									"/surveyLastMatch.json"),
-							StandardCharsets.UTF_8)
-							.replace("\"{date}\"", "" + (long) (Instant.now().getEpochSecond() - 2 * 60 * 60)))
-							.get("response");
-				return new ObjectMapper().readTree(IOUtils.toString(
-						getClass().getResourceAsStream(
-								"/surveyMatchdays.json"),
-						StandardCharsets.UTF_8)
-						.replace("\"{date}\"", "" + (long) (Instant.now().getEpochSecond() - 2 * 60 * 60)))
-						.get("response");
-			} catch (final Exception e) {
-				throw new RuntimeException(e);
-			}
+		protected JsonNode get(final String url) throws Exception {
+			return new ObjectMapper().readTree(IOUtils.toString(
+					getClass().getResourceAsStream(
+							url.startsWith("id=") ? "/surveyLastMatch.json" : "/surveyMatchdays.json"),
+					StandardCharsets.UTF_8)
+					.replace("\"{date}\"", "" + (long) (Instant.now().getEpochSecond() + TIME_OFFSET)))
+					.get("response");
 		}
 	}
 
