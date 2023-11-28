@@ -146,15 +146,15 @@ public class SupportCenterApi {
 		authenticationService.recoverSendEmailReminder(repository.one(Contact.class, id));
 	}
 
-	@PostMapping("import/location/{id}/{category}")
+	@PostMapping("location/import/{id}/{category}")
 	public String importLocation(@PathVariable final BigInteger id, @PathVariable final String category)
 			throws Exception {
 		return importLocationsService.importLocation(id, category);
 	}
 
-	@PostMapping("import/location/{query}")
+	@PostMapping("location/search/{query}")
 	public String importLocation(@PathVariable final String query) throws Exception {
-		return importLocationsService.importLocation(query);
+		return importLocationsService.searchLocation(query);
 	}
 
 	@PostMapping("authenticate/{id}")
