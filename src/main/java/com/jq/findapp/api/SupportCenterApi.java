@@ -77,9 +77,6 @@ public class SupportCenterApi {
 	private EventService eventService;
 
 	@Autowired
-	private ExternalService externalService;
-
-	@Autowired
 	private RssService rssService;
 
 	@Autowired
@@ -165,10 +162,7 @@ public class SupportCenterApi {
 
 	@PostMapping("event/publish/{id}")
 	public void eventPublish(@PathVariable final BigInteger id) throws Exception {
-		final Event event = repository.one(Event.class, id);
-		final Contact contact = repository.one(Contact.class, event.getContactId());
-		externalService.publishOnFacebook(contact.getClientId(), event.getDescription(),
-				"/rest/action/marketing/event/" + event.getId());
+		eventService.publish(id);
 	}
 
 	@PostMapping("survey/test/{type}")
