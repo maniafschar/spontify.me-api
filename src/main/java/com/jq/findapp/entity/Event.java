@@ -13,6 +13,7 @@ import jakarta.persistence.Entity;
 public class Event extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger locationId;
+	private Boolean publish;
 	private Date endDate;
 	private Double price;
 	// TODO rm 0.6
@@ -138,6 +139,14 @@ public class Event extends BaseEntity {
 
 	public void setUrl(final String url) {
 		this.url = url;
+	}
+
+	public Boolean getPublish() {
+		return publish;
+	}
+
+	public void setPublish(Boolean publish) {
+		this.publish = publish;
 	}
 
 	public String getRepetition() {

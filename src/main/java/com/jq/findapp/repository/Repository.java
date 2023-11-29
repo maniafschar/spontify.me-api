@@ -257,7 +257,7 @@ public class Repository {
 				}
 			}
 		}
-		return count > 0 ? dir + ": " + count + '\n' : "";
+		return count > 0 ? dir.substring(0, dir.length() - 1) + ": " + count + '\n' : "";
 	}
 
 	public static class Attachment {
