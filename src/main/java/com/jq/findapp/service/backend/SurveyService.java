@@ -728,12 +728,14 @@ public class SurveyService {
 
 		private void send(final Result users, final ClientMarketing clientMarketing,
 				final ContactNotificationTextType type, final String field) throws Exception {
+			final JsonNode poll = new ObjectMapper().readTree(Attachment.resolve(clientMarketing.getStorage()));
+			final String opponent = poll.get("home".equals(poll.get("location").asText()) ? "awayName" : "homeName").asText();
 			final List<Object> sent = new ArrayList<>();
 			for (int i = 0; i < users.size(); i++) {
 				if (!sent.contains(users.get(i).get(field))) {
 					notificationService.sendNotification(null,
 							repository.one(Contact.class, (BigInteger) users.get(i).get(field)),
-							type, "m=" + clientMarketing.getId());
+							type, "m=" + clientMarketing.getId(), opponent);
 					sent.add(users.get(i).get(field));
 				}
 			}
