@@ -127,6 +127,7 @@ public class SurveyService {
 						poll.put("league", json.get(i).get("league").get("logo").asText());
 						poll.put("leagueName", json.get(i).get("league").get("name").asText());
 						poll.put("timestamp", json.get(i).get("fixture").get("timestamp").asLong());
+						poll.put("fixtureId", json.get(i).get("fixture").get("id").asLong());
 						poll.put("venue", json.get(i).get("fixture").get("venue").get("name").asText());
 						poll.put("city", json.get(i).findPath("fixture").get("venue").get("city").asText());
 						poll.put("location",
@@ -154,6 +155,7 @@ public class SurveyService {
 									ContactNotificationTextType.clientMarketingPrediction);
 							externalService.publishOnFacebook(clientId,
 									"Eure Ergebnistipps für unsere Bayern im Spiel" + getOponent(poll)
+											+ "\n\nKlickt auf das Bild, um abzustimmen. Dort wird Eure Stimme erfasst und automatisch in die Wertung übernommen, die Ihr dann kurz vor dem Spiel hier sehen könnt."
 											+ (poll.get("statistics").size() > 0
 													? "\n\nIm Bild seht ihr die zusammengefassten Statistiken zu den letzen Spielen."
 													: ""),
@@ -296,6 +298,7 @@ public class SurveyService {
 									matchDay.findPath("away").get("name").asText().replace("Munich", "München"));
 							poll.put("league", matchDay.findPath("league").get("logo").asText());
 							poll.put("timestamp", matchDay.findPath("fixture").get("timestamp").asLong());
+							poll.put("fixtureId", matchDay.get(i).get("fixture").get("id").asLong());
 							poll.put("venue", matchDay.findPath("fixture").get("venue").get("name").asText());
 							poll.put("city", matchDay.findPath("fixture").get("venue").get("city").asText());
 							poll.put("location",
