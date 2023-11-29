@@ -427,9 +427,8 @@ public class SurveyService {
 						params.setSearch("storage.label='" + label + "'");
 						list = repository.list(params);
 						if (list.size() > 0) {
-							repository.delete(
-									repository.one(Storage.class,
-											(BigInteger) list.get(0).get("storage.id")));
+							repository.delete(repository.one(Storage.class,
+									(BigInteger) list.get(0).get("storage.id")));
 							get(label);
 						}
 						break;
@@ -761,33 +760,24 @@ public class SurveyService {
 
 	protected JsonNode get(final String url) throws Exception {
 		final JsonNode fixture;
-		if (url.contains("team=0&"))
-			fixture = new ObjectMapper().readTree(IOUtils
-					.toString(getClass().getResourceAsStream("/surveyMatchdays.json"),
-							StandardCharsets.UTF_8)
-					.replace("\"{date}\"", "" + Instant.now().getEpochSecond()));
-		else if (url.equals("id=0"))
-			fixture = new ObjectMapper().readTree(getClass().getResourceAsStream("/surveyLastMatch.json"));
+		final String label = "football-fixture-" + url;
+		final QueryParams params = new QueryParams(Query.misc_listStorage);
+		params.setSearch("storage.label='" + label + "'");
+		final Result result = repository.list(params);
+		if (result.size() > 0)
+			fixture = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
 		else {
-			final String label = "football-fixture-" + url;
-			final QueryParams params = new QueryParams(Query.misc_listStorage);
-			params.setSearch("storage.label='" + label + "'");
-			final Result result = repository.list(params);
-			if (result.size() > 0)
-				fixture = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
-			else {
-				fixture = WebClient
-						.create("https://v3.football.api-sports.io/fixtures?" + url)
-						.get()
-						.header("x-rapidapi-key", token)
-						.header("x-rapidapi-host", "v3.football.api-sports.io")
-						.retrieve()
-						.toEntity(JsonNode.class).block().getBody();
-				final Storage storage = new Storage();
-				storage.setLabel(label);
-				storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
-				repository.save(storage);
-			}
+			fixture = WebClient
+					.create("https://v3.football.api-sports.io/fixtures?" + url)
+					.get()
+					.header("x-rapidapi-key", token)
+					.header("x-rapidapi-host", "v3.football.api-sports.io")
+					.retrieve()
+					.toEntity(JsonNode.class).block().getBody();
+			final Storage storage = new Storage();
+			storage.setLabel(label);
+			storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
+			repository.save(storage);
 		}
 		if (fixture == null)
 			throw new RuntimeException(url + " not found");
