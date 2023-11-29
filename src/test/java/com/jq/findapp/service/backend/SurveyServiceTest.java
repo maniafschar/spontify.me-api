@@ -75,6 +75,19 @@ public class SurveyServiceTest {
 	public void prediction() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
+		final BigInteger clientMarketingId = surveyService.synchronize.prediction(BigInteger.ONE, 0);
+
+		// when
+		final String result = result(clientMarketingId);
+
+		// then
+		assertTrue(Integer.valueOf(result) > 0);
+	}
+
+	@Test
+	public void prediction_withHistory() throws Exception {
+		// given
+		utils.createContact(BigInteger.ONE);
 		final String s = IOUtils
 				.toString(getClass().getResourceAsStream("/surveyMatchdays.json"), StandardCharsets.UTF_8);
 		Storage storage = new Storage();
@@ -93,19 +106,6 @@ public class SurveyServiceTest {
 				.replaceAll("\"timestamp\": \"(\\d*)\",",
 						"" + (Instant.now().minus(Duration.ofDays(720)).toEpochMilli() / 1000)));
 		repository.save(storage);
-		final BigInteger clientMarketingId = surveyService.synchronize.prediction(BigInteger.ONE, 0);
-
-		// when
-		final String result = result(clientMarketingId);
-
-		// then
-		assertTrue(Integer.valueOf(result) > 0);
-	}
-
-	@Test
-	public void prediction_withoutHistory() throws Exception {
-		// given
-		utils.createContact(BigInteger.ONE);
 		final BigInteger clientMarketingId = surveyService.synchronize.prediction(BigInteger.ONE, 0);
 
 		// when
