@@ -47,7 +47,6 @@ public class SurveyServiceTest {
 	public void update_twice() throws Exception {
 		// given
 		utils.createContact(BigInteger.valueOf(4));
-		TestConfig.TIME_OFFSET = 0;
 		SchedulerResult result = surveyService.update();
 		assertNull(result.exception);
 
@@ -60,11 +59,10 @@ public class SurveyServiceTest {
 	}
 
 	@Test
-	public void testPollPlayerOfTheMatch() throws Exception {
+	public void poll() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
-		TestConfig.TIME_OFFSET = -2 * 60 * 60;
-		final BigInteger clientMarketingId = poll(false);
+		final BigInteger clientMarketingId = surveyService.synchronize.poll(BigInteger.ONE, 0);
 
 		// when
 		final String result = result(clientMarketingId);
@@ -74,10 +72,9 @@ public class SurveyServiceTest {
 	}
 
 	@Test
-	public void testPollPrediction() throws Exception {
+	public void prediction() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
-		TestConfig.TIME_OFFSET = 0;
 		final String s = IOUtils
 				.toString(getClass().getResourceAsStream("/surveyMatchdays.json"), StandardCharsets.UTF_8);
 		Storage storage = new Storage();
@@ -96,7 +93,7 @@ public class SurveyServiceTest {
 				.replaceAll("\"timestamp\": \"(\\d*)\",",
 						"" + (Instant.now().minus(Duration.ofDays(720)).toEpochMilli() / 1000)));
 		repository.save(storage);
-		final BigInteger clientMarketingId = poll(true);
+		final BigInteger clientMarketingId = surveyService.synchronize.prediction(BigInteger.ONE, 0);
 
 		// when
 		final String result = result(clientMarketingId);
@@ -106,23 +103,16 @@ public class SurveyServiceTest {
 	}
 
 	@Test
-	public void testPollPrediction_withoutHistory() throws Exception {
+	public void prediction_withoutHistory() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
-		TestConfig.TIME_OFFSET = 0;
-		final BigInteger clientMarketingId = poll(true);
+		final BigInteger clientMarketingId = surveyService.synchronize.prediction(BigInteger.ONE, 0);
 
 		// when
 		final String result = result(clientMarketingId);
 
 		// then
 		assertTrue(Integer.valueOf(result) > 0);
-	}
-
-	private BigInteger poll(final boolean prediction) throws Exception {
-		if (prediction)
-			return surveyService.synchronize.prediction(BigInteger.ONE, 0);
-		return surveyService.synchronize.poll(BigInteger.ONE, 0);
 	}
 
 	private String result(final BigInteger clientMarketingId) throws Exception {
