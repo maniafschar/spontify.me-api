@@ -46,6 +46,8 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 		eventParticipate.setEventId(event.getId());
 		eventParticipate.setEventDate(new Date(event.getStartDate().getTime()));
 		repository.save(eventParticipate);
+		if (event.getPublish() != null && event.getPublish())
+			eventService.publish(event.getId());
 	}
 
 	@Override
@@ -86,6 +88,8 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 				}
 			}
 		}
+		if (event.getPublish() != null && event.getPublish())
+			eventService.publish(event.getId());
 	}
 
 	@Override
