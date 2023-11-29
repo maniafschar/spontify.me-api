@@ -12,6 +12,7 @@ select
 	event.locationId,
 	event.maxParticipants,
 	event.price,
+	event.publish,
 	event.skills,
 	event.skillsText,
 	event.startDate,

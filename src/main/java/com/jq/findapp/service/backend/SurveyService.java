@@ -62,7 +62,7 @@ public class SurveyService {
 	private final Synchonize synchronize = new Synchonize();
 	private final Image image = new Image();
 	private final Notification notification = new Notification();
-	public final Test test = new Test();
+	final Test test = new Test();
 
 	@Autowired
 	private Repository repository;

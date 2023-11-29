@@ -165,20 +165,6 @@ public class SupportCenterApi {
 		repository.save(contact);
 	}
 
-	@PostMapping("event/publish/{id}")
-	public void eventPublish(@PathVariable final BigInteger id) throws Exception {
-		eventService.publish(id);
-	}
-
-	@PostMapping("survey/test/{type}")
-	public Object survey(@PathVariable final String type) throws Exception {
-		if ("prediction".equals(type))
-			return surveyService.test.poll(true);
-		if ("poll".equals(type))
-			return surveyService.test.poll(false);
-		return surveyService.test.result(new BigInteger(type));
-	}
-
 	@GetMapping("metrics")
 	public Map<String, Object> metrics() throws Exception {
 		final Map<String, Object> result = new HashMap<>();

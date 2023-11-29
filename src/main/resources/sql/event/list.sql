@@ -7,6 +7,7 @@ SELECT
 	event.locationId,
 	event.maxParticipants,
 	event.price,
+	event.publish,
 	event.rating,
 	event.skills,
 	event.skillsText,
