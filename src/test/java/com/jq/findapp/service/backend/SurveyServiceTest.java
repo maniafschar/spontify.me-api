@@ -1,11 +1,11 @@
 package com.jq.findapp.service.backend;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -18,11 +18,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
+import com.jq.findapp.entity.ClientMarketing;
+import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.entity.Storage;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith(SpringExtension.class)
@@ -59,10 +64,10 @@ public class SurveyServiceTest {
 		// given
 		utils.createContact(BigInteger.ONE);
 		TestConfig.TIME_OFFSET = -2 * 60 * 60;
-		final BigInteger clientMarketingId = surveyService.test.poll(false);
+		final BigInteger clientMarketingId = poll(false);
 
 		// when
-		final String result = surveyService.test.result(clientMarketingId);
+		final String result = result(clientMarketingId);
 
 		// then
 		assertTrue(Integer.valueOf(result) > 0);
@@ -91,10 +96,10 @@ public class SurveyServiceTest {
 				.replaceAll("\"timestamp\": \"(\\d*)\",",
 						"" + (Instant.now().minus(Duration.ofDays(720)).toEpochMilli() / 1000)));
 		repository.save(storage);
-		final BigInteger clientMarketingId = surveyService.test.poll(true);
+		final BigInteger clientMarketingId = poll(true);
 
 		// when
-		final String result = surveyService.test.result(clientMarketingId);
+		final String result = result(clientMarketingId);
 
 		// then
 		assertTrue(Integer.valueOf(result) > 0);
@@ -105,12 +110,36 @@ public class SurveyServiceTest {
 		// given
 		utils.createContact(BigInteger.ONE);
 		TestConfig.TIME_OFFSET = 0;
-		final BigInteger clientMarketingId = surveyService.test.poll(true);
+		final BigInteger clientMarketingId = poll(true);
 
 		// when
-		final String result = surveyService.test.result(clientMarketingId);
+		final String result = result(clientMarketingId);
 
 		// then
 		assertTrue(Integer.valueOf(result) > 0);
+	}
+
+	private BigInteger poll(final boolean prediction) throws Exception {
+		if (prediction)
+			return surveyService.synchronize.prediction(BigInteger.ONE, 0);
+		return surveyService.synchronize.poll(BigInteger.ONE, 0);
+	}
+
+	private String result(final BigInteger clientMarketingId) throws Exception {
+		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
+		final JsonNode poll = new ObjectMapper().readTree(Attachment.resolve(clientMarketing.getStorage()));
+		final int max = (int) (10 + Math.random() * 100);
+		for (int i = 0; i < max; i++) {
+			final ContactMarketing contactMarketing = new ContactMarketing();
+			contactMarketing.setClientMarketingId(clientMarketingId);
+			contactMarketing.setContactId(BigInteger.ONE);
+			contactMarketing.setFinished(Boolean.TRUE);
+			contactMarketing.setStorage("{\"q0\":{\"a\":["
+					+ (int) (Math.random() * poll.get("questions").get(0).get("answers").size()) + "]}}");
+			repository.save(contactMarketing);
+		}
+		clientMarketing.setEndDate(new Timestamp(System.currentTimeMillis() - 1000));
+		repository.save(clientMarketing);
+		return surveyService.synchronize.resultAndNotify(clientMarketing.getClientId());
 	}
 }

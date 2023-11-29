@@ -59,10 +59,9 @@ import com.jq.findapp.util.Strings;
 @Service
 public class SurveyService {
 	private final static Map<BigInteger, Integer> clients = new HashMap<>();
-	private final Synchonize synchronize = new Synchonize();
+	final Synchonize synchronize = new Synchonize();
 	private final Image image = new Image();
 	private final Notification notification = new Notification();
-	final Test test = new Test();
 
 	@Autowired
 	private Repository repository;
@@ -104,36 +103,10 @@ public class SurveyService {
 		synchronize.result(clientMarketingId);
 	}
 
-	public class Test {
-		public BigInteger poll(final boolean prediction) throws Exception {
-			if (prediction)
-				return synchronize.prediction(BigInteger.ONE, 0);
-			return synchronize.poll(BigInteger.ONE, 0);
-		}
-
-		public String result(final BigInteger clientMarketingId) throws Exception {
-			final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
-			final JsonNode poll = new ObjectMapper().readTree(Attachment.resolve(clientMarketing.getStorage()));
-			final int max = (int) (10 + Math.random() * 100);
-			for (int i = 0; i < max; i++) {
-				final ContactMarketing contactMarketing = new ContactMarketing();
-				contactMarketing.setClientMarketingId(clientMarketingId);
-				contactMarketing.setContactId(BigInteger.ONE);
-				contactMarketing.setFinished(Boolean.TRUE);
-				contactMarketing.setStorage("{\"q0\":{\"a\":["
-						+ (int) (Math.random() * poll.get("questions").get(0).get("answers").size()) + "]}}");
-				repository.save(contactMarketing);
-			}
-			clientMarketing.setEndDate(new Timestamp(System.currentTimeMillis() - 1000));
-			repository.save(clientMarketing);
-			return synchronize.resultAndNotify(clientMarketing.getClientId());
-		}
-	}
-
-	private class Synchonize {
+	class Synchonize {
 		private final static int FIRST_YEAR = 2010;
 
-		private BigInteger prediction(final BigInteger clientId, final int teamId) throws Exception {
+		BigInteger prediction(final BigInteger clientId, final int teamId) throws Exception {
 			final long now = Instant.now().getEpochSecond();
 			final JsonNode json = get("team=" + teamId + "&season=" + LocalDateTime.now().getYear());
 			for (int i = 0; i < json.size(); i++) {
@@ -292,7 +265,7 @@ public class SurveyService {
 					"Lieben Dank für die Teilnahme!\n\nLust auf mehr <b>Bayern Feeling</b>? In unserer neuen App bauen wir eine reine Bayern <b>Fan Community</b> auf.\n\nMit ein paar wenigen Klicks kannst auch Du dabei sein.");
 		}
 
-		private BigInteger poll(final BigInteger clientId, final int teamId) throws Exception {
+		BigInteger poll(final BigInteger clientId, final int teamId) throws Exception {
 			final JsonNode matchDays = get("team=" + teamId + "&season=" + LocalDateTime.now().getYear());
 			if (matchDays != null) {
 				for (int i = 0; i < matchDays.size(); i++) {
@@ -412,7 +385,7 @@ public class SurveyService {
 			return "<br/>" + x + (x > 1 ? plural : singular);
 		}
 
-		private String resultAndNotify(final BigInteger clientId) throws Exception {
+		String resultAndNotify(final BigInteger clientId) throws Exception {
 			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 			params.setSearch("clientMarketingResult.published=false and clientMarketing.endDate<='" + Instant.now()
 					+ "' and clientMarketing.clientId=" + clientId);
