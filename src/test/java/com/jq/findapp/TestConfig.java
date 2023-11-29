@@ -119,12 +119,11 @@ public class TestConfig {
 
 	@Service
 	@Primary
-	public class SurveyServiceTest extends SurveyService {
+	public class SurveyServiceMock extends SurveyService {
+		public int offset = 0;
+
 		@Override
 		protected JsonNode get(final String url) throws Exception {
-			int offset = 0;
-			if (url.contains("offset="))
-				offset = Integer.valueOf(url.substring(url.indexOf("offset=") + 7);
 			return new ObjectMapper().readTree(IOUtils.toString(
 					getClass().getResourceAsStream(
 							url.startsWith("id=") ? "/surveyLastMatch.json" : "/surveyMatchdays.json"),

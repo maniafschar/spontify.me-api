@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
+import com.jq.findapp.TestConfig.SurveyServiceMock;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ContactMarketing;
@@ -43,6 +45,11 @@ public class SurveyServiceTest {
 	@Autowired
 	private Repository repository;
 
+	@BeforeEach
+	public void before() {
+		((SurveyServiceMock) surveyService).offset = 0;
+	}
+
 	@Test
 	public void update_twice() throws Exception {
 		// given
@@ -62,6 +69,7 @@ public class SurveyServiceTest {
 	public void poll() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
+		((SurveyServiceMock) surveyService).offset = -2 * 60 * 60;
 		final BigInteger clientMarketingId = surveyService.synchronize.poll(BigInteger.ONE, 0);
 
 		// when
