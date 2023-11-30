@@ -321,8 +321,7 @@ public class SurveyService {
 							pollAddAnswers(question.putArray("answers"), players);
 							final ClientMarketing clientMarketing = new ClientMarketing();
 							clientMarketing.setStartDate(new Timestamp(startDate.toEpochMilli()));
-							clientMarketing
-									.setEndDate(new Timestamp(startDate.plus(Duration.ofHours(18)).toEpochMilli()));
+							clientMarketing.setEndDate(new Timestamp(startDate.plus(Duration.ofHours(18)).toEpochMilli()));
 							clientMarketing.setClientId(clientId);
 							clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
 							clientMarketing.setImage(Attachment.createImage(".png",
@@ -442,6 +441,8 @@ public class SurveyService {
 		}
 
 		public synchronized ClientMarketingResult result(final BigInteger clientMarketingId) throws Exception {
+			final JsonNode poll = new ObjectMapper().readTree(Attachment.resolve(
+					repository.one(ClientMarketing.class, clientMarketingId).getStorage()));
 			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 			params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketingId);
 			Result result = repository.list(params);
@@ -467,13 +468,15 @@ public class SurveyService {
 							.forEachRemaining(e -> {
 								if (!json.has(e.getKey())) {
 									json.set(e.getKey(), om.createObjectNode());
-									((ObjectNode) json.get(e.getKey())).set("a", om.createArrayNode());
+									final ArrayNode a = om.createArrayNode();
+									for (int i3 = 0; i3 < poll.get("questions").get(
+											Integer.valueOf(e.getKey().substring(1)).get("answers").size(); i3++)
+										a.add(0);
+									((ObjectNode) json.get(e.getKey())).set("a", a);
 								}
 								for (int i = 0; i < e.getValue().get("a").size(); i++) {
 									final int index = e.getValue().get("a").get(i).asInt();
 									final ArrayNode a = ((ArrayNode) json.get(e.getKey()).get("a"));
-									for (int i3 = a.size(); i3 <= index; i3++)
-										a.add(0);
 									a.set(index, a.get(index).asInt() + 1);
 								}
 								if (e.getValue().has("t") && !Strings.isEmpty(e.getValue().get("t").asText())) {
@@ -637,9 +640,31 @@ public class SurveyService {
 			result = result.get("q0").get("a");
 			final List<String> x = new ArrayList<>();
 			final String leftPad = "000000000000000";
-			for (int i = 0; i < result.size(); i++)
+			final boolean prediction = "Prediction".equals(poll.put("type").asText());
+			for (int i = 0; i < result.size() - (prediction ? 1 : 0); i++)
 				x.add(leftPad.substring(result.get(i).asText().length()) + result.get(i).asText() + "_"
 						+ poll.get(i).get("answer").asText());
+			if (prediction) {
+				final String text = result.get(result.size() - 1).asText();
+				if (text.length() > 0) {
+					final Pattern predictionText = Pattern.compile("(\\d+)[ ]*[ :-]+[ ]*(\\d+)", Pattern.MULTILINE);
+					final String[] answers = text.substring(5, text.length() - 6).split("</div><div>");
+					final Map<String, Integer> results = new HashMap<>();
+					for (String s : answers) {
+						final Matcher m = predictionText.matcher(s);
+						if (m.find()) {
+							final String key = m.group(1) + " : " + m.group(2);
+							if (results.containsKey(key))
+								results.put(key, results.get(key) + 1);
+							else
+								results.put(key, 1);
+						}
+					}
+					results.keySet().stream().forEach(key -> {
+						x.add(leftPad.substring(key.length()) + key + "_" + results.get(key));
+					});
+				}
+			}
 			Collections.sort(x);
 			for (int i = x.size() - 1; i >= 0 && i > x.size() - 7; i--) {
 				final String[] s = x.get(i).split("_");
