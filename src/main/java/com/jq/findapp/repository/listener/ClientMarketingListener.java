@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.ClientMarketing.ClientMarketingMode;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
@@ -27,8 +26,7 @@ public class ClientMarketingListener extends AbstractRepositoryListener<ClientMa
 
 	@Override
 	public void postUpdate(final ClientMarketing clientMarketing) throws Exception {
-		if (clientMarketing.getMode() == ClientMarketingMode.Live
-				&& clientMarketing.getStartDate().getTime() > Instant.now().toEpochMilli()
+		if (clientMarketing.getStartDate().getTime() > Instant.now().toEpochMilli()
 				&& clientMarketing.getImage() != null)
 			execute(clientMarketing);
 	}
