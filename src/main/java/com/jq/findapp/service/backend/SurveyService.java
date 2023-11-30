@@ -42,7 +42,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketing;
-import com.jq.findapp.entity.ClientMarketing.ClientMarketingMode;
 import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactMarketing;
@@ -147,7 +146,6 @@ public class SurveyService {
 									.minus(Duration.ofDays(1)).toEpochMilli()));
 							clientMarketing.setEndDate(new Timestamp(end.toEpochMilli()));
 							clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
-							clientMarketing.setMode(ClientMarketingMode.Live);
 							clientMarketing.setImage(Attachment.createImage(".png",
 									image.create(poll, "Ergebnistipps",
 											repository.one(Client.class, clientId).getName(),
@@ -329,7 +327,6 @@ public class SurveyService {
 							clientMarketing.setImage(Attachment.createImage(".png",
 									image.create(poll, "Spieler", repository.one(Client.class, clientId).getName(),
 											null)));
-							clientMarketing.setMode(teamId == 0 ? ClientMarketingMode.Test : ClientMarketingMode.Live);
 							repository.save(clientMarketing);
 							notification.sendPoll(clientMarketing,
 									ContactNotificationTextType.clientMarketingPlayerOfTheMatch);
@@ -700,8 +697,6 @@ public class SurveyService {
 	private class Notification {
 		private void sendPoll(final ClientMarketing clientMarketing, final ContactNotificationTextType type)
 				throws Exception {
-			if (clientMarketing.getMode() == ClientMarketingMode.Test)
-				return;
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			String s = "contact.verified=true and contact.clientId=" + clientMarketing.getClientId();
 			if (!Strings.isEmpty(clientMarketing.getLanguage())) {
@@ -773,8 +768,6 @@ public class SurveyService {
 		}
 
 		private void sendResult(final ClientMarketing clientMarketing) throws Exception {
-			if (clientMarketing.getMode() == ClientMarketingMode.Test)
-				return;
 			final QueryParams params = new QueryParams(Query.contact_listMarketing);
 			params.setSearch(
 					"contactMarketing.finished=true and contactMarketing.contactId is not null and contactMarketing.clientMarketingId="
