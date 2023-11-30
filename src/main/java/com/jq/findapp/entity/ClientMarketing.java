@@ -15,8 +15,6 @@ import jakarta.persistence.Transient;
 public class ClientMarketing extends BaseEntity {
 	private BigInteger clientId;
 	private Boolean share;
-	@Enumerated(EnumType.STRING)
-	private ClientMarketingMode mode = ClientMarketingMode.Live;
 	private String age;
 	private String gender;
 	private String language;
@@ -25,10 +23,6 @@ public class ClientMarketing extends BaseEntity {
 	private String image;
 	private Timestamp endDate;
 	private Timestamp startDate;
-
-	public enum ClientMarketingMode {
-		Test, Live
-	}
 
 	public BigInteger getClientId() {
 		return clientId;
@@ -108,14 +102,6 @@ public class ClientMarketing extends BaseEntity {
 
 	public void setImage(final String image) {
 		this.image = image;
-	}
-
-	public ClientMarketingMode getMode() {
-		return mode;
-	}
-
-	public void setMode(ClientMarketingMode mode) {
-		this.mode = mode;
 	}
 
 	@Transient
