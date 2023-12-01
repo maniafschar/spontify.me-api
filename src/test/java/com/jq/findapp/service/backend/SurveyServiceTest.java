@@ -1,16 +1,14 @@
 package com.jq.findapp.service.backend;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +25,6 @@ import com.jq.findapp.TestConfig.SurveyServiceMock;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ContactMarketing;
-import com.jq.findapp.entity.Storage;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.util.Utils;
@@ -83,6 +80,7 @@ public class SurveyServiceTest {
 	public void prediction() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
+		((SurveyServiceMock) surveyService).offset = -1;
 		final BigInteger clientMarketingId = surveyService.synchronize.prediction(BigInteger.ONE, 0);
 
 		// when
@@ -96,24 +94,6 @@ public class SurveyServiceTest {
 	public void prediction_withHistory() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
-		final String s = IOUtils
-				.toString(getClass().getResourceAsStream("/surveyMatchdays.json"), StandardCharsets.UTF_8);
-		Storage storage = new Storage();
-		storage.setLabel("football-0-" + LocalDateTime.now().getYear());
-		storage.setStorage(s);
-		repository.save(storage);
-		storage = new Storage();
-		storage.setLabel("football-0-" + (LocalDateTime.now().getYear() - 1));
-		storage.setStorage(s.replace("\"NS\"", "\"FT\"")
-				.replaceAll("\"timestamp\": \"(\\d*)\",",
-						"" + (Instant.now().minus(Duration.ofDays(280)).toEpochMilli() / 1000)));
-		repository.save(storage);
-		storage = new Storage();
-		storage.setLabel("football-0-" + (LocalDateTime.now().getYear() - 2));
-		storage.setStorage(s.replace("\"NS\"", "\"FT\"")
-				.replaceAll("\"timestamp\": \"(\\d*)\",",
-						"" + (Instant.now().minus(Duration.ofDays(720)).toEpochMilli() / 1000)));
-		repository.save(storage);
 		final BigInteger clientMarketingId = surveyService.synchronize.prediction(BigInteger.ONE, 0);
 
 		// when
@@ -121,6 +101,20 @@ public class SurveyServiceTest {
 
 		// then
 		assertTrue(Integer.valueOf(result) > 0);
+	}
+
+	@Test
+	public void regex() {
+		// given
+		final Pattern pattern = Pattern.compile("(\\d+)[ ]*[ :-]+[ ]*(\\d+)", Pattern.MULTILINE);
+		final Matcher matcher = pattern.matcher("abc\nxyz1 -  8op\nxyz");
+
+		// when
+		matcher.find();
+
+		// then
+		assertEquals("1", matcher.group(1));
+		assertEquals("8", matcher.group(2));
 	}
 
 	private String result(final BigInteger clientMarketingId) throws Exception {

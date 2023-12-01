@@ -1,6 +1,10 @@
 package com.jq.findapp.service;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.math.BigInteger;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -9,10 +13,18 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.TimeZone;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.Event;
@@ -190,26 +202,34 @@ public class EventService {
 		return repository.list(params).size() >= event.getMaxParticipants().intValue();
 	}
 
-	public SchedulerResult importEvents() {
+	public SchedulerResult importEvents() throws Exception {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importEvents");
-		final BigInteger clientId = BigInteger.ONE;
-		final URL url = new URL("https://www.muenchen.de/veranstaltungen/event");
-		String s = IOUtils.toString(url.openStream());
-		s = s.substring(s.indexOf("<ul class=\"m-listing__list\""), s.indexOf("</ul>"));
+		final Client client = repository.one(Client.class, BigInteger.ONE);
+		String s = get("https://www.muenchen.de/veranstaltungen/event");
+		s = s.substring(s.indexOf("<ul class=\"m-listing__list\""));
+		s = s.substring(0, s.indexOf("</ul>") + 5);
 		if (s.length() > 40) {
-			final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(s);
-		    	final NodeList lis = doc.getElementsByTagName("li");
+			final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+					.parse(new InputSource(new StringReader(s)));
+			final NodeList lis = doc.getElementsByTagName("li");
 			for (int i = 0; i < lis.getLength(); i++) {
 				final Event event = new Event();
-				Node node = lis.item(i).getFirstChild().getChildNodes().item(1);
+				final Node node = lis.item(i).getFirstChild().getChildNodes().item(1);
 				event.setDescription(node.getFirstChild().getFirstChild().getTextContent());
 				event.setSkillsText(node.getChildNodes().item(1).getTextContent());
-				event.setStartDate(new Timestamp(node.getChildNodes().item(2).getChildNodes().item(3)
-        					.getAttributes().getNamedItem("datetime").getNodeValue()));
+				event.setContactId(client.getAdminId());
+				event.setLocationId(null);
+				// event.setStartDate(new
+				// Timestamp(node.getChildNodes().item(2).getChildNodes().item(3)
+				// .getAttributes().getNamedItem("datetime").getNodeValue()));
 				node.getChildNodes().item(2).getChildNodes().item(1)
-        					.getAttributes().getNamedItem("href").getNodeValue();
+						.getAttributes().getNamedItem("href").getNodeValue();
 			}
 		}
 		return result;
+	}
+
+	protected String get(final String url) throws IOException {
+		return IOUtils.toString(new URL(url).openStream(), StandardCharsets.UTF_8);
 	}
 }

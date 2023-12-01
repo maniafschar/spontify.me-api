@@ -11,7 +11,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
@@ -22,14 +21,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.TimeZone;
 
 import javax.imageio.ImageIO;
 
 import org.apache.batik.ext.awt.RadialGradientPaint;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -44,7 +42,6 @@ import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Storage;
@@ -547,9 +544,9 @@ public class SurveyService {
 			int y = padding;
 			final double w = width * 0.3, delta = 1.6;
 			g2.setColor(new Color(0, 0, 0));
-			for (int i = 0; i < poll.get("matches").size() && i < 8; i++) {
-				final String[] s = poll.get("matches").get(poll.get("matches").size() - i - 1).asText().split("|");
-				g2.drawString(s[0], width - padding - 150 - g2.getFontMetrics().stringWidth(s[0]) / 2, y + h);
+			for (int i = 0; i < poll.get("matches").size(); i++) {
+				final String[] s = poll.get("matches").get(poll.get("matches").size() - i - 1).asText().split("\\|");
+				g2.drawString(s[0], width - padding - 120 - g2.getFontMetrics().stringWidth(s[0]) / 2, y + h);
 				g2.drawString(s[1], width - padding - g2.getFontMetrics().stringWidth(s[1]), y + h);
 				y += delta * padding;
 			}
@@ -602,9 +599,9 @@ public class SurveyService {
 						s = labels.get(s);
 					g2.drawString(s, padding + (int) w - g2.getFontMetrics().stringWidth(s) / 2, y + h);
 					s = poll.get("statistics").get(i).get("home").asText();
-					g2.drawString(s, padding + (int) w / 2 - g2.getFontMetrics().stringWidth(s), y + h);
+					g2.drawString(s, padding + (int) w * 0.4f - g2.getFontMetrics().stringWidth(s), y + h);
 					s = poll.get("statistics").get(i).get("away").asText();
-					g2.drawString(s, padding + (int) w * 1.5f, y + h);
+					g2.drawString(s, padding + (int) w * 1.6f, y + h);
 					y += delta * padding;
 				}
 			}
@@ -630,7 +627,7 @@ public class SurveyService {
 					final Pattern predictionText = Pattern.compile("(\\d+)[ ]*[ :-]+[ ]*(\\d+)", Pattern.MULTILINE);
 					final String[] answers = text.substring(5, text.length() - 6).split("</div><div>");
 					final Map<String, Integer> results = new HashMap<>();
-					for (String s : answers) {
+					for (final String s : answers) {
 						final Matcher m = predictionText.matcher(s);
 						if (m.find()) {
 							final String key = m.group(1) + " : " + m.group(2);
