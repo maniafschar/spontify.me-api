@@ -80,30 +80,6 @@ public class SurveyService {
 		clients.put(BigInteger.valueOf(4), 157);
 	}
 
-	public SchedulerResult update() {
-		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/update");
-		clients.keySet().forEach(e -> {
-			try {
-				BigInteger id = synchronize.prediction(e, clients.get(e));
-				if (id != null)
-					result.result += "\nprediction: " + id;
-				id = synchronize.poll(e, clients.get(e));
-				if (id != null)
-					result.result += "\npoll: " + id;
-				final String s = synchronize.resultAndNotify(e);
-				if (s.length() > 0)
-					result.result += "\nresultAndNotify: " + s;
-			} catch (final Exception ex) {
-				result.exception = ex;
-			}
-		});
-		return result;
-	}
-
-	public void synchronizeResult(final BigInteger clientMarketingId) throws Exception {
-		synchronize.result(clientMarketingId);
-	}
-
 	class Synchonize {
 		private final static int FIRST_YEAR = 2010;
 
@@ -166,13 +142,6 @@ public class SurveyService {
 				}
 			}
 			return null;
-		}
-
-		private String getOponent(final JsonNode poll) {
-			return " gegen " + poll.get("home".equals(poll.get("location").asText()) ? "awayName" : "homeName").asText()
-					+ " in " + poll.get("city").asText() + " · "
-					+ poll.get("venue").asText()
-					+ " am " + formatDate(poll.get("timestamp").asLong(), null) + ".";
 		}
 
 		private void predictionAddStatistics(final BigInteger clientId, final ObjectNode poll)
@@ -383,8 +352,58 @@ public class SurveyService {
 			}
 		}
 
-		private String getLine(final int x, final String singular, final String plural) {
-			return "<br/>" + x + (x > 1 ? plural : singular);
+		public synchronized ClientMarketingResult result(final BigInteger clientMarketingId) throws Exception {
+			final JsonNode poll = new ObjectMapper().readTree(Attachment.resolve(
+					repository.one(ClientMarketing.class, clientMarketingId).getStorage()));
+			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
+			params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketingId);
+			Result result = repository.list(params);
+			final ClientMarketingResult clientMarketingResult;
+			if (result.size() == 0) {
+				clientMarketingResult = new ClientMarketingResult();
+				clientMarketingResult.setClientMarketingId(clientMarketingId);
+			} else
+				clientMarketingResult = repository.one(ClientMarketingResult.class,
+						(BigInteger) result.get(0).get("clientMarketingResult.id"));
+			params.setQuery(Query.contact_listMarketing);
+			params.setSearch("contactMarketing.clientMarketingId=" + clientMarketingId);
+			result = repository.list(params);
+			final ObjectMapper om = new ObjectMapper();
+			final ObjectNode json = om.createObjectNode();
+			json.put("participants", result.size());
+			json.put("finished", 0);
+			for (int i2 = 0; i2 < result.size(); i2++) {
+				final String answers = (String) result.get(i2).get("contactMarketing.storage");
+				if (answers != null && answers.length() > 2) {
+					json.put("finished", json.get("finished").asInt() + 1);
+					om.readTree(answers).fields()
+							.forEachRemaining(e -> {
+								if (!json.has(e.getKey())) {
+									json.set(e.getKey(), om.createObjectNode());
+									final ArrayNode a = om.createArrayNode();
+									for (int i3 = 0; i3 < poll.get("questions").get(
+											Integer.valueOf(e.getKey().substring(1))).get("answers").size(); i3++)
+										a.add(0);
+									((ObjectNode) json.get(e.getKey())).set("a", a);
+								}
+								for (int i = 0; i < e.getValue().get("a").size(); i++) {
+									final int index = e.getValue().get("a").get(i).asInt();
+									final ArrayNode a = ((ArrayNode) json.get(e.getKey()).get("a"));
+									a.set(index, a.get(index).asInt() + 1);
+								}
+								if (e.getValue().has("t") && !Strings.isEmpty(e.getValue().get("t").asText())) {
+									final ObjectNode o = (ObjectNode) json.get(e.getKey());
+									if (!o.has("t"))
+										o.put("t", "");
+									o.put("t", o.get("t").asText() +
+											"<div>" + e.getValue().get("t").asText() + "</div>");
+								}
+							});
+				}
+			}
+			clientMarketingResult.setStorage(om.writeValueAsString(json));
+			repository.save(clientMarketingResult);
+			return clientMarketingResult;
 		}
 
 		String resultAndNotify(final BigInteger clientId) throws Exception {
@@ -444,58 +463,15 @@ public class SurveyService {
 			return result.trim();
 		}
 
-		public synchronized ClientMarketingResult result(final BigInteger clientMarketingId) throws Exception {
-			final JsonNode poll = new ObjectMapper().readTree(Attachment.resolve(
-					repository.one(ClientMarketing.class, clientMarketingId).getStorage()));
-			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
-			params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketingId);
-			Result result = repository.list(params);
-			final ClientMarketingResult clientMarketingResult;
-			if (result.size() == 0) {
-				clientMarketingResult = new ClientMarketingResult();
-				clientMarketingResult.setClientMarketingId(clientMarketingId);
-			} else
-				clientMarketingResult = repository.one(ClientMarketingResult.class,
-						(BigInteger) result.get(0).get("clientMarketingResult.id"));
-			params.setQuery(Query.contact_listMarketing);
-			params.setSearch("contactMarketing.clientMarketingId=" + clientMarketingId);
-			result = repository.list(params);
-			final ObjectMapper om = new ObjectMapper();
-			final ObjectNode json = om.createObjectNode();
-			json.put("participants", result.size());
-			json.put("finished", 0);
-			for (int i2 = 0; i2 < result.size(); i2++) {
-				final String answers = (String) result.get(i2).get("contactMarketing.storage");
-				if (answers != null && answers.length() > 2) {
-					json.put("finished", json.get("finished").asInt() + 1);
-					om.readTree(answers).fields()
-							.forEachRemaining(e -> {
-								if (!json.has(e.getKey())) {
-									json.set(e.getKey(), om.createObjectNode());
-									final ArrayNode a = om.createArrayNode();
-									for (int i3 = 0; i3 < poll.get("questions").get(
-											Integer.valueOf(e.getKey().substring(1))).get("answers").size(); i3++)
-										a.add(0);
-									((ObjectNode) json.get(e.getKey())).set("a", a);
-								}
-								for (int i = 0; i < e.getValue().get("a").size(); i++) {
-									final int index = e.getValue().get("a").get(i).asInt();
-									final ArrayNode a = ((ArrayNode) json.get(e.getKey()).get("a"));
-									a.set(index, a.get(index).asInt() + 1);
-								}
-								if (e.getValue().has("t") && !Strings.isEmpty(e.getValue().get("t").asText())) {
-									final ObjectNode o = (ObjectNode) json.get(e.getKey());
-									if (!o.has("t"))
-										o.put("t", "");
-									o.put("t", o.get("t").asText() +
-											"<div>" + e.getValue().get("t").asText() + "</div>");
-								}
-							});
-				}
-			}
-			clientMarketingResult.setStorage(om.writeValueAsString(json));
-			repository.save(clientMarketingResult);
-			return clientMarketingResult;
+		private String getOponent(final JsonNode poll) {
+			return " gegen " + poll.get("home".equals(poll.get("location").asText()) ? "awayName" : "homeName").asText()
+					+ " in " + poll.get("city").asText() + " · "
+					+ poll.get("venue").asText()
+					+ " am " + formatDate(poll.get("timestamp").asLong(), null) + ".";
+		}
+
+		private String getLine(final int x, final String singular, final String plural) {
+			return "<br/>" + x + (x > 1 ? plural : singular);
 		}
 	}
 
@@ -756,6 +732,15 @@ public class SurveyService {
 			send(users, clientMarketing, type, "contact.id");
 		}
 
+		private void sendResult(final ClientMarketing clientMarketing) throws Exception {
+			final QueryParams params = new QueryParams(Query.contact_listMarketing);
+			params.setSearch(
+					"contactMarketing.finished=true and contactMarketing.contactId is not null and contactMarketing.clientMarketingId="
+							+ clientMarketing.getId());
+			send(repository.list(params), clientMarketing, ContactNotificationTextType.clientMarketingResult,
+					"contactMarketing.contactId");
+		}
+
 		private void send(final Result users, final ClientMarketing clientMarketing,
 				final ContactNotificationTextType type, final String field) throws Exception {
 			final JsonNode poll = new ObjectMapper().readTree(Attachment.resolve(clientMarketing.getStorage()));
@@ -771,16 +756,30 @@ public class SurveyService {
 				}
 			}
 		}
+	}
 
-		private void sendResult(final ClientMarketing clientMarketing) throws Exception {
-			final QueryParams params = new QueryParams(Query.contact_listMarketing);
-			params.setSearch(
-					"contactMarketing.finished=true and contactMarketing.contactId is not null and contactMarketing.clientMarketingId="
-							+ clientMarketing.getId());
-			send(repository.list(params), clientMarketing, ContactNotificationTextType.clientMarketingResult,
-					"contactMarketing.contactId");
-		}
+	public SchedulerResult update() {
+		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/update");
+		clients.keySet().forEach(e -> {
+			try {
+				BigInteger id = synchronize.prediction(e, clients.get(e));
+				if (id != null)
+					result.result += "\nprediction: " + id;
+				id = synchronize.poll(e, clients.get(e));
+				if (id != null)
+					result.result += "\npoll: " + id;
+				final String s = synchronize.resultAndNotify(e);
+				if (s.length() > 0)
+					result.result += "\nresultAndNotify: " + s;
+			} catch (final Exception ex) {
+				result.exception = ex;
+			}
+		});
+		return result;
+	}
 
+	public void synchronizeResult(final BigInteger clientMarketingId) throws Exception {
+		synchronize.result(clientMarketingId);
 	}
 
 	private String formatDate(final long seconds, final String format) {
