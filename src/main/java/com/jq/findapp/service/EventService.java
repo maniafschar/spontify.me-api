@@ -189,4 +189,27 @@ public class EventService {
 				+ date.toLocalDate() + "' and eventParticipate.state=1");
 		return repository.list(params).size() >= event.getMaxParticipants().intValue();
 	}
+
+	public SchedulerResult importEvents() {
+		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importEvents");
+		final BigInteger clientId = BigInteger.ONE;
+		final URL url = new URL("https://www.muenchen.de/veranstaltungen/event");
+		String s = IOUtils.toString(url.openStream());
+		s = s.substring(s.indexOf("<ul class=\"m-listing__list\""), s.indexOf("</ul>"));
+		if (s.length() > 40) {
+			final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(s);
+		    	final NodeList lis = doc.getElementsByTagName("li");
+			for (int i = 0; i < lis.getLength(); i++) {
+				final Event event = new Event();
+				Node node = lis.item(i).getFirstChild().getChildNodes().item(1);
+				event.setDescription(node.getFirstChild().getFirstChild().getTextContent());
+				event.setSkillsText(node.getChildNodes().item(1).getTextContent());
+				event.setStartDate(new Timestamp(node.getChildNodes().item(2).getChildNodes().item(3)
+        					.getAttributes().getNamedItem("datetime").getNodeValue()));
+				node.getChildNodes().item(2).getChildNodes().item(1)
+        					.getAttributes().getNamedItem("href").getNodeValue();
+			}
+		}
+		return result;
+	}
 }
