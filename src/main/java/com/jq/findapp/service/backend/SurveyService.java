@@ -321,7 +321,8 @@ public class SurveyService {
 							pollAddAnswers(question.putArray("answers"), players);
 							final ClientMarketing clientMarketing = new ClientMarketing();
 							clientMarketing.setStartDate(new Timestamp(startDate.toEpochMilli()));
-							clientMarketing.setEndDate(new Timestamp(startDate.plus(Duration.ofHours(18)).toEpochMilli()));
+							clientMarketing
+									.setEndDate(new Timestamp(startDate.plus(Duration.ofHours(18)).toEpochMilli()));
 							clientMarketing.setClientId(clientId);
 							clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
 							clientMarketing.setImage(Attachment.createImage(".png",
@@ -401,7 +402,7 @@ public class SurveyService {
 				clientMarketingResult.setPublished(true);
 				if (new ObjectMapper().readTree(Attachment.resolve(clientMarketingResult.getStorage()))
 						.get("participants").asInt() > 0) {
-					final String prefix;
+					String prefix;
 					if ("Prediction".equals(poll.get("type").asText()))
 						prefix = "Ergebnistipps";
 					else
@@ -473,7 +474,7 @@ public class SurveyService {
 									json.set(e.getKey(), om.createObjectNode());
 									final ArrayNode a = om.createArrayNode();
 									for (int i3 = 0; i3 < poll.get("questions").get(
-											Integer.valueOf(e.getKey().substring(1)).get("answers").size(); i3++)
+											Integer.valueOf(e.getKey().substring(1))).get("answers").size(); i3++)
 										a.add(0);
 									((ObjectNode) json.get(e.getKey())).set("a", a);
 								}
@@ -639,17 +640,17 @@ public class SurveyService {
 			final int h = g2.getFontMetrics().getHeight();
 			final int total = result.get("participants").asInt();
 			int y = padding;
+			final boolean prediction = "Prediction".equals(poll.get("type").asText());
 			poll = poll.get("questions").get(0).get("answers");
+			final String text = result.get("q0").has("t") ? result.get("q0").get("t").asText() : null;
 			result = result.get("q0").get("a");
 			final List<String> x = new ArrayList<>();
 			final String leftPad = "000000000000000";
-			final boolean prediction = "Prediction".equals(poll.put("type").asText());
 			for (int i = 0; i < result.size() - (prediction ? 1 : 0); i++)
 				x.add(leftPad.substring(result.get(i).asText().length()) + result.get(i).asText() + "_"
 						+ poll.get(i).get("answer").asText());
 			if (prediction) {
-				final String text = result.get(result.size() - 1).asText();
-				if (text.length() > 0) {
+				if (text != null) {
 					final Pattern predictionText = Pattern.compile("(\\d+)[ ]*[ :-]+[ ]*(\\d+)", Pattern.MULTILINE);
 					final String[] answers = text.substring(5, text.length() - 6).split("</div><div>");
 					final Map<String, Integer> results = new HashMap<>();
