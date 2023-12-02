@@ -16,6 +16,7 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -244,6 +245,8 @@ public class EventService {
 		@Value("${app.event.munich.baseUrl}")
 		private String url;
 
+		private static final AtomicLong lastRun = new AtomicLong(0);
+
 		private final Pattern regexAddress = Pattern.compile("itemprop=\"address\"(.*?)</svg>(.*?)</a>");
 		private final Pattern regexAddressRef = Pattern.compile("itemprop=\"location\"(.*?)href=\"(.*?)\"");
 		private final Pattern regexDesc = Pattern.compile(" itemprop=\"description\">(.*?)</p>");
@@ -258,6 +261,9 @@ public class EventService {
 		private EventService eventService;
 
 		String run(EventService eventService) throws Exception {
+			if (lastRun.get() > System.currentTimeMillis() - 24 * 60 * 60 * 1000)
+				return "";
+			lastRun.set(System.currentTimeMillis());
 			this.eventService = eventService;
 			client = repository.one(Client.class, BigInteger.ONE);
 			params.setUser(repository.one(Contact.class, client.getAdminId()));
