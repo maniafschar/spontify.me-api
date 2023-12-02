@@ -240,11 +240,14 @@ public class EventService {
 		@Value("${app.event.munich.baseUrl}")
 		private String url;
 
-		private final Pattern regexDesc = Pattern.compile("<p itemprop=\"description\">(.*?)</p>");
+		private final Pattern regexDesc = Pattern.compile(" itemprop=\"description\">(.*?)</p>");
+		private final Pattern regexDescExternal = Pattern.compile(" itemprop=\"description\">(.*?)</div>");
 		private final Pattern regexImg = Pattern.compile("<picture(.*?)<source srcset=\"(.*?) ");
+		private final Pattern regexImgExternal = Pattern.compile("<picture(.*?)<source srcset=\"(.*?) ");
 		private final Pattern regexName = Pattern.compile("itemprop=\"location\"(.*?)</svg>(.*?)</a>");
 		private final Pattern regexAddressRef = Pattern.compile("itemprop=\"location\"(.*?)href=\"(.*?)\"");
 		private final Pattern regexAddress = Pattern.compile("itemprop=\"address\"(.*?)</svg>(.*?)</a>");
+		private final Pattern regexAddressExternal = Pattern.compile("class=\"anfahrt\"(.*?)data-venue=\"(.*?)\"");
 		private final QueryParams params = new QueryParams(Query.location_listId);
 		private final long offset = ZonedDateTime.now(ZoneId.of("Europe/Berlin")).getOffset().getTotalSeconds() * 1000;
 		private Client client;
@@ -272,8 +275,14 @@ public class EventService {
 					event.setContactId(client.getAdminId());
 					event.setSkillsText(node.getChildNodes().item(1).getTextContent().trim());
 					event.setDescription(node.getFirstChild().getFirstChild().getTextContent().trim());
-					event.setUrl(url + node.getFirstChild().getFirstChild()
-							.getAttributes().getNamedItem("href").getNodeValue().trim());
+					boolean externalPage = node.getFirstChild().getFirstChild()
+							.getAttributes().getNamedItem("href") == null;
+					event.setUrl(url + (externalPage
+							? lis.item(i).getFirstChild().getChildNodes().item(2).getFirstChild()
+									.getAttributes().getNamedItem("href").getNodeValue()
+							: node.getFirstChild().getFirstChild()
+									.getAttributes().getNamedItem("href").getNodeValue())
+							.trim());
 					final Date date = new SimpleDateFormat("dd.MM.yyyy' - 'HH:mm")
 							.parse(node.getChildNodes().item(2).getChildNodes().item(3)
 									.getAttributes().getNamedItem("datetime").getNodeValue());
@@ -283,15 +292,17 @@ public class EventService {
 							"event.startDate='" + event.getStartDate() + "' and event.url='" + event.getUrl() + "'");
 					if (repository.list(params).size() == 0) {
 						page = urlRetriever.get(url + event.getUrl());
-						Matcher m = regexDesc.matcher(page);
+						Matcher m = (externalPage ? regexDescExternal : regexDesc).matcher(page);
 						if (m.find())
 							event.setDescription(event.getDescription() + "\n\n" + m.group(1).trim());
-						m = regexImg.matcher(page);
-						if (m.find()) {
-							event.setImage(EntityUtil.getImage(url + m.group(2), EntityUtil.IMAGE_SIZE, 0));
-							if (event.getImage() != null)
-								event.setImageList(
-										EntityUtil.getImage(url + m.group(2), EntityUtil.IMAGE_THUMB_SIZE, 0));
+						if (!externalPage) {
+							m = regexImg.matcher(page);
+							if (m.find()) {
+								event.setImage(EntityUtil.getImage(url + m.group(2), EntityUtil.IMAGE_SIZE, 0));
+								if (event.getImage() != null)
+									event.setImageList(
+											EntityUtil.getImage(url + m.group(2), EntityUtil.IMAGE_THUMB_SIZE, 0));
+							}
 						}
 						final Location location = new Location();
 						m = regexAddressRef.matcher(page);
@@ -309,16 +320,18 @@ public class EventService {
 							event.setLocationId((BigInteger) list.get(0).get("location.id"));
 						else {
 							page = urlRetriever.get(url + m.group(2).trim());
-							m = regexAddress.matcher(page);
+							m = (externalPage ? regexAddressExternal : regexAddress).matcher(page);
 							m.find();
 							location.setAddress(String.join("\n",
 									Arrays.asList(m.group(2).trim().split(",")).stream().map(e -> e.trim()).toList()));
-							m = regexDesc.matcher(page);
-							m.find();
-							location.setDescription(m.group(1).trim());
-							m = regexImg.matcher(page);
+							if (!externalPage) {
+								m = regexDesc.matcher(page);
+								m.find();
+								location.setDescription(m.group(1).trim());
+							}
+							m = (externalPage ? regexImgExternal : regexImg).matcher(page);
 							if (m.find()) {
-								location.setImage(EntityUtil.getImage(url + m.group(2), EntityUtil.IMAGE_SIZE, 0));
+								location.setImage(EntityUtil.getImage(url + m.group(2), EntityUtil.IMAGE_SIZE, 300));
 								if (location.getImage() != null)
 									location.setImageList(
 											EntityUtil.getImage(url + m.group(2), EntityUtil.IMAGE_THUMB_SIZE, 0));
