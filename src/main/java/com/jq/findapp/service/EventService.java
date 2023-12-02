@@ -182,7 +182,11 @@ public class EventService {
 	public void publish(final BigInteger id) throws Exception {
 		final Event event = repository.one(Event.class, id);
 		final Contact contact = repository.one(Contact.class, event.getContactId());
-		externalService.publishOnFacebook(contact.getClientId(), event.getDescription(),
+		final Location location = repository.one(Location.class, event.getLocationId());
+		final SimpleDateFormat df = new SimpleDateFormat("d.M.yyyy H:mm");
+		externalService.publishOnFacebook(contact.getClientId(),
+				df.format(event.getStartDate()) + "\n" + location.getName() + "\n" + location.getAddress() + "\n\n"
+						+ event.getDescription(),
 				"/rest/action/marketing/event/" + id);
 	}
 
@@ -214,9 +218,13 @@ public class EventService {
 		return repository.list(params).size() >= event.getMaxParticipants().intValue();
 	}
 
-	public SchedulerResult importEvents() throws Exception {
+	public SchedulerResult importEvents() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importEvents");
-		result.result = importMunich.run(this::get);
+		try {
+			result.result = importMunich.run(this);
+		} catch (Exception e) {
+			result.exception = e;
+		}
 		return result;
 	}
 
@@ -226,10 +234,6 @@ public class EventService {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	private interface UrlRetriever {
-		String get(String url);
 	}
 
 	@Component
@@ -251,13 +255,22 @@ public class EventService {
 		private final QueryParams params = new QueryParams(Query.location_listId);
 		private final long offset = ZonedDateTime.now(ZoneId.of("Europe/Berlin")).getOffset().getTotalSeconds() * 1000;
 		private Client client;
-		private UrlRetriever urlRetriever;
+		private EventService eventService;
 
-		String run(UrlRetriever urlRetriever) throws Exception {
-			this.urlRetriever = urlRetriever;
+		String run(EventService eventService) throws Exception {
+			this.eventService = eventService;
 			client = repository.one(Client.class, BigInteger.ONE);
 			params.setUser(repository.one(Contact.class, client.getAdminId()));
-			int count = page(urlRetriever.get(url + "/veranstaltungen/event"));
+			int count = page(eventService.get(url + "/veranstaltungen/event"));
+			// page 2: count += page(urlRetriever.get(url + "/veranstaltungen/event"));
+			params.setQuery(Query.event_list);
+			params.setSearch(
+					"event.startDate>'" + Instant.now().plus(Duration.ofHours(6)) + "' and event.startDate<'"
+							+ Instant.now().plus(Duration.ofHours(30))
+							+ "' and event.url is not null and (event.repetition is null or event.repetition='o') and event.maxParticipants is null and location.zipCode like '8%' and location.country='DE'");
+			final Result result = repository.list(params);
+			for (int i = 0; i < result.size(); i++)
+				eventService.publish((BigInteger) result.get(i).get("event.id"));
 			return "Munich: " + count;
 		}
 
@@ -292,13 +305,13 @@ public class EventService {
 							"event.startDate='" + event.getStartDate() + "' and event.url='" + event.getUrl() + "'");
 					if (repository.list(params).size() == 0 && !Strings.isEmpty(event.getUrl())
 							&& !event.getUrl().contains("eventim")) {
-						page = urlRetriever.get(url + event.getUrl());
+						page = eventService.get(event.getUrl());
 						event.setDescription(event.getDescription()
 								+ ("\n\n" + getField(externalPage ? regexDescExternal : regexDesc, page, 1))
 										.trim());
 						final Location location = new Location();
 						if (externalPage) {
-							location.setUrl(url + getField(regexAddressRefExternal, page, 2));
+							location.setUrl(getField(regexAddressRefExternal, page, 2));
 							final String[] s = getField(regexAddressExternal, page, 2).split(",");
 							location.setAddress(
 									s[s.length - 1].trim() + "\n" + s[s.length - 1].trim().replace('+', ' '));
@@ -322,7 +335,7 @@ public class EventService {
 							event.setLocationId((BigInteger) list.get(0).get("location.id"));
 						else {
 							if (!externalPage && !Strings.isEmpty(location.getUrl())) {
-								page = urlRetriever.get(location.getUrl());
+								page = eventService.get(location.getUrl());
 								location.setAddress(String.join("\n",
 										Arrays.asList(getField(regexAddress, page, 2)
 												.split(",")).stream().map(e -> e.trim()).toList()));
@@ -337,8 +350,16 @@ public class EventService {
 												EntityUtil.getImage(url + image, EntityUtil.IMAGE_THUMB_SIZE, 0));
 								}
 								location.setContactId(client.getAdminId());
-								repository.save(location);
-								event.setLocationId(location.getId());
+								try {
+									repository.save(location);
+									event.setLocationId(location.getId());
+								} catch (IllegalArgumentException ex) {
+									if (ex.getMessage().contains("location exists"))
+										event.setLocationId(new BigInteger(
+												ex.getMessage().substring(ex.getMessage().indexOf(':') + 1).trim()));
+									else
+										throw ex;
+								}
 							}
 						}
 						if (event.getLocationId() != null) {

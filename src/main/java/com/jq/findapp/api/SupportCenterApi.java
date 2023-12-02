@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.Log;
 import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.entity.Ticket.TicketType;
@@ -36,7 +35,6 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.ChatService;
 import com.jq.findapp.service.EventService;
-import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.backend.DbService;
 import com.jq.findapp.service.backend.EngagementService;
@@ -184,6 +182,7 @@ public class SupportCenterApi {
 				run(dbService::backup, LAST);
 				// importLog paralell to the rest, does not interfere
 				run(importLogService::importLog, !LAST);
+				run(eventService::importEvents, !LAST);
 				run(chatService::answerAi, !LAST);
 				run(dbService::update, !LAST);
 				run(engagementService::sendRegistrationReminder, !LAST);

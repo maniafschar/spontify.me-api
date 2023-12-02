@@ -36,7 +36,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		final Result list = repository.list(params);
 		for (int i = 0; i < list.size(); i++) {
 			if (isNameMatch((String) list.get(i).get("location.name"), location.getName(), true))
-				throw new IllegalArgumentException("location exists");
+				throw new IllegalArgumentException("location exists: " + list.get(i).get("location.id"));
 		}
 	}
 
