@@ -130,7 +130,7 @@ public class TestConfig {
 				return IOUtils.toString(
 						getClass().getResourceAsStream(url.contains("/veranstaltungen/")
 								? (url.split("/").length == 5 ? "/eventList.html" : "/eventDetail.html")
-								: "/eventAddress.html"),
+								: url.contains("muenchenticket.") ? "/eventTicket.html" : "/eventAddress.html"),
 						StandardCharsets.UTF_8);
 			} catch (IOException e) {
 				throw new RuntimeException(e);

@@ -69,7 +69,7 @@ public class EntityUtil {
 			data = IOUtils.toByteArray(new URL(url));
 			img = ImageIO.read(new ByteArrayInputStream(data));
 			if (minimum == 0)
-				minimum = 400;
+				minimum = Math.min(400, size);
 			if (img.getWidth() > minimum && img.getHeight() > minimum)
 				return Repository.Attachment.createImage(".jpg", scaleImage(data, size));
 		} catch (final Exception ex) {

@@ -240,14 +240,14 @@ public class EventService {
 		@Value("${app.event.munich.baseUrl}")
 		private String url;
 
-		private final Pattern regexDesc = Pattern.compile(" itemprop=\"description\">(.*?)</p>");
-		private final Pattern regexDescExternal = Pattern.compile(" itemprop=\"description\">(.*?)</div>");
-		private final Pattern regexImg = Pattern.compile("<picture(.*?)<source srcset=\"(.*?) ");
-		private final Pattern regexImgExternal = Pattern.compile("<picture(.*?)<source srcset=\"(.*?) ");
-		private final Pattern regexName = Pattern.compile("itemprop=\"location\"(.*?)</svg>(.*?)</a>");
-		private final Pattern regexAddressRef = Pattern.compile("itemprop=\"location\"(.*?)href=\"(.*?)\"");
 		private final Pattern regexAddress = Pattern.compile("itemprop=\"address\"(.*?)</svg>(.*?)</a>");
+		private final Pattern regexAddressRef = Pattern.compile("itemprop=\"location\"(.*?)href=\"(.*?)\"");
+		private final Pattern regexDesc = Pattern.compile(" itemprop=\"description\">(.*?)</p>");
 		private final Pattern regexAddressExternal = Pattern.compile("class=\"anfahrt\"(.*?)data-venue=\"(.*?)\"");
+		private final Pattern regexAddressRefExternal = Pattern.compile("itemprop=\"location\"(.*?)href=\"(.*?)\"");
+		private final Pattern regexDescExternal = Pattern.compile(" itemprop=\"description\">(.*?)</div>");
+		private final Pattern regexImage = Pattern.compile("<picture(.*?)<source srcset=\"(.*?) ");
+		private final Pattern regexName = Pattern.compile("itemprop=\"location\"(.*?)</svg>(.*?)</");
 		private final QueryParams params = new QueryParams(Query.location_listId);
 		private final long offset = ZonedDateTime.now(ZoneId.of("Europe/Berlin")).getOffset().getTotalSeconds() * 1000;
 		private Client client;
@@ -275,14 +275,14 @@ public class EventService {
 					event.setContactId(client.getAdminId());
 					event.setSkillsText(node.getChildNodes().item(1).getTextContent().trim());
 					event.setDescription(node.getFirstChild().getFirstChild().getTextContent().trim());
-					boolean externalPage = node.getFirstChild().getFirstChild()
-							.getAttributes().getNamedItem("href") == null;
-					event.setUrl(url + (externalPage
-							? lis.item(i).getFirstChild().getChildNodes().item(2).getFirstChild()
-									.getAttributes().getNamedItem("href").getNodeValue()
-							: node.getFirstChild().getFirstChild()
-									.getAttributes().getNamedItem("href").getNodeValue())
-							.trim());
+					boolean externalPage = lis.item(i).getFirstChild().getChildNodes().item(2) != null;
+					if (externalPage) {
+						event.setUrl(
+								lis.item(i).getFirstChild().getChildNodes().item(2).getFirstChild().getNextSibling()
+										.getAttributes().getNamedItem("href").getNodeValue().trim());
+					} else if (node.getFirstChild().getFirstChild().getAttributes() != null)
+						event.setUrl(url + node.getFirstChild().getFirstChild()
+								.getAttributes().getNamedItem("href").getNodeValue().trim());
 					final Date date = new SimpleDateFormat("dd.MM.yyyy' - 'HH:mm")
 							.parse(node.getChildNodes().item(2).getChildNodes().item(3)
 									.getAttributes().getNamedItem("datetime").getNodeValue());
@@ -290,62 +290,70 @@ public class EventService {
 					params.setQuery(Query.event_list);
 					params.setSearch(
 							"event.startDate='" + event.getStartDate() + "' and event.url='" + event.getUrl() + "'");
-					if (repository.list(params).size() == 0) {
+					if (repository.list(params).size() == 0 && !Strings.isEmpty(event.getUrl())
+							&& !event.getUrl().contains("eventim")) {
 						page = urlRetriever.get(url + event.getUrl());
-						Matcher m = (externalPage ? regexDescExternal : regexDesc).matcher(page);
-						if (m.find())
-							event.setDescription(event.getDescription() + "\n\n" + m.group(1).trim());
-						if (!externalPage) {
-							m = regexImg.matcher(page);
-							if (m.find()) {
-								event.setImage(EntityUtil.getImage(url + m.group(2), EntityUtil.IMAGE_SIZE, 0));
+						event.setDescription(event.getDescription()
+								+ ("\n\n" + getField(externalPage ? regexDescExternal : regexDesc, page, 1))
+										.trim());
+						final Location location = new Location();
+						if (externalPage) {
+							location.setUrl(url + getField(regexAddressRefExternal, page, 2));
+							final String[] s = getField(regexAddressExternal, page, 2).split(",");
+							location.setAddress(
+									s[s.length - 1].trim() + "\n" + s[s.length - 1].trim().replace('+', ' '));
+							location.setName(s[0] + (s.length > 3 ? ", " + s[1] : ""));
+						} else {
+							final String image = getField(regexImage, page, 2);
+							if (image.length() > 0) {
+								event.setImage(EntityUtil.getImage(url + image, EntityUtil.IMAGE_SIZE, 300));
 								if (event.getImage() != null)
 									event.setImageList(
-											EntityUtil.getImage(url + m.group(2), EntityUtil.IMAGE_THUMB_SIZE, 0));
+											EntityUtil.getImage(url + image, EntityUtil.IMAGE_THUMB_SIZE, 0));
 							}
+							location.setUrl(url + getField(regexAddressRef, page, 2));
+							location.setName(getField(regexName, page, 2));
 						}
-						final Location location = new Location();
-						m = regexAddressRef.matcher(page);
-						m.find();
-						location.setUrl(url + m.group(2).trim());
-						m = regexName.matcher(page);
-						m.find();
-						location.setName(m.group(2).trim());
 						params.setQuery(Query.location_listId);
 						params.setSearch(
-								"location.name like '" + location.getName().replace("'", "_") + "' and location.url='"
-										+ location.getUrl() + "'");
+								"location.name like '" + location.getName().replace("'", "_") + "'");
 						final Result list = repository.list(params);
 						if (list.size() > 0)
 							event.setLocationId((BigInteger) list.get(0).get("location.id"));
 						else {
-							page = urlRetriever.get(url + m.group(2).trim());
-							m = (externalPage ? regexAddressExternal : regexAddress).matcher(page);
-							m.find();
-							location.setAddress(String.join("\n",
-									Arrays.asList(m.group(2).trim().split(",")).stream().map(e -> e.trim()).toList()));
-							if (!externalPage) {
-								m = regexDesc.matcher(page);
-								m.find();
-								location.setDescription(m.group(1).trim());
+							if (!externalPage && !Strings.isEmpty(location.getUrl())) {
+								page = urlRetriever.get(location.getUrl());
+								location.setAddress(String.join("\n",
+										Arrays.asList(getField(regexAddress, page, 2)
+												.split(",")).stream().map(e -> e.trim()).toList()));
+								location.setDescription(getField(regexDesc, page, 1));
 							}
-							m = (externalPage ? regexImgExternal : regexImg).matcher(page);
-							if (m.find()) {
-								location.setImage(EntityUtil.getImage(url + m.group(2), EntityUtil.IMAGE_SIZE, 300));
-								if (location.getImage() != null)
-									location.setImageList(
-											EntityUtil.getImage(url + m.group(2), EntityUtil.IMAGE_THUMB_SIZE, 0));
+							if (location.getAddress() != null) {
+								final String image = getField(regexImage, page, 2);
+								if (image.length() > 0) {
+									location.setImage(EntityUtil.getImage(url + image, EntityUtil.IMAGE_SIZE, 300));
+									if (location.getImage() != null)
+										location.setImageList(
+												EntityUtil.getImage(url + image, EntityUtil.IMAGE_THUMB_SIZE, 0));
+								}
+								location.setContactId(client.getAdminId());
+								repository.save(location);
+								event.setLocationId(location.getId());
 							}
-							location.setContactId(client.getAdminId());
-							repository.save(location);
-							event.setLocationId(location.getId());
 						}
-						repository.save(event);
-						count++;
+						if (event.getLocationId() != null) {
+							repository.save(event);
+							count++;
+						}
 					}
 				}
 			}
 			return count;
+		}
+
+		private String getField(Pattern pattern, String text, int group) {
+			final Matcher m = pattern.matcher(text);
+			return m.find() ? m.group(group).trim() : "";
 		}
 	}
 }
