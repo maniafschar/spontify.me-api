@@ -5,18 +5,26 @@ import java.io.StringReader;
 import java.math.BigInteger;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -34,6 +42,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.util.EntityUtil;
 import com.jq.findapp.util.Score;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
@@ -52,6 +61,9 @@ public class EventService {
 
 	@Autowired
 	private Text text;
+
+	@Autowired
+	private ImportMunich importMunich;
 
 	public SchedulerResult findMatchingBuddies() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/findMatchingBuddies");
@@ -204,32 +216,123 @@ public class EventService {
 
 	public SchedulerResult importEvents() throws Exception {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importEvents");
-		final Client client = repository.one(Client.class, BigInteger.ONE);
-		String s = get("https://www.muenchen.de/veranstaltungen/event");
-		s = s.substring(s.indexOf("<ul class=\"m-listing__list\""));
-		s = s.substring(0, s.indexOf("</ul>") + 5);
-		if (s.length() > 40) {
-			final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-					.parse(new InputSource(new StringReader(s)));
-			final NodeList lis = doc.getElementsByTagName("li");
-			for (int i = 0; i < lis.getLength(); i++) {
-				final Event event = new Event();
-				final Node node = lis.item(i).getFirstChild().getChildNodes().item(1);
-				event.setDescription(node.getFirstChild().getFirstChild().getTextContent());
-				event.setSkillsText(node.getChildNodes().item(1).getTextContent());
-				event.setContactId(client.getAdminId());
-				event.setLocationId(null);
-				// event.setStartDate(new
-				// Timestamp(node.getChildNodes().item(2).getChildNodes().item(3)
-				// .getAttributes().getNamedItem("datetime").getNodeValue()));
-				node.getChildNodes().item(2).getChildNodes().item(1)
-						.getAttributes().getNamedItem("href").getNodeValue();
-			}
-		}
+		result.result = importMunich.run(this::get);
 		return result;
 	}
 
-	protected String get(final String url) throws IOException {
-		return IOUtils.toString(new URL(url).openStream(), StandardCharsets.UTF_8);
+	protected String get(final String url) {
+		try {
+			return IOUtils.toString(new URL(url).openStream(), StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private interface UrlRetriever {
+		String get(String url);
+	}
+
+	@Component
+	private static class ImportMunich {
+		@Autowired
+		private Repository repository;
+
+		@Value("${app.event.munich.baseUrl}")
+		private String url;
+
+		private final Pattern regexDesc = Pattern.compile("<p itemprop=\"description\">(.*?)</p>");
+		private final Pattern regexImg = Pattern.compile("<picture(.*?)<source srcset=\"(.*?) ");
+		private final Pattern regexName = Pattern.compile("itemprop=\"location\"(.*?)</svg>(.*?)</a>");
+		private final Pattern regexAddressRef = Pattern.compile("itemprop=\"location\"(.*?)href=\"(.*?)\"");
+		private final Pattern regexAddress = Pattern.compile("itemprop=\"address\"(.*?)</svg>(.*?)</a>");
+		private final QueryParams params = new QueryParams(Query.location_listId);
+		private final long offset = ZonedDateTime.now(ZoneId.of("Europe/Berlin")).getOffset().getTotalSeconds() * 1000;
+		private Client client;
+		private UrlRetriever urlRetriever;
+
+		String run(UrlRetriever urlRetriever) throws Exception {
+			this.urlRetriever = urlRetriever;
+			client = repository.one(Client.class, BigInteger.ONE);
+			params.setUser(repository.one(Contact.class, client.getAdminId()));
+			int count = page(urlRetriever.get(url + "/veranstaltungen/event"));
+			return "Munich: " + count;
+		}
+
+		private int page(String page) throws Exception {
+			int count = 0;
+			page = page.substring(page.indexOf("<ul class=\"m-listing__list\""));
+			page = page.substring(0, page.indexOf("</ul>") + 5);
+			if (page.length() > 40) {
+				final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+						.parse(new InputSource(new StringReader(page)));
+				final NodeList lis = doc.getElementsByTagName("li");
+				for (int i = 0; i < lis.getLength(); i++) {
+					final Node node = lis.item(i).getFirstChild().getChildNodes().item(1);
+					final Event event = new Event();
+					event.setContactId(client.getAdminId());
+					event.setSkillsText(node.getChildNodes().item(1).getTextContent().trim());
+					event.setDescription(node.getFirstChild().getFirstChild().getTextContent().trim());
+					event.setUrl(url + node.getFirstChild().getFirstChild()
+							.getAttributes().getNamedItem("href").getNodeValue().trim());
+					final Date date = new SimpleDateFormat("dd.MM.yyyy' - 'HH:mm")
+							.parse(node.getChildNodes().item(2).getChildNodes().item(3)
+									.getAttributes().getNamedItem("datetime").getNodeValue());
+					event.setStartDate(new Timestamp(date.getTime() - offset));
+					params.setQuery(Query.event_list);
+					params.setSearch(
+							"event.startDate='" + event.getStartDate() + "' and event.url='" + event.getUrl() + "'");
+					if (repository.list(params).size() == 0) {
+						page = urlRetriever.get(url + event.getUrl());
+						Matcher m = regexDesc.matcher(page);
+						if (m.find())
+							event.setDescription(event.getDescription() + "\n\n" + m.group(1).trim());
+						m = regexImg.matcher(page);
+						if (m.find()) {
+							event.setImage(EntityUtil.getImage(url + m.group(2), EntityUtil.IMAGE_SIZE, 0));
+							if (event.getImage() != null)
+								event.setImageList(
+										EntityUtil.getImage(url + m.group(2), EntityUtil.IMAGE_THUMB_SIZE, 0));
+						}
+						final Location location = new Location();
+						m = regexAddressRef.matcher(page);
+						m.find();
+						location.setUrl(url + m.group(2).trim());
+						m = regexName.matcher(page);
+						m.find();
+						location.setName(m.group(2).trim());
+						params.setQuery(Query.location_listId);
+						params.setSearch(
+								"location.name like '" + location.getName().replace("'", "_") + "' and location.url='"
+										+ location.getUrl() + "'");
+						final Result list = repository.list(params);
+						if (list.size() > 0)
+							event.setLocationId((BigInteger) list.get(0).get("location.id"));
+						else {
+							page = urlRetriever.get(url + m.group(2).trim());
+							m = regexAddress.matcher(page);
+							m.find();
+							location.setAddress(String.join("\n",
+									Arrays.asList(m.group(2).trim().split(",")).stream().map(e -> e.trim()).toList()));
+							m = regexDesc.matcher(page);
+							m.find();
+							location.setDescription(m.group(1).trim());
+							m = regexImg.matcher(page);
+							if (m.find()) {
+								location.setImage(EntityUtil.getImage(url + m.group(2), EntityUtil.IMAGE_SIZE, 0));
+								if (location.getImage() != null)
+									location.setImageList(
+											EntityUtil.getImage(url + m.group(2), EntityUtil.IMAGE_THUMB_SIZE, 0));
+							}
+							location.setContactId(client.getAdminId());
+							repository.save(location);
+							event.setLocationId(location.getId());
+						}
+						repository.save(event);
+						count++;
+					}
+				}
+			}
+			return count;
+		}
 	}
 }

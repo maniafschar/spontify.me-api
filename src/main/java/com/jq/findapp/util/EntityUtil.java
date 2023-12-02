@@ -4,11 +4,14 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Base64;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.FileImageInputStream;
 
 import org.apache.commons.io.IOUtils;
 
@@ -63,18 +66,20 @@ public class EntityUtil {
 	}
 
 	public static String getImage(final String url, final int size, int minimum) {
+		final byte[] data;
+		final BufferedImage img;
 		try {
-			final byte[] data = IOUtils.toByteArray(new URL(url));
-			final BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
+			data = IOUtils.toByteArray(new URL(url));
+			img = ImageIO.read(new ByteArrayInputStream(data));
 			if (minimum == 0)
 				minimum = 400;
 			if (img.getWidth() > minimum && img.getHeight() > minimum)
 				return Repository.Attachment.createImage(".jpg", scaleImage(data, size));
-			throw new IllegalArgumentException(
-					"no image: [size " + img.getWidth() + "x" + img.getHeight() + " too small] " + url);
 		} catch (final Exception ex) {
 			throw new IllegalArgumentException("no image: " + url, ex);
 		}
+		throw new IllegalArgumentException(
+				"no image: [size " + img.getWidth() + "x" + img.getHeight() + " too small] " + url);
 	}
 
 	public static BaseEntity createEntity(final WriteEntity entity, final Contact contact) throws Exception {

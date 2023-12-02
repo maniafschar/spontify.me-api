@@ -125,8 +125,16 @@ public class TestConfig {
 	@Primary
 	public class EventServiceMock extends EventService {
 		@Override
-		protected String get(final String url) throws IOException {
-			return IOUtils.toString(getClass().getResourceAsStream("/eventList.html"), StandardCharsets.UTF_8);
+		protected String get(final String url) {
+			try {
+				return IOUtils.toString(
+						getClass().getResourceAsStream(url.contains("/veranstaltungen/")
+								? (url.split("/").length == 5 ? "/eventList.html" : "/eventDetail.html")
+								: "/eventAddress.html"),
+						StandardCharsets.UTF_8);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
