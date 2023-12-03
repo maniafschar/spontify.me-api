@@ -39,6 +39,7 @@ import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.Location;
+import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -185,9 +186,8 @@ public class EventService {
 		final Contact contact = repository.one(Contact.class, event.getContactId());
 		final Location location = repository.one(Location.class, event.getLocationId());
 		externalService.publishOnFacebook(contact.getClientId(),
-				new SimpleDateFormat("d.M.yyyy H:mm").format(event.getStartDate()) + "\n" + location.getName() + "\n"
-						+ location.getAddress() + "\n\n"
-						+ event.getDescription(),
+				new SimpleDateFormat("d.M.yyyy H:mm").format(event.getStartDate()) + "\n" + event.getDescription()
+						+ "\n\n" + location.getName() + "\n" + location.getAddress(),
 				"/rest/action/marketing/event/" + id);
 	}
 
@@ -243,6 +243,9 @@ public class EventService {
 		@Autowired
 		private Repository repository;
 
+		@Autowired
+		private NotificationService notificationService;
+
 		@Value("${app.event.munich.baseUrl}")
 		private String url;
 
@@ -272,11 +275,15 @@ public class EventService {
 			final int count = page(eventService.get(url + "/veranstaltungen/event"));
 			// page 2: count += page(urlRetriever.get(url + "/veranstaltungen/event"));
 			final QueryParams params = new QueryParams(Query.event_listId);
-			params.setSearch(
-					"event.startDate>'" + Instant.now().plus(Duration.ofHours(6)) + "' and event.startDate<'"
-							+ Instant.now().plus(Duration.ofHours(30))
-							+ "' and event.contactId=" + client.getAdminId()
-							+ " and event.url is not null and event.repetition='o' and event.maxParticipants is null and location.zipCode like '8%' and location.country='DE'");
+			params.setSearch("event.startDate>'" + Instant.now().plus(Duration.ofHours(6))
+					+ "' and event.startDate<'" + Instant.now().plus(Duration.ofHours(30))
+					+ "' and event.contactId=" + client.getAdminId()
+					+ " and (event.image is not null or location.image is not null)"
+					+ " and event.url is not null"
+					+ " and event.repetition='o'"
+					+ " and event.maxParticipants is null"
+					+ " and location.zipCode like '8%'"
+					+ " and location.country='DE'");
 			final Result result = repository.list(params);
 			for (int i = 0; i < result.size(); i++)
 				eventService.publish((BigInteger) result.get(i).get("event.id"));
@@ -292,8 +299,14 @@ public class EventService {
 						.parse(new InputSource(new StringReader(page)));
 				final NodeList lis = doc.getElementsByTagName("li");
 				for (int i = 0; i < lis.getLength(); i++) {
-					if (importNode(lis.item(i).getFirstChild()))
-						count++;
+					try {
+						if (importNode(lis.item(i).getFirstChild()))
+							count++;
+					} catch (final Exception ex) {
+						notificationService.createTicket(TicketType.ERROR, "eventImport",
+								Strings.stackTraceToString(ex) + "\n\n" + lis.item(i).getTextContent(),
+								null);
+					}
 				}
 			}
 			return count;
@@ -339,7 +352,8 @@ public class EventService {
 								}
 							}
 							event.setDescription((body.getFirstChild().getFirstChild().getTextContent().trim()
-									+ "\n" + getField(externalPage ? regexDescExternal : regexDesc, page, 1)).trim());
+									+ "\n" + getField(externalPage ? regexDescExternal : regexDesc, page, 1))
+									.replaceAll("<[^>]*>", " ").trim());
 							event.setEndDate(new java.sql.Date(date.getTime()));
 							event.setContactId(client.getAdminId());
 							event.setSkillsText(body.getChildNodes().item(1).getTextContent().trim());
@@ -374,7 +388,7 @@ public class EventService {
 				location.setAddress(String.join("\n",
 						Arrays.asList(getField(regexAddress, page, 2)
 								.split(",")).stream().map(e -> e.trim()).toList()));
-				location.setDescription(getField(regexDesc, page, 1));
+				location.setDescription(getField(regexDesc, page, 1).replaceAll("<[^>]*>", " ").trim());
 			}
 			final QueryParams params = new QueryParams(Query.location_listId);
 			params.setSearch(
