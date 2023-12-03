@@ -15,6 +15,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
+import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.QueryParams;
+import com.jq.findapp.repository.Repository;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith(SpringExtension.class)
@@ -25,18 +28,24 @@ public class EventServiceTest {
 	private EventService eventService;
 
 	@Autowired
+	private Repository repository;
+
+	@Autowired
 	private Utils utils;
 
 	@Test
 	public void importEvents() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
+		final QueryParams params = new QueryParams(Query.event_listId);
+		params.setSearch("event.startDate='2023-12-02 09:00:00'");
 
 		// when
 		final SchedulerResult result = eventService.importEvents();
 
 		// then
 		assertNull(result.exception);
-		assertEquals("Munich: 94", result.result);
+		assertEquals("Munich: 56 imported, 2 published", result.result);
+		assertEquals(1, repository.list(params).size());
 	}
 }

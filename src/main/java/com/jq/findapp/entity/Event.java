@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 
 import com.jq.findapp.repository.Repository;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 
 @Entity
@@ -20,6 +21,7 @@ public class Event extends BaseEntity {
 	private Short confirm;
 	private Short maxParticipants;
 	private Short rating;
+	@Column(columnDefinition = "TEXT")
 	private String description;
 	private String image;
 	private String imageList;
@@ -145,7 +147,7 @@ public class Event extends BaseEntity {
 		return publish;
 	}
 
-	public void setPublish(Boolean publish) {
+	public void setPublish(final Boolean publish) {
 		this.publish = publish;
 	}
 

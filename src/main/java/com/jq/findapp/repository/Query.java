@@ -37,6 +37,7 @@ public enum Query {
 	contact_token,
 
 	event_list(true),
+	event_listId(),
 	event_listBlocked,
 	event_listMatching(true),
 	event_listParticipate(true),

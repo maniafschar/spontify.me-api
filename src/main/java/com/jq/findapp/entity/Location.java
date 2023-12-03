@@ -6,6 +6,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Transient;
 
@@ -21,6 +22,7 @@ public class Location extends BaseEntity {
 	private String address2;
 	private String category;
 	private String country;
+	@Column(columnDefinition = "TEXT")
 	private String description;
 	private String email;
 	private String image;
@@ -40,7 +42,7 @@ public class Location extends BaseEntity {
 		return contactId;
 	}
 
-	public void setContactId(BigInteger contactId) {
+	public void setContactId(final BigInteger contactId) {
 		this.contactId = contactId;
 	}
 
@@ -48,7 +50,7 @@ public class Location extends BaseEntity {
 		return category;
 	}
 
-	public void setCategory(String category) {
+	public void setCategory(final String category) {
 		this.category = category;
 	}
 
@@ -56,7 +58,7 @@ public class Location extends BaseEntity {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -64,7 +66,7 @@ public class Location extends BaseEntity {
 		return address;
 	}
 
-	public void setAddress(String address) {
+	public void setAddress(final String address) {
 		this.address = address;
 	}
 
@@ -72,7 +74,7 @@ public class Location extends BaseEntity {
 		return address2;
 	}
 
-	public void setAddress2(String address2) {
+	public void setAddress2(final String address2) {
 		this.address2 = address2;
 	}
 
@@ -80,7 +82,7 @@ public class Location extends BaseEntity {
 		return description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
@@ -88,7 +90,7 @@ public class Location extends BaseEntity {
 		return image;
 	}
 
-	public void setImage(String image) {
+	public void setImage(final String image) {
 		this.image = image;
 	}
 
@@ -96,7 +98,7 @@ public class Location extends BaseEntity {
 		return imageList;
 	}
 
-	public void setImageList(String imageList) {
+	public void setImageList(final String imageList) {
 		this.imageList = imageList;
 	}
 
@@ -104,7 +106,7 @@ public class Location extends BaseEntity {
 		return url;
 	}
 
-	public void setUrl(String url) {
+	public void setUrl(final String url) {
 		this.url = url;
 	}
 
@@ -112,7 +114,7 @@ public class Location extends BaseEntity {
 		return zipCode;
 	}
 
-	public void setZipCode(String zipCode) {
+	public void setZipCode(final String zipCode) {
 		this.zipCode = zipCode;
 	}
 
@@ -120,7 +122,7 @@ public class Location extends BaseEntity {
 		return town;
 	}
 
-	public void setTown(String town) {
+	public void setTown(final String town) {
 		this.town = town;
 	}
 
@@ -128,7 +130,7 @@ public class Location extends BaseEntity {
 		return street;
 	}
 
-	public void setStreet(String street) {
+	public void setStreet(final String street) {
 		this.street = street;
 	}
 
@@ -136,7 +138,7 @@ public class Location extends BaseEntity {
 		return number;
 	}
 
-	public void setNumber(String number) {
+	public void setNumber(final String number) {
 		this.number = number;
 	}
 
@@ -144,7 +146,7 @@ public class Location extends BaseEntity {
 		return country;
 	}
 
-	public void setCountry(String country) {
+	public void setCountry(final String country) {
 		this.country = country;
 	}
 
@@ -152,7 +154,7 @@ public class Location extends BaseEntity {
 		return urlInternal;
 	}
 
-	public void setUrlInternal(String urlInternal) {
+	public void setUrlInternal(final String urlInternal) {
 		this.urlInternal = urlInternal;
 	}
 
@@ -160,7 +162,7 @@ public class Location extends BaseEntity {
 		return email;
 	}
 
-	public void setEmail(String email) {
+	public void setEmail(final String email) {
 		this.email = email;
 	}
 
@@ -168,7 +170,7 @@ public class Location extends BaseEntity {
 		return marketingMail;
 	}
 
-	public void setMarketingMail(String marketingMail) {
+	public void setMarketingMail(final String marketingMail) {
 		this.marketingMail = marketingMail;
 	}
 
@@ -176,7 +178,7 @@ public class Location extends BaseEntity {
 		return telephone;
 	}
 
-	public void setTelephone(String telephone) {
+	public void setTelephone(final String telephone) {
 		this.telephone = telephone;
 	}
 
@@ -184,7 +186,7 @@ public class Location extends BaseEntity {
 		return rating;
 	}
 
-	public void setRating(Short rating) {
+	public void setRating(final Short rating) {
 		this.rating = rating;
 	}
 
@@ -192,15 +194,15 @@ public class Location extends BaseEntity {
 		return subcategories;
 	}
 
-	public void setSubcategories(String subcategories) {
+	public void setSubcategories(final String subcategories) {
 		this.subcategories = subcategories;
 	}
 
-	public void setLatitude(Float latitude) {
+	public void setLatitude(final Float latitude) {
 		this.latitude = latitude;
 	}
 
-	public void setLongitude(Float longitude) {
+	public void setLongitude(final Float longitude) {
 		this.longitude = longitude;
 	}
 
@@ -216,7 +218,7 @@ public class Location extends BaseEntity {
 		return googleRating;
 	}
 
-	public void setGoogleRating(Float googleRating) {
+	public void setGoogleRating(final Float googleRating) {
 		this.googleRating = googleRating;
 	}
 
@@ -224,13 +226,13 @@ public class Location extends BaseEntity {
 		return googleRatingTotal;
 	}
 
-	public void setGoogleRatingTotal(Integer googleRatingTotal) {
+	public void setGoogleRatingTotal(final Integer googleRatingTotal) {
 		this.googleRatingTotal = googleRatingTotal;
 	}
 
 	@Transient
 	@Override
-	public boolean writeAccess(BigInteger user, Repository repository) {
+	public boolean writeAccess(final BigInteger user, final Repository repository) {
 		if (user.equals(getContactId()))
 			return true;
 		final QueryParams params = new QueryParams(Query.location_list);

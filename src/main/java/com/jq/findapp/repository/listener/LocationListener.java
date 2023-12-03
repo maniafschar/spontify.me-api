@@ -1,5 +1,6 @@
 package com.jq.findapp.repository.listener;
 
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,8 +43,8 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 
 	@Override
 	public void preUpdate(final Location location) throws Exception {
-		// if (location.old("address") != null)
-		lookupAddress(location);
+		if (location.old("address") != null)
+			lookupAddress(location);
 	}
 
 	@Override
@@ -74,16 +75,17 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		location.setZipCode(geoLocation.getZipCode());
 		location.setStreet(geoLocation.getStreet());
 		location.setNumber(geoLocation.getNumber());
-		if (geoLocation.getStreet() != null && geoLocation.getStreet().trim().length() > 0) {
+		if (!Strings.isEmpty(geoLocation.getStreet())) {
 			if (location.getStreet().contains("traße")) {
 				final String street = location.getStreet().replace("traße", "tr.");
 				location.setAddress(location.getAddress().replace(location.getStreet(), street));
 				location.setStreet(street);
 			}
-			if (location.getLatitude() == null) {
-				location.setLatitude(geoLocation.getLatitude());
-				location.setLongitude(geoLocation.getLongitude());
-			}
+		}
+		if (location.getLongitude() == null || location.getLongitude() == 0
+				|| location.getLatitude() == null || location.getLatitude() == 0) {
+			location.setLatitude(geoLocation.getLatitude());
+			location.setLongitude(geoLocation.getLongitude());
 		}
 		n = result.get("address_components");
 		String s = "";

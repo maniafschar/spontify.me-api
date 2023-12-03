@@ -131,8 +131,8 @@ public class TestConfig {
 						getClass().getResourceAsStream(url.contains("/veranstaltungen/")
 								? (url.split("/").length == 5 ? "/eventList.html" : "/eventDetail.html")
 								: url.contains("muenchenticket.") ? "/eventTicket.html" : "/eventAddress.html"),
-						StandardCharsets.UTF_8);
-			} catch (IOException e) {
+						StandardCharsets.UTF_8).replace('\n', ' ').replace('\r', ' ');
+			} catch (final IOException e) {
 				throw new RuntimeException(e);
 			}
 		}
