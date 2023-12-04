@@ -111,9 +111,9 @@ public class TestConfig {
 			try {
 				return IOUtils.toString(
 						getClass().getResourceAsStream(
-								param.startsWith("place/nearbysearch/json?") ? "/googleNearBy.json"
-										: param.startsWith("place/photo?") ? "/googlePhoto.html"
-												: "/googleResponse.json"),
+								param.startsWith("place/nearbysearch/json?") ? "/json/googleNearBy.json"
+										: param.startsWith("place/photo?") ? "/html/googlePhoto.html"
+												: "/json/googleResponse.json"),
 						StandardCharsets.UTF_8);
 			} catch (final IOException e) {
 				throw new RuntimeException(e);
@@ -128,9 +128,9 @@ public class TestConfig {
 		protected String get(final String url) {
 			try {
 				return IOUtils.toString(
-						getClass().getResourceAsStream(url.contains("/veranstaltungen/")
-								? (url.split("/").length == 5 ? "/eventList.html" : "/eventDetail.html")
-								: url.contains("muenchenticket.") ? "/eventTicket.html" : "/eventAddress.html"),
+						getClass().getResourceAsStream("/html/event" + (url.contains("/veranstaltungen/")
+								? (url.split("/").length == 5 ? "List" : "Detail")
+								: url.contains("muenchenticket.") ? "Ticket" : "Address") + ".html"),
 						StandardCharsets.UTF_8).replace('\n', ' ').replace('\r', ' ');
 			} catch (final IOException e) {
 				throw new RuntimeException(e);
@@ -147,7 +147,7 @@ public class TestConfig {
 		protected JsonNode get(final String url) throws Exception {
 			String s = IOUtils.toString(
 					getClass().getResourceAsStream(
-							url.startsWith("id=") ? "/surveyLastMatch.json" : "/surveyMatchdays.json"),
+							url.startsWith("id=") ? "/json/surveyLastMatch.json" : "/json/surveyMatchdays.json"),
 					StandardCharsets.UTF_8);
 			Instant date = Instant.now();
 			if (offset != -1 && url.contains("season=")) {

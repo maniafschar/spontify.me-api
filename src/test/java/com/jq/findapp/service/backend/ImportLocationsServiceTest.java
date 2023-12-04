@@ -77,7 +77,7 @@ public class ImportLocationsServiceTest {
 	public void importLocationJSON() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
-		final String json = IOUtils.toString(getClass().getResourceAsStream("/googleNearByError.json"),
+		final String json = IOUtils.toString(getClass().getResourceAsStream("/json/googleNearByError.json"),
 				StandardCharsets.UTF_8);
 
 		// when

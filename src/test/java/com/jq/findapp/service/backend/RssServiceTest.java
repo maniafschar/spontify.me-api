@@ -41,7 +41,7 @@ public class RssServiceTest {
 		// given
 		final Pattern img = Pattern.compile("\\<article.*?\\<figure.*?\\<img .*?src=\\\"(.*?)\\\"");
 		final Matcher matcher = img.matcher(
-				IOUtils.toString(RssServiceTest.class.getResourceAsStream("/article.html"),
+				IOUtils.toString(RssServiceTest.class.getResourceAsStream("/html/article.html"),
 						StandardCharsets.UTF_8).replace('\n', ' '));
 
 		// when

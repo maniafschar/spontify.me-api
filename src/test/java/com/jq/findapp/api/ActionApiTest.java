@@ -29,7 +29,7 @@ public class ActionApiTest {
 	@Test
 	public void google() throws Exception {
 		// given
-		final String response = IOUtils.toString(getClass().getResourceAsStream("/googleResponse.json"),
+		final String response = IOUtils.toString(getClass().getResourceAsStream("/json/googleResponse.json"),
 				StandardCharsets.UTF_8);
 
 		// when
@@ -54,7 +54,7 @@ public class ActionApiTest {
 	public void paypal_refund() throws Exception {
 		// given
 		final JsonNode n = new ObjectMapper()
-				.readTree(IOUtils.toString(getClass().getResourceAsStream("/paypalWebhook.json"),
+				.readTree(IOUtils.toString(getClass().getResourceAsStream("/json/paypalWebhook.json"),
 						StandardCharsets.UTF_8));
 
 		// when
