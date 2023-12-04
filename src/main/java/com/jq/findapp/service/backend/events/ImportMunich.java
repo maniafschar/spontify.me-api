@@ -1,10 +1,7 @@
 package com.jq.findapp.service.backend.events;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.math.BigInteger;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -17,7 +14,6 @@ import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -26,9 +22,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
-import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Ticket.TicketType;
@@ -36,11 +30,13 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.EventService;
+import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.EntityUtil;
 import com.jq.findapp.util.Strings;
 
 @Component
-private static class ImportMunich {
+public class ImportMunich {
 	@Autowired
 	private Repository repository;
 
@@ -67,7 +63,7 @@ private static class ImportMunich {
 	private Client client;
 	private EventService eventService;
 
-	private String run(final EventService eventService) throws Exception {
+	public String run(final EventService eventService) throws Exception {
 		if (lastRun.get() > System.currentTimeMillis() - 24 * 60 * 60 * 1000)
 			return "";
 		lastRun.set(System.currentTimeMillis() + (long) (Math.random() * 5 * 60 * 60 * 1000));
@@ -76,8 +72,8 @@ private static class ImportMunich {
 		final int count = page(eventService.get(url + "/veranstaltungen/event"));
 		// page 2: count += page(urlRetriever.get(url + "/veranstaltungen/event"));
 		final QueryParams params = new QueryParams(Query.event_listId);
-		params.setSearch("event.startDate>'" + .now().plus(Duration.ofHours(6))
-				+ "' and event.startDate<'" + .now().plus(Duration.ofHours(30))
+		params.setSearch("event.startDate>'" + Instant.now().plus(Duration.ofHours(6))
+				+ "' and event.startDate<'" + Instant.now().plus(Duration.ofHours(30))
 				+ "' and event.contactId=" + client.getAdminId()
 				+ " and (event.image is not null or location.image is not null)"
 				+ " and event.url is not null"
@@ -105,7 +101,7 @@ private static class ImportMunich {
 						count++;
 				} catch (final Exception ex) {
 					notificationService.createTicket(TicketType.ERROR, "eventImport",
-							Strings.stackTraceToString(ex) + "\n\n" + lis.item(i).getContent(),
+							Strings.stackTraceToString(ex) + "\n\n" + lis.item(i).getTextContent(),
 							null);
 				}
 			}
@@ -136,7 +132,7 @@ private static class ImportMunich {
 					event.setStartDate(new Timestamp(date.getTime()));
 					final QueryParams params = new QueryParams(Query.event_listId);
 					params.setSearch("event.startDate='"
-							+ event.getStartDate().to().toString().substring(0, 19)
+							+ event.getStartDate().toInstant().toString().substring(0, 19)
 							+ "' and event.locationId=" + event.getLocationId() + " and event.contactId="
 							+ client.getAdminId());
 					if (repository.list(params).size() == 0) {
@@ -153,19 +149,19 @@ private static class ImportMunich {
 											EntityUtil.getImage(url + image, EntityUtil.IMAGE_THUMB_SIZE, 0));
 							}
 						}
-						event.setDescription((body.getFirstChild().getFirstChild().getContent().trim()
+						event.setDescription((body.getFirstChild().getFirstChild().getTextContent().trim()
 								+ "\n" + getField(externalPage ? regexDescExternal : regexDesc, page, 1))
 								.replaceAll("<[^>]*>", " ").trim());
 						event.setEndDate(new java.sql.Date(date.getTime()));
 						event.setContactId(client.getAdminId());
-						event.setSkills(body.getChildNodes().item(1).getContent().trim());
+						event.setSkills(body.getChildNodes().item(1).getTextContent().trim());
 						if (event.getDescription().length() > 1000)
 							event.setDescription(event.getDescription().substring(0, 997) + "...");
 						repository.save(event);
 						return true;
 					}
 				} else
-					throw new IllegalArgumentException("unable to import location: " + node.getContent());
+					throw new IllegalArgumentException("unable to import location: " + node.getTextContent());
 			} catch (final RuntimeException ex) {
 				// if unable to access event, then ignore and continue, otherwise re-throw
 				if (!ex.getMessage().contains(event.getUrl()) || ex instanceof IllegalArgumentException)
@@ -228,8 +224,8 @@ private static class ImportMunich {
 		return null;
 	}
 
-	private String getField(final Pattern pattern, final String , final int group) {
-		final Matcher m = pattern.matcher();
+	private String getField(final Pattern pattern, final String text, final int group) {
+		final Matcher m = pattern.matcher(text);
 		return m.find() ? m.group(group).trim() : "";
 	}
 }

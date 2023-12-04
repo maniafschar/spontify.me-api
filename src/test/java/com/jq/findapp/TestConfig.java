@@ -125,7 +125,7 @@ public class TestConfig {
 	@Primary
 	public class EventServiceMock extends EventService {
 		@Override
-		protected String get(final String url) {
+		public String get(final String url) {
 			try {
 				return IOUtils.toString(
 						getClass().getResourceAsStream("/html/event" + (url.contains("/veranstaltungen/")
