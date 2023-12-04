@@ -323,7 +323,8 @@ public class EventService {
 			else if (body.getFirstChild().getFirstChild().getAttributes() != null)
 				event.setUrl(url + body.getFirstChild().getFirstChild()
 						.getAttributes().getNamedItem("href").getNodeValue().trim());
-			if (!Strings.isEmpty(event.getUrl()) && !event.getUrl().contains("eventim")) {
+			if (!Strings.isEmpty(event.getUrl()) &&
+					(event.getUrl().startsWith(url) || event.getUrl().startsWith("https://www.muenchenticket.de/"))) {
 				try {
 					final String page = eventService.get(event.getUrl());
 					event.setLocationId(importLocation(page, externalPage, event.getUrl()));
@@ -362,13 +363,15 @@ public class EventService {
 							repository.save(event);
 							return true;
 						}
-					}
+					} else
+						throw new IllegalArgumentException("unable to import location: " + node.getTextContent());
 				} catch (final RuntimeException ex) {
 					// if unable to access event, then ignore and continue, otherwise re-throw
-					if (!ex.getMessage().contains(event.getUrl()))
+					if (!ex.getMessage().contains(event.getUrl()) || ex instanceof IllegalArgumentException)
 						throw ex;
 				}
-			}
+			} else
+				throw new IllegalArgumentException("unknown details URL: " + event.getUrl());
 			return false;
 		}
 
