@@ -230,7 +230,7 @@ public class EventService {
 		return result;
 	}
 
-	protected String get(final String url) {
+	public String get(final String url) {
 		try {
 			return IOUtils.toString(new URL(url).openStream(), StandardCharsets.UTF_8)
 				.replace('\n', ' ').replace('\r', ' ');
