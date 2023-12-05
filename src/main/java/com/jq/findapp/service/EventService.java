@@ -15,6 +15,7 @@ import java.util.TimeZone;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
@@ -160,14 +161,19 @@ public class EventService {
 		return result;
 	}
 
+	@Async
 	public void publish(final BigInteger id) throws Exception {
 		final Event event = repository.one(Event.class, id);
 		final Contact contact = repository.one(Contact.class, event.getContactId());
 		final Location location = repository.one(Location.class, event.getLocationId());
-		externalService.publishOnFacebook(contact.getClientId(),
+		final String fbId = externalService.publishOnFacebook(contact.getClientId(),
 				new SimpleDateFormat("d.M.yyyy H:mm").format(event.getStartDate()) + "\n" + event.getDescription()
 						+ "\n\n" + location.getName() + "\n" + location.getAddress(),
 				"/rest/action/marketing/event/" + id);
+		if (fbId != null) {
+			event.setPublishId(fbId);
+			repository.save(event);
+		}
 	}
 
 	public LocalDateTime getRealDate(final Event event) {
