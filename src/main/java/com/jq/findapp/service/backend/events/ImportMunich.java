@@ -63,7 +63,7 @@ public class ImportMunich {
 
 	public int run(final EventService eventService, final BigInteger clientId) throws Exception {
 		if (lastRun.get() > System.currentTimeMillis() - 24 * 60 * 60 * 1000)
-			return 0;
+			return -1;
 		lastRun.set(System.currentTimeMillis() + (long) (Math.random() * 5 * 60 * 60 * 1000));
 		this.eventService = eventService;
 		this.client = repository.one(Client.class, clientId);

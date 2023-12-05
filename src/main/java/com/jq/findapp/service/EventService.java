@@ -213,7 +213,8 @@ public class EventService {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importEvents");
 		try {
 			final BigInteger clientId = BigInteger.ONE;
-			result.result = "Munich: " + importMunich.run(this, clientId) + " imported, " + publishClient(clientId);
+			final int count = importMunich.run(this, clientId);
+			result.result = "Munich: " + (count < 0 ? "paused, " : count + " imported, ") + publishClient(clientId);
 		} catch (final Exception e) {
 			result.exception = e;
 		}
