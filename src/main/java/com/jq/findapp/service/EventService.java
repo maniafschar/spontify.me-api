@@ -211,7 +211,9 @@ public class EventService {
 	public SchedulerResult importEvents() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importEvents");
 		try {
-			result.result = importMunich.run(this);
+			result.result = "Munich: " + importMunich.run(this) + " imported, ";
+			final int published = importMunich.publish();
+			result.result += published >= 0 ? published + " published" : "not published, because " + (published * -1) + " published in recently");
 		} catch (final Exception e) {
 			result.exception = e;
 		}
