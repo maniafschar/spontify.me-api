@@ -25,6 +25,7 @@ public class Event extends BaseEntity {
 	private String description;
 	private String image;
 	private String imageList;
+	private String publishId;
 	private String skills;
 	private String skillsText;
 	private String repetition;
@@ -141,6 +142,14 @@ public class Event extends BaseEntity {
 
 	public void setUrl(final String url) {
 		this.url = url;
+	}
+
+	public String getPublishId() {
+		return publishId;
+	}
+
+	public void setPublishId(final String publishId) {
+		this.publishId = publishId;
 	}
 
 	public Boolean getPublish() {
