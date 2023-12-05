@@ -92,7 +92,7 @@ public class ImportMunich {
 				return -result.size();
 		}
 		for (int i = 0; i < result.size() && i < 2; i++) {
-			if (Strings.isEmpty(result.get(i).get("event.published")))
+			if (Strings.isEmpty(result.get(i).get("event.publishId")))
 				eventService.publish((BigInteger) result.get(i).get("event.id"));
 		}
 		return count;
