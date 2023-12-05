@@ -86,14 +86,19 @@ public class ImportMunich {
 				+ " and location.zipCode like '8%'"
 				+ " and location.country='DE'");
 		final Result result = repository.list(params);
+		int count = 0;
 		for (int i = 0; i < result.size(); i++) {
 			if (result.get(i).get("event.modifiedAt") != null &&
-					((Timestamp) result.get(i).get("event.modifiedAt")).getTime() > Instant.now().minus(Duration.ofMinutes(35)).toEpochMilli());
-				return -result.size();
+					((Timestamp) result.get(i).get("event.modifiedAt")).getTime() > Instant.now().minus(Duration.ofMinutes(35)).toEpochMilli())
+				count++;
 		}
+		if (count > 0)
+			return -count;
 		for (int i = 0; i < result.size() && i < 2; i++) {
-			if (Strings.isEmpty(result.get(i).get("event.publishId")))
+			if (Strings.isEmpty(result.get(i).get("event.publishId"))) {
 				eventService.publish((BigInteger) result.get(i).get("event.id"));
+				count++;
+			}
 		}
 		return count;
 	}
