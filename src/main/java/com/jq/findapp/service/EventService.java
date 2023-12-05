@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -211,13 +212,42 @@ public class EventService {
 	public SchedulerResult importEvents() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importEvents");
 		try {
-			result.result = "Munich: " + importMunich.run(this) + " imported, ";
-			final int published = importMunich.publish();
-			result.result += published >= 0 ? published + " published" : "not published, because " + (published * -1) + " published in recently");
+			final BigInteger clientId = BigInteger.ONE;
+			result.result = "Munich: " + importMunich.run(this, clientId) + " imported, " + publishClient(clientId);
 		} catch (final Exception e) {
 			result.exception = e;
 		}
 		return result;
+	}
+
+	public String publishClient(final BigInteger clientId) throws Exception {
+		final QueryParams params = new QueryParams(Query.event_listId);
+		params.setSearch("event.startDate>'" + Instant.now().plus(Duration.ofHours(6))
+				+ "' and event.startDate<'" + Instant.now().plus(Duration.ofHours(30))
+				+ "' and event.contactId=" + clientId
+				+ " and (event.image is not null or location.image is not null)"
+				+ " and event.url is not null"
+				+ " and event.repetition='o'"
+				+ " and event.maxParticipants is null"
+				+ " and location.zipCode like '8%'"
+				+ " and location.country='DE'");
+		final Result result = repository.list(params);
+		int count = 0;
+		for (int i = 0; i < result.size(); i++) {
+			if (result.get(i).get("event.modifiedAt") != null &&
+					((Timestamp) result.get(i).get("event.modifiedAt")).getTime() > Instant.now()
+							.minus(Duration.ofMinutes(10)).toEpochMilli())
+				count++;
+		}
+		if (count > 0)
+			return "not published, because " + count + " published in recently";
+		for (int i = 0; i < result.size(); i++) {
+			if (Strings.isEmpty(result.get(i).get("event.publishId"))) {
+				publish((BigInteger) result.get(i).get("event.id"));
+				break;
+			}
+		}
+		return count + " published";
 	}
 
 	public String get(final String url) {

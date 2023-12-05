@@ -4,8 +4,6 @@ import java.io.StringReader;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicLong;
@@ -63,43 +61,14 @@ public class ImportMunich {
 	private Client client;
 	private EventService eventService;
 
-	public int run(final EventService eventService) throws Exception {
+	public int run(final EventService eventService, final BigInteger clientId) throws Exception {
 		if (lastRun.get() > System.currentTimeMillis() - 24 * 60 * 60 * 1000)
 			return 0;
 		lastRun.set(System.currentTimeMillis() + (long) (Math.random() * 5 * 60 * 60 * 1000));
 		this.eventService = eventService;
-		client = repository.one(Client.class, BigInteger.ONE);
+		this.client = repository.one(Client.class, clientId);
 		final int count = page(eventService.get(url + "/veranstaltungen/event"));
 		// page 2: count += page(urlRetriever.get(url + "/veranstaltungen/event"));
-		return count;
-	}
-
-	public int publish(final EventService eventService) throws Exception {
-		final QueryParams params = new QueryParams(Query.event_listId);
-		params.setSearch("event.startDate>'" + Instant.now().plus(Duration.ofHours(6))
-				+ "' and event.startDate<'" + Instant.now().plus(Duration.ofHours(30))
-				+ "' and event.contactId=" + client.getAdminId()
-				+ " and (event.image is not null or location.image is not null)"
-				+ " and event.url is not null"
-				+ " and event.repetition='o'"
-				+ " and event.maxParticipants is null"
-				+ " and location.zipCode like '8%'"
-				+ " and location.country='DE'");
-		final Result result = repository.list(params);
-		int count = 0;
-		for (int i = 0; i < result.size(); i++) {
-			if (result.get(i).get("event.modifiedAt") != null &&
-					((Timestamp) result.get(i).get("event.modifiedAt")).getTime() > Instant.now().minus(Duration.ofMinutes(35)).toEpochMilli())
-				count++;
-		}
-		if (count > 0)
-			return -count;
-		for (int i = 0; i < result.size() && i < 2; i++) {
-			if (Strings.isEmpty(result.get(i).get("event.publishId"))) {
-				eventService.publish((BigInteger) result.get(i).get("event.id"));
-				count++;
-			}
-		}
 		return count;
 	}
 

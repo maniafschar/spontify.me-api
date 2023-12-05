@@ -36,7 +36,7 @@ public class EntityUtil {
 		}
 	}
 
-	public static byte[] scaleImage(final byte[] data, final int size) throws IOException {
+	private static byte[] scaleImage(final byte[] data, final int size) throws IOException {
 		final BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(data));
 		int width = originalImage.getWidth();
 		int height = originalImage.getHeight();
