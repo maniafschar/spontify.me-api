@@ -233,16 +233,17 @@ public class EventService {
 				+ " and location.zipCode like '8%'"
 				+ " and location.country='DE'");
 		final Result result = repository.list(params);
+		final double per10minutes = result.size() / 24 * 6;
 		int count = 0;
 		for (int i = 0; i < result.size(); i++) {
 			if (result.get(i).get("event.modifiedAt") != null &&
 					((Timestamp) result.get(i).get("event.modifiedAt")).getTime() > Instant.now()
-							.minus(Duration.ofMinutes(10)).toEpochMilli())
+							.minus(Duration.ofMinutes((int) (10 / per10minutes))).toEpochMilli())
 				count++;
 		}
 		if (count > 0)
 			return "not published, because " + count + " published in recently";
-		for (int i = 0; i < result.size(); i++) {
+		for (int i = 0; i < result.size() && count < Math.max(1.0, per10minutes); i++) {
 			if (Strings.isEmpty(result.get(i).get("event.publishId"))) {
 				publish((BigInteger) result.get(i).get("event.id"));
 				break;
