@@ -63,7 +63,7 @@ public class ImportMunich {
 	private Client client;
 	private EventService eventService;
 
-	public String run(final EventService eventService) throws Exception {
+	public int run(final EventService eventService) throws Exception {
 		if (lastRun.get() > System.currentTimeMillis() - 24 * 60 * 60 * 1000)
 			return "";
 		lastRun.set(System.currentTimeMillis() + (long) (Math.random() * 5 * 60 * 60 * 1000));
@@ -71,20 +71,34 @@ public class ImportMunich {
 		client = repository.one(Client.class, BigInteger.ONE);
 		final int count = page(eventService.get(url + "/veranstaltungen/event"));
 		// page 2: count += page(urlRetriever.get(url + "/veranstaltungen/event"));
+		return count;
+	}
+
+	public int publish(final EventService eventService) throws Exception {
 		final QueryParams params = new QueryParams(Query.event_listId);
+		params.setSearch("event.startDate>'" + Instant.now()
+				+ "' and event.startDate<'" + Instant.now().plus(Duration.ofHours(7))
+				+ "' and event.contactId=" + client.getAdminId()
+				+ " and event.publishId is not null"
+				+ " and location.zipCode like '8%'"
+				+ " and location.country='DE'");
+		Result result = repository.list(params);
+		if (result.size() > 0)
+			return -result.size();
 		params.setSearch("event.startDate>'" + Instant.now().plus(Duration.ofHours(6))
 				+ "' and event.startDate<'" + Instant.now().plus(Duration.ofHours(30))
 				+ "' and event.contactId=" + client.getAdminId()
 				+ " and (event.image is not null or location.image is not null)"
 				+ " and event.url is not null"
 				+ " and event.repetition='o'"
+				+ " and event.publishId is null"
 				+ " and event.maxParticipants is null"
 				+ " and location.zipCode like '8%'"
 				+ " and location.country='DE'");
-		final Result result = repository.list(params);
-		for (int i = 0; i < result.size(); i++)
+		result = repository.list(params);
+		for (int i = 0; i < result.size() && i < 2; i++)
 			eventService.publish((BigInteger) result.get(i).get("event.id"));
-		return "Munich: " + count + " imported, " + result.size() + " published";
+		return count;
 	}
 
 	private int page(String page) throws Exception {
