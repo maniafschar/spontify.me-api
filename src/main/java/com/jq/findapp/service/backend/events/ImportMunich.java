@@ -58,17 +58,27 @@ public class ImportMunich {
 
 	private final Pattern regexName = Pattern.compile("itemprop=\"location\"(.*?)</svg>(.*?)</");
 	private final Pattern regexPrice = Pattern.compile("Tickets sichern ab &euro; (.*?)</");
+	private final Pattern regexNextPage = Pattern.compile("<li(.*?)m-pagination__item--next-page(.*?)href=\"(.*?)\"");
 	private Client client;
 	private EventService eventService;
 
 	public int run(final EventService eventService, final BigInteger clientId) throws Exception {
 		if (lastRun.get() > System.currentTimeMillis() - 24 * 60 * 60 * 1000)
 			return -1;
+		final String path = "/veranstaltungen/event";
 		lastRun.set(System.currentTimeMillis() + (long) (Math.random() * 5 * 60 * 60 * 1000));
 		this.eventService = eventService;
 		this.client = repository.one(Client.class, clientId);
-		final int count = page(eventService.get(url + "/veranstaltungen/event"));
-		// page 2: count += page(urlRetriever.get(url + "/veranstaltungen/event"));
+		String page = eventService.get(url + path);
+		int count = page(page);
+		while (true) {
+			final Matcher m = regexNextPage.matcher(page);
+			if (m.find()) {
+				page = eventService.get(url + path + m.group(3));
+				count += page(page);
+			} else
+				break;
+		}
 		return count;
 	}
 
