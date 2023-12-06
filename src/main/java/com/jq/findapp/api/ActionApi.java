@@ -657,6 +657,15 @@ public class ActionApi {
 		}).toList();
 	}
 
+	@GetMapping(value = "marketing/news/{id}", produces = MediaType.TEXT_HTML_VALUE)
+	public String marketingNews(@PathVariable final BigInteger id) throws Exception {
+		final ClientNews news = repository.one(ClientNews.class, id);
+		if (news == null)
+			return "";
+		return getHtml(repository.one(Client.class, news.getClientId()), "news/" + news.getId(),
+				Attachment.resolve(news.getImage()));
+	}
+
 	@GetMapping(value = "marketing/event/{id}", produces = MediaType.TEXT_HTML_VALUE)
 	public String marketingEvent(@PathVariable final BigInteger id) throws Exception {
 		final Event event = repository.one(Event.class, id);
@@ -667,7 +676,7 @@ public class ActionApi {
 		if (image == null)
 			image = repository.one(Location.class, event.getLocationId()).getImage();
 		if (image == null)
-			image = repository.one(Contact.class, event.getContactId()).getImage();
+			image = contact.getImage();
 		return getHtml(repository.one(Client.class, contact.getClientId()), "event/" + event.getId(),
 				Attachment.resolve(image));
 	}
