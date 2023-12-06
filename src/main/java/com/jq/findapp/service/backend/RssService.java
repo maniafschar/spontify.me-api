@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
-import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientNews;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Query;
@@ -105,8 +104,7 @@ public class RssService {
 			urls.add(clientNews.getUrl());
 			if (b)
 				externalService.publishOnFacebook(clientId, clientNews.getDescription(),
-						repository.one(Client.class, clientId).getUrl()
-								+ "/rest/action/marketing/news/" + clientNews.getId());
+						"/rest/action/marketing/news/" + clientNews.getId());
 		}
 		params.setSearch("clientNews.publish>'"
 				+ new Timestamp(df.parse(rss.get(rss.size() - 1).get("pubDate").asText()).getTime())
