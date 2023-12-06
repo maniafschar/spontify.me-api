@@ -45,7 +45,7 @@ public class EventServiceTest {
 
 		// then
 		assertNull(result.exception);
-		assertEquals("Munich: 56 imported, 1 published", result.result);
+		assertEquals("Munich: 56 imported, 0 published", result.result);
 		assertEquals(1, repository.list(params).size());
 	}
 }

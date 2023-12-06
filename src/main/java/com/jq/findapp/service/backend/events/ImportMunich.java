@@ -74,7 +74,7 @@ public class ImportMunich {
 		while (true) {
 			final Matcher m = regexNextPage.matcher(page);
 			if (m.find()) {
-				page = eventService.get(url + path + m.group(3));
+				page = eventService.get(url + path + m.group(3).replace("&amp;", "&"));
 				count += page(page);
 			} else
 				break;
@@ -83,6 +83,8 @@ public class ImportMunich {
 	}
 
 	private int page(String page) throws Exception {
+		if (!page.contains("<ul class=\"m-listing__list\""))
+			return 0;
 		int count = 0;
 		page = page.substring(page.indexOf("<ul class=\"m-listing__list\""));
 		page = page.substring(0, page.indexOf("</ul>") + 5);
