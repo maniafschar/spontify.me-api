@@ -121,8 +121,7 @@ public class SurveyService {
 							clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
 							clientMarketing.setImage(Attachment.createImage(".png",
 									image.create(poll, "Ergebnistipps",
-											repository.one(Client.class, clientId).getName(),
-											null)));
+											repository.one(Client.class, clientId), null)));
 							repository.save(clientMarketing);
 							notification.sendPoll(clientMarketing,
 									ContactNotificationTextType.clientMarketingPrediction);
@@ -292,8 +291,7 @@ public class SurveyService {
 							clientMarketing.setClientId(clientId);
 							clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
 							clientMarketing.setImage(Attachment.createImage(".png",
-									image.create(poll, "Spieler", repository.one(Client.class, clientId).getName(),
-											null)));
+									image.create(poll, "Spieler", repository.one(Client.class, clientId), null)));
 							repository.save(clientMarketing);
 							notification.sendPoll(clientMarketing,
 									ContactNotificationTextType.clientMarketingPlayerOfTheMatch);
@@ -426,8 +424,7 @@ public class SurveyService {
 					else
 						prefix = "Spieler";
 					clientMarketingResult.setImage(Attachment.createImage(".png",
-							image.create(poll, prefix, repository.one(Client.class, clientId).getName(),
-									clientMarketingResult)));
+							image.create(poll, prefix, repository.one(Client.class, clientId), clientMarketingResult)));
 					repository.save(clientMarketingResult);
 					notification.sendResult(
 							repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId()));
@@ -477,8 +474,9 @@ public class SurveyService {
 	private class Image {
 		private final int width = 600, height = 315, padding = 20;
 
-		private byte[] create(final JsonNode poll, final String subtitlePrefix, final String copyright,
+		private byte[] create(final JsonNode poll, final String subtitlePrefix, final Client client,
 				final ClientMarketingResult clientMarketingResult) throws Exception {
+			final JsonNode json = new ObjectMapper().readTree(Attachment.resolve(client.getStorage()));
 			final String urlLeague = poll.get("league").asText();
 			final String urlHome = poll.findPath("home").asText();
 			final String urlAway = poll.findPath("away").asText();
@@ -518,7 +516,7 @@ public class SurveyService {
 			g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 17.5f);
 			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP));
 			g2.setFont(customFont.deriveFont(12f));
-			s = "© " + LocalDateTime.now().getYear() + " " + copyright;
+			s = "© " + LocalDateTime.now().getYear() + " " + client.getName();
 			g2.drawString(s, width - g2.getFontMetrics().stringWidth(s) - padding, height - padding);
 			if (clientMarketingResult != null)
 				result(g2, customFont, poll,
