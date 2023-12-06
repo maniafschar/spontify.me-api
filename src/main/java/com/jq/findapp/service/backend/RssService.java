@@ -20,13 +20,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientNews;
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.util.EntityUtil;
 
 @Service
@@ -44,7 +45,7 @@ public class RssService {
 			try {
 				final JsonNode json = new ObjectMapper().readTree(list.get(i).get("client.storage").toString());
 				if (json.has("rss")) {
-					final boolean publish = json.get("rss").get("publish").asBoolean()
+					final boolean publish = json.get("rss").get("publish").asBoolean();
 					final String count = syncFeed(json.get("rss").get("url").asText(),
 							(BigInteger) list.get(i).get("client.id"), publish);
 					if (count != null)
@@ -59,7 +60,7 @@ public class RssService {
 		return result;
 	}
 
-	private String syncFeed(final String url, final BigInteger clientId, boolean publish) throws Exception {
+	private String syncFeed(final String url, final BigInteger clientId, final boolean publish) throws Exception {
 		final ArrayNode rss = (ArrayNode) new XmlMapper().readTree(new URL(url)).get("channel").get("item");
 		if (rss == null || rss.size() == 0)
 			return null;
@@ -73,7 +74,7 @@ public class RssService {
 		int count = 0;
 		Result result;
 		for (int i = 0; i < rss.size(); i++) {
-			final String uid = rss.get(i).get("guid").get("").asText();
+			final String uid = rss.get(i).get("guid").asText();
 			params.setSearch("clientNews.url='" + uid + "'");
 			result = repository.list(params);
 			final ClientNews clientNews;
@@ -90,9 +91,12 @@ public class RssService {
 			final Matcher matcher = img
 					.matcher(IOUtils.toString(new URL(rss.get(i).get("link").asText()), StandardCharsets.UTF_8)
 							.replace('\r', ' ').replace('\n', ' '));
-			if (matcher.find())
-				clientNews.setImage(EntityUtil.getImage(matcher.group(1), EntityUtil.IMAGE_SIZE, 200));
-			else
+			if (matcher.find()) {
+				String s = matcher.group(1);
+				if (!s.startsWith("http"))
+					s = url.substring(0, url.indexOf("/", 10)) + s;
+				clientNews.setImage(EntityUtil.getImage(s, EntityUtil.IMAGE_SIZE, 200));
+			} else
 				clientNews.setImage(null);
 			if (clientNews.getId() == null)
 				count++;
@@ -100,8 +104,9 @@ public class RssService {
 			repository.save(clientNews);
 			urls.add(clientNews.getUrl());
 			if (b)
-				externalService.publishOnFacebook(clientId, clientNews.getDescription(), client.getUrl()
-						+ "/rest/action/marketing/news/" + clientNews.getId());
+				externalService.publishOnFacebook(clientId, clientNews.getDescription(),
+						repository.one(Client.class, clientId).getUrl()
+								+ "/rest/action/marketing/news/" + clientNews.getId());
 		}
 		params.setSearch("clientNews.publish>'"
 				+ new Timestamp(df.parse(rss.get(rss.size() - 1).get("pubDate").asText()).getTime())

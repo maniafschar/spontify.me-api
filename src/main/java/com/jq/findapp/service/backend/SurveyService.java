@@ -56,7 +56,6 @@ import com.jq.findapp.util.Strings;
 
 @Service
 public class SurveyService {
-	private final static Map<BigInteger, Integer> clients = new HashMap<>();
 	final Synchonize synchronize = new Synchonize();
 	private final Image image = new Image();
 	private final Notification notification = new Notification();
@@ -72,10 +71,6 @@ public class SurveyService {
 
 	@Value("${app.sports.api.token}")
 	private String token;
-
-	static {
-		clients.put(BigInteger.valueOf(4), 157);
-	}
 
 	class Synchonize {
 		private final static int FIRST_YEAR = 2010;
@@ -192,8 +187,9 @@ public class SurveyService {
 					answers.addObject().put("answer", s);
 					added += s + "|";
 				}
-				((ArrayNode) poll.get("matches"))
-						.add(s + "|" + formatDate(matches.get(i).get("timestamp").asLong(), "d.M.yyyy H:mm"));
+				if (i < 8)
+					((ArrayNode) poll.get("matches"))
+							.add(s + "|" + formatDate(matches.get(i).get("timestamp").asLong(), "d.M.yyyy H:mm"));
 			}
 			final ArrayNode statistics = om.createArrayNode();
 			for (int i = 0; i < labels.size(); i++) {
@@ -407,7 +403,7 @@ public class SurveyService {
 			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 			params.setSearch("clientMarketingResult.published=false and clientMarketing.endDate<='" + Instant.now()
 					+ "' and clientMarketing.clientId=" + clientId);
-			Result list = repository.list(params);
+			final Result list = repository.list(params);
 			String result = "";
 			for (int i = 0; i < list.size(); i++) {
 				final ClientMarketingResult clientMarketingResult = result(
@@ -437,26 +433,38 @@ public class SurveyService {
 				} else
 					repository.save(clientMarketingResult);
 			}
-			final String label = "team=" + clients.get(clientId) + "&season=" + LocalDateTime.now().getYear();
-			final JsonNode matchDays = get(label);
-			if (matchDays != null) {
-				for (int i = 0; i < matchDays.size(); i++) {
-					if ("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())
-							&& Instant.ofEpochSecond(matchDays.get(i).get("fixture").get("timestamp").asLong())
-									.plus(Duration.ofHours(6)).isBefore(Instant.now())) {
-						params.setQuery(Query.misc_listStorage);
-						params.setSearch("storage.label='" + label + "'");
-						list = repository.list(params);
-						if (list.size() > 0) {
-							repository.delete(repository.one(Storage.class,
-									(BigInteger) list.get(0).get("storage.id")));
-							get(label);
+			updateMatchdays(clientId);
+			return result.trim();
+		}
+
+		private void updateMatchdays(final BigInteger clientId) throws Exception {
+			final JsonNode json = new ObjectMapper()
+					.readTree(Attachment.resolve(repository.one(Client.class, clientId).getStorage()));
+			if (json.has("survey")) {
+				for (int i2 = 0; i2 < json.get("survey").size(); i2++) {
+					final String label = "team=" + json.get("survey").get(i2).asInt() + "&season="
+							+ LocalDateTime.now().getYear();
+					final JsonNode matchDays = get(label);
+					final QueryParams params = new QueryParams(Query.misc_listStorage);
+					if (matchDays != null) {
+						for (int i = 0; i < matchDays.size(); i++) {
+							if ("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())
+									&& Instant.ofEpochSecond(
+											matchDays.get(i).get("fixture").get("timestamp").asLong())
+											.plus(Duration.ofHours(6)).isBefore(Instant.now())) {
+								params.setSearch("storage.label='" + label + "'");
+								final Result list = repository.list(params);
+								if (list.size() > 0) {
+									repository.delete(repository.one(Storage.class,
+											(BigInteger) list.get(0).get("storage.id")));
+									get(label);
+								}
+								break;
+							}
 						}
-						break;
 					}
 				}
 			}
-			return result.trim();
 		}
 
 		private String getOponent(final JsonNode poll) {
@@ -476,14 +484,17 @@ public class SurveyService {
 
 		private byte[] create(final JsonNode poll, final String subtitlePrefix, final Client client,
 				final ClientMarketingResult clientMarketingResult) throws Exception {
-			final JsonNode json = new ObjectMapper().readTree(Attachment.resolve(client.getStorage()));
-			final String[] color1 = json.get("css").get("bg1stop").replace("rgb(", "").replace(")", "").split(",");
-			final String[] color2 = json.get("css").get("bg2stop").replace("rgb(", "").replace(")", "").split(",");
+			final JsonNode json = new ObjectMapper().readTree(Attachment.resolve(client.getStorage())).get("css");
+			final String[] color1 = json.get("bg1stop").asText().replace("rgb(", "").replace(")", "").split(",");
+			final String[] color2 = json.get("bg1start").asText().replace("rgb(", "").replace(")", "").split(",");
+			final String[] color3 = json.get("text").asText().replace("rgb(", "").replace(")", "").split(",");
 			final String urlLeague = poll.get("league").asText();
 			final String urlHome = poll.findPath("home").asText();
 			final String urlAway = poll.findPath("away").asText();
 			final boolean homeMatch = "home".equals(poll.findPath("location").asText());
 			final BufferedImage output = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+			final Color colorText = new Color(Integer.valueOf(color3[0].trim()), Integer.valueOf(color3[1].trim()),
+					Integer.valueOf(color3[2].trim()));
 			final Graphics2D g2 = output.createGraphics();
 			g2.setComposite(AlphaComposite.Src);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -491,14 +502,16 @@ public class SurveyService {
 					height / 2 - 2 * padding,
 					height,
 					new float[] { .3f, 1f },
-					new Color[] { 
-						new Color(Integer.valueOf(color1[0]), Integer.valueOf(color1[1]), Integer.valueOf(color1[2])),
-						new Color(Integer.valueOf(color2[0]), Integer.valueOf(color2[1]), Integer.valueOf(color2[2]))
+					new Color[] {
+							new Color(Integer.valueOf(color1[0].trim()), Integer.valueOf(color1[1].trim()),
+									Integer.valueOf(color1[2].trim())),
+							new Color(Integer.valueOf(color2[0].trim()), Integer.valueOf(color2[1].trim()),
+									Integer.valueOf(color2[2].trim()))
 					});
 			g2.setPaint(gradient);
 			g2.fill(new Rectangle2D.Float(0, 0, width, height));
 			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
-					clientMarketingResult == null && "PlayerOfTheMatch".equals(poll.get("type").asText()) ? 1 : 0.1f));
+					clientMarketingResult == null && "PlayerOfTheMatch".equals(poll.get("type").asText()) ? 1 : 0.15f));
 			final int h = (int) (height * 0.4);
 			if (!homeMatch)
 				draw(urlHome, g2, width / 2, padding, h, -1);
@@ -511,7 +524,7 @@ public class SurveyService {
 					.deriveFont(50f);
 			GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(customFont);
 			g2.setFont(customFont);
-			g2.setColor(Color.BLACK);
+			g2.setColor(colorText);
 			String s = "Umfrage";
 			if (clientMarketingResult != null)
 				s += "ergebnis";
@@ -525,9 +538,9 @@ public class SurveyService {
 			g2.drawString(s, width - g2.getFontMetrics().stringWidth(s) - padding, height - padding);
 			if (clientMarketingResult != null)
 				result(g2, customFont, poll,
-						new ObjectMapper().readTree(Attachment.resolve(clientMarketingResult.getStorage())));
+						new ObjectMapper().readTree(Attachment.resolve(clientMarketingResult.getStorage())), colorText);
 			else if ("Prediction".equals(poll.get("type").asText()))
-				prediction(g2, customFont, poll);
+				prediction(g2, customFont, poll, colorText);
 			// final BufferedImageTranscoder imageTranscoder = new
 			// BufferedImageTranscoder();
 			// imageTranscoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, width);
@@ -542,13 +555,12 @@ public class SurveyService {
 			return out.toByteArray();
 		}
 
-		private void prediction(final Graphics2D g2, final Font customFont, final JsonNode poll)
+		private void prediction(final Graphics2D g2, final Font customFont, final JsonNode poll, final Color colorText)
 				throws Exception {
 			g2.setFont(customFont.deriveFont(12f));
 			final int h = g2.getFontMetrics().getHeight();
 			int y = padding;
 			final double w = width * 0.3, delta = 1.6;
-			g2.setColor(new Color(0, 0, 0));
 			for (int i = 0; i < poll.get("matches").size(); i++) {
 				final String[] s = poll.get("matches").get(poll.get("matches").size() - i - 1).asText().split("\\|");
 				g2.drawString(s[0], width - padding - 120 - g2.getFontMetrics().stringWidth(s[0]) / 2, y + h);
@@ -598,7 +610,7 @@ public class SurveyService {
 					g2.fillRect(padding + (int) w, y - 4,
 							(int) (poll.get("statistics").get(i).get("away").asDouble() / max * w),
 							h * 2);
-					g2.setColor(new Color(0, 0, 0));
+					g2.setColor(colorText);
 					String s = poll.get("statistics").get(i).get("label").asText();
 					if (labels.containsKey(s))
 						s = labels.get(s);
@@ -612,8 +624,8 @@ public class SurveyService {
 			}
 		}
 
-		private void result(final Graphics2D g2, final Font customFont, JsonNode poll, JsonNode result)
-				throws Exception {
+		private void result(final Graphics2D g2, final Font customFont, JsonNode poll, JsonNode result,
+				final Color colorText) throws Exception {
 			g2.setFont(customFont.deriveFont(16f));
 			final int h = g2.getFontMetrics().getHeight();
 			final int total = result.get("participants").asInt();
@@ -659,7 +671,7 @@ public class SurveyService {
 				g2.fillRoundRect(padding, y, width - 2 * padding, h * 2, 10, 10);
 				g2.setColor(new Color(255, 100, 0, 120));
 				g2.fillRoundRect(padding, y, (width - 2 * padding) * percent / 100, h * 2, 10, 10);
-				g2.setColor(new Color(0, 0, 0));
+				g2.setColor(colorText);
 				g2.drawString(percent + "%", padding * 1.8f, y + h + 5);
 				g2.drawString(s[1], padding * 4.5f, y + h + 5);
 				y += 2.3 * padding;
@@ -762,21 +774,30 @@ public class SurveyService {
 
 	public SchedulerResult update() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/update");
-		clients.keySet().forEach(e -> {
+		final Result list = repository.list(new QueryParams(Query.misc_listClient));
+		for (int i = 0; i < list.size(); i++) {
 			try {
-				BigInteger id = synchronize.prediction(e, clients.get(e));
-				if (id != null)
-					result.result += "\nprediction: " + id;
-				id = synchronize.poll(e, clients.get(e));
-				if (id != null)
-					result.result += "\npoll: " + id;
-				final String s = synchronize.resultAndNotify(e);
-				if (s.length() > 0)
-					result.result += "\nresultAndNotify: " + s;
-			} catch (final Exception ex) {
-				result.exception = ex;
+				final BigInteger clientId = (BigInteger) list.get(i).get("client.id");
+				final JsonNode json = new ObjectMapper().readTree(list.get(i).get("client.storage").toString());
+				if (json.has("survey")) {
+					for (int i2 = 0; i2 < json.get("survey").size(); i2++) {
+						final int teamId = json.get("survey").get(i2).asInt();
+						BigInteger id = synchronize.prediction(clientId, teamId);
+						if (id != null)
+							result.result += "\nprediction: " + id;
+						id = synchronize.poll(clientId, teamId);
+						if (id != null)
+							result.result += "\npoll: " + id;
+						final String s = synchronize.resultAndNotify(clientId);
+						if (s.length() > 0)
+							result.result += "\nresultAndNotify: " + s;
+					}
+				}
+			} catch (final Exception e) {
+				if (result.exception == null)
+					result.exception = e;
 			}
-		});
+		}
 		return result;
 	}
 

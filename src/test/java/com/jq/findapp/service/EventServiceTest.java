@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.util.HtmlUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -70,5 +71,19 @@ public class EventServiceTest {
 		doc.getElementsByTagName("li");
 
 		// then no exception
+	}
+
+	@Test
+	public void decodeHtmlEntities() {
+		// given
+		String s = "Bamberger Symphoniker\nCherubini: Ouvert&uuml;re zu &bdquo;Medea&ldquo;     Beethoven: Konzert f&uuml;r Klavier und Orchester Nr. 2 B-Dur op. 19     Strawinsky: &bdquo;Le sacre du printemps&ldquo;         Mitsuko Uchida, Klavier   Jakub Hru&scaron;a, Leitung       Leonard Bernstein  galt ihm als musikalisches Idol &ndash; inzwischen ist  Jakub Hrů&scaron;a  selbst ein Vorbild f&uuml;r den Nachwuchs am Pult. &bdquo;Exzess mit Understatement&ldquo;, so beschreibt das Klassikmagazin Rondo den bescheidenen Tschechen. Parallel zu seinem Amt als Chefdirigent der Bamberger Symphoniker ist  Hrů&scaron;a  designierter Musikdirektor des Royal Opera House in London, erster Gastdirigent der Tschechischen Philharmonie sowie des Orchestra dell&rsquo;Accademia Nazionale di Santa Cecilia.      Im Dezember ist  Hrů&scaron;a  mit den Bamberger Symphonikern und  Mitsuko Uchida  zu Gast. Die japanische Pianistin ist bekannt f&uuml;r &bdquo;ihre klangliche Sensibilit&auml;t und ihren gro&szlig;en An...\nGasteig HP8, Isarphilharmonie\nHans-Preißinger-Str. 8\n81379 München";
+
+		// when
+		s = HtmlUtils.htmlUnescape(s);
+
+		// then
+		assertEquals(
+				"Bamberger Symphoniker\nCherubini: Ouvertüre zu „Medea“     Beethoven: Konzert für Klavier und Orchester Nr. 2 B-Dur op. 19     Strawinsky: „Le sacre du printemps“         Mitsuko Uchida, Klavier   Jakub Hruša, Leitung       Leonard Bernstein  galt ihm als musikalisches Idol – inzwischen ist  Jakub Hrůša  selbst ein Vorbild für den Nachwuchs am Pult. „Exzess mit Understatement“, so beschreibt das Klassikmagazin Rondo den bescheidenen Tschechen. Parallel zu seinem Amt als Chefdirigent der Bamberger Symphoniker ist  Hrůša  designierter Musikdirektor des Royal Opera House in London, erster Gastdirigent der Tschechischen Philharmonie sowie des Orchestra dell’Accademia Nazionale di Santa Cecilia.      Im Dezember ist  Hrůša  mit den Bamberger Symphonikern und  Mitsuko Uchida  zu Gast. Die japanische Pianistin ist bekannt für „ihre klangliche Sensibilität und ihren großen An...\nGasteig HP8, Isarphilharmonie\nHans-Preißinger-Str. 8\n81379 München",
+				s);
 	}
 }

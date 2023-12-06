@@ -102,6 +102,7 @@ public class DbService {
 	}
 
 	private boolean updateClient(final Client client) throws Exception {
+		client.historize();
 		final String html = IOUtils.toString(new FileInputStream(webDir + client.getId() + "/index.html"),
 				StandardCharsets.UTF_8);
 		boolean modified = updateField("<meta name=\"email\" content=\"([^\"].*)\"", html, client.getEmail(),
@@ -119,11 +120,12 @@ public class DbService {
 			css = "{";
 			while (matcher.find())
 				css += "\"" + matcher.group(1) + "\":\"" + matcher.group(2) + "\",";
+			final ObjectMapper om = new ObjectMapper();
 			css = css.substring(0, css.length() - 1) + "}";
-			final JsonNode node = new ObjectMapper().readTree(Attachment.resolve(client.getStorage()));
-			if (!node.has("css") || !node.get("css").asText().equals(css)) {
-				((ObjectNode) node).put("css", css);
-				client.setStorage(new ObjectMapper().writeValueAsString(node));
+			final JsonNode node = om.readTree(Attachment.resolve(client.getStorage()));
+			if (!node.has("css") || !om.writeValueAsString(node.get("css")).equals(css)) {
+				((ObjectNode) node).set("css", om.readTree(css));
+				client.setStorage(om.writeValueAsString(node));
 				modified = true;
 			}
 		}

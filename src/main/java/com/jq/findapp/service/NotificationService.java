@@ -374,9 +374,9 @@ public class NotificationService {
 							+ "\" width=\"150\" height=\"150\" style=\"height:150px;min-height:150px;max-height:150px;width:150px;min-width:150px;max-width:150px;border-radius:75px;\" />");
 		else
 			Strings.replaceString(html, "<jq:image />", "");
-		final JsonNode css = new ObjectMapper().readTree(new ObjectMapper()
+		final JsonNode css = new ObjectMapper()
 				.readTree(Attachment.resolve(repository.one(Client.class, contactTo.getClientId()).getStorage()))
-				.get("css").asText().replaceAll("\\\"", "\""));
+				.get("css");
 		css.fieldNames().forEachRemaining(key -> Strings.replaceString(html, "--" + key, css.get(key).asText()));
 		message = sanatizeHtml(message);
 		if (message.indexOf("\n") > 0)

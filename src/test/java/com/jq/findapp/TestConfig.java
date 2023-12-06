@@ -128,7 +128,7 @@ public class TestConfig {
 		public String get(final String url) {
 			try {
 				if (url.contains(
-						"?category-select=&amp;date-start=2023-12-01&amp;date-end=&amp;search-input=&amp;search=1&amp;page=2"))
+						"?category-select=&date-start=2023-12-01&date-end=&search-input=&search=1&page=2"))
 					return "";
 				return IOUtils.toString(
 						getClass().getResourceAsStream("/html/event" + (url.contains("/veranstaltungen/")
@@ -161,7 +161,7 @@ public class TestConfig {
 					s = s.replace("\"NS\"", "\"FT\"");
 			}
 			return new ObjectMapper().readTree(
-					s.replace("\"{date}\"", "" + (long) (date.getEpochSecond() + offset)))
+					s.replace("\"{date}\"", "" + (long) (date.getEpochSecond() + (offset == -1 ? 0 : offset))))
 					.get("response");
 		}
 	}

@@ -39,6 +39,7 @@ import com.jq.findapp.api.model.Position;
 import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketing;
+import com.jq.findapp.entity.ClientNews;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
