@@ -258,6 +258,7 @@ public class EventService {
 					.replace('\n', ' ')
 					.replace('\r', ' ')
 					.replace('\u0013', ' ')
+					.replace('\u001c', ' ')
 					.replace('\u001e', ' ');
 		} catch (final IOException e) {
 			throw new RuntimeException(e);
