@@ -477,6 +477,8 @@ public class SurveyService {
 		private byte[] create(final JsonNode poll, final String subtitlePrefix, final Client client,
 				final ClientMarketingResult clientMarketingResult) throws Exception {
 			final JsonNode json = new ObjectMapper().readTree(Attachment.resolve(client.getStorage()));
+			final String[] color1 = json.get("css").get("bg1stop").replace("rgb(", "").replace(")", "").split(",");
+			final String[] color2 = json.get("css").get("bg2stop").replace("rgb(", "").replace(")", "").split(",");
 			final String urlLeague = poll.get("league").asText();
 			final String urlHome = poll.findPath("home").asText();
 			final String urlAway = poll.findPath("away").asText();
@@ -489,7 +491,10 @@ public class SurveyService {
 					height / 2 - 2 * padding,
 					height,
 					new float[] { .3f, 1f },
-					new Color[] { new Color(245, 239, 232), new Color(246, 194, 166) });
+					new Color[] { 
+						new Color(Integer.valueOf(color1[0]), Integer.valueOf(color1[1]), Integer.valueOf(color1[2])),
+						new Color(Integer.valueOf(color2[0]), Integer.valueOf(color2[1]), Integer.valueOf(color2[2]))
+					});
 			g2.setPaint(gradient);
 			g2.fill(new Rectangle2D.Float(0, 0, width, height));
 			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
