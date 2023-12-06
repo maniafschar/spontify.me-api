@@ -22,6 +22,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.ClientNews;
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -33,6 +34,9 @@ public class RssService {
 	@Autowired
 	private Repository repository;
 
+	@Autowired
+	private ExternalService externalService;
+
 	public SchedulerResult update() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/update");
 		final Result list = repository.list(new QueryParams(Query.misc_listClient));
@@ -40,8 +44,9 @@ public class RssService {
 			try {
 				final JsonNode json = new ObjectMapper().readTree(list.get(i).get("client.storage").toString());
 				if (json.has("rss")) {
-					final String count = syncFeed(json.get("rss").asText(),
-							(BigInteger) list.get(i).get("client.id"));
+					final boolean publish = json.get("rss").get("publish").asBoolean()
+					final String count = syncFeed(json.get("rss").get("url").asText(),
+							(BigInteger) list.get(i).get("client.id"), publish);
 					if (count != null)
 						result.result += list.get(i).get("client.id") + ": " + count + "\n";
 				}
@@ -54,7 +59,7 @@ public class RssService {
 		return result;
 	}
 
-	private String syncFeed(final String url, final BigInteger clientId) throws Exception {
+	private String syncFeed(final String url, final BigInteger clientId, boolean publish) throws Exception {
 		final ArrayNode rss = (ArrayNode) new XmlMapper().readTree(new URL(url)).get("channel").get("item");
 		if (rss == null || rss.size() == 0)
 			return null;
@@ -91,8 +96,12 @@ public class RssService {
 				clientNews.setImage(null);
 			if (clientNews.getId() == null)
 				count++;
+			boolean b = publish && clientNews.getId() == null;
 			repository.save(clientNews);
 			urls.add(clientNews.getUrl());
+			if (b)
+				externalService.publishOnFacebook(clientId, clientNews.getDescription(), client.getUrl()
+						+ "/rest/action/marketing/news/" + clientNews.getId());
 		}
 		params.setSearch("clientNews.publish>'"
 				+ new Timestamp(df.parse(rss.get(rss.size() - 1).get("pubDate").asText()).getTime())
