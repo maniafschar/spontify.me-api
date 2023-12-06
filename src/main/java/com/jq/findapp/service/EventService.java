@@ -255,7 +255,10 @@ public class EventService {
 	public String get(final String url) {
 		try {
 			return IOUtils.toString(new URL(url).openStream(), StandardCharsets.UTF_8)
-					.replace('\n', ' ').replace('\r', ' ').replace('\u0013', ' ');
+					.replace('\n', ' ')
+					.replace('\r', ' ')
+					.replace('\u0013', ' ')
+					.replace('\u001e', ' ');
 		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
