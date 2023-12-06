@@ -96,7 +96,7 @@ public class RssService {
 				clientNews.setImage(null);
 			if (clientNews.getId() == null)
 				count++;
-			boolean b = publish && clientNews.getId() == null;
+			final boolean b = publish && clientNews.getId() == null;
 			repository.save(clientNews);
 			urls.add(clientNews.getUrl());
 			if (b)
