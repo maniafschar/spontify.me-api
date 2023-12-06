@@ -15,6 +15,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.HtmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -146,9 +147,9 @@ public class ImportMunich {
 											EntityUtil.getImage(url + image, EntityUtil.IMAGE_THUMB_SIZE, 0));
 							}
 						}
-						event.setDescription((body.getFirstChild().getFirstChild().getTextContent().trim()
+						event.setDescription(HtmlUtils.htmlUnescape((body.getFirstChild().getFirstChild().getTextContent().trim()
 								+ "\n" + getField(externalPage ? regexDescExternal : regexDesc, page, 1))
-								.replaceAll("<[^>]*>", " ").trim());
+								.replaceAll("<[^>]*>", " ").trim()));
 						event.setEndDate(new java.sql.Date(date.getTime()));
 						event.setContactId(client.getAdminId());
 						event.setSkills(body.getChildNodes().item(1).getTextContent().trim());
