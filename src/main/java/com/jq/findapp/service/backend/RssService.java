@@ -28,6 +28,7 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.util.EntityUtil;
+import com.jq.findapp.util.Strings;
 
 @Service
 public class RssService {
@@ -51,7 +52,7 @@ public class RssService {
 						result.result += list.get(i).get("client.id") + ": " + count + "\n";
 				}
 			} catch (final Exception e) {
-				result.result += "Error " + e.getMessage() + " on client " + list.get(i).get("client.id") + "\n";
+				result.result += list.get(i).get("client.id") + ", error " + e.getMessage() + "\n";
 				if (result.exception == null)
 					result.exception = e;
 			}
@@ -73,38 +74,42 @@ public class RssService {
 		int count = 0;
 		Result result;
 		for (int i = 0; i < rss.size(); i++) {
-			final String uid = rss.get(i).get("guid").asText();
-			params.setSearch("clientNews.url='" + uid + "'");
-			result = repository.list(params);
-			final ClientNews clientNews;
-			if (result.size() == 0)
-				clientNews = new ClientNews();
-			else {
-				clientNews = repository.one(ClientNews.class, (BigInteger) result.get(0).get("clientNews.id"));
-				clientNews.historize();
+			String uid = rss.get(i).get("guid").asText();
+			if (Strings.isEmail(uid))
+				uid = rss.get(i).get("guid").get("").asText();
+			if (Strings.isEmail(uid)) {
+				params.setSearch("clientNews.url='" + uid + "' and clientNews.clientId=" + clientId);
+				result = repository.list(params);
+				final ClientNews clientNews;
+				if (result.size() == 0)
+					clientNews = new ClientNews();
+				else {
+					clientNews = repository.one(ClientNews.class, (BigInteger) result.get(0).get("clientNews.id"));
+					clientNews.historize();
+				}
+				clientNews.setClientId(clientId);
+				clientNews.setDescription(rss.get(i).get("title").asText());
+				clientNews.setUrl(uid);
+				clientNews.setPublish(new Timestamp(df.parse(rss.get(i).get("pubDate").asText()).getTime()));
+				final Matcher matcher = img
+						.matcher(IOUtils.toString(new URL(rss.get(i).get("link").asText()), StandardCharsets.UTF_8)
+								.replace('\r', ' ').replace('\n', ' '));
+				if (matcher.find()) {
+					String s = matcher.group(1);
+					if (!s.startsWith("http"))
+						s = url.substring(0, url.indexOf("/", 10)) + s;
+					clientNews.setImage(EntityUtil.getImage(s, EntityUtil.IMAGE_SIZE, 200));
+				} else
+					clientNews.setImage(null);
+				if (clientNews.getId() == null)
+					count++;
+				final boolean b = publish && clientNews.getId() == null;
+				repository.save(clientNews);
+				urls.add(clientNews.getUrl());
+				if (b)
+					externalService.publishOnFacebook(clientId, clientNews.getDescription(),
+							"/rest/action/marketing/news/" + clientNews.getId());
 			}
-			clientNews.setClientId(clientId);
-			clientNews.setDescription(rss.get(i).get("title").asText());
-			clientNews.setUrl(uid);
-			clientNews.setPublish(new Timestamp(df.parse(rss.get(i).get("pubDate").asText()).getTime()));
-			final Matcher matcher = img
-					.matcher(IOUtils.toString(new URL(rss.get(i).get("link").asText()), StandardCharsets.UTF_8)
-							.replace('\r', ' ').replace('\n', ' '));
-			if (matcher.find()) {
-				String s = matcher.group(1);
-				if (!s.startsWith("http"))
-					s = url.substring(0, url.indexOf("/", 10)) + s;
-				clientNews.setImage(EntityUtil.getImage(s, EntityUtil.IMAGE_SIZE, 200));
-			} else
-				clientNews.setImage(null);
-			if (clientNews.getId() == null)
-				count++;
-			final boolean b = publish && clientNews.getId() == null;
-			repository.save(clientNews);
-			urls.add(clientNews.getUrl());
-			if (b)
-				externalService.publishOnFacebook(clientId, clientNews.getDescription(),
-						"/rest/action/marketing/news/" + clientNews.getId());
 		}
 		params.setSearch("clientNews.publish>'"
 				+ new Timestamp(df.parse(rss.get(rss.size() - 1).get("pubDate").asText()).getTime())
