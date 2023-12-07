@@ -155,7 +155,9 @@ public class ImportMunich {
 						event.setContactId(client.getAdminId());
 						event.setSkills(body.getChildNodes().item(1).getTextContent().trim());
 						if (event.getDescription().length() > 1000)
-							event.setDescription(event.getDescription().substring(0, 997) + "...");
+							event.setDescription(
+									event.getDescription().substring(0, event.getDescription().lastIndexOf(' '))
+											+ "...");
 						repository.save(event);
 						return true;
 					}

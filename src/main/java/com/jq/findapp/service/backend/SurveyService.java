@@ -8,15 +8,16 @@ import java.awt.GraphicsEnvironment;
 import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
-import java.net.URL;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +53,7 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
+import com.jq.findapp.util.EntityUtil;
 import com.jq.findapp.util.Strings;
 
 @Service
@@ -680,7 +682,22 @@ public class SurveyService {
 
 		private void draw(final String url, final Graphics2D g, final int x, final int y, final int height,
 				final int pos) throws Exception {
-			final BufferedImage image = ImageIO.read(new URL(url).openStream());
+			final String label = url.substring(url.lastIndexOf('/', url.length() - 10));
+			final QueryParams params = new QueryParams(Query.misc_listStorage);
+			params.setSearch("storage.label='" + label + "'");
+			final Result result = repository.list(params);
+			final String data;
+			if (result.size() > 0)
+				data = (String) result.get(0).get("storage.storage");
+			else {
+				final Storage storage = new Storage();
+				storage.setLabel(label);
+				storage.setStorage(EntityUtil.getImage(url, 0, 0));
+				repository.save(storage);
+				data = Attachment.resolve(storage.getStorage());
+			}
+			final BufferedImage image = ImageIO.read(new ByteArrayInputStream(Base64.getDecoder()
+					.decode(data.split(Attachment.SEPARATOR)[1])));
 			final int paddingLogos = -10;
 			final int w = image.getWidth() / image.getHeight() * height;
 			g.drawImage(image, x - (pos == 1 ? 0 : w) + pos * paddingLogos, y,

@@ -11,6 +11,7 @@ import java.time.ZonedDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.Event;
@@ -42,12 +43,15 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 
 	@Override
 	public void postPersist(final Event event) throws Exception {
-		final EventParticipate eventParticipate = new EventParticipate();
-		eventParticipate.setState((short) 1);
-		eventParticipate.setContactId(event.getContactId());
-		eventParticipate.setEventId(event.getId());
-		eventParticipate.setEventDate(new Date(event.getStartDate().getTime()));
-		repository.save(eventParticipate);
+		if (!repository.one(Client.class, repository.one(Contact.class, event.getContactId()).getClientId())
+				.getAdminId().equals(event.getContactId())) {
+			final EventParticipate eventParticipate = new EventParticipate();
+			eventParticipate.setState((short) 1);
+			eventParticipate.setContactId(event.getContactId());
+			eventParticipate.setEventId(event.getId());
+			eventParticipate.setEventDate(new Date(event.getStartDate().getTime()));
+			repository.save(eventParticipate);
+		}
 		if (event.getPublish() != null && event.getPublish())
 			eventService.publish(event.getId());
 	}

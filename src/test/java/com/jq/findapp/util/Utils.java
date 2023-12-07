@@ -29,7 +29,7 @@ public class Utils {
 				client.setEmail("abc@jq-consulting.de");
 				client.setUrl("https://fan-club.online");
 				client.setStorage(
-						"{\"css\":{\"bg1stop\":\"rgb(255,4,250)\",\"bg1start\":\"rgb(80,0,75)\",\"text\":\"rgb(255,255,255)\"}}");
+						"{\"css\":{\"bg1stop\":\"rgb(255,4,250)\",\"bg1start\":\"rgb(80,0,75)\",\"text\":\"rgb(255,255,255)\"},\"survey\":[0]}");
 				client.setAdminId(id);
 				repository.save(client);
 			} while (client.getId().compareTo(id) < 0);

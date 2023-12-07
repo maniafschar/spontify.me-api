@@ -67,6 +67,8 @@ public class EntityUtil {
 		final BufferedImage img;
 		try {
 			data = IOUtils.toByteArray(new URL(url));
+			if (size < 1)
+				return Repository.Attachment.createImage(url.substring(url.lastIndexOf('.')), data);
 			img = ImageIO.read(new ByteArrayInputStream(data));
 			if (minimum == 0)
 				minimum = Math.min(400, size);
