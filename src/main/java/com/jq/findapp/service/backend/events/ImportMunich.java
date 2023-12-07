@@ -147,9 +147,10 @@ public class ImportMunich {
 											EntityUtil.getImage(url + image, EntityUtil.IMAGE_THUMB_SIZE, 0));
 							}
 						}
-						event.setDescription(HtmlUtils.htmlUnescape((body.getFirstChild().getFirstChild().getTextContent().trim()
-								+ "\n" + getField(externalPage ? regexDescExternal : regexDesc, page, 1))
-								.replaceAll("<[^>]*>", " ").trim()));
+						event.setDescription(
+								HtmlUtils.htmlUnescape((body.getFirstChild().getFirstChild().getTextContent().trim()
+										+ "\n" + getField(externalPage ? regexDescExternal : regexDesc, page, 1))
+										.replaceAll("<[^>]*>", " ").trim()));
 						event.setEndDate(new java.sql.Date(date.getTime()));
 						event.setContactId(client.getAdminId());
 						event.setSkills(body.getChildNodes().item(1).getTextContent().trim());

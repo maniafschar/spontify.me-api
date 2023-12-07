@@ -88,7 +88,7 @@ public class RssService {
 					clientNews.historize();
 				}
 				clientNews.setClientId(clientId);
-				clientNews.setDescription(rss.get(i).get("title").asText());
+				clientNews.setDescription(rss.get(i).get("title").asText().trim());
 				clientNews.setUrl(uid);
 				clientNews.setPublish(new Timestamp(df.parse(rss.get(i).get("pubDate").asText()).getTime()));
 				final Matcher matcher = img
