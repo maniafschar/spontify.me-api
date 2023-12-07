@@ -75,9 +75,9 @@ public class RssService {
 		Result result;
 		for (int i = 0; i < rss.size(); i++) {
 			String uid = rss.get(i).get("guid").asText();
-			if (Strings.isEmail(uid))
+			if (Strings.isEmpty(uid))
 				uid = rss.get(i).get("guid").get("").asText();
-			if (Strings.isEmail(uid)) {
+			if (!Strings.isEmpty(uid)) {
 				params.setSearch("clientNews.url='" + uid + "' and clientNews.clientId=" + clientId);
 				result = repository.list(params);
 				final ClientNews clientNews;
