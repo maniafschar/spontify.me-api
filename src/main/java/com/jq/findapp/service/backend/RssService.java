@@ -45,11 +45,15 @@ public class RssService {
 			try {
 				final JsonNode json = new ObjectMapper().readTree(list.get(i).get("client.storage").toString());
 				if (json.has("rss")) {
-					final boolean publish = json.get("rss").get("publish").asBoolean();
-					final String count = syncFeed(json.get("rss").get("url").asText(),
-							(BigInteger) list.get(i).get("client.id"), publish);
-					if (count != null)
-						result.result += list.get(i).get("client.id") + ": " + count + "\n";
+					for (int i2 = 0; i2 < json.has("rss").size(); i2++) {
+						final boolean publish = json.get("rss").get(i2).get("publish").asBoolean();
+						final String count = syncFeed(json.get("rss").get(i2).get("url").asText(),
+								json.get("rss").get(i2).get("longitude").asDouble(),
+								json.get("rss").get(i2).get("latitude").asDouble(),
+								(BigInteger) list.get(i).get("client.id"), publish);
+						if (count != null)
+							result.result += list.get(i).get("client.id") + ": " + count + "\n";
+					}
 				}
 			} catch (final Exception e) {
 				result.result += list.get(i).get("client.id") + ", error " + e.getMessage() + "\n";
@@ -60,7 +64,7 @@ public class RssService {
 		return result;
 	}
 
-	private String syncFeed(final String url, final BigInteger clientId, final boolean publish) throws Exception {
+	private String syncFeed(final String url, final BigInteger clientId, final double longitude, final double latitude, final boolean publish) throws Exception {
 		final ArrayNode rss = (ArrayNode) new XmlMapper().readTree(new URL(url)).get("channel").get("item");
 		if (rss == null || rss.size() == 0)
 			return null;
@@ -89,6 +93,8 @@ public class RssService {
 					clientNews.historize();
 				}
 				clientNews.setClientId(clientId);
+				clientNews.setLatitude(latitude);
+				clientNews.setLongitude(longitude);
 				clientNews.setDescription(rss.get(i).get("title").asText().trim());
 				if (clientNews.getDescription().length() > 1000)
 					clientNews.setDescription(
