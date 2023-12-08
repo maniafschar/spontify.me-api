@@ -12,11 +12,29 @@ import jakarta.persistence.Transient;
 @Entity
 public class ClientNews extends BaseEntity {
 	private BigInteger clientId;
+	private Float latitude;
+	private Float longitude;
 	private String description;
 	private String image;
 	private String url;
 	private Timestamp publish;
 	private Boolean notified = false;
+
+	public Float getLatitude() {
+		return latitude;
+	}
+
+	public void setLongitude(final Float longitude) {
+		this.longitude = longitude;
+	}
+
+	public Float getLongitude() {
+		return longitude;
+	}
+
+	public void setLatitude(final Float latitude) {
+		this.latitude = latitude;
+	}
 
 	public Boolean getNotified() {
 		return notified;
