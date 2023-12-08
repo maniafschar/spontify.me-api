@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
+import org.springframework.web.util.HtmlUtils;
+
 public class Strings {
 	public static final Pattern EMAIL = Pattern.compile("([A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6})",
 			Pattern.CASE_INSENSITIVE);
@@ -65,5 +67,17 @@ public class Strings {
 	public static String formatDate(final String format, final Date date, final String zone) {
 		return date.toInstant().atZone(TimeZone.getTimeZone(zone).toZoneId())
 				.format(DateTimeFormatter.ofPattern(format == null ? "dd.MM.yyyy HH:mm" : format));
+	}
+
+	public static String sanitize(String s) {
+		s = HtmlUtils.htmlUnescape(s.replaceAll("<[^>]*>", "\n")
+				.replace("&nbsp;", " ")
+				.replace("\t", " ")
+				.replace("&nbsp;", " ")).trim();
+		while (s.contains("  "))
+			s = s.replace("  ", " ");
+		while (s.contains("\n\n"))
+			s = s.replace("\n\n", "\n");
+		return s;
 	}
 }
