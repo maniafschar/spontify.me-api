@@ -123,8 +123,7 @@ public class AuthenticationApi {
 	}
 
 	@DeleteMapping("one")
-	public void one(@RequestHeader final BigInteger user)
-			throws Exception {
+	public void one(@RequestHeader final BigInteger user) throws Exception {
 		authenticationService.deleteAccount(repository.one(Contact.class, user));
 	}
 
