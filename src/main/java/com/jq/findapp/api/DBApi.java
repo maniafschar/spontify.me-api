@@ -40,23 +40,19 @@ public class DBApi {
 
 	@GetMapping("one")
 	public Map<String, Object> one(final QueryParams params, @RequestHeader final BigInteger user) throws Exception {
-		if (repository.one(Contact.class, user) == null)
-			return null;
 		params.setUser(repository.one(Contact.class, user));
 		return repository.one(params);
 	}
 
 	@GetMapping("list")
 	public List<Object[]> list(final QueryParams params, @RequestHeader final BigInteger user) throws Exception {
-		if (repository.one(Contact.class, user) == null)
-			return null;
 		params.setUser(repository.one(Contact.class, user));
 		return repository.list(params).getList();
 	}
 
 	@PutMapping("one")
 	public void save(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger user) throws Exception {
-		if (repository.one(Contact.class, user) == null || entity.getValues().containsKey("contactId"))
+		if (entity.getValues().containsKey("contactId"))
 			return;
 		final BaseEntity e = repository.one(entity.getClazz(), entity.getId());
 		if (checkWriteAuthorisation(e, user) && checkClient(user, e)) {
@@ -85,8 +81,6 @@ public class DBApi {
 
 	@DeleteMapping("one")
 	public void delete(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger user) throws Exception {
-		if (repository.one(Contact.class, user) == null)
-			return;
 		final BaseEntity e = repository.one(entity.getClazz(), entity.getId());
 		if (e instanceof Contact)
 			notificationService.createTicket(TicketType.ERROR, "Contact Deletion",
@@ -97,21 +91,20 @@ public class DBApi {
 
 	private boolean checkClient(final BigInteger user, final BaseEntity entity) {
 		final Contact contact = repository.one(Contact.class, user);
-		if (contact != null)
+		try {
+			final Method clientId = entity.getClass().getMethod("getClientId");
+			if (clientId.invoke(entity).equals(contact.getClientId()))
+				return true;
+		} catch (final Exception ex) {
 			try {
-				final Method clientId = entity.getClass().getMethod("getClientId");
-				if (clientId.invoke(entity).equals(contact.getClientId()))
+				final Method contactId = entity.getClass().getMethod("getContactId");
+				final Contact contact2 = repository.one(Contact.class, (BigInteger) contactId.invoke(entity));
+				if (contact.getClientId().equals(contact2.getClientId()))
 					return true;
-			} catch (final Exception ex) {
-				try {
-					final Method contactId = entity.getClass().getMethod("getContactId");
-					final Contact contact2 = repository.one(Contact.class, (BigInteger) contactId.invoke(entity));
-					if (contact.getClientId().equals(contact2.getClientId()))
-						return true;
-				} catch (final Exception ex2) {
-					throw new RuntimeException(ex2);
-				}
+			} catch (final Exception ex2) {
+				throw new RuntimeException(ex2);
 			}
+		}
 		return false;
 	}
 
