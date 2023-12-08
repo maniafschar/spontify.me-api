@@ -86,4 +86,39 @@ public class EventServiceTest {
 				"Bamberger Symphoniker\nCherubini: Ouvertüre zu „Medea“     Beethoven: Konzert für Klavier und Orchester Nr. 2 B-Dur op. 19     Strawinsky: „Le sacre du printemps“         Mitsuko Uchida, Klavier   Jakub Hruša, Leitung       Leonard Bernstein  galt ihm als musikalisches Idol – inzwischen ist  Jakub Hrůša  selbst ein Vorbild für den Nachwuchs am Pult. „Exzess mit Understatement“, so beschreibt das Klassikmagazin Rondo den bescheidenen Tschechen. Parallel zu seinem Amt als Chefdirigent der Bamberger Symphoniker ist  Hrůša  designierter Musikdirektor des Royal Opera House in London, erster Gastdirigent der Tschechischen Philharmonie sowie des Orchestra dell’Accademia Nazionale di Santa Cecilia.      Im Dezember ist  Hrůša  mit den Bamberger Symphonikern und  Mitsuko Uchida  zu Gast. Die japanische Pianistin ist bekannt für „ihre klangliche Sensibilität und ihren großen An...\nGasteig HP8, Isarphilharmonie\nHans-Preißinger-Str. 8\n81379 München",
 				s);
 	}
+
+	@Test
+	public void sanitize() {
+		// given
+		final String s = "<p><strong>Alter</strong><br />\n"
+				+ "ab 5 Jahren</p>\n"
+				+ "\n"
+				+ "<p><strong>Dauer</strong><br />\n"
+				+ "ca. 90 Minuten inkl. Pause</p>\n"
+				+ "\n"
+				+ "<p><strong>Inhalt</strong><br />\n"
+				+ "In Gr&uuml;nland beginnt ein wundersch&ouml;ner Sonnentag, den unser Tabaluga in vollen Z&uuml;gen genie&szlig;en m&ouml;chte. Faul sein, in der Sonne liegen und mit den Schmetterlingen spielen, ist sein Plan. Aber da gibt es einen, der etwas dagegen hat: Arktos, der Herrscher der Eiswelt! Mit einem gewaltigen Schnee- und Eissturm beendet Arktos den sch&ouml;nen Sonnenmorgen. Tabaluga wird von den Schneemassen versch&uuml;ttet. Mit der Ank&uuml;ndigung, er werde Gr&uuml;nland &bdquo;frosten&ldquo; verl&auml;sst Arktos triumphierend Gr&uuml;nland. Tabaluga verliert sein Ged&auml;chtnis und hat vergessen wer er ist.<br />\n"
+				+ "Wie so oft im Leben, wenn man glaubt, es gibt keinen Ausweg mehr, naht die Rettung: F&uuml;r Tabaluga ist es ein Gl&uuml;cksk&auml;fer, der sich mit ihm auf eine Reise durch sein Ged&auml;chtnis begibt.<br />\n"
+				+ "&nbsp;</p>\n";
+
+		// when
+		String result = HtmlUtils.htmlUnescape(s
+				.replaceAll("<[^>]*>", "\n")
+				.replace("&nbsp;", " ")
+				.replace("\t", " ")).trim();
+		while (result.contains("  "))
+			result = result.replace("  ", " ");
+		while (result.contains("\n\n"))
+			result = result.replace("\n\n", "\n");
+
+		// then
+		assertEquals("Alter\n"
+				+ "ab 5 Jahren\n"
+				+ "Dauer\n"
+				+ "ca. 90 Minuten inkl. Pause\n"
+				+ "Inhalt\n"
+				+ "In Grünland beginnt ein wunderschöner Sonnentag, den unser Tabaluga in vollen Zügen genießen möchte. Faul sein, in der Sonne liegen und mit den Schmetterlingen spielen, ist sein Plan. Aber da gibt es einen, der etwas dagegen hat: Arktos, der Herrscher der Eiswelt! Mit einem gewaltigen Schnee- und Eissturm beendet Arktos den schönen Sonnenmorgen. Tabaluga wird von den Schneemassen verschüttet. Mit der Ankündigung, er werde Grünland „frosten“ verlässt Arktos triumphierend Grünland. Tabaluga verliert sein Gedächtnis und hat vergessen wer er ist.\n"
+				+ "Wie so oft im Leben, wenn man glaubt, es gibt keinen Ausweg mehr, naht die Rettung: Für Tabaluga ist es ein Glückskäfer, der sich mit ihm auf eine Reise durch sein Gedächtnis begibt.",
+				result);
+	}
 }

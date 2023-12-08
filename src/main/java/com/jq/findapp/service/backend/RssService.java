@@ -72,6 +72,7 @@ public class RssService {
 		final SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ROOT);
 		final Set<String> urls = new HashSet<>();
 		int count = 0;
+		Timestamp first = new Timestamp(System.currentTimeMillis());
 		Result result;
 		for (int i = 0; i < rss.size(); i++) {
 			String uid = rss.get(i).get("guid").asText();
@@ -89,6 +90,10 @@ public class RssService {
 				}
 				clientNews.setClientId(clientId);
 				clientNews.setDescription(rss.get(i).get("title").asText().trim());
+				if (clientNews.getDescription().length() > 1000)
+					clientNews.setDescription(
+							clientNews.getDescription().substring(0, clientNews.getDescription().lastIndexOf(' '))
+									+ "...");
 				clientNews.setUrl(uid);
 				clientNews.setPublish(new Timestamp(df.parse(rss.get(i).get("pubDate").asText()).getTime()));
 				final Matcher matcher = img
@@ -105,15 +110,15 @@ public class RssService {
 					count++;
 				final boolean b = publish && clientNews.getId() == null;
 				repository.save(clientNews);
+				if (first.getTime() > clientNews.getPublish().getTime())
+					first = clientNews.getPublish();
 				urls.add(clientNews.getUrl());
 				if (b)
 					externalService.publishOnFacebook(clientId, clientNews.getDescription(),
 							"/rest/action/marketing/news/" + clientNews.getId());
 			}
 		}
-		params.setSearch("clientNews.publish>'"
-				+ new Timestamp(df.parse(rss.get(rss.size() - 1).get("pubDate").asText()).getTime())
-				+ "' and clientNews.clientId=" + clientId);
+		params.setSearch("clientNews.publish>'" + first + "' and clientNews.clientId=" + clientId);
 		result = repository.list(params);
 		int deleted = 0;
 		for (int i = 0; i < result.size(); i++) {

@@ -7,8 +7,6 @@ import com.jq.findapp.entity.Contact.ContactType;
 import com.jq.findapp.repository.Repository;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Transient;
 
 @Entity
