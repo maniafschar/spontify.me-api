@@ -832,8 +832,13 @@ public class SurveyService {
 		final JsonNode fixture;
 		final String label = "football-fixture-" + url;
 		final QueryParams params = new QueryParams(Query.misc_listStorage);
+		Result result = repository.list(params);
+		for (int i = 0; i < result.size(); i++) {
+			if (result.get(i).get("storage.storage").toString().contains("\"rateLimit\":\"Too many requests"))
+				repository.delete(repository.one(Storage.class, (BigInteger) result.get(i).get("storage.id")));
+		}
 		params.setSearch("storage.label='" + label + "'");
-		final Result result = repository.list(params);
+		result = repository.list(params);
 		if (result.size() > 0)
 			fixture = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
 		else {

@@ -15,7 +15,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.HtmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -147,14 +146,16 @@ public class ImportMunich {
 											EntityUtil.getImage(url + image, EntityUtil.IMAGE_THUMB_SIZE, 0));
 							}
 						}
-						event.setDescription(Strings.sanitize((body.getFirstChild().getFirstChild().getTextContent().trim()
-								+ "\n" + getField(externalPage ? regexDescExternal : regexDesc, page, 1)));
+						event.setDescription(
+								Strings.sanitize((body.getFirstChild().getFirstChild().getTextContent().trim()
+										+ "\n" + getField(externalPage ? regexDescExternal : regexDesc, page, 1))));
 						event.setEndDate(new java.sql.Date(date.getTime()));
 						event.setContactId(client.getAdminId());
 						event.setSkills(body.getChildNodes().item(1).getTextContent().trim());
 						if (event.getDescription().length() > 1000)
 							event.setDescription(
-									event.getDescription().substring(0, event.getDescription().lastIndexOf(' '))
+									event.getDescription().substring(0,
+											event.getDescription().substring(0, 1000).lastIndexOf(' '))
 											+ "...");
 						repository.save(event);
 						return true;
@@ -208,7 +209,8 @@ public class ImportMunich {
 			}
 			location.setContactId(client.getAdminId());
 			if (location.getDescription() != null && location.getDescription().length() > 1000)
-				location.setDescription(location.getDescription().substring(0, 997) + "...");
+				location.setDescription(location.getDescription().substring(0,
+						location.getDescription().substring(0, 1000).lastIndexOf(' ')) + "...");
 			try {
 				repository.save(location);
 				return location.getId();

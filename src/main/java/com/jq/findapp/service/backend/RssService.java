@@ -45,12 +45,13 @@ public class RssService {
 			try {
 				final JsonNode json = new ObjectMapper().readTree(list.get(i).get("client.storage").toString());
 				if (json.has("rss")) {
-					for (int i2 = 0; i2 < json.has("rss").size(); i2++) {
+					for (int i2 = 0; i2 < json.get("rss").size(); i2++) {
 						final boolean publish = json.get("rss").get(i2).get("publish").asBoolean();
 						final String count = syncFeed(json.get("rss").get(i2).get("url").asText(),
-								json.get("rss").get(i2).get("longitude").asDouble(),
-								json.get("rss").get(i2).get("latitude").asDouble(),
-								(BigInteger) list.get(i).get("client.id"), publish);
+								(BigInteger) list.get(i).get("client.id"),
+								(float) json.get("rss").get(i2).get("longitude").asDouble(),
+								(float) json.get("rss").get(i2).get("latitude").asDouble(),
+								publish);
 						if (count != null)
 							result.result += list.get(i).get("client.id") + ": " + count + "\n";
 					}
@@ -64,7 +65,8 @@ public class RssService {
 		return result;
 	}
 
-	private String syncFeed(final String url, final BigInteger clientId, final double longitude, final double latitude, final boolean publish) throws Exception {
+	private String syncFeed(final String url, final BigInteger clientId, final float longitude, final float latitude,
+			final boolean publish) throws Exception {
 		final ArrayNode rss = (ArrayNode) new XmlMapper().readTree(new URL(url)).get("channel").get("item");
 		if (rss == null || rss.size() == 0)
 			return null;
@@ -98,8 +100,8 @@ public class RssService {
 				clientNews.setDescription(rss.get(i).get("title").asText().trim());
 				if (clientNews.getDescription().length() > 1000)
 					clientNews.setDescription(
-							clientNews.getDescription().substring(0, clientNews.getDescription().lastIndexOf(' '))
-									+ "...");
+							clientNews.getDescription().substring(0,
+									clientNews.getDescription().substring(0, 1000).lastIndexOf(' ')) + "...");
 				clientNews.setUrl(uid);
 				clientNews.setPublish(new Timestamp(df.parse(rss.get(i).get("pubDate").asText()).getTime()));
 				final Matcher matcher = img
