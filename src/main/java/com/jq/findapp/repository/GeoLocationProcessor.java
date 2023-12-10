@@ -36,6 +36,8 @@ public class GeoLocationProcessor {
 			table = params.getQuery().name().split("_")[0];
 			if ("event".equals(table))
 				table = "location";
+			else if ("misc".equals(table))
+				table = params.getQuery().getHeader()[0].split("\\.")[0];
 			roundToInteger = params.getQuery().name().startsWith("contact_");
 			sort = params.isSort();
 			radLat = Math.toRadians(params.getLatitude());

@@ -99,6 +99,10 @@ public enum Query {
 		}
 	}
 
+	public String[] getHeader() {
+		return header;
+	}
+
 	public Result createResult() {
 		return new Result(header);
 	}

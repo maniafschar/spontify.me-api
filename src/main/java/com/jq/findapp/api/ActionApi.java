@@ -265,10 +265,12 @@ public class ActionApi {
 		contact.setClientId(clientId);
 		params.setUser(contact);
 		if (id == null) {
-			params.setLatitude(latitude);
-			params.setLongitude(longitude);
-			params.setDistance(200);
-			params.setLimit(50);
+			if (latitude != null) {
+				params.setLatitude(latitude);
+				params.setLongitude(longitude);
+				params.setDistance(200);
+				params.setLimit(50);
+			}
 			params.setSearch("clientNews.publish<='" + Instant.now().toString() + "'");
 		} else
 			params.setSearch("clientNews.id=" + id);
