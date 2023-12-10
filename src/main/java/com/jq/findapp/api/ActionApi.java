@@ -290,7 +290,7 @@ public class ActionApi {
 		params.setDistance(-1);
 		params.setLatitude(48.13684f);
 		params.setLongitude(11.57685f);
-		if (user == null) {
+		if (user == null || BigInteger.ZERO.equals(user)) {
 			if (ip != null) {
 				final QueryParams params2 = new QueryParams(Query.misc_listIp);
 				params2.setSearch("ip.ip='" + IpService.sanatizeIp(ip) + "'");

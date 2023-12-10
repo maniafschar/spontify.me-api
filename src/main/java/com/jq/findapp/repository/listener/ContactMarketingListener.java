@@ -34,7 +34,7 @@ public class ContactMarketingListener extends AbstractRepositoryListener<Contact
 								.one(ClientMarketing.class, contactMarketing.getClientMarketingId()).getStorage()));
 						final JsonNode question = poll.get("questions").get(Integer.valueOf(key.substring(1)));
 						final int value = question.get("answers").size() - 1;
-						if (!question.get("multiple").asBoolean())
+						if (!question.has("multiple") || !question.get("multiple").asBoolean())
 							a.set(0, value);
 						else if (a.get(a.size() - 1).intValue() != value)
 							a.add(value);

@@ -72,12 +72,13 @@ public class Strings {
 	public static String sanitize(String s) {
 		s = HtmlUtils.htmlUnescape(s.replaceAll("<[^>]*>", "\n")
 				.replace("&nbsp;", " ")
-				.replace("\t", " ")
-				.replace("&nbsp;", " ")).trim();
+				.replace("\t", " ")).trim();
 		while (s.contains("  "))
 			s = s.replace("  ", " ");
 		while (s.contains("\n\n"))
 			s = s.replace("\n\n", "\n");
+		while (s.contains("\n "))
+			s = s.replace("\n ", "\n");
 		return s;
 	}
 }

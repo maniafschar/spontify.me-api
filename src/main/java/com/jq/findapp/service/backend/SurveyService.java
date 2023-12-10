@@ -414,8 +414,7 @@ public class SurveyService {
 						repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId())
 								.getStorage()));
 				clientMarketingResult.setPublished(true);
-				if (new ObjectMapper().readTree(Attachment.resolve(clientMarketingResult.getStorage()))
-						.get("participants").asInt() > 0) {
+				if (new ObjectMapper().readTree(Attachment.resolve(clientMarketingResult.getStorage())).has("q0")) {
 					String prefix;
 					if ("Prediction".equals(poll.get("type").asText()))
 						prefix = "Ergebnistipps";
@@ -424,13 +423,15 @@ public class SurveyService {
 					clientMarketingResult.setImage(Attachment.createImage(".png",
 							image.create(poll, prefix, repository.one(Client.class, clientId), clientMarketingResult)));
 					repository.save(clientMarketingResult);
-					notification.sendResult(
-							repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId()));
-					if ("PlayerOfTheMatch".equals(poll.get("type").asText()))
-						prefix = "Umfrage Spieler des Spiels";
-					externalService.publishOnFacebook(clientId,
-							"Resultat der \"" + prefix + "\" unserer Bayern" + getOponent(poll),
-							"/rest/action/marketing/result/" + clientMarketingResult.getClientMarketingId());
+					// notification.sendResult(
+					// repository.one(ClientMarketing.class,
+					// clientMarketingResult.getClientMarketingId()));
+					// if ("PlayerOfTheMatch".equals(poll.get("type").asText()))
+					// prefix = "Umfrage Spieler des Spiels";
+					// externalService.publishOnFacebook(clientId,
+					// "Resultat der \"" + prefix + "\" unserer Bayern" + getOponent(poll),
+					// "/rest/action/marketing/result/" +
+					// clientMarketingResult.getClientMarketingId());
 					result += clientMarketingResult.getId() + " ";
 				} else
 					repository.save(clientMarketingResult);
