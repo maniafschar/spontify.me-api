@@ -257,15 +257,20 @@ public class ActionApi {
 
 	@GetMapping("news")
 	public List<Object[]> news(@RequestHeader final BigInteger clientId,
-			@RequestParam(required = false) final BigInteger id) throws Exception {
+			@RequestParam(required = false) final BigInteger id,
+			@RequestParam(required = false) final Float latitude,
+			@RequestParam(required = false) final Float longitude) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_listNews);
-		params.setLimit(25);
 		final Contact contact = new Contact();
 		contact.setClientId(clientId);
 		params.setUser(contact);
-		if (id == null)
+		if (id == null) {
+			params.setLatitude(latitude);
+			params.setLongitude(longitude);
+			params.setDistance(200);
+			params.setLimit(50);
 			params.setSearch("clientNews.publish<='" + Instant.now().toString() + "'");
-		else
+		} else
 			params.setSearch("clientNews.id=" + id);
 		return repository.list(params).getList();
 	}
