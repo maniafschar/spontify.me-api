@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,50 +24,44 @@ public class SitemapService {
 	@Autowired
 	private Repository repository;
 
-	private static final AtomicLong lastRun = new AtomicLong(0);
-
 	public SchedulerResult update() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/update");
-		if (lastRun.get() < System.currentTimeMillis() - 2 * 60 * 60 * 1000) {
-			lastRun.set(System.currentTimeMillis());
-			final Result list = repository.list(new QueryParams(Query.misc_listClient));
-			for (int i = 0; i < list.size(); i++) {
-				try {
-					final JsonNode json = new ObjectMapper().readTree(list.get(i).get("client.storage").toString())
-							.get("sitemap");
-					if (json != null) {
-						final StringBuilder sitemap = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-						sitemap.append("<sitemapindex xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">");
-						if (json.get("type").asText().contains("event")) {
-							final QueryParams params = new QueryParams(Query.event_listId);
-							params.setSearch(
-									"event.contactId=" + list.get(i).get("client.adminId") + " and event.endDate>'"
-											+ Instant.now() + "'");
-							writeMap(json, "event", params, sitemap, (String) list.get(i).get("client.url"));
-						}
-						if (json.get("type").asText().contains("news")) {
-							final QueryParams params = new QueryParams(Query.misc_listNews);
-							params.setUser(new Contact());
-							params.getUser().setClientId((BigInteger) list.get(i).get("client.id"));
-							params.setSearch("clientNews.publish<'" + Instant.now() + "'");
-							writeMap(json, "news", params, sitemap, (String) list.get(i).get("client.url"));
-						}
-						if (json.get("type").asText().contains("location"))
-							writeMap(json, "location", new QueryParams(Query.location_listId), sitemap,
-									(String) list.get(i).get("client.url"));
-						sitemap.append("</sitemapindex>");
-						IOUtils.write(sitemap.toString().getBytes(StandardCharsets.UTF_8),
-								new FileOutputStream(json.get("path").asText() + File.separatorChar + "sitemap.xml"));
-						result.result += "updated " + list.get(i).get("client.id");
+		final Result list = repository.list(new QueryParams(Query.misc_listClient));
+		for (int i = 0; i < list.size(); i++) {
+			try {
+				final JsonNode json = new ObjectMapper().readTree(list.get(i).get("client.storage").toString())
+						.get("sitemap");
+				if (json != null) {
+					final StringBuilder sitemap = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+					sitemap.append("<sitemapindex xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">");
+					if (json.get("type").asText().contains("event")) {
+						final QueryParams params = new QueryParams(Query.event_listId);
+						params.setSearch(
+								"event.contactId=" + list.get(i).get("client.adminId") + " and event.endDate>'"
+										+ Instant.now() + "'");
+						writeMap(json, "event", params, sitemap, (String) list.get(i).get("client.url"));
 					}
-				} catch (final Exception e) {
-					result.result += list.get(i).get("client.id") + ", error " + e.getMessage() + "\n";
-					if (result.exception == null)
-						result.exception = e;
+					if (json.get("type").asText().contains("news")) {
+						final QueryParams params = new QueryParams(Query.misc_listNews);
+						params.setUser(new Contact());
+						params.getUser().setClientId((BigInteger) list.get(i).get("client.id"));
+						params.setSearch("clientNews.publish<'" + Instant.now() + "'");
+						writeMap(json, "news", params, sitemap, (String) list.get(i).get("client.url"));
+					}
+					if (json.get("type").asText().contains("location"))
+						writeMap(json, "location", new QueryParams(Query.location_listId), sitemap,
+								(String) list.get(i).get("client.url"));
+					sitemap.append("</sitemapindex>");
+					IOUtils.write(sitemap.toString().getBytes(StandardCharsets.UTF_8),
+							new FileOutputStream(json.get("path").asText() + File.separatorChar + "sitemap.xml"));
+					result.result += "updated " + list.get(i).get("client.id");
 				}
+			} catch (final Exception e) {
+				result.result += list.get(i).get("client.id") + ", error " + e.getMessage() + "\n";
+				if (result.exception == null)
+					result.exception = e;
 			}
-		} else
-			result.result = "paused";
+		}
 		return result;
 	}
 
