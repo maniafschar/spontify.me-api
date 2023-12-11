@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Base64;
@@ -66,6 +67,7 @@ public class RepositoryTest {
 		for (int i = 0; i < b.length; i++)
 			b[i] = 24;
 		contactChat.setImage(".jpg" + Attachment.SEPARATOR + Base64.getEncoder().encodeToString(b));
+		new File(Attachment.PATH + Attachment.PUBLIC + "100000").mkdir();
 
 		// when
 		repository.save(contactChat);

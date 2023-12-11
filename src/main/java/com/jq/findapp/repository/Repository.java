@@ -354,10 +354,9 @@ public class Repository {
 		}
 
 		private static final long getNextAttachmentID(final String dir) {
-			long max = -1;
-			final long subDir = getMax(dir, max);
-			if (subDir > -1)
-				max = getMax(dir + subDir, max);
+			long max = getMax(dir, -1);
+			if (max > -1)
+				max = getMax(dir + max, max - 10000);
 			return max + 1;
 		}
 

@@ -97,11 +97,7 @@ public class RssService {
 				clientNews.setClientId(clientId);
 				clientNews.setLatitude(latitude);
 				clientNews.setLongitude(longitude);
-				clientNews.setDescription(rss.get(i).get("title").asText().trim());
-				if (clientNews.getDescription().length() > 1000)
-					clientNews.setDescription(
-							clientNews.getDescription().substring(0,
-									clientNews.getDescription().substring(0, 1000).lastIndexOf(' ')) + "...");
+				clientNews.setDescription(Strings.sanitize(rss.get(i).get("title").asText()));
 				clientNews.setUrl(uid);
 				clientNews.setPublish(new Timestamp(df.parse(rss.get(i).get("pubDate").asText()).getTime()));
 				final Matcher matcher = img

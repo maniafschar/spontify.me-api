@@ -14,8 +14,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -291,13 +289,15 @@ public class ActionApi {
 	public List<Object[]> teaser(@PathVariable final String type, @RequestParam(required = false) String search,
 			@RequestHeader final BigInteger clientId, @RequestHeader(required = false) final BigInteger user,
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
+		if (BigInteger.ZERO.equals(user))
+			return null;
 		final QueryParams params = new QueryParams(
 				"contacts".equals(type) ? Query.contact_listTeaser : Query.event_listTeaser);
 		params.setLimit(25);
 		params.setDistance(-1);
 		params.setLatitude(48.13684f);
 		params.setLongitude(11.57685f);
-		if (user == null || BigInteger.ZERO.equals(user)) {
+		if (user == null) {
 			if (ip != null) {
 				final QueryParams params2 = new QueryParams(Query.misc_listIp);
 				params2.setSearch("ip.ip='" + IpService.sanatizeIp(ip) + "'");
@@ -724,7 +724,8 @@ public class ActionApi {
 		return marketingInit(id);
 	}
 
-	private String getHtml(final Client client, final String path, final String image, final String title) throws IOException {
+	private String getHtml(final Client client, final String path, final String image, final String title)
+			throws IOException {
 		String s;
 		synchronized (INDEXES) {
 			if (!INDEXES.containsKey(client.getId()))
@@ -733,11 +734,14 @@ public class ActionApi {
 			s = INDEXES.get(client.getId());
 		}
 		final String url = Strings.removeSubdomain(client.getUrl());
-		s = s.replaceFirst("<meta property=\"og:url\" content=\"([^\"].*)\"", url + "/rest/action/marketing/" + path);
-		s = s.replaceFirst("<meta property=\"og:image\" content=\"([^\"].*)\"", url + "/med/" + image + "\"/><base href=\"" + client.getUrl() + "/");
+		s = s.replaceFirst("<meta property=\"og:url\" content=\"([^\"].*)\"",
+				url + "<meta property=\"og:url\" content=\"/rest/action/marketing/" + path + '"');
+		s = s.replaceFirst("<meta property=\"og:image\" content=\"([^\"].*)\"",
+				"<meta property=\"og:image\" content=\"" + url + "/med/" + image + "\"/><base href=\"" + client.getUrl()
+						+ "/\"");
 		if (!Strings.isEmpty(title))
-			s = s.replaceFirst("<title></title>", "<title>" + 
-					   (client.getName() + " · " + (title.length() > 200 ? title.substring(0, 200) : title)) + "</title>");
+			s = s.replaceFirst("<title></title>", "<title>" +
+					(client.getName() + " · " + (title.length() > 200 ? title.substring(0, 200) : title)) + "</title>");
 		return s;
 	}
 

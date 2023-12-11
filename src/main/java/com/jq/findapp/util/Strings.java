@@ -70,6 +70,8 @@ public class Strings {
 	}
 
 	public static String sanitize(String s) {
+		if (s == null)
+			return s;
 		s = HtmlUtils.htmlUnescape(s.replaceAll("<[^>]*>", "\n")
 				.replace("&nbsp;", " ")
 				.replace("\t", " ")).trim();
@@ -79,6 +81,8 @@ public class Strings {
 			s = s.replace("\n\n", "\n");
 		while (s.contains("\n "))
 			s = s.replace("\n ", "\n");
-		return s;
+		if (s.length() > 1000)
+			s = s.substring(0, s.substring(0, 997).lastIndexOf(' ')) + "...";
+		return s.trim();
 	}
 }

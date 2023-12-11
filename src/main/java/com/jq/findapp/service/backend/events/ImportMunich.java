@@ -147,16 +147,11 @@ public class ImportMunich {
 							}
 						}
 						event.setDescription(
-								Strings.sanitize((body.getFirstChild().getFirstChild().getTextContent().trim()
-										+ "\n" + getField(externalPage ? regexDescExternal : regexDesc, page, 1))));
+								Strings.sanitize(body.getFirstChild().getFirstChild().getTextContent().trim()
+										+ "\n" + getField(externalPage ? regexDescExternal : regexDesc, page, 1)));
 						event.setEndDate(new java.sql.Date(date.getTime()));
 						event.setContactId(client.getAdminId());
 						event.setSkills(body.getChildNodes().item(1).getTextContent().trim());
-						if (event.getDescription().length() > 1000)
-							event.setDescription(
-									event.getDescription().substring(0,
-											event.getDescription().substring(0, 1000).lastIndexOf(' '))
-											+ "...");
 						repository.save(event);
 						return true;
 					}
@@ -188,7 +183,7 @@ public class ImportMunich {
 			location.setAddress(String.join("\n",
 					Arrays.asList(getField(regexAddress, page, 2)
 							.split(",")).stream().map(e -> e.trim()).toList()));
-			location.setDescription(getField(regexDesc, page, 1).replaceAll("<[^>]*>", " ").trim());
+			location.setDescription(Strings.sanitize(getField(regexDesc, page, 1)));
 		}
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setSearch(
@@ -208,9 +203,6 @@ public class ImportMunich {
 							EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
 			}
 			location.setContactId(client.getAdminId());
-			if (location.getDescription() != null && location.getDescription().length() > 1000)
-				location.setDescription(location.getDescription().substring(0,
-						location.getDescription().substring(0, 1000).lastIndexOf(' ')) + "...");
 			try {
 				repository.save(location);
 				return location.getId();
