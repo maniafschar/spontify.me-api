@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
@@ -66,6 +64,6 @@ public class SitemapService {
 		for (int i2 = 0; i2 < list.size(); i2++)
 			map.append(urlList + list.get(i2).get(type + ".id") + "\n");
 		IOUtils.write(map.toString().getBytes(StandardCharsets.UTF_8), new FileOutputStream(json.get(type).asText()));
-		sitemap.append("<sitemap><loc>" + url + "sitemap_" + type + ".xml</loc></sitemap>");
+		sitemap.append("<sitemap><loc>" + url + "/sitemap_" + type + ".xml</loc></sitemap>");
 	}
 }
