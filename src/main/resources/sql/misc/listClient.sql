@@ -1,5 +1,6 @@
 SELECT
 	client.id,
+	client.adminId,
 	client.storage,
 	client.name,
 	client.email,

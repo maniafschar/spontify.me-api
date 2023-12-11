@@ -50,7 +50,7 @@ public class SitemapService {
 							final QueryParams params = new QueryParams(Query.misc_listNews);
 							params.setUser(new Contact());
 							params.getUser().setClientId((BigInteger) list.get(i).get("client.id"));
-							params.setSearch("event.publish>'" + Instant.now() + "'");
+							params.setSearch("clientNews.publish<'" + Instant.now() + "'");
 							writeMap(json, "news", params, sitemap, (String) list.get(i).get("client.url"));
 						}
 						if (json.get("type").asText().contains("location"))
@@ -74,14 +74,15 @@ public class SitemapService {
 
 	private void writeMap(final JsonNode json, final String type, final QueryParams params,
 			final StringBuilder sitemap, final String url) throws Exception {
+		params.setLimit(0);
 		final Result list = repository.list(params);
 		final String urlList = url + "/rest/action/marketing/" + type + "/";
-		final String name = "sitemap_" + type + ".xml";
+		final String name = "sitemap_" + type + ".txt";
 		final String filename = json.get("path").asText() + File.separatorChar + name;
 		new File(filename).delete();
 		try (final FileOutputStream out = new FileOutputStream(filename)) {
-			for (int i2 = 0; i2 < list.size(); i2++)
-				out.write((urlList + list.get(i2).get(type + ".id") + "\n").getBytes(StandardCharsets.UTF_8));
+			for (int i = 0; i < list.size(); i++)
+				out.write((urlList + list.get(i).get(type + ".id") + "\n").getBytes(StandardCharsets.UTF_8));
 		}
 		sitemap.append("<sitemap><loc>" + url + "/" + name + "</loc></sitemap>");
 	}
