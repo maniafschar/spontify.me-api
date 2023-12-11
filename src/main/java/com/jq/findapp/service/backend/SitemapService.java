@@ -58,7 +58,7 @@ public class SitemapService {
 									(String) list.get(i).get("client.url"));
 						sitemap.append("</sitemapindex>");
 						IOUtils.write(sitemap.toString().getBytes(StandardCharsets.UTF_8),
-								new FileOutputStream(""));
+								new FileOutputStream(json.get("path").asText() + File.separatorChar + "sitemap.xml"));
 						result.result += "updated " + list.get(i).get("client.id");
 					}
 				} catch (final Exception e) {
