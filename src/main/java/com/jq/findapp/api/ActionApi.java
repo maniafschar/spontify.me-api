@@ -735,7 +735,7 @@ public class ActionApi {
 		}
 		final String url = Strings.removeSubdomain(client.getUrl());
 		s = s.replaceFirst("<meta property=\"og:url\" content=\"([^\"].*)\"",
-				url + "<meta property=\"og:url\" content=\"/rest/action/marketing/" + path + '"');
+				"<meta property=\"og:url\" content=\"" + url + "/rest/action/marketing/" + path + '"');
 		s = s.replaceFirst("<meta property=\"og:image\" content=\"([^\"].*)\"",
 				"<meta property=\"og:image\" content=\"" + url + "/med/" + image + "\"/><base href=\"" + client.getUrl()
 						+ "/\"");

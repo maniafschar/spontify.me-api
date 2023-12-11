@@ -42,6 +42,7 @@ import com.jq.findapp.service.backend.ImportLocationsService;
 import com.jq.findapp.service.backend.ImportLogService;
 import com.jq.findapp.service.backend.IpService;
 import com.jq.findapp.service.backend.RssService;
+import com.jq.findapp.service.backend.SitemapService;
 import com.jq.findapp.service.backend.SurveyService;
 import com.jq.findapp.util.Strings;
 
@@ -88,6 +89,9 @@ public class SupportCenterApi {
 
 	@Autowired
 	private ChatService chatService;
+
+	@Autowired
+	private SitemapService sitemapService;
 
 	@Autowired
 	private IpService ipService;
@@ -180,6 +184,7 @@ public class SupportCenterApi {
 				final boolean LAST = true;
 				// last job is backup, even after importLog
 				run(dbService::backup, LAST);
+				run(sitemapService::update, LAST);
 				// importLog paralell to the rest, does not interfere
 				run(importLogService::importLog, !LAST);
 				run(eventService::importEvents, !LAST);
