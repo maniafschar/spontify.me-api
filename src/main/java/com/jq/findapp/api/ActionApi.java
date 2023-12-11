@@ -665,13 +665,22 @@ public class ActionApi {
 		}).toList();
 	}
 
+	@GetMapping(value = "marketing/location/{id}", produces = MediaType.TEXT_HTML_VALUE)
+	public String marketingLocation(@PathVariable final BigInteger id) throws Exception {
+		final Location location = repository.one(Location.class, id);
+		if (location == null)
+			return "";
+		return getHtml(repository.one(Client.class, BigInteger.ONE), "location/" + id,
+				Attachment.resolve(location.getImage()), location.getName());
+	}
+
 	@GetMapping(value = "marketing/news/{id}", produces = MediaType.TEXT_HTML_VALUE)
 	public String marketingNews(@PathVariable final BigInteger id) throws Exception {
 		final ClientNews news = repository.one(ClientNews.class, id);
 		if (news == null)
 			return "";
-		return getHtml(repository.one(Client.class, news.getClientId()), "news/" + news.getId(),
-				Attachment.resolve(news.getImage()));
+		return getHtml(repository.one(Client.class, news.getClientId()), "news/" + id,
+				Attachment.resolve(news.getImage()), news.getDescription());
 	}
 
 	@GetMapping(value = "marketing/event/{id}", produces = MediaType.TEXT_HTML_VALUE)
@@ -685,8 +694,8 @@ public class ActionApi {
 			image = repository.one(Location.class, event.getLocationId()).getImage();
 		if (image == null)
 			image = contact.getImage();
-		return getHtml(repository.one(Client.class, contact.getClientId()), "event/" + event.getId(),
-				Attachment.resolve(image));
+		return getHtml(repository.one(Client.class, contact.getClientId()), "event/" + id,
+				Attachment.resolve(image), event.getDescription());
 	}
 
 	@GetMapping(value = "marketing/init/{id}", produces = MediaType.TEXT_HTML_VALUE)
@@ -707,7 +716,7 @@ public class ActionApi {
 		} else
 			image = Attachment.resolve(clientMarketing.getImage());
 		return getHtml(repository.one(Client.class, clientMarketing.getClientId()),
-				(pollTerminated ? "result/" : "init/") + clientMarketing.getId(), image);
+				(pollTerminated ? "result/" : "init/") + id, image, "");
 	}
 
 	@GetMapping(value = "marketing/result/{id}", produces = MediaType.TEXT_HTML_VALUE)
@@ -715,7 +724,7 @@ public class ActionApi {
 		return marketingInit(id);
 	}
 
-	private String getHtml(final Client client, final String path, final String image) throws IOException {
+	private String getHtml(final Client client, final String path, final String image, final String title) throws IOException {
 		String s;
 		synchronized (INDEXES) {
 			if (!INDEXES.containsKey(client.getId()))
@@ -724,13 +733,11 @@ public class ActionApi {
 			s = INDEXES.get(client.getId());
 		}
 		final String url = Strings.removeSubdomain(client.getUrl());
-		Matcher m = Pattern.compile("<meta property=\"og:url\" content=\"([^\"].*)\"").matcher(s);
-		if (m.find())
-			s = s.replace(m.group(1),
-					url + "/rest/action/marketing/" + path);
-		m = Pattern.compile("<meta property=\"og:image\" content=\"([^\"].*)\"").matcher(s);
-		if (m.find())
-			s = s.replace(m.group(1), url + "/med/" + image + "\"/><base href=\"" + client.getUrl() + "/");
+		s = s.replaceFirst("<meta property=\"og:url\" content=\"([^\"].*)\"", url + "/rest/action/marketing/" + path);
+		s = s.replaceFirst("<meta property=\"og:image\" content=\"([^\"].*)\"", url + "/med/" + image + "\"/><base href=\"" + client.getUrl() + "/");
+		if (!Strings.isEmpty(title))
+			s = s.replaceFirst("<title></title>", "<title>" + 
+					   (client.getName() + " · " + (title.length() > 200 ? title.substring(0, 200) : title)) + "</title>");
 		return s;
 	}
 
