@@ -2,6 +2,7 @@ package com.jq.findapp.service.backend;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicLong;
@@ -13,11 +14,11 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
+import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.util.Strings;
 
 @Service
 public class SitemapService {
@@ -43,17 +44,18 @@ public class SitemapService {
 							params.setSearch(
 									"event.contactId=" + list.get(i).get("client.adminId") + " and event.endDate>'"
 											+ Instant.now() + "'");
-							writeMap(json, "event", params, sitemap);
+							writeMap(json, "event", params, sitemap, (String) list.get(i).get("client.url"));
 						}
 						if (json.get("type").asText().contains("news")) {
 							final QueryParams params = new QueryParams(Query.misc_listNews);
-							params.setSearch(
-									"clientNews.clientId=" + list.get(i).get("client.id") + " and event.publish>'"
-											+ Instant.now() + "'");
-							writeMap(json, "news", params, sitemap);
+							params.setUser(new Contact());
+							params.getUser().setClientId((BigInteger) list.get(i).get("client.id"));
+							params.setSearch("event.publish>'" + Instant.now() + "'");
+							writeMap(json, "news", params, sitemap, (String) list.get(i).get("client.url"));
 						}
 						if (json.get("type").asText().contains("location"))
-							writeMap(json, "location", new QueryParams(Query.location_listId), sitemap);
+							writeMap(json, "location", new QueryParams(Query.location_listId), sitemap,
+									(String) list.get(i).get("client.url"));
 						sitemap.append("</sitemapindex>");
 						IOUtils.write(sitemap.toString().getBytes(StandardCharsets.UTF_8),
 								new FileOutputStream(""));
@@ -71,16 +73,16 @@ public class SitemapService {
 	}
 
 	private void writeMap(final JsonNode json, final String type, final QueryParams params,
-			final StringBuilder sitemap) throws Exception {
-		final StringBuilder map = new StringBuilder();
+			final StringBuilder sitemap, final String url) throws Exception {
 		final Result list = repository.list(params);
-		final String url = Strings.removeSubdomain(json.get("client.url").asText());
 		final String urlList = url + "/rest/action/marketing/" + type + "/";
 		final String name = "sitemap_" + type + ".xml";
-		for (int i2 = 0; i2 < list.size(); i2++)
-			map.append(urlList + list.get(i2).get(type + ".id") + "\n");
-		IOUtils.write(map.toString().getBytes(StandardCharsets.UTF_8),
-				new FileOutputStream(json.get("path").asText() + File.pathSeparatorChar + name));
+		final String filename = json.get("path").asText() + File.separatorChar + name;
+		new File(filename).delete();
+		try (final FileOutputStream out = new FileOutputStream(filename)) {
+			for (int i2 = 0; i2 < list.size(); i2++)
+				out.write((urlList + list.get(i2).get(type + ".id") + "\n").getBytes(StandardCharsets.UTF_8));
+		}
 		sitemap.append("<sitemap><loc>" + url + "/" + name + "</loc></sitemap>");
 	}
 }
