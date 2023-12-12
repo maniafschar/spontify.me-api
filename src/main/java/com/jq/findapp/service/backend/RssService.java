@@ -116,7 +116,7 @@ public class RssService {
 				repository.save(clientNews);
 				if (first.getTime() > clientNews.getPublish().getTime())
 					first = clientNews.getPublish();
-				urls.add(clientNews.getUrl());
+				urls.add(clientNews.getDescription());
 				if (b)
 					externalService.publishOnFacebook(clientId, clientNews.getDescription(),
 							"/rest/action/marketing/news/" + clientNews.getId());
@@ -126,7 +126,7 @@ public class RssService {
 		result = repository.list(params);
 		int deleted = 0;
 		for (int i = 0; i < result.size(); i++) {
-			if (!urls.contains(result.get(i).get("clientNews.url"))) {
+			if (!urls.contains(result.get(i).get("clientNews.description"))) {
 				repository.delete(repository.one(ClientNews.class, (BigInteger) result.get(i).get("clientNews.id")));
 				deleted++;
 			}
