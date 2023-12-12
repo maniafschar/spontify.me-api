@@ -71,9 +71,8 @@ public class RssService {
 		if (rss == null || rss.size() == 0)
 			return null;
 		final QueryParams params = new QueryParams(Query.misc_listNews);
-		final Contact contact = new Contact();
-		contact.setClientId(clientId);
-		params.setUser(contact);
+		params.setUser(new Contact());
+		params.getUser().setClientId(clientId);
 		final Pattern img = Pattern.compile("\\<article.*?\\<figure.*?\\<img .*?src=\\\"(.*?)\\\"");
 		final SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ROOT);
 		final Set<String> urls = new HashSet<>();
