@@ -96,19 +96,24 @@ public class RssService {
 				clientNews.setClientId(clientId);
 				clientNews.setLatitude(latitude);
 				clientNews.setLongitude(longitude);
-				clientNews.setDescription(Strings.sanitize(rss.get(i).get("title").asText()));
+				clientNews.setDescription(Strings.sanitize(rss.get(i).get("title").asText() +
+						(rss.get(i).has("description") ? "\n\n" + rss.get(i).get("description").asText() : "")));
 				clientNews.setUrl(uid);
 				clientNews.setPublish(new Timestamp(df.parse(rss.get(i).get("pubDate").asText()).getTime()));
-				final Matcher matcher = img
-						.matcher(IOUtils.toString(new URL(rss.get(i).get("link").asText()), StandardCharsets.UTF_8)
-								.replace('\r', ' ').replace('\n', ' '));
-				if (matcher.find()) {
-					String s = matcher.group(1);
-					if (!s.startsWith("http"))
-						s = url.substring(0, url.indexOf("/", 10)) + s;
-					clientNews.setImage(EntityUtil.getImage(s, EntityUtil.IMAGE_SIZE, 200));
-				} else
-					clientNews.setImage(null);
+				clientNews.setImage(null);
+				if (rss.get(i).has("media:content") && rss.get(i).get("media:content").has("url"))
+					clientNews.setImage(EntityUtil.getImage(rss.get(i).get("media:content").get("url").asText(), EntityUtil.IMAGE_SIZE, 200));
+				else {
+					final Matcher matcher = img
+							.matcher(IOUtils.toString(new URL(rss.get(i).get("link").asText()), StandardCharsets.UTF_8)
+									.replace('\r', ' ').replace('\n', ' '));
+					if (matcher.find()) {
+						String s = matcher.group(1);
+						if (!s.startsWith("http"))
+							s = url.substring(0, url.indexOf("/", 10)) + s;
+						clientNews.setImage(EntityUtil.getImage(s, EntityUtil.IMAGE_SIZE, 200));
+					}
+				}
 				if (clientNews.getId() == null)
 					count++;
 				final boolean b = publish && clientNews.getId() == null;
