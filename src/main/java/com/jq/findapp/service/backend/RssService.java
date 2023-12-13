@@ -148,7 +148,8 @@ public class RssService {
 					// repository.delete(repository.one(ClientNews.class, (BigInteger)
 					// result.get(i).get("clientNews.id")));
 					notificationService.createTicket(TicketType.ERROR, "RSS deletion",
-							result.get(i).get("clientNews.id") + ": " + result.get(i).get("clientNews.description"),
+							result.get(i).get("clientNews.id") + "\n" + result.get(i).get("clientNews.description")
+									+ "\n" + result.get(i).get("clientNews.url"),
 							clientId);
 					deleted++;
 				}
