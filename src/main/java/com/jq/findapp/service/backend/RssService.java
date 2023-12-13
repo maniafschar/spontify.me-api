@@ -22,11 +22,13 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.ClientNews;
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.ExternalService;
+import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.EntityUtil;
 import com.jq.findapp.util.Strings;
 
@@ -37,6 +39,9 @@ public class RssService {
 
 	@Autowired
 	private ExternalService externalService;
+
+	@Autowired
+	private NotificationService notificationService;
 
 	public SchedulerResult update() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/update");
@@ -77,6 +82,8 @@ public class RssService {
 		final SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ROOT);
 		final Set<String> urls = new HashSet<>();
 		int count = 0;
+		boolean chonological = true;
+		long lastPubDate = 0;
 		Timestamp first = new Timestamp(System.currentTimeMillis());
 		Result result;
 		for (int i = 0; i < rss.size(); i++) {
@@ -100,9 +107,15 @@ public class RssService {
 						(rss.get(i).has("description") ? "\n\n" + rss.get(i).get("description").asText() : "")));
 				clientNews.setUrl(uid);
 				clientNews.setPublish(new Timestamp(df.parse(rss.get(i).get("pubDate").asText()).getTime()));
+				if (clientNews.getPublish().getTime() > lastPubDate)
+					chonological = false;
+				else
+					lastPubDate = clientNews.getPublish().getTime();
 				clientNews.setImage(null);
 				if (rss.get(i).has("media:content") && rss.get(i).get("media:content").has("url"))
-					clientNews.setImage(EntityUtil.getImage(rss.get(i).get("media:content").get("url").asText(), EntityUtil.IMAGE_SIZE, 200));
+
+					clientNews.setImage(EntityUtil.getImage(rss.get(i).get("media:content").get("url").asText(),
+							EntityUtil.IMAGE_SIZE, 200));
 				else {
 					final Matcher matcher = img
 							.matcher(IOUtils.toString(new URL(rss.get(i).get("link").asText()), StandardCharsets.UTF_8)
@@ -120,7 +133,7 @@ public class RssService {
 				repository.save(clientNews);
 				if (first.getTime() > clientNews.getPublish().getTime())
 					first = clientNews.getPublish();
-				urls.add(clientNews.getDescription());
+				urls.add(clientNews.getUrl());
 				if (b)
 					externalService.publishOnFacebook(clientId, clientNews.getDescription(),
 							"/rest/action/marketing/news/" + clientNews.getId());
@@ -129,10 +142,16 @@ public class RssService {
 		params.setSearch("clientNews.publish>'" + first + "' and clientNews.clientId=" + clientId);
 		result = repository.list(params);
 		int deleted = 0;
-		for (int i = 0; i < result.size(); i++) {
-			if (!urls.contains(result.get(i).get("clientNews.description"))) {
-				repository.delete(repository.one(ClientNews.class, (BigInteger) result.get(i).get("clientNews.id")));
-				deleted++;
+		if (chonological) {
+			for (int i = 0; i < result.size(); i++) {
+				if (!urls.contains(result.get(i).get("clientNews.url"))) {
+					// repository.delete(repository.one(ClientNews.class, (BigInteger)
+					// result.get(i).get("clientNews.id")));
+					notificationService.createTicket(TicketType.ERROR, "RSS deletion",
+							result.get(i).get("clientNews.id") + ": " + result.get(i).get("clientNews.description"),
+							clientId);
+					deleted++;
+				}
 			}
 		}
 		if (count == 0 && deleted == 0)

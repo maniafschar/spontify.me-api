@@ -1,5 +1,6 @@
 package com.jq.findapp.service.push;
 
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,24 +43,24 @@ public class Android {
 	}
 
 	private void send(final String from, final Contact contactTo, final String text, final String action,
-			final String notificationId,
-			final boolean reset)
-			throws Exception {
-		WebClient.create(url)
-				.post()
-				.contentType(MediaType.APPLICATION_JSON)
-				.header("Authorization",
-						"Bearer " + jwtGenerator.generateToken(getHeader(), getClaims(reset), "RSA"))
-				.bodyValue(
-						IOUtils.toString(getClass().getResourceAsStream("/template/push.android"),
-								StandardCharsets.UTF_8)
-								.replace("{from}", from)
-								.replace("{to}", contactTo.getPushToken())
-								.replace("{text}", text)
-								.replace("{notificationId}", notificationId)
-								.replace("{exec}", Strings.isEmpty(action) ? "" : action))
-				.retrieve()
-				.toEntity(String.class).block().getBody();
+			final String notificationId, final boolean reset) throws Exception {
+		try (final InputStream in = getClass().getResourceAsStream("/template/push.android")) {
+			WebClient.create(url)
+					.post()
+					.contentType(MediaType.APPLICATION_JSON)
+					.header("Authorization",
+							"Bearer " + jwtGenerator.generateToken(getHeader(), getClaims(reset), "RSA"))
+					.bodyValue(
+							IOUtils.toString(in,
+									StandardCharsets.UTF_8)
+									.replace("{from}", from)
+									.replace("{to}", contactTo.getPushToken())
+									.replace("{text}", text)
+									.replace("{notificationId}", notificationId)
+									.replace("{exec}", Strings.isEmpty(action) ? "" : action))
+					.retrieve()
+					.toEntity(String.class).block().getBody();
+		}
 	}
 
 	private Map<String, String> getHeader() {

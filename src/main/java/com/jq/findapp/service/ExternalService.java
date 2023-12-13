@@ -1,5 +1,6 @@
 package com.jq.findapp.service;
 
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -170,15 +171,16 @@ public class ExternalService {
 	}
 
 	public String chatGpt(final String prompt) throws Exception {
-		final String s = WebClient
-				.create("https://api.openai.com/v1/completions")
-				.post().accept(MediaType.APPLICATION_JSON)
-				.header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-				.header("Authorization", "Bearer " + chatGpt)
-				.bodyValue(IOUtils.toString(getClass().getResourceAsStream("/template/gpt.json"),
-						StandardCharsets.UTF_8).replace("{prompt}", prompt))
-				.retrieve().toEntity(String.class).block().getBody();
-		return new ObjectMapper().readTree(s).get("choices").get(0).get("text").asText().trim();
+		try (final InputStream in = getClass().getResourceAsStream("/template/gpt.json")) {
+			final String s = WebClient
+					.create("https://api.openai.com/v1/completions")
+					.post().accept(MediaType.APPLICATION_JSON)
+					.header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+					.header("Authorization", "Bearer " + chatGpt)
+					.bodyValue(IOUtils.toString(in, StandardCharsets.UTF_8).replace("{prompt}", prompt))
+					.retrieve().toEntity(String.class).block().getBody();
+			return new ObjectMapper().readTree(s).get("choices").get(0).get("text").asText().trim();
+		}
 	}
 
 	public String publishOnFacebook(final BigInteger clientId, final String message, final String link)

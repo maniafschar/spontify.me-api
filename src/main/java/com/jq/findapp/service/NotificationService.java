@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -333,71 +334,72 @@ public class NotificationService {
 
 	public void sendNotificationEmail(final Contact contactFrom, final Contact contactTo, String message,
 			final String action) throws Exception {
-		final StringBuilder html = new StringBuilder(
-				IOUtils.toString(getClass().getResourceAsStream("/template/email.html"), StandardCharsets.UTF_8));
-		final StringBuilder s = new StringBuilder(
-				IOUtils.toString(getClass().getResourceAsStream("/template/email.txt"), StandardCharsets.UTF_8));
-		final String url = repository.one(Client.class, contactTo.getClientId()).getUrl();
-		String s2;
-		Strings.replaceString(html, "<jq:logo />", url + "/images/logo.png");
-		Strings.replaceString(html, "<jq:pseudonym />", contactTo.getPseudonym());
-		Strings.replaceString(s, "<jq:pseudonym />", contactTo.getPseudonym());
-		s2 = Strings.formatDate(null, new Date(), contactTo.getTimezone());
-		Strings.replaceString(html, "<jq:time />", s2);
-		Strings.replaceString(s, "<jq:time />", s2);
-		s2 = message;
-		Strings.replaceString(html, "<jq:text />", s2.replaceAll("\n", "<br />"));
-		Strings.replaceString(s, "<jq:text />", sanatizeHtml(s2));
-		if (Strings.isEmpty(action))
-			s2 = url;
-		else if (action.startsWith("https://"))
-			s2 = action;
-		else
-			s2 = url + "?" + action;
-		Strings.replaceString(html, "<jq:link />", s2);
-		Strings.replaceString(s, "<jq:link />", s2);
-		Strings.replaceString(html, "<jq:url />", url);
-		Strings.replaceString(s, "<jq:url />", url);
-		if (contactFrom == null || contactFrom.getType() == ContactType.adminContent
-				|| contactTo.getId() != null && contactFrom.getId().equals(contactTo.getId()))
-			s2 = text.getText(contactTo, TextId.mail_title);
-		else
-			s2 = text.getText(contactTo, TextId.mail_titleFrom).replaceAll("<jq:pseudonymFrom />",
-					contactFrom.getPseudonym());
-		Strings.replaceString(html, "<jq:newsTitle />", s2);
-		Strings.replaceString(s, "<jq:newsTitle />", s2);
-		if (contactFrom != null && contactFrom.getType() != ContactType.adminContent
-				&& contactFrom.getImageList() != null)
-			Strings.replaceString(html, "<jq:image />",
-					"<br /><img src=\"" + Strings.removeSubdomain(url) + "/med/"
-							+ Attachment.resolve(contactFrom.getImageList())
-							+ "\" width=\"150\" height=\"150\" style=\"height:150px;min-height:150px;max-height:150px;width:150px;min-width:150px;max-width:150px;border-radius:75px;\" />");
-		else
-			Strings.replaceString(html, "<jq:image />", "");
-		final JsonNode css = new ObjectMapper()
-				.readTree(Attachment.resolve(repository.one(Client.class, contactTo.getClientId()).getStorage()))
-				.get("css");
-		css.fieldNames().forEachRemaining(key -> Strings.replaceString(html, "--" + key, css.get(key).asText()));
-		message = sanatizeHtml(message);
-		if (message.indexOf("\n") > 0)
-			message = message.substring(0, message.indexOf("\n"));
-		if (message.indexOf("\r") > 0)
-			message = message.substring(0, message.indexOf("\r"));
-		if (message.indexOf(".", 45) > 0)
-			message = message.substring(0, message.indexOf(".", 45) + 1);
-		if (message.indexOf("?", 45) > 0)
-			message = message.substring(0, message.indexOf("?", 45) + 1);
-		if (message.indexOf("!", 45) > 0)
-			message = message.substring(0, message.indexOf("!", 45) + 1);
-		if (message.length() > 80) {
-			message = message.substring(0, 81);
-			if (message.lastIndexOf(" ") > 30)
-				message = message.substring(0, message.lastIndexOf(" "));
+		try (final InputStream inHtml = getClass().getResourceAsStream("/template/email.html");
+				final InputStream inText = getClass().getResourceAsStream("/template/email.txt")) {
+			final StringBuilder html = new StringBuilder(IOUtils.toString(inHtml, StandardCharsets.UTF_8));
+			final StringBuilder s = new StringBuilder(IOUtils.toString(inText, StandardCharsets.UTF_8));
+			final String url = repository.one(Client.class, contactTo.getClientId()).getUrl();
+			String s2;
+			Strings.replaceString(html, "<jq:logo />", url + "/images/logo.png");
+			Strings.replaceString(html, "<jq:pseudonym />", contactTo.getPseudonym());
+			Strings.replaceString(s, "<jq:pseudonym />", contactTo.getPseudonym());
+			s2 = Strings.formatDate(null, new Date(), contactTo.getTimezone());
+			Strings.replaceString(html, "<jq:time />", s2);
+			Strings.replaceString(s, "<jq:time />", s2);
+			s2 = message;
+			Strings.replaceString(html, "<jq:text />", s2.replaceAll("\n", "<br />"));
+			Strings.replaceString(s, "<jq:text />", sanatizeHtml(s2));
+			if (Strings.isEmpty(action))
+				s2 = url;
+			else if (action.startsWith("https://"))
+				s2 = action;
 			else
-				message = message.substring(0, 77);
-			message += "...";
+				s2 = url + "?" + action;
+			Strings.replaceString(html, "<jq:link />", s2);
+			Strings.replaceString(s, "<jq:link />", s2);
+			Strings.replaceString(html, "<jq:url />", url);
+			Strings.replaceString(s, "<jq:url />", url);
+			if (contactFrom == null || contactFrom.getType() == ContactType.adminContent
+					|| contactTo.getId() != null && contactFrom.getId().equals(contactTo.getId()))
+				s2 = text.getText(contactTo, TextId.mail_title);
+			else
+				s2 = text.getText(contactTo, TextId.mail_titleFrom).replaceAll("<jq:pseudonymFrom />",
+						contactFrom.getPseudonym());
+			Strings.replaceString(html, "<jq:newsTitle />", s2);
+			Strings.replaceString(s, "<jq:newsTitle />", s2);
+			if (contactFrom != null && contactFrom.getType() != ContactType.adminContent
+					&& contactFrom.getImageList() != null)
+				Strings.replaceString(html, "<jq:image />",
+						"<br /><img src=\"" + Strings.removeSubdomain(url) + "/med/"
+								+ Attachment.resolve(contactFrom.getImageList())
+								+ "\" width=\"150\" height=\"150\" style=\"height:150px;min-height:150px;max-height:150px;width:150px;min-width:150px;max-width:150px;border-radius:75px;\" />");
+			else
+				Strings.replaceString(html, "<jq:image />", "");
+			final JsonNode css = new ObjectMapper()
+					.readTree(Attachment.resolve(repository.one(Client.class, contactTo.getClientId()).getStorage()))
+					.get("css");
+			css.fieldNames().forEachRemaining(key -> Strings.replaceString(html, "--" + key, css.get(key).asText()));
+			message = sanatizeHtml(message);
+			if (message.indexOf("\n") > 0)
+				message = message.substring(0, message.indexOf("\n"));
+			if (message.indexOf("\r") > 0)
+				message = message.substring(0, message.indexOf("\r"));
+			if (message.indexOf(".", 45) > 0)
+				message = message.substring(0, message.indexOf(".", 45) + 1);
+			if (message.indexOf("?", 45) > 0)
+				message = message.substring(0, message.indexOf("?", 45) + 1);
+			if (message.indexOf("!", 45) > 0)
+				message = message.substring(0, message.indexOf("!", 45) + 1);
+			if (message.length() > 80) {
+				message = message.substring(0, 81);
+				if (message.lastIndexOf(" ") > 30)
+					message = message.substring(0, message.lastIndexOf(" "));
+				else
+					message = message.substring(0, 77);
+				message += "...";
+			}
+			sendEmail(contactTo, message, s.toString(), html.toString());
 		}
-		sendEmail(contactTo, message, s.toString(), html.toString());
 	}
 
 	private String sanatizeHtml(String s) {

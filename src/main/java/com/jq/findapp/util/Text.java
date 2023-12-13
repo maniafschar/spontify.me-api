@@ -1,5 +1,6 @@
 package com.jq.findapp.util;
 
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -107,10 +108,10 @@ public class Text {
 				}
 			}
 		} catch (final Exception e) {
-			try {
+			try (final InputStream in = Text.class.getResourceAsStream("/lang/DE.json")) {
 				// Test environment, only german is tested
 				languages.put("DE", new ObjectMapper().readTree(
-						IOUtils.toString(Text.class.getResourceAsStream("/lang/DE.json"), StandardCharsets.UTF_8)));
+						IOUtils.toString(in, StandardCharsets.UTF_8)));
 			} catch (final Exception e1) {
 				new RuntimeException(e);
 			}

@@ -1,6 +1,7 @@
 package com.jq.findapp.repository;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -112,9 +113,8 @@ public enum Query {
 	}
 
 	private Query(final boolean addBlock) {
-		try {
-			sql = IOUtils.toString(getClass().getResourceAsStream("/sql/" + name().replace("_", "/") + ".sql"),
-					StandardCharsets.UTF_8);
+		try (final InputStream in = getClass().getResourceAsStream("/sql/" + name().replace("_", "/") + ".sql")) {
+			sql = IOUtils.toString(in, StandardCharsets.UTF_8);
 		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}

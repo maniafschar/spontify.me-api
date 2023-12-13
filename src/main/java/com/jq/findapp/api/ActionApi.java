@@ -1,6 +1,7 @@
 package com.jq.findapp.api;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -81,9 +82,9 @@ public class ActionApi {
 	private static final Map<BigInteger, String> INDEXES = new HashMap<>();
 
 	static {
-		try {
+		try (final InputStream in = ActionApi.class.getResourceAsStream("/quotation")) {
 			final String[] t = IOUtils
-					.toString(ActionApi.class.getResourceAsStream("/quotation"), StandardCharsets.UTF_8).split("\n");
+					.toString(in, StandardCharsets.UTF_8).split("\n");
 			for (String q : t) {
 				q = q.trim();
 				if (q.length() > 0 && !QUOTATION.contains(q))
@@ -671,7 +672,7 @@ public class ActionApi {
 		if (location == null)
 			return "";
 		return getHtml(repository.one(Client.class, BigInteger.ONE), "location/" + id,
-				Attachment.resolve(location.getImage()), location.getName());
+				Attachment.resolve(location.getImage()), location.getName() + " " + location.getAddress());
 	}
 
 	@GetMapping(value = "marketing/news/{id}", produces = MediaType.TEXT_HTML_VALUE)
@@ -689,13 +690,14 @@ public class ActionApi {
 		if (event == null)
 			return "";
 		final Contact contact = repository.one(Contact.class, event.getContactId());
+		final Location location = repository.one(Location.class, event.getLocationId());
 		String image = event.getImage();
 		if (image == null)
-			image = repository.one(Location.class, event.getLocationId()).getImage();
+			image = location.getImage();
 		if (image == null)
 			image = contact.getImage();
 		return getHtml(repository.one(Client.class, contact.getClientId()), "event/" + id,
-				Attachment.resolve(image), event.getDescription());
+				Attachment.resolve(image), event.getDescription() + " " + location.getAddress());
 	}
 
 	@GetMapping(value = "marketing/init/{id}", produces = MediaType.TEXT_HTML_VALUE)
@@ -724,13 +726,14 @@ public class ActionApi {
 		return marketingInit(id);
 	}
 
-	private String getHtml(final Client client, final String path, final String image, final String title)
+	private String getHtml(final Client client, final String path, final String image, String title)
 			throws IOException {
 		String s;
 		synchronized (INDEXES) {
 			if (!INDEXES.containsKey(client.getId()))
-				INDEXES.put(client.getId(), IOUtils.toString(
-						new URL(client.getUrl()).openStream(), StandardCharsets.UTF_8));
+				try (final InputStream in = new URL(client.getUrl()).openStream()) {
+					INDEXES.put(client.getId(), IOUtils.toString(in, StandardCharsets.UTF_8));
+				}
 			s = INDEXES.get(client.getId());
 		}
 		final String url = Strings.removeSubdomain(client.getUrl());
@@ -739,9 +742,13 @@ public class ActionApi {
 		s = s.replaceFirst("<meta property=\"og:image\" content=\"([^\"].*)\"",
 				"<meta property=\"og:image\" content=\"" + url + "/med/" + image + "\"/><base href=\"" + client.getUrl()
 						+ "/\"");
-		if (!Strings.isEmpty(title))
+		if (!Strings.isEmpty(title)) {
+			title = Strings.sanitize(title.replace('\n', ' ').replace('\t', ' ').replace('\r', ' ').replace('"', '\''));
+			s = s.replaceFirst("<meta property=\"description\" content=\"([^\"].*)\"",
+					"<meta property=\"og:description\" content=\"" + title + '"');
 			s = s.replaceFirst("<title></title>", "<title>" +
 					(client.getName() + " · " + (title.length() > 200 ? title.substring(0, 200) : title)) + "</title>");
+		}
 		return s;
 	}
 

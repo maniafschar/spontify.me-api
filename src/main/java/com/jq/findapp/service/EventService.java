@@ -1,6 +1,7 @@
 package com.jq.findapp.service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -253,8 +254,8 @@ public class EventService {
 	}
 
 	public String get(final String url) {
-		try {
-			return IOUtils.toString(new URL(url).openStream(), StandardCharsets.UTF_8)
+		try (final InputStream in = new URL(url).openStream()) {
+			return IOUtils.toString(in, StandardCharsets.UTF_8)
 					.replace('\n', ' ')
 					.replace('\r', ' ')
 					.replace('\u0013', ' ')

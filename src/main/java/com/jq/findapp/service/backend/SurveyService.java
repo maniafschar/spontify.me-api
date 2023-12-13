@@ -10,6 +10,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.Duration;
@@ -521,40 +522,41 @@ public class SurveyService {
 			if (homeMatch)
 				draw(urlHome, g2, width / 2, padding, h, -1);
 			draw(urlLeague, g2, width - padding, padding, height / 4, 0);
-			final Font customFont = Font
-					.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"))
-					.deriveFont(50f);
-			GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(customFont);
-			g2.setFont(customFont);
-			g2.setColor(colorText);
-			String s = "Umfrage";
-			if (clientMarketingResult != null)
-				s += "ergebnis";
-			g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 14.5f);
-			g2.setFont(customFont.deriveFont(24f));
-			s = subtitlePrefix + " des Spiels vom " + formatDate(poll.get("timestamp").asLong(), "d.M.yyyy H:mm");
-			g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 17.5f);
-			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP));
-			g2.setFont(customFont.deriveFont(12f));
-			s = "© " + LocalDateTime.now().getYear() + " " + client.getName();
-			g2.drawString(s, width - g2.getFontMetrics().stringWidth(s) - padding, height - padding);
-			if (clientMarketingResult != null)
-				result(g2, customFont, poll,
-						new ObjectMapper().readTree(Attachment.resolve(clientMarketingResult.getStorage())), colorText);
-			else if ("Prediction".equals(poll.get("type").asText()))
-				prediction(g2, customFont, poll, colorText);
-			// final BufferedImageTranscoder imageTranscoder = new
-			// BufferedImageTranscoder();
-			// imageTranscoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, width);
-			// imageTranscoder.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, height);
-			// final TranscoderInput input = new TranscoderInput(svgFile);
-			// imageTranscoder.transcode(input, null);
-			// g2.drawImage(imageTranscoder.getBufferedImage(), 770 - image.getWidth(), 470
-			// - image.getHeight(), null);
-			g2.dispose();
-			final ByteArrayOutputStream out = new ByteArrayOutputStream();
-			ImageIO.write(output, "png", out);
-			return out.toByteArray();
+			try (final InputStream in = getClass().getResourceAsStream("/Comfortaa-Regular.ttf")) {
+				final Font customFont = Font.createFont(Font.TRUETYPE_FONT, in).deriveFont(50f);
+				GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(customFont);
+				g2.setFont(customFont);
+				g2.setColor(colorText);
+				String s = "Umfrage";
+				if (clientMarketingResult != null)
+					s += "ergebnis";
+				g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 14.5f);
+				g2.setFont(customFont.deriveFont(24f));
+				s = subtitlePrefix + " des Spiels vom " + formatDate(poll.get("timestamp").asLong(), "d.M.yyyy H:mm");
+				g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 17.5f);
+				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP));
+				g2.setFont(customFont.deriveFont(12f));
+				s = "© " + LocalDateTime.now().getYear() + " " + client.getName();
+				g2.drawString(s, width - g2.getFontMetrics().stringWidth(s) - padding, height - padding);
+				if (clientMarketingResult != null)
+					result(g2, customFont, poll,
+							new ObjectMapper().readTree(Attachment.resolve(clientMarketingResult.getStorage())),
+							colorText);
+				else if ("Prediction".equals(poll.get("type").asText()))
+					prediction(g2, customFont, poll, colorText);
+				// final BufferedImageTranscoder imageTranscoder = new
+				// BufferedImageTranscoder();
+				// imageTranscoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, width);
+				// imageTranscoder.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, height);
+				// final TranscoderInput input = new TranscoderInput(svgFile);
+				// imageTranscoder.transcode(input, null);
+				// g2.drawImage(imageTranscoder.getBufferedImage(), 770 - image.getWidth(), 470
+				// - image.getHeight(), null);
+				g2.dispose();
+				final ByteArrayOutputStream out = new ByteArrayOutputStream();
+				ImageIO.write(output, "png", out);
+				return out.toByteArray();
+			}
 		}
 
 		private void prediction(final Graphics2D g2, final Font customFont, final JsonNode poll, final Color colorText)
