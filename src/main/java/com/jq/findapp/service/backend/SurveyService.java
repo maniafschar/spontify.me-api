@@ -445,7 +445,7 @@ public class SurveyService {
 					.readTree(Attachment.resolve(repository.one(Client.class, clientId).getStorage()));
 			if (json.has("survey")) {
 				for (int i2 = 0; i2 < json.get("survey").size(); i2++) {
-					final String label = "team=" + json.get("survey").get(i2).asInt() + "&season="
+					final String label = "football-fixture-team=" + json.get("survey").get(i2).asInt() + "&season="
 							+ LocalDateTime.now().getYear();
 					final JsonNode matchDays = get(label);
 					final QueryParams params = new QueryParams(Query.misc_listStorage);

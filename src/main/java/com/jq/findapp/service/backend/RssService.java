@@ -51,12 +51,8 @@ public class RssService {
 				final JsonNode json = new ObjectMapper().readTree(list.get(i).get("client.storage").toString());
 				if (json.has("rss")) {
 					for (int i2 = 0; i2 < json.get("rss").size(); i2++) {
-						final boolean publish = json.get("rss").get(i2).get("publish").asBoolean();
-						final String count = syncFeed(json.get("rss").get(i2).get("url").asText(),
-								(BigInteger) list.get(i).get("client.id"),
-								(float) json.get("rss").get(i2).get("longitude").asDouble(),
-								(float) json.get("rss").get(i2).get("latitude").asDouble(),
-								publish);
+						final String count = syncFeed(json.get("rss").get(i2),
+								(BigInteger) list.get(i).get("client.id"));
 						if (count != null)
 							result.result += list.get(i).get("client.id") + ": " + count + "\n";
 					}
@@ -70,9 +66,10 @@ public class RssService {
 		return result;
 	}
 
-	private String syncFeed(final String url, final BigInteger clientId, final float longitude, final float latitude,
-			final boolean publish) throws Exception {
-		final ArrayNode rss = (ArrayNode) new XmlMapper().readTree(new URL(url)).get("channel").get("item");
+	private String syncFeed(final JsonNode json, final BigInteger clientId) throws Exception {
+		final String url = json.get("url").asText();
+		final ArrayNode rss = (ArrayNode) new XmlMapper().readTree(new URL(url)).get("channel")
+				.get("item");
 		if (rss == null || rss.size() == 0)
 			return null;
 		final QueryParams params = new QueryParams(Query.misc_listNews);
@@ -101,10 +98,12 @@ public class RssService {
 					clientNews.historize();
 				}
 				clientNews.setClientId(clientId);
-				clientNews.setLatitude(latitude);
-				clientNews.setLongitude(longitude);
+				clientNews.setLatitude((float) json.get("latitude").asDouble());
+				clientNews.setLongitude((float) json.get("longitude").asDouble());
 				clientNews.setDescription(Strings.sanitize(rss.get(i).get("title").asText() +
-						(rss.get(i).has("description") ? "\n\n" + rss.get(i).get("description").asText() : "")));
+						(json.has("description") && json.get("description").asBoolean() && rss.get(i).has("description")
+								? "\n\n" + rss.get(i).get("description").asText()
+								: "")));
 				clientNews.setUrl(uid);
 				clientNews.setPublish(new Timestamp(df.parse(rss.get(i).get("pubDate").asText()).getTime()));
 				if (clientNews.getPublish().getTime() > lastPubDate)
@@ -129,7 +128,7 @@ public class RssService {
 				}
 				if (clientNews.getId() == null)
 					count++;
-				final boolean b = publish && clientNews.getId() == null;
+				final boolean b = json.get("publish").asBoolean() && clientNews.getId() == null;
 				repository.save(clientNews);
 				if (first.getTime() > clientNews.getPublish().getTime())
 					first = clientNews.getPublish();
