@@ -436,20 +436,21 @@ public class SurveyService {
 				} else
 					repository.save(clientMarketingResult);
 			}
-			updateMatchdays(clientId);
+			result += updateMatchdays(clientId);
 			return result.trim();
 		}
 
-		private void updateMatchdays(final BigInteger clientId) throws Exception {
+		private String updateMatchdays(final BigInteger clientId) throws Exception {
 			final JsonNode json = new ObjectMapper()
 					.readTree(Attachment.resolve(repository.one(Client.class, clientId).getStorage()));
+			String result = "";
 			if (json.has("survey")) {
 				for (int i2 = 0; i2 < json.get("survey").size(); i2++) {
 					final String label = "football-fixture-team=" + json.get("survey").get(i2).asInt() + "&season="
 							+ LocalDateTime.now().getYear();
 					final JsonNode matchDays = get(label);
-					final QueryParams params = new QueryParams(Query.misc_listStorage);
 					if (matchDays != null) {
+						final QueryParams params = new QueryParams(Query.misc_listStorage);
 						for (int i = 0; i < matchDays.size(); i++) {
 							if ("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())
 									&& Instant.ofEpochSecond(
@@ -462,12 +463,14 @@ public class SurveyService {
 											(BigInteger) list.get(0).get("storage.id")));
 									get(label);
 								}
+								result += "|" + json.get("survey").get(i2).asInt();
 								break;
 							}
 						}
 					}
 				}
 			}
+			return result.length() > 0 ? "matchdays update: " + result.substring(1) : result;
 		}
 
 		private String getOponent(final JsonNode poll) {
@@ -832,7 +835,7 @@ public class SurveyService {
 
 	protected JsonNode get(final String url) throws Exception {
 		final JsonNode fixture;
-		final String label = "football-fixture-" + url;
+		final String label = url;
 		final QueryParams params = new QueryParams(Query.misc_listStorage);
 		Result result = repository.list(params);
 		for (int i = 0; i < result.size(); i++) {

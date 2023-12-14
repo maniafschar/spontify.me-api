@@ -1,0 +1,3347 @@
+{
+	"get": "fixtures",
+	"parameters": {
+		"team": "786",
+		"season": "2023"
+	},
+	"errors": [],
+	"results": 49,
+	"paging": {
+		"current": 1,
+		"total": 1
+	},
+	"response": [
+		{
+			"fixture": {
+				"id": 987209,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2023-01-08T00:00:00+00:00",
+				"timestamp": 1673136000,
+				"periods": {
+					"first": 1673136000,
+					"second": 1673139600
+				},
+				"venue": {
+					"id": null,
+					"name": "Regnum Carya Golf & Spa Resort - Field 1",
+					"city": "Belek"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 667,
+				"name": "Friendlies Clubs",
+				"country": "World",
+				"logo": "https://media-4.api-sports.io/football/leagues/667.png",
+				"flag": null,
+				"season": 2023,
+				"round": "Club Friendlies 3"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				},
+				"away": {
+					"id": 745,
+					"name": "FC Kaiserslautern",
+					"logo": "https://media-4.api-sports.io/football/teams/745.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": 1,
+				"away": 1
+			},
+			"score": {
+				"halftime": {
+					"home": 0,
+					"away": 0
+				},
+				"fulltime": {
+					"home": 1,
+					"away": 1
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 991202,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2023-01-08T00:00:00+00:00",
+				"timestamp": 1673136000,
+				"periods": {
+					"first": 1673136000,
+					"second": 1673139600
+				},
+				"venue": {
+					"id": null,
+					"name": "Regnum Carya Golf & Spa Resort - Field 1",
+					"city": "Belek"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 667,
+				"name": "Friendlies Clubs",
+				"country": "World",
+				"logo": "https://media-4.api-sports.io/football/leagues/667.png",
+				"flag": null,
+				"season": 2023,
+				"round": "Club Friendlies 3"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": false
+				},
+				"away": {
+					"id": 2589,
+					"name": "Uta Arad",
+					"logo": "https://media-4.api-sports.io/football/teams/2589.png",
+					"winner": true
+				}
+			},
+			"goals": {
+				"home": 1,
+				"away": 2
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": 1,
+					"away": 2
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 994447,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2023-01-21T13:00:00+00:00",
+				"timestamp": 1674306000,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": null,
+					"name": null,
+					"city": null
+				},
+				"status": {
+					"long": "Match Cancelled",
+					"short": "CANC",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 667,
+				"name": "Friendlies Clubs",
+				"country": "World",
+				"logo": "https://media-4.api-sports.io/football/leagues/667.png",
+				"flag": null,
+				"season": 2023,
+				"round": "Club Friendlies 5"
+			},
+			"teams": {
+				"home": {
+					"id": 9335,
+					"name": "Türkgücü-Ataspor",
+					"logo": "https://media-4.api-sports.io/football/teams/9335.png",
+					"winner": null
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1036162,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2023-06-25T14:00:00+00:00",
+				"timestamp": 1687701600,
+				"periods": {
+					"first": 1687701600,
+					"second": 1687705200
+				},
+				"venue": {
+					"id": null,
+					"name": "Badria-Sportplatz",
+					"city": "Wasserburg am Inn"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 667,
+				"name": "Friendlies Clubs",
+				"country": "World",
+				"logo": "https://media-4.api-sports.io/football/leagues/667.png",
+				"flag": null,
+				"season": 2023,
+				"round": "Club Friendlies 3"
+			},
+			"teams": {
+				"home": {
+					"id": 12725,
+					"name": "1880 Wasserburg",
+					"logo": "https://media-4.api-sports.io/football/teams/12725.png",
+					"winner": null
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": 0,
+				"away": 0
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": 0,
+					"away": 0
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1036182,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2023-06-30T15:00:00+00:00",
+				"timestamp": 1688137200,
+				"periods": {
+					"first": 1688137200,
+					"second": 1688140800
+				},
+				"venue": {
+					"id": null,
+					"name": "Sportplatz Windischgarsten",
+					"city": "Windischgarsten"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 667,
+				"name": "Friendlies Clubs",
+				"country": "World",
+				"logo": "https://media-4.api-sports.io/football/leagues/667.png",
+				"flag": null,
+				"season": 2023,
+				"round": "Club Friendlies 3"
+			},
+			"teams": {
+				"home": {
+					"id": 1028,
+					"name": "Ried",
+					"logo": "https://media-4.api-sports.io/football/teams/1028.png",
+					"winner": true
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": false
+				}
+			},
+			"goals": {
+				"home": 3,
+				"away": 0
+			},
+			"score": {
+				"halftime": {
+					"home": 1,
+					"away": 0
+				},
+				"fulltime": {
+					"home": 3,
+					"away": 0
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1036273,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2023-07-09T13:00:00+00:00",
+				"timestamp": 1688907600,
+				"periods": {
+					"first": 1688907600,
+					"second": 1688911200
+				},
+				"venue": {
+					"id": 6439,
+					"name": "Memminger Arena",
+					"city": "Memmingen"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 667,
+				"name": "Friendlies Clubs",
+				"country": "World",
+				"logo": "https://media-4.api-sports.io/football/leagues/667.png",
+				"flag": null,
+				"season": 2023,
+				"round": "Club Friendlies 3"
+			},
+			"teams": {
+				"home": {
+					"id": 9331,
+					"name": "Memmingen",
+					"logo": "https://media-4.api-sports.io/football/teams/9331.png",
+					"winner": false
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": true
+				}
+			},
+			"goals": {
+				"home": 0,
+				"away": 4
+			},
+			"score": {
+				"halftime": {
+					"home": 0,
+					"away": 1
+				},
+				"fulltime": {
+					"home": 0,
+					"away": 4
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1047337,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2023-07-04T15:00:00+00:00",
+				"timestamp": 1688482800,
+				"periods": {
+					"first": 1688482800,
+					"second": 1688486400
+				},
+				"venue": {
+					"id": null,
+					"name": null,
+					"city": null
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 667,
+				"name": "Friendlies Clubs",
+				"country": "World",
+				"logo": "https://media-4.api-sports.io/football/leagues/667.png",
+				"flag": null,
+				"season": 2023,
+				"round": "Club Friendlies 5"
+			},
+			"teams": {
+				"home": {
+					"id": 1026,
+					"name": "Lask Linz",
+					"logo": "https://media-4.api-sports.io/football/teams/1026.png",
+					"winner": true
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": false
+				}
+			},
+			"goals": {
+				"home": 2,
+				"away": 0
+			},
+			"score": {
+				"halftime": {
+					"home": 1,
+					"away": 0
+				},
+				"fulltime": {
+					"home": 2,
+					"away": 0
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1057950,
+				"referee": "Tom Bauer, Germany",
+				"timezone": "UTC",
+				"date": "2023-08-05T12:00:00+00:00",
+				"timestamp": 1691236800,
+				"periods": {
+					"first": 1691236800,
+					"second": 1691240400
+				},
+				"venue": {
+					"id": 695,
+					"name": "Städtisches Stadion an der Grünwalder Straße",
+					"city": "München"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 1"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": true
+				},
+				"away": {
+					"id": 4268,
+					"name": "Waldhof Mannheim",
+					"logo": "https://media-4.api-sports.io/football/teams/4268.png",
+					"winner": false
+				}
+			},
+			"goals": {
+				"home": 2,
+				"away": 0
+			},
+			"score": {
+				"halftime": {
+					"home": 1,
+					"away": 0
+				},
+				"fulltime": {
+					"home": 2,
+					"away": 0
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1057961,
+				"referee": "Martin Petersen, Germany",
+				"timezone": "UTC",
+				"date": "2023-08-19T12:00:00+00:00",
+				"timestamp": 1692446400,
+				"periods": {
+					"first": 1692446400,
+					"second": 1692450000
+				},
+				"venue": {
+					"id": 730,
+					"name": "Schauinsland-Reisen-Arena",
+					"city": "Duisburg"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 2"
+			},
+			"teams": {
+				"home": {
+					"id": 187,
+					"name": "MSV Duisburg",
+					"logo": "https://media-4.api-sports.io/football/teams/187.png",
+					"winner": false
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": true
+				}
+			},
+			"goals": {
+				"home": 0,
+				"away": 3
+			},
+			"score": {
+				"halftime": {
+					"home": 0,
+					"away": 1
+				},
+				"fulltime": {
+					"home": 0,
+					"away": 3
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1057973,
+				"referee": "Alexander Sather, Germany",
+				"timezone": "UTC",
+				"date": "2023-08-22T17:00:00+00:00",
+				"timestamp": 1692723600,
+				"periods": {
+					"first": 1692723600,
+					"second": 1692727200
+				},
+				"venue": {
+					"id": 695,
+					"name": "Städtisches Stadion an der Grünwalder Straße",
+					"city": "München"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 3"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": false
+				},
+				"away": {
+					"id": 1625,
+					"name": "VfB Lubeck",
+					"logo": "https://media-4.api-sports.io/football/teams/1625.png",
+					"winner": true
+				}
+			},
+			"goals": {
+				"home": 1,
+				"away": 2
+			},
+			"score": {
+				"halftime": {
+					"home": 1,
+					"away": 2
+				},
+				"fulltime": {
+					"home": 1,
+					"away": 2
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1057978,
+				"referee": "Harm Osmers, Germany",
+				"timezone": "UTC",
+				"date": "2023-08-26T14:30:00+00:00",
+				"timestamp": 1693060200,
+				"periods": {
+					"first": 1693060200,
+					"second": 1693063800
+				},
+				"venue": {
+					"id": 20108,
+					"name": "GP Stadion am Hardtwald",
+					"city": "Sandhausen"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 4"
+			},
+			"teams": {
+				"home": {
+					"id": 189,
+					"name": "SV Sandhausen",
+					"logo": "https://media-4.api-sports.io/football/teams/189.png",
+					"winner": true
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": false
+				}
+			},
+			"goals": {
+				"home": 3,
+				"away": 0
+			},
+			"score": {
+				"halftime": {
+					"home": 2,
+					"away": 0
+				},
+				"fulltime": {
+					"home": 3,
+					"away": 0
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1057986,
+				"referee": "Eric-Dominic Weisbach, Germany",
+				"timezone": "UTC",
+				"date": "2023-09-02T14:30:00+00:00",
+				"timestamp": 1693665000,
+				"periods": {
+					"first": 1693665000,
+					"second": 1693668600
+				},
+				"venue": {
+					"id": 695,
+					"name": "Städtisches Stadion an der Grünwalder Straße",
+					"city": "München"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 5"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": false
+				},
+				"away": {
+					"id": 190,
+					"name": "Erzgebirge AUE",
+					"logo": "https://media-4.api-sports.io/football/teams/190.png",
+					"winner": true
+				}
+			},
+			"goals": {
+				"home": 1,
+				"away": 2
+			},
+			"score": {
+				"halftime": {
+					"home": 0,
+					"away": 0
+				},
+				"fulltime": {
+					"home": 1,
+					"away": 2
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1057998,
+				"referee": "Florian Exner, Germany",
+				"timezone": "UTC",
+				"date": "2023-09-16T14:30:00+00:00",
+				"timestamp": 1694874600,
+				"periods": {
+					"first": 1694874600,
+					"second": 1694878200
+				},
+				"venue": {
+					"id": 726,
+					"name": "Audi-Sportpark",
+					"city": "Ingolstadt"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 6"
+			},
+			"teams": {
+				"home": {
+					"id": 184,
+					"name": "FC Ingolstadt 04",
+					"logo": "https://media-4.api-sports.io/football/teams/184.png",
+					"winner": true
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": false
+				}
+			},
+			"goals": {
+				"home": 2,
+				"away": 1
+			},
+			"score": {
+				"halftime": {
+					"home": 0,
+					"away": 1
+				},
+				"fulltime": {
+					"home": 2,
+					"away": 1
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058006,
+				"referee": "Martin Speckner, Germany",
+				"timezone": "UTC",
+				"date": "2023-09-23T14:30:00+00:00",
+				"timestamp": 1695479400,
+				"periods": {
+					"first": 1695479400,
+					"second": 1695483000
+				},
+				"venue": {
+					"id": 12457,
+					"name": "Leuna Chemie Stadion",
+					"city": "Saale"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 7"
+			},
+			"teams": {
+				"home": {
+					"id": 1316,
+					"name": "Hallescher FC",
+					"logo": "https://media-4.api-sports.io/football/teams/1316.png",
+					"winner": false
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": true
+				}
+			},
+			"goals": {
+				"home": 0,
+				"away": 2
+			},
+			"score": {
+				"halftime": {
+					"home": 0,
+					"away": 1
+				},
+				"fulltime": {
+					"home": 0,
+					"away": 2
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058021,
+				"referee": "Jarno Wienefeld, Germany",
+				"timezone": "UTC",
+				"date": "2023-09-30T12:00:00+00:00",
+				"timestamp": 1696075200,
+				"periods": {
+					"first": 1696075200,
+					"second": 1696078800
+				},
+				"venue": {
+					"id": 695,
+					"name": "Städtisches Stadion an der Grünwalder Straße",
+					"city": "München"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 8"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": true
+				},
+				"away": {
+					"id": 4265,
+					"name": "Verl",
+					"logo": "https://media-4.api-sports.io/football/teams/4265.png",
+					"winner": false
+				}
+			},
+			"goals": {
+				"home": 1,
+				"away": 0
+			},
+			"score": {
+				"halftime": {
+					"home": 1,
+					"away": 0
+				},
+				"fulltime": {
+					"home": 1,
+					"away": 0
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058035,
+				"referee": "Lars Erbst, Germany",
+				"timezone": "UTC",
+				"date": "2023-10-03T17:00:00+00:00",
+				"timestamp": 1696352400,
+				"periods": {
+					"first": 1696352400,
+					"second": 1696356000
+				},
+				"venue": {
+					"id": 747,
+					"name": "Donaustadion",
+					"city": "Ulm"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 9"
+			},
+			"teams": {
+				"home": {
+					"id": 1652,
+					"name": "SSV ULM 1846",
+					"logo": "https://media-4.api-sports.io/football/teams/1652.png",
+					"winner": true
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": false
+				}
+			},
+			"goals": {
+				"home": 1,
+				"away": 0
+			},
+			"score": {
+				"halftime": {
+					"home": 1,
+					"away": 0
+				},
+				"fulltime": {
+					"home": 1,
+					"away": 0
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058039,
+				"referee": "Robert Hartmann, Germany",
+				"timezone": "UTC",
+				"date": "2023-10-07T12:00:00+00:00",
+				"timestamp": 1696680000,
+				"periods": {
+					"first": 1696680000,
+					"second": 1696683600
+				},
+				"venue": {
+					"id": 695,
+					"name": "Städtisches Stadion an der Grünwalder Straße",
+					"city": "München"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 10"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				},
+				"away": {
+					"id": 183,
+					"name": "Dynamo Dresden",
+					"logo": "https://media-4.api-sports.io/football/teams/183.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": 0,
+				"away": 0
+			},
+			"score": {
+				"halftime": {
+					"home": 0,
+					"away": 0
+				},
+				"fulltime": {
+					"home": 0,
+					"away": 0
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058052,
+				"referee": "Robin Braun, Germany",
+				"timezone": "UTC",
+				"date": "2023-10-15T14:30:00+00:00",
+				"timestamp": 1697380200,
+				"periods": {
+					"first": 1697380200,
+					"second": 1697383800
+				},
+				"venue": {
+					"id": 737,
+					"name": "Preußen-Stadion",
+					"city": "Münster"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 11"
+			},
+			"teams": {
+				"home": {
+					"id": 1313,
+					"name": "Preussen Munster",
+					"logo": "https://media-4.api-sports.io/football/teams/1313.png",
+					"winner": null
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": 1,
+				"away": 1
+			},
+			"score": {
+				"halftime": {
+					"home": 0,
+					"away": 0
+				},
+				"fulltime": {
+					"home": 1,
+					"away": 1
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058063,
+				"referee": "Fabienne Michel, Germany",
+				"timezone": "UTC",
+				"date": "2023-10-21T12:00:00+00:00",
+				"timestamp": 1697889600,
+				"periods": {
+					"first": 1697889600,
+					"second": 1697893200
+				},
+				"venue": {
+					"id": 695,
+					"name": "Städtisches Stadion an der Grünwalder Straße",
+					"city": "München"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 12"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": true
+				},
+				"away": {
+					"id": 9363,
+					"name": "Freiburg II",
+					"logo": "https://media-4.api-sports.io/football/teams/9363.png",
+					"winner": false
+				}
+			},
+			"goals": {
+				"home": 2,
+				"away": 0
+			},
+			"score": {
+				"halftime": {
+					"home": 1,
+					"away": 0
+				},
+				"fulltime": {
+					"home": 2,
+					"away": 0
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058068,
+				"referee": "Timon Oliver Schulz, Germany",
+				"timezone": "UTC",
+				"date": "2023-10-28T12:00:00+00:00",
+				"timestamp": 1698494400,
+				"periods": {
+					"first": 1698494400,
+					"second": 1698498000
+				},
+				"venue": {
+					"id": 1727,
+					"name": "Sportpark Höhenberg",
+					"city": "Köln"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 13"
+			},
+			"teams": {
+				"home": {
+					"id": 1620,
+					"name": "FC Viktoria Koln",
+					"logo": "https://media-4.api-sports.io/football/teams/1620.png",
+					"winner": true
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": false
+				}
+			},
+			"goals": {
+				"home": 2,
+				"away": 1
+			},
+			"score": {
+				"halftime": {
+					"home": 1,
+					"away": 1
+				},
+				"fulltime": {
+					"home": 2,
+					"away": 1
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058081,
+				"referee": "Nicolas Winter, Germany",
+				"timezone": "UTC",
+				"date": "2023-11-04T13:00:00+00:00",
+				"timestamp": 1699102800,
+				"periods": {
+					"first": 1699102800,
+					"second": 1699106400
+				},
+				"venue": {
+					"id": 695,
+					"name": "Städtisches Stadion an der Grünwalder Straße",
+					"city": "München"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 14"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": false
+				},
+				"away": {
+					"id": 177,
+					"name": "Jahn Regensburg",
+					"logo": "https://media-4.api-sports.io/football/teams/177.png",
+					"winner": true
+				}
+			},
+			"goals": {
+				"home": 0,
+				"away": 1
+			},
+			"score": {
+				"halftime": {
+					"home": 0,
+					"away": 0
+				},
+				"fulltime": {
+					"home": 0,
+					"away": 1
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058087,
+				"referee": "Manuel Bergmann, Germany",
+				"timezone": "UTC",
+				"date": "2023-11-11T13:00:00+00:00",
+				"timestamp": 1699707600,
+				"periods": {
+					"first": 1699707600,
+					"second": 1699711200
+				},
+				"venue": {
+					"id": 11930,
+					"name": "Stadion Ludwigspark",
+					"city": "Saarbrücken"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 15"
+			},
+			"teams": {
+				"home": {
+					"id": 1639,
+					"name": "FC Saarbrücken",
+					"logo": "https://media-4.api-sports.io/football/teams/1639.png",
+					"winner": false
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": true
+				}
+			},
+			"goals": {
+				"home": 2,
+				"away": 3
+			},
+			"score": {
+				"halftime": {
+					"home": 2,
+					"away": 2
+				},
+				"fulltime": {
+					"home": 2,
+					"away": 3
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058099,
+				"referee": "Timo Gansloweit, Germany",
+				"timezone": "UTC",
+				"date": "2023-11-25T13:00:00+00:00",
+				"timestamp": 1700917200,
+				"periods": {
+					"first": 1700917200,
+					"second": 1700920800
+				},
+				"venue": {
+					"id": 695,
+					"name": "Städtisches Stadion an der Grünwalder Straße",
+					"city": "München"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 16"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": false
+				},
+				"away": {
+					"id": 1314,
+					"name": "SpVgg Unterhaching",
+					"logo": "https://media-4.api-sports.io/football/teams/1314.png",
+					"winner": true
+				}
+			},
+			"goals": {
+				"home": 0,
+				"away": 1
+			},
+			"score": {
+				"halftime": {
+					"home": 0,
+					"away": 1
+				},
+				"fulltime": {
+					"home": 0,
+					"away": 1
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058109,
+				"referee": "Daniel Bartnitzki, Germany",
+				"timezone": "UTC",
+				"date": "2023-12-03T18:30:00+00:00",
+				"timestamp": 1701628200,
+				"periods": {
+					"first": 1701628200,
+					"second": 1701631800
+				},
+				"venue": {
+					"id": 6472,
+					"name": "Stadion Rote Erde",
+					"city": "Dortmund"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 17"
+			},
+			"teams": {
+				"home": {
+					"id": 9367,
+					"name": "Borussia Dortmund II",
+					"logo": "https://media-4.api-sports.io/football/teams/9367.png",
+					"winner": true
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": false
+				}
+			},
+			"goals": {
+				"home": 3,
+				"away": 0
+			},
+			"score": {
+				"halftime": {
+					"home": 0,
+					"away": 0
+				},
+				"fulltime": {
+					"home": 3,
+					"away": 0
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058117,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2023-12-09T13:00:00+00:00",
+				"timestamp": 1702126800,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 695,
+					"name": "Städtisches Stadion an der Grünwalder Straße",
+					"city": "München"
+				},
+				"status": {
+					"long": "Match Postponed",
+					"short": "PST",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 18"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				},
+				"away": {
+					"id": 1621,
+					"name": "Rot-weiss Essen",
+					"logo": "https://media-4.api-sports.io/football/teams/1621.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058129,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2023-12-17T15:30:00+00:00",
+				"timestamp": 1702827000,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 697,
+					"name": "SchücoArena",
+					"city": "Bielefeld"
+				},
+				"status": {
+					"long": "Not Started",
+					"short": "NS",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 19"
+			},
+			"teams": {
+				"home": {
+					"id": 188,
+					"name": "Arminia Bielefeld",
+					"logo": "https://media-4.api-sports.io/football/teams/188.png",
+					"winner": null
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058137,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2023-12-20T18:00:00+00:00",
+				"timestamp": 1703095200,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 3263,
+					"name": "Carl-Benz-Stadion",
+					"city": "Mannheim"
+				},
+				"status": {
+					"long": "Not Started",
+					"short": "NS",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 20"
+			},
+			"teams": {
+				"home": {
+					"id": 4268,
+					"name": "Waldhof Mannheim",
+					"logo": "https://media-4.api-sports.io/football/teams/4268.png",
+					"winner": null
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058155,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2024-01-20T15:30:00+00:00",
+				"timestamp": 1705764600,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 695,
+					"name": "Städtisches Stadion an der Grünwalder Straße",
+					"city": "München"
+				},
+				"status": {
+					"long": "Not Started",
+					"short": "NS",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 21"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				},
+				"away": {
+					"id": 187,
+					"name": "MSV Duisburg",
+					"logo": "https://media-4.api-sports.io/football/teams/187.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058164,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2024-01-24T18:00:00+00:00",
+				"timestamp": 1706119200,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 10508,
+					"name": "Dietmar-Scholze-Stadion an der Lohmühle",
+					"city": "Lübeck"
+				},
+				"status": {
+					"long": "Not Started",
+					"short": "NS",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 22"
+			},
+			"teams": {
+				"home": {
+					"id": 1625,
+					"name": "VfB Lubeck",
+					"logo": "https://media-4.api-sports.io/football/teams/1625.png",
+					"winner": null
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058167,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2024-01-27T13:00:00+00:00",
+				"timestamp": 1706360400,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 695,
+					"name": "Städtisches Stadion an der Grünwalder Straße",
+					"city": "München"
+				},
+				"status": {
+					"long": "Not Started",
+					"short": "NS",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 23"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				},
+				"away": {
+					"id": 189,
+					"name": "SV Sandhausen",
+					"logo": "https://media-4.api-sports.io/football/teams/189.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058182,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2024-02-03T13:00:00+00:00",
+				"timestamp": 1706965200,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 712,
+					"name": "Erzgebirgsstadion",
+					"city": "Aue"
+				},
+				"status": {
+					"long": "Not Started",
+					"short": "NS",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 24"
+			},
+			"teams": {
+				"home": {
+					"id": 190,
+					"name": "Erzgebirge AUE",
+					"logo": "https://media-4.api-sports.io/football/teams/190.png",
+					"winner": null
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058192,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2024-02-10T13:00:00+00:00",
+				"timestamp": 1707570000,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 695,
+					"name": "Städtisches Stadion an der Grünwalder Straße",
+					"city": "München"
+				},
+				"status": {
+					"long": "Not Started",
+					"short": "NS",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 25"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				},
+				"away": {
+					"id": 184,
+					"name": "FC Ingolstadt 04",
+					"logo": "https://media-4.api-sports.io/football/teams/184.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058203,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2024-02-17T13:00:00+00:00",
+				"timestamp": 1708174800,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 695,
+					"name": "Städtisches Stadion an der Grünwalder Straße",
+					"city": "München"
+				},
+				"status": {
+					"long": "Not Started",
+					"short": "NS",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 26"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				},
+				"away": {
+					"id": 1316,
+					"name": "Hallescher FC",
+					"logo": "https://media-4.api-sports.io/football/teams/1316.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058210,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2024-02-24T13:00:00+00:00",
+				"timestamp": 1708779600,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 18622,
+					"name": "Home Deluxe Arena",
+					"city": "Paderborn"
+				},
+				"status": {
+					"long": "Not Started",
+					"short": "NS",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 27"
+			},
+			"teams": {
+				"home": {
+					"id": 4265,
+					"name": "Verl",
+					"logo": "https://media-4.api-sports.io/football/teams/4265.png",
+					"winner": null
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058218,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2024-03-02T13:00:00+00:00",
+				"timestamp": 1709384400,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 695,
+					"name": "Städtisches Stadion an der Grünwalder Straße",
+					"city": "München"
+				},
+				"status": {
+					"long": "Not Started",
+					"short": "NS",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 28"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				},
+				"away": {
+					"id": 1652,
+					"name": "SSV ULM 1846",
+					"logo": "https://media-4.api-sports.io/football/teams/1652.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058231,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2024-03-09T13:00:00+00:00",
+				"timestamp": 1709989200,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 707,
+					"name": "Rudolf-Harbig-Stadion",
+					"city": "Dresden"
+				},
+				"status": {
+					"long": "Not Started",
+					"short": "NS",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 29"
+			},
+			"teams": {
+				"home": {
+					"id": 183,
+					"name": "Dynamo Dresden",
+					"logo": "https://media-4.api-sports.io/football/teams/183.png",
+					"winner": null
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058242,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2024-03-16T13:00:00+00:00",
+				"timestamp": 1710594000,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 695,
+					"name": "Städtisches Stadion an der Grünwalder Straße",
+					"city": "München"
+				},
+				"status": {
+					"long": "Not Started",
+					"short": "NS",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 30"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				},
+				"away": {
+					"id": 1313,
+					"name": "Preussen Munster",
+					"logo": "https://media-4.api-sports.io/football/teams/1313.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058251,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2024-03-30T12:00:00+00:00",
+				"timestamp": 1711800000,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 6468,
+					"name": "Möslestadion",
+					"city": "Freiburg im Breisgau"
+				},
+				"status": {
+					"long": "Not Started",
+					"short": "NS",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 31"
+			},
+			"teams": {
+				"home": {
+					"id": 9363,
+					"name": "Freiburg II",
+					"logo": "https://media-4.api-sports.io/football/teams/9363.png",
+					"winner": null
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058263,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2024-04-07T11:30:00+00:00",
+				"timestamp": 1712489400,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 695,
+					"name": "Städtisches Stadion an der Grünwalder Straße",
+					"city": "München"
+				},
+				"status": {
+					"long": "Not Started",
+					"short": "NS",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 32"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				},
+				"away": {
+					"id": 1620,
+					"name": "FC Viktoria Koln",
+					"logo": "https://media-4.api-sports.io/football/teams/1620.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058267,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2024-04-13T12:00:00+00:00",
+				"timestamp": 1713009600,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 10490,
+					"name": "Jahnstadion Regensburg",
+					"city": "Regensburg"
+				},
+				"status": {
+					"long": "Not Started",
+					"short": "NS",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 33"
+			},
+			"teams": {
+				"home": {
+					"id": 177,
+					"name": "Jahn Regensburg",
+					"logo": "https://media-4.api-sports.io/football/teams/177.png",
+					"winner": null
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058279,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2024-04-20T12:00:00+00:00",
+				"timestamp": 1713614400,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 695,
+					"name": "Städtisches Stadion an der Grünwalder Straße",
+					"city": "München"
+				},
+				"status": {
+					"long": "Not Started",
+					"short": "NS",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 34"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				},
+				"away": {
+					"id": 1639,
+					"name": "FC Saarbrücken",
+					"logo": "https://media-4.api-sports.io/football/teams/1639.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058291,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2024-04-28T11:30:00+00:00",
+				"timestamp": 1714303800,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 749,
+					"name": "Alpenbauer Sportpark",
+					"city": "Unterhaching"
+				},
+				"status": {
+					"long": "Not Started",
+					"short": "NS",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 35"
+			},
+			"teams": {
+				"home": {
+					"id": 1314,
+					"name": "SpVgg Unterhaching",
+					"logo": "https://media-4.api-sports.io/football/teams/1314.png",
+					"winner": null
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058303,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2024-05-04T12:00:00+00:00",
+				"timestamp": 1714824000,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 695,
+					"name": "Städtisches Stadion an der Grünwalder Straße",
+					"city": "München"
+				},
+				"status": {
+					"long": "Not Started",
+					"short": "NS",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 36"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				},
+				"away": {
+					"id": 9367,
+					"name": "Borussia Dortmund II",
+					"logo": "https://media-4.api-sports.io/football/teams/9367.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058307,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2024-05-11T12:00:00+00:00",
+				"timestamp": 1715428800,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 19943,
+					"name": "Stadion an der Hafenstraße",
+					"city": "Essen"
+				},
+				"status": {
+					"long": "Not Started",
+					"short": "NS",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 37"
+			},
+			"teams": {
+				"home": {
+					"id": 1621,
+					"name": "Rot-weiss Essen",
+					"logo": "https://media-4.api-sports.io/football/teams/1621.png",
+					"winner": null
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1058316,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2024-05-18T12:00:00+00:00",
+				"timestamp": 1716033600,
+				"periods": {
+					"first": null,
+					"second": null
+				},
+				"venue": {
+					"id": 695,
+					"name": "Städtisches Stadion an der Grünwalder Straße",
+					"city": "München"
+				},
+				"status": {
+					"long": "Not Started",
+					"short": "NS",
+					"elapsed": null
+				}
+			},
+			"league": {
+				"id": 80,
+				"name": "3. Liga",
+				"country": "Germany",
+				"logo": "https://media-4.api-sports.io/football/leagues/80.png",
+				"flag": "https://media-4.api-sports.io/flags/de.svg",
+				"season": 2023,
+				"round": "Regular Season - 38"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": null
+				},
+				"away": {
+					"id": 188,
+					"name": "Arminia Bielefeld",
+					"logo": "https://media-4.api-sports.io/football/teams/188.png",
+					"winner": null
+				}
+			},
+			"goals": {
+				"home": null,
+				"away": null
+			},
+			"score": {
+				"halftime": {
+					"home": null,
+					"away": null
+				},
+				"fulltime": {
+					"home": null,
+					"away": null
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1072704,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2023-07-22T14:45:00+00:00",
+				"timestamp": 1690037100,
+				"periods": {
+					"first": 1690037100,
+					"second": 1690040700
+				},
+				"venue": {
+					"id": null,
+					"name": null,
+					"city": null
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 667,
+				"name": "Friendlies Clubs",
+				"country": "World",
+				"logo": "https://media-4.api-sports.io/football/leagues/667.png",
+				"flag": null,
+				"season": 2023,
+				"round": "Club Friendlies 5"
+			},
+			"teams": {
+				"home": {
+					"id": 171,
+					"name": "FC Nurnberg",
+					"logo": "https://media-4.api-sports.io/football/teams/171.png",
+					"winner": true
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": false
+				}
+			},
+			"goals": {
+				"home": 3,
+				"away": 0
+			},
+			"score": {
+				"halftime": {
+					"home": 2,
+					"away": 0
+				},
+				"fulltime": {
+					"home": 3,
+					"away": 0
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1072708,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2023-07-22T16:00:00+00:00",
+				"timestamp": 1690041600,
+				"periods": {
+					"first": 1690041600,
+					"second": 1690045200
+				},
+				"venue": {
+					"id": null,
+					"name": null,
+					"city": null
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 667,
+				"name": "Friendlies Clubs",
+				"country": "World",
+				"logo": "https://media-4.api-sports.io/football/leagues/667.png",
+				"flag": null,
+				"season": 2023,
+				"round": "Club Friendlies 5"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": false
+				},
+				"away": {
+					"id": 1314,
+					"name": "SpVgg Unterhaching",
+					"logo": "https://media-4.api-sports.io/football/teams/1314.png",
+					"winner": true
+				}
+			},
+			"goals": {
+				"home": 0,
+				"away": 1
+			},
+			"score": {
+				"halftime": {
+					"home": 0,
+					"away": 0
+				},
+				"fulltime": {
+					"home": 0,
+					"away": 1
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1097210,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2023-07-29T15:30:00+00:00",
+				"timestamp": 1690644600,
+				"periods": {
+					"first": 1690644600,
+					"second": 1690648200
+				},
+				"venue": {
+					"id": 6437,
+					"name": "Sportpark Heimstetten",
+					"city": "Kirchheim bei München"
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 667,
+				"name": "Friendlies Clubs",
+				"country": "World",
+				"logo": "https://media-4.api-sports.io/football/leagues/667.png",
+				"flag": null,
+				"season": 2023,
+				"round": "Club Friendlies 5"
+			},
+			"teams": {
+				"home": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": false
+				},
+				"away": {
+					"id": 172,
+					"name": "VfB Stuttgart",
+					"logo": "https://media-4.api-sports.io/football/teams/172.png",
+					"winner": true
+				}
+			},
+			"goals": {
+				"home": 0,
+				"away": 2
+			},
+			"score": {
+				"halftime": {
+					"home": 0,
+					"away": 2
+				},
+				"fulltime": {
+					"home": 0,
+					"away": 2
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		},
+		{
+			"fixture": {
+				"id": 1097326,
+				"referee": null,
+				"timezone": "UTC",
+				"date": "2023-07-29T13:00:00+00:00",
+				"timestamp": 1690635600,
+				"periods": {
+					"first": 1690635600,
+					"second": 1690639200
+				},
+				"venue": {
+					"id": null,
+					"name": null,
+					"city": null
+				},
+				"status": {
+					"long": "Match Finished",
+					"short": "FT",
+					"elapsed": 90
+				}
+			},
+			"league": {
+				"id": 667,
+				"name": "Friendlies Clubs",
+				"country": "World",
+				"logo": "https://media-4.api-sports.io/football/leagues/667.png",
+				"flag": null,
+				"season": 2023,
+				"round": "Club Friendlies 5"
+			},
+			"teams": {
+				"home": {
+					"id": 163,
+					"name": "Borussia Monchengladbach",
+					"logo": "https://media-4.api-sports.io/football/teams/163.png",
+					"winner": true
+				},
+				"away": {
+					"id": 786,
+					"name": "TSV 1860 Munich",
+					"logo": "https://media-4.api-sports.io/football/teams/786.png",
+					"winner": false
+				}
+			},
+			"goals": {
+				"home": 2,
+				"away": 1
+			},
+			"score": {
+				"halftime": {
+					"home": 1,
+					"away": 1
+				},
+				"fulltime": {
+					"home": 2,
+					"away": 1
+				},
+				"extratime": {
+					"home": null,
+					"away": null
+				},
+				"penalty": {
+					"home": null,
+					"away": null
+				}
+			}
+		}
+	]
+}
