@@ -32,7 +32,7 @@ public class Android {
 	@Value("${push.fcm.url}")
 	private String url;
 
-	private static String template;
+	private static final String template;
 
 	static {
 		try (final InputStream in = getClass().getResourceAsStream("/template/push.android")) {
