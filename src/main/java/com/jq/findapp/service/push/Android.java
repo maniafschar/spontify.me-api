@@ -1,7 +1,7 @@
 package com.jq.findapp.service.push;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,9 +35,9 @@ public class Android {
 	private static final String template;
 
 	static {
-		try (final InputStream in = getClass().getResourceAsStream("/template/push.android")) {
+		try (final InputStream in = Android.class.getResourceAsStream("/template/push.android")) {
 			template = IOUtils.toString(in, StandardCharsets.UTF_8);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
 	}

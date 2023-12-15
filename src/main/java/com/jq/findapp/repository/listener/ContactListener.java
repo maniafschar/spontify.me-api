@@ -17,6 +17,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.service.AuthenticationService;
+import com.jq.findapp.util.Strings;
 
 @Component
 public class ContactListener extends AbstractRepositoryListener<Contact> {
@@ -37,18 +38,18 @@ public class ContactListener extends AbstractRepositoryListener<Contact> {
 			contact.setAuthenticate(Boolean.FALSE);
 		if (contact.old("visitPage") != null)
 			contact.setVisitPage(new Timestamp(Instant.now().toEpochMilli()));
-		if (contact.old("pushToken") != null)
+		if (!Strings.isEmpty(contact.old("pushToken")))
 			repository.executeUpdate(
 					"update Contact contact set contact.pushToken=null, contact.pushSystem=null where contact.pushToken='"
 							+ contact.old("pushToken") + "' and contact.id<>" + contact.getId());
-		if (contact.old("fbToken") != null)
+		if (!Strings.isEmpty(contact.old("fbToken") != null))
 			repository.executeUpdate(
 					"update Contact contact set contact.fbToken=null where contact.fbToken='"
 							+ contact.old("fbToken")
 							+ "' and contact.id<>" + contact.getId());
-		if (contact.old("pseudonym") != null)
+		if (!Strings.isEmpty(contact.old("pseudonym")))
 			contact.setPseudonym(sanitizePseudonym(contact.getPseudonym()));
-		if (contact.old("password") != null)
+		if (!Strings.isEmpty(contact.old("password")))
 			contact.setLoginLink(null);
 		if (contact.getBirthday() == null)
 			contact.setAge(null);

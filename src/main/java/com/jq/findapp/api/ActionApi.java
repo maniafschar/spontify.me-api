@@ -185,7 +185,8 @@ public class ActionApi {
 	public Map<String, Object> one(final QueryParams params, @RequestHeader final BigInteger clientId,
 			@RequestHeader(required = false) final BigInteger user) throws Exception {
 		if (user == null) {
-			if (params.getQuery() != Query.contact_listTeaser && params.getQuery() != Query.event_listTeaser)
+			if (params.getQuery() != Query.location_list && params.getQuery() != Query.contact_listTeaser
+					&& params.getQuery() != Query.event_listTeaser)
 				throw new RuntimeException("unauthenticated request");
 			final Contact contact = new Contact();
 			contact.setClientId(clientId);
@@ -745,7 +746,7 @@ public class ActionApi {
 		if (!Strings.isEmpty(title)) {
 			title = Strings.sanitize(title.replace('\n', ' ').replace('\t', ' ').replace('\r', ' ').replace('"', '\''));
 			s = s.replaceFirst("<meta property=\"description\" content=\"([^\"].*)\"",
-					"<meta property=\"og:description\" content=\"" + title + '"');
+					"<meta property=\"description\" content=\"" + title + '"');
 			s = s.replaceFirst("<title></title>", "<title>" +
 					(client.getName() + " · " + (title.length() > 200 ? title.substring(0, 200) : title)) + "</title>");
 		}

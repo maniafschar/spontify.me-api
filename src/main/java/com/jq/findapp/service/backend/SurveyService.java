@@ -547,7 +547,7 @@ public class SurveyService {
 							colorText);
 				else if ("Prediction".equals(poll.get("type").asText()))
 					prediction(g2, customFont, poll, colorText);
-				// final BufferedImageTranscoder imageTranscoder = new
+				// TODO final BufferedImageTranscoder imageTranscoder = new
 				// BufferedImageTranscoder();
 				// imageTranscoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, width);
 				// imageTranscoder.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, height);

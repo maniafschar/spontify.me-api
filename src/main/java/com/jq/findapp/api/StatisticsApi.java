@@ -48,7 +48,7 @@ public class StatisticsApi {
 			final QueryParams params = new QueryParams(Query.contact_statisticsGeoLocation);
 			params.setSearch("contact.longitude is not null and contact.id<>"
 					+ repository.one(Client.class, contact.getClientId()).getAdminId());
-			// + " and contactGeoLocationHistory.manual=false and contact.clientId=" +
+			// TODO + " and contactGeoLocationHistory.manual=false and contact.clientId=" +
 			// contact.getClientId());
 			final Result result = repository.list(params);
 			final List<Object[]> latLng = new ArrayList<>();

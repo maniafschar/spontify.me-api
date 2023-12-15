@@ -48,8 +48,7 @@ public class Video {
 		js = (JavascriptExecutor) Util.driver;
 		Util.driver.manage().window().setSize(new Dimension(width, height + 200));
 		Util.driver.manage().window().setPosition(new Point(100, 0));
-		// Util.driver.get("https://after-work.events/");
-		Util.driver.get("https://demo.fan-club.online/");
+		Util.driver.get("https://after-work.events/");
 	}
 
 	@AfterAll

@@ -266,9 +266,10 @@ public class NotificationService {
 				notification.setType(ContactNotificationType.valueOf(contactTo.getPushSystem()));
 			return true;
 		} catch (NotFound | NotFoundException ex) {
-			contactTo.setPushSystem(null);
-			contactTo.setPushToken(null);
-			repository.save(contactTo);
+			createTicket(TicketType.ERROR, "Push Notification", Strings.stackTraceToString(ex), null);
+			// TODO contactTo.setPushSystem(null);
+			// contactTo.setPushToken(null);
+			// repository.save(contactTo);
 			return false;
 		} catch (final Exception ex) {
 			final QueryParams params = new QueryParams(Query.misc_setting);
