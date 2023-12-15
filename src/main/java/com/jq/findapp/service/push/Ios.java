@@ -50,7 +50,7 @@ public class Ios {
 	@Value("${push.apns.url.test}")
 	private String urlTest;
 
-	private static String template;
+	private static final String template;
 
 	static {
 		try (final InputStream in = getClass().getResourceAsStream("/template/push.ios")) {
