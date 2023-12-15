@@ -1,6 +1,7 @@
 package com.jq.findapp.service.push;
 
 import java.io.InputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -49,6 +50,16 @@ public class Ios {
 	@Value("${push.apns.url.test}")
 	private String urlTest;
 
+	private static String template;
+
+	static {
+		try (final InputStream in = getClass().getResourceAsStream("/template/push.ios")) {
+			template = IOUtils.toString(in, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public Environment send(final String from, final Contact contactTo, final String text, final String action,
 			final int badge, final String notificationId) throws Exception {
 		try {
@@ -68,30 +79,27 @@ public class Ios {
 
 	private void send(final String from, final Contact contactTo, final String url, final String text,
 			final String action, final int badge, final String notificationId) throws Exception {
-		try (final InputStream in = getClass().getResourceAsStream("/template/push.ios")) {
-			final HttpRequest request = HttpRequest.newBuilder()
-					.POST(BodyPublishers.ofString(
-							IOUtils.toString(in, StandardCharsets.UTF_8)
-									.replace("{text}", text)
-									.replace("{from}", from)
-									.replace("{badge}", "" + badge)
-									.replace("{notificationId}", notificationId)
-									.replace("{exec}", Strings.isEmpty(action) ? "" : action)))
-					.header("apns-push-type", "alert")
-					.header("apns-topic",
-							BigInteger.ONE.equals(contactTo.getClientId()) ? topic
-									: "com.jq.fanclub.client" + contactTo.getClientId())
-					.header("authorization", "bearer " + jwtGenerator.generateToken(getHeader(), getClaims(), "EC"))
-					.header("Content-Type", "application/json")
-					.uri(new URI(url + contactTo.getPushToken()))
-					.build();
-			final HttpClient client = HttpClient.newBuilder().version(Version.HTTP_2).build();
-			final HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
-			if (response.statusCode() >= 300 || response.statusCode() < 200)
-				throw new NotFoundException(
-						"Failed to push to " + contactTo.getId() + ": " + text + "\n" + response.statusCode() + " "
-								+ response.body());
-		}
+		final HttpRequest request = HttpRequest.newBuilder()
+				.POST(BodyPublishers.ofString(
+						template.replace("{text}", text)
+								.replace("{from}", from)
+								.replace("{badge}", "" + badge)
+								.replace("{notificationId}", notificationId)
+								.replace("{exec}", Strings.isEmpty(action) ? "" : action)))
+				.header("apns-push-type", "alert")
+				.header("apns-topic",
+						BigInteger.ONE.equals(contactTo.getClientId()) ? topic
+								: "com.jq.fanclub.client" + contactTo.getClientId())
+				.header("authorization", "bearer " + jwtGenerator.generateToken(getHeader(), getClaims(), "EC"))
+				.header("Content-Type", "application/json")
+				.uri(new URI(url + contactTo.getPushToken()))
+				.build();
+		final HttpClient client = HttpClient.newBuilder().version(Version.HTTP_2).build();
+		final HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+		if (response.statusCode() >= 300 || response.statusCode() < 200)
+			throw new NotFoundException(
+					"Failed to push to " + contactTo.getId() + ": " + text + "\n" + response.statusCode() + " "
+							+ response.body());
 	}
 
 	private Map<String, String> getHeader() {
