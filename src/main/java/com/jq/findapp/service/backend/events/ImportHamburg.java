@@ -7,12 +7,12 @@ https://www.stuttgart.de/service/veranstaltungen.php
 https://veranstaltungen.freiburg.de/events/
 https://www.leipzig.de/freizeit-kultur-und-tourismus/veranstaltungen-und-termine
 
-https://feed.rundschau-online.de/feed/rss/region/index.rss Köln
-https://www.rbb24.de/aktuell/index.xml/feed=rss.xml Berlin
-http://www.ndr.de/home/index-rss.xml
-https://www.hessenschau.de/rheinmain/index.rss
+https://feed.rundschau-online.de/feed/rss/region/index.rss Köln lat 50.9413 lon 6.9583
+https://www.rbb24.de/aktuell/index.xml/feed=rss.xml Berlin lat 52.531677 lon 13.381777
+http://www.ndr.de/home/index-rss.xml Hamburg lat 53.55073 and lon 9.99302
+https://www.hessenschau.de/rheinmain/index.rss Frankfurt lat 50.110573 lon 8.684966
 https://rss.sueddeutsche.de/rss/Muenchen
-https://www.leipzig.de/newsfeed/rss.xml
+https://www.leipzig.de/newsfeed/rss.xml Leipzig lat 51.340199 lon 12.360103
 
 <item>
   <guid isPermaLink="false">news-48431</guid>
