@@ -152,16 +152,18 @@ public class RssService {
 									clientNews.setImage(EntityUtil.getImage(s, EntityUtil.IMAGE_SIZE, 200));
 								}
 							}
-							if (clientNews.getId() == null)
-								count++;
-							final boolean b = json.get("publish").asBoolean() && clientNews.getId() == null;
-							repository.save(clientNews);
-							if (first.getTime() > clientNews.getPublish().getTime())
-								first = clientNews.getPublish();
-							urls.add(clientNews.getUrl());
-							if (b)
-								externalService.publishOnFacebook(clientId, clientNews.getDescription(),
-										"/rest/action/marketing/news/" + clientNews.getId());
+							if (clientNews.getImage() != null) {
+								if (clientNews.getId() == null)
+									count++;
+								final boolean b = json.get("publish").asBoolean() && clientNews.getId() == null;
+								repository.save(clientNews);
+								if (first.getTime() > clientNews.getPublish().getTime())
+									first = clientNews.getPublish();
+								urls.add(clientNews.getUrl());
+								if (b)
+									externalService.publishOnFacebook(clientId, clientNews.getDescription(),
+											"/rest/action/marketing/news/" + clientNews.getId());
+							}
 						} catch (final IllegalArgumentException ex) {
 							notificationService.createTicket(TicketType.ERROR, "RSS Import Image",
 									Strings.stackTraceToString(ex), clientId);
@@ -174,7 +176,7 @@ public class RssService {
 				if (chonological) {
 					for (int i = 0; i < result.size(); i++) {
 						if (!urls.contains(result.get(i).get("clientNews.url"))) {
-							// repository.delete(repository.one(ClientNews.class, (BigInteger)
+							// TODO rm repository.delete(repository.one(ClientNews.class, (BigInteger)
 							// result.get(i).get("clientNews.id")));
 							notificationService.createTicket(TicketType.ERROR, "RSS deletion",
 									result.get(i).get("clientNews.id") + "\n"
