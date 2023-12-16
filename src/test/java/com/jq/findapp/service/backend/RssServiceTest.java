@@ -20,6 +20,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.util.EntityUtil;
 
 public class RssServiceTest {
 	@Test
@@ -65,5 +67,19 @@ public class RssServiceTest {
 
 		// then
 		assertEquals(new Date(1694205368000l), d);
+	}
+
+	@Test
+	public void image() throws Exception {
+		// given
+		IOUtils.toByteArray(new URL("https://feed.rundschau-online.de/feed/rss/region/index.rss"));
+		final String url = "https://images.live.dumontnext.de/2023/12/15/fa32ac34-271a-4215-bf76-0b815e789f7a.jpeg?w=3594&auto=format&q=75&format=auto&s=dd3d4f50f4f3af9f0a4a478dca1e8ef6";
+
+		// when
+		final String tag = EntityUtil.getImage(url, EntityUtil.IMAGE_SIZE, 200);
+
+		// then
+		assertNotNull(tag);
+		assertTrue(tag.startsWith(".jpg" + Attachment.SEPARATOR));
 	}
 }

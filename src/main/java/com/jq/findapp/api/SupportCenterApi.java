@@ -234,8 +234,8 @@ public class SupportCenterApi {
 					if (result.result != null)
 						log.setBody(result.result.trim());
 					if (result.exception != null) {
-						log.setBody(result.exception.getClass().getName() + ": " + result.exception.getMessage() +
-								(log.getBody() == null ? "" : "\n" + log.getBody()));
+						log.setBody((log.getBody() == null ? "" : log.getBody() + "\n")
+								+ result.exception.getClass().getName() + ": " + result.exception.getMessage());
 						notificationService.createTicket(TicketType.ERROR, "scheduler",
 								Strings.stackTraceToString(result.exception), null);
 					}

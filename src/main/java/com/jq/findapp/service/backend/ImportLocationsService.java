@@ -245,7 +245,7 @@ public class ImportLocationsService {
 						} catch (final Exception ex) {
 							if (location != null && (ex.getMessage() == null
 									|| (!ex.getMessage().contains("no image")
-											// TODO && !ex.getMessage().contains("invalid address")
+											&& !ex.getMessage().contains("invalid address")
 											&& !ex.getMessage().contains("location exists")
 											&& !Strings.stackTraceToString(ex).toLowerCase()
 													.contains("duplicate entry")))) {

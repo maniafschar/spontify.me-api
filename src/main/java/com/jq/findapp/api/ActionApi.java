@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -293,10 +294,10 @@ public class ActionApi {
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
 		if (BigInteger.ZERO.equals(user))
 			return null;
+		final int limit = 25;
 		final QueryParams params = new QueryParams(
 				"contacts".equals(type) ? Query.contact_listTeaser : Query.event_listTeaser);
-		params.setLimit(25);
-		params.setDistance(-1);
+		params.setDistance(1000);
 		params.setLatitude(48.13684f);
 		params.setLongitude(11.57685f);
 		if (user == null) {
@@ -333,11 +334,18 @@ public class ActionApi {
 			if (params.getQuery() == Query.contact_listTeaser)
 				search = (search == null ? "" : "(" + search + ") and ") + "contact.id<>" + user;
 		}
-		if (params.getQuery() == Query.event_listTeaser)
+		if (params.getQuery() == Query.event_listTeaser) {
+			params.setLimit(0);
+			final ZonedDateTime today = Instant.now().atZone(ZoneOffset.UTC);
 			search = (search == null ? "" : "(" + search + ") and ") + "event.endDate>='"
-					+ Instant.now().atZone(ZoneOffset.UTC).toLocalDate() + "'";
+					+ today.toLocalDate() + "' and event.startDate<='" + today.plus(Duration.ofDays(1)) + "'";
+		} else
+			params.setLimit(limit);
 		params.setSearch(search);
-		return repository.list(params).getList();
+		final List<Object[]> list = repository.list(params).getList();
+		while (list.size() > limit + 1)
+			list.remove(list.size() - 1);
+		return list;
 	}
 
 	@GetMapping("searchLocation")
