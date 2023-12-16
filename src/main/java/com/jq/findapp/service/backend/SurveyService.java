@@ -124,7 +124,7 @@ public class SurveyService {
 							notification.sendPoll(clientMarketing,
 									ContactNotificationTextType.clientMarketingPrediction);
 							externalService.publishOnFacebook(clientId,
-									"Eure Ergebnistipps für unsere Bayern im Spiel" + getOponent(poll)
+									"Eure Ergebnistipps für das Spiel " + getTeam(clientId, poll) + getOponent(poll)
 											+ "\n\nKlickt auf das Bild, um abzustimmen. Dort wird Eure Stimme erfasst und automatisch in die Wertung übernommen, die Ihr dann kurz vor dem Spiel hier sehen könnt."
 											+ (poll.get("statistics").size() > 0
 													? "\n\nIm Bild seht ihr die zusammengefassten Statistiken zu den letzen Spielen."
@@ -260,6 +260,8 @@ public class SurveyService {
 									matchDay.findPath("home").get("name").asText().replace("Munich", "München"));
 							poll.put("awayName",
 									matchDay.findPath("away").get("name").asText().replace("Munich", "München"));
+							poll.put("homeId", matchDay.findPath("home").get("id").asInt());
+							poll.put("awayId", matchDay.findPath("away").get("id").asInt());
 							poll.put("league", matchDay.findPath("league").get("logo").asText());
 							poll.put("timestamp", matchDay.findPath("fixture").get("timestamp").asLong());
 							poll.put("fixtureId", matchDays.get(i).get("fixture").get("id").asLong());
@@ -295,7 +297,7 @@ public class SurveyService {
 							notification.sendPoll(clientMarketing,
 									ContactNotificationTextType.clientMarketingPlayerOfTheMatch);
 							externalService.publishOnFacebook(clientId,
-									"Umfrage Spieler des Spiels unserer Bayern" + getOponent(poll),
+									"Umfrage Spieler des Spiels " + getTeam(clientId, poll) + getOponent(poll),
 									"/rest/action/marketing/init/" + clientMarketing.getId());
 							return clientMarketing.getId();
 						}
@@ -429,9 +431,8 @@ public class SurveyService {
 					if ("PlayerOfTheMatch".equals(poll.get("type").asText()))
 						prefix = "Umfrage Spieler des Spiels";
 					externalService.publishOnFacebook(clientId,
-							"Resultat der \"" + prefix + "\" unserer Bayern" + getOponent(poll),
-							"/rest/action/marketing/result/" +
-									clientMarketingResult.getClientMarketingId());
+							"Resultat der \"" + prefix + "\" " + getTeam(clientId, poll) + getOponent(poll),
+							"/rest/action/marketing/result/" + clientMarketingResult.getClientMarketingId());
 					result += clientMarketingResult.getId() + " ";
 				} else
 					repository.save(clientMarketingResult);
@@ -470,7 +471,16 @@ public class SurveyService {
 					}
 				}
 			}
-			return result.length() > 0 ? "matchdays update: " + result.substring(1) : result;
+			return result.length() > 0 ? " (updated matchdays: " + result.substring(1) + ")" : result;
+		}
+
+		private String getTeam(final BigInteger clientId, final JsonNode poll) {
+			if (clientId.intValue() == 4) {
+				final int id = poll.get(poll.get("location").asText() + "Id").asInt();
+				if (id == 157 && clientId.intValue() == 4)
+					return "unserer Bayern";
+			}
+			return poll.get(poll.get("location").asText() + "Name").asText();
 		}
 
 		private String getOponent(final JsonNode poll) {

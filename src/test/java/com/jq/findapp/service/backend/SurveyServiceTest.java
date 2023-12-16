@@ -73,7 +73,7 @@ public class SurveyServiceTest {
 		final String result = result(clientMarketingId);
 
 		// then
-		assertTrue(Integer.valueOf(result) > 0);
+		assertTrue(Integer.valueOf(result.split(" ")[0]) > 0);
 	}
 
 	@Test
@@ -87,7 +87,7 @@ public class SurveyServiceTest {
 		final String result = result(clientMarketingId);
 
 		// then
-		assertTrue(Integer.valueOf(result) > 0);
+		assertTrue(Integer.valueOf(result.split(" ")[0]) > 0);
 	}
 
 	@Test
@@ -100,7 +100,7 @@ public class SurveyServiceTest {
 		final String result = result(clientMarketingId);
 
 		// then
-		assertTrue(Integer.valueOf(result) > 0);
+		assertTrue(Integer.valueOf(result.split(" ")[0]) > 0);
 	}
 
 	@Test
