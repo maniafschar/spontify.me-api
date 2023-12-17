@@ -36,14 +36,16 @@
 		"title": "a message for",
 		"titleFrom": "a message from <jq:pseudonymFrom /> for"
 	},
+	"marketing": {
+		"playerOfTheMatch": "player of the match {0}",
+		"prediction": "result tips {0}"
+	},
 	"notification": {
 		"authenticate": "Your video authentication appointment for the {0} is confirmed. Click this message at that time, the video call opens automaticaly.\n\nHave your ID card ready.\n\nUntil then\nAPP_TITLE support",
 		"chatNew": "<jq:EXTRA_1 />",
 		"chatSeen": "has seen your chat message.",
-		"clientMarketing": "Poll player of the match",
-		"clientMarketingPlayerOfTheMatch": "Poll player of our match for the match against <jq:EXTRA_1 />",
-		"clientMarketingPrediction": "Result tips for our match against <jq:EXTRA_1 />",
-		"clientMarketingResult": "Poll result",
+		"clientMarketing": "Poll <jq:EXTRA_1 />",
+		"clientMarketingResult": "Outcome of the poll <jq:EXTRA_1 />",
 		"clientNews": "new article: <jq:EXTRA_1 />",
 		"contactBirthday": "will be <jq:EXTRA_1 /> years young today.",
 		"contactDelete": "has left APP_TITLE 😢",
@@ -71,7 +73,6 @@
 		"sentPos2": "has sent you her current position."
 	},
 	"or": " or ",
-	"preventDelete": "By the way, our campaign <b>50 euros</b> per event held in Munich and soon elsewhere is running.<br/><br/>Just meet up with your <b>friends</b> in a location, post this in advance as an <b>event</b> here and cash in.<br/><br/>Can that convince you to stay?",
 	"today": "today",
 	"tomorrow": "tomorrow"
 }

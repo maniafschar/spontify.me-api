@@ -310,7 +310,6 @@ public class Repository {
 								save(field.getName().contains("image"), (String) field.get(entity),
 										(String) entity.old(field.getName())));
 					} catch (final Exception e) {
-						e.printStackTrace();
 						throw new RuntimeException("Failed on " + field.getName(), e);
 					}
 				}

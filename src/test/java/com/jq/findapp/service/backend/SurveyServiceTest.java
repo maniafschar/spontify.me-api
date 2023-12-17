@@ -67,7 +67,7 @@ public class SurveyServiceTest {
 		// given
 		utils.createContact(BigInteger.ONE);
 		((SurveyServiceMock) surveyService).offset = -2 * 60 * 60;
-		final BigInteger clientMarketingId = surveyService.synchronize.poll(BigInteger.ONE, 0);
+		final BigInteger clientMarketingId = surveyService.synchronize.playerOfTheMatch(BigInteger.ONE, 0);
 
 		// when
 		final String result = result(clientMarketingId);

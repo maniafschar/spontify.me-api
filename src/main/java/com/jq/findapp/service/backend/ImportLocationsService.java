@@ -244,7 +244,7 @@ public class ImportLocationsService {
 							}
 						} catch (final Exception ex) {
 							if (location != null && (ex.getMessage() == null
-									|| (!ex.getMessage().contains("no image")
+									|| (!ex.getMessage().contains("NO_IMAGE")
 											&& !ex.getMessage().contains("invalid address")
 											&& !ex.getMessage().contains("location exists")
 											&& !Strings.stackTraceToString(ex).toLowerCase()

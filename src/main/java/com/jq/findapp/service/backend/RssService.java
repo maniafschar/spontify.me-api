@@ -81,7 +81,7 @@ public class RssService {
 		}).collect(Collectors.joining("\n"));
 		if (failed.size() > 0)
 			notificationService.createTicket(TicketType.ERROR, "ImportRss",
-					failed.stream().sorted().collect(Collectors.joining("\n")), null);
+					failed.size() + " error:\n" + failed.stream().sorted().collect(Collectors.joining("\n")), null);
 		return result;
 	}
 

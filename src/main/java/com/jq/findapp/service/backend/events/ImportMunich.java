@@ -85,7 +85,8 @@ public class ImportMunich {
 		}
 		if (failed.size() > 0)
 			notificationService.createTicket(TicketType.ERROR, "ImportEventMunich",
-					failed.stream().sorted().collect(Collectors.joining("\n")), clientId);
+					failed.size() + " error:\n" + failed.stream().sorted().collect(Collectors.joining("\n")),
+					clientId);
 		return count;
 	}
 
@@ -185,13 +186,16 @@ public class ImportMunich {
 					(s.length > 1 ? s[s.length - 2].trim() + "\n" : "") + s[s.length - 1].trim().replace('+', ' '));
 			location.setName(s[0].trim() + (s.length > 3 ? ", " + s[1].trim() : ""));
 		} else {
-			location.setUrl(url + getField(regexAddressRef, page, 2));
 			location.setName(getField(regexName, page, 2));
-			page = eventService.get(location.getUrl());
-			location.setAddress(String.join("\n",
-					Arrays.asList(getField(regexAddress, page, 2)
-							.split(",")).stream().map(e -> e.trim()).toList()));
-			location.setDescription(Strings.sanitize(getField(regexDesc, page, 1), 1000));
+			location.setUrl(getField(regexAddressRef, page, 2));
+			if (!Strings.isEmpty(location.getUrl())) {
+				location.setUrl(url + location.getUrl());
+				page = eventService.get(location.getUrl());
+				location.setAddress(String.join("\n",
+						Arrays.asList(getField(regexAddress, page, 2)
+								.split(",")).stream().map(e -> e.trim()).toList()));
+				location.setDescription(Strings.sanitize(getField(regexDesc, page, 1), 1000));
+			}
 		}
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setSearch(

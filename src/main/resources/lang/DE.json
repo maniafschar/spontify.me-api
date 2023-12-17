@@ -36,14 +36,16 @@
 		"title": "eine Nachricht für",
 		"titleFrom": "eine Nachricht von <jq:pseudonymFrom /> für"
 	},
+	"marketing": {
+		"playerOfTheMatch": "Spieler des Spiels {0}",
+		"prediction": "Ergebnistipps {0}"
+	},
 	"notification": {
 		"authenticate": "Deine Videoauthentifizierungstermin für den {0} ist bestätigt. Klicke zu diesem Zeitpunkt auf diese Nachricht, der Video-Anruf öffnet sich dann automatisch.\n\nHalte Deinen Personalausweis bereit.\n\nBis dann\nAPP_TITLE support",
 		"chatNew": "<jq:EXTRA_1 />",
 		"chatSeen": "hat Deine Chatnachricht gelesen.",
-		"clientMarketing": "Umfrage Spieler des Spiels",
-		"clientMarketingPlayerOfTheMatch": "Umfrage Spieler des Spiels für unser Spiel gegen <jq:EXTRA_1 />",
-		"clientMarketingPrediction": "Eure Ergebnistipps für unser Spiel gegen <jq:EXTRA_1 />",
-		"clientMarketingResult": "Ergebnis der Umfrage",
+		"clientMarketing": "Umfrage <jq:EXTRA_1 />",
+		"clientMarketingResult": "Resultat der Umfrage <jq:EXTRA_1 />",
 		"clientNews": "neuer Artikel: <jq:EXTRA_1 />",
 		"contactBirthday": "wird heute <jq:EXTRA_1 /> Jahre jung.",
 		"contactDelete": "hat APP_TITLE verlassen 😢",
@@ -71,7 +73,6 @@
 		"sentPos2": " hat Dir ihre aktuelle Position gesendet."
 	},
 	"or": " oder ",
-	"preventDelete": "Im übrigen läuft momentan unsere Aktion <b>50 Euro</b> pro abgehaltenes Event in München und bald auch anderswo.<br/><br/>Triff Dich einfach mit Deinen <b>Freunden</b> in einer Location, stell dies vorher hier als <b>Event</b> hier ein und kassiere ab.<br/><br/>Kann das Dich überzeugen zu bleiben?",
 	"today": "Heute",
 	"tomorrow": "Morgen"
 }

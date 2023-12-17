@@ -82,4 +82,18 @@ public class RssServiceTest {
 		assertNotNull(tag);
 		assertTrue(tag.startsWith(".jpg" + Attachment.SEPARATOR));
 	}
+
+	@Test
+	public void image_webp() throws Exception {
+		// given
+
+		// when
+		final String tag = EntityUtil.getImage(
+				"https://www.muenchen.de/sites/default/files/styles/3_2_w1202/public/2023-07/staatliche_antikensammlungen_und_glyptothek_foto_markus_loex.jpg.webp",
+				EntityUtil.IMAGE_SIZE, 200);
+
+		// then
+		assertNotNull(tag);
+		assertTrue(tag.startsWith(".jpg" + Attachment.SEPARATOR));
+	}
 }
