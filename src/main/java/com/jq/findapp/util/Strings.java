@@ -69,7 +69,7 @@ public class Strings {
 				.format(DateTimeFormatter.ofPattern(format == null ? "dd.MM.yyyy HH:mm" : format));
 	}
 
-	public static String sanitize(String s) {
+	public static String sanitize(String s, final int limit) {
 		if (s == null)
 			return s;
 		s = HtmlUtils.htmlUnescape(s.replaceAll("<[^>]*>", "\n")
@@ -81,8 +81,8 @@ public class Strings {
 			s = s.replace("\n\n", "\n");
 		while (s.contains("\n "))
 			s = s.replace("\n ", "\n");
-		if (s.length() > 1000)
-			s = s.substring(0, s.substring(0, 997).lastIndexOf(' ')) + "...";
+		if (limit > 0 && s.length() > limit)
+			s = s.substring(0, s.substring(0, limit - 3).lastIndexOf(' ')) + "...";
 		return s.trim();
 	}
 }

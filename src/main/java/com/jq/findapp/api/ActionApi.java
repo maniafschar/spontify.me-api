@@ -681,7 +681,8 @@ public class ActionApi {
 		if (location == null)
 			return "";
 		return getHtml(repository.one(Client.class, BigInteger.ONE), "location/" + id,
-				Attachment.resolve(location.getImage()), location.getName() + " " + location.getAddress());
+				Attachment.resolve(location.getImage()),
+				location.getName() + " " + location.getAddress() + " " + location.getDescription());
 	}
 
 	@GetMapping(value = "marketing/news/{id}", produces = MediaType.TEXT_HTML_VALUE)
@@ -706,7 +707,8 @@ public class ActionApi {
 		if (image == null)
 			image = contact.getImage();
 		return getHtml(repository.one(Client.class, contact.getClientId()), "event/" + id,
-				Attachment.resolve(image), event.getDescription() + " " + location.getAddress());
+				Attachment.resolve(image),
+				event.getDescription() + " " + location.getAddress() + " " + location.getDescription());
 	}
 
 	@GetMapping(value = "marketing/init/{id}", produces = MediaType.TEXT_HTML_VALUE)
@@ -752,9 +754,13 @@ public class ActionApi {
 				"<meta property=\"og:image\" content=\"" + url + "/med/" + image + "\"/><base href=\"" + client.getUrl()
 						+ "/\"");
 		if (!Strings.isEmpty(title)) {
-			title = Strings.sanitize(title.replace('\n', ' ').replace('\t', ' ').replace('\r', ' ').replace('"', '\''));
-			s = s.replaceFirst("<meta property=\"description\" content=\"([^\"].*)\"",
-					"<meta property=\"description\" content=\"" + title + '"');
+			title = Strings.sanitize(title.replace('\n', ' ').replace('\t', ' ').replace('\r', ' ').replace('"', '\''),
+					0);
+			s = s.replaceFirst("</preloader>",
+					"<style>div.article{opacity:0;position:absolute;}</style><div class=\"article\">" + title
+							+ "</div></preloader>");
+			s = s.replaceFirst("<meta name=\"description\" content=\"([^\"].*)\"",
+					"<meta name=\"description\" content=\"" + title + '"');
 			s = s.replaceFirst("<title></title>", "<title>" +
 					(client.getName() + " · " + (title.length() > 200 ? title.substring(0, 200) : title)) + "</title>");
 		}

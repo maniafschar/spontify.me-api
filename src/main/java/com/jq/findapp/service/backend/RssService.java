@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -48,6 +49,8 @@ public class RssService {
 	@Autowired
 	private NotificationService notificationService;
 
+	private final Set<String> failed = Collections.synchronizedSet(new HashSet<>());
+
 	public SchedulerResult update() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/update");
 		final Result list = repository.list(new QueryParams(Query.misc_listClient));
@@ -76,6 +79,9 @@ public class RssService {
 				return ex.getMessage();
 			}
 		}).collect(Collectors.joining("\n"));
+		if (failed.size() > 0)
+			notificationService.createTicket(TicketType.ERROR, "ImportRss",
+					failed.stream().sorted().collect(Collectors.joining("\n")), null);
 		return result;
 	}
 
@@ -126,7 +132,8 @@ public class RssService {
 								(json.has("description") && json.get("description").asBoolean()
 										&& rss.get(i).has("description")
 												? "\n\n" + rss.get(i).get("description").asText()
-												: "")));
+												: ""),
+								1000));
 						clientNews.setUrl(uid);
 						clientNews.setPublish(new Timestamp(df.parse(rss.get(i).get("pubDate").asText()).getTime()));
 						if (clientNews.getPublish().getTime() > lastPubDate)
@@ -165,8 +172,9 @@ public class RssService {
 											"/rest/action/marketing/news/" + clientNews.getId());
 							}
 						} catch (final IllegalArgumentException ex) {
-							notificationService.createTicket(TicketType.ERROR, "RSS Import Image",
-									Strings.stackTraceToString(ex), clientId);
+							synchronized (failed) {
+								failed.add("image: " + ex.getMessage() + " on " + uid);
+							}
 						}
 					}
 				}
@@ -178,7 +186,7 @@ public class RssService {
 						if (!urls.contains(result.get(i).get("clientNews.url"))) {
 							// TODO rm repository.delete(repository.one(ClientNews.class, (BigInteger)
 							// result.get(i).get("clientNews.id")));
-							notificationService.createTicket(TicketType.ERROR, "RSS deletion",
+							notificationService.createTicket(TicketType.ERROR, "RSS Deletion",
 									result.get(i).get("clientNews.id") + "\n"
 											+ result.get(i).get("clientNews.description")
 											+ "\n" + result.get(i).get("clientNews.url"),
@@ -190,8 +198,9 @@ public class RssService {
 				if (count != 0 || deleted != 0)
 					return clientId + " " + count + (deleted > 0 ? "/" + deleted : "");
 			} catch (final Exception ex) {
-				notificationService.createTicket(TicketType.ERROR, "RSS Import",
-						json.get("url").asText() + "\n" + Strings.stackTraceToString(ex), clientId);
+				synchronized (failed) {
+					failed.add(ex.getClass().getName() + ": " + ex.getMessage() + " on " + json.get("url").asText());
+				}
 			}
 			return "";
 		});

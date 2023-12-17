@@ -6,9 +6,12 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -61,6 +64,7 @@ public class ImportMunich {
 	private final Pattern regexNextPage = Pattern.compile("<li(.*?)m-pagination__item--next-page(.*?)href=\"(.*?)\"");
 	private Client client;
 	private EventService eventService;
+	private final Set<String> failed = new HashSet<>();
 
 	public int run(final EventService eventService, final BigInteger clientId) throws Exception {
 		if (lastRun.get() > System.currentTimeMillis() - 24 * 60 * 60 * 1000)
@@ -79,6 +83,9 @@ public class ImportMunich {
 			} else
 				break;
 		}
+		if (failed.size() > 0)
+			notificationService.createTicket(TicketType.ERROR, "ImportEventMunich",
+					failed.stream().sorted().collect(Collectors.joining("\n")), clientId);
 		return count;
 	}
 
@@ -148,7 +155,8 @@ public class ImportMunich {
 						}
 						event.setDescription(
 								Strings.sanitize(body.getFirstChild().getFirstChild().getTextContent().trim()
-										+ "\n" + getField(externalPage ? regexDescExternal : regexDesc, page, 1)));
+										+ "\n" + getField(externalPage ? regexDescExternal : regexDesc, page, 1),
+										1000));
 						event.setEndDate(new java.sql.Date(date.getTime()));
 						event.setContactId(client.getAdminId());
 						event.setSkills(body.getChildNodes().item(1).getTextContent().trim());
@@ -156,14 +164,14 @@ public class ImportMunich {
 						return true;
 					}
 				} else
-					throw new IllegalArgumentException("unable to import location: " + node.getTextContent());
+					failed.add("location: " + node.getTextContent());
 			} catch (final RuntimeException ex) {
 				// if unable to access event, then ignore and continue, otherwise re-throw
 				if (!ex.getMessage().contains(event.getUrl()) || ex instanceof IllegalArgumentException)
-					throw ex;
+					failed.add(ex.getClass().getName() + ": " + ex.getMessage().replace('\n', ' '));
 			}
 		} else
-			throw new IllegalArgumentException("unknown details URL: " + event.getUrl());
+			failed.add("event: " + event.getUrl());
 		return false;
 	}
 
@@ -183,7 +191,7 @@ public class ImportMunich {
 			location.setAddress(String.join("\n",
 					Arrays.asList(getField(regexAddress, page, 2)
 							.split(",")).stream().map(e -> e.trim()).toList()));
-			location.setDescription(Strings.sanitize(getField(regexDesc, page, 1)));
+			location.setDescription(Strings.sanitize(getField(regexDesc, page, 1), 1000));
 		}
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setSearch(
