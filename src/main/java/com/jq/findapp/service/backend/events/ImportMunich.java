@@ -205,17 +205,18 @@ public class ImportMunich {
 		if (list.size() > 0)
 			return (BigInteger) list.get(0).get("location.id");
 		if (!Strings.isEmpty(location.getAddress())) {
-			String image = getField(externalPage ? regexImageExternal : regexImage, page, 2);
-			if (image.length() > 0) {
-				if (!image.startsWith("http"))
-					image = (externalPage ? externalUrl.substring(0, externalUrl.indexOf("/", 10)) : url) + image;
-				location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, 250));
-				if (location.getImage() != null)
-					location.setImageList(
-							EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
-			}
 			location.setContactId(client.getAdminId());
 			try {
+				repository.save(location);
+				String image = getField(externalPage ? regexImageExternal : regexImage, page, 2);
+				if (image.length() > 0) {
+					if (!image.startsWith("http"))
+						image = (externalPage ? externalUrl.substring(0, externalUrl.indexOf("/", 10)) : url) + image;
+					location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, 250));
+					if (location.getImage() != null)
+						location.setImageList(
+								EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
+				}
 				repository.save(location);
 				return location.getId();
 			} catch (final IllegalArgumentException ex) {

@@ -298,12 +298,13 @@ public class SurveyService {
 								clientMarketing.setStartDate(new Timestamp(startDate.toEpochMilli()));
 								clientMarketing
 										.setEndDate(new Timestamp(startDate.plus(Duration.ofHours(18)).toEpochMilli()));
+								final String endDate = formatDate(
+										clientMarketing.getEndDate().getTime() / 1000 + 10 * 60, null);
 								clientMarketing.setClientId(clientId);
 								clientMarketing.setImage(Attachment.createImage(".png",
 										image.create(poll, "Spieler", repository.one(Client.class, clientId), null)));
-								String epilog = "Lieben Dank für die Teilnahme!\nDas Ergebnis wird am ";
-								epilog += formatDate(clientMarketing.getEndDate().getTime() / 1000 + 10 * 60, null);
-								epilog += " hier bekanntgegeben.";
+								String epilog = "Lieben Dank für die Teilnahme!\nDas Ergebnis wird am " + endDate
+										+ " hier bekanntgegeben.";
 								if (clientId.intValue() == 4)
 									epilog += "\n\nLust auf mehr <b>Bayern Feeling</b>? In unserer neuen App bauen wir eine reine Bayern <b>Fan Community</b> auf.\n\nMit ein paar wenigen Klicks kannst auch Du dabei sein.";
 								poll.put("epilog", epilog);
@@ -312,7 +313,9 @@ public class SurveyService {
 								notification.sendPoll(clientMarketing);
 								externalService.publishOnFacebook(clientId,
 										"Umfrage Spieler des Spiels " + getTeam(clientId, poll)
-												+ getOponent(clientId, poll),
+												+ getOponent(clientId, poll)
+												+ "\n\nKlickt auf das Bild, um abzustimmen. Dort wird Eure Stimme erfasst und automatisch in die Wertung übernommen, die Ihr ab dem "
+												+ endDate + " Uhr hier sehen könnt.",
 										"/rest/action/marketing/init/" + clientMarketing.getId());
 								return clientMarketing.getId();
 							}
