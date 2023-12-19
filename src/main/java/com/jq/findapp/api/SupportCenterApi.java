@@ -4,16 +4,17 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -174,23 +175,24 @@ public class SupportCenterApi {
 		return result;
 	}
 
+	@Async
 	@PutMapping("scheduler")
 	public void scheduler(@RequestHeader final String secret) throws Exception {
 		if (schedulerSecret.equals(secret)) {
 			if (schedulerRunning)
 				throw new RuntimeException("Failed to start, scheduler is currently running");
 			schedulerRunning = true;
-			final CompletableFuture<?>[] list = new CompletableFuture[9];
-			list[0] = run(chatService::answerAi);
-			list[1] = run(dbService::update);
-			list[2] = run(engagementService::sendRegistrationReminder);
-			list[3] = run(eventService::findMatchingBuddies);
-			list[4] = run(eventService::importEvents);
-			list[5] = run(eventService::notifyParticipation);
-			list[6] = run(importLogService::importLog);
-			list[7] = run(rssService::update);
-			list[8] = run(surveyService::update);
-			CompletableFuture.allOf(all).thenApply(e -> futures.stream()
+			final List<CompletableFuture<Void>> list = new ArrayList<>();
+			list.add(run(chatService::answerAi));
+			list.add(run(dbService::update));
+			list.add(run(engagementService::sendRegistrationReminder));
+			list.add(run(eventService::findMatchingBuddies));
+			list.add(run(eventService::importEvents));
+			list.add(run(eventService::notifyParticipation));
+			list.add(run(importLogService::importLog));
+			list.add(run(rssService::update));
+			list.add(run(surveyService::update));
+			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 					.map(CompletableFuture::join).collect(Collectors.toList())).join();
 			run(engagementService::sendNearBy).join();
 			run(engagementService::sendChats).join();
@@ -202,7 +204,7 @@ public class SupportCenterApi {
 	}
 
 	@Async
-	private CompletableFuture<Void> void run(final Scheduler scheduler) {
+	private CompletableFuture<Void> run(final Scheduler scheduler) {
 		return CompletableFuture.supplyAsync(() -> {
 			final Log log = new Log();
 			log.setContactId(BigInteger.ZERO);
@@ -234,6 +236,7 @@ public class SupportCenterApi {
 					throw new RuntimeException(e);
 				}
 			}
+			return null;
 		});
 	}
 
