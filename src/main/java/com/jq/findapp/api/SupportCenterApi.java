@@ -9,8 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,8 +54,6 @@ import jakarta.ws.rs.core.MediaType;
 @CrossOrigin(origins = { "https://sc.skills.community" })
 @RequestMapping("support")
 public class SupportCenterApi {
-	private static final List<Integer> schedulerRunning = Collections.synchronizedList(new ArrayList<>());
-
 	@Autowired
 	private Repository repository;
 
@@ -102,7 +99,7 @@ public class SupportCenterApi {
 	@Value("${app.scheduler.secret}")
 	private String schedulerSecret;
 
-	private static final ExecutorService executorService = Executors.newCachedThreadPool();
+	private static volatile boolean schedulerRunning = false;
 
 	@DeleteMapping("user/{id}")
 	public void userDelete(@PathVariable final BigInteger id) throws Exception {
@@ -180,80 +177,62 @@ public class SupportCenterApi {
 	@PutMapping("scheduler")
 	public void scheduler(@RequestHeader final String secret) throws Exception {
 		if (schedulerSecret.equals(secret)) {
-			if (schedulerRunning.size() == 0) {
-				final boolean LAST = true;
-				// last job is backup, even after importLog
-				run(dbService::backup, LAST);
-				run(sitemapService::update, LAST);
-				// importLog paralell to the rest, does not interfere
-				run(importLogService::importLog, !LAST);
-				run(eventService::importEvents, !LAST);
-				run(chatService::answerAi, !LAST);
-				run(dbService::update, !LAST);
-				run(engagementService::sendRegistrationReminder, !LAST);
-				// sendNearBy and sendChats after all event services
-				// to avoid multiple chat at the same time
-				run(engagementService::sendNearBy, LAST);
-				run(engagementService::sendChats, LAST);
-				run(ipService::lookupIps, LAST);
-				run(eventService::findMatchingBuddies, !LAST);
-				run(eventService::notifyParticipation, !LAST);
-				run(rssService::update, !LAST);
-				run(surveyService::update, !LAST);
-			} else
-				throw new RuntimeException("Scheduler already running " + schedulerRunning.size() + " processes");
+			if (schedulerRunning)
+				throw new RuntimeException("Failed to start, scheduler is currently running");
+			schedulerRunning = true;
+			final CompletableFuture<Object>[] list = new CompletableFuture<>[];
+			list[0] = run(chatService::answerAi);
+			list[1] = run(dbService::update);
+			list[2] = run(engagementService::sendRegistrationReminder);
+			list[3] = run(eventService::findMatchingBuddies);
+			list[4] = run(eventService::importEvents);
+			list[5] = run(eventService::notifyParticipation);
+			list[6] = run(importLogService::importLog);
+			list[7] = run(rssService::update);
+			list[8] = run(surveyService::update);
+			CompletableFuture.allOf(all)
+					.thenApply(ignored -> futures.stream()
+							.map(CompletableFuture::join).collect(Collectors.toList())).join();
+			run(engagementService::sendNearBy).join();
+			run(engagementService::sendChats).join();
+			run(ipService::lookupIps).join();
+			run(sitemapService::update).join();
+			run(dbService::backup).join();
+			schedulerRunning = false;
 		}
 	}
 
-	private void run(final Scheduler scheduler, final boolean last) {
-		final Integer id = schedulerRunning.size() + 1;
-		schedulerRunning.add(id);
-		executorService.submit(new Runnable() {
-			@Override
-			public void run() {
-				final Log log = new Log();
-				log.setContactId(BigInteger.ZERO);
-				try {
-					if (last) {
-						boolean execute = false;
-						do {
-							try {
-								Thread.sleep(100);
-							} catch (final InterruptedException e) {
-								throw new RuntimeException(e);
-							}
-							synchronized (schedulerRunning) {
-								execute = schedulerRunning.stream().anyMatch(e -> e > id);
-							}
-						} while (execute);
-					}
-					log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
-					final SchedulerResult result = scheduler.run();
-					log.setUri("/support/scheduler/" + result.name);
-					log.setStatus(Strings.isEmpty(result.exception) ? 200 : 500);
-					if (result.result != null)
-						log.setBody(result.result.trim());
-					if (result.exception != null) {
-						log.setBody((log.getBody() == null ? "" : log.getBody() + "\n")
-								+ result.exception.getClass().getName() + ": " + result.exception.getMessage());
-						notificationService.createTicket(TicketType.ERROR, "scheduler",
-								Strings.stackTraceToString(result.exception), null);
-					}
-				} catch (final Throwable ex) {
-					log.setBody("uncaught exception " + ex.getClass().getName() + ": " + ex.getMessage() +
-							(log.getBody() == null ? "" : "\n" + log.getBody()));
+	@Async
+	private CompletableFuture<Void> void run(final Scheduler scheduler) {
+		return CompletableFuture.supplyAsync(() -> {
+			final Log log = new Log();
+			log.setContactId(BigInteger.ZERO);
+			try {
+				log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
+				final SchedulerResult result = scheduler.run();
+				log.setUri("/support/scheduler/" + result.name);
+				log.setStatus(Strings.isEmpty(result.exception) ? 200 : 500);
+				if (result.result != null)
+					log.setBody(result.result.trim());
+				if (result.exception != null) {
+					log.setBody((log.getBody() == null ? "" : log.getBody() + "\n")
+							+ result.exception.getClass().getName() + ": " + result.exception.getMessage());
 					notificationService.createTicket(TicketType.ERROR, "scheduler",
-							"uncatched exception:\n" + Strings.stackTraceToString(ex), null);
-				} finally {
-					schedulerRunning.remove(id);
-					log.setTime((int) (System.currentTimeMillis() - log.getCreatedAt().getTime()));
-					if (log.getBody() != null && log.getBody().length() > 255)
-						log.setBody(log.getBody().substring(0, 252) + "...");
-					try {
-						repository.save(log);
-					} catch (final Exception e) {
-						throw new RuntimeException(e);
-					}
+							Strings.stackTraceToString(result.exception), null);
+				}
+			} catch (final Throwable ex) {
+				log.setBody("uncaught exception " + ex.getClass().getName() + ": " + ex.getMessage() +
+						(log.getBody() == null ? "" : "\n" + log.getBody()));
+				notificationService.createTicket(TicketType.ERROR, "scheduler",
+						"uncatched exception:\n" + Strings.stackTraceToString(ex), null);
+			} finally {
+				log.setTime((int) (System.currentTimeMillis() - log.getCreatedAt().getTime()));
+				if (log.getBody() != null && log.getBody().length() > 255)
+					log.setBody(log.getBody().substring(0, 252) + "...");
+				try {
+					repository.save(log);
+				} catch (final Exception e) {
+					throw new RuntimeException(e);
 				}
 			}
 		});
