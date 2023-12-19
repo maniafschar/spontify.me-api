@@ -180,7 +180,7 @@ public class SupportCenterApi {
 			if (schedulerRunning)
 				throw new RuntimeException("Failed to start, scheduler is currently running");
 			schedulerRunning = true;
-			final CompletableFuture<Object>[] list = new CompletableFuture<>[9];
+			final CompletableFuture<?>[] list = new CompletableFuture[9];
 			list[0] = run(chatService::answerAi);
 			list[1] = run(dbService::update);
 			list[2] = run(engagementService::sendRegistrationReminder);
@@ -190,9 +190,8 @@ public class SupportCenterApi {
 			list[6] = run(importLogService::importLog);
 			list[7] = run(rssService::update);
 			list[8] = run(surveyService::update);
-			CompletableFuture.allOf(all)
-					.thenApply(ignored -> futures.stream()
-							.map(CompletableFuture::join).collect(Collectors.toList())).join();
+			CompletableFuture.allOf(all).thenApply(e -> futures.stream()
+					.map(CompletableFuture::join).collect(Collectors.toList())).join();
 			run(engagementService::sendNearBy).join();
 			run(engagementService::sendChats).join();
 			run(ipService::lookupIps).join();
