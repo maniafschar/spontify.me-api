@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -204,13 +205,13 @@ public class SupportCenterApi {
 	}
 
 	@Async
-	private CompletableFuture<Void> run(final Scheduler scheduler) {
+	private CompletableFuture<Void> run(final Supplier<SchedulerResult> scheduler) {
 		return CompletableFuture.supplyAsync(() -> {
 			final Log log = new Log();
 			log.setContactId(BigInteger.ZERO);
 			try {
 				log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
-				final SchedulerResult result = scheduler.run();
+				final SchedulerResult result = scheduler.get();
 				log.setUri("/support/scheduler/" + result.name);
 				log.setStatus(Strings.isEmpty(result.exception) ? 200 : 500);
 				if (result.result != null)
@@ -238,10 +239,6 @@ public class SupportCenterApi {
 			}
 			return null;
 		});
-	}
-
-	private interface Scheduler {
-		SchedulerResult run();
 	}
 
 	public static class SchedulerResult {
