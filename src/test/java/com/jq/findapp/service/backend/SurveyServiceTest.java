@@ -117,6 +117,19 @@ public class SurveyServiceTest {
 		assertEquals("8", matcher.group(2));
 	}
 
+	@Test
+	public void errors() throws Exception {
+		// given
+		final JsonNode json = new ObjectMapper().readTree(
+				"{\"get\":\"fixtures\",\"parameters\":{\"id\":\"209214\"},\"errors\":{\"rateLimit\":\"Too many requests. Your rate limit is 10 requests per minute.\"},\"results\":0,\"paging\":{\"current\":1,\"total\":1},\"response\":[]}");
+
+		// when
+		final boolean result = json.has("errors") && json.get("errors").size() > 0;
+
+		// then
+		assertTrue(result);
+	}
+
 	private String result(final BigInteger clientMarketingId) throws Exception {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
 		final JsonNode poll = new ObjectMapper().readTree(Attachment.resolve(clientMarketing.getStorage()));

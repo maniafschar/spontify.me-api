@@ -722,7 +722,7 @@ public class SurveyService {
 
 		private void draw(final String url, final Graphics2D g, final int x, final int y, final int height,
 				final int pos) throws Exception {
-			final String label = url.substring(url.lastIndexOf('/', url.length() - 10));
+			final String label = "api-sports-" + url.substring(url.lastIndexOf('/', url.length() - 10));
 			final QueryParams params = new QueryParams(Query.misc_listStorage);
 			params.setSearch("storage.label='" + label + "'");
 			final Result result = repository.list(params);
@@ -875,19 +875,14 @@ public class SurveyService {
 	}
 
 	protected JsonNode get(final String url) throws Exception {
-		final JsonNode fixture;
-		final String label = url;
+		JsonNode fixture = null;
+		final String label = "api-sports-" + url;
 		final QueryParams params = new QueryParams(Query.misc_listStorage);
-		Result result = repository.list(params);
-		for (int i = 0; i < result.size(); i++) {
-			if (result.get(i).get("storage.storage").toString().contains("\"rateLimit\":\"Too many requests"))
-				repository.delete(repository.one(Storage.class, (BigInteger) result.get(i).get("storage.id")));
-		}
 		params.setSearch("storage.label='" + label + "'");
-		result = repository.list(params);
+		final Result result = repository.list(params);
 		if (result.size() > 0)
 			fixture = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
-		else {
+		if (fixture == null || fixture.has("errors") && fixture.get("errors").size() > 0) {
 			fixture = WebClient
 					.create("https://v3.football.api-sports.io/fixtures?" + url)
 					.get()
@@ -895,7 +890,8 @@ public class SurveyService {
 					.header("x-rapidapi-host", "v3.football.api-sports.io")
 					.retrieve()
 					.toEntity(JsonNode.class).block().getBody();
-			final Storage storage = new Storage();
+			final Storage storage = fixture == null ? new Storage()
+					: repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
 			storage.setLabel(label);
 			storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
 			repository.save(storage);
