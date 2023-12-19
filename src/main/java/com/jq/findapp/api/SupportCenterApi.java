@@ -180,7 +180,7 @@ public class SupportCenterApi {
 			if (schedulerRunning)
 				throw new RuntimeException("Failed to start, scheduler is currently running");
 			schedulerRunning = true;
-			final CompletableFuture<Object>[] list = new CompletableFuture<>[];
+			final CompletableFuture<Object>[] list = new CompletableFuture<>[9];
 			list[0] = run(chatService::answerAi);
 			list[1] = run(dbService::update);
 			list[2] = run(engagementService::sendRegistrationReminder);
