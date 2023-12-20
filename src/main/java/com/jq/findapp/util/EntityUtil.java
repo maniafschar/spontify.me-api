@@ -59,7 +59,8 @@ public class EntityUtil {
 		final byte[] result = out.toByteArray();
 		if (result == null || result.length < 100)
 			throw new IllegalArgumentException(
-					"NO_IMAGE_SCALE_TOO_SMALL " + (result == null ? -1 : result.length));
+					"NO_IMAGE_SCALE_TOO_SMALL orig. " + data.length + ", result "
+							+ (result == null ? -1 : result.length));
 		return result;
 	}
 
@@ -94,7 +95,7 @@ public class EntityUtil {
 			try {
 				return Repository.Attachment.createImage(".jpg", scaleImage(data, size));
 			} catch (final IOException ex) {
-				throw new IllegalArgumentException("NO_IMAGE_FAILED_SCALE\n" + url, ex);
+				throw new IllegalArgumentException("NO_IMAGE_EXCEPTION_SCALE " + ex.getMessage() + "\n" + url, ex);
 			}
 		throw new IllegalArgumentException(
 				"NO_IMAGE_SIZE_TOO_SMALL " + img.getWidth() + "x" + img.getHeight() + "\n" + url);
