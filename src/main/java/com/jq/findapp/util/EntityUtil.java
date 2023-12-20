@@ -70,7 +70,7 @@ public class EntityUtil {
 		try {
 			data = IOUtils.toByteArray(new URL(url));
 		} catch (final Exception ex) {
-			throw new IllegalArgumentException("IMAGE_EXCEPTION_READ_BYTE_ARRAY " + ex.getMessage() + "\n" + url,
+			throw new IllegalArgumentException("IMAGE_EXCEPTION_BYTE_ARRAY " + ex.getMessage() + "\n" + url,
 					ex);
 		}
 		if (data == null)
@@ -88,7 +88,7 @@ public class EntityUtil {
 		}
 		if (img == null)
 			throw new IllegalArgumentException(
-					"IMAGE_NULL_IMAGE_CONVERT " + data.length + " bytes\n" + url);
+					"IMAGE_NULL_CONVERT " + data.length + " bytes\n" + url);
 		if (minimum == 0)
 			minimum = Math.min(400, size);
 		if (img.getWidth() > minimum && img.getHeight() > minimum)
