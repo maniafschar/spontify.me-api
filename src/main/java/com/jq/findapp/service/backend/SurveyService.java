@@ -81,6 +81,8 @@ public class SurveyService {
 	@Value("${app.sports.api.token}")
 	private String token;
 
+	private static final String STORAGE_PREFIX = "api-sports-";
+
 	class Synchonize {
 		private final static int FIRST_YEAR = 2010;
 
@@ -465,7 +467,7 @@ public class SurveyService {
 			String result = "";
 			if (json.has("survey")) {
 				for (int i2 = 0; i2 < json.get("survey").size(); i2++) {
-					final String label = "football-fixture-team=" + json.get("survey").get(i2).asInt() + "&season="
+					final String label = "team=" + json.get("survey").get(i2).asInt() + "&season="
 							+ LocalDateTime.now().getYear();
 					final JsonNode matchDays = get(label);
 					if (matchDays != null) {
@@ -475,11 +477,14 @@ public class SurveyService {
 									&& Instant.ofEpochSecond(
 											matchDays.get(i).get("fixture").get("timestamp").asLong())
 											.plus(Duration.ofHours(6)).isBefore(Instant.now())) {
-								params.setSearch("storage.label='" + label + "'");
+								params.setSearch("storage.label='" + STORAGE_PREFIX + label + "'");
 								final Result list = repository.list(params);
 								if (list.size() > 0) {
-									repository.delete(repository.one(Storage.class,
-											(BigInteger) list.get(0).get("storage.id")));
+									final Storage storage = repository.one(Storage.class,
+											(BigInteger) list.get(0).get("storage.id"));
+									storage.historize();
+									storage.setStorage("");
+									repository.save(storage);
 									get(label);
 								}
 								result += "|" + json.get("survey").get(i2).asInt();
@@ -722,7 +727,7 @@ public class SurveyService {
 
 		private void draw(final String url, final Graphics2D g, final int x, final int y, final int height,
 				final int pos) throws Exception {
-			final String label = "api-sports-" + url.substring(url.lastIndexOf('/', url.length() - 10));
+			final String label = STORAGE_PREFIX + url.substring(url.lastIndexOf('/', url.length() - 10));
 			final QueryParams params = new QueryParams(Query.misc_listStorage);
 			params.setSearch("storage.label='" + label + "'");
 			final Result result = repository.list(params);
@@ -876,11 +881,11 @@ public class SurveyService {
 
 	protected JsonNode get(final String url) throws Exception {
 		JsonNode fixture = null;
-		final String label = "api-sports-" + url;
+		final String label = STORAGE_PREFIX + url;
 		final QueryParams params = new QueryParams(Query.misc_listStorage);
 		params.setSearch("storage.label='" + label + "'");
 		final Result result = repository.list(params);
-		if (result.size() > 0)
+		if (result.size() > 0 && !Strings.isEmpty(result.get(0).get("storage.storage")))
 			fixture = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
 		if (fixture == null || fixture.has("errors") && fixture.get("errors").size() > 0) {
 			fixture = WebClient
@@ -890,7 +895,7 @@ public class SurveyService {
 					.header("x-rapidapi-host", "v3.football.api-sports.io")
 					.retrieve()
 					.toEntity(JsonNode.class).block().getBody();
-			final Storage storage = fixture == null ? new Storage()
+			final Storage storage = result.size() == 0 ? new Storage()
 					: repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
 			storage.setLabel(label);
 			storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
