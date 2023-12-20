@@ -196,9 +196,12 @@ public class SupportCenterApi {
 			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 					.map(CompletableFuture::join).collect(Collectors.toList())).join();
 			run(engagementService::sendNearBy).join();
-			run(engagementService::sendChats).join();
-			run(ipService::lookupIps).join();
-			run(sitemapService::update).join();
+			list.clear();
+			list.add(run(engagementService::sendChats));
+			list.add(run(ipService::lookupIps));
+			list.add(run(sitemapService::update));
+			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
+					.map(CompletableFuture::join).collect(Collectors.toList())).join();
 			run(dbService::backup).join();
 			schedulerRunning = false;
 		}
