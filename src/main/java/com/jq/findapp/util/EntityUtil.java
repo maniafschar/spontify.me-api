@@ -59,7 +59,7 @@ public class EntityUtil {
 		final byte[] result = out.toByteArray();
 		if (result == null || result.length < 100)
 			throw new IllegalArgumentException(
-					"NO_IMAGE_SCALE_TOO_SMALL orig. " + data.length + ", result "
+					"IMAGE_TOO_SMALL_SCALE orig. " + data.length + ", result "
 							+ (result == null ? -1 : result.length));
 		return result;
 	}
@@ -70,35 +70,35 @@ public class EntityUtil {
 		try {
 			data = IOUtils.toByteArray(new URL(url));
 		} catch (final Exception ex) {
-			throw new IllegalArgumentException("NO_IMAGE_EXCEPTION_READ_BYTE_ARRAY " + ex.getMessage() + "\n" + url,
+			throw new IllegalArgumentException("IMAGE_EXCEPTION_READ_BYTE_ARRAY " + ex.getMessage() + "\n" + url,
 					ex);
 		}
 		if (data == null)
-			throw new IllegalArgumentException("NO_IMAGE_NULL_BYTE_ARRAY\n" + url);
+			throw new IllegalArgumentException("IMAGE_NULL_BYTE_ARRAY\n" + url);
 		if (data.length < 100)
-			throw new IllegalArgumentException("NO_IMAGE_BYTE_ARRAY_TOO_SMALL " + data.length + " bytes\n" + url);
+			throw new IllegalArgumentException("IMAGE_TOO_SMALL_BYTE_ARRAY " + data.length + " bytes\n" + url);
 		if (size < 1)
 			return Repository.Attachment.createImage(url.substring(url.lastIndexOf('.')), data);
 		try {
 			img = ImageIO.read(new ByteArrayInputStream(data));
 		} catch (final Exception ex) {
 			throw new IllegalArgumentException(
-					"NO_IMAGE_EXCEPTION_CONVERT_BYTE_ARRAY " + data.length + " bytes " + ex.getMessage() + "\n" + url,
+					"IMAGE_EXCEPTION_CONVERT " + data.length + " bytes " + ex.getMessage() + "\n" + url,
 					ex);
 		}
 		if (img == null)
 			throw new IllegalArgumentException(
-					"NO_IMAGE_NULL_IMAGE_CONVERT_BYTE_ARRAY " + data.length + " bytes\n" + url);
+					"IMAGE_NULL_IMAGE_CONVERT " + data.length + " bytes\n" + url);
 		if (minimum == 0)
 			minimum = Math.min(400, size);
 		if (img.getWidth() > minimum && img.getHeight() > minimum)
 			try {
 				return Repository.Attachment.createImage(".jpg", scaleImage(data, size));
 			} catch (final IOException ex) {
-				throw new IllegalArgumentException("NO_IMAGE_EXCEPTION_SCALE " + ex.getMessage() + "\n" + url, ex);
+				throw new IllegalArgumentException("IMAGE_EXCEPTION_SCALE " + ex.getMessage() + "\n" + url, ex);
 			}
 		throw new IllegalArgumentException(
-				"NO_IMAGE_SIZE_TOO_SMALL " + img.getWidth() + "x" + img.getHeight() + "\n" + url);
+				"IMAGE_TOO_SMALL " + img.getWidth() + "x" + img.getHeight() + "\n" + url);
 	}
 
 	public static BaseEntity createEntity(final WriteEntity entity, final Contact contact) throws Exception {
