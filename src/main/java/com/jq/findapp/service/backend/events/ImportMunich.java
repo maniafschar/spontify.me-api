@@ -85,7 +85,7 @@ public class ImportMunich {
 		}
 		if (failed.size() > 0)
 			notificationService.createTicket(TicketType.ERROR, "ImportEventMunich",
-					failed.size() + " error:\n" + failed.stream().sorted().collect(Collectors.joining("\n")),
+					failed.size() + " errors:\n" + failed.stream().sorted().collect(Collectors.joining("\n")),
 					clientId);
 		return count;
 	}
@@ -169,7 +169,7 @@ public class ImportMunich {
 			} catch (final RuntimeException ex) {
 				// if unable to access event, then ignore and continue, otherwise re-throw
 				if (!ex.getMessage().contains(event.getUrl()) || ex instanceof IllegalArgumentException)
-					failed.add(ex.getClass().getName() + ": " + ex.getMessage().replace('\n', ' '));
+					failed.add(ex.getClass().getName() + ": " + ex.getMessage().replace("\n", "\n  "));
 			}
 		} else
 			failed.add("event: " + event.getUrl());

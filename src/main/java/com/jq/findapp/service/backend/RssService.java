@@ -81,7 +81,7 @@ public class RssService {
 		}).collect(Collectors.joining("\n"));
 		if (failed.size() > 0)
 			notificationService.createTicket(TicketType.ERROR, "ImportRss",
-					failed.size() + " error:\n" + failed.stream().sorted().collect(Collectors.joining("\n")), null);
+					failed.size() + " errors:\n" + failed.stream().sorted().collect(Collectors.joining("\n")), null);
 		return result;
 	}
 
@@ -173,7 +173,7 @@ public class RssService {
 							}
 						} catch (final IllegalArgumentException ex) {
 							synchronized (failed) {
-								failed.add("image: " + ex.getMessage() + " on " + uid);
+								failed.add("image: " + ex.getMessage().replace("\n", "\n  ") + "\n  " + uid);
 							}
 						}
 					}
@@ -199,7 +199,8 @@ public class RssService {
 					return clientId + " " + count + (deleted > 0 ? "/" + deleted : "");
 			} catch (final Exception ex) {
 				synchronized (failed) {
-					failed.add(ex.getClass().getName() + ": " + ex.getMessage() + " on " + json.get("url").asText());
+					failed.add(ex.getClass().getName() + ": " + ex.getMessage().replace("\n", "\n  ") + "\n  "
+							+ json.get("url").asText());
 				}
 			}
 			return "";
