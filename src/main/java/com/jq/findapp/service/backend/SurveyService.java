@@ -317,7 +317,7 @@ public class SurveyService {
 										"Umfrage Spieler des Spiels " + getTeam(clientId, poll)
 												+ getOponent(clientId, poll)
 												+ "\n\nKlickt auf das Bild, um abzustimmen. Dort wird Eure Stimme erfasst und automatisch in die Wertung übernommen, die Ihr ab dem "
-												+ endDate + " Uhr hier sehen könnt.",
+												+ endDate + " hier sehen könnt.",
 										"/rest/action/marketing/init/" + clientMarketing.getId());
 								return clientMarketing.getId();
 							}

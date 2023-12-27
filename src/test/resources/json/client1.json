@@ -56,7 +56,7 @@
 		786
 	],
 	"sitemap": {
-		"path": "/var/www/FC_1",
+		"path": "/xxx/yyy/zzz",
 		"type": "event,news,location"
 	}
 }
