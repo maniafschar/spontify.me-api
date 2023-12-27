@@ -293,7 +293,7 @@ public class ActionApi {
 			@RequestHeader final BigInteger clientId, @RequestHeader(required = false) final BigInteger user,
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
 		if (BigInteger.ZERO.equals(user))
-			return null;
+			return Collections.emptyList();
 		final int limit = 25;
 		final QueryParams params = new QueryParams(
 				"contacts".equals(type) ? Query.contact_listTeaser : Query.event_listTeaser);
@@ -750,6 +750,8 @@ public class ActionApi {
 		final String url = Strings.removeSubdomain(client.getUrl());
 		s = s.replaceFirst("<meta property=\"og:url\" content=\"([^\"].*)\"",
 				"<meta property=\"og:url\" content=\"" + url + "/rest/action/marketing/" + path + '"');
+		s = s.replaceFirst("<link rel=\"canonical\" href=\"([^\"].*)\"",
+				"<link rel=\"canonical\" href=\"" + url + "/rest/action/marketing/" + path + '"');
 		s = s.replaceFirst("<meta property=\"og:image\" content=\"([^\"].*)\"",
 				"<meta property=\"og:image\" content=\"" + url + "/med/" + image + "\"/><base href=\"" + client.getUrl()
 						+ "/\"");
