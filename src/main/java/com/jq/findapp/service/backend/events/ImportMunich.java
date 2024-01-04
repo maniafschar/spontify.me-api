@@ -210,14 +210,16 @@ public class ImportMunich {
 				repository.save(location);
 				String image = getField(externalPage ? regexImageExternal : regexImage, page, 2);
 				if (image.length() > 0) {
+					location.historize();
 					if (!image.startsWith("http"))
 						image = (externalPage ? externalUrl.substring(0, externalUrl.indexOf("/", 10)) : url) + image;
 					location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, 250));
-					if (location.getImage() != null)
+					if (location.getImage() != null) {
 						location.setImageList(
 								EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
+						repository.save(location);
+					}
 				}
-				repository.save(location);
 				return location.getId();
 			} catch (final IllegalArgumentException ex) {
 				if (ex.getMessage().contains("location exists"))

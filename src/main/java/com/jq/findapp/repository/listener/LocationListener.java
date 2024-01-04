@@ -43,7 +43,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 
 	@Override
 	public void preUpdate(final Location location) throws Exception {
-		if (location.old("address") != null)
+		if (location.getAddress() != null && !location.getAddress().equals(location.old("address")))
 			lookupAddress(location);
 	}
 
