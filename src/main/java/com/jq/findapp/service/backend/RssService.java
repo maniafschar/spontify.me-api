@@ -116,9 +116,20 @@ public class RssService {
 							uid = rss.get(i).get("guid").get("").asText().trim();
 					}
 					if (!Strings.isEmpty(uid)) {
+						final String description = Strings.sanitize(rss.get(i).get("title").asText() +
+								(json.has("description") && json.get("description").asBoolean()
+										&& rss.get(i).has("description")
+												? "\n\n" + rss.get(i).get("description").asText()
+												: ""),
+								1000);
 						params.setSearch("clientNews.url='" + uid + "' and clientNews.clientId=" + clientId);
 						result = repository.list(params);
 						final ClientNews clientNews;
+						if (result.size() == 0) {
+							params.setSearch(
+									"clientNews.description='" + description + "' and clientNews.clientId=" + clientId);
+							result = repository.list(params);
+						}
 						if (result.size() == 0)
 							clientNews = new ClientNews();
 						else {
@@ -129,12 +140,7 @@ public class RssService {
 						clientNews.setClientId(clientId);
 						clientNews.setLatitude((float) json.get("latitude").asDouble());
 						clientNews.setLongitude((float) json.get("longitude").asDouble());
-						clientNews.setDescription(Strings.sanitize(rss.get(i).get("title").asText() +
-								(json.has("description") && json.get("description").asBoolean()
-										&& rss.get(i).has("description")
-												? "\n\n" + rss.get(i).get("description").asText()
-												: ""),
-								1000));
+						clientNews.setDescription(description);
 						clientNews.setUrl(uid);
 						if (rss.get(i).has("pubDate"))
 							clientNews
