@@ -242,6 +242,7 @@ public class EngagementService {
 		chatTemplates.add(new ChatTemplate(TextId.engagement_installCurrentVersion,
 				"global.openStore()",
 				contact -> !Strings.isEmpty(contact.getVersion()) && contact.getOs() != OS.web
+						&& currentVersion.get(contact.getClientId()) != null
 						&& currentVersion.get(contact.getClientId()).compareTo(contact.getVersion()) > 0));
 
 		chatTemplates.add(new ChatTemplate(TextId.engagement_praise,

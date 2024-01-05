@@ -1,0 +1,3672 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+xmlns="http://purl.org/rss/1.0/"
+xmlns:dc="http://purl.org/dc/elements/1.1/"
+xmlns:mp="http://www.tagesschau.de/rss/1.0/modules/metaplus/1.2.0/"
+xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+xmlns:enc="http://purl.oclc.org/net/rss_2.0/enc#"
+xmlns:dcterms="http://purl.org/dc/terms/"
+xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<channel rdf:about="https://www.ndr.de/homepage985-rss.xml">
+<title>NDR.de - Das Beste am Norden - Radio - Fernsehen - Nachrichten</title>
+<link>https://www.ndr.de/NDRde-Das-Beste-am-Norden-Radio-Fernsehen-Nachrichten,homepage985.html</link>
+<description>Die aktuellen Beiträge der Seite https://www.ndr.de/NDRde-Das-Beste-am-Norden-Radio-Fernsehen-Nachrichten,homepage985.html</description>
+<dc:source>NDR.de</dc:source>
+<dc:publisher>NDR.de</dc:publisher>
+<dc:rights>Copyright 2024 ndr.de</dc:rights>
+<dc:date>2024-01-05T01:20:22+01:00</dc:date>
+<sy:updatePeriod>hourly</sy:updatePeriod>
+<sy:updateFrequency>12</sy:updateFrequency>
+<sy:updateBase>2024-01-05T01:20:22+01:00</sy:updateBase>
+<mp:broadcasting>NDR</mp:broadcasting>
+<items>
+<rdf:Seq>
+<rdf:li resource="https://www.ndr.de/nachrichten/schleswig-holstein/Bauern-wollen-Robert-Habeck-zur-Rede-stellen,habeck1116.html" />
+<rdf:li resource="https://www.ndr.de/nachrichten/niedersachsen/Blog-zum-Hochwasser-in-Niedersachsen-Trockeneres-Wetter-erwartet,hochwasser4948.html" /><rdf:li resource="https://www.ndr.de/nachrichten/info/Schutz-vor-dem-Hochwasser-Wenn-Deiche-unter-Druck-geraten,deichsicherheit102.html" /><rdf:li resource="https://www.ndr.de/nachrichten/niedersachsen/braunschweig_harz_goettingen/Corona-Abriegelung-Hochhaus-Bewohner-reichen-Sammelklage-ein,goettingen2072.html" /><rdf:li resource="https://www.ndr.de/ratgeber/verbraucher/Verbraucherzentrale-sucht-Mogelpackung-des-Jahres-2022,mogelpackung244.html" /><rdf:li resource="https://www.ndr.de/nachrichten/mecklenburg-vorpommern/SPD-Landtagsfraktionschef-AfD-Verbot-muss-geprueft-werden,afdmv132.html" /><rdf:li resource="https://www.ndr.de/nachrichten/info/Sturmflut-an-der-Ostsee-im-Nordosten-Schnee-und-Glaette-moeglich,wetter8342.html" /><rdf:li resource="https://www.ndr.de/nachrichten/niedersachsen/lueneburg_heide_unterelbe/Radlader-Unfall-in-Toppenstedt-Prozess-beginnt-im-Januar,toppenstedt152.html" /><rdf:li resource="https://www.ndr.de/geschichte/chronologie/Reemtsma-Entfuehrer-Drach-erneut-zu-langer-Haftstrafe-verurteilt,reemtsmaentfuehrung103.html" /><rdf:li resource="https://www.ndr.de/nachrichten/hamburg/Wiederaufnahme-der-Elbvertiefung-Leonhard-appelliert-an-Bund,elbvertiefung930.html" /><rdf:li resource="https://www.ndr.de/nachrichten/info/Wie-stehen-die-Chancen-fuer-eine-Elementarschadenversicherung,ndrinfo54694.html" /><rdf:li resource="https://www.ndr.de/fernsehen/sendungen/schleswig-holstein_magazin/Sabotage-LNG-Pipeline-Brunsbuettel-beschaedigt,shmag112202.html" /><rdf:li resource="https://www.ndr.de/fernsehen/sendungen/hamburg_journal/Nach-toedlichen-Unfaellen-Polizei-appelliert-an-Fussgaenger,hamj142832.html" /><rdf:li resource="https://www.ndr.de/nachrichten/info/NDR-Info-extra-Hochwasser-keine-Entspannung-in-Sicht,ndrinfo54706.html" /><rdf:li resource="https://www.ndr.de/nachrichten/info/Dauerregen-wird-zur-Gefahr-fuer-Menschen-ohne-Obdach,ndrinfo54650.html" /><rdf:li resource="https://www.ndr.de/nachrichten/info/Unterwegs-mit-Strassensozialarbeiterinnen-in-Hamburg,ndrinfo54652.html" /><rdf:li resource="https://www.ndr.de/ndrfragt/Umfrage-Schule-ohne-Lehrer,umfrage1400.html" /><rdf:li resource="https://www.ndr.de/home/homepagebox100.html" /><rdf:li resource="https://www.ndr.de/home/gasspeicher166.html" /><rdf:li resource="https://www.ndr.de/home/gaspreis176.html" /><rdf:li resource="https://www.ndr.de/home/strompreis194.html" /><rdf:li resource="https://www.ndr.de/home/strommix104.html" /><rdf:li resource="https://www.ndr.de/home/hpboxtv100.html" /><rdf:li resource="https://www.ndr.de/der_ndr/presse/mitteilungen/Spitzenreiter-Die-vier-erfolgreichsten-Regionalmagazine-Deutschlands-laufen-im-NDR-Fernsehen-,pressemeldungndr24370.html" /><rdf:li resource="https://www.ndr.de/radio/radiologobox100.html" /><rdf:li resource="https://www.ndr.de/nachrichten/info/podcast5342.html" /><rdf:li resource="https://www.ndr.de/ndr2/podcasts/podcast5816.html" /><rdf:li resource="https://www.ndr.de/nachrichten/info/podcast4700.html" /><rdf:li resource="https://www.ndr.de/fernsehen/sendungen/die-ernaehrungsdocs/audio-podcast/index.html" /><rdf:li resource="https://www.ndr.de/kultur/sendungen/eat_read_sleep/index.html" /><rdf:li resource="https://www.ndr.de/kultur/podcast5682.html" /><rdf:li resource="https://www.ardaudiothek.de/sendung/11km-der-tagesschau-podcast/12200383/" /><rdf:li resource="https://www.ndr.de/ndr1niedersachsen/podcast5774.html" /><rdf:li resource="https://www.ndr.de/nachrichten/info/podcast2998.html" /><rdf:li resource="https://www.ndr.de/903/podcasts/podcast5108.html" /><rdf:li resource="https://www.ndr.de/nachrichten/info/podcast4274.html" /><rdf:li resource="https://www.ndr.de/nachrichten/info/podcast4932.html" /><rdf:li resource="https://www.ndr.de/home/homepagevideotipp100.html" /><rdf:li resource="https://www.ndr.de/home/homepagefilm106.html" /><rdf:li resource="https://www.ndr.de/home/homepagedoku102.html" /><rdf:li resource="https://www.ndr.de/home/homepageunterhaltung102.html" /><rdf:li resource="https://www.ndr.de/home/homepagetalk100.html" />
+</rdf:Seq>
+</items>
+</channel>
+<item rdf:about="https://www.ndr.de/nachrichten/schleswig-holstein/Bauern-wollen-Robert-Habeck-zur-Rede-stellen,habeck1116.html">
+<title>Fähre blockiert: Habeck in SH von wütenden Bauern abgefangen</title>
+<link>https://www.ndr.de/nachrichten/schleswig-holstein/Bauern-wollen-Robert-Habeck-zur-Rede-stellen,habeck1116.html</link>
+<description>Am Fähranleger in Schlüttsiel warteten rund 100 aufgebrachte Bauern auf den Bundeswirtschaftsminister Habeck (Grüne). Die Polizei setzte Pfefferspray ein.</description>
+<dc:type>Artikel</dc:type>
+<dc:date>2024-01-04T23:29:06.317+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>habeck1116</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>Habeck, Fähre, Protest, Bauern</mp:keywords>
+<mp:topline>Schleswig-Holstein</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Demonstranten blockieren einen Fähranleger.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Westküsten News</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/schleswig-holstein/habeck1120_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Demonstranten blockieren einen Fähranleger.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Westküsten News</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/schleswig-holstein/habeck1120_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Demonstranten blockieren einen Fähranleger.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Westküsten News</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/schleswig-holstein/habeck1120_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Demonstranten blockieren einen Fähranleger.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Westküsten News</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/schleswig-holstein/habeck1120_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Demonstranten blockieren einen Fähranleger.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Westküsten News</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/schleswig-holstein/habeck1120_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Demonstranten blockieren einen Fähranleger.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Westküsten News</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/schleswig-holstein/habeck1120_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Demonstranten blockieren einen Fähranleger.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Westküsten News</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/schleswig-holstein/habeck1120_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Demonstranten blockieren einen Fähranleger.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Westküsten News</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/schleswig-holstein/habeck1120_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Robert Habeck (Bündnis 90/Die Grünen), Bundesminister für Wirtschaft und Klimaschutz, nimmt mit Bernd Althusmann (CDU), Wirtschaftsminister von Niedersachsen, an einer Bootstour zum zukünftigen Anleger für das FSRUs (floating Storage and Regasification Units) für den Flüssiggasimport nach Deutschland in Wilhelmshaven teil. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/habeck888_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Robert Habeck (Bündnis 90/Die Grünen), Bundesminister für Wirtschaft und Klimaschutz, nimmt mit Bernd Althusmann (CDU), Wirtschaftsminister von Niedersachsen, an einer Bootstour zum zukünftigen Anleger für das FSRUs (floating Storage and Regasification Units) für den Flüssiggasimport nach Deutschland in Wilhelmshaven teil. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/habeck888_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Robert Habeck (Bündnis 90/Die Grünen), Bundesminister für Wirtschaft und Klimaschutz, nimmt mit Bernd Althusmann (CDU), Wirtschaftsminister von Niedersachsen, an einer Bootstour zum zukünftigen Anleger für das FSRUs (floating Storage and Regasification Units) für den Flüssiggasimport nach Deutschland in Wilhelmshaven teil. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/habeck888_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Robert Habeck (Bündnis 90/Die Grünen), Bundesminister für Wirtschaft und Klimaschutz, nimmt mit Bernd Althusmann (CDU), Wirtschaftsminister von Niedersachsen, an einer Bootstour zum zukünftigen Anleger für das FSRUs (floating Storage and Regasification Units) für den Flüssiggasimport nach Deutschland in Wilhelmshaven teil. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/habeck888_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Robert Habeck (Bündnis 90/Die Grünen), Bundesminister für Wirtschaft und Klimaschutz, nimmt mit Bernd Althusmann (CDU), Wirtschaftsminister von Niedersachsen, an einer Bootstour zum zukünftigen Anleger für das FSRUs (floating Storage and Regasification Units) für den Flüssiggasimport nach Deutschland in Wilhelmshaven teil. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/habeck888_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Robert Habeck (Bündnis 90/Die Grünen), Bundesminister für Wirtschaft und Klimaschutz, nimmt mit Bernd Althusmann (CDU), Wirtschaftsminister von Niedersachsen, an einer Bootstour zum zukünftigen Anleger für das FSRUs (floating Storage and Regasification Units) für den Flüssiggasimport nach Deutschland in Wilhelmshaven teil. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/habeck888_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Robert Habeck (Bündnis 90/Die Grünen), Bundesminister für Wirtschaft und Klimaschutz, nimmt mit Bernd Althusmann (CDU), Wirtschaftsminister von Niedersachsen, an einer Bootstour zum zukünftigen Anleger für das FSRUs (floating Storage and Regasification Units) für den Flüssiggasimport nach Deutschland in Wilhelmshaven teil. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/habeck888_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Robert Habeck (Bündnis 90/Die Grünen), Bundesminister für Wirtschaft und Klimaschutz, nimmt mit Bernd Althusmann (CDU), Wirtschaftsminister von Niedersachsen, an einer Bootstour zum zukünftigen Anleger für das FSRUs (floating Storage and Regasification Units) für den Flüssiggasimport nach Deutschland in Wilhelmshaven teil. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/habeck888_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item>
+<item rdf:about="https://www.ndr.de/nachrichten/niedersachsen/Blog-zum-Hochwasser-in-Niedersachsen-Trockeneres-Wetter-erwartet,hochwasser4948.html">
+<title>Blog zum Hochwasser in Niedersachsen: Trockeneres Wetter erwartet</title>
+<link>https://www.ndr.de/nachrichten/niedersachsen/Blog-zum-Hochwasser-in-Niedersachsen-Trockeneres-Wetter-erwartet,hochwasser4948.html</link>
+<description>Meteorologen rechnen mit sinkenden Temperaturen und weniger Regen in den kommenden Tagen. Alles zur Lage am Donnerstag im Blog.</description>
+<dc:type>Artikel</dc:type>
+<dc:date>2024-01-04T23:54:23.120+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>hochwasser4948</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>Hochwasser, Niedersachsen, Flüsse, Fluss, Pegelstand, Warnung, Regen, Dauerregen, Evakuierung</mp:keywords>
+<mp:topline>Niedersachsen</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Ein Überflutungsgebiet von oben fotografiert. Dort werden Barrieren mit Sandsäcken gebaut.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk </mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/hochwasser5810_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein Überflutungsgebiet von oben fotografiert. Dort werden Barrieren mit Sandsäcken gebaut.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk </mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/hochwasser5810_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein Überflutungsgebiet von oben fotografiert. Dort werden Barrieren mit Sandsäcken gebaut.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk </mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/hochwasser5810_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein Überflutungsgebiet von oben fotografiert. Dort werden Barrieren mit Sandsäcken gebaut.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk </mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/hochwasser5810_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein Überflutungsgebiet von oben fotografiert. Dort werden Barrieren mit Sandsäcken gebaut.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk </mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/hochwasser5810_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein Überflutungsgebiet von oben fotografiert. Dort werden Barrieren mit Sandsäcken gebaut.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk </mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/hochwasser5810_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein Überflutungsgebiet von oben fotografiert. Dort werden Barrieren mit Sandsäcken gebaut.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk </mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/hochwasser5810_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein Überflutungsgebiet von oben fotografiert. Dort werden Barrieren mit Sandsäcken gebaut.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk </mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/hochwasser5810_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/nachrichten/info/Schutz-vor-dem-Hochwasser-Wenn-Deiche-unter-Druck-geraten,deichsicherheit102.html">
+<title>Schutz vor dem Hochwasser: Wenn Deiche unter Druck geraten</title>
+<link>https://www.ndr.de/nachrichten/info/Schutz-vor-dem-Hochwasser-Wenn-Deiche-unter-Druck-geraten,deichsicherheit102.html</link>
+<description>Mit einem zweistufigen Sicherungssystem sollen Überschwemmungen verhindert werden. Dabei kommen längst nicht nur Sandsäcke zum Einsatz.</description>
+<dc:type>Artikel</dc:type>
+<dc:date>2024-01-04T19:40:18.943+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>deichsicherheit102</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>Deiche, Deichsicherheit, Hochwasser, Überschwemmungen</mp:keywords>
+<mp:topline>NDR Info</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Niedersachsen, Oldenburg: Mitarbeiter von THW und der Feuerwehr Oldenburg befüllen Elemente eines mobilen Notdeichs mit Wasser. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/deich516_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Niedersachsen, Oldenburg: Mitarbeiter von THW und der Feuerwehr Oldenburg befüllen Elemente eines mobilen Notdeichs mit Wasser. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/deich516_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Niedersachsen, Oldenburg: Mitarbeiter von THW und der Feuerwehr Oldenburg befüllen Elemente eines mobilen Notdeichs mit Wasser. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/deich516_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Niedersachsen, Oldenburg: Mitarbeiter von THW und der Feuerwehr Oldenburg befüllen Elemente eines mobilen Notdeichs mit Wasser. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/deich516_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Niedersachsen, Oldenburg: Mitarbeiter von THW und der Feuerwehr Oldenburg befüllen Elemente eines mobilen Notdeichs mit Wasser. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/deich516_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Niedersachsen, Oldenburg: Mitarbeiter von THW und der Feuerwehr Oldenburg befüllen Elemente eines mobilen Notdeichs mit Wasser. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/deich516_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Niedersachsen, Oldenburg: Mitarbeiter von THW und der Feuerwehr Oldenburg befüllen Elemente eines mobilen Notdeichs mit Wasser. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/deich516_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Niedersachsen, Oldenburg: Mitarbeiter von THW und der Feuerwehr Oldenburg befüllen Elemente eines mobilen Notdeichs mit Wasser. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/deich516_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Einsatzkräfte der Feuerwehr sichern ein Wohngebiet und eine Straße nahe der Hunte mit Sandsäcken vor Hochwasser.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/hochwasser5148_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Einsatzkräfte der Feuerwehr sichern ein Wohngebiet und eine Straße nahe der Hunte mit Sandsäcken vor Hochwasser.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/hochwasser5148_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Einsatzkräfte der Feuerwehr sichern ein Wohngebiet und eine Straße nahe der Hunte mit Sandsäcken vor Hochwasser.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/hochwasser5148_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Einsatzkräfte der Feuerwehr sichern ein Wohngebiet und eine Straße nahe der Hunte mit Sandsäcken vor Hochwasser.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/hochwasser5148_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Einsatzkräfte der Feuerwehr sichern ein Wohngebiet und eine Straße nahe der Hunte mit Sandsäcken vor Hochwasser.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/hochwasser5148_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Einsatzkräfte der Feuerwehr sichern ein Wohngebiet und eine Straße nahe der Hunte mit Sandsäcken vor Hochwasser.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/hochwasser5148_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Einsatzkräfte der Feuerwehr sichern ein Wohngebiet und eine Straße nahe der Hunte mit Sandsäcken vor Hochwasser.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/hochwasser5148_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Einsatzkräfte der Feuerwehr sichern ein Wohngebiet und eine Straße nahe der Hunte mit Sandsäcken vor Hochwasser.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/hochwasser5148_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein mobiler Hochwasserschutz liegt am Deich der Wörpe in Lilienthal. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/hochwasser5562_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein mobiler Hochwasserschutz liegt am Deich der Wörpe in Lilienthal. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/hochwasser5562_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein mobiler Hochwasserschutz liegt am Deich der Wörpe in Lilienthal. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/hochwasser5562_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein mobiler Hochwasserschutz liegt am Deich der Wörpe in Lilienthal. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/hochwasser5562_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein mobiler Hochwasserschutz liegt am Deich der Wörpe in Lilienthal. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/hochwasser5562_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein mobiler Hochwasserschutz liegt am Deich der Wörpe in Lilienthal. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/hochwasser5562_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein mobiler Hochwasserschutz liegt am Deich der Wörpe in Lilienthal. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/hochwasser5562_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein mobiler Hochwasserschutz liegt am Deich der Wörpe in Lilienthal. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/hochwasser5562_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein mobiles Deichsystem in Oldenburg.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/oldenburg2654_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein mobiles Deichsystem in Oldenburg.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/oldenburg2654_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein mobiles Deichsystem in Oldenburg.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/oldenburg2654_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein mobiles Deichsystem in Oldenburg.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/oldenburg2654_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein mobiles Deichsystem in Oldenburg.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/oldenburg2654_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein mobiles Deichsystem in Oldenburg.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/oldenburg2654_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein mobiles Deichsystem in Oldenburg.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/oldenburg2654_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein mobiles Deichsystem in Oldenburg.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/oldenburg_ostfriesland/oldenburg2654_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/nachrichten/niedersachsen/braunschweig_harz_goettingen/Corona-Abriegelung-Hochhaus-Bewohner-reichen-Sammelklage-ein,goettingen2072.html">
+<title>Corona-Abriegelung: Hochhaus-Bewohner reichen Sammelklage ein</title>
+<link>https://www.ndr.de/nachrichten/niedersachsen/braunschweig_harz_goettingen/Corona-Abriegelung-Hochhaus-Bewohner-reichen-Sammelklage-ein,goettingen2072.html</link>
+<description>Mehr als 200 Menschen wollen die Stadt Göttingen auf Schmerzensgeld in Höhe von mehr als 880.000 Euro verklagen.</description>
+<dc:type>Artikel</dc:type>
+<dc:date>2024-01-04T19:38:14.379+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>goettingen2072</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>Göttingen, Wohnkomplex, Adam, Quarantäne  Massenanzeige, Sammelklage, Massenklage, Landgericht, Verwaltungsgericht, Corona</mp:keywords>
+<mp:topline>Studio Braunschweig</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>An dem Fenster eines unter Quarantäne gestellten Wohnhauses hängt eine Plakat mit der Aufschrift "Wir sind auch Mensch".</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>picture alliance/dpa</mp:source>
+<mp:data>https://www.ndr.de/home/niedersachsen/goettingen1398_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>An dem Fenster eines unter Quarantäne gestellten Wohnhauses hängt eine Plakat mit der Aufschrift "Wir sind auch Mensch".</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>picture alliance/dpa</mp:source>
+<mp:data>https://www.ndr.de/home/niedersachsen/goettingen1398_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>An dem Fenster eines unter Quarantäne gestellten Wohnhauses hängt eine Plakat mit der Aufschrift "Wir sind auch Mensch".</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>picture alliance/dpa</mp:source>
+<mp:data>https://www.ndr.de/home/niedersachsen/goettingen1398_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>An dem Fenster eines unter Quarantäne gestellten Wohnhauses hängt eine Plakat mit der Aufschrift "Wir sind auch Mensch".</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>picture alliance/dpa</mp:source>
+<mp:data>https://www.ndr.de/home/niedersachsen/goettingen1398_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>An dem Fenster eines unter Quarantäne gestellten Wohnhauses hängt eine Plakat mit der Aufschrift "Wir sind auch Mensch".</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>picture alliance/dpa</mp:source>
+<mp:data>https://www.ndr.de/home/niedersachsen/goettingen1398_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>An dem Fenster eines unter Quarantäne gestellten Wohnhauses hängt eine Plakat mit der Aufschrift "Wir sind auch Mensch".</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>picture alliance/dpa</mp:source>
+<mp:data>https://www.ndr.de/home/niedersachsen/goettingen1398_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>An dem Fenster eines unter Quarantäne gestellten Wohnhauses hängt eine Plakat mit der Aufschrift "Wir sind auch Mensch".</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>picture alliance/dpa</mp:source>
+<mp:data>https://www.ndr.de/home/niedersachsen/goettingen1398_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>An dem Fenster eines unter Quarantäne gestellten Wohnhauses hängt eine Plakat mit der Aufschrift "Wir sind auch Mensch".</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>picture alliance/dpa</mp:source>
+<mp:data>https://www.ndr.de/home/niedersachsen/goettingen1398_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/ratgeber/verbraucher/Verbraucherzentrale-sucht-Mogelpackung-des-Jahres-2022,mogelpackung244.html">
+<title>Verbraucherzentrale sucht "Mogelpackung des Jahres 2023"</title>
+<link>https://www.ndr.de/ratgeber/verbraucher/Verbraucherzentrale-sucht-Mogelpackung-des-Jahres-2022,mogelpackung244.html</link>
+<description>Weniger Inhalt, höherer Preis: Fünf Produkte fielen durch besonders dreistes Mogeln auf. Die Abstimmung läuft bis 22. Januar.</description>
+<dc:type>Artikel</dc:type>
+<dc:date>2024-01-04T15:53:14.252+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>mogelpackung244</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>Mogelpackung des Jahres, 2024, Verbraucherzentrale, Hamburg, Kandidaten</mp:keywords>
+<mp:topline>Verbraucher</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Yoghurt-Gums, Bake Rolls, Schokolade, Mundspülung und Oreo-Eis am Stiel: Die Kandidaten für die Wahl zur "Mogelpackung des Jahres" 2023.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Verbraucherzentrale Hamburg</mp:source>
+<mp:data>https://www.ndr.de/ratgeber/verbraucher/mogelpackungen114_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Yoghurt-Gums, Bake Rolls, Schokolade, Mundspülung und Oreo-Eis am Stiel: Die Kandidaten für die Wahl zur "Mogelpackung des Jahres" 2023.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Verbraucherzentrale Hamburg</mp:source>
+<mp:data>https://www.ndr.de/ratgeber/verbraucher/mogelpackungen114_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Yoghurt-Gums, Bake Rolls, Schokolade, Mundspülung und Oreo-Eis am Stiel: Die Kandidaten für die Wahl zur "Mogelpackung des Jahres" 2023.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Verbraucherzentrale Hamburg</mp:source>
+<mp:data>https://www.ndr.de/ratgeber/verbraucher/mogelpackungen114_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Yoghurt-Gums, Bake Rolls, Schokolade, Mundspülung und Oreo-Eis am Stiel: Die Kandidaten für die Wahl zur "Mogelpackung des Jahres" 2023.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Verbraucherzentrale Hamburg</mp:source>
+<mp:data>https://www.ndr.de/ratgeber/verbraucher/mogelpackungen114_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Yoghurt-Gums, Bake Rolls, Schokolade, Mundspülung und Oreo-Eis am Stiel: Die Kandidaten für die Wahl zur "Mogelpackung des Jahres" 2023.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Verbraucherzentrale Hamburg</mp:source>
+<mp:data>https://www.ndr.de/ratgeber/verbraucher/mogelpackungen114_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Yoghurt-Gums, Bake Rolls, Schokolade, Mundspülung und Oreo-Eis am Stiel: Die Kandidaten für die Wahl zur "Mogelpackung des Jahres" 2023.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Verbraucherzentrale Hamburg</mp:source>
+<mp:data>https://www.ndr.de/ratgeber/verbraucher/mogelpackungen114_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Yoghurt-Gums, Bake Rolls, Schokolade, Mundspülung und Oreo-Eis am Stiel: Die Kandidaten für die Wahl zur "Mogelpackung des Jahres" 2023.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Verbraucherzentrale Hamburg</mp:source>
+<mp:data>https://www.ndr.de/ratgeber/verbraucher/mogelpackungen114_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Yoghurt-Gums, Bake Rolls, Schokolade, Mundspülung und Oreo-Eis am Stiel: Die Kandidaten für die Wahl zur "Mogelpackung des Jahres" 2023.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Verbraucherzentrale Hamburg</mp:source>
+<mp:data>https://www.ndr.de/ratgeber/verbraucher/mogelpackungen114_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/nachrichten/mecklenburg-vorpommern/SPD-Landtagsfraktionschef-AfD-Verbot-muss-geprueft-werden,afdmv132.html">
+<title>SPD-Landtagsfraktionschef: AfD-Verbot muss geprüft werden</title>
+<link>https://www.ndr.de/nachrichten/mecklenburg-vorpommern/SPD-Landtagsfraktionschef-AfD-Verbot-muss-geprueft-werden,afdmv132.html</link>
+<description>Julian Barlen sieht "Demokratieprobleme" bei der AfD, weist aber auf hohe Hürden für ein Verbot hin.</description>
+<dc:type>Artikel</dc:type>
+<dc:date>2024-01-05T01:20:10.664+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>afdmv132</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>Aktuell, News, Aktuelles, Nachrichten, Neuigkeiten, Mecklenburg-Vorpommern, MV, Mecklenburg Vorpommern, mv news, news mv, mv nachrichten, Mecklenburg-Vorpommern aktuell, meck pomm, meck-pomm, radio mecklenburg-vorpommern</mp:keywords>
+<mp:topline>Mecklenburg-Vorpommern</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Der scheidende Bundestagspräsident Norbert Lammert hielt die Festrede im neuen Plenarsaal des Landtages Mecklenburg-Vorpommern</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/mecklenburg-vorpommern/plenarsaal210_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Der scheidende Bundestagspräsident Norbert Lammert hielt die Festrede im neuen Plenarsaal des Landtages Mecklenburg-Vorpommern</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/mecklenburg-vorpommern/plenarsaal210_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Der scheidende Bundestagspräsident Norbert Lammert hielt die Festrede im neuen Plenarsaal des Landtages Mecklenburg-Vorpommern</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/mecklenburg-vorpommern/plenarsaal210_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Der scheidende Bundestagspräsident Norbert Lammert hielt die Festrede im neuen Plenarsaal des Landtages Mecklenburg-Vorpommern</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/mecklenburg-vorpommern/plenarsaal210_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Der scheidende Bundestagspräsident Norbert Lammert hielt die Festrede im neuen Plenarsaal des Landtages Mecklenburg-Vorpommern</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/mecklenburg-vorpommern/plenarsaal210_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Der scheidende Bundestagspräsident Norbert Lammert hielt die Festrede im neuen Plenarsaal des Landtages Mecklenburg-Vorpommern</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/mecklenburg-vorpommern/plenarsaal210_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Der scheidende Bundestagspräsident Norbert Lammert hielt die Festrede im neuen Plenarsaal des Landtages Mecklenburg-Vorpommern</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/mecklenburg-vorpommern/plenarsaal210_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Der scheidende Bundestagspräsident Norbert Lammert hielt die Festrede im neuen Plenarsaal des Landtages Mecklenburg-Vorpommern</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>dpa-Bildfunk</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/mecklenburg-vorpommern/plenarsaal210_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/nachrichten/info/Sturmflut-an-der-Ostsee-im-Nordosten-Schnee-und-Glaette-moeglich,wetter8342.html">
+<title>Ostsee Sturmflut vorüber - Im Nordosten Schnee und Glätte möglich</title>
+<link>https://www.ndr.de/nachrichten/info/Sturmflut-an-der-Ostsee-im-Nordosten-Schnee-und-Glaette-moeglich,wetter8342.html</link>
+<description>An der Elbe und nordöstlich davon sinken die Temperaturen unter den Gefrierpunkt. Die Sturmflut bereitete keine größeren Probleme.</description>
+<dc:type>Artikel</dc:type>
+<dc:date>2024-01-04T22:30:15.521+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>wetter8342</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>Wetter, Norddeutschland, Sturmflut, Ostsee, Regen, Überflutungen, Hochwasser,</mp:keywords>
+<mp:topline>NDR Info</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Mit Sandsäcken werden bei einer Sturmflut Häuser in Hafennähe in Wismar vor dem Hochwasser geschützt. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/mecklenburg-vorpommern/hochwasser5792_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mit Sandsäcken werden bei einer Sturmflut Häuser in Hafennähe in Wismar vor dem Hochwasser geschützt. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/mecklenburg-vorpommern/hochwasser5792_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mit Sandsäcken werden bei einer Sturmflut Häuser in Hafennähe in Wismar vor dem Hochwasser geschützt. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/mecklenburg-vorpommern/hochwasser5792_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mit Sandsäcken werden bei einer Sturmflut Häuser in Hafennähe in Wismar vor dem Hochwasser geschützt. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/mecklenburg-vorpommern/hochwasser5792_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mit Sandsäcken werden bei einer Sturmflut Häuser in Hafennähe in Wismar vor dem Hochwasser geschützt. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/mecklenburg-vorpommern/hochwasser5792_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mit Sandsäcken werden bei einer Sturmflut Häuser in Hafennähe in Wismar vor dem Hochwasser geschützt. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/mecklenburg-vorpommern/hochwasser5792_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mit Sandsäcken werden bei einer Sturmflut Häuser in Hafennähe in Wismar vor dem Hochwasser geschützt. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/mecklenburg-vorpommern/hochwasser5792_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mit Sandsäcken werden bei einer Sturmflut Häuser in Hafennähe in Wismar vor dem Hochwasser geschützt. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/mecklenburg-vorpommern/hochwasser5792_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mehrere Feuerwehrschläuche liegen am Strand und entlassen Wasser in die Ostsee.</mp:alt>
+<mp:caption>Feuerwehr und THW sind mit etwa zehn Hochleistungspumpen auf der Insel Fehmarn im Einsatz, um das Wasser in die Ostsee zu pumpen.</mp:caption>
+<mp:source>5NEWS</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/schleswig-holstein/hochwasser5764_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mehrere Feuerwehrschläuche liegen am Strand und entlassen Wasser in die Ostsee.</mp:alt>
+<mp:caption>Feuerwehr und THW sind mit etwa zehn Hochleistungspumpen auf der Insel Fehmarn im Einsatz, um das Wasser in die Ostsee zu pumpen.</mp:caption>
+<mp:source>5NEWS</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/schleswig-holstein/hochwasser5764_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mehrere Feuerwehrschläuche liegen am Strand und entlassen Wasser in die Ostsee.</mp:alt>
+<mp:caption>Feuerwehr und THW sind mit etwa zehn Hochleistungspumpen auf der Insel Fehmarn im Einsatz, um das Wasser in die Ostsee zu pumpen.</mp:caption>
+<mp:source>5NEWS</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/schleswig-holstein/hochwasser5764_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mehrere Feuerwehrschläuche liegen am Strand und entlassen Wasser in die Ostsee.</mp:alt>
+<mp:caption>Feuerwehr und THW sind mit etwa zehn Hochleistungspumpen auf der Insel Fehmarn im Einsatz, um das Wasser in die Ostsee zu pumpen.</mp:caption>
+<mp:source>5NEWS</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/schleswig-holstein/hochwasser5764_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mehrere Feuerwehrschläuche liegen am Strand und entlassen Wasser in die Ostsee.</mp:alt>
+<mp:caption>Feuerwehr und THW sind mit etwa zehn Hochleistungspumpen auf der Insel Fehmarn im Einsatz, um das Wasser in die Ostsee zu pumpen.</mp:caption>
+<mp:source>5NEWS</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/schleswig-holstein/hochwasser5764_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mehrere Feuerwehrschläuche liegen am Strand und entlassen Wasser in die Ostsee.</mp:alt>
+<mp:caption>Feuerwehr und THW sind mit etwa zehn Hochleistungspumpen auf der Insel Fehmarn im Einsatz, um das Wasser in die Ostsee zu pumpen.</mp:caption>
+<mp:source>5NEWS</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/schleswig-holstein/hochwasser5764_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mehrere Feuerwehrschläuche liegen am Strand und entlassen Wasser in die Ostsee.</mp:alt>
+<mp:caption>Feuerwehr und THW sind mit etwa zehn Hochleistungspumpen auf der Insel Fehmarn im Einsatz, um das Wasser in die Ostsee zu pumpen.</mp:caption>
+<mp:source>5NEWS</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/schleswig-holstein/hochwasser5764_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mehrere Feuerwehrschläuche liegen am Strand und entlassen Wasser in die Ostsee.</mp:alt>
+<mp:caption>Feuerwehr und THW sind mit etwa zehn Hochleistungspumpen auf der Insel Fehmarn im Einsatz, um das Wasser in die Ostsee zu pumpen.</mp:caption>
+<mp:source>5NEWS</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/schleswig-holstein/hochwasser5764_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/nachrichten/niedersachsen/lueneburg_heide_unterelbe/Radlader-Unfall-in-Toppenstedt-Prozess-beginnt-im-Januar,toppenstedt152.html">
+<title>Radlader-Unfall in Toppenstedt: Prozess beginnt im Januar</title>
+<link>https://www.ndr.de/nachrichten/niedersachsen/lueneburg_heide_unterelbe/Radlader-Unfall-in-Toppenstedt-Prozess-beginnt-im-Januar,toppenstedt152.html</link>
+<description>Der Fahrer muss sich unter anderem wegen fahrlässiger Tötung verantworten. Bei dem Unfall waren zwei Menschen gestorben.</description>
+<dc:type>Artikel</dc:type>
+<dc:date>2024-01-04T22:37:57.631+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>toppenstedt152</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>Unfall, Toppenstedt, Kinder, Tod, Radlader, Gericht, Harburg, Tod, Unfall</mp:keywords>
+<mp:topline>Studio Lüneburg</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Toppenstedt: Eine Gitterbox samt Gabeln von dem in den Unfall verwickelten Radlader</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/lueneburg_heide_unterelbe/toppenstedt154_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Toppenstedt: Eine Gitterbox samt Gabeln von dem in den Unfall verwickelten Radlader</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/lueneburg_heide_unterelbe/toppenstedt154_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Toppenstedt: Eine Gitterbox samt Gabeln von dem in den Unfall verwickelten Radlader</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/lueneburg_heide_unterelbe/toppenstedt154_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Toppenstedt: Eine Gitterbox samt Gabeln von dem in den Unfall verwickelten Radlader</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/lueneburg_heide_unterelbe/toppenstedt154_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Toppenstedt: Eine Gitterbox samt Gabeln von dem in den Unfall verwickelten Radlader</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/lueneburg_heide_unterelbe/toppenstedt154_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Toppenstedt: Eine Gitterbox samt Gabeln von dem in den Unfall verwickelten Radlader</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/lueneburg_heide_unterelbe/toppenstedt154_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Toppenstedt: Eine Gitterbox samt Gabeln von dem in den Unfall verwickelten Radlader</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/lueneburg_heide_unterelbe/toppenstedt154_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Toppenstedt: Eine Gitterbox samt Gabeln von dem in den Unfall verwickelten Radlader</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/lueneburg_heide_unterelbe/toppenstedt154_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Gitterbox. In ihr saßen bei einem tödlichen Unfall in Toppenstedt mehrere Personen.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>TNN</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/lueneburg_heide_unterelbe/toppenstedt112_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Gitterbox. In ihr saßen bei einem tödlichen Unfall in Toppenstedt mehrere Personen.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>TNN</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/lueneburg_heide_unterelbe/toppenstedt112_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Gitterbox. In ihr saßen bei einem tödlichen Unfall in Toppenstedt mehrere Personen.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>TNN</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/lueneburg_heide_unterelbe/toppenstedt112_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Gitterbox. In ihr saßen bei einem tödlichen Unfall in Toppenstedt mehrere Personen.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>TNN</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/lueneburg_heide_unterelbe/toppenstedt112_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Gitterbox. In ihr saßen bei einem tödlichen Unfall in Toppenstedt mehrere Personen.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>TNN</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/lueneburg_heide_unterelbe/toppenstedt112_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Gitterbox. In ihr saßen bei einem tödlichen Unfall in Toppenstedt mehrere Personen.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>TNN</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/lueneburg_heide_unterelbe/toppenstedt112_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Gitterbox. In ihr saßen bei einem tödlichen Unfall in Toppenstedt mehrere Personen.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>TNN</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/lueneburg_heide_unterelbe/toppenstedt112_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Gitterbox. In ihr saßen bei einem tödlichen Unfall in Toppenstedt mehrere Personen.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>TNN</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/niedersachsen/lueneburg_heide_unterelbe/toppenstedt112_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/geschichte/chronologie/Reemtsma-Entfuehrer-Drach-erneut-zu-langer-Haftstrafe-verurteilt,reemtsmaentfuehrung103.html">
+<title>Reemtsma-Entführer Drach erneut zu langer Haftstrafe verurteilt</title>
+<link>https://www.ndr.de/geschichte/chronologie/Reemtsma-Entfuehrer-Drach-erneut-zu-langer-Haftstrafe-verurteilt,reemtsmaentfuehrung103.html</link>
+<description>2013 hatte Thomas Drach seine Haftstrafe wegen der Reemtsma-Entführung 1996 abgesessen. Nun muss er erneut für 15 Jahre hinter Gitter.</description>
+<dc:type>Artikel</dc:type>
+<dc:date>2024-01-04T14:10:46.310+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>reemtsmaentfuehrung103</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>Jan Philipp Reemtsma, Entführung, Thomas Drach, Geiselnahme, Lösegeld, Erpressung, Garlstedt, 1996</mp:keywords>
+<mp:topline>Chronologie</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Thomas Drach (l.) sitzt im Kölner Landgericht auf der Anklagebank.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/drach186_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Thomas Drach (l.) sitzt im Kölner Landgericht auf der Anklagebank.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/drach186_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Thomas Drach (l.) sitzt im Kölner Landgericht auf der Anklagebank.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/drach186_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Thomas Drach (l.) sitzt im Kölner Landgericht auf der Anklagebank.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/drach186_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Thomas Drach (l.) sitzt im Kölner Landgericht auf der Anklagebank.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/drach186_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Thomas Drach (l.) sitzt im Kölner Landgericht auf der Anklagebank.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/drach186_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Thomas Drach (l.) sitzt im Kölner Landgericht auf der Anklagebank.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/drach186_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Thomas Drach (l.) sitzt im Kölner Landgericht auf der Anklagebank.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/drach186_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Jan Phillipp Reemtsma auf einem von den Entführern geschossenen Polaroidfoto.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>picture-alliance / dpa</mp:source>
+<mp:data>https://www.ndr.de/geschichte/chronologie/reemtsmaentfuehrung105_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Jan Phillipp Reemtsma auf einem von den Entführern geschossenen Polaroidfoto.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>picture-alliance / dpa</mp:source>
+<mp:data>https://www.ndr.de/geschichte/chronologie/reemtsmaentfuehrung105_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Jan Phillipp Reemtsma auf einem von den Entführern geschossenen Polaroidfoto.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>picture-alliance / dpa</mp:source>
+<mp:data>https://www.ndr.de/geschichte/chronologie/reemtsmaentfuehrung105_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Jan Phillipp Reemtsma auf einem von den Entführern geschossenen Polaroidfoto.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>picture-alliance / dpa</mp:source>
+<mp:data>https://www.ndr.de/geschichte/chronologie/reemtsmaentfuehrung105_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Jan Phillipp Reemtsma auf einem von den Entführern geschossenen Polaroidfoto.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>picture-alliance / dpa</mp:source>
+<mp:data>https://www.ndr.de/geschichte/chronologie/reemtsmaentfuehrung105_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Jan Phillipp Reemtsma auf einem von den Entführern geschossenen Polaroidfoto.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>picture-alliance / dpa</mp:source>
+<mp:data>https://www.ndr.de/geschichte/chronologie/reemtsmaentfuehrung105_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Jan Phillipp Reemtsma auf einem von den Entführern geschossenen Polaroidfoto.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>picture-alliance / dpa</mp:source>
+<mp:data>https://www.ndr.de/geschichte/chronologie/reemtsmaentfuehrung105_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Jan Phillipp Reemtsma auf einem von den Entführern geschossenen Polaroidfoto.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>picture-alliance / dpa</mp:source>
+<mp:data>https://www.ndr.de/geschichte/chronologie/reemtsmaentfuehrung105_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/nachrichten/hamburg/Wiederaufnahme-der-Elbvertiefung-Leonhard-appelliert-an-Bund,elbvertiefung930.html">
+<title>Wiederaufnahme der Elbvertiefung: Leonhard appelliert an Bund</title>
+<link>https://www.ndr.de/nachrichten/hamburg/Wiederaufnahme-der-Elbvertiefung-Leonhard-appelliert-an-Bund,elbvertiefung930.html</link>
+<description>Hamburgs Wirtschaftssenatorin hofft darauf, dass die Elbvertiefung bis Jahresende doch wieder voll freigegeben werden kann.</description>
+<dc:type>Artikel</dc:type>
+<dc:date>2024-01-04T18:06:33.406+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>elbvertiefung930</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>Hamburg Elbe Elbvertiefung Schlick Hafenschlick leonhard tiefgang </mp:keywords>
+<mp:topline>Hamburg</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Ein Bagger entfernt Schlick aus der Elbe. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1627060_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein Bagger entfernt Schlick aus der Elbe. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1627060_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein Bagger entfernt Schlick aus der Elbe. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1627060_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein Bagger entfernt Schlick aus der Elbe. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1627060_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein Bagger entfernt Schlick aus der Elbe. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1627060_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein Bagger entfernt Schlick aus der Elbe. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1627060_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein Bagger entfernt Schlick aus der Elbe. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1627060_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein Bagger entfernt Schlick aus der Elbe. </mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1627060_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/nachrichten/info/Wie-stehen-die-Chancen-fuer-eine-Elementarschadenversicherung,ndrinfo54694.html">
+<title>Kommt eine Versicherungspflicht für Elementarschäden?</title>
+<link>https://www.ndr.de/nachrichten/info/Wie-stehen-die-Chancen-fuer-eine-Elementarschadenversicherung,ndrinfo54694.html</link>
+<description>Ist sie politisch durchzusetzen? Wer wird die Kosten der jetzigen Hochwasserschäden übernehmen? Kerstin Dausend im Gespräch.</description>
+<dc:type>Video</dc:type>
+<dc:date>2024-01-04T23:05:40.851+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>ndrinfo54694</dc:identifier>
+<dc:source>VPMS3</dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>Nachrichten, Pflicht, Elementarschadenversicherung, Schäden, Versicherung, Kosten, Elementarschaden, Hochwasser</mp:keywords>
+<mp:topline>NDR Info</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Moderator Daniel Anibal Bröckerhoff spricht mit der aus Berlin zugeschalteten Journalistin Kerstin Dausend.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674756_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Moderator Daniel Anibal Bröckerhoff spricht mit der aus Berlin zugeschalteten Journalistin Kerstin Dausend.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674756_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Moderator Daniel Anibal Bröckerhoff spricht mit der aus Berlin zugeschalteten Journalistin Kerstin Dausend.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674756_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Moderator Daniel Anibal Bröckerhoff spricht mit der aus Berlin zugeschalteten Journalistin Kerstin Dausend.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674756_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Moderator Daniel Anibal Bröckerhoff spricht mit der aus Berlin zugeschalteten Journalistin Kerstin Dausend.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674756_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Moderator Daniel Anibal Bröckerhoff spricht mit der aus Berlin zugeschalteten Journalistin Kerstin Dausend.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674756_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Moderator Daniel Anibal Bröckerhoff spricht mit der aus Berlin zugeschalteten Journalistin Kerstin Dausend.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674756_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Moderator Daniel Anibal Bröckerhoff spricht mit der aus Berlin zugeschalteten Journalistin Kerstin Dausend.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674756_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Durch ein Kellerfenster wird nach außen ein Eimer mit braunem Wasser ausgeschüttet.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674748_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Durch ein Kellerfenster wird nach außen ein Eimer mit braunem Wasser ausgeschüttet.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674748_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Durch ein Kellerfenster wird nach außen ein Eimer mit braunem Wasser ausgeschüttet.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674748_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Durch ein Kellerfenster wird nach außen ein Eimer mit braunem Wasser ausgeschüttet.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674748_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Durch ein Kellerfenster wird nach außen ein Eimer mit braunem Wasser ausgeschüttet.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674748_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Durch ein Kellerfenster wird nach außen ein Eimer mit braunem Wasser ausgeschüttet.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674748_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Durch ein Kellerfenster wird nach außen ein Eimer mit braunem Wasser ausgeschüttet.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674748_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Durch ein Kellerfenster wird nach außen ein Eimer mit braunem Wasser ausgeschüttet.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674748_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+<enc:enclosure rdf:resource="https://mediandr-a.akamaihd.net/progressive/2024/0104/TV-20240104-2213-5400.hd.mp4" enc:type="video/mp4" enc:length="114459648" />
+</item><item rdf:about="https://www.ndr.de/fernsehen/sendungen/schleswig-holstein_magazin/Sabotage-LNG-Pipeline-Brunsbuettel-beschaedigt,shmag112202.html">
+<title>Sabotage? LNG-Pipeline Brunsbüttel beschädigt</title>
+<link>https://www.ndr.de/fernsehen/sendungen/schleswig-holstein_magazin/Sabotage-LNG-Pipeline-Brunsbuettel-beschaedigt,shmag112202.html</link>
+<description>An mehreren Stellen sollen Löcher in die Pipeline gebohrt worden sein. ARD-Terrorismusexperte Michael Götzschenberg im Gespräch.</description>
+<dc:type>Video</dc:type>
+<dc:date>2024-01-04T20:51:28.114+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>shmag112202</dc:identifier>
+<dc:source>VPMS3</dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>Schleswig-Holstein, Sabotage, LNG, Brunsbüttel, Pipline, Beschädigung, Gas, </mp:keywords>
+<mp:topline>Schleswig-Holstein Magazin</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Michael Götschenburg im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674574_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Michael Götschenburg im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674574_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Michael Götschenburg im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674574_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Michael Götschenburg im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674574_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Michael Götschenburg im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674574_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Michael Götschenburg im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674574_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Michael Götschenburg im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674574_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Michael Götschenburg im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674574_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo der Sendung Schleswig-Holstein Magazin</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Markendesign</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/schleswig-holstein_magazin/logo200_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo der Sendung Schleswig-Holstein Magazin</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Markendesign</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/schleswig-holstein_magazin/logo200_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo der Sendung Schleswig-Holstein Magazin</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Markendesign</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/schleswig-holstein_magazin/logo200_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo der Sendung Schleswig-Holstein Magazin</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Markendesign</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/schleswig-holstein_magazin/logo200_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo der Sendung Schleswig-Holstein Magazin</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Markendesign</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/schleswig-holstein_magazin/logo200_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo der Sendung Schleswig-Holstein Magazin</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Markendesign</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/schleswig-holstein_magazin/logo200_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo der Sendung Schleswig-Holstein Magazin</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Markendesign</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/schleswig-holstein_magazin/logo200_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo der Sendung Schleswig-Holstein Magazin</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Markendesign</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/schleswig-holstein_magazin/logo200_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+<enc:enclosure rdf:resource="https://mediandr-a.akamaihd.net/progressive/2024/0104/TV-20240104-2008-5200.hd.mp4" enc:type="video/mp4" enc:length="73857408" />
+</item><item rdf:about="https://www.ndr.de/fernsehen/sendungen/hamburg_journal/Nach-toedlichen-Unfaellen-Polizei-appelliert-an-Fussgaenger,hamj142832.html">
+<title>Nach tödlichen Unfällen: Polizei appelliert an Fußgänger</title>
+<link>https://www.ndr.de/fernsehen/sendungen/hamburg_journal/Nach-toedlichen-Unfaellen-Polizei-appelliert-an-Fussgaenger,hamj142832.html</link>
+<description>Mehrere Fußgänger wurden in den letzten Wochen schwer verletzt, eine 76-Jährige in Eißendorf tödlich. Die Polizei mahnt zur Vorsicht.</description>
+<dc:type>Video</dc:type>
+<dc:date>2024-01-04T20:28:35.343+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>hamj142832</dc:identifier>
+<dc:source>VPMS3</dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>Hamburg, Polizei, Unfälle, zu Fuß, Fußgänger, Appell, </mp:keywords>
+<mp:topline>Hamburg Journal</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Ein Rettungswagen und ein Poliezeiauto auf einer Straße.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674382_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein Rettungswagen und ein Poliezeiauto auf einer Straße.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674382_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein Rettungswagen und ein Poliezeiauto auf einer Straße.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674382_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein Rettungswagen und ein Poliezeiauto auf einer Straße.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674382_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein Rettungswagen und ein Poliezeiauto auf einer Straße.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674382_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein Rettungswagen und ein Poliezeiauto auf einer Straße.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674382_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein Rettungswagen und ein Poliezeiauto auf einer Straße.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674382_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ein Rettungswagen und ein Poliezeiauto auf einer Straße.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674382_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo "Hamburg Journal": Sonnenaufgang im Hamburger Hafen</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/hamburg_journal/logo1796_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo "Hamburg Journal": Sonnenaufgang im Hamburger Hafen</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/hamburg_journal/logo1796_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo "Hamburg Journal": Sonnenaufgang im Hamburger Hafen</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/hamburg_journal/logo1796_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo "Hamburg Journal": Sonnenaufgang im Hamburger Hafen</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/hamburg_journal/logo1796_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo "Hamburg Journal": Sonnenaufgang im Hamburger Hafen</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/hamburg_journal/logo1796_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo "Hamburg Journal": Sonnenaufgang im Hamburger Hafen</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/hamburg_journal/logo1796_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo "Hamburg Journal": Sonnenaufgang im Hamburger Hafen</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/hamburg_journal/logo1796_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo "Hamburg Journal": Sonnenaufgang im Hamburger Hafen</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/hamburg_journal/logo1796_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+<enc:enclosure rdf:resource="https://mediandr-a.akamaihd.net/progressive/2024/0104/TV-20240104-1940-3100.hd.mp4" enc:type="video/mp4" enc:length="35188608" />
+</item><item rdf:about="https://www.ndr.de/nachrichten/info/NDR-Info-extra-Hochwasser-keine-Entspannung-in-Sicht,ndrinfo54706.html">
+<title>NDR Info extra: Hochwasser: keine Entspannung in Sicht</title>
+<link>https://www.ndr.de/nachrichten/info/NDR-Info-extra-Hochwasser-keine-Entspannung-in-Sicht,ndrinfo54706.html</link>
+<description>Das Wetter bessert sich zwar - die Pegel reagieren aber verzögert. Das gilt etwa für Aller, Leine, Hase und Hunte. </description>
+<dc:type>Video</dc:type>
+<dc:date>2024-01-04T22:34:01.035+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>ndrinfo54706</dc:identifier>
+<dc:source>Live2VOD</dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>Nachrichten, Wetter, Pegel, Aller, Leine, Hase, Hunte, Hochwasser, Regen, niedersachsen, </mp:keywords>
+<mp:topline>NDR Info</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Ilka Petersen moderiert.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674692_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ilka Petersen moderiert.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674692_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ilka Petersen moderiert.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674692_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ilka Petersen moderiert.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674692_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ilka Petersen moderiert.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674692_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ilka Petersen moderiert.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674692_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ilka Petersen moderiert.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674692_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Ilka Petersen moderiert.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674692_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+<enc:enclosure rdf:resource="https://mediandr-a.akamaihd.net/progressive/2024/0104/TV-20240104-2014-5711.hd.mp4" enc:type="video/mp4" enc:length="238973184" />
+</item><item rdf:about="https://www.ndr.de/nachrichten/info/Dauerregen-wird-zur-Gefahr-fuer-Menschen-ohne-Obdach,ndrinfo54650.html">
+<title>Dauerregen wird zur Gefahr für Menschen ohne Obdach</title>
+<link>https://www.ndr.de/nachrichten/info/Dauerregen-wird-zur-Gefahr-fuer-Menschen-ohne-Obdach,ndrinfo54650.html</link>
+<description>Bis zu 300 Menschen leben rund um den Hauptbahnhof Hannover. Es gibt kaum Orte, an denen sie trocken bleiben können.</description>
+<dc:type>Video</dc:type>
+<dc:date>2024-01-04T17:08:10.657+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>ndrinfo54650</dc:identifier>
+<dc:source>VPMS3</dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>Nachrichten, Dauerregen, Obdach, Gefahr, Menschen, Obdachlosigkeit, Niedersachsen, </mp:keywords>
+<mp:topline>NDR Info</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Eine Person mit Mütze im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674224_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Person mit Mütze im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674224_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Person mit Mütze im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674224_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Person mit Mütze im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674224_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Person mit Mütze im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674224_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Person mit Mütze im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674224_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Person mit Mütze im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674224_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Person mit Mütze im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674224_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+<enc:enclosure rdf:resource="https://mediandr-a.akamaihd.net/progressive/2024/0104/TV-20240104-1615-0400.hd.mp4" enc:type="video/mp4" enc:length="33255168" />
+</item><item rdf:about="https://www.ndr.de/nachrichten/info/Unterwegs-mit-Strassensozialarbeiterinnen-in-Hamburg,ndrinfo54652.html">
+<title>Unterwegs mit Straßensozialarbeiterinnen in Hamburg</title>
+<link>https://www.ndr.de/nachrichten/info/Unterwegs-mit-Strassensozialarbeiterinnen-in-Hamburg,ndrinfo54652.html</link>
+<description>Die Straßensozialarbeiterinnen in der Neustadt sollen zwischen obdachlosen Menschen, Geschäftsleuten und Anwohnern vermitteln.</description>
+<dc:type>Video</dc:type>
+<dc:date>2024-01-04T17:08:16.933+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>ndrinfo54652</dc:identifier>
+<dc:source>VPMS3</dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>Nachrichten, Straßensozialarbeiter*innen, Sozialarbeit, Hamburg, Streetwork, Obdachlosigkeit, Bedürftigkeit, </mp:keywords>
+<mp:topline>NDR Info</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Die Sozialarbeiterin Sarah Menn im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674232_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Die Sozialarbeiterin Sarah Menn im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674232_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Die Sozialarbeiterin Sarah Menn im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674232_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Die Sozialarbeiterin Sarah Menn im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674232_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Die Sozialarbeiterin Sarah Menn im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674232_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Die Sozialarbeiterin Sarah Menn im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674232_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Die Sozialarbeiterin Sarah Menn im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674232_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Die Sozialarbeiterin Sarah Menn im Interview.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Screenshot NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/screenshot1674232_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/fernsehen/logoinfotv100_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+<enc:enclosure rdf:resource="https://mediandr-a.akamaihd.net/progressive/2024/0104/TV-20240104-1634-2100.hd.mp4" enc:type="video/mp4" enc:length="55683072" />
+</item><item rdf:about="https://www.ndr.de/ndrfragt/Umfrage-Schule-ohne-Lehrer,umfrage1400.html">
+<title>Umfrage: Schule ohne Lehrer?</title>
+<link>https://www.ndr.de/ndrfragt/Umfrage-Schule-ohne-Lehrer,umfrage1400.html</link>
+<description>#NDRfragt: Was hilft gegen Unterrichtsausfall - mehr Lehrer, größere Klassen oder straffere Lehrpläne? Sagen Sie es uns!</description>
+<dc:type>Link</dc:type>
+<dc:date>2024-01-03T05:00:00.591+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>ndrfragt110</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords></mp:keywords>
+<mp:topline>#ndrfragt</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Hochgestellte Stühle in einem Klassenraum</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/schule3370_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Hochgestellte Stühle in einem Klassenraum</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/schule3370_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Hochgestellte Stühle in einem Klassenraum</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/schule3370_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Hochgestellte Stühle in einem Klassenraum</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/schule3370_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Hochgestellte Stühle in einem Klassenraum</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/schule3370_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Hochgestellte Stühle in einem Klassenraum</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/schule3370_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Hochgestellte Stühle in einem Klassenraum</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/schule3370_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Hochgestellte Stühle in einem Klassenraum</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/schule3370_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/home/homepagebox100.html">
+<title></title>
+<link>https://www.ndr.de/home/homepagebox100.html</link>
+<description></description>
+<dc:type></dc:type>
+<dc:date>2022-03-10T15:26:59.503+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>homepagebox100</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords></mp:keywords>
+<mp:topline>NDR.de</mp:topline>
+<mp:states />
+</item><item rdf:about="https://www.ndr.de/home/gasspeicher166.html">
+<title>Gasspeicher Dashboard</title>
+<link>https://www.ndr.de/home/gasspeicher166.html</link>
+<description></description>
+<dc:type></dc:type>
+<dc:date>2023-04-06T14:49:06.771+02:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>gasspeicher166</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords></mp:keywords>
+<mp:topline>NDR.de</mp:topline>
+<mp:states />
+</item><item rdf:about="https://www.ndr.de/home/gaspreis176.html">
+<title>Gaspreis Dashboard</title>
+<link>https://www.ndr.de/home/gaspreis176.html</link>
+<description></description>
+<dc:type></dc:type>
+<dc:date>2023-04-06T14:49:06.409+02:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>gaspreis176</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords></mp:keywords>
+<mp:topline>NDR.de</mp:topline>
+<mp:states />
+</item><item rdf:about="https://www.ndr.de/home/strompreis194.html">
+<title>Strompreis Dashboard</title>
+<link>https://www.ndr.de/home/strompreis194.html</link>
+<description></description>
+<dc:type></dc:type>
+<dc:date>2023-04-13T14:27:01.842+02:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>strompreis194</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords></mp:keywords>
+<mp:topline>NDR.de</mp:topline>
+<mp:states />
+</item><item rdf:about="https://www.ndr.de/home/strommix104.html">
+<title>Strommix Dashboard</title>
+<link>https://www.ndr.de/home/strommix104.html</link>
+<description></description>
+<dc:type></dc:type>
+<dc:date>2023-04-06T14:49:07.158+02:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>strommix104</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords></mp:keywords>
+<mp:topline>NDR.de</mp:topline>
+<mp:states />
+</item><item rdf:about="https://www.ndr.de/home/hpboxtv100.html">
+<title></title>
+<link>https://www.ndr.de/home/hpboxtv100.html</link>
+<description></description>
+<dc:type></dc:type>
+<dc:date>2020-12-01T14:05:45.486+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>hpboxtv100</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords></mp:keywords>
+<mp:topline>NDR.de</mp:topline>
+<mp:states />
+</item><item rdf:about="https://www.ndr.de/der_ndr/presse/mitteilungen/Spitzenreiter-Die-vier-erfolgreichsten-Regionalmagazine-Deutschlands-laufen-im-NDR-Fernsehen-,pressemeldungndr24370.html">
+<title>Spitzenreiter: Die vier erfolgreichsten Regionalmagazine Deutschlands laufen im NDR Fernsehen </title>
+<link>https://www.ndr.de/der_ndr/presse/mitteilungen/Spitzenreiter-Die-vier-erfolgreichsten-Regionalmagazine-Deutschlands-laufen-im-NDR-Fernsehen-,pressemeldungndr24370.html</link>
+<description>Jeden Tag um 19.30 Uhr bietet das NDR Fernsehen in Magazinen kompakte Informationen aus der Region – mit riesigem Erfolg: Auch 2023 liefen hier die vier beliebtesten TV-Landesprogramme Deutschlands.</description>
+<dc:type>Artikel</dc:type>
+<dc:date>2024-01-04T12:00:00.185+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>pressemeldungndr24370</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>Pressemitteilung Niedersachsen Fernsehen Hamburg Mecklenburg-Vorpommern Schleswig-Holstein</mp:keywords>
+<mp:topline>Presse aktuell</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>NDR Logo</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Corporate design</mp:source>
+<mp:data>https://www.ndr.de/ndrlogo110_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Logo</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Corporate design</mp:source>
+<mp:data>https://www.ndr.de/ndrlogo110_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Logo</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Corporate design</mp:source>
+<mp:data>https://www.ndr.de/ndrlogo110_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Logo</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Corporate design</mp:source>
+<mp:data>https://www.ndr.de/ndrlogo110_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Logo</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Corporate design</mp:source>
+<mp:data>https://www.ndr.de/ndrlogo110_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Logo</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Corporate design</mp:source>
+<mp:data>https://www.ndr.de/ndrlogo110_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Logo</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Corporate design</mp:source>
+<mp:data>https://www.ndr.de/ndrlogo110_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Logo</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Corporate design</mp:source>
+<mp:data>https://www.ndr.de/ndrlogo110_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/radio/radiologobox100.html">
+<title>NDR Radioprogramme</title>
+<link>https://www.ndr.de/radio/radiologobox100.html</link>
+<description></description>
+<dc:type></dc:type>
+<dc:date>2020-12-01T14:04:26.700+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>radiologobox100</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords></mp:keywords>
+<mp:topline>Radio</mp:topline>
+<mp:states />
+</item><item rdf:about="https://www.ndr.de/nachrichten/info/podcast5342.html">
+<title>Krieg und Terror - Die Lage im Nahen Osten und der Ukraine</title>
+<link>https://www.ndr.de/nachrichten/info/podcast5342.html</link>
+<description>Russland führt Krieg gegen die Ukraine, die Hamas greift Israel an. Aktuelle Nachrichten und Berichte in diesem Podcast.</description>
+<dc:type></dc:type>
+<dc:date>2024-01-04T16:42:59.239+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>podcast5342</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>NDR, NDR Info, Ukraine, Krieg, Russland, Offensive, NATO, Selenskyj, Putin, Netanjahu, Nachrichten, Saporischschja, Israel, Gaza, Iran, Libanon Hamas, Hisbollah, Naher Osten, Terror</mp:keywords>
+<mp:topline>NDR Info</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Krieg und Terror – die Lage im Nahen Osten und der Ukraine</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Info</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/podcastbild412_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Krieg und Terror – die Lage im Nahen Osten und der Ukraine</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Info</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/podcastbild412_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Krieg und Terror – die Lage im Nahen Osten und der Ukraine</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Info</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/podcastbild412_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Krieg und Terror – die Lage im Nahen Osten und der Ukraine</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Info</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/podcastbild412_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Krieg und Terror – die Lage im Nahen Osten und der Ukraine</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Info</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/podcastbild412_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Krieg und Terror – die Lage im Nahen Osten und der Ukraine</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Info</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/podcastbild412_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Krieg und Terror – die Lage im Nahen Osten und der Ukraine</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Info</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/podcastbild412_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Krieg und Terror – die Lage im Nahen Osten und der Ukraine</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Info</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/podcastbild412_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/ndr2/podcasts/podcast5816.html">
+<title>Die Kur-Oase</title>
+<link>https://www.ndr.de/ndr2/podcasts/podcast5816.html</link>
+<description>„Alle nicht ganz dicht“: In der Kur-Oase geht es um Tagesaktuelles, ganz deepes Empfinden und therapeutisch-zweifelhaftes zum Ablachen.</description>
+<dc:type></dc:type>
+<dc:date>2024-01-02T11:35:23.538+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>podcast5816</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>TV, Show, Aktuelles, Tagesthema, Fernsehen, Radio, Altenburg, NDR 2, Sylt, Andreas Altenburg, Andy Altenburg, </mp:keywords>
+<mp:topline>Podcasts</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Grafik mit Schriftzug "Die Kur-Oase"</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/ndr2/podcasts/podcast5812_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Grafik mit Schriftzug "Die Kur-Oase"</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/ndr2/podcasts/podcast5812_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Grafik mit Schriftzug "Die Kur-Oase"</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/ndr2/podcasts/podcast5812_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Grafik mit Schriftzug "Die Kur-Oase"</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/ndr2/podcasts/podcast5812_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Grafik mit Schriftzug "Die Kur-Oase"</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/ndr2/podcasts/podcast5812_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Grafik mit Schriftzug "Die Kur-Oase"</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/ndr2/podcasts/podcast5812_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Grafik mit Schriftzug "Die Kur-Oase"</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/ndr2/podcasts/podcast5812_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Grafik mit Schriftzug "Die Kur-Oase"</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/ndr2/podcasts/podcast5812_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/nachrichten/info/podcast4700.html">
+<title>Standpunkte</title>
+<link>https://www.ndr.de/nachrichten/info/podcast4700.html</link>
+<description>Die wichtigsten Medien im Norden und in ganz Deutschland - ein Meinungsüberblick zu den Topthemen des Tages!</description>
+<dc:type></dc:type>
+<dc:date>2024-01-05T00:01:15.102+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>podcast4700</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>Nachrichten, Kommentare, Meinung, Diskussion, Medien, NDR Info, Zeitungen</mp:keywords>
+<mp:topline>NDR Info</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Grafik: Eine Sprechblase mit Icons.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/podcast5332_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Grafik: Eine Sprechblase mit Icons.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/podcast5332_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Grafik: Eine Sprechblase mit Icons.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/podcast5332_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Grafik: Eine Sprechblase mit Icons.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/podcast5332_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Grafik: Eine Sprechblase mit Icons.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/podcast5332_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Grafik: Eine Sprechblase mit Icons.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/podcast5332_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Grafik: Eine Sprechblase mit Icons.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/podcast5332_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Grafik: Eine Sprechblase mit Icons.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/podcast5332_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/fernsehen/sendungen/die-ernaehrungsdocs/audio-podcast/index.html">
+<title>Die Ernährungs-Docs - Essen als Medizin</title>
+<link>https://www.ndr.de/fernsehen/sendungen/die-ernaehrungsdocs/audio-podcast/index.html</link>
+<description>Die NDR Ernährungs-Docs helfen Menschen, die an ihren massiven Gesundheitsbeschwerden fast verzweifeln: Mit gezielten Ernährungsstrategien, die einfach umzusetzen sind.</description>
+<dc:type></dc:type>
+<dc:date>2024-01-03T10:46:47.230+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>podcast5666</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>Ernährungs-Docs, Medizin, Ernährung, E-Docs</mp:keywords>
+<mp:topline>Podcast</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Die Ernährungs-Docs: Dr. Silja Schäfer,  Dr. Matthias Riedl und Dr. Viola Andresen</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/die-ernaehrungsdocs/podcastbild338_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Die Ernährungs-Docs: Dr. Silja Schäfer,  Dr. Matthias Riedl und Dr. Viola Andresen</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/die-ernaehrungsdocs/podcastbild338_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Die Ernährungs-Docs: Dr. Silja Schäfer,  Dr. Matthias Riedl und Dr. Viola Andresen</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/die-ernaehrungsdocs/podcastbild338_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Die Ernährungs-Docs: Dr. Silja Schäfer,  Dr. Matthias Riedl und Dr. Viola Andresen</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/die-ernaehrungsdocs/podcastbild338_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Die Ernährungs-Docs: Dr. Silja Schäfer,  Dr. Matthias Riedl und Dr. Viola Andresen</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/die-ernaehrungsdocs/podcastbild338_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Die Ernährungs-Docs: Dr. Silja Schäfer,  Dr. Matthias Riedl und Dr. Viola Andresen</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/die-ernaehrungsdocs/podcastbild338_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Die Ernährungs-Docs: Dr. Silja Schäfer,  Dr. Matthias Riedl und Dr. Viola Andresen</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/die-ernaehrungsdocs/podcastbild338_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Die Ernährungs-Docs: Dr. Silja Schäfer,  Dr. Matthias Riedl und Dr. Viola Andresen</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/fernsehen/sendungen/die-ernaehrungsdocs/podcastbild338_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/kultur/sendungen/eat_read_sleep/index.html">
+<title>eat.READ.sleep. Bücher für dich</title>
+<link>https://www.ndr.de/kultur/sendungen/eat_read_sleep/index.html</link>
+<description>Lieblingsbücher, Neuerscheinungen, Bestseller – wir geben Tipps und Orientierung. Außerdem: Interviews mit Büchermenschen, Fun Facts und eine literarische Vorspeise.</description>
+<dc:type></dc:type>
+<dc:date>2024-01-04T14:01:53.854+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>podcast4732</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>NDR, NDR Kultur, Theodor Fontane, Dichter, Lyrik, Roman, Buch, Bücher, Literatur, Hanja Kesting</mp:keywords>
+<mp:topline>Kultur</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Logo vom NDR Kultur Podcast "eat.READ.sleep"</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/mediathek/podcastbild434_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo vom NDR Kultur Podcast "eat.READ.sleep"</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/mediathek/podcastbild434_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo vom NDR Kultur Podcast "eat.READ.sleep"</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/mediathek/podcastbild434_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo vom NDR Kultur Podcast "eat.READ.sleep"</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/mediathek/podcastbild434_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo vom NDR Kultur Podcast "eat.READ.sleep"</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/mediathek/podcastbild434_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo vom NDR Kultur Podcast "eat.READ.sleep"</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/mediathek/podcastbild434_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo vom NDR Kultur Podcast "eat.READ.sleep"</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/mediathek/podcastbild434_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo vom NDR Kultur Podcast "eat.READ.sleep"</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR</mp:source>
+<mp:data>https://www.ndr.de/mediathek/podcastbild434_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/kultur/podcast5682.html">
+<title>Tee mit Warum - Die Philosophie und wir</title>
+<link>https://www.ndr.de/kultur/podcast5682.html</link>
+<description>Bei einem Becher Tee philosophieren unsere Hosts über die großen Fragen. Denise M‘ Baye und Sebastian Friedrich diskutieren mit Philosophen und Menschen aus dem Alltag. </description>
+<dc:type></dc:type>
+<dc:date>2023-12-21T06:00:27.782+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>podcast5682</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>Tee, Gespräche, Wissen, Sinn, Analyse, Talk, Interview, Sprache,</mp:keywords>
+<mp:topline>Kultur</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Mann und Frau sitzen am Tisch und trinken Tee.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/kultur/podcastbild352_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mann und Frau sitzen am Tisch und trinken Tee.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/kultur/podcastbild352_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mann und Frau sitzen am Tisch und trinken Tee.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/kultur/podcastbild352_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mann und Frau sitzen am Tisch und trinken Tee.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/kultur/podcastbild352_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mann und Frau sitzen am Tisch und trinken Tee.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/kultur/podcastbild352_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mann und Frau sitzen am Tisch und trinken Tee.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/kultur/podcastbild352_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mann und Frau sitzen am Tisch und trinken Tee.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/kultur/podcastbild352_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Mann und Frau sitzen am Tisch und trinken Tee.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/kultur/podcastbild352_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ardaudiothek.de/sendung/11km-der-tagesschau-podcast/12200383/">
+<title>Podcast 11KM: Der tagesschau-Podcast in der ARD Audiothek.</title>
+<link>https://www.ardaudiothek.de/sendung/11km-der-tagesschau-podcast/12200383/</link>
+<description>Geschichten und Recherchen, die bewegen: 11KM behandelt ein aktuelles Thema in aller Tiefe - spannend, investigativ und hochwertig.  </description>
+<dc:type>Link</dc:type>
+<dc:date>2023-12-26T11:55:49.328+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>elfkmpodcast100</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>11KM, Link, ARD-Audiothek,</mp:keywords>
+<mp:topline>NDR Info</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>11KM - der tagesschau Podcast</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>BR Design</mp:source>
+<mp:data>https://www.ndr.de/radio/podcasts/elfkm102_v-contentgross.png</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>11KM - der tagesschau Podcast</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>BR Design</mp:source>
+<mp:data>https://www.ndr.de</mp:data>
+</mp:image>
+<mp:image>
+<mp:alt>11KM - der tagesschau Podcast</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>BR Design</mp:source>
+<mp:data>https://www.ndr.de/radio/podcasts/elfkm102_v-zweispaltig.png</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>11KM - der tagesschau Podcast</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>BR Design</mp:source>
+<mp:data>https://www.ndr.de/radio/podcasts/elfkm102_v-einspaltig.png</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>11KM - der tagesschau Podcast</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>BR Design</mp:source>
+<mp:data>https://www.ndr.de/radio/podcasts/elfkm102_v-contentklein.png</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>11KM - der tagesschau Podcast</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>BR Design</mp:source>
+<mp:data>https://www.ndr.de/radio/podcasts/elfkm102_v-ardteaserwidescreen.png</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>11KM - der tagesschau Podcast</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>BR Design</mp:source>
+<mp:data>https://www.ndr.de/radio/podcasts/elfkm102_v-ardgrosswidescreen.png</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>11KM - der tagesschau Podcast</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>BR Design</mp:source>
+<mp:data>https://www.ndr.de/radio/podcasts/elfkm102_v-contentwidescreen.png</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/ndr1niedersachsen/podcast5774.html">
+<title>Mein Einsatz - der Feuerwehr-Podcast von NDR Niedersachsen</title>
+<link>https://www.ndr.de/ndr1niedersachsen/podcast5774.html</link>
+<description>Explosion im Chemiewerk oder Waldbrand: Feuerwehrfrau Märit Heuer und NDR Reporter Torben Hildebrandt sprechen über spannende Feuerwehr-Einsätze.</description>
+<dc:type></dc:type>
+<dc:date>2024-01-04T04:00:06.204+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>podcast5774</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>Feuer, Leben, Tod, Unfall, Krankenhaus, Rettung, Einsatz, Team, Freiwillige Feuerwehr, Berufsfeuerwehr, Löschen, </mp:keywords>
+<mp:topline>NDR 1 Niedersachsen</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Feuerwehr-Frau Mätit Heuer und NDR Reporter Torben Hildebrandt vor einem Blaulicht-Hintergund .</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/ndr1niedersachsen/podcasts/podcastbild364_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Feuerwehr-Frau Mätit Heuer und NDR Reporter Torben Hildebrandt vor einem Blaulicht-Hintergund .</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/ndr1niedersachsen/podcasts/podcastbild364_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Feuerwehr-Frau Mätit Heuer und NDR Reporter Torben Hildebrandt vor einem Blaulicht-Hintergund .</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/ndr1niedersachsen/podcasts/podcastbild364_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Feuerwehr-Frau Mätit Heuer und NDR Reporter Torben Hildebrandt vor einem Blaulicht-Hintergund .</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/ndr1niedersachsen/podcasts/podcastbild364_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Feuerwehr-Frau Mätit Heuer und NDR Reporter Torben Hildebrandt vor einem Blaulicht-Hintergund .</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/ndr1niedersachsen/podcasts/podcastbild364_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Feuerwehr-Frau Mätit Heuer und NDR Reporter Torben Hildebrandt vor einem Blaulicht-Hintergund .</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/ndr1niedersachsen/podcasts/podcastbild364_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Feuerwehr-Frau Mätit Heuer und NDR Reporter Torben Hildebrandt vor einem Blaulicht-Hintergund .</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/ndr1niedersachsen/podcasts/podcastbild364_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Feuerwehr-Frau Mätit Heuer und NDR Reporter Torben Hildebrandt vor einem Blaulicht-Hintergund .</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/ndr1niedersachsen/podcasts/podcastbild364_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/nachrichten/info/podcast2998.html">
+<title>Streitkräfte und Strategien</title>
+<link>https://www.ndr.de/nachrichten/info/podcast2998.html</link>
+<description>Die Sendung setzt sich kritisch mit aktuellen Fragen der Sicherheits- und Militärpolitik auseinander.</description>
+<dc:type></dc:type>
+<dc:date>2024-01-03T16:17:05.115+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>podcast2998</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>NDR, NDR Info, Streitkräfte, Strategien, Bundeswehr, Soldaten, Militär, Sicherheitspolitik, Ukraine, Russland, Krieg, Putin, Selenskyj, NATO, Israel, Gaza, </mp:keywords>
+<mp:topline>NDR Info</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien #Ukraine #Nahost</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild646_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien #Ukraine #Nahost</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild646_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien #Ukraine #Nahost</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild646_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien #Ukraine #Nahost</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild646_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien #Ukraine #Nahost</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild646_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien #Ukraine #Nahost</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild646_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien #Ukraine #Nahost</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild646_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien #Ukraine #Nahost</mp:alt>
+<mp:caption></mp:caption>
+<mp:source></mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild646_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien #Ukraine</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild570_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien #Ukraine</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild570_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien #Ukraine</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild570_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien #Ukraine</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild570_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien #Ukraine</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild570_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien #Ukraine</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild570_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien #Ukraine</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild570_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien #Ukraine</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild570_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild566_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild566_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild566_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild566_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild566_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild566_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild566_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>NDR Info: Streitkräfte und Strategien</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild566_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/903/podcasts/podcast5108.html">
+<title>"Feel Hamburg" - alle Folgen</title>
+<link>https://www.ndr.de/903/podcasts/podcast5108.html</link>
+<description>Britta Kehrhahn und Daniel Kaiser sprechen mit Menschen aus der Stadt, die etwas zu erzählen haben.</description>
+<dc:type></dc:type>
+<dc:date>2024-01-02T13:39:05.957+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>podcast5108</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>NDR, Hamburg, Britta Kehrhahn, Daniel Kaiser, Interview, Elbe, Hafen, Stadtleben, Urbanität</mp:keywords>
+<mp:topline>Podcasts</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Eine Frau isst ein Brötchen im Hamburger Hafen.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Fotolia</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild514_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Frau isst ein Brötchen im Hamburger Hafen.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Fotolia</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild514_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Frau isst ein Brötchen im Hamburger Hafen.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Fotolia</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild514_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Frau isst ein Brötchen im Hamburger Hafen.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Fotolia</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild514_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Frau isst ein Brötchen im Hamburger Hafen.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Fotolia</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild514_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Frau isst ein Brötchen im Hamburger Hafen.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Fotolia</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild514_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Frau isst ein Brötchen im Hamburger Hafen.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Fotolia</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild514_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Eine Frau isst ein Brötchen im Hamburger Hafen.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>Fotolia</mp:source>
+<mp:data>https://www.ndr.de/mediathek/mediathekbild514_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/nachrichten/info/podcast4274.html">
+<title>Intensiv-Station - Satire von NDR Info </title>
+<link>https://www.ndr.de/nachrichten/info/podcast4274.html</link>
+<description>Schonungslos und auf den Punkt - so nimmt das NDR Info Satiremagazin Politik und Gesellschaft unter die Lupe.</description>
+<dc:type></dc:type>
+<dc:date>2023-12-30T06:00:15.075+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>podcast4274</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>NDR, NDR Info, Intensivstation, Intensiv-Station, Satire</mp:keywords>
+<mp:topline>NDR Info</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Logo der Sendung Intensiv-Station</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/programm/intensivstation3272_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo der Sendung Intensiv-Station</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/programm/intensivstation3272_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo der Sendung Intensiv-Station</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/programm/intensivstation3272_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo der Sendung Intensiv-Station</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/programm/intensivstation3272_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo der Sendung Intensiv-Station</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/programm/intensivstation3272_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo der Sendung Intensiv-Station</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/programm/intensivstation3272_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo der Sendung Intensiv-Station</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/programm/intensivstation3272_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Logo der Sendung Intensiv-Station</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/programm/intensivstation3272_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/nachrichten/info/podcast4932.html">
+<title>Amerika, wir müssen reden!</title>
+<link>https://www.ndr.de/nachrichten/info/podcast4932.html</link>
+<description>Ingo Zamperoni spricht mit seiner Frau Jiffer Bourguignon über das politische Amerika. Sie wählt Demokraten, ihr Vater Republikaner.</description>
+<dc:type></dc:type>
+<dc:date>2023-12-11T17:50:06.645+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>podcast4932</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords>USA, Wahl, Ingo Zamperoni, Jiffer Bourguignon, Joe Biden, Donald Trump, Politik, Black Lives Matter, electoral college, Wahlsystem, Demokraten, Republikaner, Corona, Covid-19, US-Wirtschaft, Wirtschaftskrise, Gesellschaft</mp:keywords>
+<mp:topline>NDR Info</mp:topline>
+<mp:states />
+<mp:image>
+<mp:alt>Jiffer Bourguignon und ihr Mann Ingo Zamperoni stehen vor der US-amerikanischen Flagge.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/podcastbild174_v-contentgross.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>320</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Jiffer Bourguignon und ihr Mann Ingo Zamperoni stehen vor der US-amerikanischen Flagge.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/podcastbild174_v-dreispaltig.jpg</mp:data>
+<mp:width>568</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Jiffer Bourguignon und ihr Mann Ingo Zamperoni stehen vor der US-amerikanischen Flagge.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/podcastbild174_v-zweispaltig.jpg</mp:data>
+<mp:width>376</mp:width>
+<mp:height>212</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Jiffer Bourguignon und ihr Mann Ingo Zamperoni stehen vor der US-amerikanischen Flagge.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/podcastbild174_v-einspaltig.jpg</mp:data>
+<mp:width>184</mp:width>
+<mp:height>104</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Jiffer Bourguignon und ihr Mann Ingo Zamperoni stehen vor der US-amerikanischen Flagge.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/podcastbild174_v-contentklein.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Jiffer Bourguignon und ihr Mann Ingo Zamperoni stehen vor der US-amerikanischen Flagge.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/podcastbild174_v-ardteaserwidescreen.jpg</mp:data>
+<mp:width>256</mp:width>
+<mp:height>144</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Jiffer Bourguignon und ihr Mann Ingo Zamperoni stehen vor der US-amerikanischen Flagge.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/podcastbild174_v-ardgrosswidescreen.jpg</mp:data>
+<mp:width>512</mp:width>
+<mp:height>288</mp:height>
+</mp:image>
+<mp:image>
+<mp:alt>Jiffer Bourguignon und ihr Mann Ingo Zamperoni stehen vor der US-amerikanischen Flagge.</mp:alt>
+<mp:caption></mp:caption>
+<mp:source>NDR Markendesign</mp:source>
+<mp:data>https://www.ndr.de/nachrichten/info/podcastbild174_v-contentwidescreen.jpg</mp:data>
+<mp:width>192</mp:width>
+<mp:height>108</mp:height>
+</mp:image>
+</item><item rdf:about="https://www.ndr.de/home/homepagevideotipp100.html">
+<title></title>
+<link>https://www.ndr.de/home/homepagevideotipp100.html</link>
+<description></description>
+<dc:type></dc:type>
+<dc:date>2024-01-04T09:42:26.510+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>homepagevideotipp100</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords></mp:keywords>
+<mp:topline>NDR.de</mp:topline>
+<mp:states />
+</item><item rdf:about="https://www.ndr.de/home/homepagefilm106.html">
+<title></title>
+<link>https://www.ndr.de/home/homepagefilm106.html</link>
+<description></description>
+<dc:type></dc:type>
+<dc:date>2024-01-03T18:30:36.744+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>homepagefilm106</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords></mp:keywords>
+<mp:topline>NDR.de</mp:topline>
+<mp:states />
+</item><item rdf:about="https://www.ndr.de/home/homepagedoku102.html">
+<title></title>
+<link>https://www.ndr.de/home/homepagedoku102.html</link>
+<description></description>
+<dc:type></dc:type>
+<dc:date>2024-01-04T09:45:11.370+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>homepagedoku102</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords></mp:keywords>
+<mp:topline>NDR.de</mp:topline>
+<mp:states />
+</item><item rdf:about="https://www.ndr.de/home/homepageunterhaltung102.html">
+<title></title>
+<link>https://www.ndr.de/home/homepageunterhaltung102.html</link>
+<description></description>
+<dc:type></dc:type>
+<dc:date>2024-01-04T09:44:20.904+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>homepageunterhaltung102</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords></mp:keywords>
+<mp:topline>NDR.de</mp:topline>
+<mp:states />
+</item><item rdf:about="https://www.ndr.de/home/homepagetalk100.html">
+<title></title>
+<link>https://www.ndr.de/home/homepagetalk100.html</link>
+<description></description>
+<dc:type></dc:type>
+<dc:date>2024-01-04T10:40:27.346+01:00</dc:date>
+<dc:format>text/html</dc:format>
+<dc:identifier>homepagetalk100</dc:identifier>
+<dc:source></dc:source>
+<dc:language>de</dc:language>
+<dc:publisher>ndr.de</dc:publisher>
+<dc:rights>ndr.de. Alle Rechte vorbehalten.</dc:rights>
+<dc:subject></dc:subject>
+<dcterms:audience>all</dcterms:audience>
+<dcterms:isFormatOf rdf:resource="" />
+<mp:keywords></mp:keywords>
+<mp:topline>NDR.de</mp:topline>
+<mp:states />
+</item>
+</rdf:RDF>

@@ -22,7 +22,7 @@
 			"description": true
 		},
 		{
-			"url": "https://www.ndr.de/index-rss.xml",
+			"url": "http://www.ndr.de/home/index-rss.xml",
 			"publish": true,
 			"latitude": 53.55073,
 			"longitude": 9.99302,
@@ -56,7 +56,7 @@
 		786
 	],
 	"sitemap": {
-		"path": "/xxx/yyy/zzz",
+		"path": "/var/www/FC_1",
 		"type": "event,news,location"
 	}
 }

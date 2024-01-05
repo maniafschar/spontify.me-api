@@ -757,10 +757,10 @@ public class ActionApi {
 						+ "/\"");
 		if (!Strings.isEmpty(title)) {
 			title = Strings.sanitize(title.replace('\n', ' ').replace('\t', ' ').replace('\r', ' ').replace('"', '\''),
-					0);
-			s = s.replaceFirst("</preloader>",
-					"<style>div.article{opacity:0;position:absolute;}</style><div class=\"article\">" + title
-							+ "</div></preloader>");
+					0).replace("null", "").trim();
+			s = s.replaceFirst("</add>",
+					"<style>article{opacity:0;position:absolute;}</style><article>" + title
+							+ "<figure><img src=\"" + url + "/med/" + image + "\"/></figure></article></add>");
 			s = s.replaceFirst("<meta name=\"description\" content=\"([^\"].*)\"",
 					"<meta name=\"description\" content=\"" + title + '"');
 			s = s.replaceFirst("<title></title>", "<title>" +

@@ -57,6 +57,78 @@ public class RssServiceTest {
 	}
 
 	@Test
+	public void imgSrc2() throws Exception {
+		// given
+		final Pattern img = Pattern.compile("\\<article.*?\\<figure.*?\\<img .*?src=\\\"(.*?)\\\"");
+		final Matcher matcher = img.matcher(
+				IOUtils.toString(RssServiceTest.class.getResourceAsStream("/html/article2.html"),
+						StandardCharsets.UTF_8).replace('\n', ' '));
+
+		// when
+		final boolean found = matcher.find();
+
+		// then
+		assertTrue(found);
+		assertEquals(
+				"/content/dam/rbb/rbb/rbb24/2023/2023_12/dpa-account/feuerwehr-berlin2.jpg.jpg/size=708x398.jpg",
+				matcher.group(1));
+	}
+
+	@Test
+	public void imgSrc3() throws Exception {
+		// given
+		final Pattern img2 = Pattern.compile("\\<div.*?\\<picture.*?\\<img .*?src=\\\"(.*?)\\\"");
+		final Matcher matcher = img2.matcher(
+				IOUtils.toString(RssServiceTest.class.getResourceAsStream("/html/article3.html"),
+						StandardCharsets.UTF_8).replace('\n', ' '));
+
+		// when
+		final boolean found = matcher.find();
+
+		// then
+		assertTrue(found);
+		assertEquals(
+				"/nachrichten/niedersachsen/lueneburg_heide_unterelbe/treckerdemo616_v-contentgross.jpg",
+				matcher.group(1));
+	}
+
+	@Test
+	public void rss() throws Exception {
+		// given
+		final ArrayNode rss = (ArrayNode) new XmlMapper()
+				.readTree(RssServiceTest.class.getResourceAsStream("/xml/rss.xml"))
+				.findValues("item").get(0);
+
+		// when
+		final JsonNode node = rss.get(0);
+
+		// then
+		assertNotNull(node);
+		assertEquals("https://www.rbb24.de/panorama/beitrag/2024/01/schoenefeld-stadt-wachstum-wohnungsbau.html",
+				node.get("link").asText());
+	}
+
+	@Test
+	public void rss2() throws Exception {
+		// given
+		final ArrayNode rss = (ArrayNode) new XmlMapper()
+				.readTree(RssServiceTest.class.getResourceAsStream("/xml/rss2.xml"))
+				.findValues("item").get(0);
+
+		// when
+		final JsonNode node = rss.get(0);
+
+		// then
+		assertNotNull(node);
+		assertEquals(
+				"https://www.ndr.de/nachrichten/schleswig-holstein/Bauern-wollen-Robert-Habeck-zur-Rede-stellen,habeck1116.html",
+				node.get("link").asText());
+		assertEquals(
+				"2024-01-04T23:29:06.317+01:00",
+				node.get("date").asText());
+	}
+
+	@Test
 	public void date() throws ParseException {
 		// given
 		final String date = "Fri, 08 Sep 2023 20:36:08 +0000";

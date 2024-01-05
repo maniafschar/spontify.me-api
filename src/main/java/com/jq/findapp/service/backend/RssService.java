@@ -67,11 +67,11 @@ public class RssService {
 					result.exception = e;
 			}
 		}
-		final CompletableFuture<Object> all = CompletableFuture
+		CompletableFuture
 				.allOf(futures.toArray(new CompletableFuture[futures.size()]))
 				.thenApply(ignored -> futures.stream()
-						.map(CompletableFuture::join).collect(Collectors.toList()));
-		all.join();
+						.map(CompletableFuture::join).collect(Collectors.toList()))
+				.join();
 		result.result = futures.stream().map(e -> {
 			try {
 				return e.get().toString();
@@ -90,15 +90,16 @@ public class RssService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				final String url = json.get("url").asText();
-				final ArrayNode rss = (ArrayNode) new XmlMapper().readTree(new URL(url)).get("channel")
-						.get("item");
+				final ArrayNode rss = (ArrayNode) new XmlMapper().readTree(new URL(url)).findValues("item").get(0);
 				if (rss == null || rss.size() == 0)
-					return null;
+					return "";
 				final QueryParams params = new QueryParams(Query.misc_listNews);
 				params.setUser(new Contact());
 				params.getUser().setClientId(clientId);
 				final Pattern img = Pattern.compile("\\<article.*?\\<figure.*?\\<img .*?src=\\\"(.*?)\\\"");
+				final Pattern img2 = Pattern.compile("\\<div.*?\\<picture.*?\\<img .*?src=\\\"(.*?)\\\"");
 				final SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ROOT);
+				final SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-yy'T'HH:mm:ss.SSSXXX", Locale.ROOT);
 				final Set<String> urls = new HashSet<>();
 				int count = 0;
 				boolean chonological = true;
@@ -107,13 +108,13 @@ public class RssService {
 				Result result;
 				for (int i = 0; i < rss.size(); i++) {
 					String uid = null;
-					if (rss.get(i).has("guid")) {
+					if (rss.get(i).has("link"))
+						uid = rss.get(i).get("link").asText().trim();
+					if (uid == null) {
 						uid = rss.get(i).get("guid").asText().trim();
 						if (Strings.isEmpty(uid))
 							uid = rss.get(i).get("guid").get("").asText().trim();
 					}
-					if (uid == null || !uid.startsWith("https://"))
-						uid = rss.get(i).get("link").asText().trim();
 					if (!Strings.isEmpty(uid)) {
 						params.setSearch("clientNews.url='" + uid + "' and clientNews.clientId=" + clientId);
 						result = repository.list(params);
@@ -135,7 +136,12 @@ public class RssService {
 												: ""),
 								1000));
 						clientNews.setUrl(uid);
-						clientNews.setPublish(new Timestamp(df.parse(rss.get(i).get("pubDate").asText()).getTime()));
+						if (rss.get(i).has("pubDate"))
+							clientNews
+									.setPublish(new Timestamp(df.parse(rss.get(i).get("pubDate").asText()).getTime()));
+						else
+							clientNews
+									.setPublish(new Timestamp(df2.parse(rss.get(i).get("date").asText()).getTime()));
 						if (clientNews.getPublish().getTime() > lastPubDate)
 							chonological = false;
 						else
@@ -147,14 +153,18 @@ public class RssService {
 										EntityUtil.getImage(rss.get(i).get("media:content").get("url").asText(),
 												EntityUtil.IMAGE_SIZE, 200));
 							else {
-								final Matcher matcher = img
-										.matcher(IOUtils
-												.toString(new URL(rss.get(i).get("link").asText()),
-														StandardCharsets.UTF_8)
-												.replace('\r', ' ').replace('\n', ' '));
-								if (matcher.find()) {
-									String s = matcher.group(1);
-									if (!s.startsWith("http"))
+								final String html = IOUtils.toString(new URL(uid), StandardCharsets.UTF_8)
+										.replace('\r', ' ').replace('\n', ' ');
+								Matcher matcher = img.matcher(html);
+								String s = null;
+								boolean found = matcher.find();
+								if (!found) {
+									matcher = img2.matcher(html);
+									found = matcher.find();
+								}
+								if (found) {
+									s = matcher.group(1);
+									if (s.startsWith("/"))
 										s = url.substring(0, url.indexOf("/", 10)) + s;
 									clientNews.setImage(EntityUtil.getImage(s, EntityUtil.IMAGE_SIZE, 200));
 								}
@@ -196,7 +206,7 @@ public class RssService {
 					}
 				}
 				if (count != 0 || deleted != 0)
-					return clientId + " " + count + (deleted > 0 ? "/" + deleted : "");
+					return clientId + " " + url + " " + count + (deleted > 0 ? "/" + deleted : "");
 			} catch (final Exception ex) {
 				synchronized (failed) {
 					failed.add(ex.getClass().getName() + ": " + ex.getMessage().replace("\n", "\n  ") + "\n  "
