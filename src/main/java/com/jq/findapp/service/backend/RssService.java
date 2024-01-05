@@ -88,6 +88,18 @@ public class RssService {
 	@Async
 	private CompletableFuture<Object> syncFeed(final JsonNode json, final BigInteger clientId) {
 		return CompletableFuture.supplyAsync(() -> {
+			return new ImportFeed().run(json, clientId);
+		});
+	}
+
+	private class ImportFeed {
+		private final Pattern imageRegex = Pattern.compile("\\<article.*?\\<figure.*?\\<img .*?src=\\\"(.*?)\\\"");
+		private final Pattern imageRegex2 = Pattern.compile("\\<div.*?\\<picture.*?\\<img .*?src=\\\"(.*?)\\\"");
+		private final SimpleDateFormat dateParser = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ROOT);
+		private final SimpleDateFormat dateParser2 = new SimpleDateFormat("yyyy-MM-yy'T'HH:mm:ss.SSSXXX", Locale.ROOT);
+		private final Set<String> urls = new HashSet<>();
+
+		private String run(final JsonNode json, final BigInteger clientId) {
 			try {
 				final String url = json.get("url").asText();
 				final ArrayNode rss = (ArrayNode) new XmlMapper().readTree(new URL(url)).findValues("item").get(0);
@@ -96,88 +108,24 @@ public class RssService {
 				final QueryParams params = new QueryParams(Query.misc_listNews);
 				params.setUser(new Contact());
 				params.getUser().setClientId(clientId);
-				final Pattern img = Pattern.compile("\\<article.*?\\<figure.*?\\<img .*?src=\\\"(.*?)\\\"");
-				final Pattern img2 = Pattern.compile("\\<div.*?\\<picture.*?\\<img .*?src=\\\"(.*?)\\\"");
-				final SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ROOT);
-				final SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-yy'T'HH:mm:ss.SSSXXX", Locale.ROOT);
-				final Set<String> urls = new HashSet<>();
 				int count = 0;
 				boolean chonological = true;
 				long lastPubDate = 0;
 				Timestamp first = new Timestamp(System.currentTimeMillis());
-				Result result;
+				final boolean addDescription = json.has("description") && json.get("description").asBoolean();
 				for (int i = 0; i < rss.size(); i++) {
-					String uid = null;
-					if (rss.get(i).has("link"))
-						uid = rss.get(i).get("link").asText().trim();
-					if (uid == null) {
-						uid = rss.get(i).get("guid").asText().trim();
-						if (Strings.isEmpty(uid))
-							uid = rss.get(i).get("guid").get("").asText().trim();
-					}
-					if (!Strings.isEmpty(uid)) {
-						final String description = Strings.sanitize(rss.get(i).get("title").asText() +
-								(json.has("description") && json.get("description").asBoolean()
-										&& rss.get(i).has("description")
-												? "\n\n" + rss.get(i).get("description").asText()
-												: ""),
-								1000);
-						params.setSearch("clientNews.url='" + uid + "' and clientNews.clientId=" + clientId);
-						result = repository.list(params);
-						final ClientNews clientNews;
-						if (result.size() == 0) {
-							params.setSearch(
-									"clientNews.description='" + description + "' and clientNews.clientId=" + clientId);
-							result = repository.list(params);
-						}
-						if (result.size() == 0)
-							clientNews = new ClientNews();
-						else {
-							clientNews = repository.one(ClientNews.class,
-									(BigInteger) result.get(0).get("clientNews.id"));
-							clientNews.historize();
-						}
-						clientNews.setClientId(clientId);
-						clientNews.setLatitude((float) json.get("latitude").asDouble());
-						clientNews.setLongitude((float) json.get("longitude").asDouble());
-						clientNews.setDescription(description);
-						clientNews.setUrl(uid);
-						if (rss.get(i).has("pubDate"))
-							clientNews
-									.setPublish(new Timestamp(df.parse(rss.get(i).get("pubDate").asText()).getTime()));
-						else
-							clientNews
-									.setPublish(new Timestamp(df2.parse(rss.get(i).get("date").asText()).getTime()));
-						if (clientNews.getPublish().getTime() > lastPubDate)
-							chonological = false;
-						else
-							lastPubDate = clientNews.getPublish().getTime();
-						clientNews.setImage(null);
-						try {
-							if (rss.get(i).has("media:content") && rss.get(i).get("media:content").has("url"))
-								clientNews.setImage(
-										EntityUtil.getImage(rss.get(i).get("media:content").get("url").asText(),
-												EntityUtil.IMAGE_SIZE, 200));
-							else {
-								final String html = IOUtils.toString(new URL(uid), StandardCharsets.UTF_8)
-										.replace('\r', ' ').replace('\n', ' ');
-								Matcher matcher = img.matcher(html);
-								String s = null;
-								boolean found = matcher.find();
-								if (!found) {
-									matcher = img2.matcher(html);
-									found = matcher.find();
-								}
-								if (found) {
-									s = matcher.group(1);
-									if (s.startsWith("/"))
-										s = url.substring(0, url.indexOf("/", 10)) + s;
-									clientNews.setImage(EntityUtil.getImage(s, EntityUtil.IMAGE_SIZE, 200));
-								}
-							}
+					try {
+						final ClientNews clientNews = createNews(params, rss.get(i), addDescription);
+						if (clientNews != null) {
+							if (clientNews.getPublish().getTime() > lastPubDate)
+								chonological = false;
+							else
+								lastPubDate = clientNews.getPublish().getTime();
 							if (clientNews.getImage() != null) {
 								if (clientNews.getId() == null)
 									count++;
+								clientNews.setLatitude((float) json.get("latitude").asDouble());
+								clientNews.setLongitude((float) json.get("longitude").asDouble());
 								final boolean b = json.get("publish").asBoolean() && clientNews.getId() == null;
 								repository.save(clientNews);
 								if (first.getTime() > clientNews.getPublish().getTime())
@@ -187,17 +135,17 @@ public class RssService {
 									externalService.publishOnFacebook(clientId, clientNews.getDescription(),
 											"/rest/action/marketing/news/" + clientNews.getId());
 							}
-						} catch (final IllegalArgumentException ex) {
-							synchronized (failed) {
-								failed.add("image: " + ex.getMessage().replace("\n", "\n  ") + "\n  " + uid);
-							}
+						}
+					} catch (final IllegalArgumentException ex) {
+						synchronized (failed) {
+							failed.add("image: " + ex.getMessage().replace("\n", "\n  ") + "\n  " + uid);
 						}
 					}
 				}
-				params.setSearch("clientNews.publish>'" + first + "' and clientNews.clientId=" + clientId);
-				result = repository.list(params);
 				int deleted = 0;
 				if (chonological) {
+					params.setSearch("clientNews.publish>'" + first + "' and clientNews.clientId=" + clientId);
+					final Result result = repository.list(params);
 					for (int i = 0; i < result.size(); i++) {
 						if (!urls.contains(result.get(i).get("clientNews.url"))) {
 							// TODO rm repository.delete(repository.one(ClientNews.class, (BigInteger)
@@ -212,7 +160,7 @@ public class RssService {
 					}
 				}
 				if (count != 0 || deleted != 0)
-					return clientId + " " + url + " " + count + (deleted > 0 ? "/" + deleted : "");
+					return count + " on " + clientId + " " + url + (deleted > 0 ? ", " + deleted + " deleted" : "");
 			} catch (final Exception ex) {
 				synchronized (failed) {
 					failed.add(ex.getClass().getName() + ": " + ex.getMessage().replace("\n", "\n  ") + "\n  "
@@ -220,6 +168,65 @@ public class RssService {
 				}
 			}
 			return "";
-		});
+		}
+
+		private ClientNews createNews(final QueryParams params, final JsonNode rss, final boolean ) {
+			String uid = null;
+			if (rss.has("link"))
+				uid = rss.get("link").asText().trim();
+			if (uid == null) {
+				uid = rss.get("guid").asText().trim();
+				if (Strings.isEmpty(uid))
+					uid = rss.get("guid").get("").asText().trim();
+			}
+			final String description = Strings.sanitize(rss.get("title").asText() +
+					(addDescription	&& rss.has("description")
+									? "\n\n" + rss.get("description").asText()
+									: ""),
+					1000);
+			params.setSearch("clientNews.url='" + uid + "' and clientNews.clientId=" + clientId);
+			Result result = repository.list(params);
+			final ClientNews clientNews;
+			if (result.size() == 0) {
+				params.setSearch("clientNews.description='" + description + "' and clientNews.clientId=" + clientId);
+				result = repository.list(params);
+			}
+			if (result.size() == 0)
+				clientNews = new ClientNews();
+			else {
+				clientNews = repository.one(ClientNews.class,
+						(BigInteger) result.get(0).get("clientNews.id"));
+				clientNews.historize();
+			}
+			clientNews.setClientId(clientId);
+			clientNews.setDescription(description);
+			clientNews.setUrl(uid);
+			if (rss.has("pubDate"))
+				clientNews.setPublish(new Timestamp(dateParser.parse(rss.get("pubDate").asText()).getTime()));
+			else
+				clientNews.setPublish(new Timestamp(dateParser2.parse(rss.get("date").asText()).getTime()));
+			clientNews.setImage(null);
+			if (rss.has("media:content") && rss.get("media:content").has("url"))
+				clientNews.setImage(EntityUtil.getImage(rss.get("media:content").get("url").asText(),
+								EntityUtil.IMAGE_SIZE, 200));
+			else {
+				final String html = IOUtils.toString(new URL(uid), StandardCharsets.UTF_8)
+						.replace('\r', ' ').replace('\n', ' ');
+				Matcher matcher = imageRegex.matcher(html);
+				String s = null;
+				boolean found = matcher.find();
+				if (!found) {
+					matcher = imageRegex2.matcher(html);
+					found = matcher.find();
+				}
+				if (found) {
+					s = matcher.group(1);
+					if (s.startsWith("/"))
+						s = url.substring(0, url.indexOf("/", 10)) + s;
+					clientNews.setImage(EntityUtil.getImage(s, EntityUtil.IMAGE_SIZE, 200));
+				}
+			}
+			return clientNews;
+		}
 	}
 }
