@@ -136,10 +136,8 @@ public class RssService {
 											"/rest/action/marketing/news/" + clientNews.getId());
 							}
 						}
-					} catch (final IllegalArgumentException ex) {
-						synchronized (failed) {
-							failed.add("image: " + ex.getMessage().replace("\n", "\n  ") + "\n  " + url);
-						}
+					} catch (final Exception ex) {
+						addFailure(ex, url);
 					}
 				}
 				int deleted = 0;
@@ -162,12 +160,14 @@ public class RssService {
 				if (count != 0 || deleted != 0)
 					return count + " on " + clientId + " " + url + (deleted > 0 ? ", " + deleted + " deleted" : "");
 			} catch (final Exception ex) {
-				synchronized (failed) {
-					failed.add(ex.getClass().getName() + ": " + ex.getMessage().replace("\n", "\n  ") + "\n  "
-							+ json.get("url").asText());
-				}
+				addFailure(ex, json.get("url").asText());
 			}
 			return "";
+		}
+
+		private synchronized void addFailure(final Exception ex, final String url) {
+			failed.add((ex.getMessage().startsWith("IMAGE_") ? "" : ex.getClass().getName() + ": ")
+					+ ex.getMessage().replace("\n", "\n  ") + "\n  " + url);
 		}
 
 		private ClientNews createNews(final QueryParams params, final JsonNode rss, final boolean addDescription,
@@ -189,7 +189,8 @@ public class RssService {
 			Result result = repository.list(params);
 			final ClientNews clientNews;
 			if (result.size() == 0) {
-				params.setSearch("clientNews.description='" + description + "' and clientNews.clientId=" + clientId);
+				params.setSearch("clientNews.description like '" + description.replace('\'', '_').replace('\n', '_')
+						+ "' and clientNews.clientId=" + clientId);
 				result = repository.list(params);
 			}
 			if (result.size() == 0)

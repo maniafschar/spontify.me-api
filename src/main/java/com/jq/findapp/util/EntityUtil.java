@@ -48,20 +48,14 @@ public class EntityUtil {
 			y = (height - width) / 2;
 			height = width;
 		}
-		final BufferedImage resizedImage = new BufferedImage(size, size,
-				originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType());
+		final BufferedImage resizedImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
 		final Graphics2D g = resizedImage.createGraphics();
 		g.drawImage(originalImage, 0, 0, size, size, x, y, x + width, y + height, null);
-		g.dispose();
 		resizedImage.flush();
+		g.dispose();
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		ImageIO.write(resizedImage, "jpg", out);
-		final byte[] result = out.toByteArray();
-		if (result == null || result.length < 100)
-			throw new IllegalArgumentException(
-					"IMAGE_TOO_SMALL_SCALE orig. " + data.length + ", result "
-							+ (result == null ? -1 : result.length));
-		return result;
+		return out.toByteArray();
 	}
 
 	public static String getImage(final String url, final int size, int minimum) {
@@ -91,12 +85,19 @@ public class EntityUtil {
 					"IMAGE_NULL_CONVERT " + data.length + " bytes\n" + url);
 		if (minimum == 0)
 			minimum = Math.min(400, size);
-		if (img.getWidth() > minimum && img.getHeight() > minimum)
+		if (img.getWidth() > minimum && img.getHeight() > minimum) {
+			byte[] b = null;
 			try {
-				return Repository.Attachment.createImage(".jpg", scaleImage(data, size));
+				b = scaleImage(data, size);
 			} catch (final IOException ex) {
 				throw new IllegalArgumentException("IMAGE_EXCEPTION_SCALE " + ex.getMessage() + "\n" + url, ex);
 			}
+			if (b == null || b.length < 100)
+				throw new IllegalArgumentException(
+						"IMAGE_TOO_SMALL_SCALE orig. " + data.length + ", result "
+								+ (b == null ? -1 : b.length) + "\n" + url);
+			return Repository.Attachment.createImage(".jpg", b);
+		}
 		throw new IllegalArgumentException(
 				"IMAGE_TOO_SMALL " + img.getWidth() + "x" + img.getHeight() + "\n" + url);
 	}

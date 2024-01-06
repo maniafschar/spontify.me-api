@@ -156,6 +156,20 @@ public class RssServiceTest {
 	}
 
 	@Test
+	public void image_scale() throws Exception {
+		// given
+
+		// when
+		final String tag = EntityUtil.getImage(
+				"https://www.rbb24.de/content/dam/rbb/rbb/rbb24/2024/2024_01/rbb-reporter/Abendschau-Nebenkostenabrechnung.png.png/size=708x398.png",
+				EntityUtil.IMAGE_SIZE, 200);
+
+		// then
+		assertNotNull(tag);
+		assertTrue(tag.startsWith(".jpg" + Attachment.SEPARATOR));
+	}
+
+	@Test
 	public void image_webp() throws Exception {
 		// given
 
