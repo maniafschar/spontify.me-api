@@ -58,7 +58,7 @@ public class ChatService {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/answerAi");
 		final QueryParams params = new QueryParams(Query.contact_chat);
 		params.setSearch(
-				"contactChat.contactId<>(select adminId from Client client, Contact contact where client.id=contact.clientId and contact.id=contactChat.contactId) and contactChat.textId='"
+				"contactChat.contactId<>(select adminId from Client client, Contact contact where client.id=contact.clientId and contact.id=contactChat.contactId) and cast(contactChat.textId as text)='"
 						+ TextId.engagement_ai.name()
 						+ "' and contactChat.createdAt>cast('"
 						+ Instant.now().minus(Duration.ofDays(3)) + "' as timestamp)");
@@ -86,7 +86,8 @@ public class ChatService {
 
 	private void createGptAnswerIntern(final ContactChat contactChat) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_chat);
-		params.setSearch("contactChat.textId='" + TextId.engagement_ai.name() + "' and (contactChat.contactId="
+		params.setSearch("cast(contactChat.textId as text)='" + TextId.engagement_ai.name()
+				+ "' and (contactChat.contactId="
 				+ contactChat.getContactId() + " or contactChat.contactId2=" + contactChat.getContactId() + ")");
 		if (repository.list(params).size() > 40)
 			return;

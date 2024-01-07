@@ -118,7 +118,7 @@ public class EventService {
 			final QueryParams params = new QueryParams(Query.event_listParticipateRaw);
 			params.setSearch("eventParticipate.state=1 and eventParticipate.eventDate>cast('"
 					+ Instant.now().minus((Duration.ofDays(1)))
-					+ "') and eventParticipate.eventDate<cast('"
+					+ "' as timestamp) and eventParticipate.eventDate<cast('"
 					+ Instant.now().plus(Duration.ofDays(1)) + "' as timestamp)");
 			params.setLimit(0);
 			final Result ids = repository.list(params);

@@ -632,8 +632,9 @@ public class ActionApi {
 		params.setQuery(Query.misc_listMarketing);
 		final String today = Instant.now().toString().substring(0, 19);
 		String s = "clientMarketing.clientId=" + contact.getClientId()
-				+ " and clientMarketing.startDate<='" + today + "' and clientMarketing.endDate>='" + today
-				+ "' and clientMarketing.storage like '%" + Attachment.SEPARATOR + "%'";
+				+ " and clientMarketing.startDate<=cast('" + today
+				+ "' as timestamp) and clientMarketing.endDate>=cast('" + today
+				+ "' as timestamp) and clientMarketing.storage like '%" + Attachment.SEPARATOR + "%'";
 
 		s += " and (clientMarketing.language is null or length(clientMarketing.language)=0 or clientMarketing.language='"
 				+ contact.getLanguage() + "'";
@@ -646,15 +647,15 @@ public class ActionApi {
 		if (contact.getAge() == null)
 			s += "clientMarketing.age='18,99'";
 		else
-			s += "substring(clientMarketing.age,1,2)<=" + contact.getAge()
-					+ " and substring(clientMarketing.age,4,2)>="
+			s += "cast(substring(clientMarketing.age,1,2) as integer)<=" + contact.getAge()
+					+ " and cast(substring(clientMarketing.age,4,2) as integer)>="
 					+ contact.getAge();
 
 		s += ") and (clientMarketing.region is null or length(clientMarketing.region)=0";
 		if (geoLocation == null)
 			s += ")";
 		else {
-			s += " or (length(clientMarketing.region)=0 or clientMarketing.region like '%" + geoLocation.getTown()
+			s += " or (clientMarketing.region like '%" + geoLocation.getTown()
 					+ "%' or concat(' ',clientMarketing.region,' ') like '% " + geoLocation.getCountry() + " %' or ";
 			final String s2 = geoLocation.getZipCode();
 			if (s2 != null) {

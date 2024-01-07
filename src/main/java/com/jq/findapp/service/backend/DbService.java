@@ -61,8 +61,8 @@ public class DbService {
 					"update Log set webCall=substring(webCall, 1, instr(webCall, '(')-1) where instr(webCall, '(')>0");
 			final LocalDate d = LocalDate.ofInstant(Instant.now().minus(Duration.ofDays(183)), ZoneId.systemDefault());
 			repository.executeUpdate(
-					"update ContactToken set token='' where modifiedAt is not null and modifiedAt<'" + d
-							+ "' or modifiedAt is null and createdAt<'" + d + "'");
+					"update ContactToken set token='' where modifiedAt is not null and modifiedAt<cast('" + d
+							+ "' as timestamp) or modifiedAt is null and createdAt<cast('" + d + "' as timestamp)");
 			final QueryParams params = new QueryParams(Query.misc_listClient);
 			final Result list = repository.list(params);
 			params.setUser(new Contact());

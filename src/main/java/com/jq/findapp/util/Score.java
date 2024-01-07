@@ -12,7 +12,7 @@ public class Score {
 		}
 	}
 
-	public static String getSearchContact(Contact contact) throws Exception {
+	public static String getSearchContact(final Contact contact) throws Exception {
 		String search = "";
 		if (!Strings.isEmpty(contact.getAgeMale()))
 			search += "contact.gender=1 and contact.age>=" + contact.getAgeMale().split(",")[0] + " and contact.age<="
@@ -26,9 +26,9 @@ public class Score {
 		if (search.contains("contact.age"))
 			search = search.substring(0, search.length() - 4) + ") and (";
 		if (!Strings.isEmpty(contact.getSkills()))
-			search += "REGEXP_LIKE(contact.skills, '" + contact.getSkills() + "')=1 or ";
+			search += "cast(REGEXP_LIKE(contact.skills, '" + contact.getSkills() + "') as integer)=1 or ";
 		if (!Strings.isEmpty(contact.getSkillsText()))
-			search += "REGEXP_LIKE(contact.skillsText, '" + contact.getSkillsText() + "')=1 or ";
+			search += "cast(REGEXP_LIKE(contact.skillsText, '" + contact.getSkillsText() + "') as integer)=1 or ";
 		if (search.endsWith(" or "))
 			search = search.substring(0, search.length() - 4);
 		if (search.endsWith("("))
@@ -36,7 +36,7 @@ public class Score {
 		return search;
 	}
 
-	private static void match(String attributes, String attributesCompare, Result result) {
+	private static void match(final String attributes, final String attributesCompare, final Result result) {
 		if (!Strings.isEmpty(attributes)) {
 			final String[] attr = attributes.split(attributes.contains("\u0015") ? "\u0015" : ",");
 			result.total += attr.length;
@@ -49,7 +49,7 @@ public class Score {
 		}
 	}
 
-	public static double getContact(Contact contact, Contact contact2) throws Exception {
+	public static double getContact(final Contact contact, final Contact contact2) throws Exception {
 		final Result score = new Result();
 		match(contact.getSkills(), contact2.getSkills(), score);
 		match(contact.getSkillsText(), contact2.getSkillsText(), score);

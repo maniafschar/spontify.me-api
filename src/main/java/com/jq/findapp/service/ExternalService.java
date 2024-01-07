@@ -140,8 +140,10 @@ public class ExternalService {
 	public GeoLocation getAddress(final float latitude, final float longitude) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_geoLocation);
 		final float roundingFactor = 10000f;
-		params.setSearch("geoLocation.latitude like '" + ((int) (latitude * roundingFactor) / roundingFactor)
-				+ "%' and geoLocation.longitude like '" + ((int) (longitude * roundingFactor) / roundingFactor) + "%'");
+		params.setSearch(
+				"cast(geoLocation.latitude as text) like '" + ((int) (latitude * roundingFactor) / roundingFactor)
+						+ "%' and cast(geoLocation.longitude as text) like '"
+						+ ((int) (longitude * roundingFactor) / roundingFactor) + "%'");
 		final Map<String, Object> persistedAddress = repository.one(params);
 		if (persistedAddress.get("_id") != null)
 			return repository.one(GeoLocation.class, (BigInteger) persistedAddress.get("_id"));

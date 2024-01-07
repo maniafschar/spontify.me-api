@@ -408,7 +408,7 @@ public class EngagementService {
 			final BigInteger clientId = it.next();
 			final QueryParams params = new QueryParams(Query.contact_listChatFlat);
 			params.setLimit(0);
-			params.setSearch("contactChat.textId='" + TextId.engagement_installCurrentVersion.name() +
+			params.setSearch("cast(contactChat.textId as text)='" + TextId.engagement_installCurrentVersion.name() +
 					"' and contact.version='" + currentVersion.get(clientId) + "' and contact.clientId=" + clientId);
 			final Result ids = repository.list(params);
 			for (int i = 0; i < ids.size(); i++) {
@@ -448,7 +448,7 @@ public class EngagementService {
 	}
 
 	private String getLastNearByAction(final QueryParams params, final BigInteger id) {
-		params.setSearch("contactChat.action is not null and contactChat.textId like '"
+		params.setSearch("contactChat.action is not null and cast(contactChat.textId as text) like '"
 				+ TextId.engagement_nearByLocation.name().substring(0,
 						TextId.engagement_nearByLocation.name().indexOf('L'))
 				+ "%' and contactChat.contactId="
@@ -495,7 +495,7 @@ public class EngagementService {
 				params.setSearch(
 						"contactChat.contactId=" + repository.one(Client.class, contact.getClientId()).getAdminId()
 								+ " and contactChat.contactId2=" + contact.getId()
-								+ " and contactChat.textId='" + TextId.engagement_nearByContact.name()
+								+ " and cast(contactChat.textId as text)='" + TextId.engagement_nearByContact.name()
 								+ "' and contactChat.action like '%"
 								+ Strings.encodeParam("p=" + c.getId()) + "%'");
 				if (repository.list(params).size() == 0) {
@@ -525,7 +525,7 @@ public class EngagementService {
 			return false;
 		final QueryParams params = new QueryParams(Query.contact_chat);
 		params.setSearch("contactChat.contactId=" + adminId + " and contactChat.contactId2=" + contact.getId()
-				+ " and contactChat.textId='" + textId.name() + '\'');
+				+ " and cast(contactChat.textId as text)='" + textId.name() + '\'');
 		if (repository.list(params).size() == 0) {
 			String s = text.getText(contact, textId);
 			for (final REPLACMENT rep : REPLACMENT.values())
