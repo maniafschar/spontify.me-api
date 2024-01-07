@@ -83,7 +83,6 @@ public class Text {
 		notification_sentEntries,
 		notification_sentEntry,
 		or,
-		preventDelete,
 		today,
 		tomorrow
 	}
@@ -121,11 +120,16 @@ public class Text {
 	public String getText(final Contact contact, final TextId textId) {
 		final String label = textId.name();
 		String s;
-		if (label.contains("_"))
-			s = languages.get(contact.getLanguage()).get(label.substring(0, label.indexOf('_')))
-					.get(label.substring(label.indexOf('_') + 1)).asText();
-		else
-			s = languages.get(contact.getLanguage()).get(label).asText();
+		try {
+
+			if (label.contains("_"))
+				s = languages.get(contact.getLanguage()).get(label.substring(0, label.indexOf('_')))
+						.get(label.substring(label.indexOf('_') + 1)).asText();
+			else
+				s = languages.get(contact.getLanguage()).get(label).asText();
+		} catch (final NullPointerException ex) {
+			throw new RuntimeException("Missing label " + contact.getLanguage() + ": " + textId);
+		}
 		if (s.contains("APP_")) {
 			final Client client = repository.one(Client.class, contact.getClientId());
 			s = s.replaceAll("APP_TITLE", client.getName());

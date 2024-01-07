@@ -142,7 +142,9 @@ public class RssService {
 				}
 				int deleted = 0;
 				if (chonological) {
-					params.setSearch("clientNews.publish>'" + first + "' and clientNews.clientId=" + clientId);
+					params.setSearch(
+							"clientNews.publish>cast('" + first + "' as timestamp) and clientNews.clientId="
+									+ clientId);
 					final Result result = repository.list(params);
 					for (int i = 0; i < result.size(); i++) {
 						if (!urls.contains(result.get(i).get("clientNews.url"))) {

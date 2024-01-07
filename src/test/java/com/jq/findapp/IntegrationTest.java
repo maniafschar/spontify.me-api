@@ -222,7 +222,7 @@ public class IntegrationTest {
 		}
 
 		static WebElement get(final String path) {
-			final int maxWait = 20;
+			final int maxWait = 40;
 			int i = 0;
 			while (driver.findElements(By.cssSelector("main [toggle]")).size() > 0 ||
 					driver.findElements(By.cssSelector("main [class*=\"animated\"]")).size() > 0 ||

@@ -108,7 +108,8 @@ public class EngagementService {
 			params.setLatitude(contact.getLatitude());
 			params.setLongitude(contact.getLongitude());
 			params.setSearch(
-					"contact.createdAt>='" + Instant.ofEpochMilli(contact.getModifiedAt().getTime()) + "'");
+					"contact.createdAt>=cast('" + Instant.ofEpochMilli(contact.getModifiedAt().getTime())
+							+ "' as timestamp)");
 			return "" + repository.list(params).size();
 		}),
 		NEW_CONTACTS_DISTANCE((contact, location, externalService, repository) -> {
@@ -117,7 +118,8 @@ public class EngagementService {
 			params.setLatitude(contact.getLatitude());
 			params.setLongitude(contact.getLongitude());
 			params.setSearch(
-					"contact.createdAt>='" + Instant.ofEpochMilli(contact.getModifiedAt().getTime()) + "'");
+					"contact.createdAt>=cast('" + Instant.ofEpochMilli(contact.getModifiedAt().getTime())
+							+ "' as timestamp)");
 			final Result result = repository.list(params);
 			for (int i = result.size() - 1; i >= 0; i--) {
 				if (result.get(i).get("_geolocationDistance") instanceof Number)
@@ -131,7 +133,8 @@ public class EngagementService {
 			params.setLatitude(contact.getLatitude());
 			params.setLongitude(contact.getLongitude());
 			params.setSearch(
-					"location.createdAt>='" + Instant.ofEpochMilli(contact.getModifiedAt().getTime()) + "'");
+					"location.createdAt>=cast('" + Instant.ofEpochMilli(contact.getModifiedAt().getTime())
+							+ "' as timestamp)");
 			return "" + repository.list(params).size();
 		}),
 		NEW_LOCATIONS_DISTANCE((contact, location, externalService, repository) -> {
@@ -140,7 +143,8 @@ public class EngagementService {
 			params.setLatitude(contact.getLatitude());
 			params.setLongitude(contact.getLongitude());
 			params.setSearch(
-					"location.createdAt>='" + Instant.ofEpochMilli(contact.getModifiedAt().getTime()) + "'");
+					"location.createdAt>=cast('" + Instant.ofEpochMilli(contact.getModifiedAt().getTime())
+							+ "' as timestamp)");
 			final Result result = repository.list(params);
 			return ""
 					+ (int) (((Number) result.get(result.size() - 1).get("_geolocationDistance")).doubleValue() + 0.5);
@@ -215,8 +219,9 @@ public class EngagementService {
 					params.setLatitude(contact.getLatitude());
 					params.setLongitude(contact.getLongitude());
 					params.setSearch(
-							"location.createdAt>='" + Instant.ofEpochMilli(contact.getModifiedAt().getTime())
-									+ "'");
+							"location.createdAt>=cast('"
+									+ Instant.ofEpochMilli(contact.getModifiedAt().getTime())
+									+ "' as timestamp)");
 					return repository.list(params).size() > 1;
 				}));
 
@@ -231,7 +236,8 @@ public class EngagementService {
 					params.setLongitude(contact.getLongitude());
 					params.setDistance(50);
 					params.setSearch(
-							"contact.createdAt>='" + Instant.ofEpochMilli(contact.getModifiedAt().getTime()) + "'");
+							"contact.createdAt>=cast('"
+									+ Instant.ofEpochMilli(contact.getModifiedAt().getTime()) + "' as timestamp)");
 					return repository.list(params).size() > 9;
 				}));
 
@@ -267,8 +273,8 @@ public class EngagementService {
 			if (gc.get(Calendar.HOUR_OF_DAY) < 9 || gc.get(Calendar.HOUR_OF_DAY) > 18)
 				return result;
 			final QueryParams params = new QueryParams(Query.contact_listId);
-			params.setSearch("contact.createdAt<'" + Instant.now().minus(Duration.ofHours(3))
-					+ "' and contact.verified=false and contact.notificationEngagement=true");
+			params.setSearch("contact.createdAt<cast('" + Instant.now().minus(Duration.ofHours(3))
+					+ "' as timestamp) and contact.verified=false and contact.notificationEngagement=true");
 			params.setLimit(0);
 			final Result list = repository.list(params);
 			final long DAY = 86400000;
@@ -361,10 +367,10 @@ public class EngagementService {
 					+ " or block.contactId=" + contact.getId() + " and block.contactId2=" + adminId);
 			if (repository.list(paramsAdminBlocked).size() == 0) {
 				params.setSearch("contactChat.contactId=" + adminId + " and contactChat.contactId2=" + contact.getId()
-						+ " and contactChat.createdAt>'"
+						+ " and contactChat.createdAt>cast('"
 						+ Instant.now().minus(Duration.ofDays(21 + (int) (Math.random() * 3)))
 								.minus(Duration.ofHours((int) (Math.random() * 12))).toString()
-						+ '\'');
+						+ "' as timestamp)");
 				if (repository.list(params).size() == 0) {
 					params.setSearch(
 							"contactChat.textId is not null and contactChat.contactId=" + adminId

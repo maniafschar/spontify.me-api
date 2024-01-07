@@ -136,9 +136,9 @@ public class ImportMunich {
 									.getAttributes().getNamedItem("datetime").getNodeValue());
 					event.setStartDate(new Timestamp(date.getTime()));
 					final QueryParams params = new QueryParams(Query.event_listId);
-					params.setSearch("event.startDate='"
+					params.setSearch("event.startDate=cast('"
 							+ event.getStartDate().toInstant().toString().substring(0, 19)
-							+ "' and event.locationId=" + event.getLocationId() + " and event.contactId="
+							+ "' as timestamp) and event.locationId=" + event.getLocationId() + " and event.contactId="
 							+ client.getAdminId());
 					if (repository.list(params).size() == 0) {
 						if (externalPage) {

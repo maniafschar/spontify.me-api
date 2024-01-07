@@ -166,9 +166,9 @@ public class TestConfig {
 		}
 	}
 
-	public static Timestamp toDays(final Connection connection, final Timestamp timestamp)
+	public static int toDays(final Connection connection, final Timestamp timestamp)
 			throws SQLException {
-		return timestamp;
+		return 0;
 	}
 
 	public static int weekday(final Connection connection, final Timestamp timestamp)

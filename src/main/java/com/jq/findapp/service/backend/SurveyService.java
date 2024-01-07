@@ -116,7 +116,8 @@ public class SurveyService {
 								.minus(Duration.ofMinutes(15));
 						final QueryParams params = new QueryParams(Query.misc_listMarketing);
 						params.setSearch(
-								"clientMarketing.endDate='" + end + "' and clientMarketing.clientId=" + clientId);
+								"clientMarketing.endDate=cast('" + end + "' as timestamp) and clientMarketing.clientId="
+										+ clientId);
 						if (repository.list(params).size() == 0) {
 							predictionAddStatistics(clientId, poll);
 							final ClientMarketing clientMarketing = new ClientMarketing();
@@ -254,7 +255,8 @@ public class SurveyService {
 								&& startDate.plus(Duration.ofHours(2)).isBefore(Instant.now())) {
 							final QueryParams params = new QueryParams(Query.misc_listMarketing);
 							params.setSearch(
-									"clientMarketing.startDate='" + startDate + "' and clientMarketing.clientId="
+									"clientMarketing.startDate=cast('" + startDate
+											+ "' as timestamp) and clientMarketing.clientId="
 											+ clientId);
 							if (repository.list(params).size() > 0)
 								break;
@@ -426,8 +428,9 @@ public class SurveyService {
 
 		String resultAndNotify(final BigInteger clientId) throws Exception {
 			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
-			params.setSearch("clientMarketingResult.published=false and clientMarketing.endDate<='" + Instant.now()
-					+ "' and clientMarketing.clientId=" + clientId);
+			params.setSearch(
+					"clientMarketingResult.published=false and clientMarketing.endDate<=cast('" + Instant.now()
+							+ "' as timestamp) and clientMarketing.clientId=" + clientId);
 			final Result list = repository.list(params);
 			String result = "";
 			for (int i = 0; i < list.size(); i++) {

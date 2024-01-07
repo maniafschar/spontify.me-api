@@ -148,8 +148,8 @@ public class AuthenticationApi {
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_listLog);
 		params.setSearch("log.ip='" + IpService.sanatizeIp(ip)
-				+ "' and log.createdAt>'" + Instant.now().minus(Duration.ofDays(1)).toString()
-				+ "' and log.uri like '%recoverSendEmail'");
+				+ "' and log.createdAt>cast('" + Instant.now().minus(Duration.ofDays(1)).toString()
+				+ "' as timestamp) and log.uri like '%recoverSendEmail'");
 		if (repository.list(params).size() > 10)
 			return "nok:Spam";
 		return authenticationService.recoverSendEmail(Encryption.decryptBrowser(email));

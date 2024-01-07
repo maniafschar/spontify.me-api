@@ -37,15 +37,16 @@ public class SitemapService {
 					if (json.get("type").asText().contains("event")) {
 						final QueryParams params = new QueryParams(Query.event_listId);
 						params.setSearch(
-								"event.contactId=" + list.get(i).get("client.adminId") + " and event.endDate>'"
-										+ Instant.now() + "'");
+								"event.contactId=" + list.get(i).get("client.adminId")
+										+ " and event.endDate>cast('"
+										+ Instant.now() + "' as timestamp)");
 						writeMap(json, "event", params, sitemap, (String) list.get(i).get("client.url"));
 					}
 					if (json.get("type").asText().contains("news")) {
 						final QueryParams params = new QueryParams(Query.misc_listNews);
 						params.setUser(new Contact());
 						params.getUser().setClientId((BigInteger) list.get(i).get("client.id"));
-						params.setSearch("clientNews.publish<'" + Instant.now() + "'");
+						params.setSearch("clientNews.publish<cast('" + Instant.now() + "' as timestamp)");
 						writeMap(json, "news", params, sitemap, (String) list.get(i).get("client.url"));
 					}
 					if (json.get("type").asText().contains("location"))

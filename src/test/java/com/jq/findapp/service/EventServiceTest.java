@@ -46,7 +46,7 @@ public class EventServiceTest {
 		// given
 		utils.createContact(BigInteger.ONE);
 		final QueryParams params = new QueryParams(Query.event_listId);
-		params.setSearch("event.startDate='2023-12-02 09:00:00'");
+		params.setSearch("event.startDate=cast('2023-12-02 09:00:00' as timestamp)");
 
 		// when
 		final SchedulerResult result = eventService.importEvents();

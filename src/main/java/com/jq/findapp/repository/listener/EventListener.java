@@ -61,8 +61,8 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 		if (event.old("startDate") != null || event.old("price") != null) {
 			final QueryParams params = new QueryParams(Query.event_listParticipateRaw);
 			params.setSearch(
-					"eventParticipate.eventId=" + event.getId() + " and eventParticipate.eventDate>='"
-							+ Instant.now().minus((Duration.ofDays(1))) + "'");
+					"eventParticipate.eventId=" + event.getId() + " and eventParticipate.eventDate>=cast('"
+							+ Instant.now().minus((Duration.ofDays(1))) + "' as timestamp)");
 			final Result result = repository.list(params);
 			for (int i = 0; i < result.size(); i++) {
 				final EventParticipate eventParticipate = repository.one(EventParticipate.class,

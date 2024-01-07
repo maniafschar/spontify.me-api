@@ -65,7 +65,7 @@ public class EventService {
 			params.setQuery(Query.event_listMatching);
 			params.setDistance(50);
 			params.setSearch(
-					"event.startDate>=current_timestamp and TO_DAYS(event.startDate)-1<=TO_DAYS(current_timestamp)");
+					"event.startDate>=current_timestamp and cast(TO_DAYS(event.startDate) as integer)-1<=cast(TO_DAYS(current_timestamp) as integer)");
 			final LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
 			int count = 0;
 			for (int i = 0; i < ids.size(); i++) {
@@ -116,10 +116,10 @@ public class EventService {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/notifyParticipation");
 		try {
 			final QueryParams params = new QueryParams(Query.event_listParticipateRaw);
-			params.setSearch("eventParticipate.state=1 and eventParticipate.eventDate>'"
+			params.setSearch("eventParticipate.state=1 and eventParticipate.eventDate>cast('"
 					+ Instant.now().minus((Duration.ofDays(1)))
-					+ "' and eventParticipate.eventDate<'"
-					+ Instant.now().plus(Duration.ofDays(1)) + "'");
+					+ "') and eventParticipate.eventDate<cast('"
+					+ Instant.now().plus(Duration.ofDays(1)) + "' as timestamp)");
 			params.setLimit(0);
 			final Result ids = repository.list(params);
 			final ZonedDateTime now = Instant.now().atZone(ZoneOffset.UTC);
@@ -205,8 +205,8 @@ public class EventService {
 			return false;
 		final QueryParams params = new QueryParams(Query.event_listParticipateRaw);
 		params.setUser(contact);
-		params.setSearch("eventParticipate.eventId=" + event.getId() + " and eventParticipate.eventDate='"
-				+ date.toLocalDate() + "' and eventParticipate.state=1");
+		params.setSearch("eventParticipate.eventId=" + event.getId() + " and eventParticipate.eventDate=cast('"
+				+ date.toLocalDate() + "' as timestamp) and eventParticipate.state=1");
 		return repository.list(params).size() >= event.getMaxParticipants().intValue();
 	}
 
@@ -224,9 +224,9 @@ public class EventService {
 
 	public String publishClient(final BigInteger clientId) throws Exception {
 		final QueryParams params = new QueryParams(Query.event_listId);
-		params.setSearch("event.startDate>'" + Instant.now().plus(Duration.ofHours(6))
-				+ "' and event.startDate<'" + Instant.now().plus(Duration.ofHours(30))
-				+ "' and event.contactId=" + clientId
+		params.setSearch("event.startDate>cast('" + Instant.now().plus(Duration.ofHours(6))
+				+ "' as timestamp) and event.startDate<cast('" + Instant.now().plus(Duration.ofHours(30))
+				+ "' as timestamp) and event.contactId=" + clientId
 				+ " and (event.image is not null or location.image is not null)"
 				+ " and event.url is not null"
 				+ " and event.repetition='o'"

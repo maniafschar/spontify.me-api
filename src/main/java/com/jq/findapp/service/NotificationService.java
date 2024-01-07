@@ -450,8 +450,8 @@ public class NotificationService {
 				subject = subject.substring(0, 252) + "...";
 			}
 			final QueryParams params = new QueryParams(Query.misc_listTicket);
-			params.setSearch("subject='" + subject + "' and type='" + type.name() + "' and createdAt>'"
-					+ Instant.now().minus(Duration.ofDays(1)) + "'"
+			params.setSearch("subject='" + subject + "' and type='" + type.name() + "' and createdAt>cast('"
+					+ Instant.now().minus(Duration.ofDays(1)) + "' as timestamp)"
 					+ (contactId == null ? "" : " and contactId=" + contactId));
 			final Result result = repository.list(params);
 			for (int i = 0; i < result.size(); i++) {

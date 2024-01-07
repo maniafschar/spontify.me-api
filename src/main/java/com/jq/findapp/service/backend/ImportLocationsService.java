@@ -406,9 +406,9 @@ public class ImportLocationsService {
 				+ location.getCategory()
 				+ "' and (LOWER(location.address) like '%"
 				+ location.getAddress().toLowerCase().replace("traße", "tr.").replace('\n', '%').replace("'", "''")
-				+ "%' or location.latitude like '"
+				+ "%' or cast(location.latitude as text) like '"
 				+ ((int) (location.getLatitude().floatValue() * roundingFactor)) / roundingFactor
-				+ "%' and location.longitude like '"
+				+ "%' and cast(location.longitude as text) like '"
 				+ ((int) (location.getLongitude().floatValue() * roundingFactor)) / roundingFactor + "%')");
 		final Result result = repository.list(params);
 		return result.size() > 0 ? (BigInteger) result.get(0).get("location.id") : null;

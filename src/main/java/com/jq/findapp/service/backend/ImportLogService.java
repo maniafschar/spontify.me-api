@@ -103,8 +103,9 @@ public class ImportLogService {
 							}
 							params.setSearch("log.ip='" + log.getIp() + "' and log.uri='"
 									+ log.getUri().replace("'", "''")
-									+ "' and log.createdAt='" + Instant.ofEpochMilli(log.getCreatedAt().getTime())
-									+ "' and log.body='" + log.getBody().replace("'", "''") + "'");
+									+ "' and log.createdAt=cast('"
+									+ Instant.ofEpochMilli(log.getCreatedAt().getTime())
+									+ "' as timestamp) and log.body='" + log.getBody().replace("'", "''") + "'");
 							if (repository.list(params).size() == 0) {
 								log.setPort(80);
 								log.setMethod(m.group(5));

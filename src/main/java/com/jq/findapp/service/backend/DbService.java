@@ -67,7 +67,8 @@ public class DbService {
 			final Result list = repository.list(params);
 			params.setUser(new Contact());
 			params.setQuery(Query.misc_listNews);
-			params.setSearch("clientNews.notified=false and clientNews.publish<='" + Instant.now() + "'");
+			params.setSearch(
+					"clientNews.notified=false and clientNews.publish<=cast('" + Instant.now() + "' as timestamp)");
 			String clientUpdates = "";
 			for (int i = 0; i < list.size(); i++) {
 				final Client client = repository.one(Client.class, (BigInteger) list.get(i).get("client.id"));

@@ -84,8 +84,8 @@ public class WebSocket {
 		log.setTime((int) (System.currentTimeMillis() - time));
 		log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
 		final QueryParams params = new QueryParams(Query.misc_listLog);
-		params.setSearch("log.createdAt='" + log.getCreatedAt()
-				+ "' and log.body like '"
+		params.setSearch("log.createdAt=cast('" + log.getCreatedAt()
+				+ "' as timestamp) and log.body like '"
 				+ (log.getBody() == null ? "" : log.getBody().replace('\n', '%').replace(';', '_'))
 				+ "' and log.uri='" + log.getUri()
 				+ "' and log.method='WS'");

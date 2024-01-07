@@ -272,7 +272,7 @@ public class ActionApi {
 				params.setDistance(200);
 				params.setLimit(50);
 			}
-			params.setSearch("clientNews.publish<='" + Instant.now().toString() + "'");
+			params.setSearch("clientNews.publish<=cast('" + Instant.now().toString() + "' as timestamp)");
 		} else
 			params.setSearch("clientNews.id=" + id);
 		return repository.list(params).getList();
@@ -283,8 +283,8 @@ public class ActionApi {
 		final QueryParams params = new QueryParams(Query.event_listTeaserMeta);
 		params.setLimit(-1);
 		params.setSearch(
-				"contact.clientId=" + clientId + " and event.endDate>='"
-						+ Instant.now().atZone(ZoneOffset.UTC).toLocalDate() + "'");
+				"contact.clientId=" + clientId + " and event.endDate>=cast('"
+						+ Instant.now().atZone(ZoneOffset.UTC).toLocalDate() + "' as timestamp)");
 		return repository.list(params).getList();
 	}
 
@@ -337,8 +337,10 @@ public class ActionApi {
 		if (params.getQuery() == Query.event_listTeaser) {
 			params.setLimit(0);
 			final ZonedDateTime today = Instant.now().atZone(ZoneOffset.UTC);
-			search = (search == null ? "" : "(" + search + ") and ") + "event.endDate>='"
-					+ today.toLocalDate() + "' and event.startDate<='" + today.plus(Duration.ofDays(1)) + "'";
+			search = (search == null ? "" : "(" + search + ") and ") + "event.endDate>=cast('"
+					+ today.toLocalDate() + "' as timestamp) and event.startDate<=cast('"
+					+ today.plus(Duration.ofDays(1))
+					+ "' as timestamp)";
 		} else
 			params.setLimit(limit);
 		params.setSearch(search);
@@ -391,8 +393,9 @@ public class ActionApi {
 		contact.setLongitude(position.getLongitude());
 		repository.save(contact);
 		final QueryParams params = new QueryParams(Query.contact_listGeoLocationHistory);
-		params.setSearch("contactGeoLocationHistory.createdAt>'" + Instant.now().minus(Duration.ofSeconds(5))
-				+ "' and contactGeoLocationHistory.contactId=" + contact.getId());
+		params.setSearch(
+				"contactGeoLocationHistory.createdAt>cast('" + Instant.now().minus(Duration.ofSeconds(5))
+						+ "' as timestamp) and contactGeoLocationHistory.contactId=" + contact.getId());
 		if (repository.list(params).size() == 0) {
 			final GeoLocation geoLocation = externalService.getAddress(position.getLatitude(), position.getLongitude());
 			if (geoLocation != null) {
@@ -500,19 +503,19 @@ public class ActionApi {
 		if (user == null) {
 			final QueryParams params = new QueryParams(Query.misc_listLog);
 			params.setSearch("log.ip='" + IpService.sanatizeIp(ip)
-					+ "' and log.createdAt>'" + Instant.now().minus(Duration.ofHours(6)).toString()
-					+ "' and log.uri='/action/marketing' and log.status=200 and log.method='POST' and log.clientId="
+					+ "' and log.createdAt>cast('" + Instant.now().minus(Duration.ofHours(6)).toString()
+					+ "' as timestamp) and log.uri='/action/marketing' and log.status=200 and log.method='POST' and log.clientId="
 					+ clientId);
 			final Result list = repository.list(params);
 			params.setQuery(Query.contact_listMarketing);
 			for (int i = 0; i < list.size(); i++) {
 				final Instant time = Instant.ofEpochMilli(((Timestamp) list.get(i).get("log.createdAt")).getTime());
 				params.setSearch(
-						"contactMarketing.createdAt>='"
+						"contactMarketing.createdAt>=cast('"
 								+ time.minus(Duration.ofSeconds(5)).toString() +
-								"' and contactMarketing.createdAt<'"
+								"' as timestamp) and contactMarketing.createdAt<cast('"
 								+ time.plus(Duration.ofSeconds(30)).toString()
-								+ "' and contactMarketing.clientMarketingId="
+								+ "' as timestamp) and contactMarketing.clientMarketingId="
 								+ contactMarketing.getClientMarketingId());
 				final Result list2 = repository.list(params);
 				if (list2.size() > 0)
