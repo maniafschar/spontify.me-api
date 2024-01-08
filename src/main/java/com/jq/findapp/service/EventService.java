@@ -171,7 +171,7 @@ public class EventService {
 		final String fbId = externalService.publishOnFacebook(contact.getClientId(),
 				new SimpleDateFormat("d.M.yyyy H:mm").format(event.getStartDate()) + "\n" + event.getDescription()
 						+ "\n\n" + location.getName() + "\n" + location.getAddress(),
-				"/rest/action/marketing/event/" + id);
+				"/rest/marketing/event/" + id);
 		if (fbId != null) {
 			event.setPublishId(fbId);
 			repository.save(event);
