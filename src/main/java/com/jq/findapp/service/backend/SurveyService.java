@@ -138,7 +138,7 @@ public class SurveyService {
 											+ (poll.get("statistics").size() > 0
 													? "\n\nIm Bild seht ihr die zusammengefassten Statistiken zu den letzen Spielen."
 													: ""),
-									"/rest/action/marketing/init/" + clientMarketing.getId());
+									"/rest/marketing/" + clientMarketing.getId());
 							return clientMarketing.getId();
 						}
 					}
@@ -320,7 +320,7 @@ public class SurveyService {
 												+ getOponent(clientId, poll)
 												+ "\n\nKlickt auf das Bild, um abzustimmen. Dort wird Eure Stimme erfasst und automatisch in die Wertung übernommen, die Ihr ab dem "
 												+ endDate + " hier sehen könnt.",
-										"/rest/action/marketing/init/" + clientMarketing.getId());
+										"/rest/marketing/" + clientMarketing.getId());
 								return clientMarketing.getId();
 							}
 						}
