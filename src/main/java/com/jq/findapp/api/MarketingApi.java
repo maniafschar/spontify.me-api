@@ -8,20 +8,13 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,30 +24,18 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jq.findapp.api.model.Position;
 import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ClientNews;
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.ContactChat;
-import com.jq.findapp.entity.ContactGeoLocationHistory;
 import com.jq.findapp.entity.ContactMarketing;
-import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
-import com.jq.findapp.entity.ContactVideoCall;
-import com.jq.findapp.entity.ContactVisit;
 import com.jq.findapp.entity.Event;
-import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.GeoLocation;
-import com.jq.findapp.entity.Ip;
 import com.jq.findapp.entity.Location;
-import com.jq.findapp.entity.LocationVisit;
-import com.jq.findapp.entity.Ticket.TicketType;
-import com.jq.findapp.repository.GeoLocationProcessor;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -62,10 +43,8 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.backend.IpService;
-import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Strings;
 
-import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
 
 @RestController
@@ -81,7 +60,6 @@ public class MarketingApi {
 	@Autowired
 	private NotificationService notificationService;
 
-	@Autowired
 	@PostMapping
 	public BigInteger pollAnswerCreate(@RequestBody final WriteEntity entity,
 			@RequestHeader final BigInteger clientId,
@@ -285,7 +263,7 @@ public class MarketingApi {
 			image = result.get(0).get("clientMarketingResult.image").toString();
 		} else
 			image = Attachment.resolve(clientMarketing.getImage());
-		return getHtml(repository.one(Client.class, clientMarketing.getClientId()), id, image, "");
+		return getHtml(repository.one(Client.class, clientMarketing.getClientId()), "" + id, image, "");
 	}
 
 	@GetMapping(path = "location/{id}", produces = MediaType.TEXT_HTML_VALUE)
@@ -350,7 +328,7 @@ public class MarketingApi {
 			s = s.replaceFirst("</add>",
 					"<style>article{opacity:0;position:absolute;}</style><article>" + title
 							+ "<figure><img src=\"" + url + "/med/" + image + "\"/></figure><ul>"
-					   		+ MENU.get(client.getId()) + "</ul></article></add>");
+							+ MENU.get(client.getId()) + "</ul></article></add>");
 			s = s.replaceFirst("<meta name=\"description\" content=\"([^\"].*)\"",
 					"<meta name=\"description\" content=\"" + title + '"');
 			s = s.replaceFirst("<title></title>", "<title>" +
