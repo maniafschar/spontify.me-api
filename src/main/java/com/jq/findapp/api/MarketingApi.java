@@ -73,6 +73,7 @@ import jakarta.transaction.Transactional;
 @RequestMapping("marketing")
 public class MarketingApi {
 	private static final Map<BigInteger, String> INDEXES = new HashMap<>();
+	private static final Map<BigInteger, String> MENU = new HashMap<>();
 
 	@Autowired
 	private Repository repository;
@@ -284,8 +285,7 @@ public class MarketingApi {
 			image = result.get(0).get("clientMarketingResult.image").toString();
 		} else
 			image = Attachment.resolve(clientMarketing.getImage());
-		return getHtml(repository.one(Client.class, clientMarketing.getClientId()),
-				(pollTerminated ? "result/" : "init/") + id, image, "");
+		return getHtml(repository.one(Client.class, clientMarketing.getClientId()), id, image, "");
 	}
 
 	@GetMapping(path = "location/{id}", produces = MediaType.TEXT_HTML_VALUE)
@@ -349,7 +349,8 @@ public class MarketingApi {
 					0).replace("null", "").trim();
 			s = s.replaceFirst("</add>",
 					"<style>article{opacity:0;position:absolute;}</style><article>" + title
-							+ "<figure><img src=\"" + url + "/med/" + image + "\"/></figure></article></add>");
+							+ "<figure><img src=\"" + url + "/med/" + image + "\"/></figure><ul>"
+					   		+ MENU.get(client.getId()) + "</ul></article></add>");
 			s = s.replaceFirst("<meta name=\"description\" content=\"([^\"].*)\"",
 					"<meta name=\"description\" content=\"" + title + '"');
 			s = s.replaceFirst("<title></title>", "<title>" +
