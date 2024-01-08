@@ -455,7 +455,7 @@ public class SurveyService {
 						prefix = "Umfrage Spieler des Spiels";
 					externalService.publishOnFacebook(clientId,
 							"Resultat der \"" + prefix + "\" " + getTeam(clientId, poll) + getOponent(clientId, poll),
-							"/rest/action/marketing/result/" + clientMarketingResult.getClientMarketingId());
+							"/rest/marketing/" + clientMarketingResult.getClientMarketingId());
 					result += clientMarketingResult.getId() + " ";
 				} else
 					repository.save(clientMarketingResult);
