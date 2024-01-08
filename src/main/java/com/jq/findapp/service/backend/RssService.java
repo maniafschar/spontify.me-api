@@ -134,7 +134,7 @@ public class RssService {
 								urls.add(clientNews.getUrl());
 								if (b)
 									externalService.publishOnFacebook(clientId, clientNews.getDescription(),
-											"/rest/action/marketing/news/" + clientNews.getId());
+											"/rest/marketing/news/" + clientNews.getId());
 							}
 						}
 					} catch (final Exception ex) {
