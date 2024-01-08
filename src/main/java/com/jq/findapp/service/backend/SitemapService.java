@@ -70,7 +70,7 @@ public class SitemapService {
 			final StringBuilder sitemap, final String url) throws Exception {
 		params.setLimit(0);
 		final Result list = repository.list(params);
-		final String urlList = url + "/rest/action/marketing/" + type + "/";
+		final String urlList = url + "/rest/marketing/" + type + "/";
 		final String name = "sitemap_" + type + ".txt";
 		final String filename = json.get("path").asText() + File.separatorChar + name;
 		new File(filename).delete();
