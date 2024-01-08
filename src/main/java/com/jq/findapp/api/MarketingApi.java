@@ -81,7 +81,7 @@ public class MarketingApi {
 	private NotificationService notificationService;
 
 	@Autowired
-	@PostMapping("")
+	@PostMapping
 	public BigInteger marketingAnswerCreate(@RequestBody final WriteEntity entity,
 			@RequestHeader final BigInteger clientId,
 			@RequestHeader(required = false) final BigInteger user,
@@ -123,7 +123,7 @@ public class MarketingApi {
 		return contactMarketing.getId();
 	}
 
-	@PutMapping("")
+	@PutMapping
 	public void marketingAnswerSave(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger clientId)
 			throws Exception {
 		final ContactMarketing contactMarketing = repository.one(ContactMarketing.class, entity.getId());
@@ -179,7 +179,7 @@ public class MarketingApi {
 		}
 	}
 
-	@GetMapping("")
+	@GetMapping
 	public List<Object[]> marketing(@RequestHeader final BigInteger clientId,
 			@RequestHeader(required = false) final BigInteger user,
 			@RequestParam(name = "m", required = false) final BigInteger clientMarketingId) throws Exception {
@@ -267,7 +267,7 @@ public class MarketingApi {
 		}).toList();
 	}
 
-	@GetMapping(value = "location/{id}", produces = MediaType.TEXT_HTML_VALUE)
+	@GetMapping(path = "location/{id}", produces = MediaType.TEXT_HTML_VALUE)
 	public String marketingLocation(@PathVariable final BigInteger id) throws Exception {
 		final Location location = repository.one(Location.class, id);
 		if (location == null)
@@ -277,7 +277,7 @@ public class MarketingApi {
 				location.getName() + " " + location.getAddress() + " " + location.getDescription());
 	}
 
-	@GetMapping(value = "news/{id}", produces = MediaType.TEXT_HTML_VALUE)
+	@GetMapping(path = "news/{id}", produces = MediaType.TEXT_HTML_VALUE)
 	public String marketingNews(@PathVariable final BigInteger id) throws Exception {
 		final ClientNews news = repository.one(ClientNews.class, id);
 		if (news == null)
@@ -286,7 +286,7 @@ public class MarketingApi {
 				Attachment.resolve(news.getImage()), news.getDescription());
 	}
 
-	@GetMapping(value = "event/{id}", produces = MediaType.TEXT_HTML_VALUE)
+	@GetMapping(path = "event/{id}", produces = MediaType.TEXT_HTML_VALUE)
 	public String marketingEvent(@PathVariable final BigInteger id) throws Exception {
 		final Event event = repository.one(Event.class, id);
 		if (event == null)
@@ -303,7 +303,7 @@ public class MarketingApi {
 				event.getDescription() + " " + location.getAddress() + " " + location.getDescription());
 	}
 
-	@GetMapping(value = "init/{id}", produces = MediaType.TEXT_HTML_VALUE)
+	@GetMapping(path = "init/{id}", produces = MediaType.TEXT_HTML_VALUE)
 	public String marketingInit(@PathVariable final BigInteger id) throws Exception {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, id);
 		if (clientMarketing == null)
@@ -324,7 +324,7 @@ public class MarketingApi {
 				(pollTerminated ? "result/" : "init/") + id, image, "");
 	}
 
-	@GetMapping(value = "result/{id}", produces = MediaType.TEXT_HTML_VALUE)
+	@GetMapping(path = "result/{id}", produces = MediaType.TEXT_HTML_VALUE)
 	public String marketingResult(@PathVariable final BigInteger id) throws Exception {
 		return marketingInit(id);
 	}
