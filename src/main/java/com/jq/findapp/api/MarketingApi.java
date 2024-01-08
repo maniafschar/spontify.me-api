@@ -92,7 +92,7 @@ public class MarketingApi {
 			final QueryParams params = new QueryParams(Query.misc_listLog);
 			params.setSearch("log.ip='" + IpService.sanatizeIp(ip)
 					+ "' and log.createdAt>cast('" + Instant.now().minus(Duration.ofHours(6)).toString()
-					+ "' as timestamp) and log.uri='/action/marketing' and log.status=200 and log.method='POST' and log.clientId="
+					+ "' as timestamp) and log.uri='/marketing' and log.status=200 and log.method='POST' and log.clientId="
 					+ clientId);
 			final Result list = repository.list(params);
 			params.setQuery(Query.contact_listMarketing);
