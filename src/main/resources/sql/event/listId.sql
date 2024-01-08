@@ -18,6 +18,8 @@ SELECT
 	event.url
 FROM
 	Event event left join 
-	Location location on event.locationId=location.id
+	Location location on event.locationId=location.id,
+	Contact contact
 WHERE
+	event.contactId=contact.id and
 	{search}

@@ -76,7 +76,8 @@ public class SitemapService {
 		new File(filename).delete();
 		try (final FileOutputStream out = new FileOutputStream(filename)) {
 			for (int i = 0; i < list.size(); i++)
-				out.write((urlList + list.get(i).get(type + ".id") + "\n").getBytes(StandardCharsets.UTF_8));
+				out.write((urlList + list.get(i).get(("news".equals(type) ? "clientNews" : type) + ".id") + "\n")
+						.getBytes(StandardCharsets.UTF_8));
 		}
 		sitemap.append("<sitemap><loc>" + url + "/" + name + "</loc></sitemap>");
 	}

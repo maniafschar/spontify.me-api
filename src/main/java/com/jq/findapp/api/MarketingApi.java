@@ -53,6 +53,7 @@ import jakarta.transaction.Transactional;
 public class MarketingApi {
 	private static final Map<BigInteger, String> INDEXES = new HashMap<>();
 	private static final Map<BigInteger, String> MENU = new HashMap<>();
+	private static volatile long lastUpdate = 0;
 
 	@Autowired
 	private Repository repository;
@@ -302,16 +303,46 @@ public class MarketingApi {
 				event.getDescription() + " " + location.getAddress() + " " + location.getDescription());
 	}
 
-	private String getHtml(final Client client, final String path, final String image, String title)
-			throws IOException {
-		String s;
-		synchronized (INDEXES) {
-			if (!INDEXES.containsKey(client.getId()))
+	private synchronized void update() throws IOException {
+		if (System.currentTimeMillis() - lastUpdate > 24 * 60 * 60 * 1000) {
+			lastUpdate = System.currentTimeMillis();
+			final Result list = repository.list(new QueryParams(Query.misc_listClient));
+			for (int i = 0; i < list.size(); i++) {
+				final Client client = repository.one(Client.class, (BigInteger) list.get(i).get("client.id"));
 				try (final InputStream in = new URL(client.getUrl()).openStream()) {
 					INDEXES.put(client.getId(), IOUtils.toString(in, StandardCharsets.UTF_8));
 				}
-			s = INDEXES.get(client.getId());
+				final String url = Strings.removeSubdomain(client.getUrl());
+				final StringBuilder s = new StringBuilder();
+				final QueryParams params = new QueryParams(Query.location_listId);
+				params.setLimit(0);
+				Result result = repository.list(params);
+				for (int i2 = 0; i2 < result.size(); i2++)
+					s.append("<li><a href=\"" + url + "/rest/marketing/location/" + result.get(i2).get("location.id")
+							+ "\">" + result.get(i2).get("location.name") + "</a></li>");
+				params.setQuery(Query.event_listId);
+				params.setSearch("event.endDate>now() and contact.clientId=" + client.getId());
+				result = repository.list(params);
+				for (int i2 = 0; i2 < result.size(); i2++)
+					s.append("<li><a href=\"" + url + "/rest/marketing/event/" + result.get(i2).get("event.id")
+							+ "\">" + result.get(i2).get("event.description") + "</a></li>");
+				params.setQuery(Query.misc_listNews);
+				params.setSearch(null);
+				params.setUser(new Contact());
+				params.getUser().setClientId(client.getId());
+				result = repository.list(params);
+				for (int i2 = 0; i2 < result.size(); i2++)
+					s.append("<li><a href=\"" + url + "/rest/marketing/news/" + result.get(i2).get("clientNews.id")
+							+ "\">" + result.get(i2).get("clientNews.description") + "</a></li>");
+				MENU.put(client.getId(), s.toString());
+			}
 		}
+	}
+
+	private String getHtml(final Client client, final String path, final String image, String title)
+			throws IOException {
+		update();
+		String s = INDEXES.get(client.getId());
 		final String url = Strings.removeSubdomain(client.getUrl());
 		s = s.replaceFirst("<meta property=\"og:url\" content=\"([^\"].*)\"",
 				"<meta property=\"og:url\" content=\"" + url + "/rest/marketing/" + path + '"');
@@ -327,8 +358,8 @@ public class MarketingApi {
 					0).replace("null", "").trim();
 			s = s.replaceFirst("</add>",
 					"<style>article{opacity:0;position:absolute;}</style><article>" + title
-							+ "<figure><img src=\"" + url + "/med/" + image + "\"/></figure><ul>"
-							+ MENU.get(client.getId()) + "</ul></article></add>");
+							+ "<figure><img src=\"" + url + "/med/" + image + "\"/></figure><menu><ul>"
+							+ MENU.get(client.getId()) + "</ul></menu></article></add>");
 			s = s.replaceFirst("<meta name=\"description\" content=\"([^\"].*)\"",
 					"<meta name=\"description\" content=\"" + title + '"');
 			s = s.replaceFirst("<title></title>", "<title>" +
