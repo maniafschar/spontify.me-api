@@ -113,9 +113,10 @@ public class RssService {
 				long lastPubDate = 0;
 				Timestamp first = new Timestamp(System.currentTimeMillis());
 				final boolean addDescription = json.has("description") && json.get("description").asBoolean();
+				final String descriptionPostfix = json.has("descriptionPostfix") ? json.get("descriptionPostfix").asText() : null;
 				for (int i = 0; i < rss.size(); i++) {
 					try {
-						final ClientNews clientNews = createNews(params, rss.get(i), addDescription, clientId, url);
+						final ClientNews clientNews = createNews(params, rss.get(i), addDescription, clientId, url, descriptionPostfix);
 						if (clientNews != null) {
 							if (clientNews.getPublish().getTime() > lastPubDate)
 								chonological = false;
@@ -173,7 +174,7 @@ public class RssService {
 		}
 
 		private ClientNews createNews(final QueryParams params, final JsonNode rss, final boolean addDescription,
-				final BigInteger clientId, final String url) throws Exception {
+				final BigInteger clientId, final String url, String descriptionPostfix) throws Exception {
 			String uid = null;
 			if (rss.has("link"))
 				uid = rss.get("link").asText().trim();
@@ -182,11 +183,18 @@ public class RssService {
 				if (Strings.isEmpty(uid))
 					uid = rss.get("guid").get("").asText().trim();
 			}
+			final int max = 1000;
 			final String description = Strings.sanitize(rss.get("title").asText() +
 					(addDescription && rss.has("description")
 							? "\n\n" + rss.get("description").asText()
 							: ""),
-					1000);
+					max);
+			if (!Strings.isEmpty(descriptionPostfix)) {
+				descriptionPostfix = "\n\n" + descriptionPostfix;
+				if (description.length() + descriptionPostfix.length() > max)
+					description = description.substing(0, max - descriptionPostfix.length() - 3) + "...";
+				description += descriptionPostfix;
+			}
 			params.setSearch("clientNews.url='" + uid + "' and clientNews.clientId=" + clientId);
 			Result result = repository.list(params);
 			final ClientNews clientNews;
