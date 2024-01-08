@@ -76,4 +76,16 @@ public class ActionApiTest {
 		// then
 		assertEquals("<htmtl>\n\t<body>\n\t\t<meta property=\"og:url\" content=\"xxx\"/>\n\t</body>\n</html>", result);
 	}
+
+	@Test
+	public void replace_alternate() {
+		// given
+		final String s = "<htmtl>\n\t<body>\n\t\t<link rel=\"alternate\" href=\"aaa\"/>\n\t</body>\n</html>";
+
+		// when
+		final String result = s.replaceFirst("(<link rel=\"alternate\" ([^>].*)>)", "");
+
+		// then
+		assertEquals("<htmtl>\n\t<body>\n\t\t\n\t</body>\n</html>", result);
+	}
 }

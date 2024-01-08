@@ -759,6 +759,8 @@ public class ActionApi {
 		s = s.replaceFirst("<meta property=\"og:image\" content=\"([^\"].*)\"",
 				"<meta property=\"og:image\" content=\"" + url + "/med/" + image + "\"/><base href=\"" + client.getUrl()
 						+ "/\"");
+		while (s.contains("(<link rel=\"alternate\""))
+			s = s.replaceFirst("(<link rel=\"alternate\" ([^>].*)>)", "");
 		if (!Strings.isEmpty(title)) {
 			title = Strings.sanitize(title.replace('\n', ' ').replace('\t', ' ').replace('\r', ' ').replace('"', '\''),
 					0).replace("null", "").trim();
