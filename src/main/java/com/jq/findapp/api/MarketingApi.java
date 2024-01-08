@@ -71,7 +71,7 @@ import jakarta.transaction.Transactional;
 @RestController
 @Transactional
 @RequestMapping("marketing")
-public class ActionApi {
+public class MarketingApi {
 	private static final Map<BigInteger, String> INDEXES = new HashMap<>();
 
 	@Autowired
