@@ -267,6 +267,27 @@ public class MarketingApi {
 		}).toList();
 	}
 
+	@GetMapping(path = "{id}", produces = MediaType.TEXT_HTML_VALUE)
+	public String poll(@PathVariable final BigInteger id) throws Exception {
+		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, id);
+		if (clientMarketing == null)
+			return "";
+		final boolean pollTerminated = clientMarketing.getEndDate() != null
+				&& clientMarketing.getEndDate().getTime() / 1000 < Instant.now().getEpochSecond();
+		final String image;
+		if (pollTerminated) {
+			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
+			params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketing.getId());
+			final Result result = repository.list(params);
+			if (result.size() == 0 || result.get(0).get("clientMarketingResult.image") == null)
+				return "";
+			image = result.get(0).get("clientMarketingResult.image").toString();
+		} else
+			image = Attachment.resolve(clientMarketing.getImage());
+		return getHtml(repository.one(Client.class, clientMarketing.getClientId()),
+				(pollTerminated ? "result/" : "init/") + id, image, "");
+	}
+
 	@GetMapping(path = "location/{id}", produces = MediaType.TEXT_HTML_VALUE)
 	public String location(@PathVariable final BigInteger id) throws Exception {
 		final Location location = repository.one(Location.class, id);
@@ -301,27 +322,6 @@ public class MarketingApi {
 		return getHtml(repository.one(Client.class, contact.getClientId()), "event/" + id,
 				Attachment.resolve(image),
 				event.getDescription() + " " + location.getAddress() + " " + location.getDescription());
-	}
-
-	@GetMapping(path = "poll/{id}", produces = MediaType.TEXT_HTML_VALUE)
-	public String poll(@PathVariable final BigInteger id) throws Exception {
-		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, id);
-		if (clientMarketing == null)
-			return "";
-		final boolean pollTerminated = clientMarketing.getEndDate() != null
-				&& clientMarketing.getEndDate().getTime() / 1000 < Instant.now().getEpochSecond();
-		final String image;
-		if (pollTerminated) {
-			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
-			params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketing.getId());
-			final Result result = repository.list(params);
-			if (result.size() == 0 || result.get(0).get("clientMarketingResult.image") == null)
-				return "";
-			image = result.get(0).get("clientMarketingResult.image").toString();
-		} else
-			image = Attachment.resolve(clientMarketing.getImage());
-		return getHtml(repository.one(Client.class, clientMarketing.getClientId()),
-				(pollTerminated ? "result/" : "init/") + id, image, "");
 	}
 
 	private String getHtml(final Client client, final String path, final String image, String title)
