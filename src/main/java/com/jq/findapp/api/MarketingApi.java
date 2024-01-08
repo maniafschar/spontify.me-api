@@ -336,9 +336,9 @@ public class MarketingApi {
 		}
 		final String url = Strings.removeSubdomain(client.getUrl());
 		s = s.replaceFirst("<meta property=\"og:url\" content=\"([^\"].*)\"",
-				"<meta property=\"og:url\" content=\"" + url + "/rest/action/marketing/" + path + '"');
+				"<meta property=\"og:url\" content=\"" + url + "/rest/marketing/" + path + '"');
 		s = s.replaceFirst("<link rel=\"canonical\" href=\"([^\"].*)\"",
-				"<link rel=\"canonical\" href=\"" + url + "/rest/action/marketing/" + path + '"');
+				"<link rel=\"canonical\" href=\"" + url + "/rest/marketing/" + path + '"');
 		s = s.replaceFirst("<meta property=\"og:image\" content=\"([^\"].*)\"",
 				"<meta property=\"og:image\" content=\"" + url + "/med/" + image + "\"/><base href=\"" + client.getUrl()
 						+ "/\"");
