@@ -231,26 +231,11 @@ public class EventService {
 				+ " and event.url is not null"
 				+ " and event.repetition='o'"
 				+ " and event.maxParticipants is null"
-				+ " and location.zipCode like '8%'"
-				+ " and location.country='DE'");
+				+ " and length(event.publishId)=0");
 		final Result result = repository.list(params);
-		final double per10minutes = result.size() / 24 * 6;
-		int count = 0;
-		for (int i = 0; i < result.size(); i++) {
-			if (result.get(i).get("event.modifiedAt") != null &&
-					((Timestamp) result.get(i).get("event.modifiedAt")).getTime() > Instant.now()
-							.minus(Duration.ofMinutes((int) (10 / per10minutes))).toEpochMilli())
-				count++;
-		}
-		if (count > 0)
-			return "not published, because " + count + " published in recently";
-		for (int i = 0; i < result.size() && count < Math.max(1.0, per10minutes); i++) {
-			if (Strings.isEmpty(result.get(i).get("event.publishId"))) {
-				publish((BigInteger) result.get(i).get("event.id"));
-				break;
-			}
-		}
-		return count + " published";
+		for (int i = 0; i < result.size(); i++)
+			publish((BigInteger) result.get(i).get("event.id"));
+		return result.size() + " published";
 	}
 
 	public String get(final String url) {
