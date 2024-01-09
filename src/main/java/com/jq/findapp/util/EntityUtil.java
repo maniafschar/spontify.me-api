@@ -37,6 +37,7 @@ public class EntityUtil {
 	}
 
 	private static byte[] scaleImage(final byte[] data, final int size) throws IOException {
+		System.out.println("WEBPsupport: " + ImageIO.getImageReadersByFormatName("WEBP").next());
 		final BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(data));
 		int width = originalImage.getWidth();
 		int height = originalImage.getHeight();
