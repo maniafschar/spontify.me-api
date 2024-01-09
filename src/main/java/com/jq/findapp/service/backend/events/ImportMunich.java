@@ -168,7 +168,9 @@ public class ImportMunich {
 					failed.add("location: " + node.getTextContent());
 			} catch (final RuntimeException ex) {
 				// if unable to access event, then ignore and continue, otherwise re-throw
-				if (!ex.getMessage().contains(event.getUrl()) || ex instanceof IllegalArgumentException)
+				if (ex instanceof IllegalArgumentException)
+					failed.add(ex.getMessage().replace("\n", "\n  "));
+				else if (!ex.getMessage().contains(event.getUrl()))
 					failed.add(ex.getClass().getName() + ": " + ex.getMessage().replace("\n", "\n  "));
 			}
 		} else
