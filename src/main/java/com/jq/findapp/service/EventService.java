@@ -215,14 +215,14 @@ public class EventService {
 		try {
 			final BigInteger clientId = BigInteger.ONE;
 			final int count = importMunich.run(this, clientId);
-			result.result = "Munich: " + (count < 0 ? "paused, " : count + " imported, ") + publishClient(clientId);
+			result.result = "Munich: " + (count < 0 ? "paused\n" : count + "\n") + publishClient(clientId);
 		} catch (final Exception e) {
 			result.exception = e;
 		}
 		return result;
 	}
 
-	public String publishClient(final BigInteger clientId) throws Exception {
+	private String publishClient(final BigInteger clientId) throws Exception {
 		final QueryParams params = new QueryParams(Query.event_listId);
 		params.setSearch("event.startDate>cast('" + Instant.now().plus(Duration.ofHours(6))
 				+ "' as timestamp) and event.startDate<cast('" + Instant.now().plus(Duration.ofHours(30))
