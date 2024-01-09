@@ -152,8 +152,8 @@ public class RssService {
 					final Result result = repository.list(params);
 					for (int i = 0; i < result.size(); i++) {
 						if (!urls.contains(result.get(i).get("clientNews.url"))) {
-							// TODO rm repository.delete(repository.one(ClientNews.class, (BigInteger)
-							// result.get(i).get("clientNews.id")));
+							repository.delete(repository.one(ClientNews.class,
+									(BigInteger) result.get(i).get("clientNews.id")));
 							notificationService.createTicket(TicketType.ERROR, "RSS Deletion",
 									result.get(i).get("clientNews.id") + "\n"
 											+ result.get(i).get("clientNews.description")
