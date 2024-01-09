@@ -64,25 +64,25 @@ public class EntityUtil {
 		try {
 			data = IOUtils.toByteArray(new URL(url));
 		} catch (final Exception ex) {
-			throw new IllegalArgumentException("IMAGE_EXCEPTION_BYTE_ARRAY " + ex.getMessage() + "\n" + url,
+			throw new IllegalArgumentException("IMAGE_BYTE_ARRAY_EXCEPTION " + ex.getMessage() + ": " + url,
 					ex);
 		}
 		if (data == null)
-			throw new IllegalArgumentException("IMAGE_NULL_BYTE_ARRAY\n" + url);
+			throw new IllegalArgumentException("IMAGE_BYTE_ARRAY_NULL: " + url);
 		if (data.length < 100)
-			throw new IllegalArgumentException("IMAGE_TOO_SMALL_BYTE_ARRAY " + data.length + " bytes\n" + url);
+			throw new IllegalArgumentException("IMAGE_BYTE_ARRAY_TOO_SMALL " + data.length + " bytes: " + url);
 		if (size < 1)
 			return Repository.Attachment.createImage(url.substring(url.lastIndexOf('.')), data);
 		try {
 			img = ImageIO.read(new ByteArrayInputStream(data));
 		} catch (final Exception ex) {
 			throw new IllegalArgumentException(
-					"IMAGE_EXCEPTION_CONVERT " + data.length + " bytes " + ex.getMessage() + "\n" + url,
+					"IMAGE_CONVERT_EXCEPTION " + data.length + " bytes " + ex.getMessage() + ": " + url,
 					ex);
 		}
 		if (img == null)
 			throw new IllegalArgumentException(
-					"IMAGE_NULL_CONVERT " + data.length + " bytes\n" + url);
+					"IMAGE_CONVERT_NULL " + data.length + " bytes: " + url);
 		if (minimum == 0)
 			minimum = Math.min(400, size);
 		if (img.getWidth() > minimum && img.getHeight() > minimum) {
@@ -90,16 +90,16 @@ public class EntityUtil {
 			try {
 				b = scaleImage(data, size);
 			} catch (final IOException ex) {
-				throw new IllegalArgumentException("IMAGE_EXCEPTION_SCALE " + ex.getMessage() + "\n" + url, ex);
+				throw new IllegalArgumentException("IMAGE_SCALE_EXCEPTION " + ex.getMessage() + ": " + url, ex);
 			}
 			if (b == null || b.length < 100)
 				throw new IllegalArgumentException(
-						"IMAGE_TOO_SMALL_SCALE orig. " + data.length + ", result "
-								+ (b == null ? -1 : b.length) + "\n" + url);
+						"IMAGE_SCALE_TOO_SMALL orig. " + data.length + ", result "
+								+ (b == null ? -1 : b.length) + ": " + url);
 			return Repository.Attachment.createImage(".jpg", b);
 		}
 		throw new IllegalArgumentException(
-				"IMAGE_TOO_SMALL " + img.getWidth() + "x" + img.getHeight() + "\n" + url);
+				"IMAGE_TOO_SMALL " + img.getWidth() + "x" + img.getHeight() + ": " + url);
 	}
 
 	public static BaseEntity createEntity(final WriteEntity entity, final Contact contact) throws Exception {
