@@ -890,7 +890,8 @@ public class SurveyService {
 		final Result result = repository.list(params);
 		if (result.size() > 0 && !Strings.isEmpty(result.get(0).get("storage.storage")))
 			fixture = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
-		if (fixture == null || fixture.has("errors") && fixture.get("errors").size() > 0) {
+		if (fixture == null || fixture.has("errors") && fixture.get("errors").size() > 0
+				&& fixture.get("results").intValue() == 0) {
 			fixture = WebClient
 					.create("https://v3.football.api-sports.io/fixtures?" + url)
 					.get()

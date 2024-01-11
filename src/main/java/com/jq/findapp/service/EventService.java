@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -224,14 +223,14 @@ public class EventService {
 
 	private String publishClient(final BigInteger clientId) throws Exception {
 		final QueryParams params = new QueryParams(Query.event_listId);
-		params.setSearch("event.startDate>cast('" + Instant.now().plus(Duration.ofHours(6))
-				+ "' as timestamp) and event.startDate<cast('" + Instant.now().plus(Duration.ofHours(30))
+		params.setSearch("event.startDate>cast('" + Instant.now().plus(Duration.ofHours(2))
+				+ "' as timestamp) and event.startDate<cast('" + Instant.now().plus(Duration.ofHours(10))
 				+ "' as timestamp) and event.contactId=" + clientId
 				+ " and (event.image is not null or location.image is not null)"
 				+ " and event.url is not null"
 				+ " and event.repetition='o'"
 				+ " and event.maxParticipants is null"
-				+ " and length(event.publishId)=0");
+				+ " and event.publishId is null");
 		final Result result = repository.list(params);
 		for (int i = 0; i < result.size(); i++)
 			publish((BigInteger) result.get(i).get("event.id"));

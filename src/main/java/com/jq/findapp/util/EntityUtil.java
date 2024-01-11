@@ -74,9 +74,6 @@ public class EntityUtil {
 		if (size < 1)
 			return Repository.Attachment.createImage(url.substring(url.lastIndexOf('.')), data);
 		try {
-			ImageIO.scanForPlugins();
-			System.out.println("WEBPsupport: " + ImageIO.getImageReadersByFormatName("WEBP").hasNext() + " - "
-					+ String.join(", ", ImageIO.getReaderFormatNames()));
 			img = ImageIO.read(new ByteArrayInputStream(data));
 		} catch (final Exception ex) {
 			throw new IllegalArgumentException(

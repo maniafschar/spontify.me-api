@@ -64,11 +64,14 @@ public class ExternalService {
 		} catch (final Exception e) {
 			notificationService.createTicket(TicketType.GOOGLE, param, value, null);
 		}
-		final Storage storage = result.size() == 0 ? new Storage()
-				: repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
-		storage.setLabel(label);
-		storage.setStorage(value);
-		repository.save(storage);
+		;
+		if ("OK".equals(new ObjectMapper().readTree(value).get("status").asText())) {
+			final Storage storage = result.size() == 0 ? new Storage()
+					: repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
+			storage.setLabel(label);
+			storage.setStorage(value);
+			repository.save(storage);
+		}
 		return value;
 	}
 
