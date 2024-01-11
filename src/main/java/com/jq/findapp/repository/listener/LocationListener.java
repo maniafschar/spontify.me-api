@@ -4,8 +4,6 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Contact;
@@ -24,7 +22,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 
 	@Override
 	public void prePersist(final Location location)
-			throws JsonMappingException, JsonProcessingException, IllegalArgumentException {
+			throws Exception {
 		lookupAddress(location);
 		final QueryParams params = new QueryParams(Query.location_list);
 		params.setUser(repository.one(Contact.class, location.getContactId()));
@@ -56,8 +54,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		repository.save(locationFavorite);
 	}
 
-	private void lookupAddress(final Location location)
-			throws JsonMappingException, JsonProcessingException, IllegalArgumentException {
+	private void lookupAddress(final Location location) throws Exception {
 		final JsonNode address = new ObjectMapper().readTree(
 				externalService.google("geocode/json?address="
 						+ location.getAddress().replaceAll("\n", ", ")));

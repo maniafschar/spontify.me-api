@@ -140,7 +140,7 @@ public class NotificationService {
 	public boolean sendNotification(final Contact contactFrom, final Contact contactTo,
 			final ContactNotificationTextType notificationTextType,
 			final String action, final String... param) throws Exception {
-		if (!contactTo.getVerified())
+		if (contactTo == null || !contactTo.getVerified())
 			return false;
 		if (contactFrom != null && contactTo.getId() != null) {
 			final QueryParams params = new QueryParams(Query.contact_block);

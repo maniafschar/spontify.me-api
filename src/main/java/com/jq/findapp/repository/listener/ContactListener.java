@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactLink;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
@@ -30,6 +32,13 @@ public class ContactListener extends AbstractRepositoryListener<Contact> {
 		contact.setAgeDivers("18,99");
 		contact.setAgeFemale("18,99");
 		contact.setAgeMale("18,99");
+		try {
+			final JsonNode props = new ObjectMapper()
+					.readTree(repository.one(com.jq.findapp.entity.Client.class, contact.getClientId()).getStorage());
+			contact.setNotificationNews(props.has("rss") && props.get("rss").size() == 1);
+		} catch (Exception ex) {
+			contact.setNotificationNews(false);
+		}
 	}
 
 	@Override

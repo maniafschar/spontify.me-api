@@ -23,14 +23,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.GeoLocation;
+import com.jq.findapp.entity.Storage;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.util.Strings;
 
 @Service
 public class ExternalService {
+	private static String STORAGE_PREFIX = "google-address-";
 	@Autowired
 	private Repository repository;
 
@@ -43,19 +46,30 @@ public class ExternalService {
 	@Value("${app.chatGPT.key}")
 	private String chatGpt;
 
-	public String google(final String param) {
-		final String result = WebClient
+	public String google(final String param) throws Exception {
+		final String label = STORAGE_PREFIX + param.hashCode();
+		final QueryParams params = new QueryParams(Query.misc_listStorage);
+		params.setSearch("storage.label='" + label + "'");
+		final Result result = repository.list(params);
+		if (result.size() > 0 && !Strings.isEmpty(result.get(0).get("storage.storage")))
+			return result.get(0).get("storage.storage").toString();
+		final String value = WebClient
 				.create("https://maps.googleapis.com/maps/api/" + param + (param.contains("?") ? "&" : "?")
 						+ "key=" + googleKey)
 				.get().retrieve().toEntity(String.class).block().getBody();
 		try {
 			final ObjectMapper om = new ObjectMapper();
 			notificationService.createTicket(TicketType.GOOGLE, param,
-					om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(result)), null);
+					om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(value)), null);
 		} catch (final Exception e) {
-			notificationService.createTicket(TicketType.GOOGLE, param, result, null);
+			notificationService.createTicket(TicketType.GOOGLE, param, value, null);
 		}
-		return result;
+		final Storage storage = result.size() == 0 ? new Storage()
+				: repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
+		storage.setLabel(label);
+		storage.setStorage(value);
+		repository.save(storage);
+		return value;
 	}
 
 	public List<GeoLocation> convertAddress(final JsonNode address) {

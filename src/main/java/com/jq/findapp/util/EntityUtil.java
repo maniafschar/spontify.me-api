@@ -37,7 +37,6 @@ public class EntityUtil {
 	}
 
 	private static byte[] scaleImage(final byte[] data, final int size) throws IOException {
-		System.out.println("WEBPsupport: " + ImageIO.getImageReadersByFormatName("WEBP").next());
 		final BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(data));
 		int width = originalImage.getWidth();
 		int height = originalImage.getHeight();
@@ -75,10 +74,13 @@ public class EntityUtil {
 		if (size < 1)
 			return Repository.Attachment.createImage(url.substring(url.lastIndexOf('.')), data);
 		try {
+			ImageIO.scanForPlugins();
+			System.out.println("WEBPsupport: " + ImageIO.getImageReadersByFormatName("WEBP").hasNext() + " - "
+					+ String.join(", ", ImageIO.getReaderFormatNames()));
 			img = ImageIO.read(new ByteArrayInputStream(data));
 		} catch (final Exception ex) {
 			throw new IllegalArgumentException(
-					"IMAGE_CONVERT_EXCEPTION " + data.length + " bytes " + ex.getMessage() + ": " + url,
+					"IMAGE_CONVERT_EXCEPTION " + data.length + " bytes (" + ex.getMessage() + "): " + url,
 					ex);
 		}
 		if (img == null)
