@@ -88,7 +88,7 @@ public class SurveyService {
 
 		BigInteger prediction(final BigInteger clientId, final int teamId) throws Exception {
 			final long now = Instant.now().getEpochSecond();
-			final JsonNode json = get("team=" + teamId + "&season=" + LocalDateTime.now().getYear());
+			final JsonNode json = get("team=" + teamId + "&season=" + currentSeason());
 			for (int i = 0; i < json.size(); i++) {
 				if ("NS".equals(json.get(i).get("fixture").get("status").get("short").asText())) {
 					final Instant date = Instant
@@ -152,7 +152,7 @@ public class SurveyService {
 			final ObjectMapper om = new ObjectMapper();
 			final int teamId = poll.get(poll.get("location").asText() + "Id").asInt();
 			final ArrayNode matches = om.createArrayNode();
-			for (int i = FIRST_YEAR; i <= LocalDateTime.now().getYear(); i++) {
+			for (int i = FIRST_YEAR; i <= currentSeason(); i++) {
 				final JsonNode json = get("team=" + teamId + "&season=" + i);
 				for (int i2 = 0; i2 < json.size(); i2++) {
 					if (json.get(i2).get("teams").get("home").get("id").asInt() == poll.get("homeId").asInt()
@@ -245,7 +245,7 @@ public class SurveyService {
 		}
 
 		BigInteger playerOfTheMatch(final BigInteger clientId, final int teamId) throws Exception {
-			final JsonNode matchDays = get("team=" + teamId + "&season=" + LocalDateTime.now().getYear());
+			final JsonNode matchDays = get("team=" + teamId + "&season=" + currentSeason());
 			if (matchDays != null) {
 				for (int i = 0; i < matchDays.size(); i++) {
 					if ("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())) {
@@ -470,8 +470,7 @@ public class SurveyService {
 			String result = "";
 			if (json.has("survey")) {
 				for (int i2 = 0; i2 < json.get("survey").size(); i2++) {
-					final String label = "team=" + json.get("survey").get(i2).asInt() + "&season="
-							+ LocalDateTime.now().getYear();
+					final String label = "team=" + json.get("survey").get(i2).asInt() + "&season=" + currentSeason();
 					final JsonNode matchDays = get(label);
 					if (matchDays != null) {
 						final QueryParams params = new QueryParams(Query.misc_listStorage);
@@ -504,6 +503,13 @@ public class SurveyService {
 			if (clientId.intValue() == 4)
 				return "unserer Bayern";
 			return poll.get("homeName").asText();
+		}
+
+		private int currentSeason() {
+			final LocalDateTime now = LocalDateTime.now();
+			if (now.getMonth().getValue() < 6)
+				return now.getYear() - 1;
+			return now.getYear();
 		}
 
 		private String getOponent(final BigInteger clientId, final JsonNode poll) {
@@ -891,7 +897,7 @@ public class SurveyService {
 		if (result.size() > 0 && !Strings.isEmpty(result.get(0).get("storage.storage")))
 			fixture = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
 		if (fixture == null || fixture.has("errors") && fixture.get("errors").size() > 0
-				&& fixture.get("results").intValue() == 0) {
+				|| fixture.get("results").intValue() == 0) {
 			fixture = WebClient
 					.create("https://v3.football.api-sports.io/fixtures?" + url)
 					.get()
@@ -899,11 +905,13 @@ public class SurveyService {
 					.header("x-rapidapi-host", "v3.football.api-sports.io")
 					.retrieve()
 					.toEntity(JsonNode.class).block().getBody();
-			final Storage storage = result.size() == 0 ? new Storage()
-					: repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
-			storage.setLabel(label);
-			storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
-			repository.save(storage);
+			if (fixture != null) {
+				final Storage storage = result.size() == 0 ? new Storage()
+						: repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
+				storage.setLabel(label);
+				storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
+				repository.save(storage);
+			}
 		}
 		if (fixture == null)
 			throw new RuntimeException(url + " not found");
