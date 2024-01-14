@@ -35,7 +35,7 @@ public class TicketListener extends AbstractRepositoryListener<Ticket> {
 	@Override
 	public void postPersist(final Ticket entity) throws Exception {
 		if (entity.getType() == TicketType.BLOCK)
-			notificationService.sendEmail(repository.one(Contact.class,
+			notificationService.sendEmail(null, repository.one(Contact.class,
 					repository.one(Client.class, repository.one(Contact.class, entity.getContactId()).getClientId())
 							.getAdminId()),
 					"Block", Attachment.resolve(entity.getNote()), null);

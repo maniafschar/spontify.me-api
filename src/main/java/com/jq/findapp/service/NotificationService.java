@@ -398,7 +398,7 @@ public class NotificationService {
 					message = message.substring(0, 77);
 				message += "...";
 			}
-			sendEmail(contactTo, message, s.toString(), html.toString());
+			sendEmail(contactFrom, contactTo, message, s.toString(), html.toString());
 		}
 	}
 
@@ -411,29 +411,28 @@ public class NotificationService {
 		return s.replaceAll("<[^>]*>", "");
 	}
 
-	public void sendEmail(final Contact to, final String subject, final String text, final String html) {
-		final String from = repository.one(Client.class, to.getClientId()).getEmail();
+	public void sendEmail(final Contact from, final Contact to, final String subject, final String text,
+			final String html) {
+		final Client client = repository.one(Client.class, to.getClientId());
 		final ImageHtmlEmail email = mailCreateor.create();
 		email.setHostName(emailHost);
 		email.setSmtpPort(emailPort);
 		email.setCharset(StandardCharsets.UTF_8.name());
-		email.setAuthenticator(new DefaultAuthenticator(from, emailPassword));
+		email.setAuthenticator(new DefaultAuthenticator(client.getEmail(), emailPassword));
 		email.setSSLOnConnect(true);
 		try {
-			email.setFrom(from, repository.one(Client.class, to.getClientId()).getName());
-			email.addTo(to == null ? from : to.getEmail());
+			email.setFrom(client.getEmail(), from == null ? null : from.getPseudonym() + " · " + client.getName());
+			email.addTo(to.getEmail());
 			email.setSubject(subject);
 			email.setTextMsg(text);
-			if (html != null && to != null) {
+			if (html != null) {
 				email.setDataSourceResolver(new DataSourceUrlResolver(
 						new URL(Strings.removeSubdomain(repository.one(Client.class, to.getClientId()).getUrl()))));
 				email.setHtmlMsg(html);
-			} else
-				email.setHtmlMsg(text);
+			}
 			email.send();
-			if (to != null)
-				createTicket(TicketType.EMAIL, to.getEmail(), text,
-						repository.one(Client.class, to.getClientId()).getAdminId());
+			createTicket(TicketType.EMAIL, to.getEmail(), text,
+					repository.one(Client.class, to.getClientId()).getAdminId());
 		} catch (final EmailException | MalformedURLException ex) {
 			if (to != null)
 				createTicket(TicketType.ERROR, "Email exception: " + to.getEmail(),
