@@ -66,7 +66,7 @@ public class WebSocket {
 						: message.offer != null ? "offer:" + message.offer : null);
 		if (log.getBody() != null && log.getBody().length() > 255)
 			log.setBody(log.getBody().substring(0, 255));
-		if (chatService.isVideoCallAllowed(contact, message.getId())) {
+		if (message.answer != null || chatService.isVideoCallAllowed(contact, message.getId())) {
 			if (USERS.containsKey(message.getId())) {
 				message.setPassword(null);
 				message.setSalt(null);

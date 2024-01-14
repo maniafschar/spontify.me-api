@@ -94,8 +94,8 @@ public class Ios {
 				.header("Content-Type", "application/json")
 				.uri(new URI(url + contactTo.getPushToken()))
 				.build();
-		final HttpClient client = HttpClient.newBuilder().version(Version.HTTP_2).build();
-		final HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+		final HttpResponse<String> response = HttpClient.newBuilder().version(Version.HTTP_2).build().send(request,
+				BodyHandlers.ofString());
 		if (response.statusCode() >= 300 || response.statusCode() < 200)
 			throw new NotFoundException(
 					"Failed to push to " + contactTo.getId() + ": " + text + "\n" + response.statusCode() + " "
