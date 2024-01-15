@@ -252,10 +252,9 @@ public class MarketingApi {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, id);
 		if (clientMarketing == null)
 			return "";
-		final boolean pollTerminated = clientMarketing.getEndDate() != null
-				&& clientMarketing.getEndDate().getTime() / 1000 < Instant.now().getEpochSecond();
 		final String image;
-		if (pollTerminated) {
+		if (clientMarketing.getEndDate() != null
+				&& clientMarketing.getEndDate().before(new Timestamp(Instant.now().toEpochMilli()))) {
 			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 			params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketing.getId());
 			final Result result = repository.list(params);

@@ -189,7 +189,7 @@ public class RssService {
 			final int max = 1000;
 			String description = Strings.sanitize(rss.get("title").asText() +
 					(addDescription && rss.has("description")
-							? "\n\n" + rss.get("description").asText()
+							? "\n" + rss.get("description").asText()
 							: ""),
 					max);
 			if (!Strings.isEmpty(descriptionPostfix)) {

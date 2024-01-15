@@ -375,6 +375,7 @@ public class SurveyService {
 					repository.one(ClientMarketing.class, clientMarketingId).getStorage()));
 			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 			params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketingId);
+			params.setLimit(0);
 			Result result = repository.list(params);
 			final ClientMarketingResult clientMarketingResult;
 			if (result.size() == 0) {
@@ -460,7 +461,6 @@ public class SurveyService {
 				} else
 					repository.save(clientMarketingResult);
 			}
-			result += updateMatchdays(clientId);
 			return result.trim();
 		}
 
@@ -496,7 +496,7 @@ public class SurveyService {
 					}
 				}
 			}
-			return result.length() > 0 ? " (updated matchdays: " + result.substring(1) + ")" : result;
+			return result.length() > 0 ? "\nmatchdays: " + result.substring(1) : result;
 		}
 
 		private String getTeam(final BigInteger clientId, final JsonNode poll) {
@@ -866,6 +866,8 @@ public class SurveyService {
 						final String s = synchronize.resultAndNotify(clientId);
 						if (s.length() > 0)
 							result.result += "\nresultAndNotify: " + s;
+						result.result += synchronize.updateMatchdays(clientId);
+
 					}
 				}
 			} catch (final Exception e) {
