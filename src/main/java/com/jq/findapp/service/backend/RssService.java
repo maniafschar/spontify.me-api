@@ -114,7 +114,7 @@ public class RssService {
 				Timestamp first = new Timestamp(System.currentTimeMillis());
 				final boolean addDescription = json.has("description") && json.get("description").asBoolean();
 				final String descriptionPostfix = json.has("descriptionPostfix")
-						? "\n\n" + json.get("descriptionPostfix").asText()
+						? "\n" + json.get("descriptionPostfix").asText()
 						: null;
 				for (int i = 0; i < rss.size(); i++) {
 					try {
