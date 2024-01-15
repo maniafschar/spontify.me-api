@@ -8,6 +8,10 @@
  * https://www.leipzig.de/freizeit-kultur-und-tourismus/veranstaltungen-und-
  * termine
  * 
+survey Result
+Web link afterwork does not open app
+Google indexing
+Images in email
  * 
  * <item>
  * <guid isPermaLink="false">news-48431</guid>
