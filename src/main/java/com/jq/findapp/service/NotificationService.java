@@ -421,7 +421,7 @@ public class NotificationService {
 		email.setAuthenticator(new DefaultAuthenticator(client.getEmail(), emailPassword));
 		email.setSSLOnConnect(true);
 		try {
-			email.setFrom(client.getEmail(), (from == null ? repository.one(Contact.class, client.getAdminId()) : from).getPseudonym() + " · " + client.getName());
+			email.setFrom(client.getEmail(), (from == null || from.getId().equals(client.getAdminId()) ? "" : from.getPseudonym() + " · ") + client.getName());
 			email.addTo(to.getEmail());
 			email.setSubject(subject);
 			email.setTextMsg(text);
