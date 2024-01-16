@@ -79,7 +79,7 @@ public class ContactListener extends AbstractRepositoryListener<Contact> {
 	@Override
 	public void postUpdate(final Contact contact) throws Exception {
 		if (contact.old("email") != null)
-			authenticationService.recoverSendEmail(contact.getEmail());
+			authenticationService.recoverSendEmail(contact.getEmail(), contact.getClientId());
 	}
 
 	@Override

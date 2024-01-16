@@ -374,9 +374,9 @@ public class AuthenticationService {
 				"r=" + s);
 	}
 
-	public String recoverSendEmail(final String email) throws Exception {
+	public String recoverSendEmail(final String email, BigInteger clientId) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_listId);
-		params.setSearch("contact.email='" + email + '\'');
+		params.setSearch("contact.email='" + email + "' and contact.clientId=" + clientId);
 		final Map<String, Object> user = repository.one(params);
 		if (user != null) {
 			final Contact contact = repository.one(Contact.class, (BigInteger) user.get("contact.id"));
@@ -389,9 +389,9 @@ public class AuthenticationService {
 		return "nok:Email";
 	}
 
-	public Contact recoverVerifyEmail(final String token) throws Exception {
+	public Contact recoverVerifyEmail(final String token, BigInteger clientId) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_listId);
-		params.setSearch("contact.loginLink like '%" + token + "%'");
+		params.setSearch("contact.loginLink like '%" + token + "%' and contact.clientId=" + clientId);
 		final Map<String, Object> user = repository.one(params);
 		if (user == null)
 			return null;

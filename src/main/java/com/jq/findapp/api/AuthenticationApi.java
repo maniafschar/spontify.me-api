@@ -145,6 +145,7 @@ public class AuthenticationApi {
 
 	@GetMapping("recoverSendEmail")
 	public String recoverSendEmail(final String email,
+			@RequestHeader final BigInteger clientId,
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_listLog);
 		params.setSearch("log.ip='" + IpService.sanatizeIp(ip)
@@ -152,12 +153,13 @@ public class AuthenticationApi {
 				+ "' as timestamp) and log.uri like '%recoverSendEmail'");
 		if (repository.list(params).size() > 10)
 			return "nok:Spam";
-		return authenticationService.recoverSendEmail(Encryption.decryptBrowser(email));
+		return authenticationService.recoverSendEmail(Encryption.decryptBrowser(email), clientId);
 	}
 
 	@GetMapping("recoverVerifyEmail")
-	public String recoverVerifyEmail(final String publicKey, final String token) throws Exception {
-		final Contact contact = authenticationService.recoverVerifyEmail(Encryption.decryptBrowser(token));
+	public String recoverVerifyEmail(final String publicKey, final String token,
+			@RequestHeader final BigInteger clientId) throws Exception {
+		final Contact contact = authenticationService.recoverVerifyEmail(Encryption.decryptBrowser(token), clientId);
 		return contact == null ? null
 				: Encryption.encrypt(
 						contact.getEmail() + "\u0015" + authenticationService.getPassword(contact), publicKey);
