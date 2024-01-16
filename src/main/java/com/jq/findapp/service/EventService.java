@@ -213,7 +213,7 @@ public class EventService {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importEvents");
 		try {
 			final BigInteger clientId = BigInteger.ONE;
-			final boolean run = LocalDateTime.now().getHour() != 5 || LocalDateTime.now().getMinute() > 9;
+			final boolean run = LocalDateTime.now().getHour() == 5 && LocalDateTime.now().getMinute() < 10;
 			result.result = "Munich: " + (run ? importMunich.run(this, clientId) + "\n" : "paused\n")
 					+ publishClient(clientId);
 		} catch (final Exception e) {
