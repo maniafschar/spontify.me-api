@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -47,8 +46,6 @@ public class ImportMunich {
 	@Value("${app.event.munich.baseUrl}")
 	private String url;
 
-	private static final AtomicLong lastRun = new AtomicLong(0);
-
 	private final Pattern regexAddress = Pattern.compile("itemprop=\"address\"(.*?)</svg>(.*?)</a>");
 	private final Pattern regexAddressRef = Pattern.compile("itemprop=\"location\"(.*?)href=\"(.*?)\"");
 	private final Pattern regexDesc = Pattern.compile(" itemprop=\"description\">(.*?)</p>");
@@ -67,10 +64,7 @@ public class ImportMunich {
 	private final Set<String> failed = new HashSet<>();
 
 	public int run(final EventService eventService, final BigInteger clientId) throws Exception {
-		if (lastRun.get() > System.currentTimeMillis() - 24 * 60 * 60 * 1000)
-			return -1;
 		final String path = "/veranstaltungen/event";
-		lastRun.set(System.currentTimeMillis() + (long) (Math.random() * 5 * 60 * 60 * 1000));
 		this.eventService = eventService;
 		this.client = repository.one(Client.class, clientId);
 		String page = eventService.get(url + path);
