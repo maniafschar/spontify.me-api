@@ -46,7 +46,7 @@ public class ExternalService {
 	@Value("${app.chatGPT.key}")
 	private String chatGpt;
 
-	public String google(final String param) throws Exception {
+	public synchronized String google(final String param) throws Exception {
 		final String label = STORAGE_PREFIX + param.hashCode();
 		final QueryParams params = new QueryParams(Query.misc_listStorage);
 		params.setSearch("storage.label='" + label + "'");
@@ -64,7 +64,6 @@ public class ExternalService {
 		} catch (final Exception e) {
 			notificationService.createTicket(TicketType.GOOGLE, param, value, null);
 		}
-		;
 		if ("OK".equals(new ObjectMapper().readTree(value).get("status").asText())) {
 			final Storage storage = result.size() == 0 ? new Storage()
 					: repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
