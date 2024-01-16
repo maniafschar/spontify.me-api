@@ -397,7 +397,7 @@ public class EngagementService {
 	private void resetChatInstallCurrentVersion() throws Exception {
 		if (currentVersion.size() == 0) {
 			final QueryParams params = new QueryParams(Query.contact_maxAppVersion);
-			params.setSearch("contact.email not like '%@jq-consulting.de'");
+			params.setSearch("contact.email not like '%@jq-consulting.de' and contact.id<>client.adminId");
 			final Result result = repository.list(params);
 			for (int i = 0; i < result.size(); i++)
 				currentVersion.put((BigInteger) result.get(i).get("contact.clientId"),
