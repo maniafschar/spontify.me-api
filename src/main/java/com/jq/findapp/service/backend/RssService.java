@@ -96,7 +96,7 @@ public class RssService {
 		private final Pattern imageRegex = Pattern.compile("\\<article.*?\\<figure.*?\\<img .*?src=\\\"(.*?)\\\"");
 		private final Pattern imageRegex2 = Pattern.compile("\\<div.*?\\<picture.*?\\<img .*?src=\\\"(.*?)\\\"");
 		private final SimpleDateFormat dateParser = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ROOT);
-		private final SimpleDateFormat dateParser2 = new SimpleDateFormat("yyyy-MM-yy'T'HH:mm:ss.SSSXXX", Locale.ROOT);
+		private final SimpleDateFormat dateParser2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.ROOT);
 		private final Set<String> urls = new HashSet<>();
 
 		private String run(final JsonNode json, final BigInteger clientId) {
