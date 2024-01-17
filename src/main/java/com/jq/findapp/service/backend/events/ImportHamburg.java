@@ -5,8 +5,7 @@
  * https://termine.koeln.de/koeln
  * https://www.stuttgart.de/service/veranstaltungen.php
  * https://veranstaltungen.freiburg.de/events/
- * https://www.leipzig.de/freizeit-kultur-und-tourismus/veranstaltungen-und-
- * termine
+ * https://www.leipzig.de/freizeit-kultur-und-tourismus/veranstaltungen-und-termine
  * 
  * <item>
  * <guid isPermaLink="false">news-48431</guid>
