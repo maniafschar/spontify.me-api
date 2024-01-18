@@ -191,7 +191,7 @@ public class RssService {
 					(addDescription && rss.has("description")
 							? "\n" + rss.get("description").asText()
 							: ""),
-					max);
+					max).trim();
 			if (!Strings.isEmpty(descriptionPostfix)) {
 				if (description.length() + descriptionPostfix.length() > max)
 					description = description.substring(0, max - descriptionPostfix.length() - 3) + "...";
