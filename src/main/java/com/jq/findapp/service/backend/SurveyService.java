@@ -160,7 +160,7 @@ public class SurveyService {
 									.asInt()
 							&& "FT".equals(json.get(i2).get("fixture").get("status").get("short").asText())) {
 						final JsonNode fixture = get("id=" + json.get(i2).get("fixture").get("id").asInt()).get(0);
-						if (fixture.has("statistics") && fixture.get("statistics").size() > 1
+						if (fixture != null && fixture.has("statistics") && fixture.get("statistics").size() > 1
 								&& fixture.get("statistics").get(0).has("statistics")) {
 							final ObjectNode match = om.createObjectNode();
 							match.put("timestamp", fixture.get("fixture").get("timestamp").asLong());
@@ -456,7 +456,7 @@ public class SurveyService {
 						prefix = "Umfrage Spieler des Spiels";
 					externalService.publishOnFacebook(clientId,
 							"Resultat der \"" + prefix + "\" " + getTeam(clientId, poll) + getOponent(clientId, poll),
-							"/rest/marketing/" + clientMarketingResult.getClientMarketingId());
+							"/rest/marketing/" + clientMarketingResult.getClientMarketingId() + "/result");
 					result += clientMarketingResult.getId() + " ";
 				} else
 					repository.save(clientMarketingResult);
@@ -907,13 +907,14 @@ public class SurveyService {
 					.header("x-rapidapi-host", "v3.football.api-sports.io")
 					.retrieve()
 					.toEntity(JsonNode.class).block().getBody();
-			if (fixture != null) {
+			if (fixture != null && fixture.get("response") != null) {
 				final Storage storage = result.size() == 0 ? new Storage()
 						: repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
 				storage.setLabel(label);
 				storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
 				repository.save(storage);
-			}
+			} else
+				notificationService.createTicket(TicketType.ERROR, "FIXTURE not FOUND", url, null);
 		}
 		if (fixture == null)
 			throw new RuntimeException(url + " not found");

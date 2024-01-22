@@ -247,7 +247,7 @@ public class MarketingApi {
 		}).toList();
 	}
 
-	@GetMapping(path = "{id}", produces = MediaType.TEXT_HTML_VALUE)
+	@GetMapping(path = { "{id}", "{id}/result" }, produces = MediaType.TEXT_HTML_VALUE)
 	public String poll(@PathVariable final BigInteger id) throws Exception {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, id);
 		if (clientMarketing == null)
