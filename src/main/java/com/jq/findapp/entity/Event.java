@@ -17,8 +17,6 @@ public class Event extends BaseEntity {
 	private Boolean publish;
 	private Date endDate;
 	private Double price;
-	// TODO rm 0.6
-	private Short confirm;
 	private Short maxParticipants;
 	private Short rating;
 	@Column(columnDefinition = "TEXT")
@@ -88,20 +86,12 @@ public class Event extends BaseEntity {
 		this.imageList = imageList;
 	}
 
-	public void setConfirm(final Short confirm) {
-		this.confirm = confirm;
-	}
-
 	public void setPrice(final Double price) {
 		this.price = price;
 	}
 
 	public void setMaxParticipants(final Short maxParticipants) {
 		this.maxParticipants = maxParticipants;
-	}
-
-	public Short getConfirm() {
-		return confirm;
 	}
 
 	public Double getPrice() {
