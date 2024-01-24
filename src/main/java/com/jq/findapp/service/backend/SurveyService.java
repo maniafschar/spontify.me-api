@@ -236,12 +236,8 @@ public class SurveyService {
 							+ "</div>vom <b>"
 							+ formatDate(poll.get("timestamp").asLong(), null)
 							+ "</b>. Möchtest Du teilnehmen?");
-			if (clientId.intValue() == 4)
-				poll.put("epilog",
-						"Lieben Dank für die Teilnahme!\nDas Ergebnis wird kurz vor dem Spiel hier bekanntgegeben.\n\nLust auf mehr <b>Bayern Feeling</b>? In unserer neuen App bauen wir eine reine Bayern <b>Fan Community</b> auf.\n\nMit ein paar wenigen Klicks kannst auch Du dabei sein.");
-			else
-				poll.put("epilog",
-						"Lieben Dank für die Teilnahme!\nDas Ergebnis wird kurz vor dem Spiel hier bekanntgegeben.");
+			poll.put("epilog",
+					"Lieben Dank für die Teilnahme!\nDas Ergebnis wird kurz vor dem Spiel hier bekanntgegeben.\n\nLust auf mehr <b>Fan Feeling</b>? In unserer neuen App bauen wir eine neue <b>Fußball Fan Community</b> auf.\n\nMit ein paar wenigen Klicks kannst auch Du dabei sein.");
 		}
 
 		BigInteger playerOfTheMatch(final BigInteger clientId, final int teamId) throws Exception {
@@ -310,7 +306,7 @@ public class SurveyService {
 								String epilog = "Lieben Dank für die Teilnahme!\nDas Ergebnis wird am " + endDate
 										+ " hier bekanntgegeben.";
 								if (clientId.intValue() == 4)
-									epilog += "\n\nLust auf mehr <b>Bayern Feeling</b>? In unserer neuen App bauen wir eine reine Bayern <b>Fan Community</b> auf.\n\nMit ein paar wenigen Klicks kannst auch Du dabei sein.";
+									epilog += "\n\nLust auf mehr <b>Fan Feeling</b>? In unserer neuen App bauen wir eine neue <b>Fußball Fan Community</b> auf.\n\nMit ein paar wenigen Klicks kannst auch Du dabei sein.";
 								poll.put("epilog", epilog);
 								clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
 								repository.save(clientMarketing);
@@ -499,12 +495,6 @@ public class SurveyService {
 			return result.length() > 0 ? "\nmatchdays: " + result.substring(1) : result;
 		}
 
-		private String getTeam(final BigInteger clientId, final JsonNode poll) {
-			if (clientId.intValue() == 4)
-				return "unserer Bayern";
-			return poll.get("homeName").asText();
-		}
-
 		private int currentSeason() {
 			final LocalDateTime now = LocalDateTime.now();
 			if (now.getMonth().getValue() < 6)
@@ -512,13 +502,12 @@ public class SurveyService {
 			return now.getYear();
 		}
 
+		private String getTeam(final BigInteger clientId, final JsonNode poll) {
+			return poll.get("homeName").asText();
+		}
+
 		private String getOponent(final BigInteger clientId, final JsonNode poll) {
-			final String label;
-			if (clientId.intValue() == 4)
-				label = "home".equals(poll.get("location").asText()) ? "awayName" : "homeName";
-			else
-				label = "awayName";
-			return " gegen " + poll.get(label).asText()
+			return " gegen " + poll.get("awayName").asText()
 					+ " in " + poll.get("city").asText() + " · " + poll.get("venue").asText()
 					+ " am " + formatDate(poll.get("timestamp").asLong(), null) + ".";
 		}
@@ -620,14 +609,8 @@ public class SurveyService {
 			y = padding;
 			if (poll.get("statistics").size() == 0) {
 				final String[] s = new String[4];
-				if (clientId.intValue() == 4) {
-					s[0] = "Unser erstes Spiel seit langem gegen";
-					s[1] = poll.get("home".equals(poll.get("location").asText()) ? "awayName"
-							: "homeName").asText();
-				} else {
-					s[0] = "Das erste Spiel seit langem zwischen";
-					s[1] = poll.get("homeName").asText() + " : " + poll.get("awayName").asText();
-				}
+				s[0] = "Das erste Spiel seit langem zwischen";
+				s[1] = poll.get("homeName").asText() + " : " + poll.get("awayName").asText();
 				s[2] = "in " + poll.get("city").asText() + " · " + poll.get("venue").asText();
 				s[3] = "Was meinst Du, wie geht das Spiel aus?";
 				g2.setFont(customFont.deriveFont(24f));
