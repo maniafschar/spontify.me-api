@@ -288,9 +288,6 @@ public class AuthenticationService {
 			repository.save(c2);
 			if (ContactType.demo == c2.getType())
 				user.put("contact.type", ContactType.adminContent.name());
-			// TODO rm 0.6
-			user.put("script_correction",
-					"initialisation.customElementsCss+='input-date {overflow-x:auto;max-width:100%;}';setInterval(function(){var e=ui.q('chatList');if(parseInt(e.style.height)==0&&parseInt(e.getAttribute('toggle'))<new Date().getTime()-500){var e2=document.createElement('chatList');e2.style.display='none';e.parentElement.replaceChild(e2,e);communication.ping()}},1000)");
 		}
 		return user;
 	}
