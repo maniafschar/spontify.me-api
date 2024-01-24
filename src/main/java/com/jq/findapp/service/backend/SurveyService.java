@@ -303,11 +303,8 @@ public class SurveyService {
 								clientMarketing.setClientId(clientId);
 								clientMarketing.setImage(Attachment.createImage(".png",
 										image.create(poll, "Spieler", repository.one(Client.class, clientId), null)));
-								String epilog = "Lieben Dank für die Teilnahme!\nDas Ergebnis wird am " + endDate
-										+ " hier bekanntgegeben.";
-								if (clientId.intValue() == 4)
-									epilog += "\n\nLust auf mehr <b>Fan Feeling</b>? In unserer neuen App bauen wir eine neue <b>Fußball Fan Community</b> auf.\n\nMit ein paar wenigen Klicks kannst auch Du dabei sein.";
-								poll.put("epilog", epilog);
+								poll.put("epilog", "Lieben Dank für die Teilnahme!\nDas Ergebnis wird am " + endDate
+										+ " hier bekanntgegeben.\n\nLust auf mehr <b>Fan Feeling</b>? In unserer neuen App bauen wir eine neue <b>Fußball Fan Community</b> auf.\n\nMit ein paar wenigen Klicks kannst auch Du dabei sein.");
 								clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
 								repository.save(clientMarketing);
 								notification.sendPoll(clientMarketing);
