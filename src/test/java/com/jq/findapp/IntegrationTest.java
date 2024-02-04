@@ -45,7 +45,7 @@ public class IntegrationTest {
 
 	@BeforeEach
 	public void start() throws Exception {
-		new ProcessBuilder("./web.sh start".split(" ")).start();
+		new ProcessBuilder("./web.sh", "start").start();
 		Util.driver = new SafariDriver();
 		Util.driver.manage().timeouts().implicitlyWait(Duration.ofMillis(50));
 		Util.driver.manage().window().setSize(new Dimension(450, 800));
@@ -55,7 +55,7 @@ public class IntegrationTest {
 	@AfterEach
 	public void stop() throws Exception {
 		Util.driver.close();
-		new ProcessBuilder("./web.sh stop".split(" ")).start();
+		new ProcessBuilder("./web.sh", "stop").start();
 	}
 
 	@Test
@@ -76,6 +76,7 @@ public class IntegrationTest {
 	private void init() throws Exception {
 		utils.createContact(BigInteger.valueOf(8));
 		utils.initPaypalSandbox();
+		Util.sleep(3000);
 		for (int i = 0; i < 20; i++) {
 			Util.sleep(1000);
 			Util.driver.get(url);

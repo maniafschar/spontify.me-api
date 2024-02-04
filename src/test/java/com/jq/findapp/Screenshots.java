@@ -32,7 +32,6 @@ public class Screenshots {
 	@BeforeAll
 	public static void start() throws Exception {
 		new File(dir).mkdir();
-		System.setProperty("webdriver.chrome.driver", "../ChromeDriver");
 		deviceMetrics.put("pixelRatio", resolution);
 		userAgent.put("deviceMetrics", deviceMetrics);
 		userAgent.put("pixelRatio", resolution);
