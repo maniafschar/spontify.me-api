@@ -1,6 +1,7 @@
 package com.jq.findapp.service.backend;
 
 import java.math.BigInteger;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
@@ -52,15 +53,15 @@ public class RssService {
 	private final Set<String> failed = Collections.synchronizedSet(new HashSet<>());
 
 	public SchedulerResult update() {
-		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/update");
-		final Result list = repository.list(new QueryParams(Query.misc_listClient));
+		final SchedulerResult result = new SchedulerResult(this.getClass().getSimpleName() + "/update");
+		final Result list = this.repository.list(new QueryParams(Query.misc_listClient));
 		final List<CompletableFuture<?>> futures = new ArrayList<>();
 		for (int i = 0; i < list.size(); i++) {
 			try {
 				final JsonNode json = new ObjectMapper().readTree(list.get(i).get("client.storage").toString());
 				if (json.has("rss")) {
 					for (int i2 = 0; i2 < json.get("rss").size(); i2++)
-						futures.add(syncFeed(json.get("rss").get(i2), (BigInteger) list.get(i).get("client.id")));
+						futures.add(this.syncFeed(json.get("rss").get(i2), (BigInteger) list.get(i).get("client.id")));
 				}
 			} catch (final Exception e) {
 				if (result.exception == null)
@@ -79,9 +80,10 @@ public class RssService {
 				return ex.getMessage();
 			}
 		}).collect(Collectors.joining("\n"));
-		if (failed.size() > 0)
-			notificationService.createTicket(TicketType.ERROR, "ImportRss",
-					failed.size() + " errors:\n" + failed.stream().sorted().collect(Collectors.joining("\n")), null);
+		if (this.failed.size() > 0)
+			this.notificationService.createTicket(TicketType.ERROR, "ImportRss",
+					this.failed.size() + " errors:\n" + this.failed.stream().sorted().collect(Collectors.joining("\n")),
+					null);
 		return result;
 	}
 
@@ -118,7 +120,7 @@ public class RssService {
 						: null;
 				for (int i = 0; i < rss.size(); i++) {
 					try {
-						final ClientNews clientNews = createNews(params, rss.get(i), addDescription, clientId, url,
+						final ClientNews clientNews = this.createNews(params, rss.get(i), addDescription, clientId, url,
 								descriptionPostfix);
 						if (clientNews != null) {
 							if (clientNews.getPublish().getTime() > lastPubDate)
@@ -131,17 +133,18 @@ public class RssService {
 								clientNews.setLatitude((float) json.get("latitude").asDouble());
 								clientNews.setLongitude((float) json.get("longitude").asDouble());
 								final boolean b = json.get("publish").asBoolean() && clientNews.getId() == null;
-								repository.save(clientNews);
+								RssService.this.repository.save(clientNews);
 								if (first.getTime() > clientNews.getPublish().getTime())
 									first = clientNews.getPublish();
-								urls.add(clientNews.getUrl());
+								this.urls.add(clientNews.getUrl());
 								if (b)
-									externalService.publishOnFacebook(clientId, clientNews.getDescription(),
+									RssService.this.externalService.publishOnFacebook(clientId,
+											clientNews.getDescription(),
 											"/rest/marketing/news/" + clientNews.getId());
 							}
 						}
 					} catch (final Exception ex) {
-						addFailure(ex, url);
+						this.addFailure(ex, url);
 					}
 				}
 				int deleted = 0;
@@ -149,12 +152,12 @@ public class RssService {
 					params.setSearch(
 							"clientNews.publish>cast('" + first + "' as timestamp) and clientNews.clientId="
 									+ clientId);
-					final Result result = repository.list(params);
+					final Result result = RssService.this.repository.list(params);
 					for (int i = 0; i < result.size(); i++) {
-						if (!urls.contains(result.get(i).get("clientNews.url"))) {
-							repository.delete(repository.one(ClientNews.class,
+						if (!this.urls.contains(result.get(i).get("clientNews.url"))) {
+							RssService.this.repository.delete(RssService.this.repository.one(ClientNews.class,
 									(BigInteger) result.get(i).get("clientNews.id")));
-							notificationService.createTicket(TicketType.ERROR, "RSS Deletion",
+							RssService.this.notificationService.createTicket(TicketType.ERROR, "RSS Deletion",
 									result.get(i).get("clientNews.id") + "\n"
 											+ result.get(i).get("clientNews.description")
 											+ "\n" + result.get(i).get("clientNews.url"),
@@ -166,13 +169,13 @@ public class RssService {
 				if (count != 0 || deleted != 0)
 					return count + " on " + clientId + " " + url + (deleted > 0 ? ", " + deleted + " deleted" : "");
 			} catch (final Exception ex) {
-				addFailure(ex, json.get("url").asText());
+				this.addFailure(ex, json.get("url").asText());
 			}
 			return "";
 		}
 
 		private synchronized void addFailure(final Exception ex, final String url) {
-			failed.add((ex.getMessage().startsWith("IMAGE_") ? "" : ex.getClass().getName() + ": ")
+			RssService.this.failed.add((ex.getMessage().startsWith("IMAGE_") ? "" : ex.getClass().getName() + ": ")
 					+ ex.getMessage().replace("\n", "\n  ") + "\n  " + url);
 		}
 
@@ -198,17 +201,17 @@ public class RssService {
 				description += descriptionPostfix;
 			}
 			params.setSearch("clientNews.url='" + uid + "' and clientNews.clientId=" + clientId);
-			Result result = repository.list(params);
+			Result result = RssService.this.repository.list(params);
 			final ClientNews clientNews;
 			if (result.size() == 0) {
 				params.setSearch("clientNews.description like '" + description.replace('\'', '_').replace('\n', '_')
 						+ "' and clientNews.clientId=" + clientId);
-				result = repository.list(params);
+				result = RssService.this.repository.list(params);
 			}
 			if (result.size() == 0)
 				clientNews = new ClientNews();
 			else {
-				clientNews = repository.one(ClientNews.class,
+				clientNews = RssService.this.repository.one(ClientNews.class,
 						(BigInteger) result.get(0).get("clientNews.id"));
 				clientNews.historize();
 			}
@@ -216,21 +219,21 @@ public class RssService {
 			clientNews.setDescription(description);
 			clientNews.setUrl(uid);
 			if (rss.has("pubDate"))
-				clientNews.setPublish(new Timestamp(dateParser.parse(rss.get("pubDate").asText()).getTime()));
+				clientNews.setPublish(new Timestamp(this.dateParser.parse(rss.get("pubDate").asText()).getTime()));
 			else
-				clientNews.setPublish(new Timestamp(dateParser2.parse(rss.get("date").asText()).getTime()));
+				clientNews.setPublish(new Timestamp(this.dateParser2.parse(rss.get("date").asText()).getTime()));
 			clientNews.setImage(null);
 			if (rss.has("media:content") && rss.get("media:content").has("url"))
 				clientNews.setImage(EntityUtil.getImage(rss.get("media:content").get("url").asText(),
 						EntityUtil.IMAGE_SIZE, 200));
 			else {
-				final String html = IOUtils.toString(new URL(uid), StandardCharsets.UTF_8)
+				final String html = IOUtils.toString(new URI(uid), StandardCharsets.UTF_8)
 						.replace('\r', ' ').replace('\n', ' ');
-				Matcher matcher = imageRegex.matcher(html);
+				Matcher matcher = this.imageRegex.matcher(html);
 				String s = null;
 				boolean found = matcher.find();
 				if (!found) {
-					matcher = imageRegex2.matcher(html);
+					matcher = this.imageRegex2.matcher(html);
 					found = matcher.find();
 				}
 				if (found) {

@@ -12,6 +12,7 @@ import jakarta.persistence.Transient;
 @Entity
 public class ClientNews extends BaseEntity {
 	private BigInteger clientId;
+	private BigInteger categoryId;
 	private Float latitude;
 	private Float longitude;
 	private String description;
@@ -21,7 +22,7 @@ public class ClientNews extends BaseEntity {
 	private Boolean notified = false;
 
 	public Float getLatitude() {
-		return latitude;
+		return this.latitude;
 	}
 
 	public void setLongitude(final Float longitude) {
@@ -29,7 +30,7 @@ public class ClientNews extends BaseEntity {
 	}
 
 	public Float getLongitude() {
-		return longitude;
+		return this.longitude;
 	}
 
 	public void setLatitude(final Float latitude) {
@@ -37,7 +38,7 @@ public class ClientNews extends BaseEntity {
 	}
 
 	public Boolean getNotified() {
-		return notified;
+		return this.notified;
 	}
 
 	public void setNotified(final boolean notified) {
@@ -45,7 +46,7 @@ public class ClientNews extends BaseEntity {
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public void setDescription(final String description) {
@@ -53,7 +54,7 @@ public class ClientNews extends BaseEntity {
 	}
 
 	public BigInteger getClientId() {
-		return clientId;
+		return this.clientId;
 	}
 
 	public void setClientId(final BigInteger clientId) {
@@ -61,7 +62,7 @@ public class ClientNews extends BaseEntity {
 	}
 
 	public Timestamp getPublish() {
-		return publish;
+		return this.publish;
 	}
 
 	public void setPublish(final Timestamp publish) {
@@ -69,7 +70,7 @@ public class ClientNews extends BaseEntity {
 	}
 
 	public String getImage() {
-		return image;
+		return this.image;
 	}
 
 	public void setImage(final String image) {
@@ -77,17 +78,25 @@ public class ClientNews extends BaseEntity {
 	}
 
 	public String getUrl() {
-		return url;
+		return this.url;
 	}
 
 	public void setUrl(final String url) {
 		this.url = url;
 	}
 
+	public BigInteger getCategoryId() {
+		return this.categoryId;
+	}
+
+	public void setCategoryId(final BigInteger categoryId) {
+		this.categoryId = categoryId;
+	}
+
 	@Transient
 	@Override
 	public boolean writeAccess(final BigInteger user, final Repository repository) {
 		final Contact contact = repository.one(Contact.class, user);
-		return contact.getClientId().equals(getClientId()) && contact.getType() == ContactType.adminContent;
+		return contact.getClientId().equals(this.getClientId()) && contact.getType() == ContactType.adminContent;
 	}
 }

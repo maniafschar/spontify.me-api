@@ -1,7 +1,6 @@
 package com.jq.findapp.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.StringReader;
 import java.math.BigInteger;
@@ -22,10 +21,10 @@ import org.xml.sax.InputSource;
 
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
-import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.backend.events.ImportMunich;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith(SpringExtension.class)
@@ -36,6 +35,9 @@ public class EventServiceTest {
 	private EventService eventService;
 
 	@Autowired
+	private ImportMunich importMunich;
+
+	@Autowired
 	private Repository repository;
 
 	@Autowired
@@ -44,23 +46,23 @@ public class EventServiceTest {
 	@Test
 	public void importEvents() throws Exception {
 		// given
-		utils.createContact(BigInteger.ONE);
+		this.utils.createContact(BigInteger.ONE);
 		final QueryParams params = new QueryParams(Query.event_listId);
 		params.setSearch("event.startDate=cast('2023-12-02 09:00:00' as timestamp)");
 
 		// when
-		final SchedulerResult result = eventService.importEvents();
+		final int result = this.importMunich.run(this.eventService, BigInteger.ONE);
 
 		// then
-		assertNull(result.exception);
-		assertEquals("Munich: 56 imported, 0 published", result.result);
-		assertEquals(1, repository.list(params).size());
+		assertEquals(56, result);
+		assertEquals(1, this.repository.list(params).size());
 	}
 
 	@Test
 	public void importEvents_error() throws Exception {
 		// given
-		String page = IOUtils.toString(getClass().getResourceAsStream("/html/eventError.html"), StandardCharsets.UTF_8);
+		String page = IOUtils.toString(this.getClass().getResourceAsStream("/html/eventError.html"),
+				StandardCharsets.UTF_8);
 		page = page.replace('\n', ' ').replace('\r', ' ').replace('\u0013', ' ');
 		page = page.substring(page.indexOf("<ul class=\"m-listing__list\""));
 		page = page.substring(0, page.indexOf("</ul>") + 5);

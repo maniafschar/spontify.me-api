@@ -36,7 +36,6 @@ public class FindappConfiguration implements AsyncConfigurer, WebSocketMessageBr
 			"https://*.fan-club.online",
 			"https://offline-poker.com",
 			"https://skills.community",
-			"https://skillvents.com",
 			"http://localhost:9000"
 	};
 
@@ -79,7 +78,8 @@ public class FindappConfiguration implements AsyncConfigurer, WebSocketMessageBr
 					for (int i = 0; i < params.length; i++)
 						msg += "\n\nParameter " + (i + 1) + ":\n" + params[i];
 					try {
-						notificationService.createTicket(TicketType.ERROR, "async", msg, null);
+						FindappConfiguration.this.notificationService.createTicket(TicketType.ERROR, "async", msg,
+								null);
 					} catch (final Exception e1) {
 						// never happend in 20 years...
 					}

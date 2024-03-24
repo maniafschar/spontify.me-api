@@ -250,11 +250,11 @@ public class NotificationService {
 				text.delete(text.lastIndexOf(" "), text.length());
 			text.append("...");
 		}
+		final String from = contactFrom == null ? repository.one(Client.class, contactTo.getClientId()).getName()
+				: contactFrom.getPseudonym();
 		try {
 			final String notificationId = notification == null ? "" : notification.getId().toString();
 			final String s = text.toString().replace("\"", "\\\"");
-			final String from = contactFrom == null ? repository.one(Client.class, contactTo.getClientId()).getName()
-					: contactFrom.getPseudonym();
 			if ("ios".equals(contactTo.getPushSystem())) {
 				final Ping p = getPingValues(contactTo);
 				ios.send(from, contactTo, s, action,
@@ -282,6 +282,7 @@ public class NotificationService {
 					contactTo.getId() + "\n\n"
 							+ IOUtils.toString(getClass().getResourceAsStream("/template/push.android"),
 									StandardCharsets.UTF_8)
+									.replace("{from}", from)
 									.replace("{to}", contactTo.getPushToken())
 									.replace("{text}", text)
 									.replace("{notificationId}",
@@ -421,7 +422,9 @@ public class NotificationService {
 		email.setAuthenticator(new DefaultAuthenticator(client.getEmail(), emailPassword));
 		email.setSSLOnConnect(true);
 		try {
-			email.setFrom(client.getEmail(), (from == null || from.getId().equals(client.getAdminId()) ? "" : from.getPseudonym() + " · ") + client.getName());
+			email.setFrom(client.getEmail(),
+					(from == null || from.getId().equals(client.getAdminId()) ? "" : from.getPseudonym() + " · ")
+							+ client.getName());
 			email.addTo(to.getEmail());
 			email.setSubject(subject);
 			email.setTextMsg(text);
