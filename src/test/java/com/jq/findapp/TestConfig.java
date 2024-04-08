@@ -16,7 +16,6 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -154,11 +153,9 @@ public class TestConfig {
 					StandardCharsets.UTF_8);
 			Instant date = Instant.now();
 			if (offset != -1 && url.contains("season=")) {
-				for (int i = 0; i < LocalDate.now().getYear()
-						- Integer.valueOf(url.substring(url.indexOf("season=") + 7)); i++)
-					date = date.minus(Duration.ofDays(365));
-				if (LocalDate.now().getYear() > date.atZone(ZoneId.systemDefault()).getYear())
-					s = s.replace("\"NS\"", "\"FT\"");
+				final int year = LocalDate.now().getYear();
+				for (int i = 0; i < year - Integer.valueOf(url.substring(url.indexOf("season=") + 7)); i++)
+					date = date.minus(Duration.ofDays(182));
 			}
 			return new ObjectMapper().readTree(
 					s.replace("\"{date}\"", "" + (long) (date.getEpochSecond() + (offset == -1 ? 0 : offset))))

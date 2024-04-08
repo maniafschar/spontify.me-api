@@ -494,9 +494,7 @@ public class SurveyService {
 
 		private int currentSeason() {
 			final LocalDateTime now = LocalDateTime.now();
-			if (now.getMonth().getValue() < 6)
-				return now.getYear() - 1;
-			return now.getYear();
+			return now.getYear() - (now.getMonth().getValue() < 6 ? 0 : 1);
 		}
 
 		private String getTeam(final BigInteger clientId, final JsonNode poll) {

@@ -22,8 +22,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.safari.SafariDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -46,10 +46,11 @@ public class IntegrationTest {
 	@BeforeEach
 	public void start() throws Exception {
 		new ProcessBuilder("./web.sh", "start").start();
-		Util.driver = new SafariDriver();
+		Util.sleep(5000);
+		Util.driver = new ChromeDriver();
 		Util.driver.manage().timeouts().implicitlyWait(Duration.ofMillis(50));
 		Util.driver.manage().window().setSize(new Dimension(450, 800));
-		init();
+		this.init();
 	}
 
 	@AfterEach
@@ -61,21 +62,21 @@ public class IntegrationTest {
 	@Test
 	public void run() throws Exception {
 		try {
-			register("testabcd", "test@jq-consulting.de");
-			addLocation("location 1", "Melchiorstr. 9\n81479 München", false);
-			addEvent();
-			addRating();
-			addLocation("location 1", "Melchiorstr. 9\n81479 München", true);
-			addFriend();
+			this.register("testabcd", "test@jq-consulting.de");
+			this.addLocation("location 1", "Melchiorstr. 9\n81479 München", false);
+			this.addEvent();
+			this.addRating();
+			this.addLocation("location 1", "Melchiorstr. 9\n81479 München", true);
+			this.addFriend();
 		} catch (final Exception ex) {
 			ex.printStackTrace();
-			Util.sleep(600000);
+			// Util.sleep(600000);
 		}
 	}
 
 	private void init() throws Exception {
-		utils.createContact(BigInteger.valueOf(8));
-		utils.initPaypalSandbox();
+		this.utils.createContact(BigInteger.valueOf(8));
+		this.utils.initPaypalSandbox();
 		Util.sleep(3000);
 		for (int i = 0; i < 20; i++) {
 			Util.sleep(1000);
@@ -91,7 +92,7 @@ public class IntegrationTest {
 
 	private void register(final String pseudonym, final String email) {
 		Util.click("dialog-navigation item.events");
-		Util.get("dialog-hint").sendKeys("\t");
+		new Actions(Util.driver).sendKeys("\t").build().perform();
 		new Actions(Util.driver).sendKeys(" ").build().perform();
 		Util.sendKeys("login input[name=\"email\"]", email);
 		Util.click("login tab:nth-of-type(3)");
@@ -103,6 +104,7 @@ public class IntegrationTest {
 		final String s = Util.email(0).lines().reduce(
 				(e, e2) -> e.startsWith("https://") ? e : e2.startsWith("https://") ? e2 : "").get();
 		Util.driver.navigate().to(url + s.substring(s.indexOf('?')));
+		new Actions(Util.driver).sendKeys("qwer1234").build().perform();
 		Util.sendKeys("dialog-popup input[name=\"passwd\"]", "qwer1234");
 		Util.click("dialog-popup button-text");
 	}
@@ -156,7 +158,7 @@ public class IntegrationTest {
 		Util.click("dialog-navigation item.events");
 		Util.click("dialog-menu a[onclick*=\"ui.query.eventMy()\"]");
 		final String id = Util.get("events list-row.participate").getAttribute("i").split("_")[0];
-		utils.setEventDate(new BigInteger(id), new Timestamp(System.currentTimeMillis() - 86460000));
+		this.utils.setEventDate(new BigInteger(id), new Timestamp(System.currentTimeMillis() - 86460000));
 		Util.click("dialog-menu a[onclick*=\"ui.query.eventTickets()\"]");
 		Util.click("events list-row.participate");
 		Util.click("detail button-text[onclick*=\"ui.openRating\"]");
@@ -253,8 +255,8 @@ public class IntegrationTest {
 			for (int i = 0; i < 5; i++) {
 				try {
 					final WebElement e = get(path);
-					e.clear();
-					e.sendKeys(keys);
+					((JavascriptExecutor) driver)
+							.executeScript("ui.q('" + path + "').value='" + keys.replace("\n", "\\n") + "'");
 					return;
 				} catch (final ElementNotInteractableException e) {
 					sleep(250);
