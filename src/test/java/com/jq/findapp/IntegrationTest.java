@@ -19,7 +19,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -70,7 +69,7 @@ public class IntegrationTest {
 			this.addFriend();
 		} catch (final Exception ex) {
 			ex.printStackTrace();
-			// Util.sleep(600000);
+			Util.sleep(600000);
 		}
 	}
 
@@ -134,6 +133,7 @@ public class IntegrationTest {
 		if (!Util.get("dialog-popup .url").getAttribute("style").contains("none"))
 			throw new RuntimeException("Event .url should be invisible!");
 		Util.sendKeys("dialog-popup input[name=\"price\"]", "10");
+		new Actions(Util.driver).sendKeys("\n").build().perform();
 		if (Util.get("dialog-popup .picture").getAttribute("style").contains("none"))
 			throw new RuntimeException("Event .picture should be visible!");
 		if (Util.get("dialog-popup .url").getAttribute("style").contains("none"))
@@ -145,9 +145,8 @@ public class IntegrationTest {
 		Util.click("dialog-popup eventLocationInputHelper ul li");
 		Util.sleep(500);
 		Util.click("dialog-popup dialogButtons button-text[onclick*=\"save\"]");
-		Util.get("dialog-popup input-date[name=\"startDate\"]").sendKeys("");
-		new Actions(Util.driver).keyDown(Keys.SHIFT).sendKeys("\t\t\t\t\t").keyUp(Keys.SHIFT).build().perform();
-		Util.get("dialog-popup input-hashtags").sendKeys("textabc");
+		Util.sendKeys("dialog-popup input-date[name=\"startDate\"]", "");
+		Util.sendKeys("dialog-popup input-hashtags textarea", "textabc");
 		Util.sendKeys("dialog-popup textarea[name=\"description\"]", "mega sex");
 		Util.click("dialog-popup dialogButtons button-text[onclick*=\"save\"]");
 		Util.click("dialog-popup dialogButtons button-text[onclick*=\"save\"]");
@@ -162,9 +161,7 @@ public class IntegrationTest {
 		Util.click("dialog-menu a[onclick*=\"ui.query.eventTickets()\"]");
 		Util.click("events list-row.participate");
 		Util.click("detail button-text[onclick*=\"ui.openRating\"]");
-		Util.sleep(500);
-		Util.get("detail button-text[onclick*=\"ui.openRating\"]").sendKeys("\t\t\t\t\t");
-		new Actions(Util.driver).sendKeys(" ").build().perform();
+		Util.click("dialog-popup input-rating button-text");
 		Util.click("dialog-navigation item.search");
 		Util.click("search tabHeader tab[i=\"locations\"]");
 		Util.click("search tabBody div.locations button-text[onclick*=\"pageSearch\"]");
@@ -254,9 +251,10 @@ public class IntegrationTest {
 		static void sendKeys(final String path, final String keys) {
 			for (int i = 0; i < 5; i++) {
 				try {
-					final WebElement e = get(path);
+					get(path);
 					((JavascriptExecutor) driver)
-							.executeScript("ui.q('" + path + "').value='" + keys.replace("\n", "\\n") + "'");
+							.executeScript("var e=ui.q('" + path + "');e.value='" + keys.replace("\n", "\\n") +
+									"';e.dispatchEvent(new KeyboardEvent('keyup',{'key':'Shift'}));");
 					return;
 				} catch (final ElementNotInteractableException e) {
 					sleep(250);
