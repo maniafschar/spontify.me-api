@@ -12,11 +12,12 @@ import jakarta.persistence.Transient;
 @Entity
 public class ClientNews extends BaseEntity {
 	private BigInteger clientId;
-	private BigInteger categoryId;
 	private Float latitude;
 	private Float longitude;
+	private String category;
 	private String description;
 	private String image;
+	private String source;
 	private String url;
 	private Timestamp publish;
 	private Boolean notified = false;
@@ -85,12 +86,20 @@ public class ClientNews extends BaseEntity {
 		this.url = url;
 	}
 
-	public BigInteger getCategoryId() {
-		return this.categoryId;
+	public String getSource() {
+		return this.source;
 	}
 
-	public void setCategoryId(final BigInteger categoryId) {
-		this.categoryId = categoryId;
+	public void setSource(final String source) {
+		this.source = source;
+	}
+
+	public String getCategory() {
+		return this.category;
+	}
+
+	public void setCategory(final String category) {
+		this.category = category;
 	}
 
 	@Transient

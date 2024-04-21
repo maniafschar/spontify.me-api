@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.math.BigInteger;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
@@ -15,15 +16,33 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.jq.findapp.FindappApplication;
+import com.jq.findapp.TestConfig;
+import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.util.EntityUtil;
+import com.jq.findapp.util.Utils;
 
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = { FindappApplication.class, TestConfig.class })
+@ActiveProfiles("test")
 public class RssServiceTest {
+	@Autowired
+	private RssService rssService;
+
+	@Autowired
+	private Utils utils;
+
 	@Test
 	public void rssMap() throws Exception {
 		// given
@@ -181,5 +200,17 @@ public class RssServiceTest {
 		// then
 		assertNotNull(tag);
 		assertTrue(tag.startsWith(".jpg" + Attachment.SEPARATOR));
+	}
+
+	@Test
+	public void run() throws Exception {
+		// given
+		utils.createContact(BigInteger.ONE);
+
+		// when
+		final SchedulerResult result = rssService.update();
+
+		// then
+		assertTrue(result.result.startsWith("20 "));
 	}
 }

@@ -1,0 +1,1898 @@
+<!DOCTYPE html>
+<html lang="de-DE" class="">
+
+<head>
+	<link rel="preconnect" href="//app.usercentrics.eu">
+	<link rel="preconnect" href="//api.usercentrics.eu">
+	<link rel="preload" href="//app.usercentrics.eu/browser-ui/latest/loader.js" as="script">
+	<script>      window.UC_UI_DOMAINS = { crossDomainConsentSharingIFrame: 'https://www.kicker.de/cross-domain-bridge.html' }; window.UC_UI_SUPPRESS_CMP_DISPLAY = true; window.UC_UI_EXCLUDE_ACCEPT_ALL_VENDORS = [280]; var ov = ov || {}; ov.checkLocalStorage = () => { try { window.localStorage.getItem("x"); return true; } catch (e) { return false; } }; ov.consts = class { static kickerJwtSessionKey = 'kicker_jwt'; static kickerHashSessionKey = 'kicker_hash'; static cmpDe = 'z_EpYIcla'; static cmpAt = 'fFviQLnE3'; static cmpCh = 'uGOj2JrVGe6qE4'; static cmpDePur = 'egMyDWpZj'; static cmpAtPur = '6N_bNDeLE'; static cmpChPur = 'CxliiGGYScOcdR'; static jwtPublicKey = 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDMbktQ4izOVOh8Q3EGRptfyOuF2vQm63DSawZW/nxHPnJeep4I25c5D26H/uqLkOgvxkrIeCJyznBmmVRbBVBJW6T3sKKCiEmUT9ZfampzbDD2S2UlRxBunAGbgGK3QfWDa1ujCuE905nPYB0f1fz2upNCp3Z+IgKoRkqfipM6cQIDAQAB'; static suppressPurLayer = false; static vendorOpenWebName = 'OpenWeb LTD'; static vendorGoogleMapsName = 'Google Maps'; static vendorQualifioName = 'Qualifio'; static vendorVgWortName = 'VG Wort'; static vendorGoogleAdvertising = '755'; static vendorOpenWeb = '280'; static vendorAti = 'sriqFX5Ul'; static vendorGoogleMaps = 'BCRPwvLvQ'; static vendorQualifio = '8FnA0UgdN'; static vendorTwitter = 'cBGu1RvTt'; static vendorFacebook = 'caGWhvFkc'; static vendorInstagram = 'FMA0p-Rae'; static vendorYouTube = 'npXpWrfXe'; static vendorTwitch = 'kuoC0lwYN'; static vendorVgWort = 'd6CVl4xM7'; static vendorE2 = 'RAmiEasiN'; static kickerDarkCss = 'https://static.kicker.de/content/css/main-dark.min.css?rv=24.15.8845302'; }; Object.freeze(ov.consts);  </script>
+	<script>ov.logger = { CSS_LOG: ["color: #fff;", "background: #cc0000;", "display: inline-block;", "padding: 1px 4px;", "border-radius: 3px;"].join(" "), isActive: function () { if ("undefined" == typeof console) return !1; if (window.location.hash.indexOf("development") > -1) return !0; switch (window.location.hostname) { case "www.kicker.de": case "www.kicker.at": case "www.kicker.ch": case "manager.kicker.de": return !1; default: return !0 } }, info: function (o) { "undefined" != typeof console && console.info("%cOV:", ov.logger.CSS_LOG, o) }, log: function (o) { this.isActive() && console.log("%cOV:", ov.logger.CSS_LOG, o) }, debug: function (o) { this.isActive() && console.debug("%cOV:", ov.logger.CSS_LOG, o) }, error: function (o) { "undefined" != typeof console && console.error("%cOV:", ov.logger.CSS_LOG, o) } };  </script>
+	<script>ov.cmp = { isConsentGiven: !1, tcData: null }, ov.cmp.init = (() => { if (ov.logger.debug("ov.cmp.init"), ov.isAppWebview()) ov.cmp.checkApp(); else if (ov.cmp.checkTokenInReq(), ov.cmp.isUserLoggedIn()) { const e = ov.cmp.getToken(); void 0 === e ? ov.cmp.checkUserSubs() : ov.cmp.hasNoSubs(e) ? ov.cmp.setCmp(!1) : ov.cmp.verifyToken(e).then(o => { o ? ov.cmp.hasSubs(e) : ov.cmp.checkUserSubs() }) } else { ov.cmp.setCmp(!1), void 0 !== ov.cmp.getToken() && ov.cmp.removeToken() } }), ov.cmp.checkApp = (() => { "" !== ov.WebGuid && "" !== ov.AppGuid && "" !== ov.AppMd5Hash ? ov.cmp.checkAppUserHash(ov.AppGuid, ov.WebGuid, ov.AppMd5Hash) : ov.cmp.setCmp(!1) }), ov.cmp.checkAppUserHash = ((e, o, n) => { ov.logger.debug("ov.cmp.checkAppUserHash start "); const t = { guid1: e, guid2: o, hash: n }; window.fetch("/kickerapi/userpurhashedsecret", { method: "POST", body: JSON.stringify(t), headers: { Accept: "application/json", "Content-Type": "application/json" } }).then(e => e.json()).then(e => { if (0 === e.Status) return ov.logger.debug("ov.cmp.checkAppUserHash success "), void ov.cmp.setCmp(!0); ov.logger.debug("ov.cmp.checkAppUserHash failed "), ov.cmp.setCmp(!1) }).catch(() => { ov.logger.debug("ov.cmp.checkAppUserHash failed "), ov.cmp.setCmp(!1) }) }), ov.cmp.checkTokenInReq = (() => { const e = ov.cmp.getParameterByName("jwt"); if (null != e) return ov.logger.debug("ov.cmp.checkTokenInReq token found"), void ov.cmp.saveToken(e); ov.logger.debug("ov.cmp.checkTokenInReq no token found") }), ov.cmp.getParameterByName = (e => { var o = RegExp("[?&]" + e + "=([^&]*)").exec(window.location.search); return o && decodeURIComponent(o[1].replace(/\+/g, " ")) }), ov.cmp.checkUserSubs = (() => { ov.logger.debug("ov.cmp.checkUserSubs start "); const e = { sessionId: ov.cmp.getTokenSessionId() }; window.fetch("/kickerapi/userpursubscriptiondata", { method: "POST", body: JSON.stringify(e), headers: { Accept: "application/json", "Content-Type": "application/json" } }).then(e => e.json()).then(e => { ov.cmp.onFetchSuccess(e) }).catch(e => { ov.cmp.onFetchError(e) }) }), ov.cmp.onFetchSuccess = (e => { ov.logger.debug("ov.cmp.onFetchSuccess " + JSON.stringify(e)), "" !== e.Jwt ? (ov.cmp.saveToken(e.Jwt), ov.cmp.hasNoSubs(e.Jwt) ? ov.cmp.setCmp(!1) : ov.cmp.hasSubs(e.Jwt)) : ov.cmp.setCmp(!1) }), ov.cmp.onFetchError = (e => { ov.logger.debug("ov.cmp.onFetchError error" + e), ov.cmp.setCmp(!1) }), ov.cmp.getToken = (() => { if (!1 === ov.checkLocalStorage()) return void ov.logger.debug("ov.cmp.getToken localStorage disabled"); let e = window.localStorage.getItem(ov.consts.kickerJwtSessionKey); return null === e && (e = void 0), ov.logger.debug("ov.cmp.getToken " + e), e }), ov.cmp.getTokenClaims = (e => { const [, o] = e.split("."); if (void 0 === o) return null; const n = JSON.parse(window.atob(o)); return ov.logger.debug("ov.cmp.getTokenClaims claims: " + JSON.stringify(n)), n }), ov.cmp.getTokenSessionId = (() => { const e = ov.cmp.getToken(); if (void 0 === e || ov.cmp.hasNoSubs(e)) return ""; const o = ov.cmp.getTokenClaims(e); return null == o ? "" : (ov.logger.debug("ov.cmp.getTokenSessionId " + o.sessionKey), o.sessionKey) }), ov.cmp.getUserSsoId = (() => { let e = document.cookie.split("; ").find(e => e.startsWith("kickeruser=")); if (null !== e && void 0 !== e) { const o = (e = e.replace("kickeruser=", "")).indexOf("ssoid=") > -1 ? e.split("&").find(e => e.startsWith("ssoid=")).replace("ssoid=", "") : null; return ov.logger.debug("ov.cmp.getUserSsoId: " + o), o } return ov.logger.debug("ov.cmp.getUserSsoId: undefined"), null }), ov.cmp.isUserLoggedIn = (() => { let e = document.cookie.split("; ").find(e => e.startsWith("kickeruser=")); if (null !== e && void 0 !== e) { return ((e = e.replace("kickeruser=", "")).indexOf("ssoid=") > -1 ? e.split("&").find(e => e.startsWith("ssoid=")).replace("ssoid=", "") : "").length > 0 ? (ov.logger.debug("ov.cmp.isUserLoggedIn: true"), !0) : (ov.logger.debug("ov.cmp.isUserLoggedIn: false"), !1) } return ov.logger.debug("ov.cmp.isUserLoggedIn: false"), !1 }), ov.cmp.hasNoSubs = (e => "NotExisting" === e), ov.cmp.hasSubs = (e => { const o = ov.cmp.getTokenClaims(e); null != o && "valid" === o.result.toLowerCase() && o.issuedTo === ov.cmp.getUserSsoId() && Date.now() <= 1e3 * o.exp ? (ov.logger.debug("ov.cmp.hasSubs: true"), ov.cmp.setCmp(!0)) : (ov.logger.debug("ov.cmp.hasSubs: false"), ov.cmp.checkUserSubs()) }), ov.cmp.verifyToken = (async e => { if (void 0 === e || null == e) return ov.logger.debug("ov.cmp.verifyToken: Invalid token"), !1; function o(e) { const o = e.length % 4; return Uint8Array.from(window.atob(e.replace(/-/g, "+").replace(/_/g, "/").padEnd(e.length + (0 === o ? 0 : 4 - o), "=")), e => e.charCodeAt(0)).buffer } const [n, t, c] = e.split("."), s = new o(ov.consts.jwtPublicKey); return crypto.subtle.importKey("spki", s, { name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-256" } }, !0, ["verify"]).then(e => crypto.subtle.verify({ name: "RSASSA-PKCS1-v1_5" }, e, new o(c), (new TextEncoder).encode(n + "." + t))).then(e => (ov.logger.debug("ov.cmp.verifyToken: " + (e ? "Valid token" : "Invalid token")), e)).catch(e => (ov.logger.debug("ov.cmp.verifyToken: Invalid token ex: " + e), !1)) }), ov.cmp.removeToken = (() => { ov.logger.debug("ov.cmp.removeToken"), !1 !== ov.checkLocalStorage() ? window.localStorage.removeItem(ov.consts.kickerJwtSessionKey) : ov.logger.debug("ov.cmp.removeToken localStorage disabled") }), ov.cmp.saveToken = (e => { ov.logger.debug("ov.cmp.saveToken"), !1 !== ov.checkLocalStorage() ? window.localStorage.setItem(ov.consts.kickerJwtSessionKey, e) : ov.logger.debug("ov.cmp.saveToken localStorage disabled") }), ov.cmp.setCmp = (e => { const o = window.location.hostname.indexOf("kicker.at") > -1, n = window.location.hostname.indexOf("kicker.ch") > -1 || window.location.hostname.indexOf("localhost") > -1, t = e ? o ? ov.consts.cmpAtPur : n ? ov.consts.cmpChPur : ov.consts.cmpDePur : o ? ov.consts.cmpAt : n ? ov.consts.cmpCh : ov.consts.cmpDe; e && (document.firstElementChild.className += " kick__modernart"), ov.logger.info("ov.cmp.setCmp " + e + " " + t), ov.cmp.loadCmp(t) }), ov.cmp.loadCmp = (e => { ov.logger.debug("ov.cmp.loadCmp"); const o = "usercentrics-cmp"; if (!document.getElementById(o)) { var n = document.getElementsByTagName("script")[0], t = document.createElement("script"); t.id = o, t.src = "https://app.usercentrics.eu/browser-ui/latest/loader.js", t.dataset.settingsId = e, t.dataset.tcfEnabled = "", t.onload = ov.cmp.onLoadCmp, t.async = 1, n.parentNode.insertBefore(t, n) } }), ov.cmp.onLoadCmp = (() => { ov.logger.debug("ov.cmp.onLoadCmp"), ov.cmp.bindEvents() }), ov.cmp.bindEvents = (() => { ov.logger.debug("ov.cmp.bindEvents"), window.addEventListener("UC_UI_INITIALIZED", function (e) { ov.cmp.onUcUiInitialized(e) }), window.addEventListener("ucEvent", function (e) { e.detail && "consent_status" === e.detail.event && ov.cmp.onUcLoaded(e) }), "undefined" != typeof __tcfapi && __tcfapi("addEventListener", 2, function (e, o) { ov.cmp.onTcLoaded(e, o) }) }), ov.cmp.onUcUiInitialized = (() => { ov.logger.debug(`ov.cmp.onUcUiInitialized: Used cmp settingsId: ${window.UC_UI.getSettingsCore().id} isConsentRequired: ${window.UC_UI.isConsentRequired()}`), ov.cmp.consentHandler(window.UC_UI.isConsentRequired()), !1 === ov.cmp.isConsentGiven && !0 === ov.cmp.isPurSettingsId() && (ov.logger.debug("ov.cmp.onUcUiInitialized: consent required - accept service"), window.UC_UI.acceptService().then(() => { ov.logger.debug("ov.cmp.onUcUiInitialized: accept service done"), ov.cmp.consentHandler(window.UC_UI.isConsentRequired()) })), !1 === ov.cmp.isConsentGiven && !1 === ov.cmp.isPurSettingsId() ? (ov.logger.debug("ov.cmp.onUcUiInitialized: consent required - showing modal"), ov.isAppWebview() ? ov.cmp.acceptAllConsents() : ov.cmp.load2WayLayer()) : !0 === ov.cmp.isConsentGiven && !1 === ov.cmp.isPurSettingsId() && (ov.logger.debug("ov.cmp.onUcUiInitialized: consent given - check vendors"), !1 === ov.isAppWebview() && !1 === ov.cmp.areAllConsentsAccepted() && ov.cmp.load2WayLayer()), ov.cmp.showOptOutLinks() }), ov.cmp.onUcLoaded = (e => { e.detail && "consent_status" === e.detail.event && (ov.logger.debug("ov.cmp.onUcLoaded e: " + JSON.stringify(e.detail)), "onDenyAllServices" === e.detail.action ? (window.UC_UI.clearStorage(), window.location.reload()) : "onUpdateServices" !== e.detail.action && "onAcceptAllServices" !== e.detail.action || (ov.cmp.consentHandler(window.UC_UI.isConsentRequired()), !0 === e.detail[ov.consts.vendorGoogleMapsName] && ov.triggerEvent(new Event(ov.EVENT_CMP_CONSENT_EXISTS_GOOGLE_MAPS)), !0 === e.detail[ov.consts.vendorQualifioName] && ov.triggerEvent(new Event(ov.EVENT_CMP_CONSENT_EXISTS_QUALIFIO)), !0 === e.detail[ov.consts.vendorVgWortName] && ov.triggerEvent(new Event(ov.EVENT_CMP_CONSENT_EXISTS_VGWORT)))) }), ov.cmp.onTcLoaded = ((e, o) => { ov.cmp.tcData = e, !o || "tcloaded" !== e.eventStatus && "useractioncomplete" !== e.eventStatus || (ov.logger.debug("ov.cmp.onTcLoaded success: " + o + " status: " + e.eventStatus), ov.cmp.consentHandler(window.UC_UI.isConsentRequired()), "useractioncomplete" === e.eventStatus && ov.cmp.checkConsentForTcfVendor(ov.consts.vendorOpenWeb) && ov.triggerEvent(new Event(ov.EVENT_CMP_CONSENT_EXISTS_OPENWEB))) }), ov.cmp.consentHandler = (e => { ov.logger.debug("ov.cmp.consentHandler isConsentRequired: " + e), !1 === e && (ov.cmp.isConsentGiven = !0, ov.triggerEvent(new Event(ov.EVENT_CMP_CONSENT_EXISTS))) }), ov.cmp.consentExists = (() => ov.cmp.isConsentGiven), ov.cmp.areAllConsentsAccepted = (() => { return ov.logger.debug("ov.cmp.areAllConsentsAccepted"), !(window.UC_UI.getServicesBaseInfo().filter(e => !1 === e.consent.status).length > 0) && !(UC_UI.getTCFVendors().filter(e => !1 === e.consent && !0 === e.showConsentToggle && 280 !== e.id).length > 0) }), ov.cmp.load2WayLayer = (() => { ov.logger.debug("ov.cmp.load2WayLayer"), $j("#vendor-count").html(window.UC_UI.getThirdPartyCount()), ov.cmp.showPurModal(null) }), ov.cmp.showOptOutLinks = (() => { if (!1 !== ov.cmp.isPurSettingsId()) { ov.logger.debug("ov.cmp.showOptOutLinks"); var e = document.getElementById("kick__js-cmpoptoutlinks"); e && (e.style.display = "block") } }), ov.cmp.showPurModal = (() => { if (ov.consts.suppressPurLayer) return void ov.logger.debug("ov.cmp.showPurModal modal suppressed"); ov.logger.debug("ov.cmp.showPurModal"), window.event && window.event.preventDefault(); const e = document.getElementById("kick__pur__layer"), o = document.getElementById("kick__js-pur-login"); document.getElementById("kick__js-pur-loginbtn").href = `/meinkicker/login?returnurl=${encodeURIComponent(window.location.href)}`, o.style.display = ov.cmp.isUserLoggedIn() ? "none" : "block", null != e ? e.style.display = "block" : window.location.href = "/meinkicker/login" }), ov.cmp.hidePurModal = (() => { ov.logger.debug("ov.cmp.hidePurModal"); let e = document.getElementById("kick__pur__layer"); null != e && (e.style.display = "none") }), ov.cmp.acceptAllConsents = (() => { ov.logger.debug("ov.cmp.acceptAllConsents"), window.event && window.event.preventDefault(), window.UC_UI.acceptAllConsents().then(() => { ov.cmp.hidePurModal() }) }), ov.cmp.getSettingsId = (() => void 0 === window.UC_UI ? "" : window.UC_UI.getSettingsCore().id), ov.cmp.isPurSettingsId = (() => { const e = ov.cmp.getSettingsId(); return e === ov.consts.cmpDePur || e === ov.consts.cmpAtPur || e === ov.consts.cmpChPur }), ov.cmp.checkConsentForTcfVendor = (e => { let o = !1; const n = ov.cmp.getTcData(); return void 0 !== n && null !== n && e in n.vendor.consents && n.vendor.consents[e] && (o = !0), ov.logger.debug("ov.cmp.checkConsentForTcfVendor: " + e + ": " + o), o }), ov.cmp.checkConsentForNonTcfVendor = (e => { if (void 0 === window.UC_UI) return !1; var o = window.UC_UI.getServicesBaseInfo().find(o => o.id === e); return o = void 0 !== o && null !== o && o.consent.status, ov.logger.debug("ov.cmp.checkConsentForNonTcfVendor: " + e + ": " + o), o }), ov.cmp.getTcData = (() => { let e = null; return "undefined" != typeof __tcfapi && __tcfapi("getTCData", 2, o => { e = o }), e }), ov.cmp.getConsentString = (() => { let e = ov.cmp.getTcData(); return void 0 !== e && null !== e ? e.tcString : "" }), ov.cmp.setConsent = (e => { void 0 !== window.uc && (ov.logger.debug("ov.cmp.setConsent " + e), window.uc.ucapi.setConsents([{ templateId: e, status: !0 }])) }), ov.cmp.getLayer = ((e, o) => { let n = ""; e === ov.consts.vendorOpenWeb && (n = " uc-embedding-container-openweb"); let t = '<div class="uc-embedding-container' + n + ' uc-embedding-1" data-nosnippet="true" pid="' + e + '" ><div class="uc-embedding-wrapper" style="width:80%"><h3>Wir benötigen deine Zustimmung, um den ' + o + "-Service zu laden!</h3>"; return e === ov.consts.vendorOpenWeb ? t += '<p class="description-text">In diesem Fenster könntest du Kommentare von anderen Nutzern einsehen. Diese Funktion wird dir über unseren externen Partner ' + o + " zur Verfügung gestellt. Um zu kommentieren oder sich die Kommentare anzeigen zu lassen, werden deine Login-Daten, wenn du eingeloggt bist, an unseren externen Partner " + o + " übermittelt.Die Anzahl unserer Partner beträgt aktuell " + window.UC_UI.getThirdPartyCount() + ' . Deine Einwilligung kannst du jederzeit für die Zukunft unter <a href="#" onclick="uc.ucapi.showInfoModal(\'' + e + '\'); return false;">Cookies & Tracking</a> widerrufen.<br><br>Durch klicken auf "Hier Akzeptieren" kannst du die Kommentare anderer User sehen. Um selbst kommentieren zu können, musst du eingeloggt sein.<br><br>Ich willige mit Betätigung der Schaltfläche dazu ein, dass meine Login-Daten, sofern ich eingeloggt bin, und damit personenbezogene Daten an Dritte übermittelt werden. Mehr Informationen hierzu in der <a href="' + (ov.common.isPortalAt ? "/datenschutzhinweis-oesterreich-864956/artikel" : "/datenschutzhinweis-513381/artikel") + '" target="_blank">Datenschutzerklärung</a>.</p><div class="uc-embedding-buttons"><button onclick="uc.ucapi.showInfoModal(\'' + e + '\'); return false;" class="uc-embedding-more-info">Mehr Informationen</button><button onclick="UC_UI.updateChoicesForTcf({vendors: [{id: 280, consent: true, legitimateInterestConsent: true}]},2); return false;" class="uc-embedding-accept">Hier Akzeptieren</button>' : t += '<p class="description-text">Wir verwenden ' + o + ', um Inhalte einzubetten. Dieser Service kann Daten zu deinen Aktivitäten sammeln. Bitte lese die Details durch und stimme der Nutzung des Service zu, um diese Inhalte anzuzeigen.</p><div class="uc-embedding-buttons"><button onclick="uc.ucapi.showInfoModal(\'' + e + "'); return false;\" class=\"uc-embedding-more-info\">Mehr Informationen</button><button onclick=\"uc.ucapi.setConsents([{'templateId':'" + e + "', 'status':true}])\" class=\"uc-embedding-accept\">Akzeptieren</button>", t += "</div></div></div>" }), ov.logger.debug("ov.cmp....");  </script>
+	<script>ov.AppPlatform = "", ov.AppDarkMode = !1, ov.AppTablet = !1, ov.AppComments = !1, ov.AppLocationHash = "", ov.AppHash = "", ov.AppMd5Hash = "", ov.AppGuid = "", ov.WebGuid = "", ov.AppSsoId = "", ov.AppConfigExists = !1, ov.AppConfig = "", ov.getKickerHash = (() => (ov.logger.log("ov.getKickerHash"), window.location.hash && window.location.hash.length > 0 && (window.location.hash.indexOf("iphone") > -1 || window.location.hash.indexOf("android") > -1 || window.location.hash.indexOf("windows") > -1) ? (ov.AppHash = window.location.hash, !0 === ov.checkLocalStorage() && window.sessionStorage.setItem(ov.consts.kickerHashSessionKey, ov.AppHash), ov.AppHash) : (!0 === ov.checkLocalStorage() && (ov.AppHash = window.sessionStorage.getItem(ov.consts.kickerHashSessionKey)), ov.AppHash))), ov.isAppWebview = (() => { if (void 0 !== window.KickerMobile && "function" == typeof window.KickerMobile.getConfig) return ov.logger.log("ov.isAppWebview true per KickerMobile"), !0; const e = ov.AppLocationHash; return e && e.length > 0 ? (ov.logger.log("ov.isAppWebview true per hash"), !0) : (ov.logger.log("ov.isAppWebview false"), !1) }), ov.checkAppWebviewParams = (() => { ov.logger.log("ov.checkAppWebviewParams KickerMobile:" + (void 0 !== window.KickerMobile)), void 0 === window.KickerMobile || "function" != typeof window.KickerMobile.getConfig ? (ov.AppLocationHash = ov.getKickerHash(), ov.AppLocationHash && ov.AppLocationHash.length > 0 ? ov.checkAppWebviewHash() : ov.cmp.init()) : ov.checkAppWebviewConfig() }), ov.checkAppWebviewConfig = (() => { ov.logger.log("ov.checkAppWebviewConfig"), ov.AppConfigExists = !0, ov.WebGuid = window.location.hash.indexOf("withappconfig") > -1 ? "9af0947e-0033-45ba-8d76-da2aca1b72d5" : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, e => (e ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> e / 4).toString(16)), new Promise(e => { e(window.KickerMobile.getConfig(ov.WebGuid)) }).then(e => { const o = ov.AppConfig = JSON.parse(e); void 0 !== o && null != o && (ov.logger.log("ov.checkAppWebviewConfig " + JSON.stringify(o)), ov.AppPlatform = o.platform, ov.AppDarkMode = "1" === o.darkMode, ov.AppTablet = "1" === o.tablet, ov.AppComments = "1" === o.comments, ov.AppSsoId = void 0 !== o.cryptedSsoId ? o.cryptedSsoId : "", ov.AppGuid = void 0 !== o.appGuid ? o.appGuid : "", ov.AppMd5Hash = void 0 !== o.hash ? o.hash : "", ov.setAppWebviewMode()) }).catch(() => { ov.logger.log("ov.checkAppWebviewConfig failed ") }) }), ov.checkAppWebviewHash = (() => { ov.logger.log("ov.checkAppWebviewHash"), ov.AppPlatform = ov.AppHash.indexOf("iphone") > -1 ? "iphone" : ov.AppHash.indexOf("windows") ? "windows" : "android", ov.AppDarkMode = ov.AppHash.indexOf("dark") > -1, ov.AppTablet = !1, ov.AppComments = ov.AppHash.indexOf("comments") > -1, ov.setAppWebviewMode() }), ov.setAppWebviewMode = (() => { ov.logger.log("ov.setAppWebviewMode platform:" + ov.AppPlatform + " darkmode:" + ov.AppDarkMode + " comments:" + ov.AppComments + " ssoid:" + ov.AppSsoId + " tablet:" + ov.AppTablet), "windows" !== ov.AppPlatform && (document.firstElementChild.className += " kick__apps"), ov.AppDarkMode ? (document.firstElementChild.className += " kick__dark", document.getElementsByTagName("head")[0].insertAdjacentHTML("beforeend", '<link rel="stylesheet" href="' + ov.consts.kickerDarkCss + '" />')) : document.firstElementChild.className += " kick__nodark", ov.AppComments && (document.firstElementChild.className += " kick__apps__comments"), ov.cmp.init() }), ov.checkAppWebviewParams(), ov.EVENT_CMP_CONSENT_EXISTS = "OV:CMP_CONSENT_EXISTS", ov.EVENT_CMP_CONSENT_EXISTS_GOOGLE_MAPS = "OV:CMP_CONSENT_EXISTS_GOOGLE_MAPS", ov.EVENT_CMP_CONSENT_EXISTS_QUALIFIO = "OV:CMP_CONSENT_EXISTS_QUALIFIO", ov.EVENT_CMP_CONSENT_EXISTS_OPENWEB = "OV:CMP_CONSENT_EXISTS_OPENWEB", ov.EVENT_CMP_CONSENT_EXISTS_VGWORT = "OV:CMP_CONSENT_EXISTS_VGWORT", ov.EVENT_TRACKING_LOADED = "OV:TRACKING_LOADED", ov.EVENT_VIDEO_CAN_START = "OV:VIDEO_CAN_START", ov.EVENT_AD_STICKY_LOADED = "OV:AD_STICKY_LOADED", ov.registerEvent = ((e, o) => { ov.logger.debug("ov.registerEvent " + e), window.removeEventListener(e, o), window.addEventListener(e, o) }), ov.removeEvent = ((e, o) => { ov.logger.debug("ov.removeEvent " + e), window.removeEventListener(e, o) }), ov.triggerEvent = (e => { "object" == typeof e ? (ov.logger.debug("ov.triggerEvent " + e.type), window.dispatchEvent(e)) : ov.logger.error("ov.triggerEvent event is not an object") }), window.ovCountryLayerTimeout = void 0, ov.appRedirect = { layerVisible: !1, init: function () { this.checkSwitchCountry(), document.addEventListener("DOMContentLoaded", function () { ov.appRedirect.bindEvents(), ov.appRedirect.showCountryBtn() }) }, bindEvents: function () { ov.logger.debug("ov.appRedirect.bindEvents"); let e = document.getElementById("kick__js-country-opener"); e.onclick = function (e) { window.clearTimeout(window.ovCountryLayerTimeout), !1 === ov.appRedirect.layerVisible ? ov.appRedirect.showCountryLayer() : ov.appRedirect.hideCountryLayer(), e.preventDefault() }, e.onmouseout = function () { ov.appRedirect.layerVisible && (window.clearTimeout(window.ovCountryLayerTimeout), window.ovCountryLayerTimeout = window.setTimeout(function () { ov.appRedirect.hideCountryLayer() }, 500)) }; let o = document.getElementById("kick__js-country-at"); o.onclick = function (e) { ov.appRedirect.setPortal("at"), e.preventDefault() }, o.onmouseover = function () { window.clearTimeout(window.ovCountryLayerTimeout) }, o.onmouseout = function () { window.clearTimeout(window.ovCountryLayerTimeout), window.ovCountryLayerTimeout = window.setTimeout(function () { ov.appRedirect.hideCountryLayer() }, 500) }; let t = document.getElementById("kick__js-country-de"); t.onclick = function (e) { ov.appRedirect.setPortal("de"), e.preventDefault() }, t.onmouseover = function () { window.clearTimeout(window.ovCountryLayerTimeout) }, t.onmouseout = function () { window.clearTimeout(window.ovCountryLayerTimeout), window.ovCountryLayerTimeout = window.setTimeout(function () { ov.appRedirect.hideCountryLayer() }, 500) } }, checkSwitchCountry: function () { if (ov.logger.debug("ov.appRedirect.checkSwitchCountry"), -1 === location.hostname.indexOf("kicker.de") && -1 === location.hostname.indexOf("localhost")) return; const e = ov.appRedirect.getCountryFromStorage(); ov.appRedirect.checkCountryObj(e) ? ov.appRedirect.checkRedirect(e) : window.fetch("/kickerapi/country", { method: "GET", headers: { Accept: "application/json", "Content-Type": "application/json" } }).then(e => e.json()).then(e => { ov.appRedirect.setCountryToStorage(e.country), ov.appRedirect.checkRedirect(ov.appRedirect.getCountryFromStorage()) }).catch(e => { ov.logger.error("ov.appRedirect.api call " + e) }) }, checkRedirect: function (e) { ov.logger.debug("ov.appRedirect.checkRedirect"), location.href.indexOf("/kontakt") > -1 || ("ch" === e.country.toLowerCase() && location.hostname.indexOf("kicker.de") > -1 && (location.href = location.href.replace("kicker.de", "kicker.ch")), "at" === e.country.toLowerCase() && location.hostname.indexOf("kicker.de") > -1 && "de" !== e.portal && (-1 === location.hash.indexOf("portalde") ? location.href = location.href.replace("kicker.de", "kicker.at") : ov.appRedirect.setCountryToStorage(e.country, "de"))) }, checkCountryObj: function (e) { if (void 0 === e || null == e) return !1; const o = new Date, t = o.getDate() - 30; return o.setDate(t), o.getTime() < e.t }, getCountryFromStorage: function () { if (!1 === ov.checkLocalStorage()) return null; const e = window.localStorage.getItem("kicker_country"); return void 0 === e || null == e ? null : (void 0 === e.portal && (e.portal = ""), JSON.parse(e)) }, setCountryToStorage: function (e, o) { !1 !== ov.checkLocalStorage() && (o = void 0 === o ? "" : o, window.localStorage.setItem("kicker_country", '{"t": ' + Date.now() + ', "country":"' + e + '", "portal": "' + o + '"}')) }, showCountryLayer: function () { document.getElementById("kick__js-country-layer").style.display = "block", ov.appRedirect.layerVisible = !0, document.getElementById("kick__js-country-opener-icon").className = "kick__icon-DropUp" }, hideCountryLayer: function () { document.getElementById("kick__js-country-layer").style.display = "none", ov.appRedirect.layerVisible = !1, document.getElementById("kick__js-country-opener-icon").className = "kick__icon-DropDown" }, showCountryBtn: function () { const e = ov.appRedirect.getCountryFromStorage(); if (location.hostname.indexOf("kicker.at") > -1 || null !== e && "at" === e.country.toLowerCase()) { let e = document.getElementById("kick__js-country"); if (void 0 === e) return; e.style.display = "inline-block", document.getElementById("kick__js-country-opener-portal").innerHTML = location.hostname.indexOf("kicker.at") > -1 ? ".at" : ".de" } }, setPortal: function (e) { const o = ov.appRedirect.getCountryFromStorage(); null !== o && ov.appRedirect.setCountryToStorage(o.country, e), "at" === e && (location.href = "https://www.kicker.at#portalat"), "de" === e && (location.href = "https://www.kicker.de#portalde") } }, ov.appRedirect.init();  </script>
+	<!-- kicker_meta -->
+	<title>&quot;Feuer frei&quot;: Doppelpacker Müller ist &quot;manchmal dabei, manchmal nicht&quot; - kicker</title>
+	<meta name="Description"
+		content="Auf das gefeierte 1:0 im Rückspiel des Champions-League-Viertelfinals gegen Arsenal ließ der FC Bayern ein souveränes 5:1 bei Union Berlin folgen. Leon Goretzka und Thomas Müller ordneten hinterher ein." />
+	<!-- /kicker_meta -->
+	<meta name="Publisher" content="kicker, Olympia-Verlag GmbH, Nürnberg, Germany" />
+	<meta name="Copyright" content="kicker, Olympia-Verlag GmbH, Nürnberg, Germany" />
+	<meta name="Email" content="info@kicker.de" />
+	<meta name="Date" content="2024-04-20T21:55:00+02:00" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+	<meta name="robots" content="index,follow,max-image-preview:large,max-video-preview:-1" />
+	<meta name="format-detection" content="telephone=no">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="theme-color" content="#CC0000" />
+	<link rel="icon" sizes="48x48" href="https://static.kicker.de/content/img/favicon/appicon48x48.png">
+	<link rel="icon" sizes="192x192" href="https://static.kicker.de/content/img/favicon/appicon192x192.png">
+	<link rel="canonical"
+		href="https://www.kicker.de/feuer-frei-doppelpacker-mueller-ist-manchmal-dabei-manchmal-nicht-1017516/artikel">
+	<link rel="alternate" hreflang="x-default"
+		href="https://www.kicker.de/feuer-frei-doppelpacker-mueller-ist-manchmal-dabei-manchmal-nicht-1017516/artikel">
+	<link rel="alternate" hreflang="de-AT"
+		href="https://www.kicker.at/feuer-frei-doppelpacker-mueller-ist-manchmal-dabei-manchmal-nicht-1017516/artikel">
+	<link rel="alternate" hreflang="de-CH"
+		href="https://www.kicker.ch/feuer-frei-doppelpacker-mueller-ist-manchmal-dabei-manchmal-nicht-1017516/artikel">
+	<meta name="application-name" content="kicker" />
+	<meta name="msapplication-starturl" content="https://www.kicker.de" />
+	<meta name="msapplication-navbutton-color" content="#CC0000" />
+	<meta name="msapplication-TileColor" content="#CC0000" />
+	<meta name="msapplication-TileImage" content="https://static.kicker.de/content/img/favicon/ms-144x144.png" />
+	<meta name="msapplication-square70x70logo" content="https://static.kicker.de/content/img/favicon/ms-70x70.png" />
+	<meta name="msapplication-square150x150logo"
+		content="https://static.kicker.de/content/img/favicon/ms-150x150.png" />
+	<meta name="msapplication-wide310x150logo" content="https://static.kicker.de/content/img/favicon/ms-310x150.png" />
+	<meta name="msapplication-square310x310logo"
+		content="https://static.kicker.de/content/img/favicon/ms-310x310.png" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-title" content="kicker" />
+	<link rel="apple-touch-icon" sizes="57x57"
+		href="https://static.kicker.de/content/img/favicon/apple-touch-icon.png" />
+	<link rel="apple-touch-icon" sizes="72x72"
+		href="https://static.kicker.de/content/img/favicon/apple-touch-icon-72x72.png" />
+	<link rel="apple-touch-icon" sizes="76x76"
+		href="https://static.kicker.de/content/img/favicon/apple-touch-icon-76x76.png" />
+	<link rel="apple-touch-icon" sizes="114x114"
+		href="https://static.kicker.de/content/img/favicon/apple-touch-icon-114x114.png" />
+	<link rel="apple-touch-icon" sizes="120x120"
+		href="https://static.kicker.de/content/img/favicon/apple-touch-icon-120x120.png" />
+	<link rel="apple-touch-icon" sizes="152x152"
+		href="https://static.kicker.de/content/img/favicon/apple-touch-icon-152x152.png" />
+	<link rel="apple-touch-icon" sizes="167x167"
+		href="https://static.kicker.de/content/img/favicon/apple-touch-icon-167x167.png" />
+	<link rel="apple-touch-icon" sizes="180x180"
+		href="https://static.kicker.de/content/img/favicon/apple-touch-icon-180x180.png" />
+	<meta name="google-site-verification" content="6Vu77hBR0JOD2-WoT5wG2ePaRfzne7LD4l4at8DEPe8" />
+	<link rel="alternate" type="application/rss+xml" title="kicker Bundesliga News"
+		href="https://newsfeed.kicker.de/news/bundesliga" />
+	<meta property="article:publisher" content="https://www.facebook.com/kickeronline">
+	<meta property="fb:admins" content="100001673493920" />
+	<meta property="fb:app_id" content="242756395742301" />
+	<meta property="fb:pages" content="140532159333089" /> <!-- kicker_socialmedia -->
+	<meta property="og:title"
+		content="&quot;Feuer frei&quot;: Doppelpacker Müller ist &quot;manchmal dabei, manchmal nicht&quot;"
+		id="kick__metaFacebookTitel" />
+	<meta property="og:image"
+		content="https://derivates.kicker.de/image/upload/c_crop%2Cx_0%2Cy_0%2Cw_4000%2Ch_2250/w_1200%2Cq_auto/v1/2024/04/20/2562a892-0fa1-4d53-adce-feb155cc117e.jpeg"
+		id="kick__metaFacebookImage" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url"
+		content="https://www.kicker.de/feuer-frei-doppelpacker-mueller-ist-manchmal-dabei-manchmal-nicht-1017516/artikel" />
+	<meta property="og:site_name" content="kicker" />
+	<meta property="og:description"
+		content="Auf das gefeierte 1:0 im Rückspiel des Champions-League-Viertelfinals gegen Arsenal ließ der FC Bayern ein souveränes 5:1 bei Union Berlin folgen. Leon Goretzka und Thomas Müller ordneten hinterher ein." />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:url"
+		content="https://www.kicker.de/feuer-frei-doppelpacker-mueller-ist-manchmal-dabei-manchmal-nicht-1017516/artikel" />
+	<meta name="twitter:title"
+		content="&quot;Feuer frei&quot;: Doppelpacker Müller ist &quot;manchmal dabei, manchmal nicht&quot; - Goretzka will &quot;Saison am Leben halten&quot; - Lob für Choupo-Moting" />
+	<meta name="twitter:description"
+		content="Auf das gefeierte 1:0 im Rückspiel des Champions-League-Viertelfinals gegen Arsenal ließ der FC Bayern ein souveränes 5:1 bei Union Berlin folgen. Leon Goretzka und Thomas Müller ordneten hinterher ein." />
+	<meta name="twitter:image:src"
+		content="https://derivates.kicker.de/image/upload/c_crop%2Cx_0%2Cy_0%2Cw_4000%2Ch_2250/w_1200%2Cq_auto/v1/2024/04/20/2562a892-0fa1-4d53-adce-feb155cc117e.jpeg" />
+	<meta property="taboola:sport" content="Fußball" /> <!-- /kicker_socialmedia -->
+	<link rel="preconnect" href="https://static.kicker.de" crossorigin>
+	<link rel="preconnect" href="https://derivates.kicker.de" crossorigin>
+	<link rel="preload"
+		href="https://static.kicker.de/content/fonts/RingsideCondensed/RingsideCondensed-Semibold_Web.woff2" as="font"
+		type="font/woff2" crossorigin>
+	<link rel="preload"
+		href="https://static.kicker.de/content/fonts/RingsideCondensed/RingsideCondensed-Medium_Web.woff2" as="font"
+		type="font/woff2" crossorigin>
+	<link rel="preload"
+		href="https://static.kicker.de/content/fonts/RingsideCompressed/RingsideCompressed-Semibold_Web.woff2" as="font"
+		type="font/woff2" crossorigin>
+	<link rel="preload" href="https://static.kicker.de/content/fonts/RingsideNarrow/RingsideNarrow-Semibold_Web.woff2"
+		as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="https://static.kicker.de/content/fonts/RingsideNarrow/RingsideNarrow-Medium_Web.woff2"
+		as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="https://static.kicker.de/content/fonts/Knockout/Knockout-29_Web.woff2" as="font"
+		type="font/woff2" crossorigin>
+	<link rel="preload" href="https://static.kicker.de/content/fonts/Knockout/Knockout-50_Web.woff2" as="font"
+		type="font/woff2" crossorigin>
+	<link rel="preload" href="https://static.kicker.de/content/fonts/tiempos/TiemposTextWeb-Regular.woff?v2" as="font"
+		type="font/woff2" crossorigin>
+	<link rel="preload" href="https://static.kicker.de/content/fonts/tiempos/TiemposTextWeb-Semibold.woff?v2" as="font"
+		type="font/woff2" crossorigin>
+	<link rel="preload" href="https://static.kicker.de/content/fonts/kick-fo.woff?rv=24.15.8845302" as="font"
+		type="font/woff" crossorigin>
+	<script
+		type="application/ld+json">          {"@context":"http://schema.org", "@type":"NewsArticle", "mainEntityOfPage":{"@type":"WebPage","@id":"https://www.kicker.de/feuer-frei-doppelpacker-mueller-ist-manchmal-dabei-manchmal-nicht-1017516/artikel"}, "headline":"&quot;Feuer frei&quot;: Doppelpacker M&#252;ller ist &quot;manchmal dabei, manchmal nicht&quot;", "datePublished":"2024-04-20T21:55:00+02:00", "dateModified":"2024-04-20T21:55:00+02:00", "author":{"@type": "Organization","name":"kicker"}, "image":["https://derivates.kicker.de/image/upload/c_crop%2Cx_0%2Cy_0%2Cw_4000%2Ch_2250/w_1200%2Cq_auto/v1/2024/04/20/2562a892-0fa1-4d53-adce-feb155cc117e.jpeg"], "publisher":{"@type": "Organization","name":"kicker","logo":{"@type":"ImageObject","url":"https://secure-mediadb.kicker.de/content/img/kicker_amp_logo_v04.png"}}}      </script>
+	<link rel="preload" href="https://data-3cd8fb3825.kicker.de/iomm/latest/manager/base/es6/bundle.js" as="script"
+		id="IOMmBundle">
+	<link rel="preload" href="https://data-3cd8fb3825.kicker.de/iomm/latest/bootstrap/loader.js" as="script">
+	<script type="text/javascript" src="https://data-3cd8fb3825.kicker.de/iomm/latest/bootstrap/loader.js"
+		data-cmp-ab="2"></script>
+	<meta name="color-scheme" content="dark light">
+	<link rel="stylesheet" type="text/css" href="https://static.kicker.de/content/css/main.min.css?rv=24.15.8845302">
+	<link rel="stylesheet" type="text/css"
+		href="https://static.kicker.de/content/css/main-dark.min.css?rv=24.15.8845302"
+		media="(prefers-color-scheme: dark)">
+	<link media="print" rel="stylesheet" type="text/css"
+		href="https://static.kicker.de/content/css/print.min.css?rv=24.15.8845302">
+	<script src="https://static.kicker.de/content/js/vendor/lazysizes-5.0.0.min.js" async></script>
+	<link rel="manifest" href="https://www.kicker.de/manifest.json" crossorigin="use-credentials">
+	<link rel="preconnect" href="//privacy-proxy.usercentrics.eu">
+	<link rel="preload" href="//privacy-proxy.usercentrics.eu/latest/uc-block.bundle.js" as="script">
+	<script type="application/javascript"
+		src="https://privacy-proxy.usercentrics.eu/latest/uc-block.bundle.js"></script>
+	<script>      uc.blockOnly(['S1pcEj_jZX', 'BJTzqNi_i-m', 'FPZz1xJI', 'Z0TcXjY0P', 'BJz7qNsdj-7', 'SyUQ54odobQ', 'XYQZBUojc']);  </script>
+	<script>      //Google Maps, Twitter Plugin, Twitch, TikTok, Youtube Video, Instagram, Facebook Social Plugin      uc.setServiceAlias({ 'S1pcEj_jZX': 'BCRPwvLvQ' });      uc.setServiceAlias({ 'BJTzqNi_i-m': 'cBGu1RvTt' });      uc.setServiceAlias({ 'FPZz1xJI': 'kuoC0lwYN' });      uc.setServiceAlias({ 'Z0TcXjY0P': 'MWMCL2SyC' });      uc.setServiceAlias({ 'BJz7qNsdj-7': 'npXpWrfXe' });      uc.setServiceAlias({ 'SyUQ54odobQ': 'FMA0p-Rae' });      uc.setServiceAlias({ 'XYQZBUojc': 'caGWhvFkc' });  </script>
+	<style scoped>
+		.uc-embedding-container {
+			min-height: 360px;
+		}
+
+		.uc-embedding-container-openweb {
+			min-height: 560px;
+			max-height: 560px;
+		}
+
+		.uc-embedding-wrapper h3 {
+			font-weight: normal
+		}
+
+		.uc-embedding-wrapper .description-text {
+			font-family: 'Ringside Narrow', sans-serif;
+		}
+
+		.uc-embedding-more-info {
+			font-family: 'Ringside Narrow', sans-serif;
+			font-weight: normal;
+		}
+
+		.uc-embedding-accept {
+			font-family: 'Ringside Narrow', sans-serif;
+			background-color: #CC0000;
+			color: white;
+			border-radius: 2px;
+			font-weight: normal;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.uc-embedding-wrapper .description-text {
+				color: #000;
+			}
+
+			.uc-embedding-more-info {
+				color: #000;
+			}
+		}
+	</style>
+	<style>
+		html {
+			font-family: "mobile";
+		}
+
+		body {
+			font-family: "Tiempos", serif;
+		}
+
+		body:after {
+			display: none;
+		}
+
+		@media screen and (max-width: 767px) {
+			html {
+				font-family: "mobile";
+			}
+
+			body:after {
+				content: "mobile";
+			}
+		}
+
+		@media screen and (min-width: 768px) {
+			html {
+				font-family: "tablet";
+			}
+
+			body:after {
+				content: "tablet";
+			}
+		}
+
+		@media screen and (min-width: 1201px) {
+			html {
+				font-family: "desktop";
+			}
+
+			body:after {
+				content: "desktop";
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div class="fancybox-container fancybox-is-open kick__fancybox--small fancybox-can-drag" role="dialog" tabindex="-1"
+		id="kick__js-switchportal-container" style="display: none;">
+		<div class="" id="kick__switchAtDe">
+			<div id="kick__small__alert">
+				<div class="kick__small__alert__box">
+					<div class="kick__small__alert__box__header">
+						<div> <span id="kick__js-switchportal-text"></span> </div> <a href="#"
+							id="kick__js-switchportal-close"><span class="kick__icon-X"></span></a>
+					</div>
+					<div class="kick__small__alert__btn-group"> <a href="#"
+							class="kick__btn kick__btn-light  kick__btn-sm kick__btn-expand"
+							id="kick__js-switchportal-linkde">auf kicker.de bleiben</a> <a href="#"
+							class="kick__btn kick__btn-primary kick__btn-sm kick__btn-expand"
+							id="kick__js-switchportal-linkportal"></a> </div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="fancybox-container kick__modal-fancyb fancybox-is-open kick__pur__layer" role="dialog" tabindex="-1"
+		id="kick__pur__layer" style="display:none">
+		<div class="fancybox-bg"></div>
+		<div class="fancybox-inner">
+			<div class="fancybox-stage">
+				<div class="fancybox-slide fancybox-slide--html fancybox-slide--current fancybox-slide--complete"
+					style="">
+					<div class="fancybox-content" style="overflow: visible;">
+						<div id="kick__logi-container">
+							<div class="kick__login-container__ref-element kick__login-container__ref-element--wide kick__login-container__pur"
+								id="kick__pur" style="display: inline-block;">
+								<div class="kick__info-section-bg"></div>
+								<div class="kick__login-header kick__site-padding">
+									<div>
+										<div class="kick__login-header__logo">
+											<h2 class="kick__site-headline">Wie möchtest du kicker.de nutzen?</h2>
+										</div>
+									</div>
+								</div>
+								<div class="kick__data-grid kick__data-grid--half-r-s kick__login-box">
+									<div class="kick__data-grid__main">
+										<div class="kick__card--full-height kick__card--full-height--first">
+											<h3 class="kick__site-headline kick__site-headline--flow-padding">Weiter mit
+												Werbung und Tracking</h3>
+											<p
+												class="kick__settings__description kick__settings__description--large kick__settings__description--flow-padding">
+												Nutze kicker auf seinen digitalen Plattformen wie gewohnt mit Werbung
+												und Tracking. Die Zustimmung kann jederzeit für die Zukunft widerrufen
+												werden. Details zu Werbe- und Analyse-Trackern findest du in unserer <a
+													href="/datenschutzhinweis-513381/artikel">Datenschutzerklärung</a>
+												oder bei <a href="#"
+													onclick="UC_UI.showSecondLayer();return false;">Cookies &amp;
+													Tracking</a> am Ende jeder Seite.</p> <a href="/"
+												onclick="ov.cmp.acceptAllConsents()"
+												class="kick__btn kick__btn-primary kick__btn-block kick__module-margin">Zustimmen
+												& weiter</a>
+										</div>
+									</div>
+									<div class="kick__data-grid__main">
+										<div class="kick__card--full-height">
+											<h3 class="kick__site-headline kick__site-headline--flow-padding">… oder
+												"kicker PUR-Abo - werbefrei lesen" abschließen</h3>
+											<p
+												class="kick__settings__description kick__settings__description--large kick__settings__description--flow-padding">
+												Mit dem PUR-Abo nutzt du kicker auf seinen digitalen Plattformen ohne
+												Werbetracking und praktisch werbefrei.</p>
+											<p
+												class="kick__settings__description kick__settings__description--large kick__settings__description--flow-padding">
+												Nur 2,49 EUR im Monat</p> <a id="kick__js-pur-btn"
+												href="/meinkicker/mein-abonnement"
+												class="kick__btn kick__btn-primary kick__btn-block kick__module-margin">PUR-Abo
+												kaufen</a>
+											<p id="kick__js-pur-login"
+												class="kick__settings__description kick__login-text kick__login-text--gray kick__settings__description--flow-padding">
+												Bereits PUR-Abonnent? <a href="/meinkicker/login"
+													id="kick__js-pur-loginbtn">Hier anmelden</a>. </p>
+											<p
+												class="kick__settings__description kick__login-text kick__login-text--gray">
+												Alle Antworten zum PUR-Abo findest du <a
+													href="/das-kicker-pur-abo-werbefrei-lesen-918147/artikel">hier</a>.
+											</p>
+										</div>
+									</div>
+								</div>
+								<div
+									class="kick__data-grid kick__data-grid--half-r-s kick__login-box kick__login-box-detailspur">
+									<div>
+										<h3 class="kick__site-headline kick__site-headline--flow-padding">Weitere
+											Informationen</h3>
+										<p
+											class="kick__settings__description kick__settings__description--flow-padding">
+											Werbung und Tracking: Um dir relevante Inhalte und personalisierte Werbung
+											anzubieten, setzen wir Cookies und andere Technologien ein. Damit messen
+											wir, wie und womit du unsere Angebote nutzt. Diese Daten geben wir auch an
+											Dritte weiter. Die Anzahl unserer Partner beträgt aktuell <span
+												id="vendor-count">0</span>. Wir greifen dabei auf dein Endgerät zu,
+											speichern Cookies oder sonstige Informationen und wir oder Dritte können mit
+											diesen sowie mit persönlichen Identifikatoren (z.B. Geräte-Kennungen oder
+											IP-Adressen) und basierend auf deinem individuellen Nutzungsverhalten ...
+										</p>
+										<ul class="kick__login-list">
+											<li onclick="$j('#kick__js-cmp-1').toggle()"> &nbsp;...Informationen auf
+												einem Gerät speichern und/oder abrufen <span id="kick__js-cmp-1"
+													style="display: none;">Für die dir angezeigten Verarbeitungszwecke
+													können Cookies, Geräte-Kennungen oder andere Informationen auf
+													deinem Gerät gespeichert oder abgerufen werden.</span> </li>
+											<li onclick="$j('#kick__js-cmp-2').toggle()"> &nbsp;...Externe Inhalte
+												einbinden <span id="kick__js-cmp-2" style="display: none;">Cookies
+													helfen dabei, Inhalte von sozialen Netzwerken und eingebetteten
+													Inhalte von Drittanbietern anzuzeigen.</span> </li>
+											<li onclick="$j('#kick__js-cmp-3').toggle()"> &nbsp;...Genaue Standortdaten
+												und Geräteeigenschaften zur Identifikation abfragen <span
+													id="kick__js-cmp-3" style="display: none;">Es können genaue
+													Standortdaten und Informationen über Gerätemerkmale verwendet
+													werden.</span> </li>
+											<li onclick="$j('#kick__js-cmp-4').toggle()"> &nbsp;...Personalisierte
+												Inhalte, Inhaltemessung, Erkenntnisse über Zielgruppen und
+												Produktentwicklung ausspielen <span id="kick__js-cmp-4"
+													style="display: none;">Inhalte können basierend auf einem Profil
+													personalisiert werden. Es können Daten hinzugefügt werden, um
+													Inhalte besser zu personalisieren. Die Leistung von Inhalten kann
+													gemessen werden. Erkenntnisse über Zielgruppen, die die Anzeigen und
+													Inhalte gesehen haben, können abgeleitet werden. Daten können
+													verwendet werden, um die Benutzerfreundlichkeit zu verbessern und
+													Systeme und Software zu entwickeln.</span> </li>
+											<li onclick="$j('#kick__js-cmp-5').toggle()"> &nbsp;...Personalisierte
+												Anzeigen und Anzeigenmessung ausspielen <span id="kick__js-cmp-5"
+													style="display: none;">Anzeigen können basierend auf einem Profil
+													personalisiert werden. Es können mehr Daten hinzugefügt werden, um
+													Anzeigen besser zu personalisieren. Die Anzeigen-Leistung kann
+													gemessen werden.</span> </li>
+										</ul>
+										<p class="kick__settings__description">Hinweis zur Datenübermittlung außerhalb
+											der EU: Je nach Einzelfall werden Daten außerhalb der Europäischen Union im
+											Rahmen der Inanspruchnahme von Diensten Dritter verarbeitet . Dies findet
+											nur statt, wenn die besonderen Voraussetzungen der Art. 44 ff. DSGVO erfüllt
+											sind.</p>
+									</div>
+								</div>
+								<div class="kick__data-grid kick__data-grid--half-r-s kick__login-box">
+									<ul class="kick__site-padding kick__login-footer">
+										<li><a href="/datenschutzhinweis-513381/artikel">Datenschutz</a></li>
+										<li><a href="/nutzungsbedingungen-350282/artikel">Nutzungsbedingungen</a></li>
+										<li><a href="/agb-pur-abo-918509/artikel">AGB</a></li>
+										<li><a href="/impressum-316443/artikel">Impressum</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script
+		type='text/javascript'>      if (typeof IOMm !== "undefined") { var INFOnline_data = { st: iomSt, cp: '3100', co: 'fu_bl', sv: iomSv, sc: 'yes' }; if (typeof window.KickerMobile !== 'undefined' && typeof window.KickerMobile.trackIvw === 'function') { window.KickerMobile.trackIvw('3100,fu_bl', ''); } else { var iomDomain = window.innerWidth < 768 ? 'data-3cd8fb3825.kicker.de' : 'data-e69b3d32a9.kicker.de'; var iomSt = window.innerWidth < 768 ? 'mobkicke' : 'kicker'; var iomSv = 'ke'; IOMm('configure', { st: iomSt, dn: iomDomain, mh: 5 }); IOMm('pageview', INFOnline_data); IOMm('3p', 'qds', iomSv); } } else { console.error("OV: IOMm is not defined"); }  </script>
+	<div class="kick__ad-pos_wrapper" data-pagetype="article" data-pos="wallpaper">
+		<div id="kick__ad-wallpaper_desktop" data-device="desktop"></div>
+	</div>
+	<div id="kick__page-container">
+		<header class="kick__page-container" id="kick__global_nav">
+			<div class="kick__sticky_wrap kick__page-container">
+				<div class="kick__main-area-holder kick__js-main-head-area">
+					<nav class="kick__main-head">
+						<div class="kick__header-logo "> <a class="kick__header-logo__img" href="/"
+								title="Startseite kicker"><img
+									src="https://derivates.kicker.de/image/fetch/q_auto:best/https://mediadb.kicker.de/content/img/kicker-logo.svg"
+									alt="kicker"></a>
+							<div class="kick__header-country" id="kick__js-country" style="display:none"> <a href="#"
+									id="kick__js-country-opener"><span id="kick__js-country-opener-portal"></span> <span
+										id="kick__js-country-opener-icon" class="kick__icon-DropDown"></span></a>
+								<div class="kick__header-country__layer" id="kick__js-country-layer"> <a href="#"
+										id="kick__js-country-at"><img
+											src="https://derivates.kicker.de/image/fetch/f_webp%2Cw_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2017/fussball/vereine/xxl/927_20161031105951840.png"
+											alt=".at" /> AT</a> <a href="#" id="kick__js-country-de"><img
+											src="https://derivates.kicker.de/image/fetch/f_webp%2Cw_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2017/fussball/vereine/xxl/940_2016103110595835.png"
+											alt=".de" /> DE</a> </div>
+							</div>
+						</div>
+						<div class="kick__navi-actions"> <a class="kick__js-main-head-mobile-navbar-dropdown-button"
+								href="/"><img
+									src="https://derivates.kicker.de/image/fetch/q_auto:best/https://mediadb.kicker.de/content/img/navi-menu-icon.svg"
+									alt=""></a> </div>
+						<ul class="kick__navbar-main">
+							<li> <a class="kick__navbar-main__text-link kick__navbar-main__text-link--active" href="/">
+									<span class="kick__icon-News_solo"></span> <span
+										class="kick__navbar-link-item__title">News</span> </a> </li>
+							<li> <a class="kick__navbar-main__text-link " href="/fussball/heute-live"> <span
+										class="kick__icon-Live_solo"></span> <span
+										class="kick__navbar-link-item__title">Live</span> </a> </li>
+							<li> <a class="kick__navbar-main__text-link " href="/kicker-tv/videos"> <span
+										class="kick__icon-Kicker_TV"></span> <span
+										class="kick__navbar-link-item__title">kicker.tv</span> </a> </li>
+							<li> <a class="kick__navbar-main__text-link " href="/0/podcaststartseite"> <span
+										class="kick__icon-Podcast"></span> <span
+										class="kick__navbar-link-item__title">Podcasts</span> </a> </li>
+							<li> <a class="kick__navbar-main__text-link " href="/games/startseite"> <span
+										class="kick__icon-Games"></span> <span
+										class="kick__navbar-link-item__title">Games</span> </a> </li>
+							<li> <a class="kick__navbar-main__text-link "
+									href="https://shop.kicker.de/?utm_source=Kicker.de&amp;utm_campaign=navi&amp;utm_medium=shophub&amp;utm_content=navi"
+									target="_blank"> <span class="kick__icon-Shop"></span> <span
+										class="kick__navbar-link-item__title">Shop</span> </a> </li>
+							<li> <a class="kick__navbar-main__text-link "
+									href="https://leserservice.kicker.de/?onwewe=0602&amp;utm_campaign=kickerde-navi&amp;utm_term=kicker-abo-angebote"
+									target="_blank"> <span class="kick__icon-Abo"></span> <span
+										class="kick__navbar-link-item__title">Abo</span> </a> </li>
+							<li> <a class="kick__btn kick__btn-dark kick__navbar-main__login-area kick__js-open-login-overlay"
+									href="/meinkicker/login" data-ref-element="login">
+									<div class="kick__navbar-main__login-logo"> <img id="kick__userloggedIn"
+											src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+											alt="Profil" style="display: none;" /> <img id="kick__userloggedOut"
+											src="https://derivates.kicker.de/image/fetch/q_auto:best/https://mediadb.kicker.de/content/img/user.png"
+											alt="Login" /> </div> <span id="kick__userLogin-title">Anmelden</span>
+								</a> </li>
+						</ul>
+						<div class="kick__search-bg-fade"></div>
+					</nav>
+					<ul class="kick__navbar-sports kick__js-navbar-size-check">
+						<li
+							class="kick__navbar-sports__item kick__js-navbar-size-check__item kick__navbar-sports__item--active">
+							<a class="kick__js-navi-selectable-item kick__js-navbar-sub-expandable-trigger" href="#"
+								data-ref-element="navbar-sub-fussball-multi-list">Fussball</a> </li>
+						<li class="kick__navbar-sports__item kick__js-navbar-size-check__item "> <a
+								class="kick__js-navi-selectable-item" href="/handball/startseite">Handball</a> </li>
+						<li class="kick__navbar-sports__item kick__js-navbar-size-check__item "> <a
+								class="kick__js-navi-selectable-item" href="/eishockey/startseite">Eishockey</a> </li>
+						<li class="kick__navbar-sports__item kick__js-navbar-size-check__item "> <a
+								class="kick__js-navi-selectable-item" href="/basketball/startseite">Basketball</a> </li>
+						<li class="kick__navbar-sports__item kick__js-navbar-size-check__item "> <a
+								class="kick__js-navi-selectable-item" href="/motorsport/startseite">Motorsport</a> </li>
+						<li class="kick__navbar-sports__item kick__js-navbar-size-check__item "> <a
+								class="kick__js-navi-selectable-item" href="/tennis/startseite">Tennis</a> </li>
+						<li class="kick__navbar-sports__item kick__js-navbar-size-check__item "> <a
+								class="kick__js-navi-selectable-item" href="/wintersport/startseite">Wintersport</a>
+						</li>
+						<li class="kick__navbar-sports__item kick__js-navbar-size-check__item "> <a
+								class="kick__js-navi-selectable-item" href="/olympia/startseite">Olympia</a> </li>
+						<li class="kick__navbar-sports__item kick__js-navbar-size-check__item "> <a
+								class="kick__js-navi-selectable-item" href="/football/startseite">Football</a> </li>
+						<li class="kick__navbar-sports__item kick__js-navbar-size-check__item "> <a
+								class="kick__js-navi-selectable-item" href="/radsport/startseite">Rad</a> </li>
+						<li class="kick__navbar-sports__item kick__js-navbar-size-check__item "> <a
+								class="kick__js-navi-selectable-item" href="/esport/startseite">eSport</a> </li>
+						<li class="kick__navbar-sports__item kick__js-navbar-size-check__item "> <a
+								class="kick__js-navi-selectable-item" href="/mehr-sport/startseite">Mehr Sport</a> </li>
+						<li class="kick__navbar-sports__item kick__navbar-sports__item--button-holder"> <a
+								class="kick__js-navi-selectable-item kick__navbar-dropdown-button kick__js-navbar-dropdown-button"
+								href="#"><span class="kick__icon-DropDown"></span></a>
+							<ul class="kick__navbar-dropdown kick__js-navbar-dropdown kick__is--hide"></ul>
+						</li>
+					</ul>
+				</div>
+				<nav class="kick__mobile-navbar-main kick__is--hide" id="kick__main-head-mobile-navbar-dropdown">
+					<div class="kick__mobile-navbar-main__holder">
+						<ul class="kick__mobile-navbar-main__list kick__mobile-navbar-main__list--no-top-border">
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/fussball/heute-live"> <span
+										class="kick__navbar-link-item__icon kick__icon-Live_solo"></span> <span
+										class="kick__navbar-link-item__title">Live</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/kicker-tv/videos"> <span
+										class="kick__navbar-link-item__icon kick__icon-Kicker_TV"></span> <span
+										class="kick__navbar-link-item__title">kicker.tv</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/0/podcaststartseite"> <span
+										class="kick__navbar-link-item__icon kick__icon-Podcast"></span> <span
+										class="kick__navbar-link-item__title">Podcasts</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="https://shop.kicker.de/?utm_source=Kicker.de&amp;utm_campaign=navi&amp;utm_medium=shophub&amp;utm_content=navi">
+									<span class="kick__navbar-link-item__icon kick__icon-Shop"></span> <span
+										class="kick__navbar-link-item__title">Shop</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/fussball/transfermarkt"> <span
+										class="kick__navbar-link-item__icon kick__icon-Wechsel01"></span> <span
+										class="kick__navbar-link-item__title">Transferticker</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									id="kick__userMobileLogin" href="/meinkicker/login"> <span
+										class="kick__navbar-link-item__icon kick__icon-Person"></span> <span
+										class="kick__navbar-link-item__title">mein kicker</span> </a> </li>
+						</ul>
+						<div class="kick__mobile-navbar-main__header">Fußball</div>
+						<ul class="kick__mobile-navbar-main__list">
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/bundesliga/startseite"> <span
+										class="kick__navbar-link-item__icon kick__icon-Bundesliga"></span> <span
+										class="kick__navbar-link-item__title">Bundesliga</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/2-bundesliga/startseite"> <span
+										class="kick__navbar-link-item__icon kick__icon-Zweite_Bundesliga"></span> <span
+										class="kick__navbar-link-item__title">2. Bundesliga</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/3-liga/startseite"> <span
+										class="kick__navbar-link-item__icon kick__icon-Dritte_Bundesliga"></span> <span
+										class="kick__navbar-link-item__title">3. Liga</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/regionalliga/startseite"> <span
+										class="kick__navbar-link-item__icon kick__icon-Regionalliga"></span> <span
+										class="kick__navbar-link-item__title">Regionalliga</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/amateure/startseite"> <span
+										class="kick__navbar-link-item__icon kick__icon-Amateure"></span> <span
+										class="kick__navbar-link-item__title">Amateure</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/dfb-pokal/startseite"> <span
+										class="kick__navbar-link-item__icon kick__icon-Navigation_DFB"></span> <span
+										class="kick__navbar-link-item__title">DFB-Pokal</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/internationaler-fussball/startseite"> <span
+										class="kick__navbar-link-item__icon kick__icon-International"></span> <span
+										class="kick__navbar-link-item__title">Int. Fu&#223;ball</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/champions-league/startseite"> <span
+										class="kick__navbar-link-item__icon kick__icon-Championsleague"></span> <span
+										class="kick__navbar-link-item__title">Champions League</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/europa-league/startseite"> <span
+										class="kick__navbar-link-item__icon kick__icon-Navigation_EL"></span> <span
+										class="kick__navbar-link-item__title">Europa League</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/europa-conference-league/startseite"> <span
+										class="kick__navbar-link-item__icon kick__icon-Navigation_Conferenceleague"></span>
+									<span class="kick__navbar-link-item__title">Conference League</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/nationalmannschaft/startseite"> <span
+										class="kick__navbar-link-item__icon kick__icon-Nationalelf"></span> <span
+										class="kick__navbar-link-item__title">Nationalelf</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/wm/startseite"> <span
+										class="kick__navbar-link-item__icon kick__icon-WM_Pokal"></span> <span
+										class="kick__navbar-link-item__title">WM</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/em/startseite"> <span
+										class="kick__navbar-link-item__icon kick__icon-Navigation_EM"></span> <span
+										class="kick__navbar-link-item__title">EM</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/nations-league/startseite"> <span
+										class="kick__navbar-link-item__icon kick__icon-Navigation_Nationsleague"></span>
+									<span class="kick__navbar-link-item__title">Nations League</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/frauen/startseite"> <span
+										class="kick__navbar-link-item__icon kick__icon-Navigation_Frauen"></span> <span
+										class="kick__navbar-link-item__title">Frauen</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/junioren/startseite"> <span
+										class="kick__navbar-link-item__icon kick__icon-Junioren"></span> <span
+										class="kick__navbar-link-item__title">Junioren</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/business/startseite"> <span
+										class="kick__navbar-link-item__icon kick__icon-Servicewelt"></span> <span
+										class="kick__navbar-link-item__title">Business</span> </a> </li>
+						</ul>
+						<div class="kick__mobile-navbar-main__header">weiterer Sport</div>
+						<ul class="kick__mobile-navbar-main__list">
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/handball/startseite" data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Handball"></span> <span
+										class="kick__navbar-link-item__title">Handball</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/eishockey/startseite" data-ref-element="navbar-sub-fussball-multi-list">
+									<span class="kick__navbar-link-item__icon kick__icon-Eishockey"></span> <span
+										class="kick__navbar-link-item__title">Eishockey</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/basketball/startseite" data-ref-element="navbar-sub-fussball-multi-list">
+									<span class="kick__navbar-link-item__icon kick__icon-Basketball"></span> <span
+										class="kick__navbar-link-item__title">Basketball</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/motorsport/startseite" data-ref-element="navbar-sub-fussball-multi-list">
+									<span class="kick__navbar-link-item__icon kick__icon-F1"></span> <span
+										class="kick__navbar-link-item__title">Motorsport</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/tennis/startseite" data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Tennis"></span> <span
+										class="kick__navbar-link-item__title">Tennis</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/wintersport/startseite" data-ref-element="navbar-sub-fussball-multi-list">
+									<span class="kick__navbar-link-item__icon kick__icon-Wintersport"></span> <span
+										class="kick__navbar-link-item__title">Wintersport</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/olympia/startseite" data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Olympia"></span> <span
+										class="kick__navbar-link-item__title">Olympia</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/football/startseite" data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-NFL"></span> <span
+										class="kick__navbar-link-item__title">Football</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/radsport/startseite" data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Rad"></span> <span
+										class="kick__navbar-link-item__title">Rad</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/mehr-sport/startseite" data-ref-element="navbar-sub-fussball-multi-list">
+									<span class="kick__navbar-link-item__icon kick__icon-Mehr_Sport"></span> <span
+										class="kick__navbar-link-item__title">Mehr Sport</span> </a> </li>
+						</ul>
+						<div class="kick__mobile-navbar-main__header">eSport</div>
+						<ul class="kick__mobile-navbar-main__list">
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/esport/startseite" data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Esports"></span> <span
+										class="kick__navbar-link-item__title">Startseite</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/ea-sports-fc/startseite" data-ref-element="navbar-sub-fussball-multi-list">
+									<span class="kick__navbar-link-item__icon kick__icon-EA_Sports_FC"></span> <span
+										class="kick__navbar-link-item__title">EA SPORTS FC 24</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/fifa/startseite" data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Fifa"></span> <span
+										class="kick__navbar-link-item__title">FIFA</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/esport/wettbewerbe" data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-eSport_Wettbewerbe"></span> <span
+										class="kick__navbar-link-item__title">Wettbewerbe</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/efootball/startseite" data-ref-element="navbar-sub-fussball-multi-list">
+									<span class="kick__navbar-link-item__icon kick__icon-eFootball"></span> <span
+										class="kick__navbar-link-item__title">eFootball</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/sport-games/startseite" data-ref-element="navbar-sub-fussball-multi-list">
+									<span class="kick__navbar-link-item__icon kick__icon-Sport_Games"></span> <span
+										class="kick__navbar-link-item__title">Sport Games</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/mehr-esport/startseite" data-ref-element="navbar-sub-fussball-multi-list">
+									<span class="kick__navbar-link-item__icon kick__icon-Mehr_eSport"></span> <span
+										class="kick__navbar-link-item__title">Mehr eSport</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/kicker-esport/videos" data-ref-element="navbar-sub-fussball-multi-list">
+									<span class="kick__navbar-link-item__icon kick__icon-Kicker_TV"></span> <span
+										class="kick__navbar-link-item__title">Videos</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="javascript:window.open(&#39;https://www.earlygame.com/de/&#39;,&#39;_blank&#39;);"
+									data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Earlygame"></span> <span
+										class="kick__navbar-link-item__title">Early Game</span> </a> </li>
+						</ul>
+						<div class="kick__mobile-navbar-main__header">Games</div>
+						<ul class="kick__mobile-navbar-main__list">
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/games/startseite" data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Games"></span> <span
+										class="kick__navbar-link-item__title">Startseite</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/managerspiel/classic" data-ref-element="navbar-sub-fussball-multi-list">
+									<span class="kick__navbar-link-item__icon kick__icon-Managerspiel"></span> <span
+										class="kick__navbar-link-item__title">Managerspiel Classic</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/managerspiel/interactive" data-ref-element="navbar-sub-fussball-multi-list">
+									<span class="kick__navbar-link-item__icon kick__icon-Managerspiel"></span> <span
+										class="kick__navbar-link-item__title">Managerspiel Interactive</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/tippspiel" data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Tippspiel_DICK"></span> <span
+										class="kick__navbar-link-item__title">Tippspiel</span> </a> </li>
+						</ul>
+						<div class="kick__mobile-navbar-main__header">Mehr kicker</div>
+						<ul class="kick__mobile-navbar-main__list">
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/auto/startseite" data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Autosport"></span> <span
+										class="kick__navbar-link-item__title">Auto &amp; Mobilit&#228;t</span> </a>
+							</li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/kids/startseite" data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Kids"></span> <span
+										class="kick__navbar-link-item__title">kicker Kids</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/live/tvprogramm" data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Kalender"></span> <span
+										class="kick__navbar-link-item__title">TV-Programm</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="https://secure-mediadb.kicker.de/apps/index.html"
+									data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Apps"></span> <span
+										class="kick__navbar-link-item__title">Apps</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="https://kicker.mindline-analytics.de/index.php?program=Trendmonitor&amp;controller=Webview&amp;action=index&amp;token"
+									data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Trendmonitor_Logo"></span> <span
+										class="kick__navbar-link-item__title">TrendMonitor</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/deutsche-akademie-fuer-fussball-kultur/startseite"
+									data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Kultur"></span> <span
+										class="kick__navbar-link-item__title">Fu&#223;ball-Kultur</span> </a> </li>
+						</ul>
+						<div class="kick__mobile-navbar-main__header">Social Media</div>
+						<ul class="kick__mobile-navbar-main__list">
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="https://instagram.com/kicker"
+									data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Instagram"></span> <span
+										class="kick__navbar-link-item__title">Instagram</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="https://www.facebook.com/kickeronline"
+									data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Facebook"></span> <span
+										class="kick__navbar-link-item__title">Facebook</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="https://whatsapp.com/channel/0029VaC7QTC4SpkNv1YHk50g"
+									data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Whats_app02"></span> <span
+										class="kick__navbar-link-item__title">WhatsApp</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="https://www.threads.net/@kicker"
+									data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Threads"></span> <span
+										class="kick__navbar-link-item__title">Threads</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/kicker-bei-twitter-507014/artikel"
+									data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-xTwitter"></span> <span
+										class="kick__navbar-link-item__title">X / Twitter</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="https://www.youtube.com/user/kickertv"
+									data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Youtube02_solo"></span> <span
+										class="kick__navbar-link-item__title">YouTube</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="https://www.tiktok.com/@kicker"
+									data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Tiktok"></span> <span
+										class="kick__navbar-link-item__title">TikTok</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="https://story.snapchat.com/p/463b39f6-3042-4b5b-9b64-54fd2b0a6a49"
+									data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Snapchat"></span> <span
+										class="kick__navbar-link-item__title">Snapchat</span> </a> </li>
+						</ul>
+						<div class="kick__mobile-navbar-main__header">Sonstiges</div>
+						<ul class="kick__mobile-navbar-main__list">
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/impressum-316443/artikel" data-ref-element="navbar-sub-fussball-multi-list">
+									<span class="kick__navbar-link-item__icon kick__icon-Impressum"></span> <span
+										class="kick__navbar-link-item__title">Impressum</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/datenschutzhinweis-513381/artikel"
+									data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Datenschutz"></span> <span
+										class="kick__navbar-link-item__title">Datenschutz</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item" href="#"
+									onclick="ov.navi.hideMainHeadMobileNavibarDropdown();UC_UI.showSecondLayer();return false;"
+									data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Cookies_und_Tracking"></span>
+									<span class="kick__navbar-link-item__title">Cookies &amp; Tracking</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/kontakt" data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Feedback"></span> <span
+										class="kick__navbar-link-item__title">Feedback</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/nutzungsbedingungen-350282/artikel"
+									data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Nutzungsbedingungen"></span>
+									<span class="kick__navbar-link-item__title">Nutzungsbedingungen</span> </a> </li>
+							<li class="kick__mobile-navbar-main__item"> <a class="kick__navbar-link-item"
+									href="/mediadaten-2023-864578/artikel"
+									data-ref-element="navbar-sub-fussball-multi-list"> <span
+										class="kick__navbar-link-item__icon kick__icon-Mediadaten"></span> <span
+										class="kick__navbar-link-item__title">Mediadaten</span> </a> </li>
+						</ul>
+					</div>
+				</nav>
+				<nav class="kick__navbar-sub kick__navbar-sub--multi-list kick__navi-space--fussball kick__js-navbar-sub-expandable-item kick__is--hide"
+					id="kick__navbar-sub-fussball-multi-list">
+					<div class="kick__navbar-sub--multi-list__item">
+						<ul>
+							<li class="kick__navbar-sub__item"><a class="kick__navbar-sub__item__icon-link"
+									href="/bundesliga/startseite"><span
+										class="kick__navbar-sub__icon kick__icon-Bundesliga"></span>Bundesliga</a></li>
+							<li class="kick__navbar-sub__item"><a class="kick__navbar-sub__item__icon-link"
+									href="/2-bundesliga/startseite"><span
+										class="kick__navbar-sub__icon kick__icon-Zweite_Bundesliga"></span>2.
+									Bundesliga</a></li>
+							<li class="kick__navbar-sub__item"><a class="kick__navbar-sub__item__icon-link"
+									href="/3-liga/startseite"><span
+										class="kick__navbar-sub__icon kick__icon-Dritte_Bundesliga"></span>3. Liga</a>
+							</li>
+							<li class="kick__navbar-sub__item"><a class="kick__navbar-sub__item__icon-link"
+									href="/regionalliga/startseite"><span
+										class="kick__navbar-sub__icon kick__icon-Regionalliga"></span>Regionalliga</a>
+							</li>
+							<li class="kick__navbar-sub__item"><a class="kick__navbar-sub__item__icon-link"
+									href="/amateure/startseite"><span
+										class="kick__navbar-sub__icon kick__icon-Amateure"></span>Amateure</a></li>
+							<li class="kick__navbar-sub__item"><a class="kick__navbar-sub__item__icon-link"
+									href="/dfb-pokal/startseite"><span
+										class="kick__navbar-sub__icon kick__icon-Navigation_DFB"></span>DFB-Pokal</a>
+							</li>
+						</ul>
+					</div>
+					<div class="kick__navbar-sub--multi-list__item">
+						<ul>
+							<li class="kick__navbar-sub__item"><a class="kick__navbar-sub__item__icon-link"
+									href="/internationaler-fussball/startseite"><span
+										class="kick__navbar-sub__icon kick__icon-International"></span>Int.
+									Fu&#223;ball</a></li>
+							<li class="kick__navbar-sub__item"><a class="kick__navbar-sub__item__icon-link"
+									href="/champions-league/startseite"><span
+										class="kick__navbar-sub__icon kick__icon-Championsleague"></span>Champions
+									League</a></li>
+							<li class="kick__navbar-sub__item"><a class="kick__navbar-sub__item__icon-link"
+									href="/europa-league/startseite"><span
+										class="kick__navbar-sub__icon kick__icon-Navigation_EL"></span>Europa League</a>
+							</li>
+							<li class="kick__navbar-sub__item"><a class="kick__navbar-sub__item__icon-link"
+									href="/europa-conference-league/startseite"><span
+										class="kick__navbar-sub__icon kick__icon-Navigation_Conferenceleague"></span>Conference
+									League</a></li>
+							<li class="kick__navbar-sub__item"><a class="kick__navbar-sub__item__icon-link"
+									href="/nationalmannschaft/startseite"><span
+										class="kick__navbar-sub__icon kick__icon-Nationalelf"></span>Nationalelf</a>
+							</li>
+							<li class="kick__navbar-sub__item"><a class="kick__navbar-sub__item__icon-link"
+									href="/wm/startseite"><span
+										class="kick__navbar-sub__icon kick__icon-WM_Pokal"></span>WM</a></li>
+						</ul>
+					</div>
+					<div class="kick__navbar-sub--multi-list__item">
+						<ul>
+							<li class="kick__navbar-sub__item"><a class="kick__navbar-sub__item__icon-link"
+									href="/em/startseite"><span
+										class="kick__navbar-sub__icon kick__icon-Navigation_EM"></span>EM</a></li>
+							<li class="kick__navbar-sub__item"><a class="kick__navbar-sub__item__icon-link"
+									href="/nations-league/startseite"><span
+										class="kick__navbar-sub__icon kick__icon-Navigation_Nationsleague"></span>Nations
+									League</a></li>
+							<li class="kick__navbar-sub__item"><a class="kick__navbar-sub__item__icon-link"
+									href="/frauen/startseite"><span
+										class="kick__navbar-sub__icon kick__icon-Navigation_Frauen"></span>Frauen</a>
+							</li>
+							<li class="kick__navbar-sub__item"><a class="kick__navbar-sub__item__icon-link"
+									href="/junioren/startseite"><span
+										class="kick__navbar-sub__icon kick__icon-Junioren"></span>Junioren</a></li>
+							<li class="kick__navbar-sub__item"><a class="kick__navbar-sub__item__icon-link"
+									href="/kids/startseite"><span
+										class="kick__navbar-sub__icon kick__icon-Kids"></span>kicker Kids</a></li>
+							<li class="kick__navbar-sub__item"><a class="kick__navbar-sub__item__icon-link"
+									href="/business/startseite"><span
+										class="kick__navbar-sub__icon kick__icon-Servicewelt"></span>Business</a></li>
+						</ul>
+					</div>
+				</nav>
+				<nav class="kick__sub-head" id="kick__sub-head-primary">
+					<h4 class="kick__navbar-breadcrumb"> <a class="" href="/bundesliga/startseite">Bundesliga</a> </h4>
+					<div class="kick__navbar-sub-idicator"> <a class="kick__js-sub-head-mobile-navbar-dropdown-button"
+							href="/bundesliga/startseite"> Startseite<span class="kick__icon-DropDown"></span> <span
+								class="kick__icon-DropUp"></span> </a> </div>
+					<ul class="kick__navbar-sub kick__js-navbar-size-check" id="kick__sub-head-mobile-navbar-dropdown">
+						<li
+							class="kick__navbar-sub__item kick__js-navbar-size-check__item kick__navbar-sub__item--active">
+							<a href="/bundesliga/startseite">Startseite</a> </li>
+						<li class="kick__navbar-sub__item kick__js-navbar-size-check__item "> <a
+								href="/bundesliga/spieltag">Spieltag</a> </li>
+						<li class="kick__navbar-sub__item kick__js-navbar-size-check__item "> <a
+								href="/bundesliga/tabelle">Tabelle</a> </li>
+						<li class="kick__navbar-sub__item kick__js-navbar-size-check__item "> <a
+								href="/bundesliga/tabellenrechner">Tabellenrechner</a> </li>
+						<li class="kick__navbar-sub__item kick__js-navbar-size-check__item "> <a
+								href="/bundesliga/transfermarkt">Transfers</a> </li>
+						<li class="kick__navbar-sub__item kick__js-navbar-size-check__item "> <a
+								href="/bundesliga-relegation/spieltag">Relegation</a> </li>
+						<li class="kick__navbar-sub__item kick__js-navbar-size-check__item "> <a
+								href="/bundesliga-rangliste/startseite">Rangliste</a> </li>
+						<li class="kick__navbar-sub__item kick__js-navbar-size-check__item "> <a
+								href="/bundesliga/statistiken">Statistiken</a> </li>
+						<li class="kick__navbar-sub__item kick__js-navbar-size-check__item "> <a
+								href="/bundesliga/elf-des-tages">Elf des Tages</a> </li>
+						<li class="kick__navbar-sub__item kick__js-navbar-size-check__item "> <a
+								href="/bundesliga/teams">Vereine</a> </li>
+						<li class="kick__navbar-sub__item kick__js-navbar-size-check__item "> <a
+								href="/bundesliga/titeltraeger">Historie</a> </li>
+						<li class="kick__navbar-sub__item kick__navbar-sub__item--button-holder"> <a
+								class="kick__js-navbar-dropdown-button kick__navbar-sub-more-button kick__js-navi-selectable-item kick__is--hide"
+								href="#"><span class="kick__icon-DropDown"></span></a>
+							<ul class="kick__navbar-dropdown kick__js-navbar-dropdown kick__is--hide"></ul>
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</header>
+		<div id="kick__page" class="">
+			<div class="kick__area--main">
+				<div class="kick__ad-pos_wrapper" data-pagetype="article" data-pos="top">
+					<script>  //gqPYbsU("Billboard")  </script>
+					<div id="kick__ad-top_desktop" class=" kick__global__display--none" data-device="desktop"></div>
+					<span class='gqPYbsU_end'></span>
+					<div id="kick__ad-top_tablet" class=" kick__global__display--none" data-device="tablet"></div>
+					<div id="kick__ad-top_mew" class=" kick__global__display--none" data-device="mew"></div>
+				</div>
+				<div class="kick__ad-pos_wrapper" data-pagetype="article" data-pos="presenterheader">
+					<div id="kick__ad-presenterheader_desktop" class=" kick__global__display--none"
+						data-device="desktop"></div>
+					<div id="kick__ad-presenterheader_tablet" class=" kick__global__display--none" data-device="tablet">
+					</div>
+				</div>
+				<div id="kick__article__container">
+					<article data-docid="1017516" class="">
+						<header class="kick__article__header">
+							<div class="kick__article__header__crumb"> <a href="/bundesliga/startseite">Bundesliga</a>
+								<span class="kick__icon-DropRight_DICK"></span>
+								<h1>"Feuer frei": Doppelpacker Müller ist "manchmal dabei, manchmal nicht"</h1>
+							</div>
+							<p class="kick__article__header-subline">Goretzka will "Saison am Leben halten" - Lob für
+								Choupo-Moting</p>
+							<h2>"Feuer frei": Doppelpacker Müller ist "manchmal dabei, manchmal nicht"</h2>
+						</header>
+						<div class="kick__article__body">
+							<aside>
+								<div class="kick__article__teams"> <a href="/fc-bayern-muenchen/info">
+										<picture>
+											<source
+												data-srcset="https://derivates.kicker.de/image/fetch/f_webp/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 1x, https://derivates.kicker.de/image/fetch/f_webp/w_120%2Ch_120%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 2x"
+												type="image/webp">
+											<source
+												data-srcset="https://derivates.kicker.de/image/fetch/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 1x, https://derivates.kicker.de/image/fetch/w_120%2Ch_120%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 2x">
+											<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+												data-src="https://derivates.kicker.de/image/fetch/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png"
+												alt="Bayern München" class="lazyload">
+										</picture>
+									</a> </div>
+								<div class="kick__article__time">20.04.24 - 21:55</div>
+								<div class="kick__article__ia">
+									<div class="kick__article__audio" id="kick__js-lecta-link"
+										data-documentid="1017516"></div>
+									<script
+										type="module">          import LectaPlayer from 'https://player.lecta.io/lecta-player/js/lecta-module.js';              </script>
+									<div class="kick__article__social"> <a href="#" onclick="return false;"
+											class="kick__icon-Share_sechseck"></a>
+										<div class="kick__article__social-meta"> <a class="kick__icon-Facebook_Sechseck"
+												target="_blank" rel="noopener"
+												href="https://www.facebook.com/sharer.php?u=https://www.kicker.de/feuer-frei-doppelpacker-mueller-ist-manchmal-dabei-manchmal-nicht-1017516/artikel%23fbshare"></a>
+											<a class="kick__icon-xTwitter_Sechseck" target="_blank" rel="noopener"
+												href="https://twitter.com/intent/tweet?url=https://www.kicker.de/feuer-frei-doppelpacker-mueller-ist-manchmal-dabei-manchmal-nicht-1017516/artikel%23twshare"></a>
+											<a class="kick__icon-Whats_app_Sechseck" target="_blank" rel="noopener"
+												href="whatsapp://send?text=https://www.kicker.de/feuer-frei-doppelpacker-mueller-ist-manchmal-dabei-manchmal-nicht-1017516/artikel%23washare"></a>
+											<a class="kick__icon-Messenger_Sechseck" target="_blank" rel="noopener"
+												href="fb-messenger://share/?link=https://www.kicker.de/feuer-frei-doppelpacker-mueller-ist-manchmal-dabei-manchmal-nicht-1017516/artikel%23fbmshare&app_id=242756395742301"></a>
+											<a class="kick__icon-Telegram_Sechseck" target="_blank" rel="noopener"
+												href="tg://msg?text=https://www.kicker.de/feuer-frei-doppelpacker-mueller-ist-manchmal-dabei-manchmal-nicht-1017516/artikel%23tgshare"></a>
+											<a class="kick__icon-Mail_Sechseck" target="_blank" rel="noopener"
+												href="mailto:?subject=Empfehlung über kicker.de - %22Feuer%20frei%22%3a%20Doppelpacker%20M%c3%bcller%20ist%20%22manchmal%20dabei%2c%20manchmal%20nicht%22&body=https://www.kicker.de/feuer-frei-doppelpacker-mueller-ist-manchmal-dabei-manchmal-nicht-1017516/artikel%23emlshare"></a>
+										</div>
+									</div>
+								</div>
+							</aside>
+							<div class="kick__article__content">
+								<p class="kick__article__teaser"> Auf das gefeierte 1:0 im Rückspiel des
+									Champions-League-Viertelfinals gegen Arsenal ließ der FC Bayern ein souveränes 5:1
+									bei Union Berlin folgen. Leon Goretzka und Thomas Müller ordneten hinterher ein.
+								</p>
+								<div class="kick__article__picture kick__article__picture--teaser">
+									<picture>
+										<source
+											srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+											data-srcset="https://derivates.kicker.de/image/upload/f_webp/c_crop%2Cx_0%2Cy_0%2Cw_4000%2Ch_2250/w_1000%2Cq_auto%2Ch_563/v1/2024/04/20/2562a892-0fa1-4d53-adce-feb155cc117e.jpeg"
+											media="(min-width:1024px)" type="image/webp">
+										<source
+											srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+											data-srcset="https://derivates.kicker.de/image/upload/c_crop%2Cx_0%2Cy_0%2Cw_4000%2Ch_2250/w_1000%2Cq_auto%2Ch_563/v1/2024/04/20/2562a892-0fa1-4d53-adce-feb155cc117e.jpeg"
+											media="(min-width:1024px)">
+										<source
+											srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+											data-srcset="https://derivates.kicker.de/image/upload/f_webp/c_crop%2Cx_0%2Cy_0%2Cw_4000%2Ch_2250/w_988%2Cq_auto%2Ch_556/v1/2024/04/20/2562a892-0fa1-4d53-adce-feb155cc117e.jpeg"
+											media="(min-width:768px)" type="image/webp">
+										<source
+											srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+											data-srcset="https://derivates.kicker.de/image/upload/c_crop%2Cx_0%2Cy_0%2Cw_4000%2Ch_2250/w_988%2Cq_auto%2Ch_556/v1/2024/04/20/2562a892-0fa1-4d53-adce-feb155cc117e.jpeg"
+											media="(min-width:768px)">
+										<source
+											srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+											data-srcset="https://derivates.kicker.de/image/upload/f_webp/c_crop%2Cx_0%2Cy_0%2Cw_4000%2Ch_2250/w_732%2Cq_auto%2Ch_412/v1/2024/04/20/2562a892-0fa1-4d53-adce-feb155cc117e.jpeg"
+											media="(min-width:481px)" type="image/webp">
+										<source
+											srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+											data-srcset="https://derivates.kicker.de/image/upload/c_crop%2Cx_0%2Cy_0%2Cw_4000%2Ch_2250/w_732%2Cq_auto%2Ch_412/v1/2024/04/20/2562a892-0fa1-4d53-adce-feb155cc117e.jpeg"
+											media="(min-width:481px)">
+										<source
+											srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+											data-srcset="https://derivates.kicker.de/image/upload/f_webp/c_crop%2Cx_0%2Cy_0%2Cw_4000%2Ch_2250/w_444%2Cq_auto%2Ch_250/v1/2024/04/20/2562a892-0fa1-4d53-adce-feb155cc117e.jpeg"
+											media="(max-width:480px)" type="image/webp">
+										<source
+											srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+											data-srcset="https://derivates.kicker.de/image/upload/c_crop%2Cx_0%2Cy_0%2Cw_4000%2Ch_2250/w_444%2Cq_auto%2Ch_250/v1/2024/04/20/2562a892-0fa1-4d53-adce-feb155cc117e.jpeg"
+											media="(max-width:480px)"><img
+											src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+											data-src="https://derivates.kicker.de/image/upload/c_crop%2Cx_0%2Cy_0%2Cw_4000%2Ch_2250/w_1000%2Cq_auto/v1/2024/04/20/2562a892-0fa1-4d53-adce-feb155cc117e.jpeg"
+											alt="Hat in seiner langen und erfolgreichen Karriere nun an allen 34 Bundesliga-Spieltagen getroffen: Thomas Müller."
+											class="lazyload">
+									</picture>
+									<p> Hat in seiner langen und erfolgreichen Karriere nun an allen 34
+										Bundesliga-Spieltagen getroffen: Thomas Müller. <span>Getty Images</span> </p>
+								</div>
+								<div class="kick__article__content__child">
+									<p> <a href="/leon-goretzka/spieler">Leon Goretzka</a>, der mit dem 1:0 den
+										Grundstein beim klaren <a
+											href="/union-gegen-bayern-2024-bundesliga-4862228/spielbericht">5:1-Erfolg</a>
+										im Stadion An der Alten Försterei gelegt hatte, schritt als erster
+										Bayern-Spieler nach Spielschluss vors Mikrofon von <em>Sky</em> und gab zu
+										Protokoll: "Wir haben den Kampf am Anfang gut angenommen und es sehr gut zu Ende
+										gespielt." </p>
+									<div class="kick__ad-pos_wrapper" data-pagetype="article" data-pos="maxiad">
+										<div id="kick__ad-maxiad_desktop" class=" kick__global__display--none"
+											data-device="desktop"></div>
+										<div id="kick__ad-maxiad_tablet" class=" kick__global__display--none"
+											data-device="tablet"></div>
+									</div>
+									<div class="kick__ad-pos_wrapper" data-pagetype="article" data-pos="mrec_1">
+										<script>  //gqPYbsU("Medium")  </script>
+										<div id="kick__ad-mrec_1_mew" class=" kick__global__display--none"
+											data-device="mew"></div> <span class='gqPYbsU_end'></span>
+									</div>
+									<p> Damit traf der 29-Jährige den Nagel auf den Kopf: Denn ein insgesamt souverän
+										auftretender Rekordmeister, der in dieser Saison schon manch eine eigentlich
+										schon sichergeglaubte Partie noch in den Sand gesetzt hatte, hatte sich in der
+										Hauptstadt voll fokussiert gezeigt. Die Zahlen abseits der fünf erzielten
+										Treffer: <a
+											href="/union-gegen-bayern-2024-bundesliga-4862228/spieldaten">Passquote von
+											92 Prozent, 64 Prozent Ballbesitz, 52 Prozent Zweikampfquote</a>. </p>
+									<section class="kick__modul kick__modul--news">
+										<div class="kick__site-padding">
+											<div class="pinpoll" data-pinpoll-id="267495" data-css-class="web"
+												data-autoplay="10" data-block-ads="false"></div>
+										</div>
+									</section>
+									<p> Wenig verwunderlich zog schließlich auch Doppelpacker <a
+											href="/thomas-mueller/spieler">Thomas Müller</a>, der zum ersten Mal
+										überhaupt an einem 30. Bundesliga-Spieltag vollstreckt und allgemein seinen 26.
+										Mehrfachpack erreicht hatte (Höchstwert unter allen aktuellen
+										Bundesliga-Spielern) ein rundum positives Fazit: "Wir haben einfach ein gutes
+										Spiel gemacht." </p>
+									<div class="kick__ad-pos_wrapper" data-pagetype="article" data-pos="mma_1">
+										<div id="kick__ad-mma_1_mew" class=" kick__global__display--none"
+											data-device="mew"></div>
+									</div>
+									<h2>Müller zu Choupo-Moting: "Ich lauer innen"</h2>
+									<div class="kick__article__context kick__article__context--pano">
+										<h4>zum Thema</h4>
+										<div class="kick__v100-gameList kick__module-margin">
+											<div class="kick__v100-gameList__gameRow">
+												<div class="kick__v100-gameList__gameRow__gameCell">
+													<div class="kick__v100-gameCell kick__v100-gameCell--standard"> <a
+															class="kick__v100-gameCell__team "
+															href="/1-fc-union-berlin/info/bundesliga/2023-24">
+															<div class="kick__v100-gameCell__team__name">1. FC Union
+																Berlin <span
+																	class="kick__v100-gameCell__team__info"></span>
+															</div>
+															<div class="kick__v100-gameCell__team__shortname">Union
+																<span class="kick__v100-gameCell__team__info"></span>
+															</div>
+															<div class="kick__v100-gameCell__team__logo">
+																<picture class="">
+																	<source
+																		data-srcset="https://derivates.kicker.de/image/fetch/f_webp/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2021/fussball/vereine/xxl/62_20210316732.png 1x, https://derivates.kicker.de/image/fetch/f_webp/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2021/fussball/vereine/xxl/62_20210316732.png 2x"
+																		type="image/webp">
+																	<source
+																		data-srcset="https://derivates.kicker.de/image/fetch/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2021/fussball/vereine/xxl/62_20210316732.png 1x, https://derivates.kicker.de/image/fetch/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2021/fussball/vereine/xxl/62_20210316732.png 2x">
+																	<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+																		data-src="https://derivates.kicker.de/image/fetch/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2021/fussball/vereine/xxl/62_20210316732.png"
+																		alt="1. FC Union Berlin" class="lazyload">
+																</picture>
+															</div>
+														</a> <a
+															href="/union-gegen-bayern-2024-bundesliga-4862228/spielbericht"
+															class="kick__v100-scoreBoard kick__v100-scoreBoard--standard ">
+															<div class="kick__v100-scoreBoard__scoreHolder ">
+																<div class="kick__v100-scoreBoard__scoreHolder__score">1
+																</div>
+																<div
+																	class="kick__v100-scoreBoard__scoreHolder__divider">
+																	:</div>
+																<div class="kick__v100-scoreBoard__scoreHolder__score">5
+																</div>
+															</div>
+															<div
+																class="kick__v100-scoreBoard__scoreHolder kick__v100-scoreBoard__scoreHolder--subscore">
+																<div class="kick__v100-scoreBoard__scoreHolder__score">0
+																</div>
+																<div
+																	class="kick__v100-scoreBoard__scoreHolder__divider">
+																	:</div>
+																<div class="kick__v100-scoreBoard__scoreHolder__score">2
+																</div>
+															</div>
+														</a> <a class="kick__v100-gameCell__team "
+															href="/fc-bayern-muenchen/info/bundesliga/2023-24">
+															<div class="kick__v100-gameCell__team__logo">
+																<picture class="">
+																	<source
+																		data-srcset="https://derivates.kicker.de/image/fetch/f_webp/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 1x, https://derivates.kicker.de/image/fetch/f_webp/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 2x"
+																		type="image/webp">
+																	<source
+																		data-srcset="https://derivates.kicker.de/image/fetch/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 1x, https://derivates.kicker.de/image/fetch/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 2x">
+																	<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+																		data-src="https://derivates.kicker.de/image/fetch/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png"
+																		alt="Bayern München" class="lazyload">
+																</picture>
+															</div>
+															<div class="kick__v100-gameCell__team__name">Bayern München
+																<span class="kick__v100-gameCell__team__info"></span>
+															</div>
+															<div class="kick__v100-gameCell__team__shortname">Bayern
+																<span class="kick__v100-gameCell__team__info"></span>
+															</div>
+														</a> </div>
+												</div>
+												<div class="kick__v100-gameList__gameRow__stateCell"> <a
+														class="kick__v100-gameList__gameRow__stateCell__indicator kick__v100-gameList__gameRow__stateCell__indicator--schema"
+														href="/union-gegen-bayern-2024-bundesliga-4862228/spielbericht">
+														<span class="kick__gameinfo_ic kick__icon-Analyse"></span> <span
+															class="kick__v100-gameList__gameRow__stateCell__indicator--schema__txt">Bericht</span>
+													</a> </div>
+											</div>
+											<div class="kick__v100-gameList__gameRow">
+												<div class="kick__v100-gameList__gameRow__gameCell">
+													<div class="kick__v100-gameCell kick__v100-gameCell--standard"> <a
+															class="kick__v100-gameCell__team "
+															href="/fc-bayern-muenchen/info/bundesliga/2023-24">
+															<div class="kick__v100-gameCell__team__name">Bayern München
+																<span class="kick__v100-gameCell__team__info"></span>
+															</div>
+															<div class="kick__v100-gameCell__team__shortname">Bayern
+																<span class="kick__v100-gameCell__team__info"></span>
+															</div>
+															<div class="kick__v100-gameCell__team__logo">
+																<picture class="">
+																	<source
+																		data-srcset="https://derivates.kicker.de/image/fetch/f_webp/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 1x, https://derivates.kicker.de/image/fetch/f_webp/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 2x"
+																		type="image/webp">
+																	<source
+																		data-srcset="https://derivates.kicker.de/image/fetch/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 1x, https://derivates.kicker.de/image/fetch/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 2x">
+																	<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+																		data-src="https://derivates.kicker.de/image/fetch/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png"
+																		alt="Bayern München" class="lazyload">
+																</picture>
+															</div>
+														</a> <a
+															href="/bayern-gegen-frankfurt-2024-bundesliga-4862236/spielinfo"
+															class="kick__v100-scoreBoard kick__v100-scoreBoard--standard ">
+															<div class="kick__dateboard">
+																<div class="kick__v100-scoreBoard__dateHolder">Sa.</div>
+																<div class="kick__v100-scoreBoard__dateHolder">15:30
+																</div>
+															</div>
+														</a> <a class="kick__v100-gameCell__team "
+															href="/eintracht-frankfurt/info/bundesliga/2023-24">
+															<div class="kick__v100-gameCell__team__logo">
+																<picture class="">
+																	<source
+																		data-srcset="https://derivates.kicker.de/image/fetch/f_webp/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2009/fussball/vereine/xxl/32_20150225827.png 1x, https://derivates.kicker.de/image/fetch/f_webp/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2009/fussball/vereine/xxl/32_20150225827.png 2x"
+																		type="image/webp">
+																	<source
+																		data-srcset="https://derivates.kicker.de/image/fetch/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2009/fussball/vereine/xxl/32_20150225827.png 1x, https://derivates.kicker.de/image/fetch/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2009/fussball/vereine/xxl/32_20150225827.png 2x">
+																	<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+																		data-src="https://derivates.kicker.de/image/fetch/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2009/fussball/vereine/xxl/32_20150225827.png"
+																		alt="Eintracht Frankfurt" class="lazyload">
+																</picture>
+															</div>
+															<div class="kick__v100-gameCell__team__name">Eintracht
+																Frankfurt <span
+																	class="kick__v100-gameCell__team__info"></span>
+															</div>
+															<div class="kick__v100-gameCell__team__shortname">Frankfurt
+																<span class="kick__v100-gameCell__team__info"></span>
+															</div>
+														</a> </div>
+												</div>
+												<div class="kick__v100-gameList__gameRow__stateCell"> <a
+														class="kick__v100-gameList__gameRow__stateCell__indicator kick__v100-gameList__gameRow__stateCell__indicator--schema"
+														href="/bayern-gegen-frankfurt-2024-bundesliga-4862236/spielinfo">
+														<span
+															class="kick__gameinfo_ic kick__icon-Spielinfo_DICK"></span>
+														<span
+															class="kick__v100-gameList__gameRow__stateCell__indicator--schema__txt">Spielinfo</span>
+													</a> </div>
+											</div>
+											<div class="kick__v100-gameList__gameRow">
+												<div class="kick__v100-gameList__gameRow__gameCell">
+													<div class="kick__v100-gameCell kick__v100-gameCell--standard"> <a
+															class="kick__v100-gameCell__team "
+															href="/fc-bayern-muenchen/info/champions-league/2023-24">
+															<div class="kick__v100-gameCell__team__name">Bayern München
+																<span class="kick__v100-gameCell__team__info"></span>
+															</div>
+															<div class="kick__v100-gameCell__team__shortname">Bayern
+																<span class="kick__v100-gameCell__team__info"></span>
+															</div>
+															<div class="kick__v100-gameCell__team__logo">
+																<picture class="">
+																	<source
+																		data-srcset="https://derivates.kicker.de/image/fetch/f_webp/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 1x, https://derivates.kicker.de/image/fetch/f_webp/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 2x"
+																		type="image/webp">
+																	<source
+																		data-srcset="https://derivates.kicker.de/image/fetch/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 1x, https://derivates.kicker.de/image/fetch/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 2x">
+																	<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+																		data-src="https://derivates.kicker.de/image/fetch/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png"
+																		alt="Bayern München" class="lazyload">
+																</picture>
+															</div>
+														</a> <a
+															href="/bayern-gegen-real-madrid-2024-champions-league-4913587/spielinfo"
+															class="kick__v100-scoreBoard kick__v100-scoreBoard--standard ">
+															<div class="kick__dateboard">
+																<div class="kick__v100-scoreBoard__dateHolder">30.04.
+																</div>
+																<div class="kick__v100-scoreBoard__dateHolder">21:00
+																</div>
+															</div>
+														</a> <a class="kick__v100-gameCell__team "
+															href="/real-madrid/info/champions-league/2023-24">
+															<div class="kick__v100-gameCell__team__logo">
+																<picture class="">
+																	<source
+																		data-srcset="https://derivates.kicker.de/image/fetch/f_webp/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2009/fussball/vereine/xxl/908_20160504477.png 1x, https://derivates.kicker.de/image/fetch/f_webp/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2009/fussball/vereine/xxl/908_20160504477.png 2x"
+																		type="image/webp">
+																	<source
+																		data-srcset="https://derivates.kicker.de/image/fetch/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2009/fussball/vereine/xxl/908_20160504477.png 1x, https://derivates.kicker.de/image/fetch/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2009/fussball/vereine/xxl/908_20160504477.png 2x">
+																	<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+																		data-src="https://derivates.kicker.de/image/fetch/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2009/fussball/vereine/xxl/908_20160504477.png"
+																		alt="Real Madrid" class="lazyload">
+																</picture>
+															</div>
+															<div class="kick__v100-gameCell__team__name">Real Madrid
+																<span class="kick__v100-gameCell__team__info"></span>
+															</div>
+															<div class="kick__v100-gameCell__team__shortname">Real
+																Madrid <span
+																	class="kick__v100-gameCell__team__info"></span>
+															</div>
+														</a> </div>
+												</div>
+												<div class="kick__v100-gameList__gameRow__stateCell"> <a
+														class="kick__v100-gameList__gameRow__stateCell__indicator kick__v100-gameList__gameRow__stateCell__indicator--schema"
+														href="/bayern-gegen-real-madrid-2024-champions-league-4913587/spielinfo">
+														<span
+															class="kick__gameinfo_ic kick__icon-Spielinfo_DICK"></span>
+														<span
+															class="kick__v100-gameList__gameRow__stateCell__indicator--schema__txt">Spielinfo</span>
+													</a> </div>
+											</div>
+											<div class="kick__v100-gameList__gameRow">
+												<div class="kick__v100-gameList__gameRow__gameCell">
+													<div class="kick__v100-gameCell kick__v100-gameCell--standard"> <a
+															class="kick__v100-gameCell__team "
+															href="/real-madrid/info/champions-league/2023-24">
+															<div class="kick__v100-gameCell__team__name">Real Madrid
+																<span class="kick__v100-gameCell__team__info"></span>
+															</div>
+															<div class="kick__v100-gameCell__team__shortname">Real
+																Madrid <span
+																	class="kick__v100-gameCell__team__info"></span>
+															</div>
+															<div class="kick__v100-gameCell__team__logo">
+																<picture class="">
+																	<source
+																		data-srcset="https://derivates.kicker.de/image/fetch/f_webp/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2009/fussball/vereine/xxl/908_20160504477.png 1x, https://derivates.kicker.de/image/fetch/f_webp/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2009/fussball/vereine/xxl/908_20160504477.png 2x"
+																		type="image/webp">
+																	<source
+																		data-srcset="https://derivates.kicker.de/image/fetch/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2009/fussball/vereine/xxl/908_20160504477.png 1x, https://derivates.kicker.de/image/fetch/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2009/fussball/vereine/xxl/908_20160504477.png 2x">
+																	<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+																		data-src="https://derivates.kicker.de/image/fetch/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2009/fussball/vereine/xxl/908_20160504477.png"
+																		alt="Real Madrid" class="lazyload">
+																</picture>
+															</div>
+														</a> <a
+															href="/real-madrid-gegen-bayern-2024-champions-league-4913585/spielinfo"
+															class="kick__v100-scoreBoard kick__v100-scoreBoard--standard ">
+															<div class="kick__dateboard">
+																<div class="kick__v100-scoreBoard__dateHolder">08.05.
+																</div>
+																<div class="kick__v100-scoreBoard__dateHolder">21:00
+																</div>
+															</div>
+														</a> <a class="kick__v100-gameCell__team "
+															href="/fc-bayern-muenchen/info/champions-league/2023-24">
+															<div class="kick__v100-gameCell__team__logo">
+																<picture class="">
+																	<source
+																		data-srcset="https://derivates.kicker.de/image/fetch/f_webp/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 1x, https://derivates.kicker.de/image/fetch/f_webp/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 2x"
+																		type="image/webp">
+																	<source
+																		data-srcset="https://derivates.kicker.de/image/fetch/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 1x, https://derivates.kicker.de/image/fetch/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 2x">
+																	<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+																		data-src="https://derivates.kicker.de/image/fetch/w_30%2Ch_30%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png"
+																		alt="Bayern München" class="lazyload">
+																</picture>
+															</div>
+															<div class="kick__v100-gameCell__team__name">Bayern München
+																<span class="kick__v100-gameCell__team__info"></span>
+															</div>
+															<div class="kick__v100-gameCell__team__shortname">Bayern
+																<span class="kick__v100-gameCell__team__info"></span>
+															</div>
+														</a> </div>
+												</div>
+												<div class="kick__v100-gameList__gameRow__stateCell"> <a
+														class="kick__v100-gameList__gameRow__stateCell__indicator kick__v100-gameList__gameRow__stateCell__indicator--schema"
+														href="/real-madrid-gegen-bayern-2024-champions-league-4913585/spielinfo">
+														<span
+															class="kick__gameinfo_ic kick__icon-Spielinfo_DICK"></span>
+														<span
+															class="kick__v100-gameList__gameRow__stateCell__indicator--schema__txt">Spielinfo</span>
+													</a> </div>
+											</div>
+										</div>
+									</div>
+									<div class="kick__article__context kick__article__context--right">
+										<h4></h4>
+										<ul>
+											<li class="kick__list__item"> <span class="kick__list__text-cell"> <a
+														href="/bundesliga/tabelle/2023-24/30">Die aktuelle Tabelle</a>
+												</span> </li>
+										</ul>
+									</div>
+									<p> Ins Detail ging der Weltmeister von 2014 dabei auch: "Wir waren heute ein
+										'bissl' aggressiver, haben den Ball höher gewonnen. Bei ein, zwei, drei Aktionen
+										nach eigenem Fehlpass hat Union zwar gezeigt, was sie mit ihrer Konterstärke
+										anrichten können. Wir hatten also schon Aktionen, wo Union vielleicht hätte ein
+										Tor machen können - aber insgesamt waren wir bissig, drin in den Zweikämpfen,
+										immer dabei." </p>
+									<p> Und auch offensiv sei es "ordentlich" gewesen, was auch Coach Thomas Tuchel nach
+										<a href="/bundesliga/tabelle">dieser Untermauerung von Tabellenplatz 2</a>
+										unterstrich: "Perfekte Woche, dickes Kompliment an die Mannschaft. Mir hat alles
+										gefallen, es war eine Teamleistung. Wir hängen keine Tabellenplätze in die
+										Kabine, wir als FC Bayern sind immer gefordert. Wir sind es uns selber schuldig.
+										Wir haben den höchsten Anspruch an uns selber." </p>
+									<blockquote class="kick__article__zitat">
+										<div class="kick__icon__komb kick__icon__komb--zitat"></div>
+										<p>Ich freu mich riesig, Choupo hat super gespielt.</p>
+										<div class="kick__article__bq__per">
+											<div class="kick__article__bq__per__name"> Thomas Müller über den
+												auffälligen Eric Maxim Choupo-Moting </div>
+										</div>
+									</blockquote>
+									<p> Das zweite Tor kurz vor der Pause habe an diesem Samstagabend auf Müllers Sicht
+										"natürlich gut in die Karten gespielt mit dem Freistoß (<a
+											href="/harry-kane/spieler">Harry Kane</a> schießt durch eine Lücke in der
+										Berliner Mauer; <em>Anm. d. Red.</em>), spätestens Anfang zweite Halbzeit dann
+										waren wir nicht mehr zu stoppen." </p>
+									<p> Dieser Umstand war auch eng mit Müller selbst verbunden gewesen, der schließlich
+										nach der Pause zweimal getroffen hatte - einmal prt Volley unters Tordach,
+										einmal via Kopfball ins rechte Eck. Und hier erkannte der Angreifer selbst, dass
+										das auch mit dem auffällig guten <a
+											href="/eric-maxim-choupo-moting/spieler">Eric-Maxim Choupo-Moting</a> zu tun
+										gehabt hatte. Der Dribbelkünstler hatte mit etlichen feinen Ballaktionen
+										überzeugt und unter anderem Müller bei seinem Kracher unter die Latte herrlich
+										bedient. Müllers Kommentar dazu: "Ich freu mich riesig, Choupo hat super
+										gespielt, hat immer wieder das Dribbling gesucht, war aggressiv nach vorn. Wir
+										hatten schon vor dem Spiel miteinander gesprochen, dass wenn er mal abhakt dann
+										einfach die Flanke bringen soll - ich 'lauer' innen. Das Tor war auch
+										tatsächlich schön, da hab ich ihn schön unters Dach gejagt. </p>
+									<h2>"Die klassische Müller-Frage"</h2> <a
+										class="kick__article__picture kick__article__picture--pano"
+										href="https://derivates.kicker.de/image/upload/c_crop%2Cx_0%2Cy_337%2Cw_3053%2Ch_1717/w_1200%2Cq_auto/v1/2024/04/20/a4df34d8-b683-45ee-981e-2b87151014b1.jpeg"
+										data-caption="Thomas Tuchel und Thomas M&#252;ller" data-fancybox="images">
+										<picture>
+											<source
+												srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+												data-srcset="https://derivates.kicker.de/image/upload/f_webp/c_crop%2Cx_0%2Cy_337%2Cw_3053%2Ch_1717/w_1000%2Cq_auto%2Ch_563/v1/2024/04/20/a4df34d8-b683-45ee-981e-2b87151014b1.jpeg"
+												media="(min-width:1024px)" type="image/webp">
+											<source
+												srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+												data-srcset="https://derivates.kicker.de/image/upload/c_crop%2Cx_0%2Cy_337%2Cw_3053%2Ch_1717/w_1000%2Cq_auto%2Ch_563/v1/2024/04/20/a4df34d8-b683-45ee-981e-2b87151014b1.jpeg"
+												media="(min-width:1024px)">
+											<source
+												srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+												data-srcset="https://derivates.kicker.de/image/upload/f_webp/c_crop%2Cx_0%2Cy_337%2Cw_3053%2Ch_1717/w_988%2Cq_auto%2Ch_556/v1/2024/04/20/a4df34d8-b683-45ee-981e-2b87151014b1.jpeg"
+												media="(min-width:768px)" type="image/webp">
+											<source
+												srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+												data-srcset="https://derivates.kicker.de/image/upload/c_crop%2Cx_0%2Cy_337%2Cw_3053%2Ch_1717/w_988%2Cq_auto%2Ch_556/v1/2024/04/20/a4df34d8-b683-45ee-981e-2b87151014b1.jpeg"
+												media="(min-width:768px)">
+											<source
+												srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+												data-srcset="https://derivates.kicker.de/image/upload/f_webp/c_crop%2Cx_0%2Cy_337%2Cw_3053%2Ch_1717/w_732%2Cq_auto%2Ch_412/v1/2024/04/20/a4df34d8-b683-45ee-981e-2b87151014b1.jpeg"
+												media="(min-width:481px)" type="image/webp">
+											<source
+												srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+												data-srcset="https://derivates.kicker.de/image/upload/c_crop%2Cx_0%2Cy_337%2Cw_3053%2Ch_1717/w_732%2Cq_auto%2Ch_412/v1/2024/04/20/a4df34d8-b683-45ee-981e-2b87151014b1.jpeg"
+												media="(min-width:481px)">
+											<source
+												srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+												data-srcset="https://derivates.kicker.de/image/upload/f_webp/c_crop%2Cx_0%2Cy_337%2Cw_3053%2Ch_1717/w_444%2Cq_auto%2Ch_250/v1/2024/04/20/a4df34d8-b683-45ee-981e-2b87151014b1.jpeg"
+												media="(max-width:480px)" type="image/webp">
+											<source
+												srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+												data-srcset="https://derivates.kicker.de/image/upload/c_crop%2Cx_0%2Cy_337%2Cw_3053%2Ch_1717/w_444%2Cq_auto%2Ch_250/v1/2024/04/20/a4df34d8-b683-45ee-981e-2b87151014b1.jpeg"
+												media="(max-width:480px)"><img
+												src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+												data-src="https://derivates.kicker.de/image/upload/c_crop%2Cx_0%2Cy_337%2Cw_3053%2Ch_1717/w_1000%2Cq_auto/v1/2024/04/20/a4df34d8-b683-45ee-981e-2b87151014b1.jpeg"
+												alt="Thomas Tuchel und Thomas Müller" class="lazyload">
+										</picture>
+										<p> Waren nach dem Doppelpack und kurz nach der Auswechslung zu Scherzen
+											aufgelegt: Bayern-Trainer Thomas Tuchel und Doppelpacker Thomas Müller.
+											<span>DeFodi Images via Getty Images</span> </p>
+									</a>
+									<p> Wie geht es aber nun für Müller persönlich weiter? Darf der Doppelpacker auch
+										kommenden Samstag (15.30 Uhr, LIVE! bei kicker) gegen Eintracht Frankfurt ran -
+										und vor allem im <a
+											href="/champions-league/spieltag/2023-24/9">Champions-League-Halbfinale
+											gegen Real Madrid</a> (30. April und 8. Mai jeweils um 21 Uhr) seinen 150.
+										Einsatz in der Königsklasse feiern? </p>
+									<div class="kick__article__context kick__article__context--right">
+										<h4>zum Thema</h4>
+										<ul>
+											<li class="kick__list__item"> <span class="kick__list__text-cell"> <a
+														href="/eberl-ueber-nagelsmann-der-stachel-von-damals-sitzt-noch-tief-1017469/artikel">Eberl
+														über Nagelsmann: "Der Stachel von damals sitzt noch tief"</a>
+												</span> </li>
+											<li class="kick__list__item"> <span class="kick__list__text-cell"> <a
+														href="/muss-nicht-deutsch-sprechen-bayern-trainersuche-in-sehr-sehr-guten-zuegen-1017470/artikel">"Muss
+														nicht Deutsch sprechen": Bayern-Trainersuche in "sehr, sehr
+														guten Zügen"</a> </span> </li>
+										</ul>
+									</div>
+									<p> "Das ist völlig egal", stellte der 34-Jährige mit der Erfahrung von inzwischen
+										470 Bundesliga-Spielen (149 Tore, 206 Vorlagen) klar und untermauerte mit:
+										"Wichtig ist, dass wir eine Mannschaft bringen, die gewinnt. Wer welche Minuten
+										sammelt, ist völlig egal. Es ist ein nettes Spielchen und ich find's ja amüsant,
+										dass immer wieder die klassische Müller-Frage kommt. Jeder will Zeitungen und
+										Klicks verkaufen, aber am Ende des Tages ist es schon ein 'bissl' zäh für den
+										Trainer. Er stellt so auf, wie er meint, dass er am besten gewinnt. Manchmal bin
+										ich dabei, manchmal nicht - und wenn ich von der Bank komm, dann werf ich auch
+										alles rein. Und jetzt gehen wir nach Hause, Doppelpack gemacht." </p>
+									<section class="kick__modul kick__modul--news">
+										<div class="kick__site-padding">
+											<div class="pinpoll" data-pinpoll-id="267225" data-css-class="web"
+												data-autoplay="10" data-block-ads="false"></div>
+										</div>
+									</section>
+									<p> Ganz entlassen war Müller zu diesem Zeitpunkt aber noch nicht. Auf die
+										Trainerfrage, die vor dem Spiel auch Sportvorstand Max Eberl angegangen war (<a
+											href="/eberl-ueber-nagelsmann-der-stachel-von-damals-sitzt-noch-tief-1017469/artikel">Nagelsmann-Entscheidung
+											"hat uns das jetzt nicht überrascht"</a> - neuer Bayern-Coach <a
+											href="/muss-nicht-deutsch-sprechen-bayern-trainersuche-in-sehr-sehr-guten-zuegen-1017470/artikel">"muss
+											nicht Deutsch sprechen"</a>), sagte er noch: "Ich hab keine Ahnung (wer auf
+										Tuchel folgen wird; <em>Anm. d. Red.</em>). "Wir haben genug damit zu tun,
+										unseren Tagesablauf zu absolvieren. Wir wissen, wie es in der Liga gelaufen ist
+										(Meisterschaft verpasst, unnötige Niederlagen kassiert; <em>Anm. d. Red.</em>),
+										dass das auch auf unserem Schreibtisch liegt. Wir haben nicht den Anspruch und
+										überhaupt nicht die Grundlage dafür, irgendwie unruhig zu werden. Wir müssen uns
+										konzentrieren, dass wir die Spiele gewinnen. Und dementsprechend: Feuer frei!"
+									</p>
+									<div class="oddsServeCreative" id="oddsCsiCreative">
+										<script>  document.addEventListener('ov.advertising.e2.load', function () { var oddsUnitId = ov.common.isMobile() ? 4583624 : 4583625; oddsServe(oddsUnitId, null, null, null, document.querySelector('#oddsCsiCreative')); });  </script>
+									</div>
+									<p> Oder in Goretzkas Worten: "Wir haben noch ein großes Ziel in der Champions
+										League und versuchen, die Saison am Leben zu halten." </p>
+									<div class="kick__article__detail">
+										<p class="kick__article__detail__author">mag</p>
+									</div>
+									<div class="kick__article__picture kick__article__picture--medias"> <a
+											href="/union-gegen-bayern-2024-bundesliga-4862228/bilder">
+											<div class="kick__article__picture--medias__imgcon">
+												<picture>
+													<source
+														srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+														data-srcset="https://derivates.kicker.de/image/upload/f_webp/c_crop%2Cx_0%2Cy_221%2Cw_4000%2Ch_2250/w_800%2Cq_auto%2Ch_450/v1/2024/04/20/4465be95-dfe1-44bd-a673-22d0e6886259.jpeg"
+														media="(min-width:1024px)" type="image/webp">
+													<source
+														srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+														data-srcset="https://derivates.kicker.de/image/upload/c_crop%2Cx_0%2Cy_221%2Cw_4000%2Ch_2250/w_800%2Cq_auto%2Ch_450/v1/2024/04/20/4465be95-dfe1-44bd-a673-22d0e6886259.jpeg"
+														media="(min-width:1024px)">
+													<source
+														srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+														data-srcset="https://derivates.kicker.de/image/upload/f_webp/c_crop%2Cx_0%2Cy_221%2Cw_4000%2Ch_2250/w_988%2Cq_auto%2Ch_556/v1/2024/04/20/4465be95-dfe1-44bd-a673-22d0e6886259.jpeg"
+														media="(min-width:768px)" type="image/webp">
+													<source
+														srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+														data-srcset="https://derivates.kicker.de/image/upload/c_crop%2Cx_0%2Cy_221%2Cw_4000%2Ch_2250/w_988%2Cq_auto%2Ch_556/v1/2024/04/20/4465be95-dfe1-44bd-a673-22d0e6886259.jpeg"
+														media="(min-width:768px)">
+													<source
+														srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+														data-srcset="https://derivates.kicker.de/image/upload/f_webp/c_crop%2Cx_0%2Cy_221%2Cw_4000%2Ch_2250/w_732%2Cq_auto%2Ch_412/v1/2024/04/20/4465be95-dfe1-44bd-a673-22d0e6886259.jpeg"
+														media="(min-width:481px)" type="image/webp">
+													<source
+														srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+														data-srcset="https://derivates.kicker.de/image/upload/c_crop%2Cx_0%2Cy_221%2Cw_4000%2Ch_2250/w_732%2Cq_auto%2Ch_412/v1/2024/04/20/4465be95-dfe1-44bd-a673-22d0e6886259.jpeg"
+														media="(min-width:481px)">
+													<source
+														srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+														data-srcset="https://derivates.kicker.de/image/upload/f_webp/c_crop%2Cx_0%2Cy_221%2Cw_4000%2Ch_2250/w_444%2Cq_auto%2Ch_250/v1/2024/04/20/4465be95-dfe1-44bd-a673-22d0e6886259.jpeg"
+														media="(max-width:480px)" type="image/webp">
+													<source
+														srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+														data-srcset="https://derivates.kicker.de/image/upload/c_crop%2Cx_0%2Cy_221%2Cw_4000%2Ch_2250/w_444%2Cq_auto%2Ch_250/v1/2024/04/20/4465be95-dfe1-44bd-a673-22d0e6886259.jpeg"
+														media="(max-width:480px)"><img
+														src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+														data-src="https://derivates.kicker.de/image/upload/c_crop%2Cx_0%2Cy_221%2Cw_4000%2Ch_2250/w_800%2Cq_auto/v1/2024/04/20/4465be95-dfe1-44bd-a673-22d0e6886259.jpeg"
+														alt="" class="lazyload">
+												</picture>
+												<div class="kick__article__picture--medias__container">
+													<div class="kick__article__picture--medias__info">
+														<div class="kick__article__picture--medias__info-text">
+															<h2>Bilder zur Partie Union Berlin gegen Bayern München</h2>
+														</div>
+														<div class="kick__article__picture--medias__info-btn"></div>
+													</div>
+												</div>
+											</div>
+										</a> </div>
+								</div>
+								<div class="kick__bonus-stat__mask">
+									<div class="kick__bonus-stat__mask__container">
+										<div class="kick__bonus-stat__mask__container__block">
+											<div class="kick__bonus-stat__mask__container__block2">
+												<div class="kick__bonus-stat__mask__container__block3">
+													<div
+														class="kick__article__bonus-stat kick__article__bonus-stat--small">
+														<div class="kick__article__bonus-stat__content">
+															<div
+																class="kick__article__bonus-stat__content__mask js-carousel">
+																<div class="kick__article__bonus-stat__content__container kick__invisible-scrollbar js-carousel-container"
+																	data-slides="1" data-slidescount="3"
+																	data-centermode="false" data-infinite="false"
+																	data-variablewidth="true" data-index="0">
+																	<div
+																		class="kick__article__bonus-stat__content__item">
+																		<a href="/fc-bayern-muenchen/team-news"
+																			class="kick__openContextBox">
+																			<div
+																				class="kick__article__bonus-stat__header">
+																				<span
+																					class="kick__icon-Spielinfo_DICK"></span>
+																				<h6>FC Bayern M&#252;nchen News</h6>
+																			</div>
+																		</a> </div>
+																	<div
+																		class="kick__article__bonus-stat__content__item">
+																		<a href="/fussball/heute-live"
+																			class="kick__openContextBox">
+																			<div
+																				class="kick__article__bonus-stat__header">
+																				<span
+																					class="kick__icon-Kalender_DICK"></span>
+																				<h6>Fu&#223;ball heute live</h6>
+																			</div>
+																		</a> </div>
+																	<div
+																		class="kick__article__bonus-stat__content__item">
+																		<a href="/live/schlagzeilen/fussball/bundesliga"
+																			class="kick__openContextBox">
+																			<div
+																				class="kick__article__bonus-stat__header">
+																				<span
+																					class="kick__icon-Spielinfo_DICK"></span>
+																				<h6>Bundesliga News</h6>
+																			</div>
+																		</a> </div>
+																	<div
+																		class="kick__article__bonus-stat__content__item">
+																		<a href="/bundesliga/spieltag"
+																			class="kick__openContextBox">
+																			<div
+																				class="kick__article__bonus-stat__header">
+																				<span
+																					class="kick__icon-Spieltage"></span>
+																				<h6>Bundesliga Spielplan &amp;
+																					Ergebnisse</h6>
+																			</div>
+																		</a> </div>
+																	<div
+																		class="kick__article__bonus-stat__content__item">
+																		<a href="/bundesliga/tabelle"
+																			class="kick__openContextBox">
+																			<div
+																				class="kick__article__bonus-stat__header">
+																				<span class="kick__icon-Tabelle"></span>
+																				<h6>Bundesliga Tabelle</h6>
+																			</div>
+																		</a> </div>
+																	<div
+																		class="kick__article__bonus-stat__content__item">
+																		<a href="/bundesliga/torjaeger"
+																			class="kick__openContextBox">
+																			<div
+																				class="kick__article__bonus-stat__header">
+																				<span
+																					class="kick__icon-Ballkontakte"></span>
+																				<h6>Bundesliga Torj&#228;ger Liste</h6>
+																			</div>
+																		</a> </div>
+																	<div
+																		class="kick__article__bonus-stat__content__item">
+																		<a href="/bundesliga/elf-des-tages"
+																			class="kick__openContextBox">
+																			<div
+																				class="kick__article__bonus-stat__header">
+																				<span
+																					class="kick__icon-Spieler_des_Spiels_DICK"></span>
+																				<h6>Bundesliga Elf des Tages</h6>
+																			</div>
+																		</a> </div>
+																	<div
+																		class="kick__article__bonus-stat__content__item">
+																		<a href="/kicker-tv/videos"
+																			class="kick__openContextBox">
+																			<div
+																				class="kick__article__bonus-stat__header">
+																				<span
+																					class="kick__icon-video-ic"></span>
+																				<h6>kicker.tv - Sport Highlights im
+																					Video</h6>
+																			</div>
+																		</a> </div>
+																	<div
+																		class="kick__article__bonus-stat__content__item">
+																		<a href="/live/tvprogramm"
+																			class="kick__openContextBox">
+																			<div
+																				class="kick__article__bonus-stat__header">
+																				<span class="kick__icon-TV_DICK"></span>
+																				<h6>Sport heute im TV</h6>
+																			</div>
+																		</a> </div>
+																</div>
+																<div class="kick__pager">
+																	<div
+																		class="kick__pager__count js-carousel-pagecount">
+																		1 / </div>
+																	<div class="kick__pager__button"> <a
+																			class="kick__pager__button__prev js-carousel-prev kick__pager__button__deac kick__slick-arrow kick__slick-disabled slick-disabled"
+																			aria-disabled="true" style=""></a> <a
+																			class="kick__pager__button__next js-carousel-next kick__slick-arrow"
+																			style="" aria-disabled="false"> </a> </div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="kick__article__share__end">
+									<div class="kick__article__teams"> <a href="/fc-bayern-muenchen/info">
+											<picture>
+												<source
+													data-srcset="https://derivates.kicker.de/image/fetch/f_webp/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 1x, https://derivates.kicker.de/image/fetch/f_webp/w_120%2Ch_120%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 2x"
+													type="image/webp">
+												<source
+													data-srcset="https://derivates.kicker.de/image/fetch/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 1x, https://derivates.kicker.de/image/fetch/w_120%2Ch_120%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png 2x">
+												<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+													data-src="https://derivates.kicker.de/image/fetch/w_60%2Ch_60%2Cc_fit%2Cq_auto:best/https://mediadb.kicker.de/2018/fussball/vereine/xxl/14_20170731800.png"
+													alt="Bayern München" class="lazyload">
+											</picture>
+										</a> </div>
+									<div class="kick__article__ia">
+										<div class="kick__article__social"> <a href="#" onclick="return false;"
+												class="kick__icon-Share_sechseck"></a>
+											<div class="kick__article__social-meta"> <a
+													class="kick__icon-Facebook_Sechseck" target="_blank" rel="noopener"
+													href="https://www.facebook.com/sharer.php?u=https://www.kicker.de/feuer-frei-doppelpacker-mueller-ist-manchmal-dabei-manchmal-nicht-1017516/artikel%23fbshare"></a>
+												<a class="kick__icon-xTwitter_Sechseck" target="_blank" rel="noopener"
+													href="https://twitter.com/intent/tweet?url=https://www.kicker.de/feuer-frei-doppelpacker-mueller-ist-manchmal-dabei-manchmal-nicht-1017516/artikel%23twshare"></a>
+												<a class="kick__icon-Whats_app_Sechseck" target="_blank" rel="noopener"
+													href="whatsapp://send?text=https://www.kicker.de/feuer-frei-doppelpacker-mueller-ist-manchmal-dabei-manchmal-nicht-1017516/artikel%23washare"></a>
+												<a class="kick__icon-Messenger_Sechseck" target="_blank" rel="noopener"
+													href="fb-messenger://share/?link=https://www.kicker.de/feuer-frei-doppelpacker-mueller-ist-manchmal-dabei-manchmal-nicht-1017516/artikel%23fbmshare&app_id=242756395742301"></a>
+												<a class="kick__icon-Telegram_Sechseck" target="_blank" rel="noopener"
+													href="tg://msg?text=https://www.kicker.de/feuer-frei-doppelpacker-mueller-ist-manchmal-dabei-manchmal-nicht-1017516/artikel%23tgshare"></a>
+												<a class="kick__icon-Mail_Sechseck" target="_blank" rel="noopener"
+													href="mailto:?subject=Empfehlung über kicker.de - %22Feuer%20frei%22%3a%20Doppelpacker%20M%c3%bcller%20ist%20%22manchmal%20dabei%2c%20manchmal%20nicht%22&body=https://www.kicker.de/feuer-frei-doppelpacker-mueller-ist-manchmal-dabei-manchmal-nicht-1017516/artikel%23emlshare"></a>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</article>
+					<div class="kick__ad__taboola" data-pos="default">
+						<div class="kick__js-taboola-pos" id="kick__ad-taboola-default"
+							data-mode="organic-thumbs-feed-01" data-placement="Web-12Karten-Artikel" data-pos="default">
+						</div>
+					</div>
+				</div>
+				<div class="kick__ad-pos_wrapper" data-pagetype="article" data-pos="presenterfooter">
+					<div id="kick__ad-presenterfooter_desktop" class=" kick__global__display--none"
+						data-device="desktop"></div>
+					<div id="kick__ad-presenterfooter_tablet" class=" kick__global__display--none" data-device="tablet">
+					</div>
+				</div>
+			</div>
+			<div class="kick__ad-pos_wrapper" data-pagetype="article" data-pos="sticky_leaderboard">
+				<div id="kick__ad-sticky_leaderboard_tablet" class=" kick__global__display--none" data-device="tablet">
+				</div>
+			</div>
+			<footer>
+				<div class="kick__footerlinks">
+					<div class="kick__footerlinks__item">
+						<div class="kick__site-padding">
+							<div class="kick__card-headline">News &amp; Themen</div>
+							<div class="kick__footerlinks-block">
+								<ul>
+									<li> <a href="/bundesliga/live-konferenz"> Bundesliga Live-Ticker </a> </li>
+									<li> <a href="/bundesliga/spieltag"> Bundesliga heute </a> </li>
+									<li> <a href="/fussball/heute-live"> Fußball heute </a> </li>
+									<li> <a href="/fussball/transfermarkt"> Transfer News </a> </li>
+									<li> <a href="/borussia-dortmund/info"> Borussia Dortmund </a> </li>
+									<li> <a href="/fc-bayern-muenchen/info"> Bayern München </a> </li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="kick__footerlinks__item">
+						<div class="kick__site-padding">
+							<div class="kick__card-headline">kicker Abo</div>
+							<div class="kick__footerlinks-block">
+								<ul>
+									<li> <a href="https://leserservice.kicker.de/?onwewe=0603&amp;utm_campaign=kickerde-navi&amp;utm_term=kicker-abo-angebote"
+											target="_blank" rel="noopener"> kicker Abo </a> </li>
+									<li> <a href="https://leserservice.kicker.de/de_DE/abo/kicker-wunschabo/48213.html?onwewe=0603&amp;utm_campaign=kicker-de-navi&amp;utm_term=kicker-abo-digital#oc=selbstzahler&amp;medium=digital"
+											target="_blank" rel="noopener"> eMagazine Abo </a> </li>
+									<li> <a href="https://leserservice.kicker.de/de_DE/erlebniswelt/erlebniswelt.html?onwewe=0603&amp;utm_campaign=kicker-de-navi&amp;utm_term=kicker-erlebniswelt"
+											target="_blank" rel="noopener"> Erlebniswelt </a> </li>
+									<li> <a href="https://emagazine.kicker.de/de/profiles/6925623b4e1b/editions"
+											target="_blank" rel="noopener"> eMagazine-Login </a> </li>
+									<li> <a href="https://shop.kicker.de/de-de/kicker-produkte/einzelhefte/?utm_source=Kicker.de&amp;utm_campaign=navi&amp;utm_medium=button&amp;utm_content=einzelheftebestellen"
+											target="_blank" rel="noopener"> Einzelhefte bestellen </a> </li>
+									<li> <a href="https://www.mykiosk.com/suche/11000160/kicker/" target="_blank"
+											rel="noopener"> kicker am Kiosk kaufen </a> </li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="kick__footerlinks__item">
+						<div class="kick__site-padding">
+							<div class="kick__card-headline">kicker Apps</div>
+							<div class="kick__footerlinks-block">
+								<ul>
+									<li> <a href="https://secure-mediadb.kicker.de/apps/vereinsheim.html"
+											target="_blank" rel="noopener">
+											<picture>
+												<source
+													data-srcset="https://derivates.kicker.de/image/fetch/f_webp/w_21%2Ch_21%2Cc_fill%2Cg_auto%2Cq_auto:best/https://mediadb.kicker.de/apps/library/Grafiken/kicker-vereinsheim.png 1x, https://derivates.kicker.de/image/fetch/f_webp/w_42%2Ch_42%2Cc_fill%2Cg_auto%2Cq_auto:best/https://mediadb.kicker.de/apps/library/Grafiken/kicker-vereinsheim.png 2x"
+													type="image/webp">
+												<source
+													data-srcset="https://derivates.kicker.de/image/fetch/w_21%2Ch_21%2Cc_fill%2Cg_auto%2Cq_auto:best/https://mediadb.kicker.de/apps/library/Grafiken/kicker-vereinsheim.png 1x, https://derivates.kicker.de/image/fetch/w_42%2Ch_42%2Cc_fill%2Cg_auto%2Cq_auto:best/https://mediadb.kicker.de/apps/library/Grafiken/kicker-vereinsheim.png 2x">
+												<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+													data-src="https://derivates.kicker.de/image/fetch/w_21%2Ch_21%2Cc_fill%2Cg_auto%2Cq_auto:best/https://mediadb.kicker.de/apps/library/Grafiken/kicker-vereinsheim.png"
+													alt="Vereinsheim" class="lazyload">
+											</picture> Vereinsheim
+										</a> </li>
+									<li> <a href="https://secure-mediadb.kicker.de/apps/emagazine.html" target="_blank"
+											rel="noopener">
+											<picture>
+												<source
+													data-srcset="https://derivates.kicker.de/image/fetch/f_webp/w_21%2Ch_21%2Cc_fill%2Cg_auto%2Cq_auto:best/https://mediadb.kicker.de/apps/library/Grafiken/kicker-emag-icon.png 1x, https://derivates.kicker.de/image/fetch/f_webp/w_42%2Ch_42%2Cc_fill%2Cg_auto%2Cq_auto:best/https://mediadb.kicker.de/apps/library/Grafiken/kicker-emag-icon.png 2x"
+													type="image/webp">
+												<source
+													data-srcset="https://derivates.kicker.de/image/fetch/w_21%2Ch_21%2Cc_fill%2Cg_auto%2Cq_auto:best/https://mediadb.kicker.de/apps/library/Grafiken/kicker-emag-icon.png 1x, https://derivates.kicker.de/image/fetch/w_42%2Ch_42%2Cc_fill%2Cg_auto%2Cq_auto:best/https://mediadb.kicker.de/apps/library/Grafiken/kicker-emag-icon.png 2x">
+												<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+													data-src="https://derivates.kicker.de/image/fetch/w_21%2Ch_21%2Cc_fill%2Cg_auto%2Cq_auto:best/https://mediadb.kicker.de/apps/library/Grafiken/kicker-emag-icon.png"
+													alt="eMagazine" class="lazyload">
+											</picture> eMagazine
+										</a> </li>
+									<li> <a href="https://secure-mediadb.kicker.de/apps/smarttv.html" target="_blank"
+											rel="noopener"> <span
+												class="kick__icon-App kick__icon-App_FussballNews"></span> SmartTV </a>
+									</li>
+									<li> <a href="https://secure-mediadb.kicker.de/apps/voiceskill.html" target="_blank"
+											rel="noopener">
+											<picture>
+												<source
+													data-srcset="https://derivates.kicker.de/image/fetch/f_webp/w_21%2Ch_21%2Cc_fill%2Cg_auto%2Cq_auto:best/https://mediadb.kicker.de/apps/library/Grafiken/kicker-app-icon.png 1x, https://derivates.kicker.de/image/fetch/f_webp/w_42%2Ch_42%2Cc_fill%2Cg_auto%2Cq_auto:best/https://mediadb.kicker.de/apps/library/Grafiken/kicker-app-icon.png 2x"
+													type="image/webp">
+												<source
+													data-srcset="https://derivates.kicker.de/image/fetch/w_21%2Ch_21%2Cc_fill%2Cg_auto%2Cq_auto:best/https://mediadb.kicker.de/apps/library/Grafiken/kicker-app-icon.png 1x, https://derivates.kicker.de/image/fetch/w_42%2Ch_42%2Cc_fill%2Cg_auto%2Cq_auto:best/https://mediadb.kicker.de/apps/library/Grafiken/kicker-app-icon.png 2x">
+												<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAC0lEQVQI12NggAIAAAkAAWMqFg0AAAAASUVORK5CYII="
+													data-src="https://derivates.kicker.de/image/fetch/w_21%2Ch_21%2Cc_fill%2Cg_auto%2Cq_auto:best/https://mediadb.kicker.de/apps/library/Grafiken/kicker-app-icon.png"
+													alt="Voice" class="lazyload">
+											</picture> Voice
+										</a> </li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="kick__footerlinks__item">
+						<div class="kick__site-padding">
+							<div class="kick__card-headline">Tools &amp; Services</div>
+							<div class="kick__footerlinks-block">
+								<ul>
+									<li> <a href="https://instagram.com/kicker" target="_blank" rel="noopener"> <span
+												class="kick__icon-App kick__icon-Instagram"></span> Instagram </a> </li>
+									<li> <a href="https://www.facebook.com/kickeronline" target="_blank" rel="noopener">
+											<span class="kick__icon-App kick__icon-Facebook"></span> Facebook </a> </li>
+									<li> <a href="https://whatsapp.com/channel/0029VaC7QTC4SpkNv1YHk50g" target="_blank"
+											rel="noopener"> <span class="kick__icon-App kick__icon-Whats_app02"></span>
+											WhatsApp </a> </li>
+									<li> <a href="https://www.threads.net/@kicker" target="_blank" rel="noopener"> <span
+												class="kick__icon-App kick__icon-Threads"></span> Threads </a> </li>
+									<li> <a href="/kicker-bei-twitter-507014/artikel"> <span
+												class="kick__icon-App kick__icon-xTwitter"></span> X / Twitter </a>
+									</li>
+									<li> <a href="https://www.youtube.com/user/kickertv" target="_blank" rel="noopener">
+											<span class="kick__icon-App kick__icon-Youtube02_solo"></span> YouTube </a>
+									</li>
+									<li> <a href="https://www.tiktok.com/@kicker" target="_blank" rel="noopener"> <span
+												class="kick__icon-App kick__icon-Tiktok"></span> TikTok </a> </li>
+									<li> <a href="https://story.snapchat.com/p/463b39f6-3042-4b5b-9b64-54fd2b0a6a49"
+											target="_blank" rel="noopener"> <span
+												class="kick__icon-App kick__icon-Snapchat"></span> Snapchat </a> </li>
+									<li> <a href="/mit_rss_immer_informiert-371919/artikel#omShort"> <span
+												class="kick__icon-App kick__icon-RSS"></span> RSS </a> </li>
+									<li> <a href="/der_kicker_newsletter-244964/artikel"> <span
+												class="kick__icon-App kick__icon-Mail"></span> Newsletter </a> </li>
+									<li> <a href="https://kicker.mindline-analytics.de/index.php?program=Trendmonitor&amp;controller=Webview&amp;action=index&amp;token"
+											target="_blank" rel="noopener"> <span
+												class="kick__icon-App kick__icon-Trendmonitor_Logo"></span> TrendMonitor
+										</a> </li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+				<hr class="kick__card-hr">
+				<div class="kick__footerinfo kick__site-padding">
+					<ul>
+						<li><a href="/impressum-316443/artikel">Impressum</a></li>
+						<li><a href="/datenschutzhinweis-513381/artikel">Datenschutz</a></li>
+						<li><a href="#" onclick="UC_UI.showSecondLayer();return false;">Cookies &amp; Tracking</a></li>
+						<li><a href="/kontakt">Feedback</a></li>
+						<li><a href="/nutzungsbedingungen-350282/artikel">Nutzungsbedingungen</a></li>
+						<li><a href="/jobs">Jobs</a></li>
+						<li><a href="/tarife">Mediadaten</a></li>
+					</ul>
+					<p class="kick__footer-text--small">Weitere Angebote des Olympia-Verlags:</p>
+					<div class="kick__footerinfo">
+						<ul>
+							<li><a href="https://www.alpin.de/" target="_blank" rel="noopener">alpin.de</a></li>
+							<li><a href="https://www.olympia-verlag.de/" target="_blank"
+									rel="noopener">olympia-verlag.de</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="kick__footer-sticky">
+					<div>
+						<div class="kick__scroll-top">
+							<div> <a href="#" onclick="return false;" title="nach oben"><span
+										class="kick__scroll-top-ic"></span></a> </div>
+						</div>
+					</div>
+				</div>
+			</footer>
+		</div>
+		<div class="kick__ad-pos_wrapper" data-pagetype="article" data-pos="sky">
+			<script>  //gqPYbsU("Sky")  </script>
+			<div id="kick__ad-sky_desktop" class=" kick__global__display--none" data-device="desktop"></div> <span
+				class='gqPYbsU_end'></span>
+		</div>
+		<div class="kick__ad-pos_wrapper" data-pagetype="article" data-pos="sticky_mma">
+			<div id="kick__ad-sticky_mma_mew" class=" kick__global__display--none" data-device="mew"></div>
+		</div>
+	</div>
+	<script>      var kickConfig = { "Portal": "de", "CountryVersion": "de-de", "fbAppId": 242756395742301, "fbSdkVersion": "v8.0", "LectaPlayerUrl": "https://player.lecta.io/lecta-player/js/lecta-module.js", "LectaProjectId": "1b7d86ed-4ae1-4932-96a5-f2b284e38bbb", "LectaAccountId": "1f7a8ba5-8234-456c-a3b5-9c4ae2760ac0", "QmTagUrl": "https://storage.googleapis.com/adtags/kicker/QMAX_kicker.de.js", "AditionTagUrl": "https://imagesrv.adition.com/js/srp.js", "RingierTagUrl": "https://cdn.ringier-advertising.ch/prod/tagmanager/kicker.de_de/latest/atm.js", "AdEnabled": true, "DeviceType": "desktop", "Ctr": "article", "TrackFirstLoad": true, "e2ContentUnitId": 0, "e2Competitions": [], "PinpollIvwCp": "2200", "PinpollIvwCo": "ki_pinpoll", "SwEnabled": true, "VideoEnabled": true, "PianoSdkUrl": "https://tag.aticdn.net/js-sdk/piano-analytics-6.12.0.js", "e2OddsserveUrl": "https://creative-cdn.oddsserve.com/unit/loader.js?publisher=kicker", "PinPollGlobalUrl": "https://cdn.pinpoll.com/global.js", "PinPollSdkUrl": "https://cdn.pinpoll.com/sdk.js", "GoogleMapsApiUrl": "https://maps.googleapis.com/maps/api/js?key=AIzaSyAjdpUmOJhJxoXosLlCNaMZ3KHejFTjU5g&amp;async=&amp;_=1482501536989", "appleClientId": "de.olympiaverlag.kicker.apple.login", "appleRedirectUrl": "https://www.kicker.de/meinkicker/apple-registrierung", "dmLibUrl": "https://geo.dailymotion.com/libs/player/xslz.js", "dmPlaylistDefault": "x73sr1", "dmPlaylistGermanFootball": "x80o9u", "dmPlaylistInternationalFootball": "x80oa7", "dmPlaylistHandball": "x80oa2", "dmPlaylistBasketball": "x80oa5", "dmPlaylistIceHockey": "x80oa9", "dmPlaylistESport": "x80oaz", "dmPlaylistBundesLiga": "x80wt0", "HomadUrl": "https://static.kicker.de/content/js/vendor/homad-1.0.2.min.js", "scrollTo": "", "vgwortDomain": "", "vgwortObjectId": "", "FriendlyCaptchaSiteKey": "FCMTFKFV960LI6O7", "FriendlyCaptchaUrl": "/content/js/vendor/friendly-challenge-0.9.9.min.js", "TaboolaMode": "article", "TaboolaUrl": "https://cdn.taboola.com/libtrc/kicker-kickerde/loader.js" }; var QMConfig = { "Enabled": true, "CountryCode": "de-de", "Device": "desktop", "Orientation": "landscape", "Darkmode": "false", "Platform": "Website", "PageType": "article", "Ressort": "bundesliga_3000", "ContentGroup": "Artikel", "ContentType": "artikel", "ContentPartner": "", "Sportart": "fussball_1", "Wettbewerb": "bundesliga_1", "Verein": "fc-bayern-muenchen_14", "Spieltag": "30", "Saison": "2023/24", "Spielpaarung": "", "ContentUrl": window.location.pathname, "Special": "", "Event": "", "Slots": [" Top_desktop_tablet_mew ", " PresenterHeader_desktop_tablet ", " MaxiAd_desktop_tablet ", " MRec_1_mew ", " MMA_1_mew ", " PresenterFooter_desktop_tablet ", " Sticky_Leaderboard_tablet ", " Wallpaper_desktop ", " Sky_desktop ", " Sticky_MMA_mew "], "Zone": "fussball/bundesliga", "DocumentId": "1017516", "Debug": true }  </script>
+	<script>      var ovTrackingConfigOld = { pageName: "artikel: \"Feuer frei\": Doppelpacker Müller ist \"manchmal dabei, manchmal nicht\" - Bundesliga", level2Id: "1", pageType: "", searchPhrase: "", searchResults: "", objectId: "artikel: 1017516", contentType: "artikel", subSection1: "Bundesliga-3000", subSection3: "", subSection4: "", mandant: "kicker", slideshow: "", team: "", teams: "fc-bayern-muenchen_14", contests: "bundesliga_1", match: "", league: "bundesliga_1", season: "2023/24", matchday: "30", sports: "Fußball", contentGroup: "Artikel", contentPartner: "" }; var ovTrackingConfig = { page: "artikel: \"Feuer frei\": Doppelpacker Müller ist \"manchmal dabei, manchmal nicht\" - Bundesliga", CountryVersion: "de-de", site_level2: "News", pageType: "", searchPhrase: "", searchResults: "", objectId: "artikel: 1017516", contentType: "artikel", subSection1: "Bundesliga-3000", subSection3: "", subSection4: "", mandant: "kicker", slideshow: "", team: "fc-bayern-muenchen_14", teams: "fc-bayern-muenchen_14_0", contests: "bundesliga_1", match: "", league: "bundesliga_1", season: "2023/24", matchday: "30", sports: "Fußball", contentGroup: "Artikel", contentPartner: "" };      </script>
+	<script
+		type='text/javascript'>              kickConfig.vgwortDomain = 'https://vg05.met.vgwort.de'; kickConfig.vgwortObjectId = 'article1017516';          </script>
+	<script src="https://static.kicker.de/content/js/vendor/jquery-3.6.3.min.js"></script>
+	<script src="https://static.kicker.de/content/js/vendor/jquery.ba-throttle-debounce-1.1.min.js"></script>
+	<script src="https://static.kicker.de/content/js/vendor/jquery-ui-1.13.2.custom.min.js"></script>
+	<script src="https://static.kicker.de/content/js/vendor/jquery.fancybox-3.3.5.min.js"></script>
+	<script>          var $j = jQuery.noConflict();      </script>
+	<script src="https://static.kicker.de/content/js/vendor/slick-1.8.0.js"></script>
+	<script src="https://geo.dailymotion.com/libs/player/xslz.js" async></script>
+	<script src="https://static.kicker.de/content/js/video.min.js?rv=24.15.8845302"></script>
+	<script src="https://static.kicker.de/content/js/kicker.min.js?rv=24.15.8845302"></script>
+	<script src="https://static.kicker.de/content/js/business.min.js?rv=24.15.8845302"></script>
+	<script src="https://voting.kicker.de/generic/js/general24.15.8845302.js"></script>
+</body>
+
+</html>

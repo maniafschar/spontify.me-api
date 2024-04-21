@@ -27,32 +27,37 @@ public class ClientNewsListener extends AbstractRepositoryListener<ClientNews> {
 	}
 
 	@Async
-	public void execute(final ClientNews clientNews) {
+	public void execute(ClientNews clientNews) {
 		if (clientNews.getPublish() != null
 				&& clientNews.getPublish().getTime() <= Instant.now().atZone(ZoneOffset.UTC).toEpochSecond() * 1000
 				&& (clientNews.getNotified() == null || !clientNews.getNotified())) {
 			try {
-				clientNews.setNotified(true);
-				this.repository.save(clientNews);
-				final QueryParams params = new QueryParams(Query.contact_listId);
-				params.setSearch("contact.clientId=" + clientNews.getClientId() + " and contact.verified=true");
-				final Result users = this.repository.list(params);
-				for (int i2 = 0; i2 < users.size(); i2++) {
-					final Contact contact = this.repository.one(Contact.class,
-							(BigInteger) users.get(i2).get("contact.id"));
-					if (clientNews.getCategoryId() == null)
-						this.notificationService.sendNotification(null,
-								contact,
-								ContactNotificationTextType.clientNews, "news=" + clientNews.getId(),
-								clientNews.getDescription());
+				clientNews = repository.one(ClientNews.class, clientNews.getId());
+				if (clientNews != null) {
+					clientNews.setNotified(true);
+					this.repository.save(clientNews);
+					final QueryParams params = new QueryParams(Query.contact_listId);
+					params.setSearch("contact.clientId=" + clientNews.getClientId() + " and contact.verified=true");
+					final Result users = this.repository.list(params);
+					for (int i2 = 0; i2 < users.size(); i2++) {
+						final Contact contact = this.repository.one(Contact.class,
+								(BigInteger) users.get(i2).get("contact.id"));
+						if (clientNews.getCategory() == null)
+							this.notificationService.sendNotification(null,
+									contact,
+									ContactNotificationTextType.clientNews, "news=" + clientNews.getId(),
+									clientNews.getSource() + ": " + clientNews.getDescription());
+					}
 				}
 			} catch (final Exception e) {
-				try {
-					clientNews.setNotified(false);
-					this.repository.save(clientNews);
-				} catch (final Exception e1) {
+				if (clientNews != null) {
+					try {
+						clientNews.setNotified(false);
+						this.repository.save(clientNews);
+					} catch (final Exception e1) {
+					}
+					throw new RuntimeException(e);
 				}
-				throw new RuntimeException(e);
 			}
 		}
 	}

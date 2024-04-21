@@ -46,7 +46,7 @@
 		"chatSeen": "hat Deine Chatnachricht gelesen.",
 		"clientMarketing": "Umfrage <jq:EXTRA_1 />",
 		"clientMarketingResult": "Resultat der Umfrage <jq:EXTRA_1 />",
-		"clientNews": "neuer Artikel: <jq:EXTRA_1 />",
+		"clientNews": "<jq:EXTRA_1 />",
 		"contactBirthday": "wird heute <jq:EXTRA_1 /> Jahre jung.",
 		"contactDelete": "hat APP_TITLE verlassen 😢",
 		"contactFindMe": "ist in Deiner unmittelbarren Umgebung, ihr habt <jq:EXTRA_1 /> gemeinsame Skills.",

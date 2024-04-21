@@ -8,7 +8,6 @@ SELECT
 	contact.birthday,
 	contact.birthdayDisplay,
 	contact.bluetooth,
-	contact.clubs,
 	contact.createdAt,
 	contact.gender,
 	contact.id,

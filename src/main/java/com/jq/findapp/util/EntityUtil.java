@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.Base64;
 
 import javax.imageio.ImageIO;
@@ -62,7 +62,10 @@ public class EntityUtil {
 		final byte[] data;
 		final BufferedImage img;
 		try {
-			data = IOUtils.toByteArray(new URL(url));
+			if (url.startsWith("data:"))
+				data = Base64.getDecoder().decode(url.substring(url.indexOf(',') + 1));
+			else
+				data = IOUtils.toByteArray(URI.create(url));
 		} catch (final Exception ex) {
 			throw new IllegalArgumentException("IMAGE_BYTE_ARRAY_EXCEPTION " + ex.getMessage() + ": " + url,
 					ex);

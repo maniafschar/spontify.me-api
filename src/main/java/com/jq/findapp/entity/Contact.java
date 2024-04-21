@@ -51,7 +51,6 @@ public class Contact extends BaseEntity {
 	private String ageFemale;
 	private String ageMale;
 	private String appleId;
-	private String clubs;
 	private String description;
 	private String email;
 	private String emailVerified;
@@ -109,14 +108,6 @@ public class Contact extends BaseEntity {
 
 	public void setEmail(final String email) {
 		this.email = email;
-	}
-
-	public void setClubs(final String clubs) {
-		this.clubs = clubs;
-	}
-
-	public String getClubs() {
-		return clubs;
 	}
 
 	public String getEmailVerified() {
