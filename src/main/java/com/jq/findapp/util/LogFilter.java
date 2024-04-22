@@ -72,7 +72,7 @@ public class LogFilter implements Filter {
 				else if (!query.startsWith("_="))
 					log.setQuery(URLDecoder.decode(query, StandardCharsets.UTF_8.name()));
 				if (log.getQuery() != null && log.getQuery().length() > 255)
-					log.setQuery(log.getQuery().substring(0, 255));
+					log.setQuery(log.getQuery().substring(0, 252) + "...");
 			}
 		}
 		final long time = System.currentTimeMillis();

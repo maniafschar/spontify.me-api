@@ -27,6 +27,7 @@ import com.jq.findapp.entity.Log;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.util.Strings;
 
 @Service
 public class ImportLogService {
@@ -98,8 +99,8 @@ public class ImportLogService {
 								final String[] s = path.split("\\?");
 								if (s[0].length() > 1)
 									log.setUri(log.getUri() + URLDecoder.decode(s[0], StandardCharsets.UTF_8));
-								if (s.length > 1)
-									log.setQuery(s[1]);
+								if (s.length > 1 && !Strings.isEmpty(s[1]))
+									log.setQuery(s[1].length() > 255 ? s[1].substring(0, 252) + "..." : s[1]);
 							}
 							params.setSearch("log.ip='" + log.getIp() + "' and log.uri='"
 									+ log.getUri().replace("'", "''")
