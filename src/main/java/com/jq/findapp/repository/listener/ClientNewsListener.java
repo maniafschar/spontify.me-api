@@ -39,10 +39,12 @@ public class ClientNewsListener extends AbstractRepositoryListener<ClientNews> {
 					final QueryParams params = new QueryParams(Query.contact_listId);
 					params.setSearch("contact.clientId=" + clientNews.getClientId() + " and contact.verified=true");
 					final Result users = this.repository.list(params);
+					final String cat = "|" + clientNews.getCategory() + "|";
 					for (int i2 = 0; i2 < users.size(); i2++) {
 						final Contact contact = this.repository.one(Contact.class,
 								(BigInteger) users.get(i2).get("contact.id"));
-						if (clientNews.getCategory() == null)
+						if (clientNews.getCategory() == null
+								|| ("|" + contact.getSkills() + "|").contains(cat))
 							this.notificationService.sendNotification(null,
 									contact,
 									ContactNotificationTextType.clientNews, "news=" + clientNews.getId(),
