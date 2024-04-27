@@ -454,7 +454,8 @@ public class ActionApi {
 		final Boolean active = WebClient.create(serverWebSocket + "active/" + id).get().retrieve()
 				.toEntity(Boolean.class).block().getBody();
 		if ((active == null || !active) && chatService.isVideoCallAllowed(repository.one(Contact.class, user), id))
-			notificationService.sendNotification(repository.one(Contact.class, user), repository.one(Contact.class, id),
+			notificationService.sendNotificationSync(repository.one(Contact.class, user),
+					repository.one(Contact.class, id),
 					ContactNotificationTextType.contactVideoCall, "video=" + user);
 	}
 

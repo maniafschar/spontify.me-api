@@ -45,7 +45,7 @@ public class ClientNewsListener extends AbstractRepositoryListener<ClientNews> {
 								(BigInteger) users.get(i2).get("contact.id"));
 						if (clientNews.getCategory() == null
 								|| ("|" + contact.getSkills() + "|").contains(cat))
-							this.notificationService.sendNotification(null,
+							this.notificationService.sendNotificationSync(null,
 									contact,
 									ContactNotificationTextType.clientNews, "news=" + clientNews.getId(),
 									clientNews.getSource() + ": " + clientNews.getDescription());

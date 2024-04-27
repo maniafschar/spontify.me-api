@@ -48,7 +48,7 @@ public class ClientMarketingListener extends AbstractRepositoryListener<ClientMa
 			params.setSearch("contact.clientId=" + clientMarketing.getClientId() + " and contact.verified=true");
 			final Result users = repository.list(params);
 			for (int i2 = 0; i2 < users.size(); i2++)
-				notificationService.sendNotification(null,
+				notificationService.sendNotificationSync(null,
 						repository.one(Contact.class, (BigInteger) users.get(i2).get("contact.id")),
 						ContactNotificationTextType.clientMarketing, "m=" + clientMarketing.getId());
 		} catch (final Exception e) {

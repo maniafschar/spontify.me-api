@@ -109,7 +109,6 @@ public class ChatService {
 		repository.save(chat);
 	}
 
-	@Async
 	public void notifyContact(final ContactChat contactChat) throws Exception {
 		final Contact contactFrom = repository.one(Contact.class, contactChat.getContactId());
 		final Contact contactTo = repository.one(Contact.class, contactChat.getContactId2());

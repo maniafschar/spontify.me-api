@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
@@ -130,14 +130,14 @@ public class NotificationService {
 							for (int i = 0; i < param.length; i++)
 								param2[i + 1] = param[i];
 						}
-						sendNotification(me, other, textID, Strings.encodeParam("p=" + me.getId()), param2);
+						sendNotificationSync(me, other, textID, Strings.encodeParam("p=" + me.getId()), param2);
 					}
 				}
 			}
 		}
 	}
 
-	public boolean sendNotification(final Contact contactFrom, final Contact contactTo,
+	public boolean sendNotificationSync(final Contact contactFrom, final Contact contactTo,
 			final ContactNotificationTextType notificationTextType,
 			final String action, final String... param) throws Exception {
 		if (contactTo == null || !contactTo.getVerified())
@@ -184,6 +184,13 @@ public class NotificationService {
 			return true;
 		}
 		return false;
+	}
+
+	@Async
+	public void sendNotification(final Contact contactFrom, final Contact contactTo,
+			final ContactNotificationTextType notificationTextType,
+			final String action, final String... param) throws Exception {
+		sendNotificationSync(contactFrom, contactTo, notificationTextType, action, param);
 	}
 
 	private ContactNotification save(final Contact contactTo, final Contact contactFrom, final String text,
@@ -430,7 +437,8 @@ public class NotificationService {
 			email.setTextMsg(text);
 			if (html != null) {
 				email.setDataSourceResolver(new DataSourceUrlResolver(
-						new URL(Strings.removeSubdomain(repository.one(Client.class, to.getClientId()).getUrl()))));
+						URI.create(Strings.removeSubdomain(repository.one(Client.class, to.getClientId()).getUrl()))
+								.toURL()));
 				email.setHtmlMsg(html);
 			}
 			email.send();
