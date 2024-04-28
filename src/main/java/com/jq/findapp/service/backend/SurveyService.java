@@ -494,7 +494,7 @@ public class SurveyService {
 
 		private int currentSeason() {
 			final LocalDateTime now = LocalDateTime.now();
-			return now.getYear() - (now.getMonth().getValue() < 6 ? 0 : 1);
+			return now.getYear() - (now.getMonth().getValue() < 6 ? 1 : 0);
 		}
 
 		private String getTeam(final BigInteger clientId, final JsonNode poll) {
@@ -835,6 +835,7 @@ public class SurveyService {
 				if (json.has("survey")) {
 					for (int i2 = 0; i2 < json.get("survey").size(); i2++) {
 						final int teamId = json.get("survey").get(i2).asInt();
+						System.out.println("update " + clientId + " - " + teamId);
 						BigInteger id = synchronize.prediction(clientId, teamId);
 						if (id != null)
 							result.result += "\nprediction: " + id;
@@ -876,8 +877,8 @@ public class SurveyService {
 		final Result result = repository.list(params);
 		if (result.size() > 0 && !Strings.isEmpty(result.get(0).get("storage.storage")))
 			fixture = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
-		if (fixture == null || fixture.has("errors") && fixture.get("errors").size() > 0
-				|| fixture.get("results").intValue() == 0) {
+		if (fixture == null || fixture.get("results").intValue() == 0
+				|| fixture.has("errors") && fixture.get("errors").has("rateLimit")) {
 			fixture = WebClient
 					.create("https://v3.football.api-sports.io/fixtures?" + url)
 					.get()
