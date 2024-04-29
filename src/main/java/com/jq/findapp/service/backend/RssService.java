@@ -60,7 +60,8 @@ public class RssService {
 				final JsonNode json = new ObjectMapper().readTree(list.get(i).get("client.storage").toString());
 				if (json.has("rss")) {
 					for (int i2 = 0; i2 < json.get("rss").size(); i2++)
-						futures.add(this.syncFeed(json.get("rss").get(i2), (BigInteger) list.get(i).get("client.id")));
+						futures.add(this.syncFeed(json.get("rss").get(i2), (BigInteger) list.get(i).get("client.id"),
+								json.has("publishingPostfix") ? json.get("publishingPostfix").asText() : null));
 				}
 			} catch (final Exception e) {
 				if (result.exception == null)
@@ -87,9 +88,10 @@ public class RssService {
 	}
 
 	@Async
-	private CompletableFuture<Object> syncFeed(final JsonNode json, final BigInteger clientId) {
+	private CompletableFuture<Object> syncFeed(final JsonNode json, final BigInteger clientId,
+			final String publishingPostfix) {
 		return CompletableFuture.supplyAsync(() -> {
-			return new ImportFeed().run(json, clientId);
+			return new ImportFeed().run(json, clientId, publishingPostfix);
 		});
 	}
 
@@ -103,7 +105,7 @@ public class RssService {
 		private final SimpleDateFormat dateParser2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.ROOT);
 		private final Set<String> urls = new HashSet<>();
 
-		private String run(final JsonNode json, final BigInteger clientId) {
+		private String run(final JsonNode json, final BigInteger clientId, final String publishingPostfix) {
 			try {
 				final String url = json.get("url").asText();
 				final ArrayNode rss = (ArrayNode) new XmlMapper().readTree(URI.create(url).toURL()).findValues("item")
@@ -140,7 +142,10 @@ public class RssService {
 							this.urls.add(clientNews.getUrl());
 							if (b)
 								RssService.this.externalService.publishOnFacebook(clientId,
-										clientNews.getDescription() + (Strings.isEmpty(source) ? "" : "\n" + source),
+										clientNews.getDescription()
+												+ (Strings.isEmpty(source) ? "" : "\n" + source)
+												+ (Strings.isEmpty(publishingPostfix) ? ""
+														: "\n\n" + publishingPostfix),
 										"/rest/marketing/news/" + clientNews.getId());
 						}
 					} catch (final Exception ex) {

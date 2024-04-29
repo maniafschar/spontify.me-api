@@ -89,6 +89,8 @@ public class SurveyService {
 		BigInteger prediction(final BigInteger clientId, final int teamId) throws Exception {
 			final long now = Instant.now().getEpochSecond();
 			final JsonNode json = get("team=" + teamId + "&season=" + currentSeason());
+			final JsonNode clientJson = new ObjectMapper()
+					.readTree(repository.one(Client.class, clientId).getStorage());
 			for (int i = 0; i < json.size(); i++) {
 				if ("NS".equals(json.get(i).get("fixture").get("status").get("short").asText())) {
 					final Instant date = Instant
@@ -137,6 +139,9 @@ public class SurveyService {
 											+ "\n\nKlickt auf das Bild, um abzustimmen. Dort wird Eure Stimme erfasst und automatisch in die Wertung übernommen, die Ihr dann kurz vor dem Spiel hier sehen könnt."
 											+ (poll.get("statistics").size() > 0
 													? "\n\nIm Bild seht ihr die zusammengefassten Statistiken zu den letzen Spielen."
+													: "")
+											+ (clientJson.has("publishingPostfix")
+													? "\n\n" + clientJson.get("publishingPostfix").asText()
 													: ""),
 									"/rest/marketing/" + clientMarketing.getId());
 							return clientMarketing.getId();
@@ -243,6 +248,8 @@ public class SurveyService {
 		BigInteger playerOfTheMatch(final BigInteger clientId, final int teamId) throws Exception {
 			final JsonNode matchDays = get("team=" + teamId + "&season=" + currentSeason());
 			if (matchDays != null) {
+				final JsonNode clientJson = new ObjectMapper()
+						.readTree(repository.one(Client.class, clientId).getStorage());
 				for (int i = 0; i < matchDays.size(); i++) {
 					if ("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())) {
 						final Instant startDate = Instant
@@ -312,7 +319,10 @@ public class SurveyService {
 										"Umfrage Spieler des Spiels " + getTeam(clientId, poll)
 												+ getOponent(clientId, poll)
 												+ "\n\nKlickt auf das Bild, um abzustimmen. Dort wird Eure Stimme erfasst und automatisch in die Wertung übernommen, die Ihr ab dem "
-												+ endDate + " hier sehen könnt.",
+												+ endDate + " hier sehen könnt."
+												+ (clientJson.has("publishingPostfix")
+														? "\n\n" + clientJson.get("publishingPostfix").asText()
+														: ""),
 										"/rest/marketing/" + clientMarketing.getId());
 								return clientMarketing.getId();
 							}
@@ -421,6 +431,8 @@ public class SurveyService {
 		}
 
 		String resultAndNotify(final BigInteger clientId) throws Exception {
+			final JsonNode clientJson = new ObjectMapper()
+					.readTree(repository.one(Client.class, clientId).getStorage());
 			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 			params.setSearch(
 					"clientMarketingResult.published=false and clientMarketing.endDate<=cast('" + Instant.now()
@@ -448,7 +460,10 @@ public class SurveyService {
 					if ("PlayerOfTheMatch".equals(poll.get("type").asText()))
 						prefix = "Umfrage Spieler des Spiels";
 					externalService.publishOnFacebook(clientId,
-							"Resultat der \"" + prefix + "\" " + getTeam(clientId, poll) + getOponent(clientId, poll),
+							"Resultat der \"" + prefix + "\" " + getTeam(clientId, poll) + getOponent(clientId, poll)
+									+ (clientJson.has("publishingPostfix")
+											? "\n\n" + clientJson.get("publishingPostfix").asText()
+											: ""),
 							"/rest/marketing/" + clientMarketingResult.getClientMarketingId() + "/result");
 					result += clientMarketingResult.getId() + " ";
 				} else
@@ -741,8 +756,11 @@ public class SurveyService {
 	private class Notification {
 		private void sendPoll(final ClientMarketing clientMarketing)
 				throws Exception {
+			final JsonNode poll = new ObjectMapper().readTree(Attachment.resolve(clientMarketing.getStorage()));
 			final QueryParams params = new QueryParams(Query.contact_listId);
-			String s = "contact.verified=true and contact.clientId=" + clientMarketing.getClientId();
+			String s = "contact.verified=true and contact.clientId=" + clientMarketing.getClientId()
+					+ " and cast(REGEXP_LIKE(contact.skills,'9." + poll.get("homeId").asText()
+					+ "|9." + poll.get("awayId").asText() + "') as integer)=1";
 			if (!Strings.isEmpty(clientMarketing.getLanguage())) {
 				String s2 = "";
 				final String[] langs = clientMarketing.getLanguage().split(Attachment.SEPARATOR);

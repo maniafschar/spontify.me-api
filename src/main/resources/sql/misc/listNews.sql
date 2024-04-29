@@ -4,6 +4,8 @@ SELECT
 	clientNews.publish,
 	clientNews.image,
 	clientNews.url,
+	clientNews.category,
+	clientNews.source,
 	clientNews.createdAt,
 	clientNews.modifiedAt,
 	clientNews.description

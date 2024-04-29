@@ -19,7 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.Event;
@@ -167,9 +170,12 @@ public class EventService {
 		final Event event = repository.one(Event.class, id);
 		final Contact contact = repository.one(Contact.class, event.getContactId());
 		final Location location = repository.one(Location.class, event.getLocationId());
+		final JsonNode json = new ObjectMapper()
+				.readTree(repository.one(Client.class, contact.getClientId()).getStorage());
 		final String fbId = externalService.publishOnFacebook(contact.getClientId(),
 				new SimpleDateFormat("d.M.yyyy H:mm").format(event.getStartDate()) + "\n" + event.getDescription()
-						+ "\n\n" + location.getName() + "\n" + location.getAddress(),
+						+ "\n\n" + location.getName() + "\n" + location.getAddress()
+						+ (json.has("publishingPostfix") ? "\n\n" + json.get("publishingPostfix").asText() : ""),
 				"/rest/marketing/event/" + id);
 		if (fbId != null) {
 			event.setPublishId(fbId);
