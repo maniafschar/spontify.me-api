@@ -32,6 +32,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.backend.events.ImportMunich;
 import com.jq.findapp.util.Score;
 import com.jq.findapp.util.Strings;
@@ -171,7 +172,7 @@ public class EventService {
 		final Contact contact = repository.one(Contact.class, event.getContactId());
 		final Location location = repository.one(Location.class, event.getLocationId());
 		final JsonNode json = new ObjectMapper()
-				.readTree(repository.one(Client.class, contact.getClientId()).getStorage());
+				.readTree(Attachment.resolve(repository.one(Client.class, contact.getClientId()).getStorage()));
 		final String fbId = externalService.publishOnFacebook(contact.getClientId(),
 				new SimpleDateFormat("d.M.yyyy H:mm").format(event.getStartDate()) + "\n" + event.getDescription()
 						+ "\n\n" + location.getName() + "\n" + location.getAddress()

@@ -90,7 +90,7 @@ public class SurveyService {
 			final long now = Instant.now().getEpochSecond();
 			final JsonNode json = get("team=" + teamId + "&season=" + currentSeason());
 			final JsonNode clientJson = new ObjectMapper()
-					.readTree(repository.one(Client.class, clientId).getStorage());
+					.readTree(Attachment.resolve(repository.one(Client.class, clientId).getStorage()));
 			for (int i = 0; i < json.size(); i++) {
 				if ("NS".equals(json.get(i).get("fixture").get("status").get("short").asText())) {
 					final Instant date = Instant
@@ -249,7 +249,7 @@ public class SurveyService {
 			final JsonNode matchDays = get("team=" + teamId + "&season=" + currentSeason());
 			if (matchDays != null) {
 				final JsonNode clientJson = new ObjectMapper()
-						.readTree(repository.one(Client.class, clientId).getStorage());
+						.readTree(Attachment.resolve(repository.one(Client.class, clientId).getStorage()));
 				for (int i = 0; i < matchDays.size(); i++) {
 					if ("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())) {
 						final Instant startDate = Instant
@@ -432,7 +432,7 @@ public class SurveyService {
 
 		String resultAndNotify(final BigInteger clientId) throws Exception {
 			final JsonNode clientJson = new ObjectMapper()
-					.readTree(repository.one(Client.class, clientId).getStorage());
+					.readTree(Attachment.resolve(repository.one(Client.class, clientId).getStorage()));
 			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 			params.setSearch(
 					"clientMarketingResult.published=false and clientMarketing.endDate<=cast('" + Instant.now()
