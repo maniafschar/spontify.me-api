@@ -223,6 +223,7 @@ public class EventService {
 			final boolean run = LocalDateTime.now().getHour() == 5 && LocalDateTime.now().getMinute() < 10;
 			result.result = "Munich: " + (run ? importMunich.run(this, clientId) + "\n" : "paused\n")
 					+ publishClient(clientId);
+			result.result += "Publish User: " + publishUser();
 		} catch (final Exception e) {
 			result.exception = e;
 		}
@@ -243,6 +244,21 @@ public class EventService {
 		for (int i = 0; i < result.size(); i++)
 			publish((BigInteger) result.get(i).get("event.id"));
 		return result.size() + " published";
+	}
+
+	private int publishUser() throws Exception {
+		final QueryParams params = new QueryParams(Query.event_listId);
+		params.setSearch("event.startDate>cast('" + Instant.now().plus(Duration.ofMinutes(30))
+				+ "' as timestamp) 
+				+ " and event.publish=true"
+				+ " and (event.image is not null or location.image is not null)"
+				+ " and event.publishId is null"
+				+ " and (event.modifiedAt is null or event.modifiedAt<cast('"
+				+ Instant.now().minus(Duration.ofMinutes(15)) + "' as timestamp))");
+		final Result result = repository.list(params);
+		for (int i = 0; i < result.size(); i++)
+			publish((BigInteger) result.get(i).get("event.id"));
+		return result.size();
 	}
 
 	public String get(final String url) {
