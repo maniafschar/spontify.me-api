@@ -291,15 +291,17 @@ public class MarketingApi {
 		if (event == null)
 			return "";
 		final Contact contact = repository.one(Contact.class, event.getContactId());
-		final Location location = repository.one(Location.class, event.getLocationId());
+		final Location location = event.getLocationId() == null ? null
+				: repository.one(Location.class, event.getLocationId());
 		String image = event.getImage();
-		if (image == null)
+		if (image == null && location != null)
 			image = location.getImage();
 		if (image == null)
 			image = contact.getImage();
 		return getHtml(repository.one(Client.class, contact.getClientId()), "event/" + id,
 				Attachment.resolve(image),
-				event.getDescription() + " " + location.getAddress() + " " + location.getDescription());
+				event.getDescription()
+						+ (location == null ? "" : " " + location.getAddress() + " " + location.getDescription()));
 	}
 
 	private synchronized void update() throws IOException {

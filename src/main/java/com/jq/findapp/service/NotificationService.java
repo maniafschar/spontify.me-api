@@ -174,7 +174,7 @@ public class NotificationService {
 			boolean b = !Strings.isEmpty(contactTo.getPushSystem()) && !Strings.isEmpty(contactTo.getPushToken());
 			if (b)
 				b = sendNotificationDevice(contactFrom, contactTo, s, action, notification);
-			if (!b) {
+			if (!b && notificationTextType != ContactNotificationTextType.clientNews) {
 				sendNotificationEmail(contactFrom, contactTo, s.toString(), action);
 				if (notification != null)
 					notification.setType(ContactNotificationType.email);

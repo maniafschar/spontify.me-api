@@ -248,10 +248,8 @@ public class EventService {
 
 	private int publishUser() throws Exception {
 		final QueryParams params = new QueryParams(Query.event_listId);
-		params.setSearch("event.startDate>cast('" + Instant.now().plus(Duration.ofMinutes(30))
-				+ "' as timestamp) 
+		params.setSearch("event.startDate>cast('" + Instant.now().plus(Duration.ofMinutes(10)) + "' as timestamp)"
 				+ " and event.publish=true"
-				+ " and (event.image is not null or location.image is not null)"
 				+ " and event.publishId is null"
 				+ " and (event.modifiedAt is null or event.modifiedAt<cast('"
 				+ Instant.now().minus(Duration.ofMinutes(15)) + "' as timestamp))");
