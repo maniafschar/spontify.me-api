@@ -221,9 +221,9 @@ public class EventService {
 		try {
 			final BigInteger clientId = BigInteger.ONE;
 			final boolean run = LocalDateTime.now().getHour() == 5 && LocalDateTime.now().getMinute() < 10;
-			result.result = "Munich: " + (run ? importMunich.run(this, clientId) + "\n" : "paused\n")
-					+ publishClient(clientId);
-			result.result += "Publish User: " + publishUser();
+			result.result = "Munich: " + (run ? importMunich.run(this, clientId) + "" : "paused")
+					+ "\n" + publishClient(clientId);
+			result.result += "\n" + publishUser() + " user events published";
 		} catch (final Exception e) {
 			result.exception = e;
 		}
@@ -250,7 +250,7 @@ public class EventService {
 		final QueryParams params = new QueryParams(Query.event_listId);
 		params.setSearch("event.startDate>cast('" + Instant.now().plus(Duration.ofMinutes(10)) + "' as timestamp)"
 				+ " and event.publish=true"
-				+ " and length(event.publishId)=0"
+				+ " and event.publishId is null"
 				+ " and (event.modifiedAt is null or event.modifiedAt<cast('"
 				+ Instant.now().minus(Duration.ofMinutes(15)) + "' as timestamp))");
 		final Result result = repository.list(params);
