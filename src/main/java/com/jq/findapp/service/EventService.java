@@ -175,7 +175,7 @@ public class EventService {
 				.readTree(Attachment.resolve(repository.one(Client.class, contact.getClientId()).getStorage()));
 		final String fbId = externalService.publishOnFacebook(contact.getClientId(),
 				new SimpleDateFormat("d.M.yyyy H:mm").format(event.getStartDate()) + "\n" + event.getDescription()
-						+ "\n\n" + location.getName() + "\n" + location.getAddress()
+						+ (location == null ? "" : "\n\n" + location.getName() + "\n" + location.getAddress())
 						+ (json.has("publishingPostfix") ? "\n\n" + json.get("publishingPostfix").asText() : ""),
 				"/rest/marketing/event/" + id);
 		if (fbId != null) {
@@ -250,7 +250,7 @@ public class EventService {
 		final QueryParams params = new QueryParams(Query.event_listId);
 		params.setSearch("event.startDate>cast('" + Instant.now().plus(Duration.ofMinutes(10)) + "' as timestamp)"
 				+ " and event.publish=true"
-				+ " and event.publishId is null"
+				+ " and length(event.publishId)=0"
 				+ " and (event.modifiedAt is null or event.modifiedAt<cast('"
 				+ Instant.now().minus(Duration.ofMinutes(15)) + "' as timestamp))");
 		final Result result = repository.list(params);

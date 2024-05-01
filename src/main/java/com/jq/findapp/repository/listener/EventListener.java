@@ -39,7 +39,6 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 			event.setRepetition("o");
 		if ("o".equals(event.getRepetition()))
 			event.setEndDate(new Date(event.getStartDate().getTime()));
-		event.setPublishId(null);
 	}
 
 	@Override
