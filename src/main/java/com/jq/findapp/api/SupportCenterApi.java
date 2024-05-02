@@ -173,7 +173,7 @@ public class SupportCenterApi {
 		final Map<String, Map<String, Set<String>>> result = new HashMap<>();
 		final QueryParams params = new QueryParams(Query.misc_listLog);
 		params.setLimit(Integer.MAX_VALUE);
-		params.setSearch("(log.uri='/action/teaser/contacts' or (log.uri not like '/%' and LOWER(ip.org) not like '%google%' and LOWER(ip.org) not like '%facebook%'")) and log.createdAt<cast('" + Instant.now().minus(Duration.ofDays(40)) + "' as timestamp)");
+		params.setSearch("(log.uri='/action/teaser/contacts' or (log.uri not like '/%' and LOWER(ip.org) not like '%google%' and LOWER(ip.org) not like '%facebook%')) and log.createdAt<cast('" + Instant.now().minus(Duration.ofDays(40)) + "' as timestamp)");
 		result.put("login", new HashMap<>());
 		result.put("anonym", new HashMap<>());
 		result.put("teaser", new HashMap<>());
