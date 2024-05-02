@@ -183,22 +183,20 @@ public class SupportCenterApi {
 			final Map<String, Object> row = list.get(i);
 			final String key = Instant.ofEpochMilli(((Date) row.get("log.createdAt")).getTime()).toString().substring(0, 10);
 			if (log.getUri().startsWith("/")) {
-				if (row.get("log.contactId") == null) {
-					if (!result.get(anonym).containsKey(key))
-						result.get(anonym).put(key, new HashSet<>());
-					result.get(anonym).get(key).add(row.get("log.ip"));
-				} else {
-					if (!result.get(login).containsKey(key))
-						result.get(login).put(key, new HashSet<>());
-					result.get(login).get(key).add(row.get("log.contactId").toString());
-				}
-			} else {
-				if (!result.get(teaser).containsKey(key))
-					result.get(teaser).put(key, new HashSet<>());
-				result.get(teaser).get(key).add(row.get("log.ip"));
-			}
+				if (row.get("log.contactId") == null)
+					addLogEntry(result, anonym, key, (String) row.get("log.ip"));
+				else
+					addLogEntry(result, login, key, row.get("log.contactId").toString());
+			} else
+				addLogEntry(result, teaser, key, (String) row.get("log.ip"));
 		}
 		return result;
+	}
+
+	private void addLogEntry(final Map<String, Map<String, Set<String>>> result, final String label, final String key, final String value) {
+		if (!result.get(label).containsKey(key))
+			result.get(label).put(key, new HashSet<>());
+		result.get(label).get(key).add(value);
 	}
 
 	@GetMapping("metrics")
