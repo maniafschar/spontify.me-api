@@ -21,6 +21,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
@@ -453,6 +455,13 @@ public class NotificationService {
 
 	public void createTicket(final TicketType type, String subject, String text, final BigInteger contactId) {
 		try {
+			if (type == TicketType.ERROR && "client".equals(subject)) {
+				final QueryParams params = new QueryParams(Query.misc_listTicket);
+				params.setSearch("storage.label='logErrorExclusionRegex'");
+				final Map<String, Object> exclude = repository.one(params);
+				if (exclude != null && Pattern.compile(exclude.getStorage()).matcher(text).find())
+					return;
+			}
 			if (subject == null)
 				subject = "no subject";
 			else if (subject.length() > 255) {
