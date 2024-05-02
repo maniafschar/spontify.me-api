@@ -2,9 +2,11 @@ package com.jq.findapp.api;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -168,19 +170,30 @@ public class SupportCenterApi {
 
 	@GetMapping("report")
 	public Map<String, Map<Date, Integer>> metrics() throws Exception {
-		final Map<String, Map<String, Integer>> result = new HashMap<>();
+		final Map<String, Map<String, Set<String>>> result = new HashMap<>();
 		final QueryParams params = new QueryParams(Query.misc_listLog);
 		params.setLimit(Integer.MAX_VALUE);
-		params.setSearch("");
+		params.setSearch("log.uri='/action/teaser/contacts' and log.createdAt<cast('" + Instant.now().minus(Duration.ofDays(40)) + "' as timestamp)");
 		result.put("login", new HashMap<>());
-		final Result list = repository.list(params);
+		result.put("anonym", new HashMap<>());
+		Result list = repository.list(params);
 		for (int i = 0; i < list.size(); i++) {
 			final Map<String, Object> row = list.get(i);
-			row.get("log.createdAt");
-			if (result.get("login").containsKey(key))
-				result.get("login").get(key)++;
-			else
-				result.get("login").put(key, 1);
+			final String key = Instant.ofEpochMilli(((Date) row.get("log.createdAt")).getTime()).toString().substring(0, 10);
+			if (row.get("log.contactId") == null) {
+				if (!result.get("anonym").containsKey(key))
+					result.get("anonym").put(key, new HashSet<>());
+				result.get("anonym").get(key).add(row.get("log.ip"));
+			} else {
+				if (!result.get("login").containsKey(key))
+					result.get("login").put(key, new HashSet<>());
+				result.get("login").get(key).add(row.get("log.contactId").toString());
+			}
+		}
+		params.setSearch(params.getSearch().replace("uri='/action/teaser/contacts", " not like '/%") + " and LOWER(ip.org) not like '%google%' and LOWER(ip.org) not like '%facebook%'"");
+		result.put("teaser", new HashMap<>());
+		Result list = repository.list(params);
+		for (int i = 0; i < list.size(); i++) {
 		}
 		return result;
 	}
