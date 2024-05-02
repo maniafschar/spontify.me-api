@@ -173,27 +173,29 @@ public class SupportCenterApi {
 		final Map<String, Map<String, Set<String>>> result = new HashMap<>();
 		final QueryParams params = new QueryParams(Query.misc_listLog);
 		params.setLimit(Integer.MAX_VALUE);
-		params.setSearch("log.uri='/action/teaser/contacts' and log.createdAt<cast('" + Instant.now().minus(Duration.ofDays(40)) + "' as timestamp)");
+		params.setSearch("(log.uri='/action/teaser/contacts' or (log.uri not like '/%' and LOWER(ip.org) not like '%google%' and LOWER(ip.org) not like '%facebook%'")) and log.createdAt<cast('" + Instant.now().minus(Duration.ofDays(40)) + "' as timestamp)");
 		result.put("login", new HashMap<>());
 		result.put("anonym", new HashMap<>());
+		result.put("teaser", new HashMap<>());
 		Result list = repository.list(params);
 		for (int i = 0; i < list.size(); i++) {
 			final Map<String, Object> row = list.get(i);
 			final String key = Instant.ofEpochMilli(((Date) row.get("log.createdAt")).getTime()).toString().substring(0, 10);
-			if (row.get("log.contactId") == null) {
-				if (!result.get("anonym").containsKey(key))
-					result.get("anonym").put(key, new HashSet<>());
-				result.get("anonym").get(key).add(row.get("log.ip"));
+			if (log.getUri().startsWith("/")) {
+				if (row.get("log.contactId") == null) {
+					if (!result.get("anonym").containsKey(key))
+						result.get("anonym").put(key, new HashSet<>());
+					result.get("anonym").get(key).add(row.get("log.ip"));
+				} else {
+					if (!result.get("login").containsKey(key))
+						result.get("login").put(key, new HashSet<>());
+					result.get("login").get(key).add(row.get("log.contactId").toString());
+				}
 			} else {
-				if (!result.get("login").containsKey(key))
-					result.get("login").put(key, new HashSet<>());
-				result.get("login").get(key).add(row.get("log.contactId").toString());
+				if (!result.get("teaser").containsKey(key))
+						result.get("teaser").put(key, new HashSet<>());
+				result.get("teaser").get(key).add(row.get("log.ip"));
 			}
-		}
-		params.setSearch(params.getSearch().replace("uri='/action/teaser/contacts", " not like '/%") + " and LOWER(ip.org) not like '%google%' and LOWER(ip.org) not like '%facebook%'"");
-		result.put("teaser", new HashMap<>());
-		Result list = repository.list(params);
-		for (int i = 0; i < list.size(); i++) {
 		}
 		return result;
 	}
