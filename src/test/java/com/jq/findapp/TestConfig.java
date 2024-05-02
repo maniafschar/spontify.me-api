@@ -13,9 +13,7 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -151,14 +149,8 @@ public class TestConfig {
 					getClass().getResourceAsStream(
 							url.startsWith("id=") ? "/json/surveyLastMatch.json" : "/json/surveyMatchdays.json"),
 					StandardCharsets.UTF_8);
-			Instant date = Instant.now();
-			if (offset != -1 && url.contains("season=")) {
-				final int year = LocalDate.now().getYear();
-				for (int i = 0; i < year - Integer.valueOf(url.substring(url.indexOf("season=") + 7)); i++)
-					date = date.minus(Duration.ofDays(182));
-			}
 			return new ObjectMapper().readTree(
-					s.replace("\"{date}\"", "" + (long) (date.getEpochSecond() + (offset == -1 ? 0 : offset))))
+					s.replace("\"{date}\"", "" + (long) (Instant.now().getEpochSecond() + (offset == -1 ? 0 : offset))))
 					.get("response");
 		}
 	}

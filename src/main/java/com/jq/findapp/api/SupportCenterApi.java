@@ -33,6 +33,7 @@ import com.jq.findapp.entity.Log;
 import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
@@ -169,31 +170,36 @@ public class SupportCenterApi {
 	}
 
 	@GetMapping("report/{days}")
-	public Map<String, Map<Date, Integer>> metrics(@PathVariable final int days) throws Exception {
+	public Map<String, Map<String, Set<String>>> report(@PathVariable final int days) throws Exception {
 		final Map<String, Map<String, Set<String>>> result = new HashMap<>();
 		final QueryParams params = new QueryParams(Query.misc_listLog);
 		final String anonym = "anonym", login = "login", teaser = "teaser";
 		params.setLimit(Integer.MAX_VALUE);
-		params.setSearch("(log.uri='/action/teaser/contacts' or (log.uri not like '/%' and LOWER(ip.org) not like '%google%' and LOWER(ip.org) not like '%facebook%')) and log.createdAt<cast('" + Instant.now().minus(Duration.ofDays(days)) + "' as timestamp)");
+		params.setSearch(
+				"(log.uri='/action/teaser/contacts' or log.uri not like '/%') and LOWER(ip.org) not like '%google%' and LOWER(ip.org) not like '%facebook%' and LOWER(ip.org) not like '%amazon%' and log.createdAt>cast('"
+						+ Instant.now().minus(Duration.ofDays(days)) + "' as timestamp)");
 		result.put(login, new HashMap<>());
 		result.put(anonym, new HashMap<>());
 		result.put(teaser, new HashMap<>());
 		Result list = repository.list(params);
 		for (int i = 0; i < list.size(); i++) {
-			final Map<String, Object> row = list.get(i);
-			final String key = Instant.ofEpochMilli(((Date) row.get("log.createdAt")).getTime()).toString().substring(0, 10);
-			if (log.getUri().startsWith("/")) {
-				if (row.get("log.contactId") == null)
-					addLogEntry(result, anonym, key, (String) row.get("log.ip"));
-				else
-					addLogEntry(result, login, key, row.get("log.contactId").toString());
+			final Map<String, Object> log = list.get(i);
+			final String key = Instant.ofEpochMilli(((Timestamp) log.get("log.createdAt")).getTime()).toString()
+					.substring(0,
+							10);
+			if (((String) log.get("log.uri")).startsWith("/")) {
+				if (log.get("log.contactId") == null)
+					addLogEntry(result, anonym, key, (String) log.get("log.ip"));
+				else if (!BigInteger.ZERO.equals(log.get("log.contactId")))
+					addLogEntry(result, login, key, log.get("log.contactId").toString());
 			} else
-				addLogEntry(result, teaser, key, (String) row.get("log.ip"));
+				addLogEntry(result, teaser, key, (String) log.get("log.ip"));
 		}
 		return result;
 	}
 
-	private void addLogEntry(final Map<String, Map<String, Set<String>>> result, final String label, final String key, final String value) {
+	private void addLogEntry(final Map<String, Map<String, Set<String>>> result, final String label, final String key,
+			final String value) {
 		if (!result.get(label).containsKey(key))
 			result.get(label).put(key, new HashSet<>());
 		result.get(label).get(key).add(value);
