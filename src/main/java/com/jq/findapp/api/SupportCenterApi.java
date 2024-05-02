@@ -166,6 +166,25 @@ public class SupportCenterApi {
 		repository.save(contact);
 	}
 
+	@GetMapping("report")
+	public Map<String, Map<Date, Integer>> metrics() throws Exception {
+		final Map<String, Map<String, Integer>> result = new HashMap<>();
+		final QueryParams params = new QueryParams(Query.misc_listLog);
+		params.setLimit(Integer.MAX_VALUE);
+		params.setSearch("");
+		result.put("login", new HashMap<>());
+		final Result list = repository.list(params);
+		for (int i = 0; i < list.size(); i++) {
+			final Map<String, Object> row = list.get(i);
+			row.get("log.createdAt");
+			if (result.get("login").containsKey(key))
+				result.get("login").get(key)++;
+			else
+				result.get("login").put(key, 1);
+		}
+		return result;
+	}
+
 	@GetMapping("metrics")
 	public Map<String, Object> metrics() throws Exception {
 		final Map<String, Object> result = new HashMap<>();
