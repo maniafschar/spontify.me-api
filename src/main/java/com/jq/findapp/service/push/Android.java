@@ -43,8 +43,7 @@ public class Android {
 	}
 
 	public Environment send(final String from, final Contact contactTo, final String text, final String action,
-			final String notificationId)
-			throws Exception {
+			final String notificationId) throws Exception {
 		try {
 			send(from, contactTo, text, action, notificationId, false);
 		} catch (final Unauthorized ex) {

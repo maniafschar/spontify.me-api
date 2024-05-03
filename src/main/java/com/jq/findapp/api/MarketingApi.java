@@ -3,7 +3,7 @@ package com.jq.findapp.api;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.net.URL;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Duration;
@@ -310,7 +310,7 @@ public class MarketingApi {
 			final Result list = repository.list(new QueryParams(Query.misc_listClient));
 			for (int i = 0; i < list.size(); i++) {
 				final Client client = repository.one(Client.class, (BigInteger) list.get(i).get("client.id"));
-				try (final InputStream in = new URL(client.getUrl()).openStream()) {
+				try (final InputStream in = URI.create(client.getUrl()).toURL().openStream()) {
 					INDEXES.put(client.getId(), IOUtils.toString(in, StandardCharsets.UTF_8));
 				}
 				final String url = Strings.removeSubdomain(client.getUrl());
