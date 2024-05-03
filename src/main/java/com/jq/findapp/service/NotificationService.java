@@ -454,7 +454,7 @@ public class NotificationService {
 
 	public void createTicket(final TicketType type, String subject, String text, final BigInteger contactId) {
 		try {
-			if (type == TicketType.ERROR && "client".equals(subject)) {
+			if (type == TicketType.ERROR) {
 				final QueryParams params = new QueryParams(Query.misc_listTicket);
 				params.setSearch("storage.label='logErrorExclusionRegex'");
 				final Map<String, Object> exclude = repository.one(params);
