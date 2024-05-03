@@ -217,32 +217,35 @@ public class SupportCenterApi {
 
 	@Async
 	@PutMapping("scheduler")
-	public void scheduler(@RequestHeader final String secret) throws Exception {
+	public synchronized void scheduler(@RequestHeader final String secret) throws Exception {
 		if (schedulerSecret.equals(secret)) {
 			if (schedulerRunning)
 				throw new RuntimeException("Failed to start, scheduler is currently running");
-			schedulerRunning = true;
-			final List<CompletableFuture<Void>> list = new ArrayList<>();
-			list.add(run(chatService::answerAi));
-			list.add(run(dbService::update));
-			list.add(run(engagementService::sendRegistrationReminder));
-			list.add(run(eventService::findMatchingBuddies));
-			list.add(run(eventService::importEvents));
-			list.add(run(eventService::notifyParticipation));
-			list.add(run(importLogService::importLog));
-			list.add(run(rssService::update));
-			list.add(run(surveyService::update));
-			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
-					.map(CompletableFuture::join).collect(Collectors.toList())).join();
-			run(engagementService::sendNearBy).join();
-			list.clear();
-			list.add(run(engagementService::sendChats));
-			list.add(run(ipService::lookupIps));
-			list.add(run(sitemapService::update));
-			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
-					.map(CompletableFuture::join).collect(Collectors.toList())).join();
-			run(dbService::backup).join();
-			schedulerRunning = false;
+			try {
+				schedulerRunning = true;
+				final List<CompletableFuture<Void>> list = new ArrayList<>();
+				list.add(run(chatService::answerAi));
+				list.add(run(dbService::update));
+				list.add(run(engagementService::sendRegistrationReminder));
+				list.add(run(eventService::findMatchingBuddies));
+				list.add(run(eventService::importEvents));
+				list.add(run(eventService::notifyParticipation));
+				list.add(run(importLogService::importLog));
+				list.add(run(rssService::update));
+				list.add(run(surveyService::update));
+				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
+						.map(CompletableFuture::join).collect(Collectors.toList())).join();
+				run(engagementService::sendNearBy).join();
+				list.clear();
+				list.add(run(engagementService::sendChats));
+				list.add(run(ipService::lookupIps));
+				list.add(run(sitemapService::update));
+				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
+						.map(CompletableFuture::join).collect(Collectors.toList())).join();
+				run(dbService::backup).join();
+			} finally {
+				schedulerRunning = false;
+			}
 		}
 	}
 

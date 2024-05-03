@@ -244,6 +244,21 @@ public class AuthenticationServiceTest {
 		assertTrue(result);
 	}
 
+	@Test
+	public void referer2() {
+		// given
+		final Pattern pattern = Pattern.compile(
+				"model.convert: property clientNews|Die Verbindung wurde vom Kommunikationspartner zur|java.io.IOException: Datenübergabe unterbrochen ");
+
+		// when
+		final boolean result = pattern.matcher(
+				"abc\ndefjava.io.IOException: Die Verbindung wurde vom Kommunikationspartner zurückgesetzt\t\nzwq")
+				.find();
+
+		// then
+		assertTrue(result);
+	}
+
 	public void ios() throws Exception {
 		// given
 		final Contact contact = this.utils.createContact(BigInteger.ONE);
