@@ -853,7 +853,6 @@ public class SurveyService {
 				if (json.has("survey")) {
 					for (int i2 = 0; i2 < json.get("survey").size(); i2++) {
 						final int teamId = json.get("survey").get(i2).asInt();
-						System.out.println("update " + clientId + " - " + teamId);
 						BigInteger id = synchronize.prediction(clientId, teamId);
 						if (id != null)
 							result.result += "\nprediction: " + id;

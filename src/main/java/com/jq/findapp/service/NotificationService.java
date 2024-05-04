@@ -454,12 +454,19 @@ public class NotificationService {
 
 	public void createTicket(final TicketType type, String subject, String text, final BigInteger contactId) {
 		try {
-			if (type == TicketType.ERROR) {
+			if (type == TicketType.ERROR && !"REGEX".equals(subject)) {
 				final QueryParams params = new QueryParams(Query.misc_listStorage);
 				params.setSearch("storage.label='logErrorExclusionRegex'");
 				final Map<String, Object> exclude = repository.one(params);
-				if (exclude != null && Pattern.compile((String) exclude.get("storage")).matcher(text).find())
-					return;
+				if (exclude != null) {
+					try {
+						if (Pattern.compile((String) exclude.get("storage.storage")).matcher(text).find())
+							return;
+					} catch (Exception ex) {
+						createTicket(TicketType.ERROR, "REGEX", ex.getMessage() + "\n" + exclude.get("storage.storage"),
+								null);
+					}
+				}
 			}
 			if (subject == null)
 				subject = "no subject";
