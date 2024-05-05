@@ -177,7 +177,7 @@ public class SupportCenterApi {
 		final String anonym = "anonym", login = "login", teaser = "teaser";
 		params.setLimit(Integer.MAX_VALUE);
 		params.setSearch(
-				"log.clientId is not null and (log.uri='/action/teaser/contacts' or log.uri not like '/%') and LOWER(ip.org) not like '%google%' and LOWER(ip.org) not like '%facebook%' and LOWER(ip.org) not like '%amazon%' and log.createdAt>cast('"
+				"log.clientId>0 and (log.uri='/action/teaser/contacts' or log.uri not like '/%') and LOWER(ip.org) not like '%google%' and LOWER(ip.org) not like '%facebook%' and LOWER(ip.org) not like '%amazon%' and log.createdAt>cast('"
 						+ Instant.now().minus(Duration.ofDays(days)) + "' as timestamp)");
 		Result list = repository.list(params);
 		for (int i = 0; i < list.size(); i++) {
