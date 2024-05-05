@@ -80,6 +80,8 @@ public class RssService {
 				return ex.getMessage();
 			}
 		}).collect(Collectors.joining("\n"));
+		while (result.result.contains("\n\n"))
+			result.result = result.result.replace("\n\n", "\n");
 		if (this.failed.size() > 0)
 			this.notificationService.createTicket(TicketType.ERROR, "ImportRss",
 					this.failed.size() + " errors:\n" + this.failed.stream().sorted().collect(Collectors.joining("\n")),
