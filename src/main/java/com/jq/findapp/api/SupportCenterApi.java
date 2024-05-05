@@ -177,29 +177,27 @@ public class SupportCenterApi {
 		final String anonym = "anonym", login = "login", teaser = "teaser";
 		params.setLimit(Integer.MAX_VALUE);
 		params.setSearch(
-				"(log.uri='/action/teaser/contacts' or log.uri not like '/%') and LOWER(ip.org) not like '%google%' and LOWER(ip.org) not like '%facebook%' and LOWER(ip.org) not like '%amazon%' and log.createdAt>cast('"
+				"log.clientId is not null and (log.uri='/action/teaser/contacts' or log.uri not like '/%') and LOWER(ip.org) not like '%google%' and LOWER(ip.org) not like '%facebook%' and LOWER(ip.org) not like '%amazon%' and log.createdAt>cast('"
 						+ Instant.now().minus(Duration.ofDays(days)) + "' as timestamp)");
 		Result list = repository.list(params);
 		for (int i = 0; i < list.size(); i++) {
 			final Map<String, Object> log = list.get(i);
-			if (log.get("log.clientId") != null) {
-				final String clientId = log.get("log.clientId").toString();
-				if (!result.containsKey(clientId)) {
-					result.put(clientId.toString(), new HashMap<>());
-					result.get(clientId).put(anonym, new HashMap<>());
-					result.get(clientId).put(login, new HashMap<>());
-					result.get(clientId).put(teaser, new HashMap<>());
-				}
-				final String key = Instant.ofEpochMilli(((Timestamp) log.get("log.createdAt")).getTime()).toString()
-						.substring(0, 10);
-				if (((String) log.get("log.uri")).startsWith("/")) {
-					if (log.get("log.contactId") == null)
-						addLogEntry(result.get(clientId).get(anonym), key, (String) log.get("log.ip"));
-					else if (!BigInteger.ZERO.equals(log.get("log.contactId")))
-						addLogEntry(result.get(clientId).get(login), key, log.get("log.contactId").toString());
-				} else
-					addLogEntry(result.get(clientId).get(teaser), key, (String) log.get("log.ip"));
+			final String clientId = log.get("log.clientId").toString();
+			if (!result.containsKey(clientId)) {
+				result.put(clientId.toString(), new HashMap<>());
+				result.get(clientId).put(anonym, new HashMap<>());
+				result.get(clientId).put(login, new HashMap<>());
+				result.get(clientId).put(teaser, new HashMap<>());
 			}
+			final String key = Instant.ofEpochMilli(((Timestamp) log.get("log.createdAt")).getTime()).toString()
+					.substring(0, 10);
+			if (((String) log.get("log.uri")).startsWith("/")) {
+				if (log.get("log.contactId") == null)
+					addLogEntry(result.get(clientId).get(anonym), key, (String) log.get("log.ip"));
+				else if (!BigInteger.ZERO.equals(log.get("log.contactId")))
+					addLogEntry(result.get(clientId).get(login), key, log.get("log.contactId").toString());
+			} else
+				addLogEntry(result.get(clientId).get(teaser), key, (String) log.get("log.ip"));
 		}
 		return result;
 	}

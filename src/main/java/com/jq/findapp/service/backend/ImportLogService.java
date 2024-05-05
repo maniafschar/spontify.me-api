@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
@@ -95,6 +96,8 @@ public class ImportLogService {
 							if (log.getBody().length() > 255)
 								log.setBody(log.getBody().substring(0, 255));
 							log.setUri(uri);
+							log.setClientId(BigInteger.valueOf("afterwork".equals(uri) ? 1
+									: "fanclub".equals(uri) ? 4 : "offlinepoker".equals(uri) ? 6 : 0));
 							if (path.length() > 2) {
 								final String[] s = path.split("\\?");
 								if (s[0].length() > 1)
