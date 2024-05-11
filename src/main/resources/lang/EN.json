@@ -29,6 +29,9 @@
 		"uploadProfileImage": "You get 81% more interactions with an attractive picture in your profile. It's worth it, give it a try. Ask me if you have problems using the app.",
 		"welcome": "Hello CONTACT_PSEUDONYM,\n\nit's nice to have you here. Take a look around and contact me if you have any questions.\n\nHave fun\nYour APP_TITLE team"
 	},
+	"event": {
+		"fbWithoutLocation": "{pseudonym} would like to do the following on {date}:\n{description}\nLog in and you can get in touch."
+	},
 	"mail": {
 		"contactPasswordReset": "Your password has been reset. Click the link, you will then be asked to enter a new password.",
 		"contactRegistrationReminder": "the best comes spontaneously!\n\nThat might not include this spontaneous email. Nevertheless, we would be happy if you complete your registration from <jq:EXTRA_1 /> on APP_TITLE.\n\nIf the registration was by mistake and you want to cancel it, just reply to this email. We will delete your registration for you.\n\nGreetings and stay healthy!\nSponti Support",

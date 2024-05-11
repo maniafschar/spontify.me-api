@@ -30,5 +30,5 @@ FROM
 WHERE
 	contact.id=event.contactId and
 	contact.clientId={CLIENTID} and
-	(event.image is not null or location.image is not null) and
+	(event.image is not null or location.image is not null or contact.image is not null) and
 	{search}

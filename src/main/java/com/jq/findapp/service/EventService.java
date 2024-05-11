@@ -171,11 +171,16 @@ public class EventService {
 		final Event event = repository.one(Event.class, id);
 		final Contact contact = repository.one(Contact.class, event.getContactId());
 		final Location location = repository.one(Location.class, event.getLocationId());
+		final String date = new SimpleDateFormat("d.M.yyyy H:mm").format(event.getStartDate());
 		final JsonNode json = new ObjectMapper()
 				.readTree(Attachment.resolve(repository.one(Client.class, contact.getClientId()).getStorage()));
 		final String fbId = externalService.publishOnFacebook(contact.getClientId(),
-				new SimpleDateFormat("d.M.yyyy H:mm").format(event.getStartDate()) + "\n" + event.getDescription()
-						+ (location == null ? "" : "\n\n" + location.getName() + "\n" + location.getAddress())
+				(location == null
+						? text.getText(contact, TextId.event_fbWithoutLocation)
+								.replace("{pseudonym}", contact.getPseudonym()).replace("{date}", date)
+								.replace("{description}", event.getDescription())
+						: date + "\n" + event.getDescription() + "\n\n" + location.getName() + "\n"
+								+ location.getAddress())
 						+ (json.has("publishingPostfix") ? "\n\n" + json.get("publishingPostfix").asText() : ""),
 				"/rest/marketing/event/" + id);
 		if (fbId != null) {

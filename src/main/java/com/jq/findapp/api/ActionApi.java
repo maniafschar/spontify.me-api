@@ -331,10 +331,7 @@ public class ActionApi {
 		} else
 			params.setLimit(limit);
 		params.setSearch(search);
-		final List<Object[]> list = repository.list(params).getList();
-		while (list.size() > limit + 1)
-			list.remove(list.size() - 1);
-		return list;
+		return repository.list(params).getList();
 	}
 
 	@GetMapping("searchLocation")
