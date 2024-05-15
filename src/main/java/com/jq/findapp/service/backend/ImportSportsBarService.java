@@ -10,7 +10,9 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -38,5 +40,15 @@ public class ImportSportsBarService {
 	private static final String URL = "https://skyfinder.sky.de/sf/skyfinder.servlet?detailedSearch=Suchen&group=H&group=B&group=A&country=de&action=search&zip=";
 
 	public SchedulerResult importSportsBars() {
+		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importSportsBars");
+		final LocalDateTime now = LocalDateTime.now();
+		if (now.getDayOfWeek() == DayOfWeek.SUNDAY && now.getHour() == 4 && now.getMinute() < 10) {
+			try {
+				;
+			} catch (final Exception e) {
+				result.exception = e;
+			}
+		}
+		return result;
 	}
 }
