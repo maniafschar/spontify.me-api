@@ -1,0 +1,657 @@
+{
+	"currentPage" : 1,
+	"previousPage" : 1,
+	"nextPage" : 2,
+	"numberOfPages" : 2,
+	"totalEntries" : 21,
+	"currentPageIndexStart" : 1,
+	"currentPageIndexEnd" : 20,
+	"isActivateBackward" : false,
+	"isActivateForward" : true,
+	"pageNumbers" : [ 1, 2 ],
+	"isResultRestricted" : false,
+	"querySummary" : "PLZ&#x3d;80331, Land&#x3d;Deutschland",
+	"currentData" : {
+		"0" : {
+			"id" : 58945,
+			"number" : "6113287831",
+			"name" : "Andechser am Dom",
+			"mapdata" : {
+				"latitude" : 48.1382236,
+				"longitude" : 11.5737244,
+				"addressUrlFragment" : "Frauenplatz+7%2C+80331+M%C3%BCnchen",
+				"type" : "B"
+			},
+			"description" : {
+				"stars" : 0,
+				"street" : "Frauenplatz 7",
+				"city" : "80331 München",
+				"detailLink" : 0,
+				"roomnumbers" : "0",
+				"roomPriceFrom" : "0",
+				"squareFootage" : 150,
+				"kindOfBusiness" : 0,
+				"operationMode" : "0"
+			},
+			"contactData" : {
+				"mail" : "info@andechser-am-dom.de"
+			},
+			"distanceData" : {
+				"DistToCenter" : 0,
+				"DistToHighway" : 0,
+				"DistToRailStation" : 0,
+				"DistToAirport" : 0
+			},
+			"imageData" : { }
+		},
+		"1" : {
+			"id" : 249,
+			"number" : "6412000982",
+			"name" : "Augustiner Am Dom",
+			"mapdata" : {
+				"latitude" : 48.1382047,
+				"longitude" : 11.5740588,
+				"addressUrlFragment" : "Frauenplatz+8%2C+80331+M%C3%BCnchen",
+				"type" : "B"
+			},
+			"description" : {
+				"stars" : 0,
+				"street" : "Frauenplatz 8",
+				"city" : "80331 München",
+				"detailLink" : 1,
+				"roomnumbers" : "0",
+				"roomPriceFrom" : "0",
+				"squareFootage" : 280,
+				"kindOfBusiness" : 3,
+				"operationMode" : "0"
+			},
+			"contactData" : { },
+			"distanceData" : {
+				"DistToCenter" : 0,
+				"DistToHighway" : 0,
+				"DistToRailStation" : 0,
+				"DistToAirport" : 0
+			},
+			"imageData" : { }
+		},
+		"2" : {
+			"id" : 76247,
+			"number" : "4112443125",
+			"name" : "Christine & Lorenz Stiftl",
+			"mapdata" : {
+				"latitude" : 48.1357916,
+				"longitude" : 11.5706352,
+				"addressUrlFragment" : "Sendlinger+Str.+14%2C+80331+M%C3%BCnchen",
+				"type" : "B"
+			},
+			"description" : {
+				"stars" : 0,
+				"street" : "Sendlinger Str. 14",
+				"city" : "80331 München",
+				"detailLink" : 2,
+				"roomnumbers" : "0",
+				"roomPriceFrom" : "0",
+				"squareFootage" : 175,
+				"kindOfBusiness" : 0,
+				"operationMode" : "0"
+			},
+			"contactData" : { },
+			"distanceData" : {
+				"DistToCenter" : 0,
+				"DistToHighway" : 0,
+				"DistToRailStation" : 0,
+				"DistToAirport" : 0
+			},
+			"imageData" : { }
+		},
+		"3" : {
+			"id" : null,
+			"number" : "3912537731",
+			"name" : "City Aparthotel München",
+			"mapdata" : {
+				"latitude" : 48.1361501,
+				"longitude" : 11.5644478,
+				"addressUrlFragment" : "Sonnenstr.+18b%2C+80331+M%C3%BCnchen",
+				"type" : "A"
+			},
+			"description" : {
+				"stars" : 3,
+				"street" : "Sonnenstr. 18b",
+				"city" : "80331 München",
+				"detailLink" : 3,
+				"roomnumbers" : "96",
+				"program" : "1. Bundesliga, 2. Bundesliga, UEFA Champions League, DFB Pokal",
+				"roomPriceFrom" : "109",
+				"squareFootage" : 0,
+				"kindOfBusiness" : 3,
+				"operationMode" : "3"
+			},
+			"contactData" : {
+				"phoneAreaCode" : "089",
+				"phoneNumber" : "4613530",
+				"homepageUrl" : "www.city-restaurant-muenchen.de"
+			},
+			"distanceData" : {
+				"DistToCenter" : 0,
+				"DistToHighway" : 4,
+				"DistToRailStation" : 1,
+				"DistToAirport" : 30
+			},
+			"imageData" : {
+				"titleImageId" : 1195,
+				"imageId1" : 1195,
+				"imageCount" : 1
+			}
+		},
+		"4" : {
+			"id" : null,
+			"number" : "8013345332",
+			"name" : "Der Spöckmeier",
+			"mapdata" : {
+				"addressUrlFragment" : "Rosenstr.+9%2C+80331+M%C3%BCnchen",
+				"type" : "B"
+			},
+			"description" : {
+				"stars" : 0,
+				"street" : "Rosenstr. 9",
+				"city" : "80331 München",
+				"detailLink" : 4,
+				"roomnumbers" : "0",
+				"roomPriceFrom" : "0",
+				"squareFootage" : 495,
+				"kindOfBusiness" : 0,
+				"operationMode" : "0"
+			},
+			"contactData" : {
+				"mail" : "r.pongratz@der-spoeckmeier.de"
+			},
+			"distanceData" : {
+				"DistToCenter" : 0,
+				"DistToHighway" : 0,
+				"DistToRailStation" : 0,
+				"DistToAirport" : 0
+			},
+			"imageData" : { }
+		},
+		"5" : {
+			"id" : null,
+			"number" : "9813342752",
+			"name" : "Dubliner Irish Pub",
+			"mapdata" : {
+				"addressUrlFragment" : "Platzl+2%2C+80331+M%C3%BCnchen",
+				"type" : "B"
+			},
+			"description" : {
+				"stars" : 0,
+				"street" : "Platzl 2",
+				"city" : "80331 München",
+				"detailLink" : 5,
+				"roomnumbers" : "0",
+				"roomPriceFrom" : "0",
+				"squareFootage" : 120,
+				"kindOfBusiness" : 0,
+				"operationMode" : "0"
+			},
+			"contactData" : { },
+			"distanceData" : {
+				"DistToCenter" : 0,
+				"DistToHighway" : 0,
+				"DistToRailStation" : 0,
+				"DistToAirport" : 0
+			},
+			"imageData" : { }
+		},
+		"6" : {
+			"id" : 296,
+			"number" : "5908152997",
+			"name" : "Hard Rock Cafe",
+			"mapdata" : {
+				"latitude" : 48.1377726,
+				"longitude" : 11.5795606,
+				"addressUrlFragment" : "Platzl+1%2C+80331+M%C3%BCnchen",
+				"type" : "B"
+			},
+			"description" : {
+				"stars" : 0,
+				"street" : "Platzl 1",
+				"city" : "80331 München",
+				"detailLink" : 6,
+				"roomnumbers" : "0",
+				"program" : "1. Bundesliga, 2. Bundesliga, Football, UEFA Champions League, DFB Pokal",
+				"roomPriceFrom" : "0",
+				"squareFootage" : 337,
+				"kindOfBusiness" : 3,
+				"operationMode" : "0"
+			},
+			"contactData" : {
+				"phoneAreaCode" : "089",
+				"phoneNumber" : "2429490",
+				"mail" : "germany.invoices@hardrock.com"
+			},
+			"distanceData" : {
+				"DistToCenter" : 0,
+				"DistToHighway" : 4,
+				"DistToRailStation" : 2,
+				"DistToAirport" : 60
+			},
+			"imageData" : {
+				"titleImageId" : 3328,
+				"imageId1" : 3328,
+				"imageCount" : 1
+			}
+		},
+		"7" : {
+			"id" : 13573,
+			"number" : "5712653880",
+			"name" : "Hotel Torbräu",
+			"mapdata" : {
+				"latitude" : 48.1355401,
+				"longitude" : 11.5816009,
+				"addressUrlFragment" : "Tal+41%2C+80331+M%C3%BCnchen",
+				"type" : "H"
+			},
+			"description" : {
+				"stars" : 4,
+				"street" : "Tal 41",
+				"city" : "80331 München",
+				"detailLink" : 7,
+				"roomnumbers" : "90",
+				"roomPriceFrom" : "160",
+				"squareFootage" : 0,
+				"kindOfBusiness" : 0,
+				"operationMode" : "0"
+			},
+			"contactData" : {
+				"phoneAreaCode" : "089",
+				"phoneNumber" : "242340"
+			},
+			"distanceData" : {
+				"DistToCenter" : 0,
+				"DistToHighway" : 5,
+				"DistToRailStation" : 0,
+				"DistToAirport" : 27
+			},
+			"imageData" : {
+				"titleImageId" : 1480,
+				"imageId1" : 1480,
+				"imageCount" : 1
+			}
+		},
+		"8" : {
+			"id" : 36638,
+			"number" : "4813115417",
+			"name" : "La Pizzetta",
+			"mapdata" : {
+				"latitude" : 48.1360694,
+				"longitude" : 11.577865,
+				"addressUrlFragment" : "Tal+4%2C+80331+M%C3%BCnchen",
+				"type" : "B"
+			},
+			"description" : {
+				"stars" : 0,
+				"street" : "Tal 4",
+				"city" : "80331 München",
+				"detailLink" : 8,
+				"roomnumbers" : "0",
+				"roomPriceFrom" : "0",
+				"squareFootage" : 170,
+				"kindOfBusiness" : 0,
+				"operationMode" : "0"
+			},
+			"contactData" : {
+				"mail" : "info@la-pizzetta-tal.de"
+			},
+			"distanceData" : {
+				"DistToCenter" : 0,
+				"DistToHighway" : 0,
+				"DistToRailStation" : 0,
+				"DistToAirport" : 0
+			},
+			"imageData" : { }
+		},
+		"9" : {
+			"id" : 12018,
+			"number" : "4011600779",
+			"name" : "Landhaus",
+			"mapdata" : {
+				"latitude" : 48.1367048,
+				"longitude" : 11.5805879,
+				"addressUrlFragment" : "Marienstr.+2%2C+80331+M%C3%BCnchen",
+				"type" : "B"
+			},
+			"description" : {
+				"stars" : 0,
+				"street" : "Marienstr. 2",
+				"city" : "80331 München",
+				"detailLink" : 9,
+				"roomnumbers" : "0",
+				"roomPriceFrom" : "0",
+				"squareFootage" : 35,
+				"kindOfBusiness" : 2,
+				"operationMode" : "0"
+			},
+			"contactData" : {
+				"phoneAreaCode" : "089",
+				"phoneNumber" : "221444",
+				"mail" : "gaby_07.01@web.de"
+			},
+			"distanceData" : {
+				"DistToCenter" : 0,
+				"DistToHighway" : 0,
+				"DistToRailStation" : 0,
+				"DistToAirport" : 0
+			},
+			"imageData" : { }
+		},
+		"10" : {
+			"id" : 31064,
+			"number" : "2112660267",
+			"name" : "Maximilian Munich",
+			"mapdata" : {
+				"latitude" : 48.1372744,
+				"longitude" : 11.5821358,
+				"addressUrlFragment" : "Hochbr%C3%BCckenstr.+18%2C+80331+M%C3%BCnchen",
+				"type" : "H"
+			},
+			"description" : {
+				"stars" : 0,
+				"street" : "Hochbrückenstr. 18",
+				"city" : "80331 München",
+				"detailLink" : 10,
+				"roomnumbers" : "0",
+				"roomPriceFrom" : "0",
+				"squareFootage" : 0,
+				"kindOfBusiness" : 0,
+				"operationMode" : "0"
+			},
+			"contactData" : { },
+			"distanceData" : {
+				"DistToCenter" : 0,
+				"DistToHighway" : 0,
+				"DistToRailStation" : 0,
+				"DistToAirport" : 0
+			},
+			"imageData" : { }
+		},
+		"11" : {
+			"id" : 14157,
+			"number" : "6410485840",
+			"name" : "Mercure Hotel München Altst",
+			"mapdata" : {
+				"latitude" : 48.1366089,
+				"longitude" : 11.5700003,
+				"addressUrlFragment" : "Hotterstr.+12%2C+80331+M%C3%BCnchen",
+				"type" : "H"
+			},
+			"description" : {
+				"stars" : 0,
+				"street" : "Hotterstr. 12",
+				"city" : "80331 München",
+				"detailLink" : 11,
+				"roomnumbers" : "0",
+				"roomPriceFrom" : "0",
+				"squareFootage" : 0,
+				"kindOfBusiness" : 0,
+				"operationMode" : "0"
+			},
+			"contactData" : { },
+			"distanceData" : {
+				"DistToCenter" : 0,
+				"DistToHighway" : 0,
+				"DistToRailStation" : 0,
+				"DistToAirport" : 0
+			},
+			"imageData" : { }
+		},
+		"12" : {
+			"id" : null,
+			"number" : "3513338504",
+			"name" : "Ned Kelly'S Australien Bar_&a",
+			"mapdata" : {
+				"addressUrlFragment" : "Frauenplatz+11%2C+80331+M%C3%BCnchen",
+				"type" : "B"
+			},
+			"description" : {
+				"stars" : 0,
+				"street" : "Frauenplatz 11",
+				"city" : "80331 München",
+				"detailLink" : 12,
+				"roomnumbers" : "0",
+				"roomPriceFrom" : "0",
+				"squareFootage" : 280,
+				"kindOfBusiness" : 0,
+				"operationMode" : "0"
+			},
+			"contactData" : {
+				"mail" : "office@dalygastro.de"
+			},
+			"distanceData" : {
+				"DistToCenter" : 0,
+				"DistToHighway" : 0,
+				"DistToRailStation" : 0,
+				"DistToAirport" : 0
+			},
+			"imageData" : { }
+		},
+		"13" : {
+			"id" : null,
+			"number" : "8513347315",
+			"name" : "Opatija easy am Viktualienmar",
+			"mapdata" : {
+				"addressUrlFragment" : "Viktualienmarkt+6%2C+80331+M%C3%BCnchen",
+				"type" : "B"
+			},
+			"description" : {
+				"stars" : 0,
+				"street" : "Viktualienmarkt 6",
+				"city" : "80331 München",
+				"detailLink" : 13,
+				"roomnumbers" : "0",
+				"roomPriceFrom" : "0",
+				"squareFootage" : 100,
+				"kindOfBusiness" : 0,
+				"operationMode" : "0"
+			},
+			"contactData" : {
+				"mail" : "mo@opatija-easy.de"
+			},
+			"distanceData" : {
+				"DistToCenter" : 0,
+				"DistToHighway" : 0,
+				"DistToRailStation" : 0,
+				"DistToAirport" : 0
+			},
+			"imageData" : { }
+		},
+		"14" : {
+			"id" : null,
+			"number" : "8912310419",
+			"name" : "Ratskeller München",
+			"mapdata" : {
+				"latitude" : 48.13781,
+				"longitude" : 11.57594,
+				"addressUrlFragment" : "Marienplatz+8%2C+80331+M%C3%BCnchen",
+				"type" : "B"
+			},
+			"description" : {
+				"stars" : 0,
+				"street" : "Marienplatz 8",
+				"city" : "80331 München",
+				"detailLink" : 14,
+				"roomnumbers" : "0",
+				"program" : "1. Bundesliga, UEFA Champions League, DFB Pokal",
+				"roomPriceFrom" : "0",
+				"squareFootage" : 500,
+				"kindOfBusiness" : 3,
+				"operationMode" : "0"
+			},
+			"contactData" : {
+				"phoneAreaCode" : "089",
+				"phoneNumber" : "2199890"
+			},
+			"distanceData" : {
+				"DistToCenter" : 0,
+				"DistToHighway" : 10,
+				"DistToRailStation" : 1,
+				"DistToAirport" : 30
+			},
+			"imageData" : { }
+		},
+		"15" : {
+			"id" : 64808,
+			"number" : "6712685027",
+			"name" : "Restaurant Opatija",
+			"mapdata" : {
+				"latitude" : 48.1364796,
+				"longitude" : 11.5794961,
+				"addressUrlFragment" : "Hochbr%C3%BCckenstr.+3%2C+80331+M%C3%BCnchen",
+				"type" : "B"
+			},
+			"description" : {
+				"stars" : 0,
+				"street" : "Hochbrückenstr. 3",
+				"city" : "80331 München",
+				"detailLink" : 15,
+				"roomnumbers" : "0",
+				"roomPriceFrom" : "0",
+				"squareFootage" : 75,
+				"kindOfBusiness" : 0,
+				"operationMode" : "0"
+			},
+			"contactData" : {
+				"phoneAreaCode" : "0171",
+				"phoneNumber" : "2163409"
+			},
+			"distanceData" : {
+				"DistToCenter" : 0,
+				"DistToHighway" : 0,
+				"DistToRailStation" : 0,
+				"DistToAirport" : 0
+			},
+			"imageData" : { }
+		},
+		"16" : {
+			"id" : 66659,
+			"number" : "5813296321",
+			"name" : "Scholars Lounge",
+			"mapdata" : {
+				"latitude" : 48.1364796,
+				"longitude" : 11.5794961,
+				"addressUrlFragment" : "Hochbr%C3%BCckenstr.+3%2C+80331+M%C3%BCnchen",
+				"type" : "B"
+			},
+			"description" : {
+				"stars" : 0,
+				"street" : "Hochbrückenstr. 3",
+				"city" : "80331 München",
+				"detailLink" : 16,
+				"roomnumbers" : "0",
+				"roomPriceFrom" : "0",
+				"squareFootage" : 100,
+				"kindOfBusiness" : 0,
+				"operationMode" : "0"
+			},
+			"contactData" : {
+				"phoneAreaCode" : "089",
+				"phoneNumber" : "90166559"
+			},
+			"distanceData" : {
+				"DistToCenter" : 0,
+				"DistToHighway" : 0,
+				"DistToRailStation" : 0,
+				"DistToAirport" : 0
+			},
+			"imageData" : { }
+		},
+		"17" : {
+			"id" : 46264,
+			"number" : "9213276153",
+			"name" : "Steirer Am Markt",
+			"mapdata" : {
+				"latitude" : 48.135099,
+				"longitude" : 11.577109,
+				"addressUrlFragment" : "Dreifaltigkeitsplatz+4%2C+80331+M%C3%BCnchen",
+				"type" : "B"
+			},
+			"description" : {
+				"stars" : 0,
+				"street" : "Dreifaltigkeitsplatz 4",
+				"city" : "80331 München",
+				"detailLink" : 17,
+				"roomnumbers" : "0",
+				"roomPriceFrom" : "0",
+				"squareFootage" : 120,
+				"kindOfBusiness" : 0,
+				"operationMode" : "0"
+			},
+			"contactData" : {
+				"mail" : "werner-hochreiter@t-online.de"
+			},
+			"distanceData" : {
+				"DistToCenter" : 0,
+				"DistToHighway" : 0,
+				"DistToRailStation" : 0,
+				"DistToAirport" : 0
+			},
+			"imageData" : { }
+		},
+		"18" : {
+			"id" : 6098,
+			"number" : "5912628866",
+			"name" : "Tegernseer Tal Bräuhaus",
+			"mapdata" : {
+				"latitude" : 48.1360176,
+				"longitude" : 11.5782498,
+				"addressUrlFragment" : "Tal+8%2C+80331+M%C3%BCnchen",
+				"type" : "B"
+			},
+			"description" : {
+				"stars" : 0,
+				"street" : "Tal 8",
+				"city" : "80331 München",
+				"detailLink" : 18,
+				"roomnumbers" : "0",
+				"roomPriceFrom" : "0",
+				"squareFootage" : 200,
+				"kindOfBusiness" : 3,
+				"operationMode" : "0"
+			},
+			"contactData" : { },
+			"distanceData" : {
+				"DistToCenter" : 0,
+				"DistToHighway" : 0,
+				"DistToRailStation" : 0,
+				"DistToAirport" : 0
+			},
+			"imageData" : { }
+		},
+		"19" : {
+			"id" : null,
+			"number" : "8113331115",
+			"name" : "Tipico Sportwettenvermittlu",
+			"mapdata" : {
+				"addressUrlFragment" : "Sonnenstr.+16%2C+80331+M%C3%BCnchen",
+				"type" : "B"
+			},
+			"description" : {
+				"stars" : 0,
+				"street" : "Sonnenstr. 16",
+				"city" : "80331 München",
+				"detailLink" : 19,
+				"roomnumbers" : "0",
+				"roomPriceFrom" : "0",
+				"squareFootage" : 0,
+				"kindOfBusiness" : 0,
+				"operationMode" : "0"
+			},
+			"contactData" : { },
+			"distanceData" : {
+				"DistToCenter" : 0,
+				"DistToHighway" : 0,
+				"DistToRailStation" : 0,
+				"DistToAirport" : 0
+			},
+			"imageData" : { }
+		}
+	}
+}
