@@ -16,6 +16,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.util.EntityUtil;
 
 @Service
 public class ImportSportsBarService {
@@ -70,26 +71,50 @@ public class ImportSportsBarService {
 				location.setAddress(location.getStreet() + " " + location.getNumber() + "\n" + location.getZipCode()
 						+ " " + location.getTown() + "\nDeutschland");
 				location.setCountry("DE");
-				if (data.get("contactData").has("phoneNumber"))
-					location.setTelephone(data.get("contactData").get("phoneAreaCode").asText() + "/" +
-							data.get("contactData").get("phoneNumber").asText());
-				if (data.get("contactData").has("homepageUrl"))
-					location.setUrl(data.get("contactData").get("homepageUrl").asText());
-				if (data.get("contactData").has("mail"))
-					location.setUrl(data.get("contactData").get("mail").asText());
-				location.setSkills("x.1");
+				updateFields(location, data);
 				location.setContactId(BigInteger.ONE);
 				repository.save(location);
 				imported++;
 			} else {
 				location = repository.one(Location.class, (BigInteger) result.get(0).get("location.id"));
-				if (!("|" + location.getSkills() + "|").contains("|x.1|")) {
-					location.setSkills(Strings.isEmpty(location.getSkills()) ? "x.1" : location.getSkills() + "|x.1");
+				if (updateFields(location, data)) {
 					repository.save(location);
 					updated++;
 				}
 			}
 		}
 		return imported + updated;
+	}
+
+	private boolean updateFields(final Location location, final JsonNode data) {
+		boolean changed = false;
+		if (!("|" + location.getSkills() + "|").contains("|x.1|")) {
+			location.setSkills(Strings.isEmpty(location.getSkills()) ? "x.1" : location.getSkills() + "|x.1");
+			changed = true;
+		}
+		if (Strings.isEmpty(location.getDescription()) && data.get("description").has("program")) {
+			location.setDescription(data.get("description").get("program").asText());
+			changed = true;
+		}
+		if (Strings.isEmpty(location.getImage()) && data.get("imageData").has("titleImageId")) {
+			location.setImage(
+					EntityUtil.getImage("https://skyfinder.sky.de/sf/sbs/boundary/ApprovedFileDownload.do?contentId="
+							+ data.get("imageData").get("titleImageId").asText(), 800, 250));
+			changed = true;
+		}
+		if (Strings.isEmpty(location.getTelephone()) && data.get("contactData").has("phoneNumber")) {
+			location.setTelephone(data.get("contactData").get("phoneAreaCode").asText() + "/"
+					+ data.get("contactData").get("phoneNumber").asText());
+			changed = true;
+		}
+		if (Strings.isEmpty(location.getUrl()) && data.get("contactData").has("homepageUrl")) {
+			location.setUrl(data.get("contactData").get("homepageUrl").asText());
+			changed = true;
+		}
+		if (Strings.isEmpty(location.getEmail()) && data.get("contactData").has("mail")) {
+			location.setEmail(data.get("contactData").get("mail").asText());
+			changed = true;
+		}
+		return changed;
 	}
 }
