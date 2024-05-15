@@ -24,17 +24,21 @@ public class ImportSportsBarService {
 
 	private static final String URL = "https://skyfinder.sky.de/sf/skyfinder.servlet?detailedSearch=Suchen&group=H&group=B&group=A&country=de&action=search&zip=";
 
+	private int imported = 0, updated = 0;
+
 	public SchedulerResult importSportsBars() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importSportsBars");
 		final LocalDateTime now = LocalDateTime.now();
 		if (now.getHour() == 4 && now.getMinute() < 10) {
 			try {
 				final JsonNode zip = new ObjectMapper().readTree(getClass().getResourceAsStream("/json/zip.json"));
+				final String prefix = "" + (LocalDateTime.now().getDayOfMonth() % 10);
 				for (int i = 0; i < zip.size(); i++) {
 					final String s = zip.get(i).get("zip").asText();
-					if (s.startsWith("" + (LocalDateTime.now().getDayOfMonth() % 10)))
+					if (s.startsWith(prefix))
 						importZip(s);
 				}
+				result.result = imported + "imports/" + updated + " updates on " + prefix + "*";
 			} catch (final Exception e) {
 				result.exception = e;
 			}
@@ -47,7 +51,6 @@ public class ImportSportsBarService {
 		final JsonNode list = new ObjectMapper()
 				.readTree(WebClient.create(URL + zip).get().retrieve()
 						.toEntity(String.class).block().getBody());
-		int count = 0;
 		for (int i2 = list.get("currentPageIndexStart").intValue() - 1; i2 < list.get("currentPageIndexEnd")
 				.intValue(); i2++) {
 			final JsonNode data = list.get("currentData").get("" + i2);
@@ -77,17 +80,16 @@ public class ImportSportsBarService {
 				location.setSkills("x.1");
 				location.setContactId(BigInteger.ONE);
 				repository.save(location);
-				count++;
+				imported++;
 			} else {
 				location = repository.one(Location.class, (BigInteger) result.get(0).get("location.id"));
 				if (!("|" + location.getSkills() + "|").contains("|x.1|")) {
 					location.setSkills(Strings.isEmpty(location.getSkills()) ? "x.1" : location.getSkills() + "|x.1");
 					repository.save(location);
-					count++;
+					updated++;
 				}
 			}
-			System.out.println(data.get("name").asText());
 		}
-		return count;
+		return imported + updated;
 	}
 }
