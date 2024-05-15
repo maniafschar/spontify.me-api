@@ -44,6 +44,7 @@ import com.jq.findapp.service.backend.DbService;
 import com.jq.findapp.service.backend.EngagementService;
 import com.jq.findapp.service.backend.ImportLocationsService;
 import com.jq.findapp.service.backend.ImportLogService;
+import com.jq.findapp.service.backend.ImportSportsBarService;
 import com.jq.findapp.service.backend.IpService;
 import com.jq.findapp.service.backend.RssService;
 import com.jq.findapp.service.backend.SitemapService;
@@ -88,6 +89,9 @@ public class SupportCenterApi {
 
 	@Autowired
 	private ImportLocationsService importLocationsService;
+
+	@Autowired
+	private ImportSportsBarService importSportsBarService;
 
 	@Autowired
 	private ChatService chatService;
@@ -234,6 +238,7 @@ public class SupportCenterApi {
 			try {
 				schedulerRunning = true;
 				final List<CompletableFuture<Void>> list = new ArrayList<>();
+				list.add(run(importSportsBarService::importSportsBars));
 				list.add(run(chatService::answerAi));
 				list.add(run(dbService::update));
 				list.add(run(engagementService::sendRegistrationReminder));

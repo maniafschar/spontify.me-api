@@ -31,6 +31,7 @@ public class Location extends BaseEntity {
 	private String name;
 	private String street;
 	private String number;
+	private String skills;
 	private String subcategories;
 	private String telephone;
 	private String town;
@@ -196,6 +197,14 @@ public class Location extends BaseEntity {
 
 	public void setSubcategories(final String subcategories) {
 		this.subcategories = subcategories;
+	}
+
+	public String getSkills() {
+		return skills;
+	}
+
+	public void setSkills(final String skills) {
+		this.skills = skills;
 	}
 
 	public void setLatitude(final Float latitude) {

@@ -1,9 +1,8 @@
 package com.jq.findapp.service;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.net.URL;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -265,14 +264,14 @@ public class EventService {
 	}
 
 	public String get(final String url) {
-		try (final InputStream in = new URL(url).openStream()) {
+		try (final InputStream in = new URI(url).toURL().openStream()) {
 			return IOUtils.toString(in, StandardCharsets.UTF_8)
 					.replace('\n', ' ')
 					.replace('\r', ' ')
 					.replace('\u0013', ' ')
 					.replace('\u001c', ' ')
 					.replace('\u001e', ' ');
-		} catch (final IOException e) {
+		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
