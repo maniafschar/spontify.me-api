@@ -8,6 +8,8 @@ select
 	location.latitude,
 	location.longitude,
 	location.name,
+	location.skills,
+	location.skillsText,
 	location.town,
 	locationFavorite.id,
 	locationFavorite.favorite,

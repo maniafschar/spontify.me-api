@@ -32,6 +32,7 @@ public class Location extends BaseEntity {
 	private String street;
 	private String number;
 	private String skills;
+	private String skillsText;
 	private String subcategories;
 	private String telephone;
 	private String town;
@@ -207,6 +208,14 @@ public class Location extends BaseEntity {
 		this.skills = skills;
 	}
 
+	public String getSkillsText() {
+		return skillsText;
+	}
+
+	public void setSkillsText(final String skillsText) {
+		this.skillsText = skillsText;
+	}
+
 	public void setLatitude(final Float latitude) {
 		this.latitude = latitude;
 	}
@@ -244,8 +253,7 @@ public class Location extends BaseEntity {
 	public boolean writeAccess(final BigInteger user, final Repository repository) {
 		if (user.equals(getContactId()))
 			return true;
-		final QueryParams params = new QueryParams(Query.location_list);
-		params.setUser(repository.one(Contact.class, user));
+		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setSearch("location.contactId=" + user);
 		return repository.list(params).size() > 4;
 	}

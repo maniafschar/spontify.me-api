@@ -173,6 +173,13 @@ public class SupportCenterApi {
 		repository.save(contact);
 	}
 
+	@PostMapping("run/{id}")
+	public String run(@PathVariable final String id) throws Exception {
+		if (id.equals("importSportsBars"))
+			return importSportsBarService.execute();
+		return null;
+	}
+
 	@GetMapping("report/{days}")
 	public Map<String, Map<String, Map<String, Set<String>>>> report(@PathVariable final int days)
 			throws Exception {

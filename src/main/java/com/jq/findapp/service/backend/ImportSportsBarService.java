@@ -31,19 +31,25 @@ public class ImportSportsBarService {
 		final LocalDateTime now = LocalDateTime.now();
 		if (now.getHour() == 4 && now.getMinute() < 9) {
 			try {
-				final JsonNode zip = new ObjectMapper().readTree(getClass().getResourceAsStream("/json/zip.json"));
-				final String prefix = "" + (LocalDateTime.now().getDayOfMonth() % 10);
-				for (int i = 0; i < zip.size(); i++) {
-					final String s = zip.get(i).get("zip").asText();
-					if (s.startsWith(prefix))
-						importZip(s);
-				}
-				result.result = imported + "imports/" + updated + " updates on " + prefix + "*";
+				result.result = execute();
 			} catch (final Exception e) {
 				result.exception = e;
 			}
 		}
 		return result;
+	}
+
+	public String execute() throws Exception {
+		imported = 0;
+		updated = 0;
+		final JsonNode zip = new ObjectMapper().readTree(getClass().getResourceAsStream("/json/zip.json"));
+		final String prefix = "" + (LocalDateTime.now().getDayOfMonth() % 10);
+		for (int i = 0; i < zip.size(); i++) {
+			final String s = zip.get(i).get("zip").asText();
+			if (s.startsWith(prefix))
+				importZip(s);
+		}
+		return imported + "imports/" + updated + " updates on " + prefix + "*";
 	}
 
 	int importZip(String zip) throws Exception {

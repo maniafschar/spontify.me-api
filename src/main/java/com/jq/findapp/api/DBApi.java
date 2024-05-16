@@ -19,6 +19,7 @@ import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.ContactType;
+import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
@@ -90,22 +91,21 @@ public class DBApi {
 	}
 
 	private boolean checkClient(final BigInteger user, final BaseEntity entity) {
+		if (entity instanceof Location)
+			return true;
 		final Contact contact = repository.one(Contact.class, user);
 		try {
 			final Method clientId = entity.getClass().getMethod("getClientId");
-			if (clientId.invoke(entity).equals(contact.getClientId()))
-				return true;
+			return clientId.invoke(entity).equals(contact.getClientId());
 		} catch (final Exception ex) {
 			try {
 				final Method contactId = entity.getClass().getMethod("getContactId");
 				final Contact contact2 = repository.one(Contact.class, (BigInteger) contactId.invoke(entity));
-				if (contact.getClientId().equals(contact2.getClientId()))
-					return true;
+				return contact.getClientId().equals(contact2.getClientId());
 			} catch (final Exception ex2) {
 				throw new RuntimeException(ex2);
 			}
 		}
-		return false;
 	}
 
 	private boolean checkWriteAuthorisation(final BaseEntity e, final BigInteger user) throws Exception {
