@@ -182,8 +182,6 @@ public class RssService {
 		}
 
 		private synchronized void addFailure(final Exception ex, final String url) {
-			RssService.this.notificationService.createTicket(TicketType.ERROR, "RSS ex",
-					Strings.stackTraceToString(ex), null);
 			RssService.this.failed.add((ex.getMessage().startsWith("IMAGE_") ? "" : ex.getClass().getName() + ": ")
 					+ ex.getMessage().replace("\n", "\n  ") + "\n  " + url);
 		}

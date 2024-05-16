@@ -16,7 +16,6 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.util.EntityUtil;
 
 @Service
 public class ImportSportsBarService {
@@ -30,7 +29,7 @@ public class ImportSportsBarService {
 	public SchedulerResult importSportsBars() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importSportsBars");
 		final LocalDateTime now = LocalDateTime.now();
-		if (now.getHour() == 4 && now.getMinute() < 10) {
+		if (now.getHour() == 4 && now.getMinute() < 9) {
 			try {
 				final JsonNode zip = new ObjectMapper().readTree(getClass().getResourceAsStream("/json/zip.json"));
 				final String prefix = "" + (LocalDateTime.now().getDayOfMonth() % 10);
@@ -55,31 +54,33 @@ public class ImportSportsBarService {
 		for (int i2 = list.get("currentPageIndexStart").intValue() - 1; i2 < list.get("currentPageIndexEnd")
 				.intValue(); i2++) {
 			final JsonNode data = list.get("currentData").get("" + i2);
-			String street = data.get("description").get("street").asText();
-			params.setSearch("location.country='DE' and location.country='" + zip + "' and (location.name like '"
-					+ data.get("name").asText().replace('\'', '_') + "' or location.street like '"
-					+ street.substring(0, street.lastIndexOf(' ')).replace('\'', '_') + "%')");
-			final Result result = repository.list(params);
-			final Location location;
-			if (result.size() == 0) {
-				location = new Location();
-				location.setName(data.get("name").asText());
-				location.setStreet(street.substring(0, street.lastIndexOf(' ')));
-				location.setNumber(street.substring(street.lastIndexOf(' ')).trim());
-				location.setZipCode(zip);
-				location.setTown(data.get("description").get("city").asText().replace(zip, "").trim());
-				location.setAddress(location.getStreet() + " " + location.getNumber() + "\n" + location.getZipCode()
-						+ " " + location.getTown() + "\nDeutschland");
-				location.setCountry("DE");
-				updateFields(location, data);
-				location.setContactId(BigInteger.ONE);
-				repository.save(location);
-				imported++;
-			} else {
-				location = repository.one(Location.class, (BigInteger) result.get(0).get("location.id"));
-				if (updateFields(location, data)) {
+			if (data != null) {
+				String street = data.get("description").get("street").asText();
+				params.setSearch("location.country='DE' and location.country='" + zip + "' and (location.name like '"
+						+ data.get("name").asText().replace('\'', '_') + "' or location.street like '"
+						+ street.substring(0, street.lastIndexOf(' ')).replace('\'', '_') + "%')");
+				final Result result = repository.list(params);
+				final Location location;
+				if (result.size() == 0) {
+					location = new Location();
+					location.setName(data.get("name").asText());
+					location.setStreet(street.substring(0, street.lastIndexOf(' ')));
+					location.setNumber(street.substring(street.lastIndexOf(' ')).trim());
+					location.setZipCode(zip);
+					location.setTown(data.get("description").get("city").asText().replace(zip, "").trim());
+					location.setAddress(location.getStreet() + " " + location.getNumber() + "\n" + location.getZipCode()
+							+ " " + location.getTown() + "\nDeutschland");
+					location.setCountry("DE");
+					updateFields(location, data);
+					location.setContactId(BigInteger.ONE);
 					repository.save(location);
-					updated++;
+					imported++;
+				} else {
+					location = repository.one(Location.class, (BigInteger) result.get(0).get("location.id"));
+					if (updateFields(location, data)) {
+						repository.save(location);
+						updated++;
+					}
 				}
 			}
 		}
@@ -94,12 +95,6 @@ public class ImportSportsBarService {
 		}
 		if (Strings.isEmpty(location.getDescription()) && data.get("description").has("program")) {
 			location.setDescription(data.get("description").get("program").asText());
-			changed = true;
-		}
-		if (Strings.isEmpty(location.getImage()) && data.get("imageData").has("titleImageId")) {
-			location.setImage(
-					EntityUtil.getImage("https://skyfinder.sky.de/sf/sbs/boundary/ApprovedFileDownload.do?contentId="
-							+ data.get("imageData").get("titleImageId").asText(), 800, 250));
 			changed = true;
 		}
 		if (Strings.isEmpty(location.getTelephone()) && data.get("contactData").has("phoneNumber")) {
