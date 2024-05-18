@@ -94,20 +94,24 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 	}
 
 	private boolean isNameMatch(String name1, String name2, final boolean tryReverse) {
-		name1 = name1.trim().toLowerCase();
-		name2 = name2.trim().toLowerCase();
-		while (name1.contains("  "))
-			name1 = name1.replaceAll("  ", " ");
+		name1 = prepare(name1);
+		name2 = prepare(name2);
 		final String[] n = name1.split(" ");
-		int count = 0;
+		int letters = 0;
 		for (int i = 0; i < n.length; i++) {
 			if (name2.contains(n[i]))
-				count++;
+				letters += n[i].length();
 		}
-		if (count == n.length || n.length > 3 && count > n.length - 2)
+		if (letters > name2.length() * 0.7)
 			return true;
 		if (tryReverse)
 			return isNameMatch(name2, name1, false);
 		return false;
+	}
+
+	private String prepare(String s) {
+		while (s.contains("  "))
+			s = s.replaceAll("  ", " ");
+		return s.trim().toLowerCase().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").replace("ß", "ss");
 	}
 }

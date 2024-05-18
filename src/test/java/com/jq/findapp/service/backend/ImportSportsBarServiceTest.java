@@ -1,8 +1,9 @@
 package com.jq.findapp.service.backend;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,9 +32,10 @@ public class ImportSportsBarServiceTest {
 		utils.createContact(BigInteger.ONE);
 
 		// when
-		final int count = importSportsBarService.importZip("80331");
+		final Map<String, Integer> result = importSportsBarService.importZip("80331");
 
 		// then
-		assertEquals(20, count);
+		assertTrue(result.get("processed") == 20);
+		assertTrue(result.get("imported") > 2);
 	}
 }

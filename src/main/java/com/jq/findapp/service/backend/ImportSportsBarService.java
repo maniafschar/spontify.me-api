@@ -2,6 +2,8 @@ package com.jq.findapp.service.backend;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +14,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Location;
-import com.jq.findapp.repository.Query;
-import com.jq.findapp.repository.Query.Result;
-import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 
 @Service
@@ -24,14 +23,28 @@ public class ImportSportsBarService {
 
 	private static final String URL = "https://skyfinder.sky.de/sf/skyfinder.servlet?detailedSearch=Suchen&group=H&group=B&group=A&country=de&action=search&zip=";
 
-	private int imported = 0, updated = 0;
-
 	public SchedulerResult importSportsBars() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importSportsBars");
 		final LocalDateTime now = LocalDateTime.now();
 		if (now.getHour() == 4 && now.getMinute() < 9) {
+			int imported = 0, updated = 0, processed = 0, error = 0;
 			try {
-				result.result = execute();
+				imported = 0;
+				updated = 0;
+				final JsonNode zip = new ObjectMapper().readTree(getClass().getResourceAsStream("/json/zip.json"));
+				final String prefix = "" + (LocalDateTime.now().getDayOfMonth() % 10);
+				for (int i = 0; i < zip.size(); i++) {
+					final String s = zip.get(i).get("zip").asText();
+					if (s.startsWith(prefix)) {
+						final Map<String, Integer> r = importZip(s);
+						imported += r.get("imported");
+						updated += r.get("updated");
+						processed += r.get("processed");
+						error += r.get("error");
+					}
+				}
+				result.result = processed + " processed/" + imported + " imports/" + updated + " updates/" + error
+						+ " errors on " + prefix + "*";
 			} catch (final Exception e) {
 				result.exception = e;
 			}
@@ -39,21 +52,12 @@ public class ImportSportsBarService {
 		return result;
 	}
 
-	public String execute() throws Exception {
-		imported = 0;
-		updated = 0;
-		final JsonNode zip = new ObjectMapper().readTree(getClass().getResourceAsStream("/json/zip.json"));
-		final String prefix = "" + (LocalDateTime.now().getDayOfMonth() % 10);
-		for (int i = 0; i < zip.size(); i++) {
-			final String s = zip.get(i).get("zip").asText();
-			if (s.startsWith(prefix))
-				importZip(s);
-		}
-		return imported + "imports/" + updated + " updates on " + prefix + "*";
-	}
-
-	int importZip(String zip) throws Exception {
-		final QueryParams params = new QueryParams(Query.location_listId);
+	public Map<String, Integer> importZip(String zip) throws Exception {
+		final Map<String, Integer> result = new HashMap<>();
+		result.put("processed", 0);
+		result.put("imported", 0);
+		result.put("updated", 0);
+		result.put("error", 0);
 		final JsonNode list = new ObjectMapper()
 				.readTree(WebClient.create(URL + zip).get().retrieve()
 						.toEntity(String.class).block().getBody());
@@ -61,36 +65,42 @@ public class ImportSportsBarService {
 				.intValue(); i2++) {
 			final JsonNode data = list.get("currentData").get("" + i2);
 			if (data != null) {
-				String street = data.get("description").get("street").asText();
-				params.setSearch("location.country='DE' and location.country='" + zip + "' and (location.name like '"
-						+ data.get("name").asText().replace('\'', '_') + "' or location.street like '"
-						+ street.substring(0, street.lastIndexOf(' ')).replace('\'', '_') + "%')");
-				final Result result = repository.list(params);
-				final Location location;
-				if (result.size() == 0) {
-					location = new Location();
-					location.setName(data.get("name").asText());
-					location.setStreet(street.substring(0, street.lastIndexOf(' ')));
-					location.setNumber(street.substring(street.lastIndexOf(' ')).trim());
-					location.setZipCode(zip);
-					location.setTown(data.get("description").get("city").asText().replace(zip, "").trim());
-					location.setAddress(location.getStreet() + " " + location.getNumber() + "\n" + location.getZipCode()
-							+ " " + location.getTown() + "\nDeutschland");
-					location.setCountry("DE");
-					updateFields(location, data);
-					location.setContactId(BigInteger.ONE);
+				result.put("processed", result.get("processed") + 1);
+				final String street = data.get("description").get("street").asText();
+				Location location = new Location();
+				location.setName(data.get("name").asText());
+				location.setStreet(street.substring(0, street.lastIndexOf(' ')));
+				location.setNumber(street.substring(street.lastIndexOf(' ')).trim());
+				location.setZipCode(zip);
+				location.setTown(data.get("description").get("city").asText().replace(zip, "").trim());
+				location.setAddress(location.getStreet() + " " + location.getNumber() + "\n" + location.getZipCode()
+						+ " " + location.getTown() + "\nDeutschland");
+				location.setCountry("DE");
+				updateFields(location, data);
+				location.setContactId(BigInteger.ONE);
+				try {
 					repository.save(location);
-					imported++;
-				} else {
-					location = repository.one(Location.class, (BigInteger) result.get(0).get("location.id"));
-					if (updateFields(location, data)) {
-						repository.save(location);
-						updated++;
+					System.out.println("added " + location.getName());
+					result.put("imported", result.get("imported") + 1);
+				} catch (IllegalArgumentException ex) {
+					if (ex.getMessage().startsWith("location exists: ")) {
+						location = repository.one(Location.class, new BigInteger(ex.getMessage().substring(17)));
+						if (updateFields(location, data)) {
+							repository.save(location);
+							System.out.println("updated " + location.getName());
+							result.put("updated", result.get("updated") + 1);
+						}
+					} else {
+						result.put("error", result.get("error") + 1);
+						ex.printStackTrace();
 					}
+				} catch (Exception ex) {
+					result.put("error", result.get("error") + 1);
+					ex.printStackTrace();
 				}
 			}
 		}
-		return imported + updated;
+		return result;
 	}
 
 	private boolean updateFields(final Location location, final JsonNode data) {

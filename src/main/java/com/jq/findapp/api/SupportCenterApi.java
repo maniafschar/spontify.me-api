@@ -175,8 +175,8 @@ public class SupportCenterApi {
 
 	@PostMapping("run/{id}")
 	public String run(@PathVariable final String id) throws Exception {
-		if (id.equals("importSportsBars"))
-			return importSportsBarService.execute();
+		if (id.startsWith("importSportsBars"))
+			return "" + importSportsBarService.importZip(id.substring(16));
 		return null;
 	}
 
