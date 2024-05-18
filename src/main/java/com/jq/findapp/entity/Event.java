@@ -9,9 +9,13 @@ import com.jq.findapp.repository.Repository;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 @Entity
 public class Event extends BaseEntity {
+	@Enumerated(EnumType.STRING)
+	private EventType type;
 	private BigInteger contactId;
 	private BigInteger locationId;
 	private Boolean publish;
@@ -29,6 +33,10 @@ public class Event extends BaseEntity {
 	private String repetition;
 	private String url;
 	private Timestamp startDate;
+
+	public enum EventType {
+		Location, Online, Inquiry, Poll
+	}
 
 	public BigInteger getLocationId() {
 		return locationId;
@@ -156,6 +164,14 @@ public class Event extends BaseEntity {
 
 	public void setRepetition(final String repetition) {
 		this.repetition = repetition;
+	}
+
+	public EventType getType() {
+		return type;
+	}
+
+	public void setType(EventType type) {
+		this.type = type;
 	}
 
 	@Transient
