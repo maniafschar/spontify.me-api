@@ -21,6 +21,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXParseException;
 
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Event;
@@ -73,7 +74,12 @@ public class ImportMunich {
 			final Matcher m = regexNextPage.matcher(page);
 			if (m.find()) {
 				page = eventService.get(url + path + m.group(3).replace("&amp;", "&"));
-				count += page(page);
+				try {
+					count += page(page);
+				} catch (SAXParseException ex) {
+					notificationService.createTicket(TicketType.ERROR, "import munich events",
+							page + "\n\n#################\n\n" + Strings.stackTraceToString(ex), clientId);
+				}
 			} else
 				break;
 		}

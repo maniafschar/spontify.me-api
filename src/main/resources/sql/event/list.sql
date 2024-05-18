@@ -12,6 +12,7 @@ SELECT
 	event.skills,
 	event.skillsText,
 	event.startDate,
+	event.type,
 	event.description,
 	event.repetition,
 	event.url,

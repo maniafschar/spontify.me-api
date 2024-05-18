@@ -13,6 +13,7 @@ SELECT
 	event.startDate,
 	event.description,
 	event.repetition,
+	event.type,
 	event.url,
 	contact.id,
 	contact.image,
