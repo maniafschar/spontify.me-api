@@ -69,8 +69,11 @@ public class ImportSportsBarService {
 				final String street = data.get("description").get("street").asText();
 				Location location = new Location();
 				location.setName(data.get("name").asText());
-				location.setStreet(street.substring(0, street.lastIndexOf(' ')));
-				location.setNumber(street.substring(street.lastIndexOf(' ')).trim());
+				if (street.contains(" ")) {
+					location.setStreet(street.substring(0, street.lastIndexOf(' ')));
+					location.setNumber(street.substring(street.lastIndexOf(' ')).trim());
+				} else
+					location.setStreet(street);
 				location.setZipCode(zip);
 				location.setTown(data.get("description").get("city").asText().replace(zip, "").trim());
 				location.setAddress(location.getStreet() + " " + location.getNumber() + "\n" + location.getZipCode()

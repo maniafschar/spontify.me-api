@@ -1,0 +1,62 @@
+{
+	"rss": [
+		{
+			"url": "https://www.abendzeitung-muenchen.de/storage/rss/rss/muenchen-news-abendzeitung.xml",
+			"publish": true,
+			"latitude": 48.13684,
+			"longitude": 11.57685,
+			"description": true
+		},
+		{
+			"url": "https://feed.rundschau-online.de/feed/rss/region/index.rss",
+			"publish": true,
+			"latitude": 50.9413,
+			"longitude": 6.9583,
+			"description": true
+		},
+		{
+			"url": "https://www.rbb24.de/aktuell/index.xml/feed=rss.xml",
+			"publish": true,
+			"latitude": 52.531677,
+			"longitude": 13.381777,
+			"description": true
+		},
+		{
+			"url": "http://www.ndr.de/home/index-rss.xml",
+			"publish": true,
+			"latitude": 53.55073,
+			"longitude": 9.99302,
+			"description": true
+		},
+		{
+			"url": "https://www.hessenschau.de/rheinmain/index.rss",
+			"publish": true,
+			"latitude": 50.110573,
+			"longitude": 8.684966,
+			"description": true
+		},
+		{
+			"url": "https://rss.sueddeutsche.de/rss/Muenchen",
+			"publish": true,
+			"latitude": 50.9413,
+			"longitude": 6.9583,
+			"description": true
+		},
+		{
+			"url": "https://www.leipzig.de/newsfeed/rss.xml",
+			"publish": true,
+			"latitude": 51.340199,
+			"longitude": 12.360103,
+			"description": true
+		}
+	],
+	,
+	"survey": [
+		157,
+		786
+	],
+	"sitemap": {
+		"path": "/var/www/FC_1",
+		"type": "event,news,location"
+	}
+}
