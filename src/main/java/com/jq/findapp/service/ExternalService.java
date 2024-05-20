@@ -25,6 +25,7 @@ import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Storage;
 import com.jq.findapp.entity.Ticket.TicketType;
+import com.jq.findapp.repository.GeoLocationProcessor;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -154,15 +155,27 @@ public class ExternalService {
 	}
 
 	public GeoLocation getAddress(final float latitude, final float longitude) throws Exception {
-		final QueryParams params = new QueryParams(Query.misc_geoLocation);
-		final float roundingFactor = 10000f;
+		final QueryParams params = new QueryParams(Query.misc_listGeoLocation);
+		float roundingFactor = 1000f;
 		params.setSearch(
 				"cast(geoLocation.latitude as text) like '" + ((int) (latitude * roundingFactor) / roundingFactor)
 						+ "%' and cast(geoLocation.longitude as text) like '"
 						+ ((int) (longitude * roundingFactor) / roundingFactor) + "%'");
-		final Map<String, Object> persistedAddress = this.repository.one(params);
-		if (persistedAddress.get("_id") != null)
-			return this.repository.one(GeoLocation.class, (BigInteger) persistedAddress.get("_id"));
+		final Result persistedAddress = this.repository.list(params);
+		if (persistedAddress.size() > 0) {
+			double distance = Double.MAX_VALUE, d;
+			BigInteger id = null;
+			for (int i = 0; i < persistedAddress.size(); i++) {
+				d = GeoLocationProcessor.distance(latitude, longitude,
+						(Float) persistedAddress.get(i).get("geoLocation.latitude"),
+						(Float) persistedAddress.get(i).get("geoLocation.longitude"));
+				if (d < distance) {
+					distance = d;
+					id = (BigInteger) persistedAddress.get(i).get("geoLocation.id");
+				}
+			}
+			return this.repository.one(GeoLocation.class, id);
+		}
 		final List<GeoLocation> geoLocations = this.convertAddress(
 				new ObjectMapper().readTree(this.google("geocode/json?latlng=" + latitude + ',' + longitude)));
 		if (geoLocations != null)

@@ -255,6 +255,7 @@ public class SupportCenterApi {
 				list.add(run(importLogService::importLog));
 				list.add(run(rssService::update));
 				list.add(run(surveyService::update));
+				list.add(run(importLocationsService::importImages));
 				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 						.map(CompletableFuture::join).collect(Collectors.toList())).join();
 				run(engagementService::sendNearBy).join();
@@ -288,7 +289,9 @@ public class SupportCenterApi {
 					log.setBody((log.getBody() == null ? "" : log.getBody() + "\n")
 							+ result.exception.getClass().getName() + ": " + result.exception.getMessage());
 					notificationService.createTicket(TicketType.ERROR, "scheduler",
-							Strings.stackTraceToString(result.exception), null);
+							(result.result == null ? "" : result.result + "\n")
+									+ Strings.stackTraceToString(result.exception),
+							null);
 				}
 			} catch (final Throwable ex) {
 				log.setBody("uncaught exception " + ex.getClass().getName() + ": " + ex.getMessage() +

@@ -2,6 +2,7 @@ package com.jq.findapp.service.backend;
 
 import java.math.BigInteger;
 import java.net.URLEncoder;
+import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.entity.Ticket.TicketType;
@@ -168,7 +170,8 @@ public class ImportLocationsService {
 		params.setSearch("ticket.subject='import' and ticket.note like '" + s +
 				"%' and ticket.type='" + TicketType.LOCATION.name() + "'");
 		if (repository.list(params).size() == 0) {
-			final String importResult = retrieveLocations(latitude, longitude);
+			final String importResult = retrieveLocations("place/nearbysearch/json?radius=600&sensor=false&location="
+					+ latitude + "," + longitude);
 			notificationService.createTicket(TicketType.LOCATION, "import",
 					s + (importResult == null ? "" : "\n" + importResult), null);
 		}
@@ -191,11 +194,6 @@ public class ImportLocationsService {
 	public String searchLocation(final String query) throws Exception {
 		return retrieveLocations("place/textsearch/json?query="
 				+ URLEncoder.encode(query, "UTF-8"));
-	}
-
-	private String retrieveLocations(final float latitude, final float longitude) throws Exception {
-		return retrieveLocations("place/nearbysearch/json?radius=600&sensor=false&location="
-				+ latitude + "," + longitude);
 	}
 
 	private String retrieveLocations(final String query) throws Exception {
@@ -225,9 +223,9 @@ public class ImportLocationsService {
 			final JsonNode json = result.next();
 			total++;
 			location = json2location(json);
-			if (json.has("photos") && mapFirstRelevantType(json) != null && exists(location) == null &&
+			if (json.has("photos") && mapFirstRelevantType(json) != null &&
 					(!json.has("permanently_closed") || !json.get("permanently_closed").asBoolean()) &&
-					json.has("rating") && json.get("rating").asDouble() > 3) {
+					json.has("rating") && json.get("rating").asDouble() > 3 && exists(location) == null) {
 				try {
 					final String jsonLower = om.writeValueAsString(json).toLowerCase();
 					if (jsonLower.contains("sex") || jsonLower.contains("domina") || jsonLower.contains("bordel")) {
@@ -282,6 +280,48 @@ public class ImportLocationsService {
 			}
 		}
 		return null;
+	}
+
+	public SchedulerResult importImages() {
+		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/impoerImages");
+		final LocalDateTime now = LocalDateTime.now();
+		if (now.getHour() == 1 && now.getMinute() < 9) {
+			final QueryParams params = new QueryParams(Query.location_listId);
+			params.setSearch("location.image is null or length(location.image)=0");
+			final Result list = repository.list(params);
+			result.result = list.size() + " locations for update\n";
+			int updated = 0;
+			try {
+				for (int i = 0; i < list.size(); i++) {
+					final Location location = repository.one(Location.class,
+							(BigInteger) list.get(i).get("location.id"));
+					final JsonNode json = new ObjectMapper().readTree(
+							externalService.google("geocode/json?address="
+									+ location.getAddress().replaceAll("\n", ", ")));
+					if (json.has("photos") &&
+							json.get("photos").get(0).has("photo_reference")) {
+						final String html = externalService.google(
+								"place/photo?maxheight=1200&photoreference="
+										+ json.get("photos").get(0).get("photo_reference").asText())
+								.replace("<A HREF=", "<a href=");
+						final Matcher matcher = href.matcher(html);
+						if (matcher.find()) {
+							final String image = matcher.group(1);
+							location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, 0));
+							if (location.getImage() != null) {
+								location.setImageList(EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
+								repository.save(location);
+								updated++;
+							}
+						}
+					}
+				}
+			} catch (Exception ex) {
+				result.exception = ex;
+			}
+			result.result = result.result + updated + " updated";
+		}
+		return result;
 	}
 
 	Location importLocation(final JsonNode json, final String category) throws Exception {
