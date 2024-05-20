@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -14,12 +13,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Location;
+import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.NotificationService;
+import com.jq.findapp.util.Strings;
 
 @Service
 public class ImportSportsBarService {
 	@Autowired
 	private Repository repository;
+
+	@Autowired
+	private NotificationService notificationService;
 
 	private static final String URL = "https://skyfinder.sky.de/sf/skyfinder.servlet?detailedSearch=Suchen&group=H&group=B&group=A&country=de&action=search&zip=";
 
@@ -83,23 +88,24 @@ public class ImportSportsBarService {
 				location.setContactId(BigInteger.ONE);
 				try {
 					repository.save(location);
-					System.out.println("added " + location.getName());
 					result.put("imported", result.get("imported") + 1);
 				} catch (IllegalArgumentException ex) {
 					if (ex.getMessage().startsWith("location exists: ")) {
 						location = repository.one(Location.class, new BigInteger(ex.getMessage().substring(17)));
 						if (updateFields(location, data)) {
 							repository.save(location);
-							System.out.println("updated " + location.getName());
 							result.put("updated", result.get("updated") + 1);
 						}
 					} else {
 						result.put("error", result.get("error") + 1);
-						ex.printStackTrace();
+						if (!ex.getMessage().contains("OVER_QUERY_LIMIT"))
+							notificationService.createTicket(TicketType.ERROR, "ImportSportsBar",
+									Strings.stackTraceToString(ex), null);
 					}
 				} catch (Exception ex) {
 					result.put("error", result.get("error") + 1);
-					ex.printStackTrace();
+					notificationService.createTicket(TicketType.ERROR, "ImportSportsBar",
+							Strings.stackTraceToString(ex), null);
 				}
 			}
 		}
