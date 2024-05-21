@@ -268,7 +268,7 @@ public class ActionApi {
 	@GetMapping("teaser/meta")
 	public List<Object[]> teaserMeta(@RequestHeader final BigInteger clientId) throws Exception {
 		final QueryParams params = new QueryParams(Query.event_listTeaserMeta);
-		params.setLimit(-1);
+		params.setLimit(0);
 		params.setSearch(
 				"contact.clientId=" + clientId + " and event.endDate>=cast('"
 						+ Instant.now().atZone(ZoneOffset.UTC).toLocalDate() + "' as timestamp)");

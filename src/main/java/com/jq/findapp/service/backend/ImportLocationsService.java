@@ -288,6 +288,7 @@ public class ImportLocationsService {
 		if (now.getHour() == 1 && now.getMinute() < 9) {
 			final QueryParams params = new QueryParams(Query.location_listId);
 			params.setSearch("location.image is null or length(location.image)=0");
+			params.setLimit(0);
 			final Result list = repository.list(params);
 			result.result = list.size() + " locations for update\n";
 			int updated = 0;
