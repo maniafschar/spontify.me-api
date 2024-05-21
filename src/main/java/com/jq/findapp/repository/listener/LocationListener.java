@@ -30,7 +30,9 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 				"location.zipCode='" + location.getZipCode() + "' and LOWER(location.street)='"
 						+ (location.getStreet() == null ? ""
 								: location.getStreet().replace("'", "''").toLowerCase().replace("traße", "tr.")
-										.replaceAll("'", "\\'"))
+						+ "' and LOWER(location.number)='"
+						+ (location.getNumber() == null ? ""
+								: location.getNumber().toLowerCase())
 						+ "'");
 		final Result list = repository.list(params);
 		for (int i = 0; i < list.size(); i++) {
@@ -96,13 +98,15 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 	private boolean isNameMatch(String name1, String name2, final boolean tryReverse) {
 		name1 = prepare(name1);
 		name2 = prepare(name2);
-		final String[] n = name1.split(" ");
-		int letters = 0;
-		for (int i = 0; i < n.length; i++) {
-			if (name2.contains(n[i]))
-				letters += n[i].length();
+		final String[] name1Splitted = name1.split(" ");
+		int letters = 0, words;
+		for (int i = 0; i < name1Splitted.length; i++) {
+			if (name2.contains(name1Splitted[i])) {
+				letters += name1Splitted[i].length();
+				words++;
+			}
 		}
-		if (letters > name2.length() * 0.7)
+		if (letters > name2.length() * 0.75 || name1Splitted.length > 2 && words > name1Splitted.length * 0.6)
 			return true;
 		if (tryReverse)
 			return isNameMatch(name2, name1, false);
