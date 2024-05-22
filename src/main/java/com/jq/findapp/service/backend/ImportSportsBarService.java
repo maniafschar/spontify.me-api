@@ -37,7 +37,8 @@ public class ImportSportsBarService {
 				imported = 0;
 				updated = 0;
 				final JsonNode zip = new ObjectMapper().readTree(getClass().getResourceAsStream("/json/zip.json"));
-				final String prefix = "" + (now.getHour() == 4 ? 0 : 6) + now.getMinute() / 10;
+				final String prefix = "" + ((LocalDateTime.now().getDayOfMonth() + (now.getHour() == 4 ? 0 : 6)
+						+ now.getMinute() / 10) % 10);
 				for (int i = 0; i < zip.size(); i++) {
 					final String s = zip.get(i).get("zip").asText();
 					if (s.startsWith(prefix)) {
@@ -92,6 +93,7 @@ public class ImportSportsBarService {
 				} catch (IllegalArgumentException ex) {
 					if (ex.getMessage().startsWith("location exists: ")) {
 						location = repository.one(Location.class, new BigInteger(ex.getMessage().substring(17)));
+						location.historize();
 						if (updateFields(location, data)) {
 							repository.save(location);
 							result.put("updated", result.get("updated") + 1);

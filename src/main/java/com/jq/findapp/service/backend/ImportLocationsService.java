@@ -301,12 +301,16 @@ public class ImportLocationsService {
 								.replace("<A HREF=", "<a href=");
 						final Matcher matcher = href.matcher(html);
 						if (matcher.find()) {
+							location.historize();
 							final String image = matcher.group(1);
-							location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, 0));
-							if (location.getImage() != null) {
+							try {
+								location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, 0));
 								location.setImageList(EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
 								repository.save(location);
 								updated++;
+							} catch (IllegalArgumentException ex) {
+								notificationService.createTicket(TicketType.ERROR, "importImage",
+										Strings.stackTraceToString(ex), null);
 							}
 						}
 					}

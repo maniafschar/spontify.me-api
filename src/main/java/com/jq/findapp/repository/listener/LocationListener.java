@@ -60,11 +60,10 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		final JsonNode address = new ObjectMapper().readTree(
 				externalService.google("geocode/json?address="
 						+ location.getAddress().replaceAll("\n", ", ")));
-		if (!"OK".equals(address.get("status").asText())) {
+		if (!"OK".equals(address.get("status").asText()))
 			throw new IllegalArgumentException(
 					"invalid address:\n" + location.getName() + "\n" + location.getAddress() + "\n"
 							+ new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(address));
-		}
 		final JsonNode result = address.get("results").get(0);
 		JsonNode n = result.get("geometry").get("location");
 		final GeoLocation geoLocation = externalService.convertAddress(address).get(0);
