@@ -29,7 +29,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		params.setSearch(
 				"location.zipCode='" + location.getZipCode() + "' and LOWER(location.street)='"
 						+ (location.getStreet() == null ? ""
-								: location.getStreet().replace("'", "''").toLowerCase().replace("traße", "tr.")
+								: location.getStreet().replace("'", "''").toLowerCase().replace("traße", "tr."))
 						+ "' and LOWER(location.number)='"
 						+ (location.getNumber() == null ? ""
 								: location.getNumber().toLowerCase())
@@ -99,7 +99,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		name1 = prepare(name1);
 		name2 = prepare(name2);
 		final String[] name1Splitted = name1.split(" ");
-		int letters = 0, words;
+		int letters = 0, words = 0;
 		for (int i = 0; i < name1Splitted.length; i++) {
 			if (name2.contains(name1Splitted[i])) {
 				letters += name1Splitted[i].length();

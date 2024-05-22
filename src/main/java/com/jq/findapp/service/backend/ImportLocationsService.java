@@ -2,6 +2,7 @@ package com.jq.findapp.service.backend;
 
 import java.math.BigInteger;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.regex.Matcher;
@@ -170,8 +171,22 @@ public class ImportLocationsService {
 		params.setSearch("ticket.subject='import' and ticket.note like '" + s +
 				"%' and ticket.type='" + TicketType.LOCATION.name() + "'");
 		if (repository.list(params).size() == 0) {
-			final String importResult = retrieveLocations("place/nearbysearch/json?radius=600&sensor=false&location="
-					+ latitude + "," + longitude);
+			String importResult = null;
+			final ObjectMapper om = new ObjectMapper();
+			JsonNode json = om
+					.readTree(externalService.google("place/nearbysearch/json?radius=600&sensor=false&location="
+							+ latitude + "," + longitude));
+			if ("OK".equals(json.get("status").asText())) {
+				importResult = importLocations(json.get("results").elements());
+				while (json.has("next_page_token")) {
+					json = om.readTree(externalService.google(
+							"place/nearbysearch/json?pagetoken=" + json.get("next_page_token").asText()));
+					if ("OK".equals(json.get("status").asText()))
+						importResult += "\n" + importLocations(json.get("results").elements());
+					else
+						break;
+				}
+			}
 			notificationService.createTicket(TicketType.LOCATION, "import",
 					s + (importResult == null ? "" : "\n" + importResult), null);
 		}
@@ -189,29 +204,6 @@ public class ImportLocationsService {
 			result = Strings.stackTraceToString(ex);
 		}
 		return result;
-	}
-
-	public String searchLocation(final String query) throws Exception {
-		return retrieveLocations("place/textsearch/json?query="
-				+ URLEncoder.encode(query, "UTF-8"));
-	}
-
-	private String retrieveLocations(final String query) throws Exception {
-		final ObjectMapper om = new ObjectMapper();
-		JsonNode json = om.readTree(externalService.google(query));
-		if ("OK".equals(json.get("status").asText())) {
-			String result = importLocations(json.get("results").elements());
-			while (json.has("next_page_token")) {
-				json = om.readTree(externalService.google(
-						"place/nearbysearch/json?pagetoken=" + json.get("next_page_token").asText()));
-				if ("OK".equals(json.get("status").asText()))
-					result += "\n" + importLocations(json.get("results").elements());
-				else
-					break;
-			}
-			return result;
-		}
-		return null;
 	}
 
 	private String importLocations(final Iterator<JsonNode> result) {
@@ -283,7 +275,7 @@ public class ImportLocationsService {
 	}
 
 	public SchedulerResult importImages() {
-		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/impoerImages");
+		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importImages");
 		final LocalDateTime now = LocalDateTime.now();
 		if (now.getHour() == 1 && now.getMinute() < 9) {
 			final QueryParams params = new QueryParams(Query.location_listId);
@@ -297,13 +289,15 @@ public class ImportLocationsService {
 					final Location location = repository.one(Location.class,
 							(BigInteger) list.get(i).get("location.id"));
 					final JsonNode json = new ObjectMapper().readTree(
-							externalService.google("geocode/json?address="
-									+ location.getAddress().replaceAll("\n", ", ")));
-					if (json.has("photos") &&
-							json.get("photos").get(0).has("photo_reference")) {
+							externalService
+									.google("place/textsearch/json?query=" + URLEncoder.encode(location.getName() + ","
+											+ location.getAddress().replaceAll("\n", ","), StandardCharsets.UTF_8)));
+					if ("OK".equals(json.get("status").asText()) && json.get("results").get(0).has("photos") &&
+							json.get("results").get(0).get("photos").get(0).has("photo_reference")) {
 						final String html = externalService.google(
 								"place/photo?maxheight=1200&photoreference="
-										+ json.get("photos").get(0).get("photo_reference").asText())
+										+ json.get("results").get(0).get("photos").get(0).get("photo_reference")
+												.asText())
 								.replace("<A HREF=", "<a href=");
 						final Matcher matcher = href.matcher(html);
 						if (matcher.find()) {

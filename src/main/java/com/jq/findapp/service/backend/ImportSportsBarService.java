@@ -31,13 +31,14 @@ public class ImportSportsBarService {
 	public SchedulerResult importSportsBars() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importSportsBars");
 		final LocalDateTime now = LocalDateTime.now();
-		if (now.getHour() == 4 && now.getMinute() < 9) {
+		if (now.getHour() == 4 || now.getHour() == 5 && now.getMinute() < 39) {
 			int imported = 0, updated = 0, processed = 0, error = 0;
 			try {
 				imported = 0;
 				updated = 0;
 				final JsonNode zip = new ObjectMapper().readTree(getClass().getResourceAsStream("/json/zip.json"));
-				final String prefix = "" + (LocalDateTime.now().getDayOfMonth() % 10);
+				final String prefix = ""
+						+ ((LocalDateTime.now().getDayOfMonth() + (now.getHour() == 4 ? 0 : 6) + now.getMinute()) % 10);
 				for (int i = 0; i < zip.size(); i++) {
 					final String s = zip.get(i).get("zip").asText();
 					if (s.startsWith(prefix)) {

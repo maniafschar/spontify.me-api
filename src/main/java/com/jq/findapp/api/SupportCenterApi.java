@@ -160,11 +160,6 @@ public class SupportCenterApi {
 		return importLocationsService.importLocation(id, category);
 	}
 
-	@PostMapping("location/search/{query}")
-	public String importLocation(@PathVariable final String query) throws Exception {
-		return importLocationsService.searchLocation(query);
-	}
-
 	@PostMapping("authenticate/{id}")
 	public void authenticate(@PathVariable final BigInteger id, final String image) throws Exception {
 		final Contact contact = repository.one(Contact.class, id);
