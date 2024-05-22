@@ -288,19 +288,25 @@ public class ImportLocationsService {
 				for (int i = 0; i < list.size(); i++) {
 					final Location location = repository.one(Location.class,
 							(BigInteger) list.get(i).get("location.id"));
-					final JsonNode json = new ObjectMapper().readTree(
-							externalService
-									.google("place/textsearch/json?query=" + URLEncoder.encode(location.getName() + ","
-											+ location.getAddress().replaceAll("\n", ","), StandardCharsets.UTF_8)));
+					final String address = location.getAddress().replace("\n", ", ");
+					JsonNode json = new ObjectMapper().readTree(
+							externalService.google("place/textsearch/json?query="
+									+ URLEncoder.encode(location.getName() + ", " + address, StandardCharsets.UTF_8)
+											.replace("+", "%20")));
+					if (!"OK".equals(json.get("status").asText()))
+						json = new ObjectMapper().readTree(
+								externalService.google("place/textsearch/json?query="
+										+ URLEncoder.encode(address, StandardCharsets.UTF_8)));
 					if ("OK".equals(json.get("status").asText())) {
-						for (int i2 = 0; i2 < json.get("results").size(); i2++) {
-							if (json.get("results").get(i2).has("photos") && Strings.isEmpty(location.getImage())) {
-								for (int i3 = 0; i3 < json.get("results").get("photos").size(); i3++) {
-								    	if (json.get("results").get(i2).get("photos").get(i3).has("photo_reference")) {
+						final JsonNode results = json.get("results");
+						for (int i2 = 0; i2 < results.size(); i2++) {
+							if (results.get(i2).has("photos")) {
+								final JsonNode photos = results.get(i2).get("photos");
+								for (int i3 = 0; i3 < photos.size(); i3++) {
+									if (photos.get(i3).has("photo_reference")) {
 										final String html = externalService.google(
 												"place/photo?maxheight=1200&photoreference="
-														+ json.get("results").get(i2).get("photos").get(i3).get("photo_reference")
-																.asText())
+														+ photos.get(i3).get("photo_reference").asText())
 												.replace("<A HREF=", "<a href=");
 										final Matcher matcher = href.matcher(html);
 										if (matcher.find()) {
@@ -308,7 +314,8 @@ public class ImportLocationsService {
 											final String image = matcher.group(1);
 											try {
 												location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, 0));
-												location.setImageList(EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
+												location.setImageList(
+														EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
 												repository.save(location);
 												updated++;
 												break;
@@ -320,12 +327,11 @@ public class ImportLocationsService {
 										}
 									}
 								}
+								if (!Strings.isEmpty(location.getImage()))
+									break;
 							}
 						}
-					} else
-						notificationService.createTicket(TicketType.ERROR, "importImageNotFound", location.getName() + ","
-								+ location.getAddress().replaceAll("\n", ",") + "\n"
-								+ new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(json), null);
+					}
 				}
 			} catch (Exception ex) {
 				result.exception = ex;
