@@ -294,27 +294,30 @@ public class ImportLocationsService {
 											+ location.getAddress().replaceAll("\n", ","), StandardCharsets.UTF_8)));
 					if ("OK".equals(json.get("status").asText())) {
 						for (int i2 = 0; i2 < json.get("results").size(); i2++) {
-							if (json.get("results").get(i2).has("photos") &&
-							    	json.get("results").get(i2).get("photos").get(0).has("photo_reference")) {
-								final String html = externalService.google(
-										"place/photo?maxheight=1200&photoreference="
-												+ json.get("results").get(i2).get("photos").get(0).get("photo_reference")
-														.asText())
-										.replace("<A HREF=", "<a href=");
-								final Matcher matcher = href.matcher(html);
-								if (matcher.find()) {
-									location.historize();
-									final String image = matcher.group(1);
-									try {
-										location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, 0));
-										location.setImageList(EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
-										repository.save(location);
-										updated++;
-										break;
-									} catch (IllegalArgumentException ex) {
-										if (!ex.getMessage().contains("IMAGE_TOO_SMALL"))
-											notificationService.createTicket(TicketType.ERROR, "importImage",
-													Strings.stackTraceToString(ex), null);
+							if (json.get("results").get(i2).has("photos") && Strings.isEmpty(location.getImage())) {
+								for (int i3 = 0; i3 < json.get("results").get("photos").size(); i3++) {
+								    	if (json.get("results").get(i2).get("photos").get(i3).has("photo_reference")) {
+										final String html = externalService.google(
+												"place/photo?maxheight=1200&photoreference="
+														+ json.get("results").get(i2).get("photos").get(i3).get("photo_reference")
+																.asText())
+												.replace("<A HREF=", "<a href=");
+										final Matcher matcher = href.matcher(html);
+										if (matcher.find()) {
+											location.historize();
+											final String image = matcher.group(1);
+											try {
+												location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, 0));
+												location.setImageList(EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
+												repository.save(location);
+												updated++;
+												break;
+											} catch (IllegalArgumentException ex) {
+												if (!ex.getMessage().contains("IMAGE_TOO_SMALL"))
+													notificationService.createTicket(TicketType.ERROR, "importImage",
+															Strings.stackTraceToString(ex), null);
+											}
+										}
 									}
 								}
 							}
