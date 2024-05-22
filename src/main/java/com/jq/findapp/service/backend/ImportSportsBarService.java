@@ -124,8 +124,9 @@ public class ImportSportsBarService {
 			changed = true;
 		}
 		if (Strings.isEmpty(location.getTelephone()) && data.get("contactData").has("phoneNumber")) {
-			location.setTelephone(data.get("contactData").get("phoneAreaCode").asText() + "/"
-					+ data.get("contactData").get("phoneNumber").asText());
+			location.setTelephone((data.get("contactData").has("phoneAreaCode")
+					? data.get("contactData").get("phoneAreaCode").asText() + "/"
+					: "") + data.get("contactData").get("phoneNumber").asText());
 			changed = true;
 		}
 		if (Strings.isEmpty(location.getUrl()) && data.get("contactData").has("homepageUrl")) {
