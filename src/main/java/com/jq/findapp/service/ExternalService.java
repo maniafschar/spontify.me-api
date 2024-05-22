@@ -65,7 +65,8 @@ public class ExternalService {
 		} catch (final Exception e) {
 			this.notificationService.createTicket(TicketType.GOOGLE, param, value, null);
 		}
-		if ("OK".equals(new ObjectMapper().readTree(value).get("status").asText())) {
+		if (value != null && value.startsWith("{") && value.endsWith("}")
+				&& "OK".equals(new ObjectMapper().readTree(value).get("status").asText())) {
 			final Storage storage = result.size() == 0 ? new Storage()
 					: this.repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
 			storage.setLabel(label);
