@@ -37,8 +37,7 @@ public class ImportSportsBarService {
 				imported = 0;
 				updated = 0;
 				final JsonNode zip = new ObjectMapper().readTree(getClass().getResourceAsStream("/json/zip.json"));
-				final String prefix = ""
-						+ ((LocalDateTime.now().getDayOfMonth() + (now.getHour() == 4 ? 0 : 6) + now.getMinute()) % 10);
+				final String prefix = "" + (now.getHour() == 4 ? 0 : 6) + now.getMinute() / 10;
 				for (int i = 0; i < zip.size(); i++) {
 					final String s = zip.get(i).get("zip").asText();
 					if (s.startsWith(prefix)) {
