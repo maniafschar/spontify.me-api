@@ -309,8 +309,9 @@ public class ImportLocationsService {
 								repository.save(location);
 								updated++;
 							} catch (IllegalArgumentException ex) {
-								notificationService.createTicket(TicketType.ERROR, "importImage",
-										Strings.stackTraceToString(ex), null);
+								if (!ex.getMessage().contains("IMAGE_TOO_SMALL"))
+									notificationService.createTicket(TicketType.ERROR, "importImage",
+											Strings.stackTraceToString(ex), null);
 							}
 						}
 					}
