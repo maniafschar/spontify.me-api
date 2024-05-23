@@ -15,6 +15,7 @@ import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.Event;
+import com.jq.findapp.entity.Event.EventType;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.repository.Query;
@@ -43,8 +44,9 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 
 	@Override
 	public void postPersist(final Event event) throws Exception {
-		if (!repository.one(Client.class, repository.one(Contact.class, event.getContactId()).getClientId())
-				.getAdminId().equals(event.getContactId())) {
+		if (event.getType() != EventType.Poll &&
+				!repository.one(Client.class, repository.one(Contact.class, event.getContactId()).getClientId())
+						.getAdminId().equals(event.getContactId())) {
 			final EventParticipate eventParticipate = new EventParticipate();
 			eventParticipate.setState((short) 1);
 			eventParticipate.setContactId(event.getContactId());
