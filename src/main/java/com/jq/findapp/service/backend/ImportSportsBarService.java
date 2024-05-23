@@ -49,8 +49,8 @@ public class ImportSportsBarService {
 						results.error += r.error;
 					}
 				}
-				result.result = "prefix " + prefix + "*\n" + results.processed + " processed\n" + results.imported
-						+ " imports\n" + results.updated + " updates\n" + results.error;
+				result.result = "prefix " + prefix + "*\nproces " + results.processed + "\ninsert " + results.imported
+						+ "\nupdate " + results.updated + "\nerror " + results.error;
 			} catch (final Exception e) {
 				result.exception = e;
 			}
