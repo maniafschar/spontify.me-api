@@ -123,19 +123,21 @@ public class ImportSportsBarService {
 			location.setDescription(data.get("description").get("program").asText());
 			changed = true;
 		}
-		if (Strings.isEmpty(location.getTelephone()) && data.get("contactData").has("phoneNumber")) {
-			location.setTelephone((data.get("contactData").has("phoneAreaCode")
-					? data.get("contactData").get("phoneAreaCode").asText() + "/"
-					: "") + data.get("contactData").get("phoneNumber").asText());
-			changed = true;
-		}
-		if (Strings.isEmpty(location.getUrl()) && data.get("contactData").has("homepageUrl")) {
-			location.setUrl(data.get("contactData").get("homepageUrl").asText());
-			changed = true;
-		}
-		if (Strings.isEmpty(location.getEmail()) && data.get("contactData").has("mail")) {
-			location.setEmail(data.get("contactData").get("mail").asText());
-			changed = true;
+		if (data.has("contactData")) {
+			if (Strings.isEmpty(location.getTelephone()) && data.get("contactData").has("phoneNumber")) {
+				location.setTelephone((data.get("contactData").has("phoneAreaCode")
+						? data.get("contactData").get("phoneAreaCode").asText() + "/"
+						: "") + data.get("contactData").get("phoneNumber").asText());
+				changed = true;
+			}
+			if (Strings.isEmpty(location.getUrl()) && data.get("contactData").has("homepageUrl")) {
+				location.setUrl(data.get("contactData").get("homepageUrl").asText());
+				changed = true;
+			}
+			if (Strings.isEmpty(location.getEmail()) && data.get("contactData").has("mail")) {
+				location.setEmail(data.get("contactData").get("mail").asText());
+				changed = true;
+			}
 		}
 		return changed;
 	}
