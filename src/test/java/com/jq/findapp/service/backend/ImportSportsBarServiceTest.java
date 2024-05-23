@@ -3,7 +3,6 @@ package com.jq.findapp.service.backend;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
-import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
+import com.jq.findapp.service.backend.ImportSportsBarService.Results;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith(SpringExtension.class)
@@ -32,10 +32,10 @@ public class ImportSportsBarServiceTest {
 		utils.createContact(BigInteger.ONE);
 
 		// when
-		final Map<String, Integer> result = importSportsBarService.importZip("80331");
+		final Results result = importSportsBarService.importZip("80331");
 
 		// then
-		assertTrue(result.get("processed") == 20);
-		assertTrue(result.get("imported") > 2);
+		assertTrue(result.processed == 20);
+		assertTrue(result.imported > 2);
 	}
 }

@@ -1,5 +1,7 @@
 package com.jq.findapp.repository.listener;
 
+import java.math.BigInteger;
+
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,9 +25,21 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 	@Override
 	public void prePersist(final Location location)
 			throws Exception {
-		lookupAddress(location);
+		location.setName(sanitize(location.getName()));
+		final float roundingFactor = 1000f;
 		final QueryParams params = new QueryParams(Query.location_list);
-		params.setUser(repository.one(Contact.class, location.getContactId()));
+		params.setUser(new Contact());
+		params.getUser().setId(BigInteger.ZERO);
+		params.setSearch(
+				"location.name like '%" + location.getName().replace("'", "_").replace(" ", "%")
+						+ "%' and cast(location.longitude as text) like '"
+						+ ((int) (location.getLongitude().floatValue() * roundingFactor)) / roundingFactor + "%'"
+						+ " and cast(location.latitude as text) like '"
+						+ ((int) (location.getLatitude().floatValue() * roundingFactor)) / roundingFactor + "%'");
+		Result list = repository.list(params);
+		if (list.size() > 0)
+			throw new IllegalArgumentException("location exists: " + list.get(0).get("location.id"));
+		lookupAddress(location);
 		params.setSearch(
 				"location.zipCode='" + location.getZipCode() + "' and LOWER(location.street)='"
 						+ (location.getStreet() == null ? ""
@@ -34,7 +48,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 						+ (location.getNumber() == null ? ""
 								: location.getNumber().toLowerCase())
 						+ "'");
-		final Result list = repository.list(params);
+		list = repository.list(params);
 		for (int i = 0; i < list.size(); i++) {
 			if (isNameMatch((String) list.get(i).get("location.name"), location.getName(), true))
 				throw new IllegalArgumentException("location exists: " + list.get(i).get("location.id"));
@@ -43,7 +57,8 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 
 	@Override
 	public void preUpdate(final Location location) throws Exception {
-		if (location.getAddress() != null && !location.getAddress().equals(location.old("address")))
+		location.setName(sanitize(location.getName()));
+		if (location.old("address") != null)
 			lookupAddress(location);
 	}
 
@@ -110,6 +125,14 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		if (tryReverse)
 			return isNameMatch(name2, name1, false);
 		return false;
+	}
+
+	private String sanitize(String name) {
+		if (name != null) {
+			while (name.contains("  "))
+				name = name.replace("  ", " ");
+		}
+		return name;
 	}
 
 	private String prepare(String s) {

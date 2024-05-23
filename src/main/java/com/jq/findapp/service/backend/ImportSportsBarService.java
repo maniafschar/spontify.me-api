@@ -2,8 +2,6 @@ package com.jq.findapp.service.backend;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,24 +30,22 @@ public class ImportSportsBarService {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importSportsBars");
 		final LocalDateTime now = LocalDateTime.now();
 		if (now.getHour() < 10 && now.getMinute() < 9) {
-			int imported = 0, updated = 0, processed = 0, error = 0;
+			final Results results = new Results();
 			try {
-				imported = 0;
-				updated = 0;
 				final JsonNode zip = new ObjectMapper().readTree(getClass().getResourceAsStream("/json/zip.json"));
 				final String prefix = "" + ((LocalDateTime.now().getDayOfMonth() + now.getHour()) % 10);
 				for (int i = 0; i < zip.size(); i++) {
 					final String s = zip.get(i).get("zip").asText();
 					if (s.startsWith(prefix)) {
-						final Map<String, Integer> r = importZip(s);
-						imported += r.get("imported");
-						updated += r.get("updated");
-						processed += r.get("processed");
-						error += r.get("error");
+						final Results r = importZip(s);
+						results.imported += r.imported;
+						results.updated += r.updated;
+						results.processed += r.processed;
+						results.error += r.error;
 					}
 				}
-				result.result = processed + " processed/" + imported + " imports/" + updated + " updates/" + error
-						+ " errors on " + prefix + "*";
+				result.result = "prefix " + prefix + "*\n" + results.processed + " processed\n" + results.imported
+						+ " imports\n" + results.updated + " updates\n" + results.error;
 			} catch (final Exception e) {
 				result.exception = e;
 			}
@@ -57,12 +53,8 @@ public class ImportSportsBarService {
 		return result;
 	}
 
-	public Map<String, Integer> importZip(String zip) throws Exception {
-		final Map<String, Integer> result = new HashMap<>();
-		result.put("processed", 0);
-		result.put("imported", 0);
-		result.put("updated", 0);
-		result.put("error", 0);
+	public Results importZip(String zip) throws Exception {
+		final Results result = new Results();
 		final JsonNode list = new ObjectMapper()
 				.readTree(WebClient.create(URL + zip).get().retrieve()
 						.toEntity(String.class).block().getBody());
@@ -70,7 +62,7 @@ public class ImportSportsBarService {
 				.intValue(); i2++) {
 			final JsonNode data = list.get("currentData").get("" + i2);
 			if (data != null) {
-				result.put("processed", result.get("processed") + 1);
+				result.processed++;
 				final String street = data.get("description").get("street").asText();
 				Location location = new Location();
 				location.setName(data.get("name").asText());
@@ -88,23 +80,23 @@ public class ImportSportsBarService {
 				location.setContactId(BigInteger.ONE);
 				try {
 					repository.save(location);
-					result.put("imported", result.get("imported") + 1);
+					result.imported++;
 				} catch (IllegalArgumentException ex) {
 					if (ex.getMessage().startsWith("location exists: ")) {
 						location = repository.one(Location.class, new BigInteger(ex.getMessage().substring(17)));
 						location.historize();
 						if (updateFields(location, data)) {
 							repository.save(location);
-							result.put("updated", result.get("updated") + 1);
+							result.updated++;
 						}
 					} else {
-						result.put("error", result.get("error") + 1);
+						result.error++;
 						if (!ex.getMessage().contains("OVER_QUERY_LIMIT"))
 							notificationService.createTicket(TicketType.ERROR, "ImportSportsBar",
 									Strings.stackTraceToString(ex), null);
 					}
 				} catch (Exception ex) {
-					result.put("error", result.get("error") + 1);
+					result.error++;
 					notificationService.createTicket(TicketType.ERROR, "ImportSportsBar",
 							Strings.stackTraceToString(ex), null);
 				}
@@ -140,5 +132,12 @@ public class ImportSportsBarService {
 			}
 		}
 		return changed;
+	}
+
+	class Results {
+		int processed = 0;
+		int imported = 0;
+		int updated = 0;
+		int error = 0;
 	}
 }
