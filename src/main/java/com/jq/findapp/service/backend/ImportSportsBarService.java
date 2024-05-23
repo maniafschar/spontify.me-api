@@ -2,6 +2,7 @@ package com.jq.findapp.service.backend;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,10 +59,13 @@ public class ImportSportsBarService {
 		final JsonNode list = new ObjectMapper()
 				.readTree(WebClient.create(URL + zip).get().retrieve()
 						.toEntity(String.class).block().getBody());
+		final QueryParams params = new QueryParams(Query.misc_listStorage);
+		params.setSearch("storage.label='importSportBars'");
+		final Set<String> imported = new ObjectMapper().readValue(repository.one(params).get("storage.storage"), Set.class);
 		for (int i2 = list.get("currentPageIndexStart").intValue() - 1; i2 < list.get("currentPageIndexEnd")
 				.intValue(); i2++) {
 			final JsonNode data = list.get("currentData").get("" + i2);
-			if (data != null) {
+			if (data != null && !imported.contains(data.get("number").asText())) {
 				result.processed++;
 				final String street = data.get("description").get("street").asText();
 				Location location = new Location();
@@ -80,6 +84,7 @@ public class ImportSportsBarService {
 				location.setContactId(BigInteger.ONE);
 				try {
 					repository.save(location);
+					imported.add(data.get("number").asText());
 					result.imported++;
 				} catch (IllegalArgumentException ex) {
 					if (ex.getMessage().startsWith("location exists: ")) {
@@ -102,6 +107,8 @@ public class ImportSportsBarService {
 				}
 			}
 		}
+		storage.setStorage(new ObjectMapper()..writeValueAsString(imported));
+		repository.save(storage);
 		return result;
 	}
 
