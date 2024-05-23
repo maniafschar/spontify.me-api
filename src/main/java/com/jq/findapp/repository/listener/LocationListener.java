@@ -31,7 +31,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		params.setUser(new Contact());
 		params.getUser().setId(BigInteger.ZERO);
 		params.setSearch(
-				"location.name like '%" + location.getName().replace("'", "_").replace(" ", "%")
+				"LOWER(location.name) like '%" + location.getName().toLowerCase().replace("'", "_").replace(" ", "%")
 						+ "%' and cast(location.longitude as text) like '"
 						+ ((int) (location.getLongitude().floatValue() * roundingFactor)) / roundingFactor + "%'"
 						+ " and cast(location.latitude as text) like '"
@@ -131,6 +131,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		if (name != null) {
 			while (name.contains("  "))
 				name = name.replace("  ", " ");
+			name = name.replace('\t', ' ').replace('\r', ' ').replace('\n', ' ');
 		}
 		return name;
 	}
