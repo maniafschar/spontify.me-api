@@ -2,6 +2,7 @@ package com.jq.findapp.service.backend;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Location;
+import com.jq.findapp.entity.Storage;
 import com.jq.findapp.entity.Ticket.TicketType;
+import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Strings;
@@ -61,7 +65,10 @@ public class ImportSportsBarService {
 						.toEntity(String.class).block().getBody());
 		final QueryParams params = new QueryParams(Query.misc_listStorage);
 		params.setSearch("storage.label='importSportBars'");
-		final Set<String> imported = new ObjectMapper().readValue(repository.one(params).get("storage.storage"), Set.class);
+		final Map<String, Object> storage = repository.one(params);
+		@SuppressWarnings("unchecked")
+		final Set<String> imported = new ObjectMapper()
+				.readValue(storage.get("storage.storage").toString(), Set.class);
 		for (int i2 = list.get("currentPageIndexStart").intValue() - 1; i2 < list.get("currentPageIndexEnd")
 				.intValue(); i2++) {
 			final JsonNode data = list.get("currentData").get("" + i2);
@@ -107,8 +114,9 @@ public class ImportSportsBarService {
 				}
 			}
 		}
-		storage.setStorage(new ObjectMapper()..writeValueAsString(imported));
-		repository.save(storage);
+		final Storage s = repository.one(Storage.class, (BigInteger) storage.get("storage.id"));
+		s.setStorage(new ObjectMapper().writeValueAsString(imported));
+		repository.save(s);
 		return result;
 	}
 
