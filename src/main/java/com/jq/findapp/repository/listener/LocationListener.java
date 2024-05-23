@@ -26,20 +26,10 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 	public void prePersist(final Location location)
 			throws Exception {
 		location.setName(sanitize(location.getName()));
-		final float roundingFactor = 1000f;
+		lookupAddress(location);
 		final QueryParams params = new QueryParams(Query.location_list);
 		params.setUser(new Contact());
 		params.getUser().setId(BigInteger.ZERO);
-		params.setSearch(
-				"LOWER(location.name) like '%" + location.getName().toLowerCase().replace("'", "_").replace(" ", "%")
-						+ "%' and cast(location.longitude as text) like '"
-						+ ((int) (location.getLongitude().floatValue() * roundingFactor)) / roundingFactor + "%'"
-						+ " and cast(location.latitude as text) like '"
-						+ ((int) (location.getLatitude().floatValue() * roundingFactor)) / roundingFactor + "%'");
-		Result list = repository.list(params);
-		if (list.size() > 0)
-			throw new IllegalArgumentException("location exists: " + list.get(0).get("location.id"));
-		lookupAddress(location);
 		params.setSearch(
 				"location.zipCode='" + location.getZipCode() + "' and LOWER(location.street)='"
 						+ (location.getStreet() == null ? ""
@@ -48,7 +38,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 						+ (location.getNumber() == null ? ""
 								: location.getNumber().toLowerCase())
 						+ "'");
-		list = repository.list(params);
+		final Result list = repository.list(params);
 		for (int i = 0; i < list.size(); i++) {
 			if (isNameMatch((String) list.get(i).get("location.name"), location.getName(), true))
 				throw new IllegalArgumentException("location exists: " + list.get(i).get("location.id"));
@@ -71,7 +61,25 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		repository.save(locationFavorite);
 	}
 
+	private void checkDuplicateLatLon(Location location) {
+		if (location.getId() != null)
+			return;
+		final float roundingFactor = 1000f;
+		final QueryParams params = new QueryParams(Query.location_listId);
+		params.setSearch(
+				"LOWER(location.name) like '%" + location.getName().toLowerCase().replace("'", "_").replace(" ", "%")
+						+ "%' and cast(location.longitude as text) like '"
+						+ ((int) (location.getLongitude().floatValue() * roundingFactor)) / roundingFactor + "%'"
+						+ " and cast(location.latitude as text) like '"
+						+ ((int) (location.getLatitude().floatValue() * roundingFactor)) / roundingFactor + "%'");
+		final Result list = repository.list(params);
+		if (list.size() > 0)
+			throw new IllegalArgumentException("location exists: " + list.get(0).get("location.id"));
+	}
+
 	private void lookupAddress(final Location location) throws Exception {
+		if (location.getLatitude() != null)
+			checkDuplicateLatLon(location);
 		final JsonNode address = new ObjectMapper().readTree(
 				externalService.google("geocode/json?address="
 						+ location.getAddress().replaceAll("\n", ", ")));
@@ -99,6 +107,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 				|| location.getLatitude() == null || location.getLatitude() == 0) {
 			location.setLatitude(geoLocation.getLatitude());
 			location.setLongitude(geoLocation.getLongitude());
+			checkDuplicateLatLon(location);
 		}
 		n = result.get("address_components");
 		String s = "";
