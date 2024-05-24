@@ -283,12 +283,12 @@ public class ImportLocationsService {
 			params.setLimit(0);
 			final Result list = repository.list(params);
 			result.result = list.size() + " locations for update\n";
-			int updated = 0;
-			try {
-				for (int i = 0; i < list.size(); i++) {
-					final Location location = repository.one(Location.class,
-							(BigInteger) list.get(i).get("location.id"));
-					final String address = location.getAddress().replace("\n", ", ");
+			int updated = 0, exceptions = 0;
+			for (int i = 0; i < list.size(); i++) {
+				final Location location = repository.one(Location.class,
+						(BigInteger) list.get(i).get("location.id"));
+				final String address = location.getAddress().replace("\n", ", ");
+				try {
 					JsonNode json = new ObjectMapper().readTree(
 							externalService.google("place/textsearch/json?query="
 									+ URLEncoder.encode(location.getName() + ", " + address, StandardCharsets.UTF_8)
@@ -332,11 +332,12 @@ public class ImportLocationsService {
 							}
 						}
 					}
+				} catch (Exception ex) {
+					exceptions++;
+					result.exception = ex;
 				}
-			} catch (Exception ex) {
-				result.exception = ex;
 			}
-			result.result = result.result + updated + " updated";
+			result.result = result.result + updated + " updated\n" + exceptions + " exceptions";
 		}
 		return result;
 	}
