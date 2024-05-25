@@ -275,8 +275,7 @@ public class SupportCenterApi {
 	}
 
 	@Async
-	private CompletableFuture<Void> run(final Object bean, String method,
-			final List<CompletableFuture<Void>> list) {
+	private CompletableFuture<Void> run(final Object bean, String method, final List<CompletableFuture<Void>> list) {
 		try {
 			final Cron cron = bean.getClass().getDeclaredMethod(method).getAnnotation(Cron.class);
 			if (cron != null) {
