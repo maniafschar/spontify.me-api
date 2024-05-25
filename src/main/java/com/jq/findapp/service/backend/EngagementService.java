@@ -7,7 +7,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -20,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSendException;
 import org.springframework.stereotype.Service;
 
+import com.jq.findapp.api.SupportCenterApi.Cron;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
@@ -266,12 +266,11 @@ public class EngagementService {
 		chatTemplates.add(new ChatTemplate(TextId.engagement_like, null, null));
 	}
 
+	@Cron(hour = 0, minute = 40)
 	public SchedulerResult sendRegistrationReminder() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/sendRegistrationReminder");
 		try {
 			final GregorianCalendar gc = new GregorianCalendar();
-			if (gc.get(Calendar.HOUR_OF_DAY) < 9 || gc.get(Calendar.HOUR_OF_DAY) > 18)
-				return result;
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setSearch("contact.createdAt<cast('" + Instant.now().minus(Duration.ofHours(3))
 					+ "' as timestamp) and contact.verified=false and contact.notificationEngagement=true");

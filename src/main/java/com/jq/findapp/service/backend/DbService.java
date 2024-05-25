@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +22,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.jq.findapp.api.SupportCenterApi.Cron;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientNews;
@@ -83,9 +83,18 @@ public class DbService {
 			if (clientUpdates.length() > 0)
 				result.result += (result.result.length() > 0 ? "\n" : "") + "ClientUpdate:"
 						+ clientUpdates.substring(1);
-			if (LocalDateTime.now().getHour() == 0 && LocalDateTime.now().getMinute() < 10)
-				result.result += (result.result.length() > 0 ? "\n" : "") + repository.cleanUpAttachments();
 			statistics(BigInteger.valueOf(4l));
+		} catch (final Exception e) {
+			result.exception = e;
+		}
+		return result;
+	}
+
+	@Cron(hour = 0)
+	public SchedulerResult cleanUpAttachments() {
+		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/cleanUpAttachments");
+		try {
+			result.result = repository.cleanUpAttachments();
 		} catch (final Exception e) {
 			result.exception = e;
 		}

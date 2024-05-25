@@ -1,9 +1,14 @@
 package com.jq.findapp.api;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -168,11 +173,11 @@ public class SupportCenterApi {
 		repository.save(contact);
 	}
 
-	@PostMapping("run/{id}")
-	public String run(@PathVariable final String id) throws Exception {
-		if (id.startsWith("importSportsBars"))
-			return "" + importSportsBarService.importZip(id.substring(16));
-		return null;
+	@PostMapping("run/{classname}/{methodname}")
+	public SchedulerResult run(@PathVariable final String classname, @PathVariable final String methodname)
+			throws Exception {
+		final Object clazz = getClass().getDeclaredField(classname);
+		return (SchedulerResult) clazz.getClass().getDeclaredMethod(methodname).invoke(clazz);
 	}
 
 	@GetMapping("report/{days}")
@@ -240,27 +245,29 @@ public class SupportCenterApi {
 			try {
 				schedulerRunning = true;
 				final List<CompletableFuture<Void>> list = new ArrayList<>();
-				list.add(run(importSportsBarService::importSportsBars));
-				list.add(run(chatService::answerAi));
-				list.add(run(dbService::update));
-				list.add(run(engagementService::sendRegistrationReminder));
-				list.add(run(eventService::findMatchingBuddies));
-				list.add(run(eventService::importEvents));
-				list.add(run(eventService::notifyParticipation));
-				list.add(run(importLogService::importLog));
-				list.add(run(rssService::update));
-				list.add(run(surveyService::update));
-				list.add(run(importLocationsService::importImages));
+				run(importSportsBarService::importSportsBars, list);
+				run(chatService::answerAi, list);
+				run(dbService::update, list);
+				run(dbService::cleanUpAttachments, list);
+				run(engagementService::sendRegistrationReminder, list);
+				run(eventService::findMatchingBuddies, list);
+				run(eventService::importEvents, list);
+				run(eventService::publishEvents, list);
+				run(eventService::notifyParticipation, list);
+				run(importLogService::importLog, list);
+				run(rssService::update, list);
+				run(surveyService::update, list);
+				run(importLocationsService::importImages, list);
 				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 						.map(CompletableFuture::join).collect(Collectors.toList())).join();
-				run(engagementService::sendNearBy).join();
+				run(engagementService::sendNearBy, list).join();
 				list.clear();
-				list.add(run(engagementService::sendChats));
-				list.add(run(ipService::lookupIps));
-				list.add(run(sitemapService::update));
+				run(engagementService::sendChats, list);
+				run(ipService::lookupIps, list);
+				run(sitemapService::update, list);
 				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 						.map(CompletableFuture::join).collect(Collectors.toList())).join();
-				run(dbService::backup).join();
+				run(dbService::backup, list).join();
 			} finally {
 				schedulerRunning = false;
 			}
@@ -269,8 +276,24 @@ public class SupportCenterApi {
 	}
 
 	@Async
-	private CompletableFuture<Void> run(final Supplier<SchedulerResult> scheduler) {
-		return CompletableFuture.supplyAsync(() -> {
+	private CompletableFuture<Void> run(final Supplier<SchedulerResult> scheduler,
+			final List<CompletableFuture<Void>> list) {
+		final Cron cron = scheduler.getClass().getAnnotation(Cron.class);
+		if (cron != null) {
+			final LocalDateTime now = LocalDateTime.now();
+			if (cron.minute() != now.getMinute())
+				return null;
+			boolean run = false;
+			for (int i = 0; i < cron.hour().length; i++) {
+				if (cron.hour()[i] == now.getHour()) {
+					run = true;
+					break;
+				}
+			}
+			if (!run)
+				return null;
+		}
+		list.add(CompletableFuture.supplyAsync(() -> {
 			final Log log = new Log();
 			log.setContactId(BigInteger.ZERO);
 			try {
@@ -304,7 +327,8 @@ public class SupportCenterApi {
 				}
 			}
 			return null;
-		});
+		}));
+		return list.get(list.size() - 1);
 	}
 
 	public static class SchedulerResult {
@@ -320,5 +344,13 @@ public class SupportCenterApi {
 	@GetMapping("healthcheck")
 	public void healthcheck(@RequestHeader final String secret) throws Exception {
 		repository.one(Contact.class, BigInteger.ONE);
+	}
+
+	@Target(ElementType.METHOD)
+	@Retention(RetentionPolicy.RUNTIME)
+	public @interface Cron {
+		int[] hour();
+
+		int minute() default 0;
 	}
 }

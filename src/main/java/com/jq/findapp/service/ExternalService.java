@@ -52,7 +52,8 @@ public class ExternalService {
 		final QueryParams params = new QueryParams(Query.misc_listStorage);
 		params.setSearch("storage.label='" + label + "'");
 		final Result result = this.repository.list(params);
-		if (result.size() > 0 && !Strings.isEmpty(result.get(0).get("storage.storage")))
+		if (result.size() > 0 && !Strings.isEmpty(result.get(0).get("storage.storage"))
+				&& !((String) result.get(0).get("storage.storage")).contains("OVER_QUERY_LIMIT"))
 			return result.get(0).get("storage.storage").toString();
 		final String value = WebClient
 				.create("https://maps.googleapis.com/maps/api/" + param + (param.contains("?") ? "&" : "?")

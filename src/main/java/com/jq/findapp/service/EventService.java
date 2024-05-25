@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jq.findapp.api.SupportCenterApi.Cron;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
@@ -220,14 +221,23 @@ public class EventService {
 		return repository.list(params).size() >= event.getMaxParticipants().intValue();
 	}
 
+	@Cron(hour = 5, minute = 40)
 	public SchedulerResult importEvents() {
 		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importEvents");
 		try {
 			final BigInteger clientId = BigInteger.ONE;
-			final boolean run = LocalDateTime.now().getHour() == 5 && LocalDateTime.now().getMinute() < 10;
-			result.result = "Munich: " + (run ? importMunich.run(this, clientId) + "" : "paused")
-					+ "\n" + publishClient(clientId);
-			result.result += "\n" + publishUser() + " user events published";
+			result.result = "Munich: " + importMunich.run(this, clientId);
+		} catch (final Exception e) {
+			result.exception = e;
+		}
+		return result;
+	}
+
+	public SchedulerResult publishEvents() {
+		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/publishEvents");
+		try {
+			final BigInteger clientId = BigInteger.ONE;
+			result.result = publishClient(clientId) + "\n" + publishUser() + " user events published";
 		} catch (final Exception e) {
 			result.exception = e;
 		}

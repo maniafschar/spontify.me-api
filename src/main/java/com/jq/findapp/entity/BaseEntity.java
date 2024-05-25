@@ -97,7 +97,18 @@ public class BaseEntity {
 
 	@Transient
 	public Object old(final String name) {
-		return old == null ? null : old.get(name);
+		if (old == null)
+			return null;
+		final Object value = old.get(name);
+		if (value == null)
+			return null;
+		try {
+			final Field field = getClass().getDeclaredField(name);
+			field.setAccessible(true);
+			return value.equals(field.get(this)) ? null : value;
+		} catch (final Exception ex) {
+			throw new RuntimeException("Failed to read " + name, ex);
+		}
 	}
 
 	@Transient
