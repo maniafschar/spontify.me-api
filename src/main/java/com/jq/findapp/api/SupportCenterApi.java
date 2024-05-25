@@ -304,7 +304,10 @@ public class SupportCenterApi {
 			try {
 				log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
 				final SchedulerResult result = (SchedulerResult) bean.getClass().getMethod(method).invoke(bean);
-				log.setUri("/support/scheduler/" + bean.getClass().getSimpleName() + "/" + method);
+				String name = bean.getClass().getSimpleName();
+				if (name.contains("$"))
+					name = name.substring(0, name.indexOf('$'));
+				log.setUri("/support/scheduler/" + name + "/" + method);
 				log.setStatus(Strings.isEmpty(result.exception) ? 200 : 500);
 				if (result.result != null)
 					log.setBody(result.result.trim());
