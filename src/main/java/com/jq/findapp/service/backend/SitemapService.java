@@ -27,7 +27,7 @@ public class SitemapService {
 
 	@Cron(hour = 20)
 	public SchedulerResult update() {
-		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/update");
+		final SchedulerResult result = new SchedulerResult();
 		final Result list = repository.list(new QueryParams(Query.misc_listClient));
 		for (int i = 0; i < list.size(); i++) {
 			try {

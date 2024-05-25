@@ -55,7 +55,7 @@ public class ChatService {
 	}
 
 	public SchedulerResult answerAi() {
-		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/answerAi");
+		final SchedulerResult result = new SchedulerResult();
 		final QueryParams params = new QueryParams(Query.contact_chat);
 		params.setSearch(
 				"contactChat.contactId<>(select adminId from Client client, Contact contact where client.id=contact.clientId and contact.id=contactChat.contactId) and cast(contactChat.textId as text)='"

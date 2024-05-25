@@ -35,7 +35,7 @@ public class IpService {
 	}
 
 	public SchedulerResult lookupIps() {
-		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/lookupIps");
+		final SchedulerResult result = new SchedulerResult();
 		final QueryParams params = new QueryParams(Query.misc_listIp);
 		params.setSearch("ip.longitude=0 and ip.latitude=0");
 		final Result list = repository.list(params);

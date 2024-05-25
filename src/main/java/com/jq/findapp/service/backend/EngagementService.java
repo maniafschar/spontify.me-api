@@ -268,7 +268,7 @@ public class EngagementService {
 
 	@Cron(hour = 0, minute = 40)
 	public SchedulerResult sendRegistrationReminder() {
-		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/sendRegistrationReminder");
+		final SchedulerResult result = new SchedulerResult();
 		try {
 			final GregorianCalendar gc = new GregorianCalendar();
 			final QueryParams params = new QueryParams(Query.contact_listId);
@@ -319,7 +319,7 @@ public class EngagementService {
 	}
 
 	public SchedulerResult sendChats() {
-		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/sendChats");
+		final SchedulerResult result = new SchedulerResult();
 		try {
 			resetChatInstallCurrentVersion();
 			final QueryParams params = new QueryParams(Query.contact_listId);
@@ -420,7 +420,7 @@ public class EngagementService {
 	}
 
 	public SchedulerResult sendNearBy() {
-		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/sendNearBy");
+		final SchedulerResult result = new SchedulerResult();
 		try {
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setSearch("contact.verified=true and contact.notificationEngagement=true and "

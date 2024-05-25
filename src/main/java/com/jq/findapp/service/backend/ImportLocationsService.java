@@ -276,7 +276,7 @@ public class ImportLocationsService {
 
 	@Cron(hour = 10)
 	public SchedulerResult importImages() {
-		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importImages");
+		final SchedulerResult result = new SchedulerResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setSearch("location.image is null or length(location.image)=0");
 		params.setLimit(0);

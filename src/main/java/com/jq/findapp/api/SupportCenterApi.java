@@ -293,6 +293,9 @@ public class SupportCenterApi {
 					return null;
 			}
 		} catch (Exception ex) {
+			notificationService.createTicket(TicketType.ERROR, "scheduler",
+					Strings.stackTraceToString(ex),
+					null);
 			throw new RuntimeException(ex);
 		}
 		list.add(CompletableFuture.supplyAsync(() -> {
@@ -301,7 +304,7 @@ public class SupportCenterApi {
 			try {
 				log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
 				final SchedulerResult result = (SchedulerResult) bean.getClass().getMethod(method).invoke(bean);
-				log.setUri("/support/scheduler/" + result.name);
+				log.setUri("/support/scheduler/" + bean.getClass().getSimpleName() + "/" + method);
 				log.setStatus(Strings.isEmpty(result.exception) ? 200 : 500);
 				if (result.result != null)
 					log.setBody(result.result.trim());
@@ -334,13 +337,8 @@ public class SupportCenterApi {
 	}
 
 	public static class SchedulerResult {
-		private final String name;
 		public String result = "";
 		public Exception exception;
-
-		public SchedulerResult(final String name) {
-			this.name = name;
-		}
 	}
 
 	@GetMapping("healthcheck")

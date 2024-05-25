@@ -41,7 +41,7 @@ public class ImportLogService {
 	private static final Map<String, Integer> linesRead = new HashMap<>();
 
 	public SchedulerResult importLog() {
-		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importLog");
+		final SchedulerResult result = new SchedulerResult();
 		try {
 			if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) < 1
 					&& Calendar.getInstance().get(Calendar.MINUTE) < 1)

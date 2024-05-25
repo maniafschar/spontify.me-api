@@ -47,7 +47,7 @@ public class DbService {
 	private String webDir;
 
 	public SchedulerResult update() {
-		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/update");
+		final SchedulerResult result = new SchedulerResult();
 		try {
 			repository.executeUpdate(
 					"update Contact set age=cast((YEAR(current_timestamp) - YEAR(birthday) - case when MONTH(current_timestamp) < MONTH(birthday) or MONTH(current_timestamp) = MONTH(birthday) and DAY(current_timestamp) < DAY(birthday) then 1 else 0 end) as short) where birthday is not null");
@@ -92,7 +92,7 @@ public class DbService {
 
 	@Cron(hour = 0)
 	public SchedulerResult cleanUpAttachments() {
-		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/cleanUpAttachments");
+		final SchedulerResult result = new SchedulerResult();
 		try {
 			result.result = repository.cleanUpAttachments();
 		} catch (final Exception e) {
@@ -102,7 +102,7 @@ public class DbService {
 	}
 
 	public SchedulerResult backup() {
-		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/backup");
+		final SchedulerResult result = new SchedulerResult();
 		try {
 			new ProcessBuilder("./backup.sh").start().waitFor();
 		} catch (final Exception e) {

@@ -57,7 +57,7 @@ public class EventService {
 	private ImportMunich importMunich;
 
 	public SchedulerResult findMatchingBuddies() {
-		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/findMatchingBuddies");
+		final SchedulerResult result = new SchedulerResult();
 		try {
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setSearch(
@@ -116,7 +116,7 @@ public class EventService {
 	}
 
 	public SchedulerResult notifyParticipation() {
-		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/notifyParticipation");
+		final SchedulerResult result = new SchedulerResult();
 		try {
 			final QueryParams params = new QueryParams(Query.event_listParticipateRaw);
 			params.setSearch("eventParticipate.state=1 and eventParticipate.eventDate>cast('"
@@ -223,7 +223,7 @@ public class EventService {
 
 	@Cron(hour = 5, minute = 40)
 	public SchedulerResult importEvents() {
-		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importEvents");
+		final SchedulerResult result = new SchedulerResult();
 		try {
 			final BigInteger clientId = BigInteger.ONE;
 			result.result = "Munich: " + importMunich.run(this, clientId);
@@ -234,7 +234,7 @@ public class EventService {
 	}
 
 	public SchedulerResult publishEvents() {
-		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/publishEvents");
+		final SchedulerResult result = new SchedulerResult();
 		try {
 			final BigInteger clientId = BigInteger.ONE;
 			result.result = publishClient(clientId) + "\n" + publishUser() + " user events published";

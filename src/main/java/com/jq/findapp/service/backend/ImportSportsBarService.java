@@ -34,7 +34,7 @@ public class ImportSportsBarService {
 
 	@Cron(hour = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 })
 	public SchedulerResult importSportsBars() {
-		final SchedulerResult result = new SchedulerResult(getClass().getSimpleName() + "/importSportsBars");
+		final SchedulerResult result = new SchedulerResult();
 		final Results results = new Results();
 		try {
 			final String zipCodePrefix = ""
