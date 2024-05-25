@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -176,7 +175,7 @@ public class SupportCenterApi {
 	@PostMapping("run/{classname}/{methodname}")
 	public SchedulerResult run(@PathVariable final String classname, @PathVariable final String methodname)
 			throws Exception {
-		final Object clazz = getClass().getDeclaredField(classname);
+		final Object clazz = getClass().getDeclaredField(classname).get(this);
 		return (SchedulerResult) clazz.getClass().getDeclaredMethod(methodname).invoke(clazz);
 	}
 
@@ -245,29 +244,29 @@ public class SupportCenterApi {
 			try {
 				schedulerRunning = true;
 				final List<CompletableFuture<Void>> list = new ArrayList<>();
-				run(importSportsBarService::importSportsBars, list);
-				run(chatService::answerAi, list);
-				run(dbService::update, list);
-				run(dbService::cleanUpAttachments, list);
-				run(engagementService::sendRegistrationReminder, list);
-				run(eventService::findMatchingBuddies, list);
-				run(eventService::importEvents, list);
-				run(eventService::publishEvents, list);
-				run(eventService::notifyParticipation, list);
-				run(importLogService::importLog, list);
-				run(rssService::update, list);
-				run(surveyService::update, list);
-				run(importLocationsService::importImages, list);
+				run(importSportsBarService, "importSportsBars", list);
+				run(chatService, "answerAi", list);
+				run(dbService, "update", list);
+				run(dbService, "cleanUpAttachments", list);
+				run(engagementService, "sendRegistrationReminder", list);
+				run(eventService, "findMatchingBuddies", list);
+				run(eventService, "importEvents", list);
+				run(eventService, "publishEvents", list);
+				run(eventService, "notifyParticipation", list);
+				run(importLogService, "importLog", list);
+				run(rssService, "update", list);
+				run(surveyService, "update", list);
+				run(importLocationsService, "importImages", list);
 				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 						.map(CompletableFuture::join).collect(Collectors.toList())).join();
-				run(engagementService::sendNearBy, list).join();
+				run(engagementService, "sendNearBy", list).join();
 				list.clear();
-				run(engagementService::sendChats, list);
-				run(ipService::lookupIps, list);
-				run(sitemapService::update, list);
+				run(engagementService, "sendChats", list);
+				run(ipService, "lookupIps", list);
+				run(sitemapService, "update", list);
 				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 						.map(CompletableFuture::join).collect(Collectors.toList())).join();
-				run(dbService::backup, list).join();
+				run(dbService, "backup", list).join();
 			} finally {
 				schedulerRunning = false;
 			}
@@ -276,29 +275,33 @@ public class SupportCenterApi {
 	}
 
 	@Async
-	private CompletableFuture<Void> run(final Supplier<SchedulerResult> scheduler,
+	private CompletableFuture<Void> run(final Object bean, String method,
 			final List<CompletableFuture<Void>> list) {
-		final Cron cron = scheduler.getClass().getAnnotation(Cron.class);
-		if (cron != null) {
-			final LocalDateTime now = LocalDateTime.now();
-			if (cron.minute() != now.getMinute())
-				return null;
-			boolean run = false;
-			for (int i = 0; i < cron.hour().length; i++) {
-				if (cron.hour()[i] == now.getHour()) {
-					run = true;
-					break;
+		try {
+			final Cron cron = bean.getClass().getDeclaredMethod(method).getAnnotation(Cron.class);
+			if (cron != null) {
+				final LocalDateTime now = LocalDateTime.now();
+				if (cron.minute() != now.getMinute())
+					return null;
+				boolean run = false;
+				for (int i = 0; i < cron.hour().length; i++) {
+					if (cron.hour()[i] == now.getHour()) {
+						run = true;
+						break;
+					}
 				}
+				if (!run)
+					return null;
 			}
-			if (!run)
-				return null;
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
 		}
 		list.add(CompletableFuture.supplyAsync(() -> {
 			final Log log = new Log();
 			log.setContactId(BigInteger.ZERO);
 			try {
 				log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
-				final SchedulerResult result = scheduler.get();
+				final SchedulerResult result = (SchedulerResult) bean.getClass().getMethod(method).invoke(bean);
 				log.setUri("/support/scheduler/" + result.name);
 				log.setStatus(Strings.isEmpty(result.exception) ? 200 : 500);
 				if (result.result != null)
@@ -348,7 +351,7 @@ public class SupportCenterApi {
 
 	@Target(ElementType.METHOD)
 	@Retention(RetentionPolicy.RUNTIME)
-	public @interface Cron {
+	public static @interface Cron {
 		int[] hour();
 
 		int minute() default 0;

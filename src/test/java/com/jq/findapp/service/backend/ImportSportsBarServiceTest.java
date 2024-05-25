@@ -3,6 +3,7 @@ package com.jq.findapp.service.backend;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
+import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
+import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.service.backend.ImportSportsBarService.Results;
 import com.jq.findapp.util.Utils;
 
@@ -37,5 +39,11 @@ public class ImportSportsBarServiceTest {
 		// then
 		assertTrue(result.processed == 20);
 		assertTrue(result.imported > 2);
+	}
+
+	@Test
+	public void annotation() {
+		Supplier<SchedulerResult> s = importSportsBarService::importSportsBars;
+		System.out.println(s.toString());
 	}
 }
