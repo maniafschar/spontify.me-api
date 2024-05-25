@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jq.findapp.api.SupportCenterApi.Cron;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Query;
@@ -25,7 +24,6 @@ public class SitemapService {
 	@Autowired
 	private Repository repository;
 
-	@Cron(hour = 20)
 	public SchedulerResult update() {
 		final SchedulerResult result = new SchedulerResult();
 		final Result list = repository.list(new QueryParams(Query.misc_listClient));

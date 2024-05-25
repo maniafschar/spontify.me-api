@@ -1,9 +1,5 @@
 package com.jq.findapp.api;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.Duration;
@@ -244,29 +240,29 @@ public class SupportCenterApi {
 			try {
 				schedulerRunning = true;
 				final List<CompletableFuture<Void>> list = new ArrayList<>();
-				run(importSportsBarService, "importSportsBars", list);
-				run(chatService, "answerAi", list);
-				run(dbService, "update", list);
-				run(dbService, "cleanUpAttachments", list);
-				run(engagementService, "sendRegistrationReminder", list);
-				run(eventService, "findMatchingBuddies", list);
-				run(eventService, "importEvents", list);
-				run(eventService, "publishEvents", list);
-				run(eventService, "notifyParticipation", list);
-				run(importLogService, "importLog", list);
-				run(rssService, "update", list);
-				run(surveyService, "update", list);
-				run(importLocationsService, "importImages", list);
+				run(importSportsBarService, "importSportsBars", list, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 0);
+				run(chatService, "answerAi", list, null, 0);
+				run(dbService, "update", list, null, 0);
+				run(dbService, "cleanUpAttachments", list, new int[] { 0 }, 30);
+				run(engagementService, "sendRegistrationReminder", list, new int[] { 0 }, 40);
+				run(eventService, "findMatchingBuddies", list, null, 0);
+				run(eventService, "importEvents", list, new int[] { 5 }, 40);
+				run(eventService, "publishEvents", list, null, 0);
+				run(eventService, "notifyParticipation", list, null, 0);
+				run(importLogService, "importLog", list, null, 0);
+				run(rssService, "update", list, null, 0);
+				run(surveyService, "update", list, null, 0);
+				run(importLocationsService, "importImages", list, new int[] { 10 }, 0);
 				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 						.map(CompletableFuture::join).collect(Collectors.toList())).join();
-				run(engagementService, "sendNearBy", list).join();
+				run(engagementService, "sendNearBy", list, null, 0).join();
 				list.clear();
-				run(engagementService, "sendChats", list);
-				run(ipService, "lookupIps", list);
-				run(sitemapService, "update", list);
+				run(engagementService, "sendChats", list, null, 0);
+				run(ipService, "lookupIps", list, null, 0);
+				run(sitemapService, "update", list, new int[] { 20 }, 0);
 				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 						.map(CompletableFuture::join).collect(Collectors.toList())).join();
-				run(dbService, "backup", list).join();
+				run(dbService, "backup", list, null, 0).join();
 			} finally {
 				schedulerRunning = false;
 			}
@@ -275,28 +271,21 @@ public class SupportCenterApi {
 	}
 
 	@Async
-	private CompletableFuture<Void> run(final Object bean, String method, final List<CompletableFuture<Void>> list) {
-		try {
-			final Cron cron = bean.getClass().getDeclaredMethod(method).getAnnotation(Cron.class);
-			if (cron != null) {
-				final LocalDateTime now = LocalDateTime.now();
-				if (cron.minute() != now.getMinute())
-					return null;
-				boolean run = false;
-				for (int i = 0; i < cron.hour().length; i++) {
-					if (cron.hour()[i] == now.getHour()) {
-						run = true;
-						break;
-					}
+	private CompletableFuture<Void> run(final Object bean, String method, final List<CompletableFuture<Void>> list,
+			int[] hours, int minute) {
+		if (hours != null) {
+			final LocalDateTime now = LocalDateTime.now();
+			if (minute != now.getMinute())
+				return null;
+			boolean run = false;
+			for (int i = 0; i < hours.length; i++) {
+				if (hours[i] == now.getHour()) {
+					run = true;
+					break;
 				}
-				if (!run)
-					return null;
 			}
-		} catch (Exception ex) {
-			notificationService.createTicket(TicketType.ERROR, "scheduler",
-					Strings.stackTraceToString(ex),
-					null);
-			throw new RuntimeException(ex);
+			if (!run)
+				return null;
 		}
 		list.add(CompletableFuture.supplyAsync(() -> {
 			final Log log = new Log();
@@ -347,13 +336,5 @@ public class SupportCenterApi {
 	@GetMapping("healthcheck")
 	public void healthcheck(@RequestHeader final String secret) throws Exception {
 		repository.one(Contact.class, BigInteger.ONE);
-	}
-
-	@Target(ElementType.METHOD)
-	@Retention(RetentionPolicy.RUNTIME)
-	public static @interface Cron {
-		int[] hour();
-
-		int minute() default 0;
 	}
 }

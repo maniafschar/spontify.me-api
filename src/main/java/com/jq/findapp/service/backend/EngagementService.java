@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSendException;
 import org.springframework.stereotype.Service;
 
-import com.jq.findapp.api.SupportCenterApi.Cron;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
@@ -266,7 +265,6 @@ public class EngagementService {
 		chatTemplates.add(new ChatTemplate(TextId.engagement_like, null, null));
 	}
 
-	@Cron(hour = 0, minute = 40)
 	public SchedulerResult sendRegistrationReminder() {
 		final SchedulerResult result = new SchedulerResult();
 		try {

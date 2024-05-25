@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jq.findapp.api.SupportCenterApi.Cron;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
@@ -221,7 +220,6 @@ public class EventService {
 		return repository.list(params).size() >= event.getMaxParticipants().intValue();
 	}
 
-	@Cron(hour = 5, minute = 40)
 	public SchedulerResult importEvents() {
 		final SchedulerResult result = new SchedulerResult();
 		try {

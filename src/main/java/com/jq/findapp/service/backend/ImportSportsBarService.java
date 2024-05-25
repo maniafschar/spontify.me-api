@@ -11,7 +11,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jq.findapp.api.SupportCenterApi.Cron;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Storage;
@@ -32,7 +31,6 @@ public class ImportSportsBarService {
 
 	private static final String URL = "https://skyfinder.sky.de/sf/skyfinder.servlet?detailedSearch=Suchen&group=H&group=B&group=A&country=de&action=search&zip=";
 
-	@Cron(hour = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 })
 	public SchedulerResult importSportsBars() {
 		final SchedulerResult result = new SchedulerResult();
 		final Results results = new Results();
