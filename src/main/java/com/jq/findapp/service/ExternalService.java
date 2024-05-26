@@ -152,11 +152,10 @@ public class ExternalService {
 	public GeoLocation getAddress(final float latitude, final float longitude) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_listGeoLocation);
 		float roundingFactor = 0.0005f;
-		params.setSearch(
-				"geoLocation.latitude<" + (latitude + roundingFactor)
-						+ " and geoLocation.latitude>" + (latitude - roundingFactor)
-						+ " and geoLocation.longitude<" + (longitude + roundingFactor)
-						+ " and geoLocation.longitude>" + (longitude - roundingFactor));
+		params.setSearch("geoLocation.latitude<" + (latitude + roundingFactor)
+				+ " and geoLocation.latitude>" + (latitude - roundingFactor)
+				+ " and geoLocation.longitude<" + (longitude + roundingFactor)
+				+ " and geoLocation.longitude>" + (longitude - roundingFactor));
 		final Result persistedAddress = this.repository.list(params);
 		if (persistedAddress.size() > 0) {
 			double distance = Double.MAX_VALUE, d;
