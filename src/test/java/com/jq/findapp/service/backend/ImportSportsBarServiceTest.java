@@ -34,7 +34,7 @@ public class ImportSportsBarServiceTest {
 		utils.createContact(BigInteger.ONE);
 
 		// when
-		final Results result = importSportsBarService.importZip("80331");
+		final Results result = importSportsBarService.importZipCode("80331");
 
 		// then
 		assertTrue(result.processed == 20);

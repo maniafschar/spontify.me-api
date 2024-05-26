@@ -41,7 +41,7 @@ public class ImportSportsBarService {
 			for (int i = 0; i < zip.size(); i++) {
 				final String s = zip.get(i).get("zip").asText();
 				if (s.startsWith("" + zipCodePrefix)) {
-					final Results r = importZip(s);
+					final Results r = importZipCode(s);
 					results.imported += r.imported;
 					results.updated += r.updated;
 					results.processed += r.processed;
@@ -63,7 +63,7 @@ public class ImportSportsBarService {
 		return result;
 	}
 
-	public Results importZip(String zip) throws Exception {
+	public Results importZipCode(String zip) throws Exception {
 		final Results result = new Results();
 		final JsonNode list = new ObjectMapper().readTree(WebClient.create(URL + zip).get().retrieve()
 				.toEntity(String.class).block().getBody());
@@ -84,7 +84,7 @@ public class ImportSportsBarService {
 					final String street = data.get("description").get("street").asText();
 					Location location = new Location();
 					location.setName(data.get("name").asText());
-					if (street.contains(" ")) {
+					if (street.contains(" ") && street.substring(street.lastIndexOf(' ')).matches("\\d.*")) {
 						location.setStreet(street.substring(0, street.lastIndexOf(' ')));
 						location.setNumber(street.substring(street.lastIndexOf(' ')).trim());
 					} else
@@ -94,6 +94,10 @@ public class ImportSportsBarService {
 					location.setAddress(location.getStreet() + " " + location.getNumber() + "\n" + location.getZipCode()
 							+ " " + location.getTown() + "\nDeutschland");
 					location.setCountry("DE");
+					if (data.has("mapdata") && data.get("mapdata").has("latitude")) {
+						location.setLatitude(data.get("mapdata").get("latitude").floatValue());
+						location.setLongitude(data.get("mapdata").get("longitude").floatValue());
+					}
 					updateFields(location, data);
 					location.setContactId(BigInteger.ONE);
 					try {
