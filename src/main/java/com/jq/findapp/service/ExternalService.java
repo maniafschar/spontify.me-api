@@ -59,13 +59,6 @@ public class ExternalService {
 				.create("https://maps.googleapis.com/maps/api/" + param + (param.contains("?") ? "&" : "?")
 						+ "key=" + this.googleKey)
 				.get().retrieve().toEntity(String.class).block().getBody();
-		try {
-			final ObjectMapper om = new ObjectMapper();
-			this.notificationService.createTicket(TicketType.GOOGLE, param,
-					om.writerWithDefaultPrettyPrinter().writeValueAsString(om.readTree(value)), null);
-		} catch (final Exception e) {
-			this.notificationService.createTicket(TicketType.GOOGLE, param, value, null);
-		}
 		if (value != null && value.startsWith("{") && value.endsWith("}")
 				&& "OK".equals(new ObjectMapper().readTree(value).get("status").asText())) {
 			final Storage storage = result.size() == 0 ? new Storage()
