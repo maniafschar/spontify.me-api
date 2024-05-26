@@ -30,7 +30,6 @@ import com.jq.findapp.util.Strings;
 
 @Service
 public class ImportLocationsService {
-	private final float roundingFactor = 1000f;
 	private final Pattern href = Pattern.compile("href=\"([^\"]*)\"");
 
 	@Autowired
@@ -163,6 +162,7 @@ public class ImportLocationsService {
 
 	@Async
 	public void lookup(final float latitude, final float longitude) throws Exception {
+		final float roundingFactor = 1000f;
 		final float lat = ((int) (latitude * roundingFactor) / roundingFactor);
 		final float lon = ((int) (longitude * roundingFactor) / roundingFactor);
 		final QueryParams params = new QueryParams(Query.misc_listTicket);
@@ -216,7 +216,7 @@ public class ImportLocationsService {
 			location = json2location(json);
 			if (json.has("photos") && mapFirstRelevantType(json) != null &&
 					(!json.has("permanently_closed") || !json.get("permanently_closed").asBoolean()) &&
-					json.has("rating") && json.get("rating").asDouble() > 3 && exists(location) == null) {
+					json.has("rating") && json.get("rating").asDouble() > 3) {
 				try {
 					final String jsonLower = om.writeValueAsString(json).toLowerCase();
 					if (jsonLower.contains("sex") || jsonLower.contains("domina") || jsonLower.contains("bordel")) {
@@ -347,22 +347,6 @@ public class ImportLocationsService {
 		try {
 			if (!json.has("photos"))
 				throw new IllegalArgumentException("no image in json");
-			final BigInteger id = exists(location);
-			if (id != null) {
-				final Location l = repository.one(Location.class, id);
-				if (!location.getGoogleRating().equals(l.getGoogleRating())
-						|| !location.getGoogleRatingTotal().equals(l.getGoogleRatingTotal())
-						|| !location.getCategory().equals(l.getCategory())
-						|| location.getSubcategories() == null
-						|| !location.getSubcategories().equals(l.getSubcategories())) {
-					l.setGoogleRating(location.getGoogleRating());
-					l.setGoogleRatingTotal(location.getGoogleRatingTotal());
-					l.setCategory(location.getCategory());
-					l.setSubcategories(location.getSubcategories());
-					repository.save(l);
-				}
-				throw new IllegalArgumentException("location exists");
-			}
 			final String html = externalService.google(
 					"place/photo?maxheight=1200&photoreference="
 							+ json.get("photos").get(0).get("photo_reference").asText())
@@ -377,7 +361,26 @@ public class ImportLocationsService {
 		location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, 0));
 		if (location.getImage() != null)
 			location.setImageList(EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
-		repository.save(location);
+		try {
+			repository.save(location);
+		} catch (IllegalArgumentException ex) {
+			if (ex.getMessage().startsWith("location exists: ")) {
+				final Location l = repository.one(Location.class, new BigInteger(ex.getMessage().substring(17)));
+				if (!location.getGoogleRating().equals(l.getGoogleRating())
+						|| !location.getGoogleRatingTotal().equals(l.getGoogleRatingTotal())
+						|| !location.getCategory().equals(l.getCategory())
+						|| location.getSubcategories() == null
+						|| !location.getSubcategories().equals(l.getSubcategories())) {
+					l.setGoogleRating(location.getGoogleRating());
+					l.setGoogleRatingTotal(location.getGoogleRatingTotal());
+					l.setCategory(location.getCategory());
+					l.setSubcategories(location.getSubcategories());
+					repository.save(l);
+				}
+				throw new IllegalArgumentException("location exists");
+			} else
+				throw ex;
+		}
 		return location;
 	}
 
@@ -449,21 +452,5 @@ public class ImportLocationsService {
 			}
 		}
 		return null;
-	}
-
-	private BigInteger exists(final Location location) {
-		final QueryParams params = new QueryParams(Query.location_listId);
-		params.setSearch("LOWER(location.name) like '%"
-				+ location.getName().toLowerCase().replace("'", "''").replace(' ', '%')
-				+ "%' and location.category='"
-				+ location.getCategory()
-				+ "' and (LOWER(location.address) like '%"
-				+ location.getAddress().toLowerCase().replace("traße", "tr.").replace('\n', '%').replace("'", "''")
-				+ "%' or cast(location.latitude as text) like '"
-				+ ((int) (location.getLatitude().floatValue() * roundingFactor)) / roundingFactor
-				+ "%' and cast(location.longitude as text) like '"
-				+ ((int) (location.getLongitude().floatValue() * roundingFactor)) / roundingFactor + "%')");
-		final Result result = repository.list(params);
-		return result.size() > 0 ? (BigInteger) result.get(0).get("location.id") : null;
 	}
 }

@@ -84,7 +84,7 @@ public class ImportSportsBarService {
 					final String street = data.get("description").get("street").asText();
 					Location location = new Location();
 					location.setName(data.get("name").asText());
-					if (street.contains(" ") && street.substring(street.lastIndexOf(' ')).matches("\\d.*")) {
+					if (street.contains(" ") && street.substring(street.lastIndexOf(' ')).trim().matches("\\d.*")) {
 						location.setStreet(street.substring(0, street.lastIndexOf(' ')));
 						location.setNumber(street.substring(street.lastIndexOf(' ')).trim());
 					} else

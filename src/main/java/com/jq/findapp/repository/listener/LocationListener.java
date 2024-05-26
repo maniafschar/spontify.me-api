@@ -2,7 +2,6 @@ package com.jq.findapp.repository.listener;
 
 import java.math.BigInteger;
 
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +15,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.service.ExternalService;
+import com.jq.findapp.util.Strings;
 
 @Component
 public class LocationListener extends AbstractRepositoryListener<Location> {
@@ -64,14 +64,18 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 	private void checkDuplicateLatLon(Location location) {
 		if (location.getId() != null)
 			return;
-		final float roundingFactor = 1000f;
+		final float roundingFactor = 0.0005f;
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setSearch(
 				"LOWER(location.name) like '%" + location.getName().toLowerCase().replace("'", "_").replace(" ", "%")
-						+ "%' and cast(location.longitude as text) like '"
-						+ ((int) (location.getLongitude().floatValue() * roundingFactor)) / roundingFactor + "%'"
-						+ " and cast(location.latitude as text) like '"
-						+ ((int) (location.getLatitude().floatValue() * roundingFactor)) / roundingFactor + "%'");
+						+ "%' and location.longitude<"
+						+ (location.getLongitude() + roundingFactor)
+						+ " and location.longitude>"
+						+ (location.getLongitude() - roundingFactor)
+						+ " and location.latitude<"
+						+ (location.getLatitude() + roundingFactor)
+						+ " and location.latitude>"
+						+ (location.getLatitude() - roundingFactor));
 		final Result list = repository.list(params);
 		if (list.size() > 0)
 			throw new IllegalArgumentException("location exists: " + list.get(0).get("location.id"));
@@ -80,8 +84,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 	private void lookupAddress(final Location location) throws Exception {
 		if (location.getLatitude() != null) {
 			checkDuplicateLatLon(location);
-			if ("x.1".equals(location.getSkills()))
-				return;
+			return;
 		}
 		final JsonNode address = new ObjectMapper().readTree(
 				externalService.google("geocode/json?address="
