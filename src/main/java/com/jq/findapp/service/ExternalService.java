@@ -154,7 +154,7 @@ public class ExternalService {
 		float roundingFactor = 0.0005f;
 		params.setSearch(
 				"geoLocation.latitude<" + (latitude + roundingFactor)
-						+ "geoLocation.latitude>" + (latitude - roundingFactor)
+						+ " and geoLocation.latitude>" + (latitude - roundingFactor)
 						+ " and geoLocation.longitude<" + (longitude + roundingFactor)
 						+ " and geoLocation.longitude>" + (longitude - roundingFactor));
 		final Result persistedAddress = this.repository.list(params);
