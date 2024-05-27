@@ -42,7 +42,7 @@ public class LocationMarketingService {
 		final SchedulerResult result = new SchedulerResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setSearch("location.skills like '%x.1%' and location.email like '%@%' and location.marketingMail not like '%x.1%'");
-		params.setLimit(20);
+		params.setLimit(1);
 		final Result list = repository.list(params);
 		result.result = list.size() + " locations for update\n";
 		final String html;
@@ -65,7 +65,7 @@ public class LocationMarketingService {
 					.readTree(Attachment.resolve(client.getStorage()))
 					.get("css");
 			css.fieldNames().forEachRemaining(key -> Strings.replaceString(htmlText, "--" + key, css.get(key).asText()));
-			notificationService.sendEmail(client, "", location.getEmail(), "Sky Sport Events: Möchtest Du mehr Gäste? ", text, htmlText.toString());
+			notificationService.sendEmail(client, "", "mani.afschar@jq-consulting.de"/*location.getEmail()*/, "Sky Sport Events: Möchtest Du mehr Gäste? ", text, htmlText.toString());
 			location.setMarketingMail((location.getMarketingMail() == null ? "" : location.getMarketingMail() + "|") + "x.1");
 			repository.save(location);
 		}
