@@ -151,11 +151,10 @@ public class ActionApi {
 			params.setSearch("contactChat.contactId=" + user + " and contactChat.contactId2=" + id
 					+ " or contactChat.contactId=" + id + " and contactChat.contactId2=" + user);
 		else
-			params.setSearch(
-					"contactChat.seen=false and contactChat.contactId=" + id + " and contactChat.contactId2=" + user);
+			params.setSearch("contactChat.seen=false and contactChat.contactId=" + id
+					+ " and contactChat.contactId2=" + user);
 		final Result result = repository.list(params);
-		params.setSearch(
-				"contactChat.seen=false and contactChat.contactId=" + id + " and contactChat.contactId2=" + user);
+		params.setSearch("contactChat.seen=false and contactChat.contactId=" + id + " and contactChat.contactId2=" + user);
 		final Result unseen = repository.list(params);
 		if (unseen.size() > 0) {
 			repository.executeUpdate(
@@ -377,9 +376,8 @@ public class ActionApi {
 		contact.setLongitude(position.getLongitude());
 		repository.save(contact);
 		final QueryParams params = new QueryParams(Query.contact_listGeoLocationHistory);
-		params.setSearch(
-				"contactGeoLocationHistory.createdAt>cast('" + Instant.now().minus(Duration.ofSeconds(5))
-						+ "' as timestamp) and contactGeoLocationHistory.contactId=" + contact.getId());
+		params.setSearch("contactGeoLocationHistory.createdAt>cast('" + Instant.now().minus(Duration.ofSeconds(5))
+				+ "' as timestamp) and contactGeoLocationHistory.contactId=" + contact.getId());
 		if (repository.list(params).size() == 0) {
 			final GeoLocation geoLocation = externalService.getAddress(position.getLatitude(), position.getLongitude());
 			if (geoLocation != null) {
