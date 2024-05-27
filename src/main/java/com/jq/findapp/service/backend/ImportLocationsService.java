@@ -277,7 +277,7 @@ public class ImportLocationsService {
 		final SchedulerResult result = new SchedulerResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setSearch("location.image is null or length(location.image)=0");
-		params.setLimit(0);
+		params.setLimit(20);
 		final Result list = repository.list(params);
 		result.result = list.size() + " locations for update\n";
 		int updated = 0, exceptions = 0;

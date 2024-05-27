@@ -46,6 +46,7 @@ import com.jq.findapp.service.backend.ImportLocationsService;
 import com.jq.findapp.service.backend.ImportLogService;
 import com.jq.findapp.service.backend.ImportSportsBarService;
 import com.jq.findapp.service.backend.IpService;
+import com.jq.findapp.service.backend.LocationMarketingService;
 import com.jq.findapp.service.backend.RssService;
 import com.jq.findapp.service.backend.SitemapService;
 import com.jq.findapp.service.backend.SurveyService;
@@ -101,6 +102,9 @@ public class SupportCenterApi {
 
 	@Autowired
 	private IpService ipService;
+
+	@Autowired
+	private LocationMarketingService locationMarketingService;
 
 	@Autowired
 	private MetricsEndpoint metricsEndpoint;
@@ -252,7 +256,7 @@ public class SupportCenterApi {
 				run(importLogService, "importLog", list, null, 0);
 				run(rssService, "update", list, null, 0);
 				run(surveyService, "update", list, null, 0);
-				run(importLocationsService, "importImages", list, new int[] { 10 }, 0);
+				// run(importLocationsService, "importImages", list, null, 0);
 				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 						.map(CompletableFuture::join).collect(Collectors.toList())).join();
 				run(engagementService, "sendNearBy", list, null, 0).join();
