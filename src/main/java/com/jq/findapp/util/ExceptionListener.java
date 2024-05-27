@@ -8,11 +8,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -46,12 +45,13 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 	public ResponseEntity<Object> handle(final Exception ex, final WebRequest request) {
 		final HttpStatus statusCode = ex instanceof AuthenticationException ? HttpStatus.UNAUTHORIZED
 				: HttpStatus.INTERNAL_SERVER_ERROR;
-		final Map<String, Object> body = new HashMap<>(3);
-		body.put("msg", ex.getMessage());
-		body.put("class", ex.getClass().getSimpleName());
-		body.put("time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 		report(((ServletWebRequest) request).getRequest(), ex, statusCode);
-		return createResponseEntity(body, null, statusCode, request);
+		return createResponseEntity(
+				"{\"msg\":\"" + ex.getMessage().replace("\"", "'").replace("\n", "\\n").replace("\r", "")
+						+ "\",\"class\":\"" + ex.getClass().getSimpleName() + "\",\"time\":\""
+						+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "\"}",
+				HttpHeaders.EMPTY, statusCode,
+				request);
 	}
 
 	private void report(final HttpServletRequest request, final Exception ex, final HttpStatus status) {
