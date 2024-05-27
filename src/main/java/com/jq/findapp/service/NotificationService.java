@@ -423,6 +423,13 @@ public class NotificationService {
 	public void sendEmail(final Contact from, final Contact to, final String subject, final String text,
 			final String html) {
 		final Client client = repository.one(Client.class, to.getClientId());
+		sendEmail(client, from == null || from.getId().equals(client.getAdminId()) ? "" :
+			  from.getPseudonym() + " · ", to.getEmail(), subject, text, html);
+		createTicket(TicketType.EMAIL, to.getEmail(), text, client.getAdminId());
+	}
+
+	public void sendEmail(final Client client, final String name, final String to, final String subject,
+			final String text, final String html) {
 		final ImageHtmlEmail email = mailCreateor.create();
 		email.setHostName(emailHost);
 		email.setSmtpPort(emailPort);
@@ -430,25 +437,19 @@ public class NotificationService {
 		email.setAuthenticator(new DefaultAuthenticator(client.getEmail(), emailPassword));
 		email.setSSLOnConnect(true);
 		try {
-			email.setFrom(client.getEmail(),
-					(from == null || from.getId().equals(client.getAdminId()) ? "" : from.getPseudonym() + " · ")
-							+ client.getName());
-			email.addTo(to.getEmail());
+			email.setFrom(client.getEmail(), name + client.getName());
+			email.addTo(to);
 			email.setSubject(subject);
 			email.setTextMsg(text);
 			if (html != null) {
 				email.setDataSourceResolver(new DataSourceUrlResolver(
-						URI.create(Strings.removeSubdomain(repository.one(Client.class, to.getClientId()).getUrl()))
-								.toURL()));
+						URI.create(Strings.removeSubdomain(client.getUrl())).toURL()));
 				email.setHtmlMsg(html);
 			}
 			email.send();
-			createTicket(TicketType.EMAIL, to.getEmail(), text,
-					repository.one(Client.class, to.getClientId()).getAdminId());
 		} catch (final EmailException | MalformedURLException ex) {
-			if (to != null)
-				createTicket(TicketType.ERROR, "Email exception: " + to.getEmail(),
-						Strings.stackTraceToString(ex) + "\n\n" + text, to.getId());
+			createTicket(TicketType.ERROR, "Email exception: " + to,
+					Strings.stackTraceToString(ex) + "\n\n" + text, null);
 		}
 	}
 
