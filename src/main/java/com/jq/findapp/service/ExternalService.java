@@ -151,7 +151,7 @@ public class ExternalService {
 
 	public GeoLocation getAddress(final float latitude, final float longitude, boolean exact) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_listGeoLocation);
-		final float roundingFactor = exact ? 0.0005f : 0.05f;
+		final float roundingFactor = exact ? 0.0005f : 0.005f;
 		params.setSearch("geoLocation.latitude<" + (latitude + roundingFactor)
 				+ " and geoLocation.latitude>" + (latitude - roundingFactor)
 				+ " and geoLocation.longitude<" + (longitude + roundingFactor)
