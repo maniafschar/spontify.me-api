@@ -38,38 +38,47 @@ public class LocationMarketingService {
 	private Repository repository;
 
 	public SchedulerResult sendEmails() {
-		final Client client = repository.one(Client.class, new BigInteger(4));
 		final SchedulerResult result = new SchedulerResult();
-		final QueryParams params = new QueryParams(Query.location_listId);
-		params.setSearch("location.skills like '%x.1%' and location.email like '%@%' and location.marketingMail not like '%x.1%'");
-		params.setLimit(1);
-		final Result list = repository.list(params);
-		result.result = list.size() + " locations for update\n";
-		final String html;
 		try (final InputStream inHtml = getClass().getResourceAsStream("/template/email.html")) {
-			html = new StringBuilder(IOUtils.toString(inHtml, StandardCharsets.UTF_8));
-		}
-		String text = "Lieber Sky Sport Kunde,\n\nwie zufrieden bist Du mit der Auslastung Deiner Gastronomie zu Sport Events?\n\nWir von fan-club.online möchten mehr gemeinsame Sporterlebnise auch in Deiner Gastronomie von und für Fans organisiern lassen. Bist Du an einer Kooperation interessiert? Sie ist für Dich kostenlos.\n\nViele Grüße\nMani Afschar Yazdi\nGeschäftsführer\nhttps://fan-club.online";
-		for (int i = 0; i < list.size(); i++) {
-			final Location location = repository.one(Location.class, (BigInteger) list.get(i).get("location.id"));
-			final StringBuilder htmlText = new StringBuilder();
-			Strings.replaceString(htmlText, "<jq:logo />", client.getUrl() + "/images/logo.png");
-			Strings.replaceString(htmlText, "<jq:pseudonym />", "");
-			Strings.replaceString(htmlText, "<jq:time />", Strings.formatDate(null, new Date(), contactTo.getTimezone()));
-			Strings.replaceString(htmlText, "<jq:text />", text.replaceAll("\n", "<br />"));
-			Strings.replaceString(htmlText, "<jq:link />", client.getUrl());
-			Strings.replaceString(htmlText, "<jq:url />", client.getUrl());
-			Strings.replaceString(htmlText, "<jq:newsTitle />", s2);
-			Strings.replaceString(htmlText, "<jq:image />", "");
+			final Client client = repository.one(Client.class, new BigInteger(4));
+			String html = IOUtils.toString(inHtml, StandardCharsets.UTF_8)
+					.replace("<jq:logo />", client.getUrl() + "/images/logo.png")
+					.replace("<jq:pseudonym />", "")
+					.replace("<jq:time />", Strings.formatDate(null, new Date(), contactTo.getTimezone()))
+					.replace("<jq:text />", text.replaceAll("\n", "<br />"))
+					.replace("<jq:link />", client.getUrl())
+					.replace("<jq:url />", client.getUrl())
+					.replace("<jq:newsTitle />", s2)
+					.replace("<jq:image />", "");
 			final JsonNode css = new ObjectMapper()
 					.readTree(Attachment.resolve(client.getStorage()))
 					.get("css");
-			css.fieldNames().forEachRemaining(key -> Strings.replaceString(htmlText, "--" + key, css.get(key).asText()));
-			notificationService.sendEmail(client, "", "mani.afschar@jq-consulting.de"/*location.getEmail()*/, "Sky Sport Events: Möchtest Du mehr Gäste? ", text, htmlText.toString());
-			location.setMarketingMail((location.getMarketingMail() == null ? "" : location.getMarketingMail() + "|") + "x.1");
-			repository.save(location);
+			css.fieldNames().forEachRemaining(key -> html = html.replace("--" + key, css.get(key).asText()));
+			final QueryParams params = new QueryParams(Query.location_listId);
+			params.setSearch("location.skills like '%x.1%' and location.email like '%@%' and location.marketingMail not like '%x.1%'");
+			params.setLimit(1);
+			final Result list = repository.list(params);
+			result.result = list.size() + " locations found\n";
+			final String text = "Lieber Sky Sport Kunde,\n\n"
+				+ "wie zufrieden bist Du mit der Auslastung Deiner Gastronomie zu Sport Events?\n\n"
+				+ "Wir von fan-club.online möchten mehr gemeinsame Sporterlebnise auch in Deiner Gastronomie von und für Fans organisiern lassen. "
+				+ "Bist Du an einer Kooperation interessiert? Sie ist für Dich kostenlos.\n\n"
+				+ "Der Link zu unserer App: https://fan-club.online\n"
+				+ "Bei Interesse antworte auf diese Email oder ruf uns an und wir besprechen alles telefonisch.\n\n"
+				+ "Viele Grüße\n"
+				+ "Mani Afschar Yazdi\n"
+				+ "Geschäftsführer\n"
+				+ "JNet Quality Consulting GmbH\n"
+				+ "0172 6379434";
+			for (int i = 0; i < list.size(); i++) {
+				final Location location = repository.one(Location.class, (BigInteger) list.get(i).get("location.id"));
+				notificationService.sendEmail(client, "", "mani.afschar@jq-consulting.de"/*location.getEmail()*/, "Sky Sport Events: Möchtest Du mehr Gäste? ", text, htmlText.toString());
+				location.setMarketingMail((location.getMarketingMail() == null ? "" : location.getMarketingMail() + "|") + "x.1");
+				repository.save(location);
+			}
+		} catch (Exception ex) {
+			result.exception = ex;
 		}
-		result.result = result.result + updated + " updated\n" + exceptions + " exceptions";
 		return result;
 	}
 }
