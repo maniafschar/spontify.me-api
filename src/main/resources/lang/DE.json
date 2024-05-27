@@ -27,7 +27,8 @@
 		"praise": "Hey CONTACT_PSEUDONYM, einfach mal ein Lob, nicht mehr, Du hast ein tolles Profil. Weiter so. ❤️\nWenn Dir irgendetwas bezüglich der App auf dem Herzen liegt, schreib es mir gerne hier.",
 		"uploadProfileAttributes": "Hey CONTACT_PSEUDONYM, die passenden Skills zusammen mit Deinen Geburtstag und Dein Geschlecht verhelfen Dir passende Spontis, Events und Locations zu finden und \"Heute schon was vor?\" oder Bluetooth Matching zu nutzen. Klick mich, wenn Du jetzt Deine Angaben ergänzen möchtest.",
 		"uploadProfileImage": "81% mehr Interaktionen erhältst Du mit einem attraktiven Bild in Deinem Profil. Es lohnt sich, probiere es mal aus. Frag mich, wenn Du Probleme bezüglich der Benutzung der App hast.",
-		"welcome": "Hallo CONTACT_PSEUDONYM,\n\nschön, dass Du da bist. Schau Dich um und kontaktiere mich, wenn Du Fragen hast.\n\nViel Spaß\nDein APP_TITLE Team"
+		"welcome": "Hallo CONTACT_PSEUDONYM,\n\nschön, dass Du da bist. Schau Dich um und kontaktiere mich, wenn Du Fragen hast.\n\nViel Spaß\nDein APP_TITLE Team",
+		"skySportsbar": "Lieber Sky Sport Kunde,\n\nwie zufrieden sind Sie mit der Auslastung Ihrer Gastronomie zu Sport Events?\n\nWir von fan-club.online möchten mehr gemeinsame Sporterlebnis auch in Ihrer Gastronomie von und für Fans organisiern lassen. Sind Sie an einer Kooperation interessiert? Sie ist für Sie kostenlos.\n\nViele Grüße\nMani Afschar Yazdi\nGeschäftsführer\nhttps://fan-club.online"
 	},
 	"event": {
 		"fbWithoutLocation": "{pseudonym} möchte am {date} folgendes unternehmen:\n{description}\nLogge Dich ein, dann kannst Du Kontakt aufnehmen."
