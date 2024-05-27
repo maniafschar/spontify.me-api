@@ -8,3 +8,5 @@ FROM
 	Location location
 WHERE
 	{search}
+ORDER BY
+	location.id
