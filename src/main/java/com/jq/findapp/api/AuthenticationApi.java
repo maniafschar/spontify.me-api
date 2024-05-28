@@ -69,7 +69,7 @@ public class AuthenticationApi {
 		if (user != null) {
 			final QueryParams params = new QueryParams(Query.location_listId);
 			params.setSearch("location.contactId=" + user.get("contact.id"));
-			user.put("location_added", repository.list(params).size());
+			user.put("authority", repository.list(params).size() > 4 ? "editLocation" : "");
 			if (getVideoTimeSlot((BigInteger) user.get("contact.id")))
 				user.put("login_video_call", Boolean.TRUE);
 			params.setQuery(Query.contact_listGeoLocationHistory);
