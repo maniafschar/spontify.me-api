@@ -48,7 +48,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 				!repository.one(Client.class, repository.one(Contact.class, event.getContactId()).getClientId())
 						.getAdminId().equals(event.getContactId())) {
 			final EventParticipate eventParticipate = new EventParticipate();
-			eventParticipate.setState((short) 1);
+			eventParticipate.setState(1);
 			eventParticipate.setContactId(event.getContactId());
 			eventParticipate.setEventId(event.getId());
 			eventParticipate.setEventDate(new Date(event.getStartDate().getTime()));

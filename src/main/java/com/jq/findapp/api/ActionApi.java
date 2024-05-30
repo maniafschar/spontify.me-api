@@ -154,7 +154,8 @@ public class ActionApi {
 			params.setSearch("contactChat.seen=false and contactChat.contactId=" + id
 					+ " and contactChat.contactId2=" + user);
 		final Result result = repository.list(params);
-		params.setSearch("contactChat.seen=false and contactChat.contactId=" + id + " and contactChat.contactId2=" + user);
+		params.setSearch(
+				"contactChat.seen=false and contactChat.contactId=" + id + " and contactChat.contactId2=" + user);
 		final Result unseen = repository.list(params);
 		if (unseen.size() > 0) {
 			repository.executeUpdate(
@@ -379,7 +380,8 @@ public class ActionApi {
 		params.setSearch("contactGeoLocationHistory.createdAt>cast('" + Instant.now().minus(Duration.ofSeconds(5))
 				+ "' as timestamp) and contactGeoLocationHistory.contactId=" + contact.getId());
 		if (repository.list(params).size() == 0) {
-			final GeoLocation geoLocation = externalService.getAddress(position.getLatitude(), position.getLongitude(), false);
+			final GeoLocation geoLocation = externalService.getAddress(position.getLatitude(), position.getLongitude(),
+					false);
 			if (geoLocation != null) {
 				final Map<String, Object> result = new HashMap<>();
 				if (geoLocation.getStreet() != null && geoLocation.getNumber() != null)
@@ -436,7 +438,7 @@ public class ActionApi {
 			for (int i = 0; i < result.size(); i++) {
 				final EventParticipate eventParticipate = repository.one(EventParticipate.class,
 						(BigInteger) result.get(i).get("eventParticipate.id"));
-				eventParticipate.setState((short) -1);
+				eventParticipate.setState(-1);
 				eventParticipate.setReason("Paypal " + n.get("resource").get("note_to_payer").asText());
 				repository.save(eventParticipate);
 			}
