@@ -327,7 +327,7 @@ public class ActionApi {
 			search = (search == null ? "" : "(" + search + ") and ") + "(event.type='Poll' and event.startDate>=cast('"
 					+ today.toLocalDateTime() + "' as timestamp) or event.type<>'Poll' and event.endDate>=cast('"
 					+ today.toLocalDate() + "' as timestamp) and event.startDate<=cast('"
-					+ today.plus(Duration.ofDays(1))
+					+ today.plus(Duration.ofDays(15)).toLocalDate()
 					+ "' as timestamp))";
 		} else
 			params.setLimit(limit);

@@ -70,10 +70,7 @@ public class Screenshots {
 	}
 
 	private void screenshots(final String name) throws Exception {
-		// Util.driver.get("https://after-work.events/");
-		// Util.driver.get("https://offline-poker.com/");
-		// Util.driver.get("https://alpenherz.fan-club.online/");
-		Util.driver.get("https://fcbayerntotal.fan-club.online/");
+		Util.driver.get("https://fan-club.online/");
 		Util.sleep(3000);
 		js.executeScript(
 				"ui.navigation.closeHint()");
@@ -81,14 +78,10 @@ public class Screenshots {
 				"var p={},e=ui.qa('card img');for(var i=0;i<e.length;i++)if(p[e[i].src])ui.parents(e[i],'card').outerHTML='';else p[e[i].src]=true;");
 		js.executeScript(
 				"var e=ui.qa('card[onclick*=\"(223,\"],card[onclick*=\"(244,\"],card[onclick*=\"(245,\"],card[onclick*=\"(324,\"],card[onclick*=\"(435,\"],card[onclick*=\"(445,\"],card[onclick*=\"(459,\"],card[onclick*=\"(645,\"],card[onclick*=\"(723,\"],card[onclick*=\"(385,\"],card[onclick*=\"(276,\"],card[onclick*=\"(607,\"],card[onclick*=\"(793,\"]');for(var i=0;i<e.length;i++)e[i].outerHTML='';");
-		Util.sleep(1000);
 		screenshot(name);
-		if (Util.driver.getTitle().contains("Fanclub")) {
-			js.executeScript("pageHome.openNews()");
-			Util.sleep(2000);
-			screenshot(name + "-news");
-			Util.sleep(1000);
-		}
+		js.executeScript("pageHome.openNews()");
+		screenshot(name + "-news");
+		Util.sleep(1000);
 		login();
 		Util.sleep(1000);
 		js.executeScript("ui.navigation.goTo('search')");
@@ -98,13 +91,12 @@ public class Screenshots {
 		js.executeScript("pageSearch.contacts.search()");
 		Util.sleep(1000);
 		js.executeScript(
-				"var e=ui.qa('search div list-row');for(var i=0;i<e.length;i++)if(ui.q('search div list-row[i=\"'+e[i].getAttribute('i')+'\"] img[src*=\"contacts.svg\"]'))e[i].outerHTML='';");
+				"var e=ui.qa('search div list-row');for(var i=0;i<e.length;i++)if(ui.q('search div list-row[i=\"'+e[i].getAttribute('i')+'\"] svg[class*=\"default\"]'))e[i].outerHTML='';");
 		js.executeScript(
 				"var e=ui.qa('search div list-row[i=\"223\"],search div list-row[i=\"244\"],search div list-row[i=\"276\"],search div list-row[i=\"607\"],search div list-row[i=\"793\"]');for(var i=0;i<e.length;i++)e[i].outerHTML='';");
 		screenshot(name + "-search");
-		if (Util.driver.getTitle().contains("Fanclub")) {
+		if (Util.driver.getTitle().contains("Fanclubx")) {
 			js.executeScript("ui.navigation.goTo(\"statistics\")");
-			Util.sleep(2000);
 			screenshot(name + "-stats");
 		}
 		js.executeScript(
@@ -113,7 +105,6 @@ public class Screenshots {
 								? "100% auto"
 								: "auto 100%")
 						+ "';e.backgroundPosition='center';ui.q('video-call call').style.display='none';");
-		Util.sleep(2000);
 		screenshot(name + "-video");
 		js.executeScript("pageLogin.logoff()");
 	}
@@ -131,6 +122,7 @@ public class Screenshots {
 	}
 
 	private void screenshot(final String name) throws Exception {
+		Util.sleep(3000);
 		IOUtils.write(((ChromeDriver) Util.driver).getScreenshotAs(OutputType.BYTES),
 				new FileOutputStream(dir + name + ".png"));
 	}

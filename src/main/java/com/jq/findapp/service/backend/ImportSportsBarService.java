@@ -113,6 +113,7 @@ public class ImportSportsBarService {
 								result.updated++;
 							} else
 								result.unchanged++;
+							imported.add(data.get("number").asText());
 						} else {
 							result.errors++;
 							if (!ex.getMessage().contains("OVER_QUERY_LIMIT"))
