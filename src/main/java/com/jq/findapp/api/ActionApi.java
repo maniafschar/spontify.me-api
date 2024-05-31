@@ -324,10 +324,11 @@ public class ActionApi {
 		if (params.getQuery() == Query.event_listTeaser) {
 			params.setLimit(0);
 			final ZonedDateTime today = Instant.now().atZone(ZoneOffset.UTC);
-			search = (search == null ? "" : "(" + search + ") and ") + "event.endDate>=cast('"
+			search = (search == null ? "" : "(" + search + ") and ") + "(event.type='Poll' and event.startDate>=cast('"
+					+ today.toLocalDateTime() + "' as timestamp) or event.type<>'Poll' and event.endDate>=cast('"
 					+ today.toLocalDate() + "' as timestamp) and event.startDate<=cast('"
 					+ today.plus(Duration.ofDays(1))
-					+ "' as timestamp)";
+					+ "' as timestamp))";
 		} else
 			params.setLimit(limit);
 		params.setSearch(search);

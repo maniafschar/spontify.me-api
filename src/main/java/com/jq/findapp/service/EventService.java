@@ -66,8 +66,7 @@ public class EventService {
 			final Result ids = repository.list(params);
 			params.setQuery(Query.event_listMatching);
 			params.setDistance(50);
-			params.setSearch(
-					"event.startDate>=current_timestamp and cast(TO_DAYS(event.startDate) as integer)-1<=cast(TO_DAYS(current_timestamp) as integer)");
+			params.setSearch("event.endDate>current_timestamp");
 			final LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
 			int count = 0;
 			for (int i = 0; i < ids.size(); i++) {
@@ -169,7 +168,8 @@ public class EventService {
 	public void publish(final BigInteger id) throws Exception {
 		final Event event = repository.one(Event.class, id);
 		final Contact contact = repository.one(Contact.class, event.getContactId());
-		final Location location = repository.one(Location.class, event.getLocationId());
+		final Location location = event.getLocationId() == null ? null
+				: repository.one(Location.class, event.getLocationId());
 		final String date = new SimpleDateFormat("d.M.yyyy H:mm").format(event.getStartDate());
 		final JsonNode json = new ObjectMapper()
 				.readTree(Attachment.resolve(repository.one(Client.class, contact.getClientId()).getStorage()));
@@ -260,7 +260,8 @@ public class EventService {
 
 	private int publishUser() throws Exception {
 		final QueryParams params = new QueryParams(Query.event_listId);
-		params.setSearch("event.startDate>cast('" + Instant.now().plus(Duration.ofMinutes(10)) + "' as timestamp)"
+		params.setSearch("(event.type='Poll' or event.startDate>cast('"
+				+ Instant.now().plus(Duration.ofMinutes(10)) + "' as timestamp))"
 				+ " and event.publish=true"
 				+ " and event.publishId is null"
 				+ " and (event.modifiedAt is null or event.modifiedAt<cast('"

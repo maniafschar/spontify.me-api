@@ -46,7 +46,7 @@ public class LocationMarketingService {
 					+ "Wir, ein innovativer Fußball-App Hersteller aus München, möchten mehr gemeinsame Sporterlebnise auch in Deiner Gastronomie von und für Fans organisiern lassen. "
 					+ "Bist Du an einer Kooperation interessiert? Sie ist für Dich kostenlos.\n\n"
 					+ "Der Link zu unserer App: " + client.getUrl() + "\n"
-					+ "Bei Interesse antworte auf diese Email oder ruf uns an und wir besprechen alles telefonisch.\n\n"
+					+ "Bei Interesse antworte auf diese Email oder ruf uns an und wir besprechen weitere Details telefonisch.\n\n"
 					+ "Viele Grüße\n"
 					+ "Mani Afschar Yazdi\n"
 					+ "Geschäftsführer\n"
