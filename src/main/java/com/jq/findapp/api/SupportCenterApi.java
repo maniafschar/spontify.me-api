@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -259,14 +260,14 @@ public class SupportCenterApi {
 				// run(importLocationsService, "importImages", list, null, 0);
 				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 						.map(CompletableFuture::join).collect(Collectors.toList())).join();
-				run(engagementService, "sendNearBy", list, null, 0).join();
+				run(engagementService, "sendNearBy", null, null, 0);
 				list.clear();
 				run(engagementService, "sendChats", list, null, 0);
 				run(ipService, "lookupIps", list, null, 0);
 				run(sitemapService, "update", list, new int[] { 20 }, 0);
 				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 						.map(CompletableFuture::join).collect(Collectors.toList())).join();
-				run(dbService, "backup", list, null, 0).join();
+				run(dbService, "backup", null, null, 0);
 			} finally {
 				schedulerRunning = false;
 			}
@@ -275,23 +276,14 @@ public class SupportCenterApi {
 	}
 
 	@Async
-	private CompletableFuture<Void> run(final Object bean, String method, final List<CompletableFuture<Void>> list,
+	private void run(final Object bean, String method, final List<CompletableFuture<Void>> list,
 			int[] hours, int minute) {
 		if (hours != null) {
 			final LocalDateTime now = LocalDateTime.now();
-			if (minute != now.getMinute())
-				return null;
-			boolean run = false;
-			for (int i = 0; i < hours.length; i++) {
-				if (hours[i] == now.getHour()) {
-					run = true;
-					break;
-				}
-			}
-			if (!run)
-				return null;
+			if (minute != now.getMinute() || !Arrays.stream(hours).anyMatch(e -> e == now.getHour()))
+				return;
 		}
-		list.add(CompletableFuture.supplyAsync(() -> {
+		final CompletableFuture<Void> e = CompletableFuture.supplyAsync(() -> {
 			final Log log = new Log();
 			log.setContactId(BigInteger.ZERO);
 			try {
@@ -314,22 +306,27 @@ public class SupportCenterApi {
 				}
 			} catch (final Throwable ex) {
 				log.setBody("uncaught exception " + ex.getClass().getName() + ": " + ex.getMessage() +
-						(log.getBody() == null ? "" : "\n" + log.getBody()));
+						(Strings.isEmpty(log.getBody()) ? "" : "\n" + log.getBody()));
 				notificationService.createTicket(TicketType.ERROR, "scheduler",
-						"uncatched exception:\n" + Strings.stackTraceToString(ex), null);
+						"uncaught exception:\n" + Strings.stackTraceToString(ex)
+								+ (Strings.isEmpty(log.getBody()) ? "" : "\n\n" + log.getBody()),
+						null);
 			} finally {
 				log.setTime((int) (System.currentTimeMillis() - log.getCreatedAt().getTime()));
 				if (log.getBody() != null && log.getBody().length() > 255)
 					log.setBody(log.getBody().substring(0, 252) + "...");
 				try {
 					repository.save(log);
-				} catch (final Exception e) {
-					throw new RuntimeException(e);
+				} catch (final Exception e2) {
+					throw new RuntimeException(e2);
 				}
 			}
 			return null;
-		}));
-		return list.get(list.size() - 1);
+		});
+		if (list == null)
+			e.join();
+		else
+			list.add(e);
 	}
 
 	public static class SchedulerResult {

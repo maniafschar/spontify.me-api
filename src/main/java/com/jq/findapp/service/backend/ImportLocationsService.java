@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
@@ -343,24 +342,8 @@ public class ImportLocationsService {
 			location.setCategory(category);
 		else if (location.getCategory() == null)
 			throw new IllegalArgumentException("no relevant category found:\n" + json);
-		String image;
-		try {
-			if (!json.has("photos"))
-				throw new IllegalArgumentException("no image in json");
-			final String html = externalService.google(
-					"place/photo?maxheight=1200&photoreference="
-							+ json.get("photos").get(0).get("photo_reference").asText())
-					.replace("<A HREF=", "<a href=");
-			final Matcher matcher = href.matcher(html);
-			if (!matcher.find())
-				throw new IllegalArgumentException("no image in html: " + html);
-			image = matcher.group(1);
-		} catch (final JsonProcessingException e) {
-			throw new RuntimeException(e);
-		}
-		location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, 0));
-		if (location.getImage() != null)
-			location.setImageList(EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
+		if (!json.has("photos"))
+			throw new IllegalArgumentException("no image in json");
 		try {
 			repository.save(location);
 		} catch (IllegalArgumentException ex) {
