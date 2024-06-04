@@ -190,12 +190,12 @@ public class SupportCenterApi {
 		params.setSearch(
 				"log.clientId>0 and (log.uri='/action/teaser/contacts' or log.uri not like '/%') and LOWER(ip.org) not like '%google%' and LOWER(ip.org) not like '%facebook%' and LOWER(ip.org) not like '%amazon%' and log.createdAt>cast('"
 						+ Instant.now().minus(Duration.ofDays(days)) + "' as timestamp)");
-		Result list = repository.list(params);
+		final Result list = repository.list(params);
 		for (int i = 0; i < list.size(); i++) {
 			final Map<String, Object> log = list.get(i);
 			final String clientId = log.get("log.clientId").toString();
 			if (!result.containsKey(clientId)) {
-				result.put(clientId.toString(), new HashMap<>());
+				result.put(clientId, new HashMap<>());
 				result.get(clientId).put(anonym, new HashMap<>());
 				result.get(clientId).put(login, new HashMap<>());
 				result.get(clientId).put(teaser, new HashMap<>());
@@ -209,6 +209,35 @@ public class SupportCenterApi {
 					addLogEntry(result.get(clientId).get(login), key, log.get("log.contactId").toString());
 			} else
 				addLogEntry(result.get(clientId).get(teaser), key, (String) log.get("log.ip"));
+		}
+		return result;
+	}
+
+	@GetMapping("report/{days}/api")
+	public Map<String, Map<String, Map<String, Set<String>>>> reportApi(@PathVariable final int days)
+			throws Exception {
+		final Map<String, Map<String, BigInteger>> result = new HashMap<>();
+		final QueryParams params = new QueryParams(Query.misc_listLog);
+		final String time = "time", count = "count";
+		params.setLimit(Integer.MAX_VALUE);
+		params.setSearch(
+				"log.clientId>0 and log.uri like '/%' and log.uri not like '/support/%' and log.uri not like '/marketing/%' and log.uri not like '/ws/%' and log.createdAt>cast('"
+						+ Instant.now().minus(Duration.ofDays(days)) + "' as timestamp)");
+		final Result list = repository.list(params);
+		for (int i = 0; i < list.size(); i++) {
+			final Map<String, Object> log = list.get(i);
+			final String id = log.get("log.uri") + "|" + log.get("log.webCall");
+			final Map<String, BigInteger> map;
+			if (result.containsKey(id))
+				map = result.get(id);
+			else {
+				map = new HashMap<>();
+				map.put(time, BigInteger.ZERO);
+				map.put(count, BigInteger.ZERO);
+				result.put(id, map);
+			}
+			map.put(time, map.get(time).add((BigInteger) log.get("log.time")));
+			map.put(count, map.get(count).add(BigInteger.ONE));
 		}
 		return result;
 	}
