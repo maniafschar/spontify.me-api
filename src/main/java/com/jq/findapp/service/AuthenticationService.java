@@ -397,6 +397,18 @@ public class AuthenticationService {
 		if (contact.getVerified() == null || !contact.getVerified()) {
 			contact.setVerified(Boolean.TRUE);
 			contact.setNotificationEngagement(Boolean.TRUE);
+			if (contact.getReferer() != null) {
+				final QueryParams params = new QueryParams(Query.contact_listFriends);
+				params.setUser(contact);
+				params.setId(contact.getReferer());
+				if (repository.list(params).size() == 0) {
+					final ContactLink contactLink = new ContactLink();
+					contactLink.setContactId(contact.getId());
+					contactLink.setContactId2(contact.getReferer());
+					contactLink.setStatus(Status.Friends);
+					repository.save(contactLink);
+				}
+			}
 		}
 		contact.setEmailVerified(contact.getEmail());
 		repository.save(contact);
