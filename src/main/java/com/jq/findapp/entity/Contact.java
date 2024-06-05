@@ -15,6 +15,7 @@ import jakarta.persistence.Transient;
 @Entity
 public class Contact extends BaseEntity {
 	private BigInteger clientId;
+	private BigInteger referer;
 	private Boolean acceptFriendship = false;
 	private Boolean authenticate = false;
 	private Boolean bluetooth = true;
@@ -93,6 +94,14 @@ public class Contact extends BaseEntity {
 
 	public void setClientId(final BigInteger clientId) {
 		this.clientId = clientId;
+	}
+
+	public BigInteger getReferer() {
+		return referer;
+	}
+
+	public void setReferer(final BigInteger referer) {
+		this.referer = referer;
 	}
 
 	public OS getOs() {
