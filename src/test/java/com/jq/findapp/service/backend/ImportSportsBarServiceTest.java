@@ -13,6 +13,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
+import com.jq.findapp.entity.Storage;
+import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.backend.ImportSportsBarService.Results;
 import com.jq.findapp.util.Utils;
 
@@ -24,12 +26,19 @@ public class ImportSportsBarServiceTest {
 	private ImportSportsBarService importSportsBarService;
 
 	@Autowired
+	private Repository repository;
+
+	@Autowired
 	private Utils utils;
 
 	@Test
 	public void importSportsBars() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
+		final Storage storage = new Storage();
+		storage.setLabel("importSportBars");
+		storage.setStorage("[]");
+		repository.save(storage);
 
 		// when
 		final Results result = importSportsBarService.importZipCode("80331");

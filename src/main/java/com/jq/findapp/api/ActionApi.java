@@ -135,7 +135,7 @@ public class ActionApi {
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) {
 		try {
 			final ContactReferer contactReferer = new ContactReferer();
-			contactReferer.setClientId(contactId);
+			contactReferer.setContactId(contactId);
 			contactReferer.setIp(ip);
 			contactReferer.setScreen(screen);
 			repository.save(contactReferer);

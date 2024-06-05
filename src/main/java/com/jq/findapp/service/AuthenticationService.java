@@ -243,7 +243,7 @@ public class AuthenticationService {
 		contact.setTimezone(
 				registration.getTimezone() == null ? TimeZone.getDefault().getID() : registration.getTimezone());
 		contact.setEmail(contact.getEmail().toLowerCase().trim());
-		if (contact.getReferer() == null && contact.getOs() != OS.web) {
+		if (contact.getReferer() == null && contact.getOs() != OS.web && registration.getScreen() != null) {
 			final QueryParams params = new QueryParams(Query.contact_listReferer);
 			params.setSearch("contactReferer.ip='" + registration.getIp() + "' and contactReferer.screen='"
 					+ registration.getScreen() + "'");
@@ -251,7 +251,7 @@ public class AuthenticationService {
 			if (result.size() > 0) {
 				final ContactReferer contactReferer = repository.one(ContactReferer.class,
 						(BigInteger) result.get(0).get("contactReferer.id"));
-				contact.setReferer(contactReferer.getClientId());
+				contact.setReferer(contactReferer.getContactId());
 				repository.delete(contactReferer);
 			}
 		}

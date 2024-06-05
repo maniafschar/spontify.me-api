@@ -6,16 +6,16 @@ import jakarta.persistence.Entity;
 
 @Entity
 public class ContactReferer extends BaseEntity {
-	private BigInteger clientId;
+	private BigInteger contactId;
 	private String screen;
 	private String ip;
 
-	public BigInteger getClientId() {
-		return clientId;
+	public BigInteger getContactId() {
+		return contactId;
 	}
 
-	public void setClientId(BigInteger clientId) {
-		this.clientId = clientId;
+	public void setContactId(BigInteger contactId) {
+		this.contactId = contactId;
 	}
 
 	public String getScreen() {

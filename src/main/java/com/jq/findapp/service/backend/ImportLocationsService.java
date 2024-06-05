@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
@@ -195,7 +196,6 @@ public class ImportLocationsService {
 		String result = null;
 		try {
 			importLocation(new ObjectMapper().readTree(Attachment.resolve(ticket.getNote())), category);
-			repository.delete(ticket);
 		} catch (final IllegalArgumentException ex) {
 			result = ex.getMessage();
 		} catch (final Exception ex) {
@@ -281,52 +281,9 @@ public class ImportLocationsService {
 		result.result = list.size() + " locations for update\n";
 		int updated = 0, exceptions = 0;
 		for (int i = 0; i < list.size(); i++) {
-			final Location location = repository.one(Location.class, (BigInteger) list.get(i).get("location.id"));
-			final String address = location.getAddress().replace("\n", ", ");
 			try {
-				JsonNode json = new ObjectMapper().readTree(
-						externalService.google("place/textsearch/json?query="
-								+ URLEncoder.encode(location.getName() + ", " + address, StandardCharsets.UTF_8)
-										.replace("+", "%20")));
-				if (!"OK".equals(json.get("status").asText()))
-					json = new ObjectMapper().readTree(
-							externalService.google("place/textsearch/json?query="
-									+ URLEncoder.encode(address, StandardCharsets.UTF_8)));
-				if ("OK".equals(json.get("status").asText())) {
-					final JsonNode results = json.get("results");
-					for (int i2 = 0; i2 < results.size(); i2++) {
-						if (results.get(i2).has("photos")) {
-							final JsonNode photos = results.get(i2).get("photos");
-							for (int i3 = 0; i3 < photos.size(); i3++) {
-								if (photos.get(i3).has("photo_reference")) {
-									final String html = externalService.google(
-											"place/photo?maxheight=1200&photoreference="
-													+ photos.get(i3).get("photo_reference").asText())
-											.replace("<A HREF=", "<a href=");
-									final Matcher matcher = href.matcher(html);
-									if (matcher.find()) {
-										location.historize();
-										final String image = matcher.group(1);
-										try {
-											location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, 0));
-											location.setImageList(
-													EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
-											repository.save(location);
-											updated++;
-											break;
-										} catch (IllegalArgumentException ex) {
-											if (!ex.getMessage().contains("IMAGE_TOO_SMALL"))
-												notificationService.createTicket(TicketType.ERROR, "importImage",
-														Strings.stackTraceToString(ex), null);
-										}
-									}
-								}
-							}
-							if (!Strings.isEmpty(location.getImage()))
-								break;
-						}
-					}
-				}
+				if (importImage(repository.one(Location.class, (BigInteger) list.get(i).get("location.id"))))
+					updated++;
 			} catch (Exception ex) {
 				exceptions++;
 				result.exception = ex;
@@ -334,6 +291,53 @@ public class ImportLocationsService {
 		}
 		result.result = result.result + updated + " updated\n" + exceptions + " exceptions";
 		return result;
+	}
+
+	private boolean importImage(final Location location) throws Exception {
+		final String address = location.getAddress().replace("\n", ", ");
+		JsonNode json = new ObjectMapper().readTree(
+				externalService.google("place/textsearch/json?query="
+						+ URLEncoder.encode(location.getName() + ", " + address, StandardCharsets.UTF_8)
+								.replace("+", "%20")));
+		if (!"OK".equals(json.get("status").asText()))
+			json = new ObjectMapper().readTree(
+					externalService.google("place/textsearch/json?query="
+							+ URLEncoder.encode(address, StandardCharsets.UTF_8)));
+		if ("OK".equals(json.get("status").asText())) {
+			final JsonNode results = json.get("results");
+			for (int i2 = 0; i2 < results.size(); i2++) {
+				if (results.get(i2).has("photos")) {
+					final JsonNode photos = results.get(i2).get("photos");
+					for (int i3 = 0; i3 < photos.size(); i3++) {
+						if (photos.get(i3).has("photo_reference")) {
+							final String html = externalService.google(
+									"place/photo?maxheight=1200&photoreference="
+											+ photos.get(i3).get("photo_reference").asText())
+									.replace("<A HREF=", "<a href=");
+							final Matcher matcher = href.matcher(html);
+							if (matcher.find()) {
+								location.historize();
+								final String image = matcher.group(1);
+								try {
+									location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, 0));
+									location.setImageList(
+											EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
+									repository.save(location);
+									return true;
+								} catch (IllegalArgumentException ex) {
+									if (!ex.getMessage().contains("IMAGE_TOO_SMALL"))
+										notificationService.createTicket(TicketType.ERROR, "importImage",
+												Strings.stackTraceToString(ex), null);
+								}
+							}
+						}
+					}
+					if (!Strings.isEmpty(location.getImage()))
+						break;
+				}
+			}
+		}
+		return false;
 	}
 
 	Location importLocation(final JsonNode json, final String category) throws Exception {
@@ -345,6 +349,24 @@ public class ImportLocationsService {
 		if (!json.has("photos"))
 			throw new IllegalArgumentException("no image in json");
 		try {
+			String image;
+			try {
+				if (!json.has("photos"))
+					throw new IllegalArgumentException("no image in json");
+				final String html = externalService.google(
+						"place/photo?maxheight=1200&photoreference="
+								+ json.get("photos").get(0).get("photo_reference").asText())
+						.replace("<A HREF=", "<a href=");
+				final Matcher matcher = href.matcher(html);
+				if (!matcher.find())
+					throw new IllegalArgumentException("no image in html: " + html);
+				image = matcher.group(1);
+			} catch (final JsonProcessingException e) {
+				throw new RuntimeException(e);
+			}
+			location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, 0));
+			if (location.getImage() != null)
+				location.setImageList(EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
 			repository.save(location);
 		} catch (IllegalArgumentException ex) {
 			if (ex.getMessage().startsWith("location exists: ")) {
