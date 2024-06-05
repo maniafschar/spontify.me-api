@@ -12,6 +12,7 @@ public abstract class AbstractRegistration {
 	private String version;
 	private String timezone;
 	private BigInteger clientId;
+	private BigInteger referer;
 
 	public OS getOs() {
 		return os;
@@ -59,5 +60,13 @@ public abstract class AbstractRegistration {
 
 	public void setClientId(BigInteger clientId) {
 		this.clientId = clientId;
+	}
+
+	public BigInteger getReferer() {
+		return referer;
+	}
+
+	public void setReferer(BigInteger referer) {
+		this.referer = referer;
 	}
 }
