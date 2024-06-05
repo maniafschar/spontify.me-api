@@ -230,6 +230,7 @@ public class AuthenticationService {
 		contact.setClientId(registration.getClientId());
 		contact.setOs(registration.getOs());
 		contact.setVersion(registration.getVersion());
+		contact.setReferer(registration.getReferer());
 		contact.setVisitPage(new Timestamp(Instant.now().toEpochMilli() - 1000));
 		contact.setPassword(Encryption.encryptDB(generatePin(20)));
 		contact.setPasswordReset(Instant.now().toEpochMilli());
