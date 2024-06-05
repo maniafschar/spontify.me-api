@@ -12,16 +12,21 @@ import com.jq.findapp.util.Strings;
 public class ContactLinkListener extends AbstractRepositoryListener<ContactLink> {
 	@Override
 	public void prePersist(ContactLink entity) throws Exception {
-		entity.setStatus(Status.Pending);
+		final Contact contact = repository.one(Contact.class, contactLink.contactLink.getContactId2());
+		if (contact.getAcceptFriendship() != null && contact.getAcceptFriendship())
+			entity.setStatus(Status.Friends);
+		else
+			entity.setStatus(Status.Pending);
 	}
 
 	@Override
 	public void postPersist(final ContactLink contactLink) throws Exception {
-		notificationService.sendNotification(
-				repository.one(Contact.class, contactLink.getContactId()),
-				repository.one(Contact.class, contactLink.getContactId2()),
-				ContactNotificationTextType.contactFriendRequest,
-				Strings.encodeParam("p=" + contactLink.getContactId()));
+		if (contactLink.getStatus() == Status.Pending)
+			notificationService.sendNotification(
+					repository.one(Contact.class, contactLink.getContactId()),
+					repository.one(Contact.class, contactLink.getContactId2()),
+					ContactNotificationTextType.contactFriendRequest,
+					Strings.encodeParam("p=" + contactLink.getContactId()));
 	}
 
 	@Override
