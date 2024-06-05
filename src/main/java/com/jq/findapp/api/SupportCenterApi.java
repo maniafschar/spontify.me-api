@@ -214,7 +214,7 @@ public class SupportCenterApi {
 	}
 
 	@GetMapping("report/{days}/api")
-	public Map<String, Map<String, Map<String, Set<String>>>> reportApi(@PathVariable final int days)
+	public Map<String, Map<String, BigInteger>> reportApi(@PathVariable final int days)
 			throws Exception {
 		final Map<String, Map<String, BigInteger>> result = new HashMap<>();
 		final QueryParams params = new QueryParams(Query.misc_listLog);

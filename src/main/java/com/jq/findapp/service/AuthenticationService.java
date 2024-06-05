@@ -27,6 +27,8 @@ import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.ContactType;
+import com.jq.findapp.entity.ContactLink;
+import com.jq.findapp.entity.ContactLink.Status;
 import com.jq.findapp.entity.ContactToken;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
@@ -398,7 +400,7 @@ public class AuthenticationService {
 			contact.setVerified(Boolean.TRUE);
 			contact.setNotificationEngagement(Boolean.TRUE);
 			if (contact.getReferer() != null) {
-				final QueryParams params = new QueryParams(Query.contact_listFriends);
+				params.setQuery(Query.contact_listFriends);
 				params.setUser(contact);
 				params.setId(contact.getReferer());
 				if (repository.list(params).size() == 0) {

@@ -311,7 +311,6 @@ public class ActionApi {
 			contact.setClientId(clientId);
 			contact.setId(BigInteger.ZERO);
 			params.setUser(contact);
-			search = (search == null ? "" : "(" + search + ") and ") + "contact.teaser=true";
 		} else {
 			params.setUser(repository.one(Contact.class, user));
 			if (params.getUser().getLatitude() != null) {
@@ -331,7 +330,7 @@ public class ActionApi {
 					+ "' as timestamp))";
 		} else
 			params.setLimit(limit);
-		params.setSearch(search);
+		params.setSearch((search == null ? "" : "(" + search + ") and ") + "contact.teaser=true");
 		return repository.list(params).getList();
 	}
 
