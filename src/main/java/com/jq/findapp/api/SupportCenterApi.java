@@ -236,7 +236,7 @@ public class SupportCenterApi {
 				map.put(count, BigInteger.ZERO);
 				result.put(id, map);
 			}
-			map.put(time, map.get(time).add((BigInteger) log.get("log.time")));
+			map.put(time, map.get(time).add(BigInteger.valueOf((Integer) log.get("log.time"))));
 			map.put(count, map.get(count).add(BigInteger.ONE));
 		}
 		return result;
