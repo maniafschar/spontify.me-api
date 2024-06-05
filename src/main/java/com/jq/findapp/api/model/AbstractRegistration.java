@@ -9,10 +9,20 @@ public abstract class AbstractRegistration {
 	private OS os;
 	private Device device;
 	private String language;
+	private String ip;
+	private String screen;
 	private String version;
 	private String timezone;
 	private BigInteger clientId;
 	private BigInteger referer;
+
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
 
 	public OS getOs() {
 		return os;
@@ -68,5 +78,13 @@ public abstract class AbstractRegistration {
 
 	public void setReferer(BigInteger referer) {
 		this.referer = referer;
+	}
+
+	public String getScreen() {
+		return screen;
+	}
+
+	public void setScreen(String screen) {
+		this.screen = screen;
 	}
 }

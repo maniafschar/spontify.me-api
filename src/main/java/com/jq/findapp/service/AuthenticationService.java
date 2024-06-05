@@ -27,11 +27,14 @@ import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.ContactType;
+import com.jq.findapp.entity.Contact.OS;
 import com.jq.findapp.entity.ContactLink;
 import com.jq.findapp.entity.ContactLink.Status;
+import com.jq.findapp.entity.ContactReferer;
 import com.jq.findapp.entity.ContactToken;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService.AuthenticationException.AuthenticationExceptionType;
@@ -240,6 +243,18 @@ public class AuthenticationService {
 		contact.setTimezone(
 				registration.getTimezone() == null ? TimeZone.getDefault().getID() : registration.getTimezone());
 		contact.setEmail(contact.getEmail().toLowerCase().trim());
+		if (contact.getReferer() == null && contact.getOs() != OS.web) {
+			final QueryParams params = new QueryParams(Query.contact_listReferer);
+			params.setSearch("contactReferer.ip='" + registration.getIp() + "' and contactReferer.screen='"
+					+ registration.getScreen() + "'");
+			final Result result = repository.list(params);
+			if (result.size() > 0) {
+				final ContactReferer contactReferer = repository.one(ContactReferer.class,
+						(BigInteger) result.get(0).get("contactReferer.id"));
+				contact.setReferer(contactReferer.getClientId());
+				repository.delete(contactReferer);
+			}
+		}
 		if (contact.getIdDisplay() == null) {
 			final String[] name = contact.getPseudonym().split(" ");
 			final int max = 100;

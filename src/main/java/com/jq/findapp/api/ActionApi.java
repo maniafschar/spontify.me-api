@@ -36,6 +36,7 @@ import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
+import com.jq.findapp.entity.ContactReferer;
 import com.jq.findapp.entity.ContactVideoCall;
 import com.jq.findapp.entity.ContactVisit;
 import com.jq.findapp.entity.EventParticipate;
@@ -127,6 +128,20 @@ public class ActionApi {
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) {
 		if (text != null)
 			notificationService.createTicket(TicketType.ERROR, "client", "IP\n\t" + ip + "\n\n" + text, user);
+	}
+
+	@PostMapping("referer")
+	public void referer(@RequestParam final String screen, @RequestParam final BigInteger contactId,
+			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) {
+		try {
+			final ContactReferer contactReferer = new ContactReferer();
+			contactReferer.setClientId(contactId);
+			contactReferer.setIp(ip);
+			contactReferer.setScreen(screen);
+			repository.save(contactReferer);
+		} catch (Exception ex) {
+			// already existent
+		}
 	}
 
 	@GetMapping("quotation")

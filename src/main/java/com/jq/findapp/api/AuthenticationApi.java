@@ -53,9 +53,10 @@ public class AuthenticationApi {
 	}
 
 	@PostMapping("register")
-	public void register(@RequestBody final InternalRegistration registration, @RequestHeader final BigInteger clientId)
-			throws Exception {
+	public void register(@RequestBody final InternalRegistration registration, @RequestHeader final BigInteger clientId,
+			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
 		registration.setClientId(clientId);
+		registration.setIp(ip);
 		authenticationService.register(registration);
 	}
 
@@ -129,8 +130,10 @@ public class AuthenticationApi {
 
 	@PutMapping("loginExternal")
 	public String loginExternal(@RequestBody final ExternalRegistration registration,
-			@RequestHeader final BigInteger clientId) throws Exception {
+			@RequestHeader final BigInteger clientId,
+			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
 		registration.setClientId(clientId);
+		registration.setIp(ip);
 		registration.getUser().put("id", Encryption.decryptBrowser(registration.getUser().get("id")));
 		final Contact contact = authenticationExternalService.register(registration);
 		return contact == null ? null
