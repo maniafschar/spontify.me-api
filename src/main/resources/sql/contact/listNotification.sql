@@ -1,4 +1,5 @@
 SELECT
+	contact.id,
 	contact.pseudonym,
 	contact.imageList,
 	contactNotification.id,
