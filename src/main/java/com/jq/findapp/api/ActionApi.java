@@ -132,7 +132,7 @@ public class ActionApi {
 
 	@PostMapping("referer")
 	public void referer(@RequestParam final String screen, @RequestParam final BigInteger contactId,
-			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) {
+			@RequestHeader(name = "X-Forwarded-For") final String ip) {
 		try {
 			final ContactReferer contactReferer = new ContactReferer();
 			contactReferer.setContactId(contactId);
