@@ -69,7 +69,7 @@ public class IntegrationTest {
 			this.addFriend();
 		} catch (final Exception ex) {
 			ex.printStackTrace();
-			Util.sleep(600000);
+			Util.sleep(600000000);
 		}
 	}
 

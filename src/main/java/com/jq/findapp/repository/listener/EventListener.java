@@ -39,7 +39,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 		if (event.getRepetition() == null)
 			event.setRepetition("o");
 		if ("o".equals(event.getRepetition()))
-			event.setEndDate(new Date(event.getStartDate().getTime()));
+			event.setEndDate(getDate(event.getStartDate()));
 	}
 
 	@Override
@@ -51,9 +51,14 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 			eventParticipate.setState(1);
 			eventParticipate.setContactId(event.getContactId());
 			eventParticipate.setEventId(event.getId());
-			eventParticipate.setEventDate(new Date(event.getStartDate().getTime()));
+			eventParticipate.setEventDate(getDate(event.getStartDate()));
 			repository.save(eventParticipate);
 		}
+	}
+
+	private Date getDate(Timestamp timestamp) {
+		final Instant instant = timestamp.toInstant();
+		return new Date(instant.minus(Duration.ofHours(instant.atOffset(ZoneOffset.UTC).getHour())).toEpochMilli());
 	}
 
 	@Override
@@ -69,10 +74,12 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 						(BigInteger) result.get(i).get("eventParticipate.id"));
 				if (event.old("startDate") != null) {
 					if ("o".equals(event.getRepetition()))
-						eventParticipate.setEventDate(new java.sql.Date(event.getStartDate().getTime()));
+						eventParticipate
+								.setEventDate(new java.sql.Date(event.getStartDate().toInstant().toEpochMilli()));
 					else
 						eventParticipate
-								.setEventDate(java.sql.Date.valueOf(eventService.getRealDate(event).toLocalDate()));
+								.setEventDate(new java.sql.Date(
+										eventService.getRealDate(event).toInstant(ZoneOffset.UTC).toEpochMilli()));
 					repository.save(eventParticipate);
 				}
 				if (eventParticipate.getState() == 1 && !eventParticipate.getContactId().equals(event.getContactId())) {
