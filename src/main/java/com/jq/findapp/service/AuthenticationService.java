@@ -6,9 +6,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -252,7 +254,8 @@ public class AuthenticationService {
 				final ContactReferer contactReferer = repository.one(ContactReferer.class,
 						(BigInteger) result.get(0).get("contactReferer.id"));
 				contact.setReferer(contactReferer.getContactId());
-				if (contactReferer.getCreatedAt().after(new Date(Instant.now().minus(Duration.ofDays(2)).toEpochMilli())))
+				if (contactReferer.getCreatedAt()
+						.after(new Date(Instant.now().minus(Duration.ofHours(12)).toEpochMilli())))
 					repository.delete(contactReferer);
 			}
 		}
