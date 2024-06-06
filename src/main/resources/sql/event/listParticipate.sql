@@ -18,6 +18,7 @@ select
 	event.startDate,
 	event.description,
 	event.repetition,
+	event.type,
 	event.url,
 	contact.age,
 	contact.authenticate,
