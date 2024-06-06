@@ -252,7 +252,8 @@ public class AuthenticationService {
 				final ContactReferer contactReferer = repository.one(ContactReferer.class,
 						(BigInteger) result.get(0).get("contactReferer.id"));
 				contact.setReferer(contactReferer.getContactId());
-				repository.delete(contactReferer);
+				if (contactReferer.getCreatedAt().after(new Date(Instant.now().minus(Duration.ofDays(2)).toEpochMilli())))
+					repository.delete(contactReferer);
 			}
 		}
 		if (contact.getIdDisplay() == null) {
