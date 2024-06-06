@@ -391,6 +391,8 @@ public class ActionApi {
 		contact.setLatitude(position.getLatitude());
 		contact.setLongitude(position.getLongitude());
 		repository.save(contact);
+		if (position.isManual())
+			return null;
 		final QueryParams params = new QueryParams(Query.contact_listGeoLocationHistory);
 		params.setSearch("contactGeoLocationHistory.createdAt>cast('" + Instant.now().minus(Duration.ofSeconds(5))
 				+ "' as timestamp) and contactGeoLocationHistory.contactId=" + contact.getId());
