@@ -299,7 +299,7 @@ public class ActionApi {
 		final int limit = 25;
 		final QueryParams params = new QueryParams(
 				"contacts".equals(type) ? Query.contact_listTeaser : Query.event_listTeaser);
-		params.setDistance(1000);
+		params.setDistance(100000);
 		params.setLatitude(48.13684f);
 		params.setLongitude(11.57685f);
 		if (user == null) {
