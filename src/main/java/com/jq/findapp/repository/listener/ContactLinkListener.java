@@ -12,11 +12,7 @@ import com.jq.findapp.util.Strings;
 public class ContactLinkListener extends AbstractRepositoryListener<ContactLink> {
 	@Override
 	public void prePersist(ContactLink contactLink) throws Exception {
-		final Contact contact = repository.one(Contact.class, contactLink.getContactId2());
-		if (contact.getAcceptFriendship() != null && contact.getAcceptFriendship())
-			contactLink.setStatus(Status.Friends);
-		else
-			contactLink.setStatus(Status.Pending);
+		contactLink.setStatus(Status.Pending);
 	}
 
 	@Override

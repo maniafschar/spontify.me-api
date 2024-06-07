@@ -14,6 +14,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.sql.Date;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
@@ -29,6 +30,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
 import com.jq.findapp.api.model.InternalRegistration;
+import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactToken;
 import com.jq.findapp.repository.Query;
@@ -151,6 +153,28 @@ public class AuthenticationServiceTest {
 			// then
 			assertEquals("email", ex.getMessage());
 		}
+	}
+
+	@Test
+	public void register_referer() throws Exception {
+		// given
+		utils.createContact(BigInteger.ONE);
+		final InternalRegistration registration = new InternalRegistration();
+		registration.setAgb(true);
+		registration.setEmail("test_xyz@jq-consulting.de");
+		registration.setPseudonym("testTEST");
+		registration.setLanguage("DE");
+		registration.setClientId(BigInteger.ONE);
+		registration.setTimezone("Europe/Berlin");
+		registration.setTime(5000);
+		registration.setReferer(BigInteger.ONE);
+
+		// when
+		this.authenticationService.register(registration);
+
+		// then
+		final List<BaseEntity> list = repository.list("from Contact");
+		assertEquals(1, list.size());
 	}
 
 	@Test
