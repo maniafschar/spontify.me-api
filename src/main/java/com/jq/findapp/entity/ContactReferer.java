@@ -7,7 +7,7 @@ import jakarta.persistence.Entity;
 @Entity
 public class ContactReferer extends BaseEntity {
 	private BigInteger contactId;
-	private String screen;
+	private String footprint;
 	private String ip;
 
 	public BigInteger getContactId() {
@@ -18,12 +18,12 @@ public class ContactReferer extends BaseEntity {
 		this.contactId = contactId;
 	}
 
-	public String getScreen() {
-		return screen;
+	public String getFootprint() {
+		return footprint;
 	}
 
-	public void setScreen(String screen) {
-		this.screen = screen;
+	public void setFootprint(String footprint) {
+		this.footprint = footprint;
 	}
 
 	public String getIp() {

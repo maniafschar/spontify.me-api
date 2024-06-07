@@ -245,10 +245,10 @@ public class AuthenticationService {
 		contact.setTimezone(
 				registration.getTimezone() == null ? TimeZone.getDefault().getID() : registration.getTimezone());
 		contact.setEmail(contact.getEmail().toLowerCase().trim());
-		if (contact.getReferer() == null && contact.getOs() != OS.web && registration.getScreen() != null) {
+		if (contact.getReferer() == null && contact.getOs() != OS.web && registration.getFootprint() != null) {
 			final QueryParams params = new QueryParams(Query.contact_listReferer);
-			params.setSearch("contactReferer.ip='" + registration.getIp() + "' and contactReferer.screen='"
-					+ registration.getScreen() + "'");
+			params.setSearch("contactReferer.ip='" + registration.getIp() + "' and contactReferer.footprint='"
+					+ registration.getFootprint() + "'");
 			final Result result = repository.list(params);
 			if (result.size() > 0) {
 				final ContactReferer contactReferer = repository.one(ContactReferer.class,

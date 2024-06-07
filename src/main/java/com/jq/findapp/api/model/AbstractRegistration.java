@@ -10,7 +10,7 @@ public abstract class AbstractRegistration {
 	private Device device;
 	private String language;
 	private String ip;
-	private String screen;
+	private String footprint;
 	private String version;
 	private String timezone;
 	private BigInteger clientId;
@@ -80,11 +80,11 @@ public abstract class AbstractRegistration {
 		this.referer = referer;
 	}
 
-	public String getScreen() {
-		return screen;
+	public String getFootprint() {
+		return footprint;
 	}
 
-	public void setScreen(String screen) {
-		this.screen = screen;
+	public void setFootprint(String footprint) {
+		this.footprint = footprint;
 	}
 }

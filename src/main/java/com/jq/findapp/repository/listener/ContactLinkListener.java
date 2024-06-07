@@ -12,7 +12,8 @@ import com.jq.findapp.util.Strings;
 public class ContactLinkListener extends AbstractRepositoryListener<ContactLink> {
 	@Override
 	public void prePersist(ContactLink contactLink) throws Exception {
-		contactLink.setStatus(Status.Pending);
+		if (contactLink.getStatus() == null)
+			contactLink.setStatus(Status.Pending);
 	}
 
 	@Override

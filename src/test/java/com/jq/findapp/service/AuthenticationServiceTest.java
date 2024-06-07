@@ -32,6 +32,7 @@ import com.jq.findapp.TestConfig;
 import com.jq.findapp.api.model.InternalRegistration;
 import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.ContactLink;
 import com.jq.findapp.entity.ContactToken;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
@@ -158,7 +159,7 @@ public class AuthenticationServiceTest {
 	@Test
 	public void register_referer() throws Exception {
 		// given
-		utils.createContact(BigInteger.ONE);
+		final Contact contact = utils.createContact(BigInteger.ONE);
 		final InternalRegistration registration = new InternalRegistration();
 		registration.setAgb(true);
 		registration.setEmail("test_xyz@jq-consulting.de");
@@ -168,13 +169,18 @@ public class AuthenticationServiceTest {
 		registration.setTimezone("Europe/Berlin");
 		registration.setTime(5000);
 		registration.setReferer(BigInteger.ONE);
+		authenticationService.register(registration);
+		final List<BaseEntity> list = repository.list("from Contact");
+		final Contact register = (Contact) list.get(list.size() - 1);
+		final QueryParams params = new QueryParams(Query.contact_listFriends);
+		params.setId(contact.getId());
+		params.setUser(register);
 
 		// when
-		this.authenticationService.register(registration);
+		authenticationService.recoverVerifyEmail(register.getLoginLink(), BigInteger.ONE);
 
 		// then
-		final List<BaseEntity> list = repository.list("from Contact");
-		assertEquals(1, list.size());
+		assertEquals(ContactLink.Status.Friends, repository.one(params).get("contactLink.status"));
 	}
 
 	@Test

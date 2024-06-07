@@ -1,7 +1,7 @@
 SELECT
 	contactReferer.id,
 	contactReferer.contactId,
-	contactReferer.screen,
+	contactReferer.footprint,
 	contactReferer.ip,
 	contactReferer.createdAt,
 	contactReferer.modifiedAt
