@@ -422,10 +422,11 @@ public class AuthenticationService {
 				params.setQuery(Query.contact_listFriends);
 				params.setUser(contact);
 				params.setId(contact.getReferer());
+				params.setSearch(null);
 				if (repository.list(params).size() == 0) {
 					final ContactLink contactLink = new ContactLink();
-					contactLink.setContactId(contact.getId());
-					contactLink.setContactId2(contact.getReferer());
+					contactLink.setContactId(contact.getReferer());
+					contactLink.setContactId2(contact.getId());
 					contactLink.setStatus(Status.Friends);
 					repository.save(contactLink);
 				}
