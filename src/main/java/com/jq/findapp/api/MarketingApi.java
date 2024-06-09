@@ -34,7 +34,6 @@ import com.jq.findapp.entity.ClientNews;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.entity.Event;
-import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
@@ -163,88 +162,29 @@ public class MarketingApi {
 	public List<Object[]> poll(@RequestHeader final BigInteger clientId,
 			@RequestHeader(required = false) final BigInteger user,
 			@RequestParam(name = "m", required = false) final BigInteger clientMarketingId) throws Exception {
-		if (clientMarketingId != null) {
-			final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
-			if (clientMarketing != null && clientId.equals(clientMarketing.getClientId())) {
-				if (clientMarketing.getEndDate() != null
-						&& clientMarketing.getEndDate().getTime() < Instant.now().getEpochSecond() * 1000) {
-					final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
-					params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketing.getId());
-					return repository.list(params).getList();
-				}
-				if (user != null) {
-					final QueryParams params = new QueryParams(Query.contact_listMarketing);
-					params.setSearch("contactMarketing.finished=true and contactMarketing.contactId=" + user
-							+ " and contactMarketing.clientMarketingId=" + clientMarketingId);
-					if (repository.list(params).size() > 0)
-						return null;
-				}
-				final QueryParams params = new QueryParams(Query.misc_listMarketing);
-				params.setSearch("clientMarketing.id=" + clientMarketingId);
+		if (clientMarketingId == null)
+			// TODO rm required=false 0.7
+			return null;
+		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
+		if (clientMarketing != null && clientId.equals(clientMarketing.getClientId())) {
+			if (clientMarketing.getEndDate() != null
+					&& clientMarketing.getEndDate().getTime() < Instant.now().getEpochSecond() * 1000) {
+				final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
+				params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketing.getId());
 				return repository.list(params).getList();
 			}
-			return null;
-		}
-		if (user == null)
-			return null;
-		final Contact contact = repository.one(Contact.class, user);
-		final QueryParams params = new QueryParams(Query.contact_listGeoLocationHistory);
-		params.setSearch("contactGeoLocationHistory.contactId=" + contact.getId());
-		final Result result = repository.list(params);
-		final GeoLocation geoLocation;
-		if (result.size() > 0)
-			geoLocation = repository.one(GeoLocation.class,
-					(BigInteger) result.get(0).get("contactGeoLocationHistory.geoLocationId"));
-		else
-			geoLocation = null;
-		params.setQuery(Query.misc_listMarketing);
-		final String today = Instant.now().toString().substring(0, 19);
-		String s = "clientMarketing.clientId=" + contact.getClientId()
-				+ " and clientMarketing.startDate<=cast('" + today
-				+ "' as timestamp) and clientMarketing.endDate>=cast('" + today
-				+ "' as timestamp) and clientMarketing.storage like '%" + Attachment.SEPARATOR + "%'";
-
-		s += " and (clientMarketing.language is null or length(clientMarketing.language)=0 or clientMarketing.language='"
-				+ contact.getLanguage() + "'";
-
-		s += ") and (clientMarketing.gender is null or length(clientMarketing.gender)=0";
-		if (contact.getGender() != null)
-			s += " or clientMarketing.gender like '%" + contact.getGender() + "%'";
-
-		s += ") and (clientMarketing.age is null or length(clientMarketing.age)=0 or ";
-		if (contact.getAge() == null)
-			s += "clientMarketing.age='18,99'";
-		else
-			s += "cast(substring(clientMarketing.age,1,2) as integer)<=" + contact.getAge()
-					+ " and cast(substring(clientMarketing.age,4,2) as integer)>="
-					+ contact.getAge();
-
-		s += ") and (clientMarketing.region is null or length(clientMarketing.region)=0";
-		if (geoLocation == null)
-			s += ")";
-		else {
-			s += " or (clientMarketing.region like '%" + geoLocation.getTown()
-					+ "%' or concat(' ',clientMarketing.region,' ') like '% " + geoLocation.getCountry() + " %' or ";
-			final String s2 = geoLocation.getZipCode();
-			if (s2 != null) {
-				for (int i = 1; i <= s2.length(); i++) {
-					s += "concat(' ',clientMarketing.region,' ') like '% " + geoLocation.getCountry() + "-"
-							+ s2.substring(0, i) + " %' or ";
-				}
+			if (user != null) {
+				final QueryParams params = new QueryParams(Query.contact_listMarketing);
+				params.setSearch("contactMarketing.finished=true and contactMarketing.contactId=" + user
+						+ " and contactMarketing.clientMarketingId=" + clientMarketingId);
+				if (repository.list(params).size() > 0)
+					return null;
 			}
-			s = s.substring(0, s.length() - 4) + "))";
+			final QueryParams params = new QueryParams(Query.misc_listMarketing);
+			params.setSearch("clientMarketing.id=" + clientMarketingId);
+			return repository.list(params).getList();
 		}
-		params.setSearch(s);
-		final List<Object[]> list = repository.list(params).getList();
-		params.setQuery(Query.contact_listMarketing);
-		return list.stream().filter(e -> {
-			if (e[0] instanceof String)
-				return true;
-			params.setSearch(
-					"contactMarketing.contactId=" + contact.getId() + " and contactMarketing.clientMarketingId="
-							+ e[0] + " and contactMarketing.finished=true");
-			return repository.list(params).size() == 0;
-		}).toList();
+		return null;
 	}
 
 	@GetMapping(path = { "{id}", "{id}/result" }, produces = MediaType.TEXT_HTML_VALUE)

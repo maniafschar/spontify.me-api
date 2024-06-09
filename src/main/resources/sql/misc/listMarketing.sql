@@ -1,5 +1,6 @@
 SELECT
 	clientMarketing.id,
+	clientMarketing.clientId,
 	clientMarketing.startDate,
 	clientMarketing.endDate,
 	clientMarketing.age,

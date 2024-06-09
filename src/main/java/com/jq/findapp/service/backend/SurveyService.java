@@ -810,7 +810,7 @@ public class SurveyService {
 					}
 				}
 			}
-			send(users, clientMarketing, ContactNotificationTextType.clientMarketing, "contact.id");
+			send(users, clientMarketing, ContactNotificationTextType.clientMarketingPoll, "contact.id");
 		}
 
 		private void sendResult(final ClientMarketing clientMarketing) throws Exception {
@@ -818,7 +818,7 @@ public class SurveyService {
 			params.setSearch(
 					"contactMarketing.finished=true and contactMarketing.contactId is not null and contactMarketing.clientMarketingId="
 							+ clientMarketing.getId());
-			send(repository.list(params), clientMarketing, ContactNotificationTextType.clientMarketingResult,
+			send(repository.list(params), clientMarketing, ContactNotificationTextType.clientMarketingPollResult,
 					"contactMarketing.contactId");
 		}
 
@@ -826,9 +826,7 @@ public class SurveyService {
 				final ContactNotificationTextType type, final String field) throws Exception {
 			final JsonNode poll = new ObjectMapper().readTree(Attachment.resolve(clientMarketing.getStorage()));
 			final List<Object> sent = new ArrayList<>();
-			final TextId textId = "PlayerOfTheMatch".equals(poll.get("type").asText())
-					? TextId.marketing_playerOfTheMatch
-					: TextId.marketing_prediction;
+			final TextId textId = TextId.valueOf("marketing_p" + poll.get("type").asText().substring(1));
 			for (int i = 0; i < users.size(); i++) {
 				if (!sent.contains(users.get(i).get(field))) {
 					final Contact contact = repository.one(Contact.class, (BigInteger) users.get(i).get(field));

@@ -335,8 +335,8 @@ public class NotificationService {
 		if (ContactNotificationTextType.contactBirthday == notificationTextType)
 			return contact.getNotificationBirthday();
 		if (ContactNotificationTextType.clientNews == notificationTextType ||
-				ContactNotificationTextType.clientMarketing == notificationTextType ||
-				ContactNotificationTextType.clientMarketingResult == notificationTextType)
+				ContactNotificationTextType.clientMarketingPoll == notificationTextType ||
+				ContactNotificationTextType.clientMarketingPollResult == notificationTextType)
 			return contact.getNotificationNews();
 		return true;
 	}
@@ -423,8 +423,8 @@ public class NotificationService {
 	public void sendEmail(final Contact from, final Contact to, final String subject, final String text,
 			final String html) {
 		final Client client = repository.one(Client.class, to.getClientId());
-		sendEmail(client, from == null || from.getId().equals(client.getAdminId()) ? "" :
-			  from.getPseudonym() + " · ", to.getEmail(), subject, text, html);
+		sendEmail(client, from == null || from.getId().equals(client.getAdminId()) ? "" : from.getPseudonym() + " · ",
+				to.getEmail(), subject, text, html);
 		createTicket(TicketType.EMAIL, to.getEmail(), text, client.getAdminId());
 	}
 

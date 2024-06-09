@@ -48,6 +48,7 @@ import com.jq.findapp.service.backend.ImportLogService;
 import com.jq.findapp.service.backend.ImportSportsBarService;
 import com.jq.findapp.service.backend.IpService;
 import com.jq.findapp.service.backend.LocationMarketingService;
+import com.jq.findapp.service.backend.MarketingService;
 import com.jq.findapp.service.backend.RssService;
 import com.jq.findapp.service.backend.SitemapService;
 import com.jq.findapp.service.backend.SurveyService;
@@ -106,6 +107,9 @@ public class SupportCenterApi {
 
 	@Autowired
 	private LocationMarketingService locationMarketingService;
+
+	@Autowired
+	private MarketingService marketingService;
 
 	@Autowired
 	private MetricsEndpoint metricsEndpoint;
@@ -276,6 +280,7 @@ public class SupportCenterApi {
 				final List<CompletableFuture<Void>> list = new ArrayList<>();
 				run(importSportsBarService, "importSportsBars", list, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 0);
 				run(chatService, "answerAi", list, null, 0);
+				run(marketingService, "notification", list, null, 0);
 				run(dbService, "update", list, null, 0);
 				run(dbService, "cleanUpAttachments", list, new int[] { 0 }, 30);
 				run(engagementService, "sendRegistrationReminder", list, new int[] { 0 }, 40);
