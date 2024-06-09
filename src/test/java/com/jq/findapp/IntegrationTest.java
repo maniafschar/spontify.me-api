@@ -91,8 +91,7 @@ public class IntegrationTest {
 
 	private void register(final String pseudonym, final String email) {
 		Util.click("dialog-navigation item.events");
-		new Actions(Util.driver).sendKeys("\t").build().perform();
-		new Actions(Util.driver).sendKeys(" ").build().perform();
+		Util.click("dialog-hint button-text");
 		Util.sendKeys("login input[name=\"email\"]", email);
 		Util.click("login tab:nth-of-type(3)");
 		Util.sendKeys("login input[name=\"pseudonym\"]", pseudonym);
