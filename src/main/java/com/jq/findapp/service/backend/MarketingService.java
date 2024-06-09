@@ -98,7 +98,6 @@ public class MarketingService {
 		}
 
 		final JsonNode json = new ObjectMapper().readTree(Attachment.resolve(clientMarketing.getStorage()));
-		System.out.println(json);
 		if (json.has("html")) {
 			if (contact.getId().intValue() == 551)
 				notificationService.sendNotification(null, contact,
@@ -107,13 +106,11 @@ public class MarketingService {
 		} else {
 			final TextId textId = TextId
 					.valueOf("marketing_p" + json.get("type").asText().substring(1));
-			System.out.println("poll " + textId + " " + contact.getId());
-			// notificationService.sendNotification(null, contact,
-			// ContactNotificationTextType.clientMarketingPoll,
-			// "m=" + e[0],
-			// text.getText(contact, textId).replace("{0}", json.get("homeName").asText() +
-			// " : " +
-			// json.get("awayName").asText()));
+			notificationService.sendNotification(null, contact,
+					ContactNotificationTextType.clientMarketingPoll,
+					"m=" + clientMarketing.getId(),
+					text.getText(contact, textId).replace("{0}", json.get("homeName").asText() +
+							" : " + json.get("awayName").asText()));
 		}
 	}
 
