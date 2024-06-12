@@ -66,6 +66,7 @@
 		"eventNotification": "Dein Event in der Location <jq:EXTRA_1 /> beginnt um <jq:EXTRA_2 /> Uhr!",
 		"eventParticipate": "nimmt am <jq:EXTRA_1 /> teil am Event \"<jq:EXTRA_2 />\" im <jq:EXTRA_3 />.",
 		"eventParticipateOnline": "nimmt am <jq:EXTRA_1 /> teil am Online-Event \"<jq:EXTRA_2 />\".",
+		"eventParticipatePoll": "hat mit \"<jq:EXTRA_2 />\" an der Umfrage \"<jq:EXTRA_1 />\" gewntwortet",
 		"eventParticipateWithoutLocation": "nimmt am <jq:EXTRA_1 /> teil an Deiner Suchanfrage \"<jq:EXTRA_2 />\". Nimm Kontakt auf, um den Ort festzulegen.",
 		"eventRated": "",
 		"feedback": "Wir danken Dir für Deinen Kommentar und melden uns bei Rückfragen.\n\n<jq:EXTRA_1 />",
