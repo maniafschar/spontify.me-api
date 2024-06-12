@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.commons.io.IOUtils;
@@ -54,6 +56,17 @@ public class EventService {
 
 	@Autowired
 	private ImportMunich importMunich;
+
+	public static List<String> getAnswers(JsonNode poll, long state) {
+		final List<String> answers = new ArrayList<>;
+		if (state < 0)
+			state += 2 * Integer.MAX_VALUE - 2;
+		for (var i = 0; Math.pow(2, i) <= state; i++) {
+			if ((state & Math.pow(2, i)) > 0)
+				answers.add(poll.get("a").get(i).asText());
+		}
+		return answers;
+	}
 
 	public SchedulerResult findMatchingBuddies() {
 		final SchedulerResult result = new SchedulerResult();
