@@ -58,11 +58,11 @@ public class EventService {
 	private ImportMunich importMunich;
 
 	public static List<String> getAnswers(JsonNode poll, long state) {
-		final List<String> answers = new ArrayList<>;
+		final List<String> answers = new ArrayList<>();
 		if (state < 0)
 			state += 2 * Integer.MAX_VALUE - 2;
-		for (var i = 0; Math.pow(2, i) <= state; i++) {
-			if ((state & Math.pow(2, i)) > 0)
+		for (int i = 0; Math.pow(2, i) <= state; i++) {
+			if ((state & (long) Math.pow(2, i)) > 0)
 				answers.add(poll.get("a").get(i).asText());
 		}
 		return answers;

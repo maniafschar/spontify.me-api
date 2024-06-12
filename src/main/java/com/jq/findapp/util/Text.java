@@ -75,6 +75,7 @@ public class Text {
 		notification_eventNotification,
 		notification_eventParticipate,
 		notification_eventParticipateOnline,
+		notification_eventParticipatePoll,
 		notification_eventParticipateWithoutLocation,
 		notification_eventRated,
 		notification_feedback,

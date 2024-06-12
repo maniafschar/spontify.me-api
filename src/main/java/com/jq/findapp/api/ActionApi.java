@@ -296,7 +296,6 @@ public class ActionApi {
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
 		if (BigInteger.ZERO.equals(user))
 			return Collections.emptyList();
-		final int limit = 25;
 		final QueryParams params = new QueryParams(
 				"contacts".equals(type) ? Query.contact_listTeaser : Query.event_listTeaser);
 		params.setDistance(100000);
@@ -344,7 +343,7 @@ public class ActionApi {
 					+ today.plus(Duration.ofDays(15)).toLocalDate()
 					+ "' as timestamp))";
 		} else
-			params.setLimit(limit);
+			params.setLimit(25);
 		params.setSearch((search == null ? "" : "(" + search + ") and ") + "contact.teaser=true");
 		return repository.list(params).getList();
 	}

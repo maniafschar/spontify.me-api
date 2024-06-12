@@ -69,11 +69,13 @@ public class MarketingService {
 		final Result list = repository.list(params);
 		try {
 			String text = "Lieber Sky Sportsbar Kunde,\n\n" +
-			"unsere Fußball Community ist auf der Suche nach den besten Sportbars, in denen sie Live-Übertragungen gemeinsam feiern können. " +
-			"Ist Deine Bar eine coole Location für Fußball-Fans? Wenn Ja, würden wir Deine Bar in unserer App entsprechend kennzeichnen und Dir Aufkleber zusenden, die Du gerne prominent platzieren kannst, z.B. im Sanitärbereich oder in Deiner Ablage zum verteilen an die Gäste.\n\n" +
-			"Wir freuen uns auf Dein Feedback\n" +
-			"Viele Grüße\n" +
-			"Mani Afschar\n";
+					"unsere Fußball Community ist auf der Suche nach den besten Sportbars, in denen sie Live-Übertragungen gemeinsam feiern können. "
+					+
+					"Ist Deine Bar eine coole Location für Fußball-Fans? Wenn Ja, würden wir Deine Bar in unserer App entsprechend kennzeichnen und Dir Aufkleber zusenden, die Du gerne prominent platzieren kannst, z.B. im Sanitärbereich oder in Deiner Ablage zum verteilen an die Gäste.\n\n"
+					+
+					"Wir freuen uns auf Dein Feedback\n" +
+					"Viele Grüße\n" +
+					"Mani Afschar\n";
 		} catch (Exception ex) {
 			result.exception = ex;
 		}
@@ -81,6 +83,9 @@ public class MarketingService {
 	}
 
 	private void sendNotification(final Contact contact, final ClientMarketing clientMarketing) throws Exception {
+		if ("0.6.7".compareTo(contact.getVersion()) > 0)
+			return;
+
 		if (!Strings.isEmpty(clientMarketing.getLanguage())
 				&& !clientMarketing.getLanguage().equals(contact.getLanguage()))
 			return;
@@ -119,12 +124,11 @@ public class MarketingService {
 		}
 
 		final JsonNode json = new ObjectMapper().readTree(Attachment.resolve(clientMarketing.getStorage()));
-		if (json.has("html")) {
-			if (contact.getId().intValue() == 551)
-				notificationService.sendNotification(null, contact,
-						ContactNotificationTextType.clientMarketing,
-						"m=" + clientMarketing.getId(), Strings.sanitize(json.get("html").asText(), 100));
-		} else {
+		if (json.has("html"))
+			notificationService.sendNotification(null, contact,
+					ContactNotificationTextType.clientMarketing,
+					"m=" + clientMarketing.getId(), Strings.sanitize(json.get("html").asText(), 100));
+		else {
 			final TextId textId = TextId
 					.valueOf("marketing_p" + json.get("type").asText().substring(1));
 			notificationService.sendNotification(null, contact,

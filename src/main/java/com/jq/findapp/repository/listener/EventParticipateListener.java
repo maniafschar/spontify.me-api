@@ -8,6 +8,8 @@ import java.util.Date;
 
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.Event;
@@ -50,7 +52,8 @@ public class EventParticipateListener extends AbstractRepositoryListener<EventPa
 				notificationService.sendNotification(contactFrom, contactTo,
 						ContactNotificationTextType.eventParticipatePoll,
 						Strings.encodeParam("e=" + event.getId()),
-						json.get("q").asText(), EventService.getAnswers(json, eventParticipate.getState()));
+						json.get("q").asText(),
+						String.join(", ", EventService.getAnswers(json, eventParticipate.getState())));
 			} else
 				notificationService.sendNotification(contactFrom, contactTo,
 						ContactNotificationTextType.eventParticipate,

@@ -55,8 +55,6 @@ public class ExternalService {
 		if (result.size() > 0 && !Strings.isEmpty(result.get(0).get("storage.storage"))
 				&& !((String) result.get(0).get("storage.storage")).contains("OVER_QUERY_LIMIT"))
 			return result.get(0).get("storage.storage").toString();
-		if (true)
-			return "{\"html_attributions\": [ ],\"results\": [ ],\"status\": \"ZERO_RESULTS\"}";
 		final String value = WebClient.create("https://maps.googleapis.com/maps/api/" + param
 				+ (param.contains("?") ? "&" : "?") + "key=" + this.googleKey).get().retrieve().toEntity(String.class)
 				.block().getBody();

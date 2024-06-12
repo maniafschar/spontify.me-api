@@ -25,6 +25,7 @@ import org.xml.sax.SAXParseException;
 
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Event;
+import com.jq.findapp.entity.Event.EventType;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
@@ -161,6 +162,7 @@ public class ImportMunich {
 						event.setEndDate(new java.sql.Date(date.getTime()));
 						event.setContactId(client.getAdminId());
 						event.setSkills(body.getChildNodes().item(1).getTextContent().trim());
+						event.setType(EventType.Location);
 						repository.save(event);
 						return true;
 					}
