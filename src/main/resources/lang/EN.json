@@ -66,6 +66,7 @@
 		"eventNotification": "Your Event in location <jq:EXTRA_1 /> begins at <jq:EXTRA_2 /> o'clock!",
 		"eventParticipate": "participates on <jq:EXTRA_1 /> in the event \"<jq:EXTRA_2 />\" in the <jq:EXTRA_3 />.",
 		"eventParticipateOnline": "participates on <jq:EXTRA_1 /> in the online event \"<jq:EXTRA_2 />\".",
+		"eventParticipatePoll": "answered \"<jq:EXTRA_2 />\" on your poll \"<jq:EXTRA_1 />\"",
 		"eventParticipateWithoutLocation": "participates on <jq:EXTRA_1 /> in your search request \"<jq:EXTRA_2 />\". Get in touch to set a meeting point.",
 		"eventRated": "",
 		"feedback": "We thank you for your comment and will contact you if you have any questions.\n\n<jq:EXTRA_1 />",
