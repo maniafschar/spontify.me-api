@@ -59,6 +59,21 @@ public class MarketingService {
 		return result;
 	}
 
+	public SchedulerResult notificationSportbars() {
+		final SchedulerResult result = new SchedulerResult();
+		final QueryParams params = new QueryParams(Query.misc_listMarketing);
+		params.setUser(new Contact());
+		final String today = Instant.now().toString().substring(0, 19);
+		params.setSearch("clientMarketing.startDate<=cast('" + today
+				+ "' as timestamp) and clientMarketing.endDate>=cast('" + today + "' as timestamp)");
+		final Result list = repository.list(params);
+		try {
+		} catch (Exception ex) {
+			result.exception = ex;
+		}
+		return result;
+	}
+
 	private void sendNotification(final Contact contact, final ClientMarketing clientMarketing) throws Exception {
 		if (!Strings.isEmpty(clientMarketing.getLanguage())
 				&& !clientMarketing.getLanguage().equals(contact.getLanguage()))
