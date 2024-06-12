@@ -68,6 +68,12 @@ public class MarketingService {
 				+ "' as timestamp) and clientMarketing.endDate>=cast('" + today + "' as timestamp)");
 		final Result list = repository.list(params);
 		try {
+			String text = "Lieber Sky Sportsbar Kunde,\n\n" +
+			"unsere Fußball Community ist auf der Suche nach den besten Sportbars, in denen sie Live-Übertragungen gemeinsam feiern können. " +
+			"Ist Deine Bar eine coole Location für Fußball-Fans? Wenn Ja, würden wir Deine Bar in unserer App entsprechend kennzeichnen und Dir Aufkleber zusenden, die Du gerne prominent platzieren kannst, z.B. im Sanitärbereich oder in Deiner Ablage zum verteilen an die Gäste.\n\n" +
+			"Wir freuen uns auf Dein Feedback\n" +
+			"Viele Grüße\n" +
+			"Mani Afschar\n";
 		} catch (Exception ex) {
 			result.exception = ex;
 		}
