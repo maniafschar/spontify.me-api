@@ -31,6 +31,7 @@ public class Location extends BaseEntity {
 	private String name;
 	private String street;
 	private String number;
+	private String secret;
 	private String skills;
 	private String skillsText;
 	private String subcategories;
@@ -126,6 +127,14 @@ public class Location extends BaseEntity {
 
 	public void setTown(final String town) {
 		this.town = town;
+	}
+
+	public String getSecret() {
+		return secret;
+	}
+
+	public void setSecret(final String secret) {
+		this.secret = secret;
 	}
 
 	public String getStreet() {
