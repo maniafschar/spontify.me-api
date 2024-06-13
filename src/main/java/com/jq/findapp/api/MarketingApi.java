@@ -159,9 +159,11 @@ public class MarketingApi {
 	}
 
 	@GetMapping
-	public List<Object[]> poll(@RequestHeader final BigInteger clientId,
+	public Map<String, Object> poll(@RequestHeader final BigInteger clientId,
 			@RequestHeader(required = false) final BigInteger user,
-			@RequestParam(name = "m", required = false) final BigInteger clientMarketingId) throws Exception {
+			@RequestParam(name = "m", required = false) final BigInteger clientMarketingId,
+			@RequestParam(name = "i", required = false) final BigInteger locationId,
+			@RequestParam(name = "h", required = false) final Integer hash) throws Exception {
 		if (clientMarketingId == null)
 			// TODO rm required=false 0.7
 			return null;
@@ -182,7 +184,15 @@ public class MarketingApi {
 			}
 			final QueryParams params = new QueryParams(Query.misc_listMarketing);
 			params.setSearch("clientMarketing.id=" + clientMarketingId);
-			return repository.list(params).getList();
+			final Map<String, Object> result = repository.one(params);
+			if (locationId != null) {
+				params.setQuery(Query.location_list);
+				params.setSearch("location.id=" + locationId);
+				final Map<String, Object> location = repository.one(params);
+				if (location == null || location.get("").hashCode() != 
+			} else if (result.get("clientMarketing.storage").contains("locationMarketing"))
+				return null;
+			return result;
 		}
 		return null;
 	}
