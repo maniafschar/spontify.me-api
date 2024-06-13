@@ -85,4 +85,15 @@ public class Strings {
 			s = s.substring(0, s.substring(0, limit - 3).lastIndexOf(' ')) + "...";
 		return s.trim();
 	}
+
+	public static String generatePin(final int length) {
+		final StringBuilder s = new StringBuilder();
+		char c;
+		while (s.length() < length) {
+			c = (char) (Math.random() * 150);
+			if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+				s.append(c);
+		}
+		return s.toString();
+	}
 }
