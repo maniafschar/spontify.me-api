@@ -407,7 +407,9 @@ public class NotificationService {
 					message = message.substring(0, 77);
 				message += "...";
 			}
-			sendEmail(contactFrom, contactTo, message, s.toString(), html.toString());
+			sendEmail(repository.one(Client.class, to.getClientId()),
+					from == null || from.getId().equals(client.getAdminId()) ? "" : from.getPseudonym() + " · ",
+				  	contactTo.getEmail(), message, s.toString(), html.toString());
 		}
 	}
 
@@ -418,14 +420,6 @@ public class NotificationService {
 		s = s.replace("</li>", "\n");
 		s = s.replace("</ul>", "\n");
 		return s.replaceAll("<[^>]*>", "");
-	}
-
-	public void sendEmail(final Contact from, final Contact to, final String subject, final String text,
-			final String html) {
-		final Client client = repository.one(Client.class, to.getClientId());
-		sendEmail(client, from == null || from.getId().equals(client.getAdminId()) ? "" : from.getPseudonym() + " · ",
-				to.getEmail(), subject, text, html);
-		createTicket(TicketType.EMAIL, to.getEmail(), text, client.getAdminId());
 	}
 
 	public void sendEmail(final Client client, final String name, final String to, final String subject,
