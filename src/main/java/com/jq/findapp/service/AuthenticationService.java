@@ -239,7 +239,7 @@ public class AuthenticationService {
 		contact.setVersion(registration.getVersion());
 		contact.setReferer(registration.getReferer());
 		contact.setVisitPage(new Timestamp(Instant.now().toEpochMilli() - 1000));
-		contact.setPassword(Encryption.encryptDB(generatePin(20)));
+		contact.setPassword(Encryption.encryptDB(Strings.generatePin(20)));
 		contact.setPasswordReset(Instant.now().toEpochMilli());
 		contact.setBirthdayDisplay((short) 2);
 		contact.setTimezone(
@@ -315,7 +315,7 @@ public class AuthenticationService {
 	}
 
 	private String generateLoginParam(final Contact contact) {
-		final String s = generatePin(42);
+		final String s = Strings.generatePin(42);
 		long x = 0;
 		for (int i = 0; i < s.length(); i++) {
 			x += s.charAt(i);
@@ -487,16 +487,5 @@ public class AuthenticationService {
 				throw new RuntimeException("ERROR SQL on account delete: " + ex.getMessage() + "\n" + sql);
 			}
 		}
-	}
-
-	private String generatePin(final int length) {
-		final StringBuilder s = new StringBuilder();
-		char c;
-		while (s.length() < length) {
-			c = (char) (Math.random() * 150);
-			if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
-				s.append(c);
-		}
-		return s.toString();
 	}
 }
