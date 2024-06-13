@@ -68,19 +68,61 @@ public class MarketingService {
 				+ "' as timestamp) and clientMarketing.endDate>=cast('" + today + "' as timestamp)");
 		final Result list = repository.list(params);
 		params.setQuery(Query.location_list);
+		final String text = "Lieber Sky Sportsbar Kunde,\n\n"
+				+ "unsere Fußball Community ist auf der Suche nach den besten Locations, in denen sie Live-Übertragungen gemeinsam feiern können. "
+				+ "Ist Deine Bar eine coole Location für Fußball-Fans?\n\nNäere Infos findest Du unter Deinen persönlichen Link:\n\n"
+				+ "https://fan-club.online/?m={clientMarketing.id}&i={location.id}&h={location.hash}"
+				+ "\n\nWir freuen uns auf Dein Feedback\n"
+				+ "Viele Grüße\n"
+				+ "Mani Afschar Yazdi\n"
+				+ "Geschäftsführer\n"
+				+ "JNet Quality Consulting GmbH\n"
+				+ "0172 6379434";
 		try {
 			for (int i = 0; i < list.size(); i++) {
-				if (location.getSecret() == null) {
-					location.setSecret(Strings.generatePin(64));
-					repository.save(location);
+				if (((String) list.get(i).get("clientMarketing.storage")).contains("Sky Kunde")) {
+					final Client client = repository.one(Client.class, (BigInteger) list.get(i).get("clientMarketing.clientId"));
+					String html = IOUtils.toString(inHtml, StandardCharsets.UTF_8)
+							.replace("<jq:logo />", client.getUrl() + "/images/logo.png")
+							.replace("<jq:pseudonym />", "")
+							.replace("<jq:time />", Strings.formatDate(null, new Date(), "Europe/Berlin"))
+							.replace("<jq:link />", "")
+							.replace("<jq:url />", "")
+							.replace("<jq:newsTitle />", "")
+							.replace("<jq:image />", "");
+					final int a = html.indexOf("</a>");
+					html = html.substring(0, a + 4) + html.substring(html.indexOf("<jq:text"));
+					html = html.substring(0, html.lastIndexOf("<div>", a)) + html.substring(a);
+					final JsonNode css = new ObjectMapper()
+							.readTree(Attachment.resolve(client.getStorage()))
+							.get("css");
+					final Iterator<String> it = css.fieldNames();
+					while (it.hasNext()) {
+						final String key = it.next();
+						html = html.replace("--" + key, css.get(key).asText());
+					}
+					params.setSearch("location.email like '%@%' and location.skills like '%x.1%' and cast(REGEXP_LIKE(marketingMail,'" + "') as integer)=0");
+					final Result locations = repository.list(params);
+					for (int i2 = 0; i2 < locations.size(); i2++) {
+						final Location location = repository.one(Location.class, (BigInteger) locations.get(i2).get("location.id"));
+						if (location.getSecret() == null) {
+							location.setSecret(Strings.generatePin(64));
+							repository.save(location);
+						}
+						String s = text.replace("{clientMarketing.id}", "" + list.get(i).get("clientMarketing.id"))
+								.replace("{location.id}", "" + location.getId())
+								.replace("{location.hash}", "" + location.getSecret().hashCode());
+						notificationService.sendEmail(client, "", "mani.afschar@jq-consulting.de"/* location.getEmail() */,
+								"Sky Sport Events: möchtest Du mehr Gäste?", s, html.replace("<jq:text />",
+										s.replace("\n", "<br />").replace(client.getUrl(),
+												"<a href=\"" + client.getUrl() + "?marketing=sky&client=" + location.getId()
+														+ "\">" + client.getUrl() + "</a>")));
+						location.setMarketingMail(
+								(Strings.isEmpty(location.getMarketingMail()) ? "" : location.getMarketingMail() + "|")
+										+ list.get(i).get("clientMarketing.id"));
+						repository.save(location);
+					}
 				}
-				String text = "Lieber Sky Sportsbar Kunde,\n\n"
-						+ "unsere Fußball Community ist auf der Suche nach den besten Sportbars, in denen sie Live-Übertragungen gemeinsam feiern können. "
-						+ "Ist Deine Bar eine coole Location für Fußball-Fans? Wenn Ja, würden wir Deine Bar in unserer App entsprechend kennzeichnen und Dir Aufkleber zusenden, die Du gerne prominent platzieren kannst, z.B. im Sanitärbereich oder in Deiner Ablage zum verteilen an die Gäste.\n\n"
-						+ "https://fan-club.online/?m=" + clientMarketing.getId() + "&i=" + location.getId() + "&h=" + location.getSecret().hashCode()
-						+ "Wir freuen uns auf Dein Feedback\n"
-						+ "Viele Grüße\n" 
-						+ "Mani Afschar\n";
 			}
 		} catch (Exception ex) {
 			result.exception = ex;
