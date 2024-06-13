@@ -42,9 +42,9 @@ public class MarketingService {
 		params.setSearch("clientMarketing.startDate<=cast('" + today
 				+ "' as timestamp) and clientMarketing.endDate>=cast('" + today + "' as timestamp)");
 		final Result list = repository.list(params);
+		params.setQuery(Query.contact_listNotificationId);
 		try {
 			for (int i = 0; i < list.size(); i++) {
-				params.setQuery(Query.contact_listNotificationId);
 				params.setSearch("m=" + list.get(i).get("clientMarketing.id"));
 				params.getUser().setClientId((BigInteger) list.get(i).get("clientMarketing.clientId"));
 				final Result contacts = repository.list(params);
@@ -67,18 +67,21 @@ public class MarketingService {
 		params.setSearch("clientMarketing.startDate<=cast('" + today
 				+ "' as timestamp) and clientMarketing.endDate>=cast('" + today + "' as timestamp)");
 		final Result list = repository.list(params);
+		params.setQuery(Query.location_list);
 		try {
-			if (location.getSecret() == null) {
-				location.setSecret(Strings.generatePin(64));
-				repository.save(location);
+			for (int i = 0; i < list.size(); i++) {
+				if (location.getSecret() == null) {
+					location.setSecret(Strings.generatePin(64));
+					repository.save(location);
+				}
+				String text = "Lieber Sky Sportsbar Kunde,\n\n"
+						+ "unsere Fußball Community ist auf der Suche nach den besten Sportbars, in denen sie Live-Übertragungen gemeinsam feiern können. "
+						+ "Ist Deine Bar eine coole Location für Fußball-Fans? Wenn Ja, würden wir Deine Bar in unserer App entsprechend kennzeichnen und Dir Aufkleber zusenden, die Du gerne prominent platzieren kannst, z.B. im Sanitärbereich oder in Deiner Ablage zum verteilen an die Gäste.\n\n"
+						+ "https://fan-club.online/?m=" + clientMarketing.getId() + "&i=" + location.getId() + "&h=" + location.getSecret().hashCode()
+						+ "Wir freuen uns auf Dein Feedback\n"
+						+ "Viele Grüße\n" 
+						+ "Mani Afschar\n";
 			}
-			String text = "Lieber Sky Sportsbar Kunde,\n\n"
-					+ "unsere Fußball Community ist auf der Suche nach den besten Sportbars, in denen sie Live-Übertragungen gemeinsam feiern können. "
-					+ "Ist Deine Bar eine coole Location für Fußball-Fans? Wenn Ja, würden wir Deine Bar in unserer App entsprechend kennzeichnen und Dir Aufkleber zusenden, die Du gerne prominent platzieren kannst, z.B. im Sanitärbereich oder in Deiner Ablage zum verteilen an die Gäste.\n\n"
-					+ "https://fan-club.online/?m=" + clientMarketing.getId() + "&i=" + location.getId() + "&h=" + location.getSecret().hashCode()
-					+ "Wir freuen uns auf Dein Feedback\n"
-					+ "Viele Grüße\n" 
-					+ "Mani Afschar\n";
 		} catch (Exception ex) {
 			result.exception = ex;
 		}
