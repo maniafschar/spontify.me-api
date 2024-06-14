@@ -76,6 +76,9 @@ public class SurveyService {
 	private NotificationService notificationService;
 
 	@Autowired
+	private MarketingService marketingService;
+
+	@Autowired
 	private Text text;
 
 	@Value("${app.sports.api.token}")
@@ -373,63 +376,6 @@ public class SurveyService {
 			}
 		}
 
-		public synchronized ClientMarketingResult result(final BigInteger clientMarketingId) throws Exception {
-			final JsonNode poll = new ObjectMapper().readTree(Attachment.resolve(
-					repository.one(ClientMarketing.class, clientMarketingId).getStorage()));
-			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
-			params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketingId);
-			params.setLimit(0);
-			Result result = repository.list(params);
-			final ClientMarketingResult clientMarketingResult;
-			if (result.size() == 0) {
-				clientMarketingResult = new ClientMarketingResult();
-				clientMarketingResult.setClientMarketingId(clientMarketingId);
-			} else
-				clientMarketingResult = repository.one(ClientMarketingResult.class,
-						(BigInteger) result.get(0).get("clientMarketingResult.id"));
-			params.setQuery(Query.contact_listMarketing);
-			params.setSearch("contactMarketing.clientMarketingId=" + clientMarketingId);
-			result = repository.list(params);
-			final ObjectMapper om = new ObjectMapper();
-			final ObjectNode json = om.createObjectNode();
-			json.put("participants", result.size());
-			json.put("finished", 0);
-			for (int i2 = 0; i2 < result.size(); i2++) {
-				final String answers = (String) result.get(i2).get("contactMarketing.storage");
-				if (answers != null && answers.length() > 2) {
-					json.put("finished", json.get("finished").asInt() + 1);
-					om.readTree(answers).fields()
-							.forEachRemaining(e -> {
-								if (Integer.valueOf(e.getKey().substring(1)) < poll.get("questions").size()) {
-									if (!json.has(e.getKey())) {
-										json.set(e.getKey(), om.createObjectNode());
-										final ArrayNode a = om.createArrayNode();
-										for (int i3 = 0; i3 < poll.get("questions").get(
-												Integer.valueOf(e.getKey().substring(1))).get("answers").size(); i3++)
-											a.add(0);
-										((ObjectNode) json.get(e.getKey())).set("a", a);
-									}
-									for (int i = 0; i < e.getValue().get("a").size(); i++) {
-										final int index = e.getValue().get("a").get(i).asInt();
-										final ArrayNode a = ((ArrayNode) json.get(e.getKey()).get("a"));
-										a.set(index, a.get(index).asInt() + 1);
-									}
-									if (e.getValue().has("t") && !Strings.isEmpty(e.getValue().get("t").asText())) {
-										final ObjectNode o = (ObjectNode) json.get(e.getKey());
-										if (!o.has("t"))
-											o.put("t", "");
-										o.put("t", o.get("t").asText() +
-												"<div>" + e.getValue().get("t").asText() + "</div>");
-									}
-								}
-							});
-				}
-			}
-			clientMarketingResult.setStorage(om.writeValueAsString(json));
-			repository.save(clientMarketingResult);
-			return clientMarketingResult;
-		}
-
 		String resultAndNotify(final BigInteger clientId) throws Exception {
 			final JsonNode clientJson = new ObjectMapper()
 					.readTree(Attachment.resolve(repository.one(Client.class, clientId).getStorage()));
@@ -440,7 +386,7 @@ public class SurveyService {
 			final Result list = repository.list(params);
 			String result = "";
 			for (int i = 0; i < list.size(); i++) {
-				final ClientMarketingResult clientMarketingResult = result(
+				final ClientMarketingResult clientMarketingResult = marketingService.synchronizeResult(
 						(BigInteger) list.get(i).get("clientMarketing.id"));
 				final JsonNode poll = new ObjectMapper().readTree(Attachment.resolve(
 						repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId())
@@ -872,10 +818,6 @@ public class SurveyService {
 			}
 		}
 		return result;
-	}
-
-	public void synchronizeResult(final BigInteger clientMarketingId) throws Exception {
-		synchronize.result(clientMarketingId);
 	}
 
 	private String formatDate(final long seconds, final String format) {

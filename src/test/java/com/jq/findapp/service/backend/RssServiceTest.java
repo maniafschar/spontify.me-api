@@ -165,7 +165,7 @@ public class RssServiceTest {
 	public void image() throws Exception {
 		// given
 		IOUtils.toByteArray(new URL("https://feed.rundschau-online.de/feed/rss/region/index.rss"));
-		final String url = "https://images.live.dumontnext.de/2023/12/15/fa32ac34-271a-4215-bf76-0b815e789f7a.jpeg?w=3594&auto=format&q=75&format=auto&s=dd3d4f50f4f3af9f0a4a478dca1e8ef6";
+		final String url = "https://fan-club.online/images/icon512.png";
 
 		// when
 		final String tag = EntityUtil.getImage(url, EntityUtil.IMAGE_SIZE, 200);

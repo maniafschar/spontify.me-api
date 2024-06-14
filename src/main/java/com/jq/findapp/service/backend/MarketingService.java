@@ -1,18 +1,28 @@
 package com.jq.findapp.service.backend;
 
+import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Date;
+import java.util.Iterator;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketing;
+import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.GeoLocation;
+import com.jq.findapp.entity.Location;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -81,15 +91,19 @@ public class MarketingService {
 		try {
 			for (int i = 0; i < list.size(); i++) {
 				if (((String) list.get(i).get("clientMarketing.storage")).contains("Sky Kunde")) {
-					final Client client = repository.one(Client.class, (BigInteger) list.get(i).get("clientMarketing.clientId"));
-					String html = IOUtils.toString(inHtml, StandardCharsets.UTF_8)
-							.replace("<jq:logo />", client.getUrl() + "/images/logo.png")
-							.replace("<jq:pseudonym />", "")
-							.replace("<jq:time />", Strings.formatDate(null, new Date(), "Europe/Berlin"))
-							.replace("<jq:link />", "")
-							.replace("<jq:url />", "")
-							.replace("<jq:newsTitle />", "")
-							.replace("<jq:image />", "");
+					final Client client = repository.one(Client.class,
+							(BigInteger) list.get(i).get("clientMarketing.clientId"));
+					String html;
+					try (final InputStream inHtml = getClass().getResourceAsStream("/template/email.html")) {
+						html = IOUtils.toString(inHtml, StandardCharsets.UTF_8)
+								.replace("<jq:logo />", client.getUrl() + "/images/logo.png")
+								.replace("<jq:pseudonym />", "")
+								.replace("<jq:time />", Strings.formatDate(null, new Date(), "Europe/Berlin"))
+								.replace("<jq:link />", "")
+								.replace("<jq:url />", "")
+								.replace("<jq:newsTitle />", "")
+								.replace("<jq:image />", "");
+					}
 					final int a = html.indexOf("</a>");
 					html = html.substring(0, a + 4) + html.substring(html.indexOf("<jq:text"));
 					html = html.substring(0, html.lastIndexOf("<div>", a)) + html.substring(a);
@@ -101,21 +115,27 @@ public class MarketingService {
 						final String key = it.next();
 						html = html.replace("--" + key, css.get(key).asText());
 					}
-					params.setSearch("location.email like '%@%' and location.skills like '%x.1%' and cast(REGEXP_LIKE(marketingMail,'" + "') as integer)=0");
+					params.setSearch(
+							"location.email like '%@%' and location.skills like '%x.1%' and cast(REGEXP_LIKE(marketingMail,'"
+									+ "') as integer)=0");
 					final Result locations = repository.list(params);
 					for (int i2 = 0; i2 < locations.size(); i2++) {
-						final Location location = repository.one(Location.class, (BigInteger) locations.get(i2).get("location.id"));
+						final Location location = repository.one(Location.class,
+								(BigInteger) locations.get(i2).get("location.id"));
 						if (location.getSecret() == null) {
 							location.setSecret(Strings.generatePin(64));
 							repository.save(location);
 						}
-						String s = text.replace("{clientMarketing.id}", "" + list.get(i).get("clientMarketing.id"))
+						final String s = text
+								.replace("{clientMarketing.id}", "" + list.get(i).get("clientMarketing.id"))
 								.replace("{location.id}", "" + location.getId())
 								.replace("{location.hash}", "" + location.getSecret().hashCode());
-						notificationService.sendEmail(client, "", "mani.afschar@jq-consulting.de"/* location.getEmail() */,
+						notificationService.sendEmail(client, "", "mani.afschar@jq-consulting.de"
+						/* location.getEmail() */,
 								"Sky Sport Events: möchtest Du mehr Gäste?", s, html.replace("<jq:text />",
 										s.replace("\n", "<br />").replace(client.getUrl(),
-												"<a href=\"" + client.getUrl() + "?marketing=sky&client=" + location.getId()
+												"<a href=\"" + client.getUrl() + "?marketing=sky&client="
+														+ location.getId()
 														+ "\">" + client.getUrl() + "</a>")));
 						location.setMarketingMail(
 								(Strings.isEmpty(location.getMarketingMail()) ? "" : location.getMarketingMail() + "|")
@@ -187,4 +207,60 @@ public class MarketingService {
 		}
 	}
 
+	public synchronized ClientMarketingResult synchronizeResult(final BigInteger clientMarketingId) throws Exception {
+		final JsonNode poll = new ObjectMapper().readTree(Attachment.resolve(
+				repository.one(ClientMarketing.class, clientMarketingId).getStorage()));
+		final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
+		params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketingId);
+		params.setLimit(0);
+		Result result = repository.list(params);
+		final ClientMarketingResult clientMarketingResult;
+		if (result.size() == 0) {
+			clientMarketingResult = new ClientMarketingResult();
+			clientMarketingResult.setClientMarketingId(clientMarketingId);
+		} else
+			clientMarketingResult = repository.one(ClientMarketingResult.class,
+					(BigInteger) result.get(0).get("clientMarketingResult.id"));
+		params.setQuery(Query.contact_listMarketing);
+		params.setSearch("contactMarketing.clientMarketingId=" + clientMarketingId);
+		result = repository.list(params);
+		final ObjectMapper om = new ObjectMapper();
+		final ObjectNode json = om.createObjectNode();
+		json.put("participants", result.size());
+		json.put("finished", 0);
+		for (int i2 = 0; i2 < result.size(); i2++) {
+			final String answers = (String) result.get(i2).get("contactMarketing.storage");
+			if (answers != null && answers.length() > 2) {
+				json.put("finished", json.get("finished").asInt() + 1);
+				om.readTree(answers).fields()
+						.forEachRemaining(e -> {
+							if (Integer.valueOf(e.getKey().substring(1)) < poll.get("questions").size()) {
+								if (!json.has(e.getKey())) {
+									json.set(e.getKey(), om.createObjectNode());
+									final ArrayNode a = om.createArrayNode();
+									for (int i3 = 0; i3 < poll.get("questions").get(
+											Integer.valueOf(e.getKey().substring(1))).get("answers").size(); i3++)
+										a.add(0);
+									((ObjectNode) json.get(e.getKey())).set("a", a);
+								}
+								for (int i = 0; i < e.getValue().get("a").size(); i++) {
+									final int index = e.getValue().get("a").get(i).asInt();
+									final ArrayNode a = ((ArrayNode) json.get(e.getKey()).get("a"));
+									a.set(index, a.get(index).asInt() + 1);
+								}
+								if (e.getValue().has("t") && !Strings.isEmpty(e.getValue().get("t").asText())) {
+									final ObjectNode o = (ObjectNode) json.get(e.getKey());
+									if (!o.has("t"))
+										o.put("t", "");
+									o.put("t", o.get("t").asText() +
+											"<div>" + e.getValue().get("t").asText() + "</div>");
+								}
+							}
+						});
+			}
+		}
+		clientMarketingResult.setStorage(om.writeValueAsString(json));
+		repository.save(clientMarketingResult);
+		return clientMarketingResult;
+	}
 }

@@ -407,9 +407,11 @@ public class NotificationService {
 					message = message.substring(0, 77);
 				message += "...";
 			}
-			sendEmail(repository.one(Client.class, to.getClientId()),
-					from == null || from.getId().equals(client.getAdminId()) ? "" : from.getPseudonym() + " · ",
-				  	contactTo.getEmail(), message, s.toString(), html.toString());
+			final Client client = repository.one(Client.class, contactTo.getClientId());
+			sendEmail(client,
+					contactFrom == null || contactFrom.getId().equals(client.getAdminId()) ? ""
+							: contactFrom.getPseudonym() + " · ",
+					contactTo.getEmail(), message, s.toString(), html.toString());
 		}
 	}
 

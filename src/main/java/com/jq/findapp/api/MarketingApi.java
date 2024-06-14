@@ -9,7 +9,6 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
@@ -173,7 +172,7 @@ public class MarketingApi {
 					&& clientMarketing.getEndDate().getTime() < Instant.now().getEpochSecond() * 1000) {
 				final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 				params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketing.getId());
-				return repository.list(params).getList();
+				return repository.one(params);
 			}
 			if (user != null) {
 				final QueryParams params = new QueryParams(Query.contact_listMarketing);
@@ -193,9 +192,9 @@ public class MarketingApi {
 					return null;
 				final String s = (String) location.get("location.storage");
 				location.put("location.storage", s
-						.replace("{address}", location.get("location.address"))
-						.replace("{name}", location.get("location.name")));
-			} else if (result.get("clientMarketing.storage").contains("locationMarketing"))
+						.replace("{address}", location.get("location.address").toString())
+						.replace("{name}", location.get("location.name").toString()));
+			} else if (((String) result.get("clientMarketing.storage")).contains("locationMarketing"))
 				return null;
 			return result;
 		}

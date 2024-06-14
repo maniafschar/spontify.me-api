@@ -10,12 +10,12 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.repository.Repository.Attachment;
-import com.jq.findapp.service.backend.SurveyService;
+import com.jq.findapp.service.backend.MarketingService;
 
 @Component
 public class ContactMarketingListener extends AbstractRepositoryListener<ContactMarketing> {
 	@Autowired
-	private SurveyService surveyService;
+	private MarketingService marketingService;
 
 	@Override
 	public void prePersist(final ContactMarketing contactMarketing) throws Exception {
@@ -48,12 +48,12 @@ public class ContactMarketingListener extends AbstractRepositoryListener<Contact
 
 	@Override
 	public void postPersist(final ContactMarketing contactMarketing) throws Exception {
-		surveyService.synchronizeResult(contactMarketing.getClientMarketingId());
+		marketingService.synchronizeResult(contactMarketing.getClientMarketingId());
 	}
 
 	@Override
 	public void postUpdate(final ContactMarketing contactMarketing) throws Exception {
-		surveyService.synchronizeResult(contactMarketing.getClientMarketingId());
+		marketingService.synchronizeResult(contactMarketing.getClientMarketingId());
 	}
 
 }
