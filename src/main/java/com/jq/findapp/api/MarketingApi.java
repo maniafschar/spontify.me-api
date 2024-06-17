@@ -185,15 +185,14 @@ public class MarketingApi {
 			params.setSearch("clientMarketing.id=" + clientMarketingId);
 			final Map<String, Object> result = repository.one(params);
 			if (locationId != null) {
-				params.setQuery(Query.location_list);
+				params.setQuery(Query.location_listId);
 				params.setSearch("location.id=" + locationId);
-				final Map<String, Object> location = repository.one(params);
-				if (location == null || ((String) location.get("location.secret")).hashCode() != hash)
+				final Location location = repository.one(Location.class,
+						(BigInteger) repository.one(params).get("location.id"));
+				if (location == null || location.getSecret().hashCode() != hash)
 					return null;
-				final String s = (String) location.get("location.storage");
-				location.put("location.storage", s
-						.replace("{address}", location.get("location.address").toString())
-						.replace("{name}", location.get("location.name").toString()));
+				result.put("address", location.getAddress());
+				result.put("name", location.getName());
 			} else if (((String) result.get("clientMarketing.storage")).contains("locationMarketing"))
 				return null;
 			return result;

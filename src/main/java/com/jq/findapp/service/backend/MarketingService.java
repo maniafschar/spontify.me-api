@@ -77,11 +77,11 @@ public class MarketingService {
 		params.setSearch("clientMarketing.startDate<=cast('" + today
 				+ "' as timestamp) and clientMarketing.endDate>=cast('" + today + "' as timestamp)");
 		final Result list = repository.list(params);
-		params.setQuery(Query.location_list);
+		params.setQuery(Query.location_listId);
 		final String text = "Lieber Sky Sportsbar Kunde,\n\n"
 				+ "unsere Fußball Community ist auf der Suche nach den besten Locations, in denen sie Live-Übertragungen gemeinsam feiern können. "
-				+ "Ist Deine Bar eine coole Location für Fußball-Fans?\n\nNäere Infos findest Du unter Deinen persönlichen Link:\n\n"
-				+ "https://fan-club.online/?m={clientMarketing.id}&i={location.id}&h={location.hash}"
+				+ "Ist Deine Bar eine coole Location für Fußball-Fans?\n\nNähere Infos findest Du unter Deinen persönlichen Link:\n\n"
+				+ "{url}"
 				+ "\n\nWir freuen uns auf Dein Feedback\n"
 				+ "Viele Grüße\n"
 				+ "Mani Afschar Yazdi\n"
@@ -116,27 +116,23 @@ public class MarketingService {
 						html = html.replace("--" + key, css.get(key).asText());
 					}
 					params.setSearch(
-							"location.email like '%@%' and location.skills like '%x.1%' and cast(REGEXP_LIKE(marketingMail,'"
-									+ "') as integer)=0");
+							"location.email like '%@%' and location.skills like '%x.1%' and cast(REGEXP_LIKE(location.marketingMail,'x.1') as integer)=0");
+					params.setLimit(1);
 					final Result locations = repository.list(params);
-					for (int i2 = 0; i2 < locations.size(); i2++) {
+					for (int i2 = 1; i2 < locations.size(); i2++) {
 						final Location location = repository.one(Location.class,
 								(BigInteger) locations.get(i2).get("location.id"));
 						if (location.getSecret() == null) {
 							location.setSecret(Strings.generatePin(64));
 							repository.save(location);
 						}
-						final String s = text
-								.replace("{clientMarketing.id}", "" + list.get(i).get("clientMarketing.id"))
-								.replace("{location.id}", "" + location.getId())
-								.replace("{location.hash}", "" + location.getSecret().hashCode());
+						final String url = client.getUrl() + "/?m=" + list.get(i).get("clientMarketing.id") + "&i="
+								+ location.getId() + "&h=" + location.getSecret().hashCode();
 						notificationService.sendEmail(client, "", "mani.afschar@jq-consulting.de"
 						/* location.getEmail() */,
-								"Sky Sport Events: möchtest Du mehr Gäste?", s, html.replace("<jq:text />",
-										s.replace("\n", "<br />").replace(client.getUrl(),
-												"<a href=\"" + client.getUrl() + "?marketing=sky&client="
-														+ location.getId()
-														+ "\">" + client.getUrl() + "</a>")));
+								"Sky Sport Events: möchtest Du mehr Gäste?", text.replace("{url}", url),
+								html.replace("<jq:text />", text.replace("\n", "<br />").replace("{url}",
+										"<a href=\"" + url + "\">" + client.getUrl() + "</a>")));
 						location.setMarketingMail(
 								(Strings.isEmpty(location.getMarketingMail()) ? "" : location.getMarketingMail() + "|")
 										+ list.get(i).get("clientMarketing.id"));
@@ -225,31 +221,33 @@ public class MarketingService {
 		params.setSearch("contactMarketing.clientMarketingId=" + clientMarketingId);
 		result = repository.list(params);
 		final ObjectMapper om = new ObjectMapper();
-		final ObjectNode json = om.createObjectNode();
-		json.put("participants", result.size());
-		json.put("finished", 0);
+		final ObjectNode total = om.createObjectNode();
+		total.put("participants", result.size());
+		total.put("finished", 0);
 		for (int i2 = 0; i2 < result.size(); i2++) {
 			final String answers = (String) result.get(i2).get("contactMarketing.storage");
 			if (answers != null && answers.length() > 2) {
-				json.put("finished", json.get("finished").asInt() + 1);
+				total.put("finished", total.get("finished").asInt() + 1);
 				om.readTree(answers).fields()
 						.forEachRemaining(e -> {
 							if (Integer.valueOf(e.getKey().substring(1)) < poll.get("questions").size()) {
-								if (!json.has(e.getKey())) {
-									json.set(e.getKey(), om.createObjectNode());
+								if (!total.has(e.getKey())) {
+									total.set(e.getKey(), om.createObjectNode());
 									final ArrayNode a = om.createArrayNode();
-									for (int i3 = 0; i3 < poll.get("questions").get(
-											Integer.valueOf(e.getKey().substring(1))).get("answers").size(); i3++)
-										a.add(0);
-									((ObjectNode) json.get(e.getKey())).set("a", a);
+									final JsonNode question = poll.get("questions").get(
+											Integer.valueOf(e.getKey().substring(1)));
+									if (question.has("answers"))
+										for (int i3 = 0; i3 < question.get("answers").size(); i3++)
+											a.add(0);
+									((ObjectNode) total.get(e.getKey())).set("a", a);
 								}
 								for (int i = 0; i < e.getValue().get("a").size(); i++) {
 									final int index = e.getValue().get("a").get(i).asInt();
-									final ArrayNode a = ((ArrayNode) json.get(e.getKey()).get("a"));
+									final ArrayNode a = ((ArrayNode) total.get(e.getKey()).get("a"));
 									a.set(index, a.get(index).asInt() + 1);
 								}
 								if (e.getValue().has("t") && !Strings.isEmpty(e.getValue().get("t").asText())) {
-									final ObjectNode o = (ObjectNode) json.get(e.getKey());
+									final ObjectNode o = (ObjectNode) total.get(e.getKey());
 									if (!o.has("t"))
 										o.put("t", "");
 									o.put("t", o.get("t").asText() +
@@ -259,7 +257,7 @@ public class MarketingService {
 						});
 			}
 		}
-		clientMarketingResult.setStorage(om.writeValueAsString(json));
+		clientMarketingResult.setStorage(om.writeValueAsString(total));
 		repository.save(clientMarketingResult);
 		return clientMarketingResult;
 	}
