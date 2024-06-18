@@ -21,7 +21,6 @@ import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactMarketing;
-import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.repository.Query;
@@ -152,7 +151,7 @@ public class MarketingService {
 			return;
 
 		if (!Strings.isEmpty(clientMarketing.getLanguage())
-				&& !clientMarketing.getLanguage().equals(contact.getLanguage()))
+				&& !clientMarketing.getLanguage().contains(contact.getLanguage()))
 			return;
 
 		if (!Strings.isEmpty(clientMarketing.getGender())
@@ -191,13 +190,13 @@ public class MarketingService {
 		final JsonNode json = new ObjectMapper().readTree(Attachment.resolve(clientMarketing.getStorage()));
 		if (json.has("html"))
 			notificationService.sendNotification(null, contact,
-					ContactNotificationTextType.clientMarketing,
+					TextId.notification_clientMarketing,
 					"m=" + clientMarketing.getId(), Strings.sanitize(json.get("html").asText(), 100));
 		else {
 			final TextId textId = TextId
 					.valueOf("marketing_p" + json.get("type").asText().substring(1));
 			notificationService.sendNotification(null, contact,
-					ContactNotificationTextType.clientMarketingPoll,
+					TextId.notification_clientMarketingPoll,
 					"m=" + clientMarketing.getId(),
 					text.getText(contact, textId).replace("{0}", json.get("homeName").asText() +
 							" : " + json.get("awayName").asText()));

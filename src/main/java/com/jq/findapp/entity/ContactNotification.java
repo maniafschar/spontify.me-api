@@ -3,6 +3,7 @@ package com.jq.findapp.entity;
 import java.math.BigInteger;
 
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.util.Text.TextId;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -20,37 +21,10 @@ public class ContactNotification extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private ContactNotificationType type;
 	@Enumerated(EnumType.STRING)
-	private ContactNotificationTextType textType;
+	private TextId textId;
 
 	public enum ContactNotificationType {
 		android, ios, email
-	}
-
-	public enum ContactNotificationTextType {
-		chatNew,
-		chatSeen,
-		clientMarketing,
-		clientMarketingPoll,
-		clientMarketingPollResult,
-		clientNews,
-		contactBirthday,
-		contactDelete,
-		contactFindMe,
-		contactFriendApproved,
-		contactFriendRequest,
-		contactVideoCall,
-		contactVisitLocation,
-		contactVisitProfile,
-		eventChanged,
-		eventDelete,
-		eventNotify,
-		eventNotifyWithoutLocation,
-		eventNotification,
-		eventParticipate,
-		eventParticipateOnline,
-		eventParticipatePoll,
-		eventParticipateWithoutLocation,
-		eventRated;
 	}
 
 	public String getText() {
@@ -69,12 +43,12 @@ public class ContactNotification extends BaseEntity {
 		this.action = action;
 	}
 
-	public ContactNotificationTextType getTextType() {
-		return textType;
+	public TextId getTextId() {
+		return textId;
 	}
 
-	public void setTextType(final ContactNotificationTextType textType) {
-		this.textType = textType;
+	public void setTextId(final TextId textId) {
+		this.textId = textId;
 	}
 
 	public BigInteger getContactId() {

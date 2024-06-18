@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.ClientNews;
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
+import com.jq.findapp.util.Text.TextId;
 
 @Component
 public class ClientNewsListener extends AbstractRepositoryListener<ClientNews> {
@@ -47,7 +47,7 @@ public class ClientNewsListener extends AbstractRepositoryListener<ClientNews> {
 								|| ("|" + contact.getSkills() + "|").contains(cat))
 							this.notificationService.sendNotificationSync(null,
 									contact,
-									ContactNotificationTextType.clientNews, "news=" + clientNews.getId(),
+									TextId.notification_clientNews, "news=" + clientNews.getId(),
 									clientNews.getSource() + ": " + clientNews.getDescription());
 					}
 				}

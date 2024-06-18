@@ -45,7 +45,6 @@ import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.ContactType;
 import com.jq.findapp.entity.ContactNotification;
-import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationType;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Ticket;
@@ -98,19 +97,19 @@ public class NotificationService {
 
 	@Async
 	public void locationNotifyOnMatch(final Contact me, final BigInteger locationId,
-			final ContactNotificationTextType notificationTextType, final String param) throws Exception {
+			final TextId textId, final String param) throws Exception {
 		final QueryParams params = new QueryParams(Query.location_listFavorite);
 		params.setSearch("locationFavorite.locationId=" + locationId);
 		final Result favorites = repository.list(params);
 		final Location location = repository.one(Location.class, locationId);
 		for (int i = 0; i < favorites.size(); i++)
-			sendNotificationOnMatch(notificationTextType, me,
+			sendNotificationOnMatch(textId, me,
 					repository.one(Contact.class, (BigInteger) favorites.get(i).get("locationFavorite.contactId")),
 					location.getName(), param);
 	}
 
 	@Async
-	public void sendNotificationOnMatch(final ContactNotificationTextType textID, final Contact me, final Contact other,
+	public void sendNotificationOnMatch(final TextId textId, final Contact me, final Contact other,
 			final String... param) throws Exception {
 		if (me != null && other != null && !me.getId().equals(other.getId()) && me.getAge() != null
 				&& me.getGender() != null) {
@@ -131,7 +130,7 @@ public class NotificationService {
 							for (int i = 0; i < param.length; i++)
 								param2[i + 1] = param[i];
 						}
-						sendNotificationSync(me, other, textID, Strings.encodeParam("p=" + me.getId()), param2);
+						sendNotificationSync(me, other, textId, Strings.encodeParam("p=" + me.getId()), param2);
 					}
 				}
 			}
@@ -139,8 +138,7 @@ public class NotificationService {
 	}
 
 	public boolean sendNotificationSync(final Contact contactFrom, final Contact contactTo,
-			final ContactNotificationTextType notificationTextType,
-			final String action, final String... param) throws Exception {
+			final TextId textId, final String action, final String... param) throws Exception {
 		if (contactTo == null || !contactTo.getVerified())
 			return false;
 		if (contactFrom != null && contactTo.getId() != null) {
@@ -152,8 +150,7 @@ public class NotificationService {
 			if (repository.list(params).size() > 0)
 				return false;
 		}
-		final StringBuilder s = new StringBuilder(
-				text.getText(contactTo, TextId.valueOf("notification_" + notificationTextType.name())));
+		final StringBuilder s = new StringBuilder(text.getText(contactTo, textId));
 		if (param != null) {
 			for (int i = 0; i < param.length; i++)
 				Strings.replaceString(s, "<jq:EXTRA_" + (i + 1) + " />", param[i]);
@@ -167,15 +164,15 @@ public class NotificationService {
 		WebClient.create(serverWebSocket + "refresh/" + contactTo.getId()).post()
 				.bodyValue(getPingValues(contactTo)).retrieve().toBodilessEntity();
 		ContactNotification notification = null;
-		if (notificationTextType != ContactNotificationTextType.chatNew
-				&& notificationTextType != ContactNotificationTextType.contactVideoCall
-				&& (notification = save(contactTo, contactFrom, s.toString(), action, notificationTextType)) == null)
+		if (textId != TextId.notification_chatNew
+				&& textId != TextId.notification_contactVideoCall
+				&& (notification = save(contactTo, contactFrom, s.toString(), action, textId)) == null)
 			return false;
-		if (userWantsNotification(notificationTextType, contactTo)) {
+		if (userWantsNotification(textId, contactTo)) {
 			boolean b = !Strings.isEmpty(contactTo.getPushSystem()) && !Strings.isEmpty(contactTo.getPushToken());
 			if (b)
 				b = sendNotificationDevice(contactFrom, contactTo, s, action, notification);
-			if (!b && notificationTextType != ContactNotificationTextType.clientNews) {
+			if (!b && textId != TextId.notification_clientNews) {
 				sendNotificationEmail(contactFrom, contactTo, s.toString(), action);
 				if (notification != null)
 					notification.setType(ContactNotificationType.email);
@@ -189,21 +186,19 @@ public class NotificationService {
 
 	@Async
 	public void sendNotification(final Contact contactFrom, final Contact contactTo,
-			final ContactNotificationTextType notificationTextType,
-			final String action, final String... param) throws Exception {
-		sendNotificationSync(contactFrom, contactTo, notificationTextType, action, param);
+			final TextId textId, final String action, final String... param) throws Exception {
+		sendNotificationSync(contactFrom, contactTo, textId, action, param);
 	}
 
 	private ContactNotification save(final Contact contactTo, final Contact contactFrom, final String text,
-			final String action,
-			final ContactNotificationTextType notificationTextType) throws Exception {
+			final String action, final TextId textId) throws Exception {
 		final BigInteger fromId = contactFrom == null ? null : contactFrom.getId();
 		final QueryParams params = new QueryParams(Query.contact_notification);
 		params.setSearch("contactNotification.contactId=" + contactTo.getId() +
 				" and contactNotification.contactId2=" + fromId +
 				" and TIMESTAMPDIFF(HOUR,contactNotification.createdAt,current_timestamp)<24" +
 				" and contactNotification.action='" + (action == null ? "" : action) +
-				"' and contactNotification.textType='" + notificationTextType.name() + "'");
+				"' and contactNotification.textId='" + textId.name() + "'");
 		if (repository.list(params).size() > 0)
 			return null;
 		final ContactNotification notification = new ContactNotification();
@@ -211,7 +206,7 @@ public class NotificationService {
 		notification.setContactId(contactTo.getId());
 		notification.setContactId2(fromId);
 		notification.setText(text);
-		notification.setTextType(notificationTextType);
+		notification.setTextId(textId);
 		repository.save(notification);
 		return notification;
 	}
@@ -319,24 +314,23 @@ public class NotificationService {
 		return a;
 	}
 
-	private boolean userWantsNotification(final ContactNotificationTextType notificationTextType,
-			final Contact contact) {
-		if (ContactNotificationTextType.chatNew == notificationTextType)
+	private boolean userWantsNotification(final TextId textId, final Contact contact) {
+		if (TextId.notification_chatNew == textId)
 			return contact.getNotificationChat();
-		if (ContactNotificationTextType.contactFriendRequest == notificationTextType
-				|| ContactNotificationTextType.contactFriendApproved == notificationTextType)
+		if (TextId.notification_contactFriendRequest == textId
+				|| TextId.notification_contactFriendApproved == textId)
 			return contact.getNotificationFriendRequest();
-		if (ContactNotificationTextType.contactVisitLocation == notificationTextType)
+		if (TextId.notification_contactVisitLocation == textId)
 			return contact.getNotificationVisitLocation();
-		if (ContactNotificationTextType.contactVisitProfile == notificationTextType)
+		if (TextId.notification_contactVisitProfile == textId)
 			return contact.getNotificationVisitProfile();
-		if (ContactNotificationTextType.eventParticipate == notificationTextType)
+		if (TextId.notification_eventParticipate == textId)
 			return contact.getNotificationMarkEvent();
-		if (ContactNotificationTextType.contactBirthday == notificationTextType)
+		if (TextId.notification_contactBirthday == textId)
 			return contact.getNotificationBirthday();
-		if (ContactNotificationTextType.clientNews == notificationTextType ||
-				ContactNotificationTextType.clientMarketingPoll == notificationTextType ||
-				ContactNotificationTextType.clientMarketingPollResult == notificationTextType)
+		if (TextId.notification_clientNews == textId ||
+				TextId.notification_clientMarketingPoll == textId ||
+				TextId.notification_clientMarketingPollResult == textId)
 			return contact.getNotificationNews();
 		return true;
 	}

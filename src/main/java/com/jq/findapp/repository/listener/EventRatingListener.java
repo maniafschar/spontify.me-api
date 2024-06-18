@@ -4,11 +4,11 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.EventRating;
 import com.jq.findapp.entity.Location;
+import com.jq.findapp.util.Text.TextId;
 
 @Component
 public class EventRatingListener extends AbstractRepositoryListener<EventRating> {
@@ -30,7 +30,7 @@ public class EventRatingListener extends AbstractRepositoryListener<EventRating>
 							+ event.getLocationId());
 			notificationService.locationNotifyOnMatch(
 					repository.one(Contact.class, event.getContactId()),
-					event.getLocationId(), ContactNotificationTextType.eventRated,
+					event.getLocationId(), TextId.notification_eventRated,
 					repository.one(Location.class, event.getLocationId()).getName());
 		}
 	}

@@ -11,13 +11,13 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.Event.EventType;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.service.EventService;
 import com.jq.findapp.util.Strings;
+import com.jq.findapp.util.Text.TextId;
 
 @Component
 public class EventParticipateListener extends AbstractRepositoryListener<EventParticipate> {
@@ -31,7 +31,7 @@ public class EventParticipateListener extends AbstractRepositoryListener<EventPa
 			final ZonedDateTime t = event.getStartDate().toInstant().atZone(ZoneOffset.UTC);
 			if (event.getType() == EventType.Inquiry)
 				notificationService.sendNotification(contactFrom, contactTo,
-						ContactNotificationTextType.eventParticipateWithoutLocation,
+						TextId.notification_eventParticipateWithoutLocation,
 						Strings.encodeParam("p=" + contactFrom.getId()),
 						Strings.formatDate(null,
 								new Date(time.plusSeconds((t.getHour() * 60 + t.getMinute()) * 60)
@@ -40,7 +40,7 @@ public class EventParticipateListener extends AbstractRepositoryListener<EventPa
 						event.getDescription());
 			else if (event.getType() == EventType.Online)
 				notificationService.sendNotification(contactFrom, contactTo,
-						ContactNotificationTextType.eventParticipateOnline,
+						TextId.notification_eventParticipateOnline,
 						Strings.encodeParam("p=" + contactFrom.getId()),
 						Strings.formatDate(null,
 								new Date(time.plusSeconds((t.getHour() * 60 + t.getMinute()) * 60)
@@ -50,13 +50,13 @@ public class EventParticipateListener extends AbstractRepositoryListener<EventPa
 			else if (event.getType() == EventType.Poll) {
 				final JsonNode json = new ObjectMapper().readTree(event.getDescription());
 				notificationService.sendNotification(contactFrom, contactTo,
-						ContactNotificationTextType.eventParticipatePoll,
+						TextId.notification_eventParticipatePoll,
 						Strings.encodeParam("e=" + event.getId()),
 						json.get("q").asText(),
 						String.join(", ", EventService.getAnswers(json, eventParticipate.getState())));
 			} else
 				notificationService.sendNotification(contactFrom, contactTo,
-						ContactNotificationTextType.eventParticipate,
+						TextId.notification_eventParticipate,
 						Strings.encodeParam("p=" + contactFrom.getId()),
 						Strings.formatDate(null,
 								new Date(time.plusSeconds((t.getHour() * 60 + t.getMinute()) * 60)

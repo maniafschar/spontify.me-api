@@ -35,7 +35,6 @@ import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.ContactGeoLocationHistory;
-import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.ContactReferer;
 import com.jq.findapp.entity.ContactVideoCall;
 import com.jq.findapp.entity.ContactVisit;
@@ -179,7 +178,7 @@ public class ActionApi {
 			final Contact contact = repository.one(Contact.class, id);
 			if (contact.getModifiedAt().before(new Date(Instant.now().minus(Duration.ofDays(3)).toEpochMilli())))
 				notificationService.sendNotification(params.getUser(), contact,
-						ContactNotificationTextType.chatSeen, "chat=" + user);
+						TextId.notification_chatSeen, "chat=" + user);
 		}
 		return result.getList();
 	}
@@ -469,7 +468,7 @@ public class ActionApi {
 		if ((active == null || !active) && chatService.isVideoCallAllowed(repository.one(Contact.class, user), id))
 			notificationService.sendNotificationSync(repository.one(Contact.class, user),
 					repository.one(Contact.class, id),
-					ContactNotificationTextType.contactVideoCall, "video=" + user);
+					TextId.notification_contactVideoCall, "video=" + user);
 	}
 
 	@GetMapping("paypalKey")

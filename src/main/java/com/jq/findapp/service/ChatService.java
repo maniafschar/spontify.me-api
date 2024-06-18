@@ -13,7 +13,6 @@ import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.ContactLink;
-import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -125,7 +124,7 @@ public class ChatService {
 				s = text.getText(contactTo, s.lastIndexOf(" :open(") == 0 ? TextId.notification_sentEntry
 						: TextId.notification_sentEntries);
 		}
-		notificationService.sendNotification(contactFrom, contactTo, ContactNotificationTextType.chatNew,
+		notificationService.sendNotification(contactFrom, contactTo, TextId.notification_chatNew,
 				"chat=" + contactFrom.getId(), s);
 	}
 

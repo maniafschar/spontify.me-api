@@ -4,8 +4,8 @@ import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.ContactVisit;
+import com.jq.findapp.util.Text.TextId;
 
 @Component
 public class ContactVisitListener extends AbstractRepositoryListener<ContactVisit> {
@@ -21,7 +21,7 @@ public class ContactVisitListener extends AbstractRepositoryListener<ContactVisi
 
 	private void sendNotification(final BaseEntity entity) throws Exception {
 		final ContactVisit contactVisit = (ContactVisit) entity;
-		notificationService.sendNotificationOnMatch(ContactNotificationTextType.contactVisitProfile,
+		notificationService.sendNotificationOnMatch(TextId.notification_contactVisitProfile,
 				repository.one(Contact.class,
 						contactVisit.getContactId()),
 				repository.one(Contact.class, contactVisit.getContactId2()));

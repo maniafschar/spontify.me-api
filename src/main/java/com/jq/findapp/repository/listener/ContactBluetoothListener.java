@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactBluetooth;
-import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
+import com.jq.findapp.util.Text.TextId;
 
 @Component
 public class ContactBluetoothListener extends AbstractRepositoryListener<ContactBluetooth> {
@@ -20,8 +20,8 @@ public class ContactBluetoothListener extends AbstractRepositoryListener<Contact
 		final Contact me = repository.one(Contact.class, contactBlutooth.getContactId());
 		final Contact other = repository.one(Contact.class, contactBlutooth.getContactId2());
 		if (me.getBluetooth() != null && me.getBluetooth() && other.getBluetooth() != null && other.getBluetooth()) {
-			notificationService.sendNotificationOnMatch(ContactNotificationTextType.contactFindMe, me, other);
-			notificationService.sendNotificationOnMatch(ContactNotificationTextType.contactFindMe, other, me);
+			notificationService.sendNotificationOnMatch(TextId.notification_contactFindMe, me, other);
+			notificationService.sendNotificationOnMatch(TextId.notification_contactFindMe, other, me);
 		}
 	}
 }

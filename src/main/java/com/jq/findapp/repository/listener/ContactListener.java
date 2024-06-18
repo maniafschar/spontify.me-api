@@ -14,12 +14,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactLink;
-import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.util.Strings;
+import com.jq.findapp.util.Text.TextId;
 
 @Component
 public class ContactListener extends AbstractRepositoryListener<Contact> {
@@ -97,7 +97,7 @@ public class ContactListener extends AbstractRepositoryListener<Contact> {
 					repository.one(Contact.class,
 							contactLink.getContactId().equals(contact.getId()) ? contactLink.getContactId2()
 									: contactLink.getContactId()),
-					ContactNotificationTextType.contactDelete, null);
+					TextId.notification_contactDelete, null);
 		}
 	}
 

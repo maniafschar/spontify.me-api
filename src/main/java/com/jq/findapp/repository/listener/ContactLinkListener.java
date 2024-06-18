@@ -5,8 +5,8 @@ import org.springframework.stereotype.Component;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactLink;
 import com.jq.findapp.entity.ContactLink.Status;
-import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.util.Strings;
+import com.jq.findapp.util.Text.TextId;
 
 @Component
 public class ContactLinkListener extends AbstractRepositoryListener<ContactLink> {
@@ -22,7 +22,7 @@ public class ContactLinkListener extends AbstractRepositoryListener<ContactLink>
 			notificationService.sendNotification(
 					repository.one(Contact.class, contactLink.getContactId()),
 					repository.one(Contact.class, contactLink.getContactId2()),
-					ContactNotificationTextType.contactFriendRequest,
+					TextId.notification_contactFriendRequest,
 					Strings.encodeParam("p=" + contactLink.getContactId()));
 	}
 
@@ -32,7 +32,7 @@ public class ContactLinkListener extends AbstractRepositoryListener<ContactLink>
 			notificationService.sendNotification(
 					repository.one(Contact.class, contactLink.getContactId2()),
 					repository.one(Contact.class, contactLink.getContactId()),
-					ContactNotificationTextType.contactFriendApproved,
+					TextId.notification_contactFriendApproved,
 					Strings.encodeParam("p=" + contactLink.getContactId2()));
 		}
 	}

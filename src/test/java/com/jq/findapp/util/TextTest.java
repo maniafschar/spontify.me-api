@@ -18,7 +18,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.util.Text.TextId;
 
 @ExtendWith(SpringExtension.class)
@@ -30,18 +29,6 @@ public class TextTest {
 
 	@Autowired
 	private Utils utils;
-
-	@Test
-	public void notificationToId() throws Exception {
-		// given
-		final Contact contact = utils.createContact(BigInteger.ONE);
-
-		// when
-		for (final ContactNotificationTextType id : ContactNotificationTextType.values())
-			text.getText(contact, TextId.valueOf("notification_" + id));
-
-		// then no exceptions
-	}
 
 	@Test
 	public void ids() throws Exception {

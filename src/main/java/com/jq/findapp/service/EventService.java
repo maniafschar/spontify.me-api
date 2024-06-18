@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.Location;
@@ -101,13 +100,13 @@ public class EventService {
 							final String time = t.getHour() + ":" + (t.getMinute() < 10 ? "0" : "") + t.getMinute();
 							if (event.getLocationId() == null)
 								notificationService.sendNotification(contactEvent,
-										params.getUser(), ContactNotificationTextType.eventNotifyWithoutLocation,
+										params.getUser(), TextId.notification_eventNotifyWithoutLocation,
 										Strings.encodeParam("e=" + event.getId() + "_" + realDate.toLocalDate()),
 										time,
 										event.getDescription());
 							else
 								notificationService.sendNotification(contactEvent,
-										params.getUser(), ContactNotificationTextType.eventNotify,
+										params.getUser(), TextId.notification_eventNotify,
 										Strings.encodeParam("e=" + event.getId() + "_" + realDate.toLocalDate()),
 										(realDate.getDayOfYear() == now.getDayOfYear()
 												? text.getText(params.getUser(), TextId.today)
@@ -159,7 +158,7 @@ public class EventService {
 										.atZone(TimeZone.getTimeZone(contact.getTimezone()).toZoneId());
 								notificationService.sendNotification(
 										repository.one(Contact.class, event.getContactId()),
-										contact, ContactNotificationTextType.eventNotification,
+										contact, TextId.notification_eventNotification,
 										Strings.encodeParam(
 												"e=" + event.getId() + "_" + eventParticipate.getEventDate()),
 										repository.one(Location.class, event.getLocationId()).getName(),

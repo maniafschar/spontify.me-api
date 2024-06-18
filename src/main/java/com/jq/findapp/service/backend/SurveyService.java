@@ -44,7 +44,6 @@ import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Storage;
 import com.jq.findapp.entity.Ticket.TicketType;
@@ -756,7 +755,7 @@ public class SurveyService {
 					}
 				}
 			}
-			send(users, clientMarketing, ContactNotificationTextType.clientMarketingPoll, "contact.id");
+			send(users, clientMarketing, TextId.notification_clientMarketingPoll, "contact.id");
 		}
 
 		private void sendResult(final ClientMarketing clientMarketing) throws Exception {
@@ -764,21 +763,20 @@ public class SurveyService {
 			params.setSearch(
 					"contactMarketing.finished=true and contactMarketing.contactId is not null and contactMarketing.clientMarketingId="
 							+ clientMarketing.getId());
-			send(repository.list(params), clientMarketing, ContactNotificationTextType.clientMarketingPollResult,
+			send(repository.list(params), clientMarketing, TextId.notification_clientMarketingPollResult,
 					"contactMarketing.contactId");
 		}
 
 		private void send(final Result users, final ClientMarketing clientMarketing,
-				final ContactNotificationTextType type, final String field) throws Exception {
+				final TextId textId, final String field) throws Exception {
 			final JsonNode poll = new ObjectMapper().readTree(Attachment.resolve(clientMarketing.getStorage()));
 			final List<Object> sent = new ArrayList<>();
-			final TextId textId = TextId.valueOf("marketing_p" + poll.get("type").asText().substring(1));
 			for (int i = 0; i < users.size(); i++) {
 				if (!sent.contains(users.get(i).get(field))) {
 					final Contact contact = repository.one(Contact.class, (BigInteger) users.get(i).get(field));
 					notificationService.sendNotification(null,
 							contact,
-							type, "m=" + clientMarketing.getId(),
+							textId, "m=" + clientMarketing.getId(),
 							text.getText(contact, textId).replace("{0}", poll.get("homeName").asText() + " : " +
 									poll.get("awayName").asText()));
 					sent.add(users.get(i).get(field));

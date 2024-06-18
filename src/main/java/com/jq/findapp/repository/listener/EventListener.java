@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.Event.EventType;
 import com.jq.findapp.entity.EventParticipate;
@@ -23,6 +22,7 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.service.EventService;
 import com.jq.findapp.util.Strings;
+import com.jq.findapp.util.Text.TextId;
 
 @Component
 public class EventListener extends AbstractRepositoryListener<Event> {
@@ -89,7 +89,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 						final Contact contactTo = repository.one(Contact.class, eventParticipate.getContactId());
 						final Contact contactFrom = repository.one(Contact.class, event.getContactId());
 						notificationService.sendNotification(contactFrom, contactTo,
-								ContactNotificationTextType.eventChanged,
+								TextId.notification_eventChanged,
 								Strings.encodeParam("e=" + event.getId() + "_" + eventParticipate.getEventDate()),
 								Strings.formatDate(null,
 										new Date(time.plusSeconds((t.getHour() * 60 + t.getMinute()) * 60)
@@ -120,7 +120,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 					final Contact contactTo = repository.one(Contact.class, eventParticipate.getContactId());
 					final Contact contactFrom = repository.one(Contact.class, eventParticipate.getContactId());
 					notificationService.sendNotification(contactFrom, contactTo,
-							ContactNotificationTextType.eventDelete,
+							TextId.notification_eventDelete,
 							Strings.encodeParam("p=" + contactFrom.getId()),
 							Strings.formatDate(null,
 									new Date(time.plusSeconds((t.getHour() * 60 + t.getMinute()) * 60).toEpochMilli()),
