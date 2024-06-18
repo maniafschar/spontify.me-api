@@ -193,6 +193,9 @@ public class MarketingApi {
 					return null;
 				result.put("address", location.getAddress());
 				result.put("name", location.getName());
+				result.put("skills", location.getSkills());
+				result.put("telephone", location.getTelephone());
+				result.put("url", location.getUrl());
 			} else if (((String) result.get("clientMarketing.storage")).contains("locationMarketing"))
 				return null;
 			return result;
