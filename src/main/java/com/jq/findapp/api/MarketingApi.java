@@ -192,6 +192,7 @@ public class MarketingApi {
 				if (location == null || location.getSecret().hashCode() != hash)
 					return null;
 				result.put("address", location.getAddress());
+				result.put("description", location.getDescription());
 				result.put("name", location.getName());
 				result.put("skills", location.getSkills());
 				result.put("telephone", location.getTelephone());
