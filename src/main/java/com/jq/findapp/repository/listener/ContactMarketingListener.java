@@ -48,12 +48,12 @@ public class ContactMarketingListener extends AbstractRepositoryListener<Contact
 
 	@Override
 	public void postPersist(final ContactMarketing contactMarketing) throws Exception {
-		marketingService.synchronizeResult(contactMarketing.getClientMarketingId());
+		marketingService.synchronizeResult(contactMarketing);
 	}
 
 	@Override
 	public void postUpdate(final ContactMarketing contactMarketing) throws Exception {
-		marketingService.synchronizeResult(contactMarketing.getClientMarketingId());
+		marketingService.synchronizeResult(contactMarketing);
 	}
 
 }
