@@ -47,7 +47,6 @@ import com.jq.findapp.service.backend.ImportLocationsService;
 import com.jq.findapp.service.backend.ImportLogService;
 import com.jq.findapp.service.backend.ImportSportsBarService;
 import com.jq.findapp.service.backend.IpService;
-import com.jq.findapp.service.backend.LocationMarketingService;
 import com.jq.findapp.service.backend.MarketingService;
 import com.jq.findapp.service.backend.RssService;
 import com.jq.findapp.service.backend.SitemapService;
@@ -104,9 +103,6 @@ public class SupportCenterApi {
 
 	@Autowired
 	private IpService ipService;
-
-	@Autowired
-	private LocationMarketingService locationMarketingService;
 
 	@Autowired
 	private MarketingService marketingService;
