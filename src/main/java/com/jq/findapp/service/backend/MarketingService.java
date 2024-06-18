@@ -17,9 +17,10 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
-import com.jq.findapp.entity.ClientMarketing;
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.entity.ContactNotification.ContactNotificationTextType;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Location;
@@ -204,9 +205,13 @@ public class MarketingService {
 	}
 
 	public synchronized ClientMarketingResult synchronizeResult(final ContactMarketing contactMarketing) throws Exception {
+		final ObjectMapper om = new ObjectMapper();
 		final BigInteger clientMarketingId = contactMarketing.getClientMarketingId();
-		final JsonNode poll = new ObjectMapper().readTree(Attachment.resolve(
+		final JsonNode poll = om.readTree(Attachment.resolve(
 				repository.one(ClientMarketing.class, clientMarketingId).getStorage()));
+		if (poll.has("type") && "locationMarketing".equals(poll.has("type").asString())) {
+			final JsonNode answers = om.readTree(Attachment.resolve(clientMarketing.getStorage()));
+		}
 		final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 		params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketingId);
 		params.setLimit(0);
@@ -221,7 +226,6 @@ public class MarketingService {
 		params.setQuery(Query.contact_listMarketing);
 		params.setSearch("contactMarketing.clientMarketingId=" + clientMarketingId);
 		result = repository.list(params);
-		final ObjectMapper om = new ObjectMapper();
 		final ObjectNode total = om.createObjectNode();
 		total.put("participants", result.size());
 		total.put("finished", 0);
