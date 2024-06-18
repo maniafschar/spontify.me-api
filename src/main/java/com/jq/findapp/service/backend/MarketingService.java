@@ -203,7 +203,8 @@ public class MarketingService {
 		}
 	}
 
-	public synchronized ClientMarketingResult synchronizeResult(final BigInteger clientMarketingId) throws Exception {
+	public synchronized ClientMarketingResult synchronizeResult(final ContactMarketing contactMarketing) throws Exception {
+		final BigInteger clientMarketingId = contactMarketing.getClientMarketingId();
 		final JsonNode poll = new ObjectMapper().readTree(Attachment.resolve(
 				repository.one(ClientMarketing.class, clientMarketingId).getStorage()));
 		final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
