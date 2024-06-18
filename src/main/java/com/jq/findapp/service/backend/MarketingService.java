@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
-import com.jq.findapp.entity.Client;
+import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactMarketing;
@@ -204,19 +204,23 @@ public class MarketingService {
 		}
 	}
 
-	public synchronized ClientMarketingResult synchronizeResult(final ContactMarketing contactMarketing) throws Exception {
+	public void locationUpdate(final ContactMarketing contactMarketing) throws Exception {
 		final ObjectMapper om = new ObjectMapper();
-		final BigInteger clientMarketingId = contactMarketing.getClientMarketingId();
-		final JsonNode poll = om.readTree(Attachment.resolve(
-				repository.one(ClientMarketing.class, clientMarketingId).getStorage()));
-		final JsonNode answers = om.readTree(Attachment.resolve(clientMarketing.getStorage()));
+		final JsonNode answers = om.readTree(Attachment.resolve(contactMarketing.getStorage()));
 		if (answers.has("locationId")) {
-			final Location location = repository.one(Location.class, new BigInteger(answers.get("locationId").asString()));
+			final Location location = repository.one(Location.class,
+					new BigInteger(answers.get("locationId").asText()));
 			if (location.getSecret().hashCode() == answers.get("hash").asInt()) {
-				
+
 				repository.save(location);
 			}
 		}
+	}
+
+	public synchronized ClientMarketingResult synchronizeResult(final BigInteger clientMarketingId) throws Exception {
+		final ObjectMapper om = new ObjectMapper();
+		final JsonNode poll = om.readTree(Attachment.resolve(
+				repository.one(ClientMarketing.class, clientMarketingId).getStorage()));
 		final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 		params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketingId);
 		params.setLimit(0);
@@ -235,33 +239,38 @@ public class MarketingService {
 		total.put("participants", result.size());
 		total.put("finished", 0);
 		for (int i2 = 0; i2 < result.size(); i2++) {
-			final String answers = (String) result.get(i2).get("contactMarketing.storage");
-			if (answers != null && answers.length() > 2) {
+			final String answersText = (String) result.get(i2).get("contactMarketing.storage");
+			if (answersText != null && answersText.length() > 2) {
 				total.put("finished", total.get("finished").asInt() + 1);
-				om.readTree(answers).fields()
-						.forEachRemaining(e -> {
-							if (Integer.valueOf(e.getKey().substring(1)) < poll.get("questions").size()) {
-								if (!total.has(e.getKey())) {
-									total.set(e.getKey(), om.createObjectNode());
+				om.readTree(answersText).fields()
+						.forEachRemaining(contactAnswer -> {
+							if (contactAnswer.getKey().startsWith("q") && Integer
+									.valueOf(contactAnswer.getKey().substring(1)) < poll.get("questions").size()) {
+								final JsonNode question = poll.get("questions").get(
+										Integer.valueOf(contactAnswer.getKey().substring(1)));
+								if (!total.has(contactAnswer.getKey())) {
+									total.set(contactAnswer.getKey(), om.createObjectNode());
 									final ArrayNode a = om.createArrayNode();
-									final JsonNode question = poll.get("questions").get(
-											Integer.valueOf(e.getKey().substring(1)));
 									if (question.has("answers"))
 										for (int i3 = 0; i3 < question.get("answers").size(); i3++)
 											a.add(0);
-									((ObjectNode) total.get(e.getKey())).set("a", a);
+									((ObjectNode) total.get(contactAnswer.getKey())).set("a", a);
 								}
-								for (int i = 0; i < e.getValue().get("a").size(); i++) {
-									final int index = e.getValue().get("a").get(i).asInt();
-									final ArrayNode a = ((ArrayNode) total.get(e.getKey()).get("a"));
-									a.set(index, a.get(index).asInt() + 1);
+								if (question.has("answers")) {
+									for (int i = 0; i < contactAnswer.getValue().get("a").size(); i++) {
+										final int index = contactAnswer.getValue().get("a").get(i).asInt();
+										final ArrayNode totalAnswer = ((ArrayNode) total.get(contactAnswer.getKey())
+												.get("a"));
+										totalAnswer.set(index, totalAnswer.get(index).asInt() + 1);
+									}
 								}
-								if (e.getValue().has("t") && !Strings.isEmpty(e.getValue().get("t").asText())) {
-									final ObjectNode o = (ObjectNode) total.get(e.getKey());
+								if (contactAnswer.getValue().has("t")
+										&& !Strings.isEmpty(contactAnswer.getValue().get("t").asText())) {
+									final ObjectNode o = (ObjectNode) total.get(contactAnswer.getKey());
 									if (!o.has("t"))
 										o.put("t", "");
 									o.put("t", o.get("t").asText() +
-											"<div>" + e.getValue().get("t").asText() + "</div>");
+											"<div>" + contactAnswer.getValue().get("t").asText() + "</div>");
 								}
 							}
 						});

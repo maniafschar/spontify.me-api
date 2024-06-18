@@ -25,19 +25,22 @@ public class ContactMarketingListener extends AbstractRepositoryListener<Contact
 	@Override
 	public void preUpdate(final ContactMarketing contactMarketing) throws Exception {
 		if (contactMarketing.getStorage() != null && contactMarketing.getStorage().length() > 2) {
-			final JsonNode json = new ObjectMapper().readTree(contactMarketing.getStorage());
+			final ObjectMapper om = new ObjectMapper();
+			final JsonNode json = om.readTree(Attachment.resolve(contactMarketing.getStorage()));
 			json.fieldNames().forEachRemaining(key -> {
 				if (json.get(key).has("t")) {
 					final ArrayNode a = (ArrayNode) json.get(key).get("a");
 					try {
-						final JsonNode poll = new ObjectMapper().readTree(Attachment.resolve(repository
+						final JsonNode poll = om.readTree(Attachment.resolve(repository
 								.one(ClientMarketing.class, contactMarketing.getClientMarketingId()).getStorage()));
 						final JsonNode question = poll.get("questions").get(Integer.valueOf(key.substring(1)));
-						final int value = question.get("answers").size() - 1;
-						if (a.size() > 0 && (!question.has("multiple") || !question.get("multiple").asBoolean()))
-							a.set(0, value);
-						else if (a.size() == 0 || a.get(a.size() - 1).intValue() != value)
-							a.add(value);
+						if (question.has("answers")) {
+							final int value = question.get("answers").size() - 1;
+							if (a.size() > 0 && (!question.has("multiple") || !question.get("multiple").asBoolean()))
+								a.set(0, value);
+							else if (a.size() == 0 || a.get(a.size() - 1).intValue() != value)
+								a.add(value);
+						}
 					} catch (final JsonProcessingException e) {
 						throw new RuntimeException(e);
 					}
@@ -48,12 +51,13 @@ public class ContactMarketingListener extends AbstractRepositoryListener<Contact
 
 	@Override
 	public void postPersist(final ContactMarketing contactMarketing) throws Exception {
-		marketingService.synchronizeResult(contactMarketing);
+		postUpdate(contactMarketing);
 	}
 
 	@Override
 	public void postUpdate(final ContactMarketing contactMarketing) throws Exception {
-		marketingService.synchronizeResult(contactMarketing);
+		marketingService.synchronizeResult(contactMarketing.getClientMarketingId());
+		marketingService.locationUpdate(contactMarketing);
 	}
 
 }

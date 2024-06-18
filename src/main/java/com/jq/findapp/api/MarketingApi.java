@@ -60,7 +60,7 @@ public class MarketingApi {
 	private NotificationService notificationService;
 
 	@PostMapping
-	public BigInteger pollAnswerCreate(@RequestBody final WriteEntity entity,
+	public Map<String, Object> pollAnswerCreate(@RequestBody final WriteEntity entity,
 			@RequestHeader final BigInteger clientId,
 			@RequestHeader(required = false) final BigInteger user,
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
@@ -85,7 +85,7 @@ public class MarketingApi {
 								+ contactMarketing.getClientMarketingId());
 				final Result list2 = repository.list(params);
 				if (list2.size() > 0)
-					return (BigInteger) list2.get(0).get("contactMarketing.id");
+					return list2.get(0);
 			}
 		} else {
 			final QueryParams params = new QueryParams(Query.contact_listMarketing);
@@ -94,11 +94,13 @@ public class MarketingApi {
 					+ contactMarketing.getClientMarketingId());
 			final Result list = repository.list(params);
 			if (list.size() > 0)
-				return (BigInteger) list.get(0).get("contactMarketing.id");
+				return list.get(0);
 			contactMarketing.setContactId(user);
 		}
 		repository.save(contactMarketing);
-		return contactMarketing.getId();
+		final QueryParams params = new QueryParams(Query.contact_listMarketing);
+		params.setSearch("contactMarketing.id=" + contactMarketing.getId());
+		return repository.one(params);
 	}
 
 	@PutMapping
@@ -191,12 +193,12 @@ public class MarketingApi {
 						(BigInteger) repository.one(params).get("location.id"));
 				if (location == null || location.getSecret().hashCode() != hash)
 					return null;
-				result.put("address", location.getAddress());
-				result.put("description", location.getDescription());
-				result.put("name", location.getName());
-				result.put("skills", location.getSkills());
-				result.put("telephone", location.getTelephone());
-				result.put("url", location.getUrl());
+				result.put("_address", location.getAddress());
+				result.put("_description", location.getDescription());
+				result.put("_name", location.getName());
+				result.put("_skills", location.getSkills());
+				result.put("_telephone", location.getTelephone());
+				result.put("_url", location.getUrl());
 			} else if (((String) result.get("clientMarketing.storage")).contains("locationMarketing"))
 				return null;
 			return result;
