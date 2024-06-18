@@ -209,8 +209,13 @@ public class MarketingService {
 		final BigInteger clientMarketingId = contactMarketing.getClientMarketingId();
 		final JsonNode poll = om.readTree(Attachment.resolve(
 				repository.one(ClientMarketing.class, clientMarketingId).getStorage()));
-		if (poll.has("type") && "locationMarketing".equals(poll.has("type").asString())) {
-			final JsonNode answers = om.readTree(Attachment.resolve(clientMarketing.getStorage()));
+		final JsonNode answers = om.readTree(Attachment.resolve(clientMarketing.getStorage()));
+		if (answers.has("locationId")) {
+			final Location location = repository.one(Location.class, new BigInteger(answers.get("locationId").asString()));
+			if (location.getSecret().hashCode() == answers.get("hash").asInt()) {
+				
+				repository.save(location);
+			}
 		}
 		final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 		params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketingId);
