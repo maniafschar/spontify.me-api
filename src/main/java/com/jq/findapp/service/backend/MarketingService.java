@@ -3,6 +3,7 @@ package com.jq.findapp.service.backend;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Iterator;
@@ -210,7 +211,7 @@ public class MarketingService {
 			final Location location = repository.one(Location.class,
 					new BigInteger(answers.get("locationId").asText()));
 			if (location.getSecret().hashCode() == answers.get("hash").asInt()) {
-
+				location.setUpdatedAt(new Timestamp(Instant.now().toEpochMilli()));
 				repository.save(location);
 			}
 		}
