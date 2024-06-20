@@ -39,6 +39,7 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.MarketingService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.backend.IpService;
 import com.jq.findapp.util.Strings;
@@ -55,6 +56,9 @@ public class MarketingApi {
 
 	@Autowired
 	private Repository repository;
+
+	@Autowired
+	private MarketingService marketingService;
 
 	@Autowired
 	private NotificationService notificationService;
@@ -104,7 +108,7 @@ public class MarketingApi {
 	}
 
 	@PutMapping
-	public void pollAnswerSave(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger clientId)
+	public String pollAnswerSave(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger clientId)
 			throws Exception {
 		final ContactMarketing contactMarketing = repository.one(ContactMarketing.class, entity.getId());
 		contactMarketing.populate(entity.getValues());
@@ -156,7 +160,9 @@ public class MarketingApi {
 				s.append(questions.get("epilog").asText().replaceAll("\n", "<br/>") + "</div>");
 				notificationService.sendNotificationEmail(null, to, s.toString(), null);
 			}
+			return marketingService.locationUpdate(contactMarketing);
 		}
+		return null;
 	}
 
 	@GetMapping
