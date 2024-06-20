@@ -39,6 +39,7 @@ public class Location extends BaseEntity {
 	private String town;
 	private String url;
 	private String urlInternal;
+	private String updatedAt;
 	private String zipCode;
 
 	public BigInteger getContactId() {
@@ -255,6 +256,14 @@ public class Location extends BaseEntity {
 
 	public void setGoogleRatingTotal(final Integer googleRatingTotal) {
 		this.googleRatingTotal = googleRatingTotal;
+	}
+
+	public Timestamp getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(final Timestamp updatedAt) {
+		this.updatedAt = updatedAt;
 	}
 
 	@Transient
