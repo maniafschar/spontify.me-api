@@ -204,17 +204,20 @@ public class MarketingService {
 		}
 	}
 
-	public void locationUpdate(final ContactMarketing contactMarketing) throws Exception {
+	public String locationUpdate(final ContactMarketing contactMarketing) throws Exception {
 		final ObjectMapper om = new ObjectMapper();
 		final JsonNode answers = om.readTree(Attachment.resolve(contactMarketing.getStorage()));
 		if (answers.has("locationId")) {
 			final Location location = repository.one(Location.class,
 					new BigInteger(answers.get("locationId").asText()));
 			if (location.getSecret().hashCode() == answers.get("hash").asInt()) {
+				String result = "Deine Location wurde erfolgreich akualisiert";
 				location.setUpdatedAt(new Timestamp(Instant.now().toEpochMilli()));
 				repository.save(location);
+				return result;
 			}
 		}
+		return null;
 	}
 
 	public synchronized ClientMarketingResult synchronizeResult(final BigInteger clientMarketingId) throws Exception {
