@@ -57,7 +57,6 @@ public class ContactMarketingListener extends AbstractRepositoryListener<Contact
 	@Override
 	public void postUpdate(final ContactMarketing contactMarketing) throws Exception {
 		marketingService.synchronizeResult(contactMarketing.getClientMarketingId());
-		marketingService.locationUpdate(contactMarketing);
 	}
 
 }
