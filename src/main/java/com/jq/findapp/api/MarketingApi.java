@@ -191,7 +191,8 @@ public class MarketingApi {
 				params.setSearch("location.id=" + locationId);
 				final Location location = repository.one(Location.class,
 						(BigInteger) repository.one(params).get("location.id"));
-				if (location == null || location.getSecret().hashCode() != hash)
+				if (location == null || location.getSecret().hashCode() != hash ||
+						location.getUpdatedAt() != null && location.getUpdatedAt().after(clientMarketing.getStartDate()))
 					return null;
 				result.put("_address", location.getAddress());
 				result.put("_description", location.getDescription());
