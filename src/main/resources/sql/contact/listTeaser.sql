@@ -24,4 +24,5 @@ FROM
 WHERE
 	contact.imageList is not null and
 	contact.clientId={CLIENTID} and
+	contact.type<>'admin' and
 	{search}

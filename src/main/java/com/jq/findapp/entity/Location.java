@@ -1,6 +1,7 @@
 package com.jq.findapp.entity;
 
 import java.math.BigInteger;
+import java.sql.Timestamp;
 
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
@@ -39,8 +40,8 @@ public class Location extends BaseEntity {
 	private String town;
 	private String url;
 	private String urlInternal;
-	private String updatedAt;
 	private String zipCode;
+	private Timestamp updatedAt;
 
 	public BigInteger getContactId() {
 		return contactId;

@@ -2,9 +2,12 @@ package com.jq.findapp.entity;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.jq.findapp.entity.Contact.ContactType;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.util.Text.TextId;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Transient;
@@ -21,6 +24,26 @@ public class ClientMarketing extends BaseEntity {
 	private String image;
 	private Timestamp endDate;
 	private Timestamp startDate;
+
+	public static class Poll {
+		public String html;
+		public String prolog;
+		public String epilog;
+		public String subject;
+		public String publishingPostfix;
+		public TextId textId;
+		public final List<Question> questions = new ArrayList<>();
+	}
+
+	public static class Question {
+		public String question;
+		public boolean textField;
+		public final List<Answer> answers = new ArrayList<>();
+	}
+
+	public static class Answer {
+		public String answer;
+	}
 
 	public BigInteger getClientId() {
 		return clientId;

@@ -276,7 +276,6 @@ public class SupportCenterApi {
 				final List<CompletableFuture<Void>> list = new ArrayList<>();
 				run(importSportsBarService, "importSportsBars", list, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 0);
 				run(chatService, "answerAi", list, null, 0);
-				run(marketingService, "notification", list, null, 0);
 				run(marketingService, "notificationSportbars", list, null, 0);
 				run(dbService, "update", list, null, 0);
 				run(dbService, "cleanUpAttachments", list, new int[] { 0 }, 30);
@@ -289,6 +288,11 @@ public class SupportCenterApi {
 				run(rssService, "update", list, null, 0);
 				run(surveyService, "update", list, null, 0);
 				// run(importLocationsService, "importImages", list, null, 0);
+				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
+						.map(CompletableFuture::join).collect(Collectors.toList())).join();
+				list.clear();
+				run(marketingService, "notificationClientMarketing", list, null, 0);
+				run(marketingService, "notificationClientMarketingResult", list, null, 0);
 				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 						.map(CompletableFuture::join).collect(Collectors.toList())).join();
 				run(engagementService, "sendNearBy", null, null, 0);

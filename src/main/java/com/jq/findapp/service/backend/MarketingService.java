@@ -5,8 +5,10 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketing;
+import com.jq.findapp.entity.ClientMarketing.Poll;
 import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactMarketing;
@@ -29,6 +32,7 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
@@ -40,12 +44,15 @@ public class MarketingService {
 	private Repository repository;
 
 	@Autowired
+	private ExternalService externalService;
+
+	@Autowired
 	private NotificationService notificationService;
 
 	@Autowired
 	private Text text;
 
-	public SchedulerResult notification() {
+	public SchedulerResult notificationClientMarketing() {
 		final SchedulerResult result = new SchedulerResult();
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
 		params.setUser(new Contact());
@@ -60,14 +67,126 @@ public class MarketingService {
 				params.getUser().setClientId((BigInteger) list.get(i).get("clientMarketing.clientId"));
 				final Result contacts = repository.list(params);
 				result.result += list.get(i).get("clientMarketing.id") + ": " + contacts.size() + "\n";
-				for (int i2 = 0; i2 < contacts.size(); i2++)
-					sendNotification(repository.one(Contact.class, (BigInteger) contacts.get(i2).get("contact.id")),
-							repository.one(ClientMarketing.class, (BigInteger) list.get(i).get("clientMarketing.id")));
+				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
+						(BigInteger) list.get(i).get("clientMarketing.id"));
+				for (int i2 = 0; i2 < contacts.size(); i2++) {
+					boolean run = true;
+					final Contact contact = repository.one(Contact.class,
+							(BigInteger) contacts.get(i2).get("contact.id"));
+					if ("0.6.7".compareTo(contact.getVersion()) > 0)
+						run = false;
+					if (!Strings.isEmpty(clientMarketing.getLanguage())
+							&& !clientMarketing.getLanguage().contains(contact.getLanguage()))
+						run = false;
+					if (!Strings.isEmpty(clientMarketing.getGender())
+							&& !clientMarketing.getGender().contains("" + contact.getGender()))
+						run = false;
+					if (!Strings.isEmpty(clientMarketing.getAge())
+							&& (contact.getAge() == null
+									|| Integer.valueOf(clientMarketing.getAge().split(",")[0]) > contact.getAge()
+									|| Integer.valueOf(clientMarketing.getAge().split(",")[1]) < contact.getAge()))
+						run = false;
+
+					if (!Strings.isEmpty(clientMarketing.getRegion())) {
+						final QueryParams params2 = new QueryParams(Query.contact_listGeoLocationHistory);
+						params2.setSearch("contactGeoLocationHistory.contactId=" + contact.getId());
+						final Result result2 = repository.list(params2);
+						if (result2.size() > 0) {
+							final GeoLocation geoLocation = repository.one(GeoLocation.class,
+									(BigInteger) result2.get(0).get("contactGeoLocationHistory.geoLocationId"));
+							final String region = " " + clientMarketing.getRegion() + " ";
+							if (!region.contains(" " + geoLocation.getCountry() + " ") &&
+									!region.toLowerCase().contains(" " + geoLocation.getTown().toLowerCase() + " ")) {
+								String s = geoLocation.getZipCode();
+								boolean zip = false;
+								while (s.length() > 1 && !zip) {
+									zip = region.contains(" " + geoLocation.getCountry() + "-" + s + " ");
+									s = s.substring(0, s.length() - 1);
+								}
+								if (!zip)
+									run = false;
+							}
+						} else
+							run = false;
+					}
+					if (run) {
+						final Poll poll = new ObjectMapper()
+								.readValue(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
+						notificationService.sendNotification(null, contact,
+								poll.textId, "m=" + clientMarketing.getId(), poll.subject);
+					}
+				}
+				publish(clientMarketing, false);
 			}
 		} catch (Exception ex) {
 			result.exception = ex;
 		}
 		return result;
+	}
+
+	public SchedulerResult notificationClientMarketingResult() {
+		final SchedulerResult result = new SchedulerResult();
+		try {
+			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
+			params.setSearch("clientMarketingResult.published=false and clientMarketing.endDate<=cast('" + Instant.now()
+					+ "' as timestamp)");
+			final Result clientMarketings = repository.list(params);
+			for (int i = 0; i < clientMarketings.size(); i++) {
+				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
+						(BigInteger) clientMarketings.get(i).get("clientMarketing.id"));
+				params.setQuery(Query.contact_listMarketing);
+				params.setSearch(
+						"contactMarketing.finished=true and contactMarketing.contactId is not null and contactMarketing.clientMarketingId="
+								+ clientMarketing.getId());
+				final Result users = repository.list(params);
+				final Poll poll = new ObjectMapper().readValue(Attachment.resolve(clientMarketing.getStorage()),
+						Poll.class);
+				final List<Object> sent = new ArrayList<>();
+				final String field = "contactMarketing.contactId";
+				for (int i2 = 0; i2 < users.size(); i2++) {
+					if (!sent.contains(users.get(i2).get(field))) {
+						final Contact contact = repository.one(Contact.class, (BigInteger) users.get(i2).get(field));
+						notificationService.sendNotification(null, contact,
+								TextId.notification_clientMarketingPollResult, "m=" + clientMarketing.getId(),
+								text.getText(contact, TextId.notification_clientMarketingPollResult).replace("{0}",
+										text.getText(contact, poll.textId).replace("{0}", poll.subject)));
+						sent.add(users.get(i2).get(field));
+					}
+				}
+				final ClientMarketingResult clientMarketingResult = repository.one(ClientMarketingResult.class,
+						(BigInteger) clientMarketings.get(i).get("clientMarketingResult.id"));
+				clientMarketingResult.setPublished(true);
+				publish(clientMarketing, true);
+				repository.save(clientMarketingResult);
+				result.result = "sent " + sent.size() + " for " + clientMarketing.getId() + "\n";
+			}
+		} catch (Exception ex) {
+			result.exception = ex;
+		}
+		return result;
+	}
+
+	private void publish(final ClientMarketing clientMarketing, boolean result) throws Exception {
+		if (clientMarketing.getShare()) {
+			final JsonNode clientJson = new ObjectMapper()
+					.readTree(Attachment
+							.resolve(repository.one(Client.class, clientMarketing.getClientId()).getStorage()));
+			final Poll poll = new ObjectMapper().readValue(Attachment.resolve(clientMarketing.getStorage()),
+					Poll.class);
+			final Contact contact = new Contact();
+			contact.setLanguage("DE");
+			contact.setClientId(clientMarketing.getClientId());
+			String s = text.getText(contact, poll.textId).replace("{0}", poll.subject)
+					+ (Strings.isEmpty(poll.publishingPostfix) ? "" : poll.publishingPostfix)
+					+ (clientJson.has("publishingPostfix")
+							? "\n\n" + clientJson.get("publishingPostfix").asText()
+							: "");
+			if (result)
+				s = text.getText(contact, TextId.notification_clientMarketingPollResult)
+						.replace("{0}", s);
+			externalService.publishOnFacebook(clientMarketing.getClientId(),
+					s, "/rest/marketing/" + clientMarketing.getId() + (result ? "/result" : ""));
+		}
 	}
 
 	public SchedulerResult notificationSportbars() {
@@ -145,63 +264,6 @@ public class MarketingService {
 			result.exception = ex;
 		}
 		return result;
-	}
-
-	private void sendNotification(final Contact contact, final ClientMarketing clientMarketing) throws Exception {
-		if ("0.6.7".compareTo(contact.getVersion()) > 0)
-			return;
-
-		if (!Strings.isEmpty(clientMarketing.getLanguage())
-				&& !clientMarketing.getLanguage().contains(contact.getLanguage()))
-			return;
-
-		if (!Strings.isEmpty(clientMarketing.getGender())
-				&& !clientMarketing.getGender().contains("" + contact.getGender()))
-			return;
-
-		if (!Strings.isEmpty(clientMarketing.getAge())
-				&& (contact.getAge() == null
-						|| Integer.valueOf(clientMarketing.getAge().split(",")[0]) > contact.getAge()
-						|| Integer.valueOf(clientMarketing.getAge().split(",")[1]) < contact.getAge()))
-			return;
-
-		if (!Strings.isEmpty(clientMarketing.getRegion())) {
-			final QueryParams params = new QueryParams(Query.contact_listGeoLocationHistory);
-			params.setSearch("contactGeoLocationHistory.contactId=" + contact.getId());
-			final Result result = repository.list(params);
-			if (result.size() > 0) {
-				final GeoLocation geoLocation = repository.one(GeoLocation.class,
-						(BigInteger) result.get(0).get("contactGeoLocationHistory.geoLocationId"));
-				final String region = " " + clientMarketing.getRegion() + " ";
-				if (!region.contains(" " + geoLocation.getCountry() + " ") &&
-						!region.toLowerCase().contains(" " + geoLocation.getTown().toLowerCase() + " ")) {
-					String s = geoLocation.getZipCode();
-					boolean zip = false;
-					while (s.length() > 1 && !zip) {
-						zip = region.contains(" " + geoLocation.getCountry() + "-" + s + " ");
-						s = s.substring(0, s.length() - 1);
-					}
-					if (!zip)
-						return;
-				}
-			} else
-				return;
-		}
-
-		final JsonNode json = new ObjectMapper().readTree(Attachment.resolve(clientMarketing.getStorage()));
-		if (json.has("html"))
-			notificationService.sendNotification(null, contact,
-					TextId.notification_clientMarketing,
-					"m=" + clientMarketing.getId(), Strings.sanitize(json.get("html").asText(), 100));
-		else {
-			final TextId textId = TextId
-					.valueOf("marketing_p" + json.get("type").asText().substring(1));
-			notificationService.sendNotification(null, contact,
-					TextId.notification_clientMarketingPoll,
-					"m=" + clientMarketing.getId(),
-					text.getText(contact, textId).replace("{0}", json.get("homeName").asText() +
-							" : " + json.get("awayName").asText()));
-		}
 	}
 
 	public String locationUpdate(final ContactMarketing contactMarketing) throws Exception {

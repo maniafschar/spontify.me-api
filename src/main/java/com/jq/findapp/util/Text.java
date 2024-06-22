@@ -58,6 +58,8 @@ public class Text {
 		notification_chatSeen,
 		notification_clientMarketing,
 		notification_clientMarketingPoll,
+		notification_clientMarketingPollPlayerOfTheMath,
+		notification_clientMarketingPollPrediction,
 		notification_clientMarketingPollResult,
 		notification_clientNews,
 		notification_contactBirthday,

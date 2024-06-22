@@ -39,9 +39,9 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
-import com.jq.findapp.service.MarketingService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.backend.IpService;
+import com.jq.findapp.service.backend.MarketingService;
 import com.jq.findapp.util.Strings;
 
 import jakarta.transaction.Transactional;
@@ -198,7 +198,8 @@ public class MarketingApi {
 				final Location location = repository.one(Location.class,
 						(BigInteger) repository.one(params).get("location.id"));
 				if (location == null || location.getSecret().hashCode() != hash ||
-						location.getUpdatedAt() != null && location.getUpdatedAt().after(clientMarketing.getStartDate()))
+						location.getUpdatedAt() != null
+								&& location.getUpdatedAt().after(clientMarketing.getStartDate()))
 					return null;
 				result.put("_address", location.getAddress());
 				result.put("_description", location.getDescription());

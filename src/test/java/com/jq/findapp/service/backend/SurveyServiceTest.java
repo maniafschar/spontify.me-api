@@ -5,10 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +29,7 @@ import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.backend.SurveyService.PollSurvey;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith(SpringExtension.class)
@@ -130,6 +133,45 @@ public class SurveyServiceTest {
 		assertTrue(result);
 	}
 
+	@Test
+	public void map() throws Exception {
+		// given
+		final String json = IOUtils.toString(getClass().getResourceAsStream("/json/pollPrediction.json"),
+				StandardCharsets.UTF_8);
+
+		// when
+		final PollSurvey result = new ObjectMapper().readValue(json, PollSurvey.class);
+
+		// then
+		assertEquals("Prediction", result.type);
+		assertEquals("https://media.api-sports.io/football/teams/167.png", result.home);
+		assertEquals("https://media.api-sports.io/football/teams/157.png", result.away);
+		assertEquals("1899 Hoffenheim", result.homeName);
+		assertEquals("Bayern München", result.awayName);
+		assertEquals(167, result.homeId);
+		assertEquals(157, result.awayId);
+		assertEquals("https://media.api-sports.io/football/leagues/78.png", result.league);
+		assertEquals("Bundesliga", result.leagueName);
+		assertEquals(1716039000, result.timestamp);
+		assertEquals("PreZero Arena", result.venue);
+		assertEquals("Sinsheim", result.city);
+		assertEquals("away", result.location);
+		assertEquals(2, result.statistics.get(0).get("home"));
+		assertEquals(8, result.statistics.get(0).get("away"));
+		assertEquals("Shots on Goal", result.statistics.get(0).get("label"));
+		assertEquals("1 : 3|18.1.2019 20:30", result.matches.get(3));
+		assertEquals("Erzielen wir eines der letzten Ergebnisse?", result.questions.get(0).question);
+		assertEquals(8, result.questions.get(0).answers.size());
+		assertEquals("1 : 0", result.questions.get(0).answers.get(1).answer);
+		assertEquals(true, result.questions.get(0).textField);
+		assertEquals(
+				"<b>Ergebnistipps</b> zum Bundesliga Spiel<div style=\"padding:1em 0;font-weight:bold;\">1899 Hoffenheim - Bayern München</div>vom <b>18.5.2024 um 15:30 Uhr</b>. Möchtest Du teilnehmen?",
+				result.prolog);
+		assertEquals(
+				"Lieben Dank für die Teilnahme!\nDas Ergebnis wird kurz vor dem Spiel hier bekanntgegeben.\n\nLust auf mehr <b>Fan Feeling</b>? In unserer neuen App bauen wir eine neue <b>Fußball Fan Community</b> auf.\n\nMit ein paar wenigen Klicks kannst auch Du dabei sein.",
+				result.epilog);
+	}
+
 	private String result(final BigInteger clientMarketingId) throws Exception {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
 		final JsonNode poll = new ObjectMapper().readTree(Attachment.resolve(clientMarketing.getStorage()));
@@ -145,6 +187,6 @@ public class SurveyServiceTest {
 		}
 		clientMarketing.setEndDate(new Timestamp(System.currentTimeMillis() - 1000));
 		repository.save(clientMarketing);
-		return surveyService.synchronize.resultAndNotify(clientMarketing.getClientId());
+		return surveyService.synchronize.result(clientMarketing.getClientId());
 	}
 }

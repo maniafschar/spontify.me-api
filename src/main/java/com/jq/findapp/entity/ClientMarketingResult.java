@@ -1,6 +1,8 @@
 package com.jq.findapp.entity;
 
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
 
 import jakarta.persistence.Entity;
 
@@ -10,6 +12,12 @@ public class ClientMarketingResult extends BaseEntity {
 	private String storage;
 	private String image;
 	private Boolean published;
+
+	public static class PollResult {
+		public int participants;
+		public boolean finished;
+		public final Map<String, Map<String, Object>> answers = new HashMap<>();
+	}
 
 	public BigInteger getClientMarketingId() {
 		return clientMarketingId;

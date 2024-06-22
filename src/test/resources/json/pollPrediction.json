@@ -1,0 +1,138 @@
+{
+	"type": "Prediction",
+	"home": "https://media.api-sports.io/football/teams/167.png",
+	"away": "https://media.api-sports.io/football/teams/157.png",
+	"homeName": "1899 Hoffenheim",
+	"awayName": "Bayern München",
+	"homeId": 167,
+	"awayId": 157,
+	"league": "https://media.api-sports.io/football/leagues/78.png",
+	"leagueName": "Bundesliga",
+	"timestamp": 1716039000,
+	"venue": "PreZero Arena",
+	"city": "Sinsheim",
+	"location": "away",
+	"matches": [
+		"1 : 2|22.8.2015 15:30",
+		"1 : 0|4.4.2017 20:00",
+		"2 : 0|9.9.2017 18:30",
+		"1 : 3|18.1.2019 20:30",
+		"0 : 6|29.2.2020 15:30"
+	],
+	"statistics": [
+		{
+			"home": 2,
+			"away": 8,
+			"label": "Shots on Goal"
+		},
+		{
+			"home": 3,
+			"away": 8,
+			"label": "Shots off Goal"
+		},
+		{
+			"home": 9,
+			"away": 22,
+			"label": "Total Shots"
+		},
+		{
+			"home": 3,
+			"away": 6,
+			"label": "Blocked Shots"
+		},
+		{
+			"home": 4,
+			"away": 16,
+			"label": "Shots insidebox"
+		},
+		{
+			"home": 4,
+			"away": 6,
+			"label": "Shots outsidebox"
+		},
+		{
+			"home": 9,
+			"away": 7,
+			"label": "Fouls"
+		},
+		{
+			"home": 3,
+			"away": 6,
+			"label": "Corner Kicks"
+		},
+		{
+			"home": 1,
+			"away": 3,
+			"label": "Offsides"
+		},
+		{
+			"home": 0,
+			"away": 0,
+			"label": "Ball Possession"
+		},
+		{
+			"home": 1,
+			"away": 1,
+			"label": "Yellow Cards"
+		},
+		{
+			"home": 0,
+			"away": 0,
+			"label": "Red Cards"
+		},
+		{
+			"home": 5,
+			"away": 1,
+			"label": "Goalkeeper Saves"
+		},
+		{
+			"home": 336,
+			"away": 626,
+			"label": "Total passes"
+		},
+		{
+			"home": 242,
+			"away": 542,
+			"label": "Passes accurate"
+		},
+		{
+			"home": 0,
+			"away": 0,
+			"label": "Passes %"
+		}
+	],
+	"questions": [
+		{
+			"question": "Erzielen wir eines der letzten Ergebnisse?",
+			"answers": [
+				{
+					"answer": "1 : 2"
+				},
+				{
+					"answer": "1 : 0"
+				},
+				{
+					"answer": "2 : 0"
+				},
+				{
+					"answer": "1 : 3"
+				},
+				{
+					"answer": "0 : 6"
+				},
+				{
+					"answer": "1 : 1"
+				},
+				{
+					"answer": "2 : 1"
+				},
+				{
+					"answer": "Oder erzielen wir ein anderes Ergebnis?"
+				}
+			],
+			"textField": true
+		}
+	],
+	"prolog": "<b>Ergebnistipps</b> zum Bundesliga Spiel<div style=\"padding:1em 0;font-weight:bold;\">1899 Hoffenheim - Bayern München</div>vom <b>18.5.2024 um 15:30 Uhr</b>. Möchtest Du teilnehmen?",
+	"epilog": "Lieben Dank für die Teilnahme!\nDas Ergebnis wird kurz vor dem Spiel hier bekanntgegeben.\n\nLust auf mehr <b>Fan Feeling</b>? In unserer neuen App bauen wir eine neue <b>Fußball Fan Community</b> auf.\n\nMit ein paar wenigen Klicks kannst auch Du dabei sein."
+}
