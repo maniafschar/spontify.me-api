@@ -174,15 +174,16 @@ public class SurveyServiceTest {
 
 	private String result(final BigInteger clientMarketingId) throws Exception {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
-		final JsonNode poll = new ObjectMapper().readTree(Attachment.resolve(clientMarketing.getStorage()));
+		final PollSurvey poll = new ObjectMapper().readValue(Attachment.resolve(clientMarketing.getStorage()),
+				PollSurvey.class);
 		final int max = (int) (10 + Math.random() * 100);
 		for (int i = 0; i < max; i++) {
 			final ContactMarketing contactMarketing = new ContactMarketing();
 			contactMarketing.setClientMarketingId(clientMarketingId);
 			contactMarketing.setContactId(BigInteger.ONE);
 			contactMarketing.setFinished(Boolean.TRUE);
-			contactMarketing.setStorage("{\"q0\":{\"a\":["
-					+ (int) (Math.random() * poll.get("questions").get(0).get("answers").size()) + "]}}");
+			contactMarketing.setStorage("{\"answers\":{\"q0\":{\"a\":["
+					+ (int) (Math.random() * poll.questions.get(0).answers.size()) + "]}}}");
 			repository.save(contactMarketing);
 		}
 		clientMarketing.setEndDate(new Timestamp(System.currentTimeMillis() - 1000));

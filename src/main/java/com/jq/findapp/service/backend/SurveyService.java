@@ -295,6 +295,7 @@ public class SurveyService {
 								final Question question = new Question();
 								question.question = "Wer war für Dich Spieler des Spiels?";
 								playerOfTheMatchAddAnswers(question.answers, players);
+								poll.questions.add(question);
 								final ClientMarketing clientMarketing = new ClientMarketing();
 								clientMarketing.setStartDate(new Timestamp(startDate.toEpochMilli()));
 								clientMarketing
@@ -373,7 +374,8 @@ public class SurveyService {
 						repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId())
 								.getStorage()),
 						PollSurvey.class);
-				if (new ObjectMapper().readTree(Attachment.resolve(clientMarketingResult.getStorage())).has("q0")) {
+				if (new ObjectMapper().readValue(Attachment.resolve(clientMarketingResult.getStorage()),
+						PollResult.class).answers.size() > 0) {
 					String prefix;
 					if ("Prediction".equals(poll.type))
 						prefix = "Ergebnistipps";
@@ -596,9 +598,9 @@ public class SurveyService {
 			final List<String> x = new ArrayList<>();
 			final String leftPad = "000000000000000";
 			@SuppressWarnings("unchecked")
-			final List<String> answers = (List<String>) result.answers.get("q0").get("a");
+			final List<Integer> answers = (List<Integer>) result.answers.get("q0").get("a");
 			for (int i = 0; i < answers.size() - (prediction ? 1 : 0); i++)
-				x.add(leftPad.substring(answers.get(i).length()) + answers.get(i) + "_"
+				x.add(leftPad.substring(answers.get(i).toString().length()) + answers.get(i) + "_"
 						+ poll.questions.get(0).answers.get(i).answer);
 			if (prediction) {
 				if (text != null) {

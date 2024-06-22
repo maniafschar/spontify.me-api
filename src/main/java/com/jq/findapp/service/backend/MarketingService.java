@@ -7,22 +7,25 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ClientMarketing.Poll;
+import com.jq.findapp.entity.ClientMarketing.Question;
 import com.jq.findapp.entity.ClientMarketingResult;
+import com.jq.findapp.entity.ClientMarketingResult.PollResult;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.entity.GeoLocation;
@@ -273,7 +276,7 @@ public class MarketingService {
 			final Location location = repository.one(Location.class,
 					new BigInteger(answers.get("locationId").asText()));
 			if (location.getSecret().hashCode() == answers.get("hash").asInt()) {
-				String result = "Deine Location wurde erfolgreich akualisiert";
+				final String result = "Deine Location wurde erfolgreich akualisiert";
 				location.setUpdatedAt(new Timestamp(Instant.now().toEpochMilli()));
 				repository.save(location);
 				return result;
@@ -284,8 +287,9 @@ public class MarketingService {
 
 	public synchronized ClientMarketingResult synchronizeResult(final BigInteger clientMarketingId) throws Exception {
 		final ObjectMapper om = new ObjectMapper();
-		final JsonNode poll = om.readTree(Attachment.resolve(
-				repository.one(ClientMarketing.class, clientMarketingId).getStorage()));
+		om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		final Poll poll = om.readValue(Attachment.resolve(
+				repository.one(ClientMarketing.class, clientMarketingId).getStorage()), Poll.class);
 		final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 		params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketingId);
 		params.setLimit(0);
@@ -300,48 +304,41 @@ public class MarketingService {
 		params.setQuery(Query.contact_listMarketing);
 		params.setSearch("contactMarketing.clientMarketingId=" + clientMarketingId);
 		result = repository.list(params);
-		final ObjectNode total = om.createObjectNode();
-		total.put("participants", result.size());
-		total.put("finished", 0);
+		final PollResult pollResult = new PollResult();
+		pollResult.participants = result.size();
+		pollResult.finished = 0;
 		for (int i2 = 0; i2 < result.size(); i2++) {
 			final String answersText = (String) result.get(i2).get("contactMarketing.storage");
 			if (answersText != null && answersText.length() > 2) {
-				total.put("finished", total.get("finished").asInt() + 1);
-				om.readTree(answersText).fields()
-						.forEachRemaining(contactAnswer -> {
-							if (contactAnswer.getKey().startsWith("q") && Integer
-									.valueOf(contactAnswer.getKey().substring(1)) < poll.get("questions").size()) {
-								final JsonNode question = poll.get("questions").get(
-										Integer.valueOf(contactAnswer.getKey().substring(1)));
-								if (!total.has(contactAnswer.getKey())) {
-									total.set(contactAnswer.getKey(), om.createObjectNode());
-									final ArrayNode a = om.createArrayNode();
-									if (question.has("answers"))
-										for (int i3 = 0; i3 < question.get("answers").size(); i3++)
-											a.add(0);
-									((ObjectNode) total.get(contactAnswer.getKey())).set("a", a);
-								}
-								if (question.has("answers")) {
-									for (int i = 0; i < contactAnswer.getValue().get("a").size(); i++) {
-										final int index = contactAnswer.getValue().get("a").get(i).asInt();
-										final ArrayNode totalAnswer = ((ArrayNode) total.get(contactAnswer.getKey())
-												.get("a"));
-										totalAnswer.set(index, totalAnswer.get(index).asInt() + 1);
-									}
-								}
-								if (contactAnswer.getValue().has("t")
-										&& !Strings.isEmpty(contactAnswer.getValue().get("t").asText())) {
-									final ObjectNode o = (ObjectNode) total.get(contactAnswer.getKey());
-									if (!o.has("t"))
-										o.put("t", "");
-									o.put("t", o.get("t").asText() +
-											"<div>" + contactAnswer.getValue().get("t").asText() + "</div>");
-								}
-							}
-						});
+				pollResult.finished++;
+				final PollResult contactAnswer = om.readValue(answersText, PollResult.class);
+				for (String key : contactAnswer.answers.keySet()) {
+					if (Integer.valueOf(key.substring(1)) < poll.questions.size()) {
+						final Question question = poll.questions.get(Integer.valueOf(key.substring(1)));
+						if (!pollResult.answers.containsKey(key)) {
+							pollResult.answers.put(key, new HashMap<>());
+							final List<Integer> a = new ArrayList<>();
+							for (int i3 = 0; i3 < question.answers.size(); i3++)
+								a.add(0);
+							pollResult.answers.get(key).put("a", a);
+						}
+						for (int i = 0; i < ((List<?>) contactAnswer.answers.get(key).get("a")).size(); i++) {
+							final int index = (int) ((List<?>) contactAnswer.answers.get(key).get("a")).get(i);
+							@SuppressWarnings("unchecked")
+							final List<Integer> totalAnswer = (List<Integer>) pollResult.answers.get(key).get("a");
+							totalAnswer.set(index, totalAnswer.get(index) + 1);
+						}
+						if (!Strings.isEmpty(contactAnswer.answers.get(key).containsKey("t"))) {
+							final Map<String, Object> o = pollResult.answers.get(key);
+							if (!o.containsKey("t"))
+								o.put("t", "");
+							o.put("t", o.get("t") + "<div>" + contactAnswer.answers.get(key).get("t") + "</div>");
+						}
+					}
+				}
 			}
 		}
-		clientMarketingResult.setStorage(om.writeValueAsString(total));
+		clientMarketingResult.setStorage(om.writeValueAsString(pollResult));
 		repository.save(clientMarketingResult);
 		return clientMarketingResult;
 	}

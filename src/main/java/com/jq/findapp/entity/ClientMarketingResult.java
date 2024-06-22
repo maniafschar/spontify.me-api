@@ -15,7 +15,7 @@ public class ClientMarketingResult extends BaseEntity {
 
 	public static class PollResult {
 		public int participants;
-		public boolean finished;
+		public int finished;
 		public final Map<String, Map<String, Object>> answers = new HashMap<>();
 	}
 
