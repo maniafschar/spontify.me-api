@@ -84,7 +84,7 @@ public class Contact extends BaseEntity {
 	}
 
 	public enum ContactType {
-		admin, adminContent, demo
+		admin, adminContent, demo, user
 	}
 
 	public BigInteger getClientId() {
