@@ -163,7 +163,7 @@ public class SurveyServiceTest {
 		assertEquals("Erzielen wir eines der letzten Ergebnisse?", result.questions.get(0).question);
 		assertEquals(8, result.questions.get(0).answers.size());
 		assertEquals("1 : 0", result.questions.get(0).answers.get(1).answer);
-		assertEquals(true, result.questions.get(0).textField);
+		assertEquals("textarea", result.questions.get(0).textField);
 		assertEquals(
 				"<b>Ergebnistipps</b> zum Bundesliga Spiel<div style=\"padding:1em 0;font-weight:bold;\">1899 Hoffenheim - Bayern München</div>vom <b>18.5.2024 um 15:30 Uhr</b>. Möchtest Du teilnehmen?",
 				result.prolog);

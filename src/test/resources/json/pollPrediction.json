@@ -130,7 +130,7 @@
 					"answer": "Oder erzielen wir ein anderes Ergebnis?"
 				}
 			],
-			"textField": true
+			"textField": "textarea"
 		}
 	],
 	"prolog": "<b>Ergebnistipps</b> zum Bundesliga Spiel<div style=\"padding:1em 0;font-weight:bold;\">1899 Hoffenheim - Bayern München</div>vom <b>18.5.2024 um 15:30 Uhr</b>. Möchtest Du teilnehmen?",
