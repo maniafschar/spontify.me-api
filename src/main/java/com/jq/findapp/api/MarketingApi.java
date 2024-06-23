@@ -64,47 +64,17 @@ public class MarketingApi {
 	private NotificationService notificationService;
 
 	@PostMapping
-	public Map<String, Object> pollAnswerCreate(@RequestBody final WriteEntity entity,
-			@RequestHeader final BigInteger clientId,
-			@RequestHeader(required = false) final BigInteger user,
-			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
+	public BigInteger pollAnswerCreate(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger clientId,
+			@RequestHeader(required = false) final BigInteger user) throws Exception {
 		final ContactMarketing contactMarketing = new ContactMarketing();
 		contactMarketing.populate(entity.getValues());
-		if (user == null) {
-			final QueryParams params = new QueryParams(Query.misc_listLog);
-			params.setSearch("log.ip='" + IpService.sanatizeIp(ip)
-					+ "' and log.createdAt>cast('" + Instant.now().minus(Duration.ofHours(6)).toString()
-					+ "' as timestamp) and log.uri='/marketing' and log.status=200 and log.method='POST' and log.clientId="
-					+ clientId);
-			final Result list = repository.list(params);
-			params.setQuery(Query.contact_listMarketing);
-			for (int i = 0; i < list.size(); i++) {
-				final Instant time = Instant.ofEpochMilli(((Timestamp) list.get(i).get("log.createdAt")).getTime());
-				params.setSearch(
-						"contactMarketing.createdAt>=cast('"
-								+ time.minus(Duration.ofSeconds(5)).toString() +
-								"' as timestamp) and contactMarketing.createdAt<cast('"
-								+ time.plus(Duration.ofSeconds(30)).toString()
-								+ "' as timestamp) and contactMarketing.clientMarketingId="
-								+ contactMarketing.getClientMarketingId());
-				final Result list2 = repository.list(params);
-				if (list2.size() > 0)
-					return list2.get(0);
-			}
-		} else {
-			final QueryParams params = new QueryParams(Query.contact_listMarketing);
-			params.setSearch("contactMarketing.finished=false and contactMarketing.contactId=" + user
-					+ " and contactMarketing.clientMarketingId="
-					+ contactMarketing.getClientMarketingId());
-			final Result list = repository.list(params);
-			if (list.size() > 0)
-				return list.get(0);
+		if (repository.one(ClientMarketing.class, contactMarketing.getClientMarketingId()).getClientId()
+				.equals(clientId)) {
 			contactMarketing.setContactId(user);
+			repository.save(contactMarketing);
+			return contactMarketing.getId();
 		}
-		repository.save(contactMarketing);
-		final QueryParams params = new QueryParams(Query.contact_listMarketing);
-		params.setSearch("contactMarketing.id=" + contactMarketing.getId());
-		return repository.one(params);
+		return null;
 	}
 
 	@PutMapping
@@ -170,7 +140,8 @@ public class MarketingApi {
 			@RequestHeader(required = false) final BigInteger user,
 			@RequestParam(name = "m", required = false) final BigInteger clientMarketingId,
 			@RequestParam(name = "i", required = false) final BigInteger locationId,
-			@RequestParam(name = "h", required = false) final Integer hash) throws Exception {
+			@RequestParam(name = "h", required = false) final Integer hash,
+			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
 		if (clientMarketingId == null)
 			// TODO rm required=false 0.7
 			return null;
@@ -181,13 +152,6 @@ public class MarketingApi {
 				final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 				params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketing.getId());
 				return repository.one(params);
-			}
-			if (user != null) {
-				final QueryParams params = new QueryParams(Query.contact_listMarketing);
-				params.setSearch("contactMarketing.finished=true and contactMarketing.contactId=" + user
-						+ " and contactMarketing.clientMarketingId=" + clientMarketingId);
-				if (repository.list(params).size() > 0)
-					return null;
 			}
 			final QueryParams params = new QueryParams(Query.misc_listMarketing);
 			params.setSearch("clientMarketing.id=" + clientMarketingId);
@@ -209,9 +173,47 @@ public class MarketingApi {
 				result.put("_url", location.getUrl());
 			} else if (((String) result.get("clientMarketing.storage")).contains("locationMarketing"))
 				return null;
-			return result;
+			if (!finished(result, clientId, user, clientMarketingId, ip))
+				return result;
 		}
 		return null;
+	}
+
+	private boolean finished(final Map<String, Object> result, final BigInteger clientId,
+			final BigInteger user, final BigInteger clientMarketingId, final String ip) {
+		if (user == null) {
+			final QueryParams params = new QueryParams(Query.misc_listLog);
+			params.setSearch("log.ip='" + IpService.sanatizeIp(ip)
+					+ "' and log.createdAt>cast('" + Instant.now().minus(Duration.ofHours(6)).toString()
+					+ "' as timestamp) and log.uri='/marketing' and log.status<300 and log.method='POST' and log.clientId="
+					+ clientId);
+			final Result list = repository.list(params);
+			params.setQuery(Query.contact_listMarketing);
+			for (int i = 0; i < list.size(); i++) {
+				final Instant time = Instant.ofEpochMilli(((Timestamp) list.get(i).get("log.createdAt")).getTime());
+				params.setSearch(
+						"contactMarketing.createdAt>=cast('"
+								+ time.minus(Duration.ofSeconds(5)).toString() +
+								"' as timestamp) and contactMarketing.createdAt<cast('"
+								+ time.plus(Duration.ofSeconds(30)).toString()
+								+ "' as timestamp) and contactMarketing.clientMarketingId="
+								+ clientMarketingId);
+				final Result list2 = repository.list(params);
+				if (list2.size() > 0)
+					result.put("_answer", list2.get(0));
+			}
+		} else {
+			final QueryParams params = new QueryParams(Query.contact_listMarketing);
+			params.setSearch("contactMarketing.contactId=" + user + " and contactMarketing.clientMarketingId="
+					+ clientMarketingId);
+			final Result list = repository.list(params);
+			if (list.size() > 0)
+				result.put("_answer", list.get(0));
+		}
+		@SuppressWarnings("unchecked")
+		final Boolean finished = result.containsKey("_answer") ? (Boolean) ((Map<String, Object>) result.get("_answer"))
+				.get("contactMarketing.finished") : null;
+		return finished != null && finished;
 	}
 
 	@GetMapping(path = { "{id}", "{id}/result" }, produces = MediaType.TEXT_HTML_VALUE)

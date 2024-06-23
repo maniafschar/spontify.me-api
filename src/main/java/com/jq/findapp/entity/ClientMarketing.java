@@ -37,7 +37,8 @@ public class ClientMarketing extends BaseEntity {
 
 	public static class Question {
 		public String question;
-		public boolean textField;
+		public String textField;
+		public Boolean multiple;
 		public final List<Answer> answers = new ArrayList<>();
 	}
 

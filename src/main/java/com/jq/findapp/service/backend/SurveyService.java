@@ -154,7 +154,7 @@ public class SurveyService {
 		private void predictionAddStatistics(final BigInteger clientId, final PollSurvey poll) throws Exception {
 			final Question question = new Question();
 			question.question = "Erzielen wir eines der letzten Ergebnisse?";
-			question.textField = true;
+			question.textField = "text";
 			poll.questions.add(question);
 			final int teamId = poll.location == "away" ? poll.awayId : poll.homeId;
 			final List<Map<String, Object>> matches = new ArrayList<>();
