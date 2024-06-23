@@ -275,7 +275,8 @@ public class MarketingService {
 		if (answers.has("locationId")) {
 			final Location location = repository.one(Location.class,
 					new BigInteger(answers.get("locationId").asText()));
-			if (location.getSecret().hashCode() == answers.get("hash").asInt()) {
+			if ((location.getUpdatedAt() == null || location.getUpdatedAt().isBefore(contactMarketing.getStartDate()))
+						&& location.getSecret().hashCode() == answers.get("hash").asInt()) {
 				final String result = "Deine Location wurde erfolgreich akualisiert";
 				location.setUpdatedAt(new Timestamp(Instant.now().toEpochMilli()));
 				repository.save(location);
