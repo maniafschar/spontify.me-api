@@ -329,8 +329,7 @@ public class NotificationService {
 		if (TextId.notification_contactBirthday == textId)
 			return contact.getNotificationBirthday();
 		if (TextId.notification_clientNews == textId ||
-				TextId.notification_clientMarketingPoll == textId ||
-				TextId.notification_clientMarketingPollResult == textId)
+				textId.name().startsWith(TextId.notification_clientMarketing.name()))
 			return contact.getNotificationNews();
 		return true;
 	}

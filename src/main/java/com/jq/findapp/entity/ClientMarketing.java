@@ -15,7 +15,7 @@ import jakarta.persistence.Transient;
 @Entity
 public class ClientMarketing extends BaseEntity {
 	private BigInteger clientId;
-	private Boolean share;
+	private Boolean share = true;
 	private String age;
 	private String gender;
 	private String language;
@@ -26,6 +26,7 @@ public class ClientMarketing extends BaseEntity {
 	private Timestamp startDate;
 
 	public static class Poll {
+		public boolean createResult;
 		public String html;
 		public String prolog;
 		public String epilog;
@@ -36,6 +37,7 @@ public class ClientMarketing extends BaseEntity {
 	}
 
 	public static class Question {
+		public int id;
 		public String question;
 		public String textField;
 		public Boolean multiple;
@@ -44,6 +46,8 @@ public class ClientMarketing extends BaseEntity {
 
 	public static class Answer {
 		public String answer;
+		public int next;
+		public String preset;
 	}
 
 	public BigInteger getClientId() {

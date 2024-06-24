@@ -270,30 +270,32 @@ public class MarketingService {
 	}
 
 	public String locationUpdate(final ContactMarketing contactMarketing) throws Exception {
+		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
+				contactMarketing.getClientMarketingId());
 		final Poll poll = new ObjectMapper().readValue(Attachment.resolve(
-				repository.one(ClientMarketing.class, contactMarketing.getClientMarketingId()).getStorage()), Poll.class);
-		final PollResult answers = new ObjectMapper().readValue(Attachment.resolve(contactMarketing.getStorage()), PollResult.class);
+				clientMarketing.getStorage()), Poll.class);
+		final JsonNode answers = new ObjectMapper().readTree(Attachment.resolve(contactMarketing.getStorage()));
 		if (answers.has("locationId")) {
 			final Location location = repository.one(Location.class,
 					new BigInteger(answers.get("locationId").asText()));
-			if ((location.getUpdatedAt() == null || location.getUpdatedAt().isBefore(contactMarketing.getStartDate()))
-						&& location.getSecret().hashCode() == answers.get("hash").asInt()) {
+			if ((location.getUpdatedAt() == null || location.getUpdatedAt().before(clientMarketing.getStartDate()))
+					&& location.getSecret().hashCode() == answers.get("hash").asInt()) {
 				final String result = "Deine Location wurde erfolgreich akualisiert";
 				location.historize();
 				location.setUpdatedAt(new Timestamp(Instant.now().toEpochMilli()));
-				String s = (String) pollResult.answers.get("q0").get("t");
+				String s = answers.get("q0").get("t").asText();
 				if (!Strings.isEmpty(s))
 					location.setName(s);
-				s = (String) pollResult.answers.get("q1").get("t");
+				s = answers.get("q1").get("t").asText();
 				if (!Strings.isEmpty(s) && s.contains("\n"))
 					location.setAddress(s);
-				s = (String) pollResult.answers.get("q2").get("t");
+				s = answers.get("q2").get("t").asText();
 				if (!Strings.isEmpty(s))
 					location.setTelephone(s);
-				s = (String) pollResult.answers.get("q3").get("t");
+				s = answers.get("q3").get("t").asText();
 				if (!Strings.isEmpty(s) && s.startsWith("https://"))
 					location.setUrl(s);
-				s = (String) pollResult.answers.get("q4").get("t");
+				s = answers.get("q4").get("t").asText();
 				if (!Strings.isEmpty(s))
 					location.setDescription(s);
 				repository.save(location);
@@ -308,6 +310,8 @@ public class MarketingService {
 		om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		final Poll poll = om.readValue(Attachment.resolve(
 				repository.one(ClientMarketing.class, clientMarketingId).getStorage()), Poll.class);
+		if (!poll.createResult)
+			return null;
 		final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 		params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketingId);
 		params.setLimit(0);
