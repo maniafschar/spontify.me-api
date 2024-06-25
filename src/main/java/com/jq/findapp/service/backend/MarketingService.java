@@ -274,32 +274,32 @@ public class MarketingService {
 	public String locationUpdate(final ContactMarketing contactMarketing) throws Exception {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 				contactMarketing.getClientMarketingId());
-		final Poll poll = new ObjectMapper().readValue(Attachment.resolve(
-				clientMarketing.getStorage()), Poll.class);
 		final JsonNode answers = new ObjectMapper().readTree(Attachment.resolve(contactMarketing.getStorage()));
 		if (answers.has("locationId")) {
 			final Location location = repository.one(Location.class,
 					new BigInteger(answers.get("locationId").asText()));
 			if ((location.getUpdatedAt() == null || location.getUpdatedAt().before(clientMarketing.getStartDate()))
 					&& location.getSecret().hashCode() == answers.get("hash").asInt()) {
+				final Poll poll = new ObjectMapper().readValue(Attachment.resolve(
+						clientMarketing.getStorage()), Poll.class);
 				final String result = "Deine Location wurde erfolgreich akualisiert";
 				location.historize();
 				location.setUpdatedAt(new Timestamp(Instant.now().toEpochMilli()));
-				String s = answers.get("q0").get("t").asText();
-				if (!Strings.isEmpty(s))
-					location.setName(s);
-				s = answers.get("q1").get("t").asText();
-				if (!Strings.isEmpty(s) && s.contains("\n"))
-					location.setAddress(s);
-				s = answers.get("q2").get("t").asText();
-				if (!Strings.isEmpty(s))
-					location.setTelephone(s);
-				s = answers.get("q3").get("t").asText();
-				if (!Strings.isEmpty(s) && s.startsWith("https://"))
-					location.setUrl(s);
-				s = answers.get("q4").get("t").asText();
-				if (!Strings.isEmpty(s))
-					location.setDescription(s);
+				for (int i = 0; i < poll.questions.size(); i++ {
+					String s = answers.get("q" + i).get("t").asText();
+					if (poll.questions.get(i).preset != null && !Strings.isEmpty(s)) {
+						if (poll.questions.get(i).preset.endsWith(".name"))
+							location.setName(s);
+						else if (poll.questions.get(i).preset.endsWith(".address") && s.contains("\n"))
+							location.setAddress(s);
+						else if (poll.questions.get(i).preset.endsWith(".telephone"))
+							location.setTelephone(s);
+						else if (poll.questions.get(i).preset.endsWith(".url") && s.startsWith("https://"))
+							location.setUrl(s);
+						else if (poll.questions.get(i).preset.endsWith(".description"))
+							location.setDescription(s);
+					}
+				}
 				repository.save(location);
 				return result;
 			}
