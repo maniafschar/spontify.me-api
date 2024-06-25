@@ -286,7 +286,7 @@ public class MarketingService {
 				location.historize();
 				location.setUpdatedAt(new Timestamp(Instant.now().toEpochMilli()));
 				for (int i = 0; i < poll.questions.size(); i++ {
-					String s = answers.get("q" + i).get("t").asText();
+					final String s = answers.get("q" + i).get("t").asText();
 					if (poll.questions.get(i).preset != null && !Strings.isEmpty(s)) {
 						if (poll.questions.get(i).preset.endsWith(".name"))
 							location.setName(s);
