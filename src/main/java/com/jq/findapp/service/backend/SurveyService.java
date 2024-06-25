@@ -106,7 +106,6 @@ public class SurveyService {
 							.ofEpochSecond(json.get(i).get("fixture").get("timestamp").asLong());
 					if (date.getEpochSecond() >= now && date.minus(Duration.ofDays(1)).getEpochSecond() < now) {
 						final PollSurvey poll = new PollSurvey();
-						poll.createResult = true;
 						poll.type = "Prediction";
 						poll.home = json.get(i).get("teams").get("home").get("logo").asText();
 						poll.away = json.get(i).get("teams").get("away").get("logo").asText();
@@ -135,6 +134,7 @@ public class SurveyService {
 						if (repository.list(params).size() == 0) {
 							predictionAddStatistics(clientId, poll);
 							final ClientMarketing clientMarketing = new ClientMarketing();
+							clientMarketing.setCreateResult(true);
 							clientMarketing.setClientId(clientId);
 							clientMarketing.setStartDate(new Timestamp(end
 									.minus(Duration.ofDays(1)).toEpochMilli()));
@@ -266,7 +266,6 @@ public class SurveyService {
 								players = players.get(players.get(0).get("team").get("id").asInt() == teamId ? 0 : 1)
 										.get("players");
 								final PollSurvey poll = new PollSurvey();
-								poll.createResult = true;
 								poll.type = "PlayerOfTheMatch";
 								poll.home = matchDay.findPath("home").get("logo").asText();
 								poll.away = matchDay.findPath("away").get("logo").asText();
@@ -299,6 +298,7 @@ public class SurveyService {
 								playerOfTheMatchAddAnswers(question.answers, players);
 								poll.questions.add(question);
 								final ClientMarketing clientMarketing = new ClientMarketing();
+								clientMarketing.setCreateResult(true);
 								clientMarketing.setStartDate(new Timestamp(startDate.toEpochMilli()));
 								clientMarketing
 										.setEndDate(new Timestamp(startDate.plus(Duration.ofHours(18)).toEpochMilli()));

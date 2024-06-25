@@ -299,8 +299,8 @@ public class MarketingService {
 				location.historize();
 				location.setUpdatedAt(new Timestamp(Instant.now().toEpochMilli()));
 				for (int i = 0; i < poll.questions.size(); i++) {
-					final String s = answers.get("q" + i).get("t").asText();
-					if (poll.questions.get(i).preset != null && !Strings.isEmpty(s)) {
+					String s = answers.get("q" + i).get("t").asText();
+					if (!Strings.isEmpty(s)) {
 						if ("name".equals(poll.questions.get(i).id))
 							location.setName(s);
 						else if ("address".equals(poll.questions.get(i).id) && s.contains("\n"))
@@ -311,7 +311,16 @@ public class MarketingService {
 							location.setUrl(s);
 						else if ("description".equals(poll.questions.get(i).id))
 							location.setDescription(s);
-						else if ("skills".equals(poll.questions.get(i).id))
+					}
+					s = "";
+					for (int i2 = 0; i2 < answers.get("q" + i).get("a").size(); i2++) {
+						final int index = answers.get("q" + i).get("a").get(i2).asInt();
+						s += "|" + (poll.questions.get(i).answers.get(index).key == null
+								? poll.questions.get(i).answers.get(index).answer
+								: poll.questions.get(i).answers.get(index).key);
+					}
+					if (!Strings.isEmpty(s)) {
+						if ("skills".equals(poll.questions.get(i).id))
 							location.setSkills(
 									(Strings.isEmpty(location.getSkills()) ? "" : location.getSkills() + "|") + s);
 						else if ("cards".equals(poll.questions.get(i).id))
@@ -356,9 +365,9 @@ public class MarketingService {
 	public synchronized ClientMarketingResult synchronizeResult(final BigInteger clientMarketingId) throws Exception {
 		final ObjectMapper om = new ObjectMapper();
 		om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		final Poll poll = om.readValue(Attachment.resolve(
-				repository.one(ClientMarketing.class, clientMarketingId).getStorage()), Poll.class);
-		if (!poll.createResult)
+		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
+		final Poll poll = om.readValue(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
+		if (!clientMarketing.isCreateResult())
 			return null;
 		final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 		params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketingId);
