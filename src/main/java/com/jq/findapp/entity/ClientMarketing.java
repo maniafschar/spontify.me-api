@@ -37,7 +37,7 @@ public class ClientMarketing extends BaseEntity {
 	}
 
 	public static class Question {
-		public int id;
+		public String id;
 		public String question;
 		public String textField;
 		public String preset;
@@ -47,7 +47,7 @@ public class ClientMarketing extends BaseEntity {
 
 	public static class Answer {
 		public String answer;
-		public int next;
+		public String next;
 	}
 
 	public BigInteger getClientId() {

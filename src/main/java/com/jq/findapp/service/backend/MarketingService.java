@@ -1,5 +1,6 @@
 package com.jq.findapp.service.backend;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -20,6 +21,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
+import com.jq.findapp.api.model.InternalRegistration;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ClientMarketing.Poll;
@@ -27,6 +29,8 @@ import com.jq.findapp.entity.ClientMarketing.Question;
 import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.ClientMarketingResult.PollResult;
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.Contact.Device;
+import com.jq.findapp.entity.Contact.OS;
 import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Location;
@@ -35,6 +39,7 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Strings;
@@ -45,6 +50,9 @@ import com.jq.findapp.util.Text.TextId;
 public class MarketingService {
 	@Autowired
 	private Repository repository;
+
+	@Autowired
+	private AuthenticationService authenticationService;
 
 	@Autowired
 	private ExternalService externalService;
@@ -218,28 +226,7 @@ public class MarketingService {
 				if (((String) list.get(i).get("clientMarketing.storage")).contains("Sky Kunde")) {
 					final Client client = repository.one(Client.class,
 							(BigInteger) list.get(i).get("clientMarketing.clientId"));
-					String html;
-					try (final InputStream inHtml = getClass().getResourceAsStream("/template/email.html")) {
-						html = IOUtils.toString(inHtml, StandardCharsets.UTF_8)
-								.replace("<jq:logo />", client.getUrl() + "/images/logo.png")
-								.replace("<jq:pseudonym />", "")
-								.replace("<jq:time />", Strings.formatDate(null, new Date(), "Europe/Berlin"))
-								.replace("<jq:link />", "")
-								.replace("<jq:url />", "")
-								.replace("<jq:newsTitle />", "")
-								.replace("<jq:image />", "");
-					}
-					final int a = html.indexOf("</a>");
-					html = html.substring(0, a + 4) + html.substring(html.indexOf("<jq:text"));
-					html = html.substring(0, html.lastIndexOf("<div>", a)) + html.substring(a);
-					final JsonNode css = new ObjectMapper()
-							.readTree(Attachment.resolve(client.getStorage()))
-							.get("css");
-					final Iterator<String> it = css.fieldNames();
-					while (it.hasNext()) {
-						final String key = it.next();
-						html = html.replace("--" + key, css.get(key).asText());
-					}
+					final String html = createHtmlTemplate(client);
 					params.setSearch(
 							"location.email like '%@%' and location.skills like '%x.1%' and cast(REGEXP_LIKE(location.marketingMail,'x.1') as integer)=0");
 					params.setLimit(1);
@@ -271,6 +258,32 @@ public class MarketingService {
 		return result;
 	}
 
+	private String createHtmlTemplate(Client client) throws IOException {
+		String html;
+		try (final InputStream inHtml = getClass().getResourceAsStream("/template/email.html")) {
+			html = IOUtils.toString(inHtml, StandardCharsets.UTF_8)
+					.replace("<jq:logo />", client.getUrl() + "/images/logo.png")
+					.replace("<jq:pseudonym />", "")
+					.replace("<jq:time />", Strings.formatDate(null, new Date(), "Europe/Berlin"))
+					.replace("<jq:link />", "")
+					.replace("<jq:url />", "")
+					.replace("<jq:newsTitle />", "")
+					.replace("<jq:image />", "");
+		}
+		final int a = html.indexOf("</a>");
+		html = html.substring(0, a + 4) + html.substring(html.indexOf("<jq:text"));
+		html = html.substring(0, html.lastIndexOf("<div>", a)) + html.substring(a);
+		final JsonNode css = new ObjectMapper()
+				.readTree(Attachment.resolve(client.getStorage()))
+				.get("css");
+		final Iterator<String> it = css.fieldNames();
+		while (it.hasNext()) {
+			final String key = it.next();
+			html = html.replace("--" + key, css.get(key).asText());
+		}
+		return html;
+	}
+
 	public String locationUpdate(final ContactMarketing contactMarketing) throws Exception {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 				contactMarketing.getClientMarketingId());
@@ -282,25 +295,58 @@ public class MarketingService {
 					&& location.getSecret().hashCode() == answers.get("hash").asInt()) {
 				final Poll poll = new ObjectMapper().readValue(Attachment.resolve(
 						clientMarketing.getStorage()), Poll.class);
-				final String result = "Deine Location wurde erfolgreich akualisiert";
+				String result = "Deine Location wurde erfolgreich akualisiert.\n";
 				location.historize();
 				location.setUpdatedAt(new Timestamp(Instant.now().toEpochMilli()));
-				for (int i = 0; i < poll.questions.size(); i++ {
+				for (int i = 0; i < poll.questions.size(); i++) {
 					final String s = answers.get("q" + i).get("t").asText();
 					if (poll.questions.get(i).preset != null && !Strings.isEmpty(s)) {
-						if (poll.questions.get(i).preset.endsWith(".name"))
+						if ("name".equals(poll.questions.get(i).id))
 							location.setName(s);
-						else if (poll.questions.get(i).preset.endsWith(".address") && s.contains("\n"))
+						else if ("address".equals(poll.questions.get(i).id) && s.contains("\n"))
 							location.setAddress(s);
-						else if (poll.questions.get(i).preset.endsWith(".telephone"))
+						else if ("telephone".equals(poll.questions.get(i).id))
 							location.setTelephone(s);
-						else if (poll.questions.get(i).preset.endsWith(".url") && s.startsWith("https://"))
+						else if ("url".equals(poll.questions.get(i).id) && s.startsWith("https://"))
 							location.setUrl(s);
-						else if (poll.questions.get(i).preset.endsWith(".description"))
+						else if ("description".equals(poll.questions.get(i).id))
 							location.setDescription(s);
+						else if ("skills".equals(poll.questions.get(i).id))
+							location.setSkills(
+									(Strings.isEmpty(location.getSkills()) ? "" : location.getSkills() + "|") + s);
+						else if ("cards".equals(poll.questions.get(i).id))
+							result += "Marketing-Material senden wir Dir an die Adresse Deiner Location.\n";
+						else if ("account".equals(poll.questions.get(i).id)) {
+							final InternalRegistration registration = new InternalRegistration();
+							registration.setAgb(true);
+							registration.setClientId(clientMarketing.getClientId());
+							registration.setDevice(Device.computer);
+							registration.setEmail(location.getEmail());
+							registration.setLanguage("DE");
+							registration.setOs(OS.web);
+							registration
+									.setPseudonym(location.getEmail().substring(0, location.getEmail().indexOf('@')));
+							registration.setTime(6000);
+							registration.setTimezone("Europe/Berlin");
+							registration.setVersion("0.6.8");
+							try {
+								authenticationService.register(registration);
+								result += "Ein Zugang wurde für Dich angelegt, eine Email versendet.\n";
+							} catch (Exception ex) {
+								result += "Ein Zugang konnte nicht angelegt werden, die Email ist bereits registriert!\n";
+							}
+						} else if ("cooperation".equals(poll.questions.get(i).id))
+							result += "Wir freuen uns auf eine weitere Zusammenarbeit und melden uns in Bälde bei Dir.\n";
+						else if ("feedback".equals(poll.questions.get(i).id) && !Strings.isEmpty(s))
+							result += "Lieben Dank für Dein Feedback.";
 					}
 				}
 				repository.save(location);
+				String s = Attachment.resolve(contactMarketing.getStorage()) + "\n\n" + result;
+				notificationService.sendEmail(repository.one(Client.class, clientMarketing.getClientId()), null,
+						"mani.afschar@jq-consulting.de"/* location.getEmail() */,
+						"Deine Location " + location.getName(), s,
+						createHtmlTemplate(repository.one(Client.class, clientMarketing.getClientId())).replace("", s));
 				return result;
 			}
 		}
