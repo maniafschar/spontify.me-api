@@ -40,6 +40,7 @@ public class ClientMarketing extends BaseEntity {
 		public int id;
 		public String question;
 		public String textField;
+		public String preset;
 		public Boolean multiple;
 		public final List<Answer> answers = new ArrayList<>();
 	}
@@ -47,7 +48,6 @@ public class ClientMarketing extends BaseEntity {
 	public static class Answer {
 		public String answer;
 		public int next;
-		public String preset;
 	}
 
 	public BigInteger getClientId() {
