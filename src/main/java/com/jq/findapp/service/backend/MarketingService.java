@@ -178,7 +178,7 @@ public class MarketingService {
 	}
 
 	private void publish(final ClientMarketing clientMarketing, boolean result) throws Exception {
-		if (clientMarketing.getShare()) {
+		if (clientMarketing.getShare() && clientMarketing.isCreateResult()) {
 			final JsonNode clientJson = new ObjectMapper()
 					.readTree(Attachment
 							.resolve(repository.one(Client.class, clientMarketing.getClientId()).getStorage()));
