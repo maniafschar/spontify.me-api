@@ -21,6 +21,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import com.jq.findapp.entity.Client;
@@ -98,18 +99,23 @@ public class ImportMunich {
 		page = page.substring(page.indexOf("<ul class=\"m-listing__list\""));
 		page = page.substring(0, page.indexOf("</ul>") + 5);
 		if (page.length() > 40) {
-			final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-					.parse(new InputSource(new StringReader(page)));
-			final NodeList lis = doc.getElementsByTagName("li");
-			for (int i = 0; i < lis.getLength(); i++) {
-				try {
-					if (importNode(lis.item(i).getFirstChild()))
-						count++;
-				} catch (final Exception ex) {
-					notificationService.createTicket(TicketType.ERROR, "eventImport",
-							Strings.stackTraceToString(ex) + "\n\n" + lis.item(i).getTextContent(),
-							null);
+			try {
+				final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+						.parse(new InputSource(new StringReader(page)));
+				final NodeList lis = doc.getElementsByTagName("li");
+				for (int i = 0; i < lis.getLength(); i++) {
+					try {
+						if (importNode(lis.item(i).getFirstChild()))
+							count++;
+					} catch (final Exception ex) {
+						notificationService.createTicket(TicketType.ERROR, "eventImport",
+								Strings.stackTraceToString(ex) + "\n\n" + lis.item(i).getTextContent(),
+								null);
+					}
 				}
+			} catch (SAXException ex) {
+				notificationService.createTicket(TicketType.ERROR, "eventImport",
+						Strings.stackTraceToString(ex) + "\n\n" + page, null);
 			}
 		}
 		return count;

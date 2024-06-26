@@ -243,7 +243,7 @@ public class MarketingService {
 						}
 						final String url = client.getUrl() + "/?m=" + list.get(i).get("clientMarketing.id") + "&i="
 								+ location.getId() + "&h=" + location.getSecret().hashCode();
-						notificationService.sendEmail(client, "", "mani.afschar@jq-consulting.de"
+						notificationService.sendEmail(client, null, "mani.afschar@jq-consulting.de"
 						/* location.getEmail() */,
 								"Sky Sport Events: möchtest Du mehr Gäste?", text.replace("{url}", url),
 								html.replace("<jq:text />", text.replace("\n", "<br />").replace("{url}",
@@ -261,7 +261,7 @@ public class MarketingService {
 		return result;
 	}
 
-	private String createHtmlTemplate(Client client) throws IOException {
+	String createHtmlTemplate(Client client) throws IOException {
 		String html;
 		try (final InputStream inHtml = getClass().getResourceAsStream("/template/email.html")) {
 			html = IOUtils.toString(inHtml, StandardCharsets.UTF_8)
@@ -301,66 +301,83 @@ public class MarketingService {
 				final Poll poll = om.readValue(Attachment.resolve(
 						clientMarketing.getStorage()), Poll.class);
 				String result = "Deine Location wurde erfolgreich akualisiert.\n";
+				String email = "Lieben Dank für Deine Teilnahme, Deine Location wurde erfolgreich akualisiert:\n\n";
 				location.historize();
 				location.setUpdatedAt(new Timestamp(Instant.now().toEpochMilli()));
 				for (int i = 0; i < poll.questions.size(); i++) {
-					String s = answers.get("q" + i).get("t").asText();
-					if (!Strings.isEmpty(s)) {
-						if ("name".equals(poll.questions.get(i).id))
-							location.setName(s);
-						else if ("address".equals(poll.questions.get(i).id) && s.contains("\n"))
-							location.setAddress(s);
-						else if ("telephone".equals(poll.questions.get(i).id))
-							location.setTelephone(s);
-						else if ("url".equals(poll.questions.get(i).id) && s.startsWith("https://"))
-							location.setUrl(s);
-						else if ("description".equals(poll.questions.get(i).id))
-							location.setDescription(s);
-					}
-					s = "";
-					for (int i2 = 0; i2 < answers.get("q" + i).get("a").size(); i2++) {
-						final int index = answers.get("q" + i).get("a").get(i2).asInt();
-						s += "|" + (poll.questions.get(i).answers.get(index).key == null
-								? poll.questions.get(i).answers.get(index).answer
-								: poll.questions.get(i).answers.get(index).key);
-					}
-					if (!Strings.isEmpty(s)) {
-						if ("skills".equals(poll.questions.get(i).id))
-							location.setSkills(
-									(Strings.isEmpty(location.getSkills()) ? "" : location.getSkills() + "|") + s);
-						else if ("cards".equals(poll.questions.get(i).id))
-							result += "Marketing-Material senden wir Dir an die Adresse Deiner Location.\n";
-						else if ("account".equals(poll.questions.get(i).id)) {
-							final InternalRegistration registration = new InternalRegistration();
-							registration.setAgb(true);
-							registration.setClientId(clientMarketing.getClientId());
-							registration.setDevice(Device.computer);
-							registration.setEmail(location.getEmail());
-							registration.setLanguage("DE");
-							registration.setOs(OS.web);
-							registration
-									.setPseudonym(location.getEmail().substring(0, location.getEmail().indexOf('@')));
-							registration.setTime(6000);
-							registration.setTimezone("Europe/Berlin");
-							registration.setVersion("0.6.8");
-							try {
-								authenticationService.register(registration);
-								result += "Ein Zugang wurde für Dich angelegt, eine Email versendet.\n";
-							} catch (Exception ex) {
-								result += "Ein Zugang konnte nicht angelegt werden, die Email ist bereits registriert!\n";
+					if (answers.get("q" + i).has("t")) {
+						String s = answers.get("q" + i).get("t").asText();
+						if (!Strings.isEmpty(s)) {
+							if ("name".equals(poll.questions.get(i).id)) {
+								location.setName(s);
+								email += s + "\n";
+							} else if ("address".equals(poll.questions.get(i).id) && s.contains("\n")) {
+								location.setAddress(s);
+								email += s + "\n";
+							} else if ("telephone".equals(poll.questions.get(i).id)) {
+								location.setTelephone(s);
+								email += s + "\n";
+							} else if ("url".equals(poll.questions.get(i).id) && s.startsWith("https://")) {
+								location.setUrl(s);
+								email += s + "\n";
+							} else if ("description".equals(poll.questions.get(i).id)) {
+								location.setDescription(s);
+								email += "\n" + s + "\n\n";
+							} else if ("feedback".equals(poll.questions.get(i).id) && !Strings.isEmpty(s)) {
+								result += "Lieben Dank für Dein Feedback.";
+								email += "Dein Feedback:\n" + s;
 							}
-						} else if ("cooperation".equals(poll.questions.get(i).id))
-							result += "Wir freuen uns auf eine weitere Zusammenarbeit und melden uns in Bälde bei Dir.\n";
-						else if ("feedback".equals(poll.questions.get(i).id) && !Strings.isEmpty(s))
-							result += "Lieben Dank für Dein Feedback.";
+						}
+					}
+					if (answers.get("q" + i).has("a")) {
+						String s = "";
+						for (int i2 = 0; i2 < answers.get("q" + i).get("a").size(); i2++) {
+							final int index = answers.get("q" + i).get("a").get(i2).asInt();
+							s += "|" + (poll.questions.get(i).answers.get(index).key == null
+									? poll.questions.get(i).answers.get(index).answer
+									: poll.questions.get(i).answers.get(index).key);
+						}
+						if (!Strings.isEmpty(s)) {
+							if ("skills".equals(poll.questions.get(i).id))
+								location.setSkills(
+										(Strings.isEmpty(location.getSkills()) ? "" : location.getSkills() + "|") + s);
+							else if ("cards".equals(poll.questions.get(i).id)) {
+								result += "Marketing-Material senden wir Dir an die Adresse Deiner Location.\n";
+								email += "Marketing-Material senden wir Dir an die Adresse Deiner Location.\n\n";
+							} else if ("account".equals(poll.questions.get(i).id)) {
+								final InternalRegistration registration = new InternalRegistration();
+								registration.setAgb(true);
+								registration.setClientId(clientMarketing.getClientId());
+								registration.setDevice(Device.computer);
+								registration.setEmail(location.getEmail());
+								registration.setLanguage("DE");
+								registration.setOs(OS.web);
+								registration.setPseudonym(
+										location.getEmail().substring(0, location.getEmail().indexOf('@')));
+								registration.setTime(6000);
+								registration.setTimezone("Europe/Berlin");
+								registration.setVersion("0.6.8");
+								try {
+									// authenticationService.register(registration);
+									result += "Ein Zugang wurde für Dich angelegt, eine Email versendet.\n";
+								} catch (Exception ex) {
+									result += "Ein Zugang konnte nicht angelegt werden, die Email ist bereits registriert!\n";
+								}
+							} else if ("cooperation".equals(poll.questions.get(i).id)) {
+								result += "Wir freuen uns auf eine weitere Zusammenarbeit und melden uns in Bälde bei Dir.\n";
+								email += "Wir freuen uns auf eine weitere Zusammenarbeit und melden uns in Bälde bei Dir.\n\n";
+							}
+						}
 					}
 				}
 				repository.save(location);
-				String s = Attachment.resolve(contactMarketing.getStorage()) + "\n\n" + result;
-				notificationService.sendEmail(repository.one(Client.class, clientMarketing.getClientId()), null,
+				final Client client = repository.one(Client.class, clientMarketing.getClientId());
+				email += "\n\n\n" + client.getUrl() + "?" + Strings.encodeParam("l=" + location.getUrl());
+				notificationService.sendEmail(client, null,
 						"mani.afschar@jq-consulting.de"/* location.getEmail() */,
-						"Deine Location " + location.getName(), s,
-						createHtmlTemplate(repository.one(Client.class, clientMarketing.getClientId())).replace("", s));
+						"Deine Location " + location.getName(), email,
+						createHtmlTemplate(repository.one(Client.class, clientMarketing.getClientId()))
+								.replace("<jq:text />", email.replace("\n", "<br />")));
 				return result;
 			}
 		}

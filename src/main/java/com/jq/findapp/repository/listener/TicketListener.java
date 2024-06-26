@@ -37,7 +37,7 @@ public class TicketListener extends AbstractRepositoryListener<Ticket> {
 		if (entity.getType() == TicketType.BLOCK) {
 			final Client client = repository.one(Client.class,
 					repository.one(Contact.class, entity.getContactId()).getClientId());
-			notificationService.sendEmail(client, "", repository.one(Contact.class, client.getAdminId()).getEmail(),
+			notificationService.sendEmail(client, null, repository.one(Contact.class, client.getAdminId()).getEmail(),
 					"Block", Attachment.resolve(entity.getNote()), null);
 		}
 	}

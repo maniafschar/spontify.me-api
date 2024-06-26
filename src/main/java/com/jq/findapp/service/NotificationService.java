@@ -402,8 +402,8 @@ public class NotificationService {
 			}
 			final Client client = repository.one(Client.class, contactTo.getClientId());
 			sendEmail(client,
-					contactFrom == null || contactFrom.getId().equals(client.getAdminId()) ? ""
-							: contactFrom.getPseudonym() + " · ",
+					contactFrom == null || contactFrom.getId().equals(client.getAdminId()) ? null
+							: contactFrom.getPseudonym(),
 					contactTo.getEmail(), message, s.toString(), html.toString());
 		}
 	}
@@ -426,7 +426,7 @@ public class NotificationService {
 		email.setAuthenticator(new DefaultAuthenticator(client.getEmail(), emailPassword));
 		email.setSSLOnConnect(true);
 		try {
-			email.setFrom(client.getEmail(), name + client.getName());
+			email.setFrom(client.getEmail(), (Strings.isEmpty(name) ? "" : name + " · ") + client.getName());
 			email.addTo(to);
 			email.setSubject(subject);
 			email.setTextMsg(text);
