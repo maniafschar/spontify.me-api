@@ -68,7 +68,7 @@ public class MarketingService {
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
 		params.setUser(new Contact());
 		final String today = Instant.now().toString().substring(0, 19);
-		params.setSearch("clientMarketing.startDate<=cast('" + today
+		params.setSearch("clientMarketing.share=true and clientMarketing.startDate<=cast('" + today
 				+ "' as timestamp) and clientMarketing.endDate>=cast('" + today + "' as timestamp)");
 		final Result list = repository.list(params);
 		params.setQuery(Query.contact_listNotificationId);
@@ -361,7 +361,8 @@ public class MarketingService {
 									// authenticationService.register(registration);
 									result += "Ein Zugang wurde für Dich angelegt, eine Email versendet.\n";
 								} catch (Exception ex) {
-									result += "Ein Zugang konnte nicht angelegt werden, die Email ist bereits registriert!\n";
+									result += "Ein Zugang konnte nicht angelegt werden, die Email ist bereits registriert! Versuche Dich anzumelden oder über den \"Passwort vergessen\" Dialog Dir Dein Passwort zurücksetzen zu lassen.\n";
+									email += "Ein Zugang konnte nicht angelegt werden, Deine Email ist bereits registriert! Versuche Dich anzumelden oder über den \"Passwort vergessen\" Dialog Dir Dein Passwort zurücksetzen zu lassen.\n\n";
 								}
 							} else if ("cooperation".equals(poll.questions.get(i).id)) {
 								result += "Wir freuen uns auf eine weitere Zusammenarbeit und melden uns in Bälde bei Dir.\n";
@@ -372,7 +373,7 @@ public class MarketingService {
 				}
 				repository.save(location);
 				final Client client = repository.one(Client.class, clientMarketing.getClientId());
-				email += "\n\n\n" + client.getUrl() + "?" + Strings.encodeParam("l=" + location.getUrl());
+				email += "\n\n\n" + client.getUrl() + "?" + Strings.encodeParam("l=" + location.getId());
 				notificationService.sendEmail(client, null,
 						"mani.afschar@jq-consulting.de"/* location.getEmail() */,
 						"Deine Location " + location.getName(), email,
