@@ -121,8 +121,9 @@ public class MarketingService {
 							run = false;
 					}
 					if (run) {
-						final Poll poll = new ObjectMapper()
-								.readValue(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
+						final ObjectMapper om = new ObjectMapper();
+						om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+						final Poll poll = om.readValue(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
 						notificationService.sendNotification(null, contact,
 								poll.textId, "m=" + clientMarketing.getId(), poll.subject);
 					}
@@ -150,8 +151,9 @@ public class MarketingService {
 						"contactMarketing.finished=true and contactMarketing.contactId is not null and contactMarketing.clientMarketingId="
 								+ clientMarketing.getId());
 				final Result users = repository.list(params);
-				final Poll poll = new ObjectMapper().readValue(Attachment.resolve(clientMarketing.getStorage()),
-						Poll.class);
+				final ObjectMapper om = new ObjectMapper();
+				om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+				final Poll poll = om.readValue(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
 				final List<Object> sent = new ArrayList<>();
 				final String field = "contactMarketing.contactId";
 				for (int i2 = 0; i2 < users.size(); i2++) {
@@ -179,10 +181,11 @@ public class MarketingService {
 
 	private void publish(final ClientMarketing clientMarketing, boolean result) throws Exception {
 		if (clientMarketing.getShare() && clientMarketing.isCreateResult()) {
-			final JsonNode clientJson = new ObjectMapper()
-					.readTree(Attachment
-							.resolve(repository.one(Client.class, clientMarketing.getClientId()).getStorage()));
-			final Poll poll = new ObjectMapper().readValue(Attachment.resolve(clientMarketing.getStorage()),
+			final ObjectMapper om = new ObjectMapper();
+			om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+			final JsonNode clientJson = om.readTree(Attachment
+					.resolve(repository.one(Client.class, clientMarketing.getClientId()).getStorage()));
+			final Poll poll = om.readValue(Attachment.resolve(clientMarketing.getStorage()),
 					Poll.class);
 			final Contact contact = new Contact();
 			contact.setLanguage("DE");
@@ -287,13 +290,15 @@ public class MarketingService {
 	public String locationUpdate(final ContactMarketing contactMarketing) throws Exception {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 				contactMarketing.getClientMarketingId());
-		final JsonNode answers = new ObjectMapper().readTree(Attachment.resolve(contactMarketing.getStorage()));
+		final ObjectMapper om = new ObjectMapper();
+		om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		final JsonNode answers = om.readTree(Attachment.resolve(contactMarketing.getStorage()));
 		if (answers.has("locationId")) {
 			final Location location = repository.one(Location.class,
 					new BigInteger(answers.get("locationId").asText()));
 			if ((location.getUpdatedAt() == null || location.getUpdatedAt().before(clientMarketing.getStartDate()))
 					&& location.getSecret().hashCode() == answers.get("hash").asInt()) {
-				final Poll poll = new ObjectMapper().readValue(Attachment.resolve(
+				final Poll poll = om.readValue(Attachment.resolve(
 						clientMarketing.getStorage()), Poll.class);
 				String result = "Deine Location wurde erfolgreich akualisiert.\n";
 				location.historize();
