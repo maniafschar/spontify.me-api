@@ -48,13 +48,13 @@ public class EventServiceTest {
 		// given
 		this.utils.createContact(BigInteger.ONE);
 		final QueryParams params = new QueryParams(Query.event_listId);
-		params.setSearch("event.startDate=cast('2023-12-02 09:00:00' as timestamp)");
+		params.setSearch("event.startDate=cast('2024-06-28 09:00:00' as timestamp)");
 
 		// when
 		final int result = this.importMunich.run(this.eventService, BigInteger.ONE);
 
 		// then
-		assertEquals(56, result);
+		assertEquals(27, result);
 		assertEquals(1, this.repository.list(params).size());
 	}
 

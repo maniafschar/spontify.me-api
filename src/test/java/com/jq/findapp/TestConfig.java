@@ -124,8 +124,7 @@ public class TestConfig {
 		@Override
 		public String get(final String url) {
 			try {
-				if (url.contains(
-						"?category-select=&date-start=2023-12-01&date-end=&search-input=&search=1&page=2"))
+				if (url.contains("search=1"))
 					return "";
 				return IOUtils.toString(
 						getClass().getResourceAsStream("/html/event" + (url.contains("/veranstaltungen/")
