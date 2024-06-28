@@ -1,6 +1,5 @@
 package com.jq.findapp.service.backend.events;
 
-import java.io.StringReader;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -12,16 +11,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import com.jq.findapp.entity.Client;
@@ -51,17 +43,20 @@ public class ImportMunich {
 
 	private final Pattern regexAddress = Pattern.compile("itemprop=\"address\"(.*?)</svg>(.*?)</a>");
 	private final Pattern regexAddressRef = Pattern.compile("itemprop=\"location\"(.*?)href=\"(.*?)\"");
-	private final Pattern regexDesc = Pattern.compile(" itemprop=\"description\">(.*?)</p>");
+	private final Pattern regexTitle = Pattern.compile("<h3(.*?)>(.*?)<span>(.*?)</span>");
+	private final Pattern regexDesc = Pattern.compile(" itemprop=\"description\">(.*?)</(p|div)>");
 	private final Pattern regexImage = Pattern.compile("<picture(.*?)<source srcset=\"(.*?) ");
 
 	private final Pattern regexAddressExternal = Pattern.compile("class=\"anfahrt\"(.*?)data-venue=\"(.*?)\"");
 	private final Pattern regexAddressRefExternal = Pattern.compile("itemprop=\"location\"(.*?)href=\"(.*?)\"");
-	private final Pattern regexDescExternal = Pattern.compile(" itemprop=\"description\">(.*?)</div>");
 	private final Pattern regexImageExternal = Pattern.compile("class=\"show_detail_images\"(.*?) src=\"(.*?)\"");
 
 	private final Pattern regexName = Pattern.compile("itemprop=\"location\"(.*?)</svg>(.*?)</");
 	private final Pattern regexPrice = Pattern.compile("Tickets sichern ab &euro; (.*?)</");
 	private final Pattern regexNextPage = Pattern.compile("<li(.*?)m-pagination__item--next-page(.*?)href=\"(.*?)\"");
+	private final Pattern regexLink = Pattern.compile("<a (.*?)href=\"(.*?)\"");
+	private final Pattern regexDatetime = Pattern.compile("<time (.*?)datetime=\"(.*?)\"");
+
 	private Client client;
 	private EventService eventService;
 	private final Set<String> failed = new HashSet<>();
@@ -93,55 +88,44 @@ public class ImportMunich {
 	}
 
 	private int page(String page) throws Exception {
-		if (!page.contains("<ul class=\"m-listing__list\""))
-			return 0;
 		int count = 0;
-		page = page.substring(page.indexOf("<ul class=\"m-listing__list\""));
-		page = page.substring(0, page.indexOf("</ul>") + 5);
-		if (page.length() > 40) {
+		final String tag = "<li class=\"m-listing__list-item\">";
+		if (page.contains(tag))
+			page = page.substring(page.indexOf(tag));
+		while (page.contains(tag)) {
+			String li = page.substring(0, page.indexOf("</li>"));
 			try {
-				final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-						.parse(new InputSource(new StringReader(page)));
-				final NodeList lis = doc.getElementsByTagName("li");
-				for (int i = 0; i < lis.getLength(); i++) {
-					try {
-						if (importNode(lis.item(i).getFirstChild()))
-							count++;
-					} catch (final Exception ex) {
-						notificationService.createTicket(TicketType.ERROR, "eventImport",
-								Strings.stackTraceToString(ex) + "\n\n" + lis.item(i).getTextContent(),
-								null);
-					}
-				}
-			} catch (SAXException ex) {
+				if (importNode(li))
+					count++;
+			} catch (final Exception ex) {
 				notificationService.createTicket(TicketType.ERROR, "eventImport",
-						Strings.stackTraceToString(ex) + "\n\n" + page, null);
+						Strings.stackTraceToString(ex) + "\n\n" + li, null);
 			}
+			page = page.substring(page.indexOf("</li>") + 5);
 		}
 		return count;
 	}
 
-	private boolean importNode(final Node node) throws Exception {
-		final Node body = node.getChildNodes().item(1);
+	private boolean importNode(final String li) throws Exception {
 		final Event event = new Event();
-		final boolean externalPage = node.getChildNodes().item(2) != null;
-		if (externalPage)
-			event.setUrl(
-					node.getChildNodes().item(2).getFirstChild().getNextSibling()
-							.getAttributes().getNamedItem("href").getNodeValue().trim());
-		else if (body.getFirstChild().getFirstChild().getAttributes() != null)
-			event.setUrl(url + body.getFirstChild().getFirstChild()
-					.getAttributes().getNamedItem("href").getNodeValue().trim());
-		if (!Strings.isEmpty(event.getUrl()) &&
-				(event.getUrl().startsWith(url) || event.getUrl().startsWith("https://www.muenchenticket.de/"))) {
+		Matcher m = regexLink.matcher(li);
+		if (m.find()) {
+			final String link = m.group(2);
+			event.setUrl((link.startsWith("https://") ? "" : url) + link);
+		} else
+			return false;
+		final boolean externalPage = event.getUrl().startsWith("https://www.muenchenticket.de/");
+		if (event.getUrl().startsWith(url) || externalPage) {
 			try {
 				final String page = eventService.get(event.getUrl());
 				event.setLocationId(importLocation(page, externalPage, event.getUrl()));
 				if (event.getLocationId() != null) {
-					final Date date = new SimpleDateFormat("dd.MM.yyyy' - 'HH:mm")
-							.parse(body.getChildNodes().item(2).getChildNodes().item(3)
-									.getAttributes().getNamedItem("datetime").getNodeValue());
+					m = regexDatetime.matcher(li);
+					for (int i = 0; i < 3; i++)
+						m.find();
+					final Date date = new SimpleDateFormat("dd.MM.yyyy' - 'HH:mm").parse(m.group(2));
 					event.setStartDate(new Timestamp(date.getTime()));
+					event.setEndDate(new java.sql.Date(date.getTime()));
 					final QueryParams params = new QueryParams(Query.event_listId);
 					params.setSearch("event.startDate=cast('"
 							+ event.getStartDate().toInstant().toString().substring(0, 19)
@@ -149,7 +133,7 @@ public class ImportMunich {
 							+ client.getAdminId());
 					if (repository.list(params).size() == 0) {
 						if (externalPage) {
-							final Matcher m = regexPrice.matcher(page);
+							m = regexPrice.matcher(page);
 							if (m.find())
 								event.setPrice(Double.valueOf(m.group(1).replace(".", "").replace(",", "")) / 100);
 						} else {
@@ -161,19 +145,18 @@ public class ImportMunich {
 											EntityUtil.getImage(url + image, EntityUtil.IMAGE_THUMB_SIZE, 0));
 							}
 						}
-						event.setDescription(
-								Strings.sanitize(body.getFirstChild().getFirstChild().getTextContent().trim()
-										+ "\n" + getField(externalPage ? regexDescExternal : regexDesc, page, 1),
-										1000));
-						event.setEndDate(new java.sql.Date(date.getTime()));
+						event.setDescription(getField(regexDesc, page, 1));
+						m = regexTitle.matcher(li);
+						if (m.find())
+							event.setDescription(m.group(3) + "\n" + event.getDescription());
+						event.setDescription(Strings.sanitize(event.getDescription(), 1000));
 						event.setContactId(client.getAdminId());
-						event.setSkills(body.getChildNodes().item(1).getTextContent().trim());
 						event.setType(EventType.Location);
 						repository.save(event);
 						return true;
 					}
 				} else
-					failed.add("location: " + node.getTextContent());
+					failed.add("location: " + page);
 			} catch (final RuntimeException ex) {
 				// if unable to access event, then ignore and continue, otherwise re-throw
 				if (ex instanceof IllegalArgumentException)

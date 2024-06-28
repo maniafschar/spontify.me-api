@@ -36,19 +36,20 @@ public class ClientNewsListener extends AbstractRepositoryListener<ClientNews> {
 				if (clientNews != null) {
 					clientNews.setNotified(true);
 					this.repository.save(clientNews);
-					final QueryParams params = new QueryParams(Query.contact_listId);
-					params.setSearch("contact.clientId=" + clientNews.getClientId() + " and contact.verified=true");
-					final Result users = this.repository.list(params);
-					final String cat = "|" + clientNews.getCategory() + "|";
-					for (int i2 = 0; i2 < users.size(); i2++) {
-						final Contact contact = this.repository.one(Contact.class,
-								(BigInteger) users.get(i2).get("contact.id"));
-						if (clientNews.getCategory() == null
-								|| ("|" + contact.getSkills() + "|").contains(cat))
-							this.notificationService.sendNotificationSync(null,
-									contact,
-									TextId.notification_clientNews, "news=" + clientNews.getId(),
-									clientNews.getSource() + ": " + clientNews.getDescription());
+					if (clientNews.getCategory() != null) {
+						final QueryParams params = new QueryParams(Query.contact_listId);
+						params.setSearch("contact.clientId=" + clientNews.getClientId() + " and contact.verified=true");
+						final Result users = this.repository.list(params);
+						final String cat = "|" + clientNews.getCategory() + "|";
+						for (int i2 = 0; i2 < users.size(); i2++) {
+							final Contact contact = this.repository.one(Contact.class,
+									(BigInteger) users.get(i2).get("contact.id"));
+							if (("|" + contact.getSkills() + "|").contains(cat))
+								this.notificationService.sendNotificationSync(null,
+										contact,
+										TextId.notification_clientNews, "news=" + clientNews.getId(),
+										clientNews.getSource() + ": " + clientNews.getDescription());
+						}
 					}
 				}
 			} catch (final Exception e) {
