@@ -167,6 +167,7 @@ public class LocationListenerTest {
 		location.setLongitude(1f);
 		location.setLatitude(1f);
 		location.setName("Test The Location Insert Update");
+		location.setAddress("Melchiorstr. 6\n81479 München");
 		location.setStreet("Melchiorstr.");
 		location.setNumber("6");
 		location.setTown("München");

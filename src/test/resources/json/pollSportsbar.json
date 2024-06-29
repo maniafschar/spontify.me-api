@@ -1,5 +1,5 @@
 {
-	"prolog": "Lieber Sky Kunde,<br><br>unsere Community ist auf der suche nach den besten <b>Live-Sport-Locations</b> in ihrer Umgebung. Unsere App listet auch Deine Location.<br><br>Möchtest Du <b>mehr Gäste?</b><br><br><button-text label=\"meine Location anzeigen\" onclick=\"details.openLocationMarketing()\"></button-text><br><br><br><br><explain style=\"width:70%;margin-left:15%;\">Wir sind ein Münchner IT Unternehmen und begeisterte Fußball Fans. Wir möchten Fans besser vernetzen.</explain>",
+	"prolog": "Lieber Sky Kunde,<br><br>unsere neue Community ist auf der suche nach den besten <b>Live-Sport-Locations</b> in ihrer Umgebung. Unsere App listet auch Deine Location.<br><br>Möchtest Du <b>mehr Gäste?</b><br><br><button-text label=\"meine Location anzeigen\" onclick=\"details.openLocationMarketing()\"></button-text><br><br><br><br><explain style=\"width:70%;margin-left:15%;\">Wir sind ein Münchner IT Unternehmen und begeisterte Fußball Fans. Wir möchten Fans besser vernetzen, so dass sie gemeinsam in Kneipen und Restaurants Fußball anschauen und z.B. regelmäßige Stammtische organisieren.</explain>",
 	"epilog": "Lieben Dank für Deine Teilnahme.",
 	"questions": [
 		{
