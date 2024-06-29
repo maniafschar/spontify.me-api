@@ -138,13 +138,10 @@ public class MarketingApi {
 	@GetMapping
 	public Map<String, Object> poll(@RequestHeader final BigInteger clientId,
 			@RequestHeader(required = false) final BigInteger user,
-			@RequestParam(name = "m", required = false) final BigInteger clientMarketingId,
+			@RequestParam(name = "m") final BigInteger clientMarketingId,
 			@RequestParam(name = "i", required = false) final BigInteger locationId,
 			@RequestParam(name = "h", required = false) final Integer hash,
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
-		if (clientMarketingId == null)
-			// TODO rm required=false 0.7
-			return null;
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
 		if (clientMarketing != null && clientId.equals(clientMarketing.getClientId())) {
 			if (clientMarketing.getEndDate() != null

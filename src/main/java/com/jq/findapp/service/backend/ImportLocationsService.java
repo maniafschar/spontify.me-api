@@ -275,8 +275,8 @@ public class ImportLocationsService {
 	public SchedulerResult importImages() {
 		final SchedulerResult result = new SchedulerResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
-		params.setSearch("location.image is null or length(location.image)=0");
-		params.setLimit(20);
+		params.setSearch("location.image is null");
+		params.setLimit(5);
 		final Result list = repository.list(params);
 		result.result = list.size() + " locations for update\n";
 		int updated = 0, exceptions = 0;
@@ -289,7 +289,7 @@ public class ImportLocationsService {
 				result.exception = ex;
 			}
 		}
-		result.result = result.result + updated + " updated\n" + exceptions + " exceptions";
+		result.result += updated + " updated\n" + exceptions + " exceptions";
 		return result;
 	}
 
@@ -337,6 +337,8 @@ public class ImportLocationsService {
 				}
 			}
 		}
+		location.setImage("");
+		repository.save(location);
 		return false;
 	}
 

@@ -21,33 +21,43 @@ public class ImageTest {
 
 	@Test
 	public void createFanclub() throws Exception {
+		create("fanclub", "Wer wird denn alleine schauen?", 1, Color.BLACK);
+	}
+
+	@Test
+	public void createAfterwork() throws Exception {
+		create("afterwork", "Wer feiert denn alleine?", 1, Color.WHITE);
+	}
+
+	private void create(String prefix, String claim, int no, Color textColor) throws Exception {
+		prefix = "/image/marketing/" + prefix + "/";
 		final int width = 5568, height = 3712;
 		final BufferedImage output = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		final Graphics2D g2 = (Graphics2D) output.getGraphics();
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		BufferedImage image = ImageIO.read(getClass().getResourceAsStream("/image/fanclub-marketing1.jpg"));
+		BufferedImage image = ImageIO.read(getClass().getResourceAsStream(prefix + "background" + no + ".jpg"));
 		g2.drawImage(image, 0, 0, width, height, 0, 0, image.getWidth(),
 				image.getHeight(), null);
-		image = ImageIO.read(getClass().getResourceAsStream("/image/fanclub-marketing1.png"));
-		g2.drawImage(image, width - image.getWidth() - 50, height - image.getHeight() - 50, width - 50,
-				height - 50, 0, 0, image.getWidth(), image.getHeight(), null);
-		image = ImageIO.read(getClass().getResourceAsStream("/image/fanclub-logo.png"));
-		g2.drawImage(image, width - (int) (2.5 * image.getWidth()) - 20, 50, width - 20,
-				(int) (2.5 * image.getHeight()) + 50, 0, 0,
+		image = ImageIO.read(getClass().getResourceAsStream(prefix + "qr" + no + ".png"));
+		g2.drawImage(image, width - (int) (0.8 * image.getWidth()) - 50, height - (int) (0.8 * image.getHeight()) - 50,
+				width - 50, height - 50, 0, 0, image.getWidth(), image.getHeight(), null);
+		image = ImageIO.read(getClass().getResourceAsStream(prefix + "logo.png"));
+		g2.drawImage(image, 50, height - 100 - (int) (3 * image.getHeight()), 50 + (int) (3 * image.getWidth()),
+				height - 100, 0, 0,
 				image.getWidth(), image.getHeight(), null);
 		final Font font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"))
-				.deriveFont(210f);
+				.deriveFont(325f);
 		GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(font);
-		g2.setColor(new Color(0, 0, 0, 240));
+		g2.setColor(textColor);
 		g2.setFont(font);
-		g2.drawString("Wer wird denn alleine Fußball schauen?", 100,
+		g2.drawString(claim, (width - g2.getFontMetrics().stringWidth(claim)) / 2,
 				50 + g2.getFontMetrics().getHeight());
 		output.flush();
 		ImageIO.write(output, "png", new FileOutputStream("test.png"));
 	}
 
 	@Test
-	public void createAfterwork() throws Exception {
+	public void createAfterworkFBTitel() throws Exception {
 		final int width = 851, height = 315;
 		final BufferedImage output = new BufferedImage(factor * width, factor * height, BufferedImage.TYPE_INT_ARGB);
 		final Graphics2D g2 = (Graphics2D) output.getGraphics();
