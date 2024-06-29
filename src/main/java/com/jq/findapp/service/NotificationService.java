@@ -436,9 +436,10 @@ public class NotificationService {
 				email.setHtmlMsg(html);
 			}
 			email.send();
+			createTicket(TicketType.EMAIL, to, subject + "\n" + text, client.getAdminId());
 		} catch (final EmailException | MalformedURLException ex) {
 			createTicket(TicketType.ERROR, "Email exception: " + to,
-					Strings.stackTraceToString(ex) + "\n\n" + text, null);
+					Strings.stackTraceToString(ex) + "\n\n" + text, client.getAdminId());
 		}
 	}
 

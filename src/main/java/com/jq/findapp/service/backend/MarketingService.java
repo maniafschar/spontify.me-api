@@ -233,9 +233,9 @@ public class MarketingService {
 							(BigInteger) list.get(i).get("clientMarketing.clientId"));
 					final String html = createHtmlTemplate(client);
 					params.setSearch(
-							"location.email like '%@%' and location.skills like '%x.1%' and cast(REGEXP_LIKE('"
+							"location.email like '%@%' and location.skills like '%x.1%' and (length(location.marketingMail)=0 or cast(REGEXP_LIKE('"
 									+ list.get(i).get("clientMarketing.id")
-									+ "',location.marketingMail) as integer)=0 and location.country='DE' and location.zipCode like '8%'");
+									+ "',location.marketingMail) as integer)=0) and location.country='DE' and location.zipCode like '8%'");
 					params.setLimit(1);
 					final Result locations = repository.list(params);
 					for (int i2 = 0; i2 < locations.size(); i2++) {

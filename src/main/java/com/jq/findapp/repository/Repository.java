@@ -378,10 +378,10 @@ public class Repository {
 
 		private static synchronized String save(final boolean publicDir, final String value, final String old)
 				throws IOException {
-			if (value == null) {
+			if (Strings.isEmpty(value)) {
 				if (old != null && old.contains(SEPARATOR))
 					new File(PATH + (old.contains(".") ? PUBLIC : "") + getFilename(old)).delete();
-				return null;
+				return value;
 			}
 			final String id;
 			// value = ".jpg" + SEPARATOR + "base64data";
