@@ -236,7 +236,7 @@ public class MarketingService {
 									+ "',location.marketingMail) as integer)=0");
 					params.setLimit(1);
 					final Result locations = repository.list(params);
-					for (int i2 = 1; i2 < locations.size(); i2++) {
+					for (int i2 = 0; i2 < locations.size(); i2++) {
 						final Location location = repository.one(Location.class,
 								(BigInteger) locations.get(i2).get("location.id"));
 						if (location.getSecret() == null) {
@@ -245,8 +245,7 @@ public class MarketingService {
 						}
 						final String url = client.getUrl() + "/?m=" + list.get(i).get("clientMarketing.id") + "&i="
 								+ location.getId() + "&h=" + location.getSecret().hashCode();
-						notificationService.sendEmail(client, null, "mani.afschar@jq-consulting.de"
-						/* location.getEmail() */,
+						notificationService.sendEmail(client, null, location.getEmail(),
 								"Sky Sport Events: möchtest Du mehr Gäste?", text.replace("{url}", url),
 								html.replace("<jq:text />", text.replace("\n", "<br />").replace("{url}",
 										"<a href=\"" + url + "\">" + client.getUrl() + "</a>")));
@@ -377,7 +376,7 @@ public class MarketingService {
 				final Client client = repository.one(Client.class, clientMarketing.getClientId());
 				email += "\n\n\n" + client.getUrl() + "?" + Strings.encodeParam("l=" + location.getId());
 				notificationService.sendEmail(client, null,
-						"mani.afschar@jq-consulting.de"/* location.getEmail() */,
+						location.getEmail(),
 						"Deine Location " + location.getName(), email,
 						createHtmlTemplate(repository.one(Client.class, clientMarketing.getClientId()))
 								.replace("<jq:text />", email.replace("\n", "<br />")));
