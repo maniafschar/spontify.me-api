@@ -114,6 +114,7 @@ public class SupportCenterApi {
 	private String schedulerSecret;
 
 	private static volatile boolean schedulerRunning = false;
+	private LocalDateTime now;
 
 	@DeleteMapping("user/{id}")
 	public void userDelete(@PathVariable final BigInteger id) throws Exception {
@@ -273,36 +274,37 @@ public class SupportCenterApi {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				schedulerRunning = true;
+				now = LocalDateTime.now();
 				final List<CompletableFuture<Void>> list = new ArrayList<>();
 				run(importSportsBarService, "importSportsBars", list, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 0);
-				run(chatService, "answerAi", list, null, 0);
-				run(marketingService, "notificationSportbars", list, null, 0);
-				run(dbService, "update", list, null, 0);
+				run(chatService, "answerAi", list, null, -1);
+				run(marketingService, "notificationSportbars", list, null, 10);
+				run(dbService, "update", list, null, -1);
 				run(dbService, "cleanUpAttachments", list, new int[] { 0 }, 30);
 				run(engagementService, "sendRegistrationReminder", list, new int[] { 0 }, 40);
-				run(eventService, "findMatchingBuddies", list, null, 0);
+				run(eventService, "findMatchingBuddies", list, null, -1);
 				run(eventService, "importEvents", list, new int[] { 5 }, 40);
-				run(eventService, "publishEvents", list, null, 0);
-				run(eventService, "notifyParticipation", list, null, 0);
-				run(importLogService, "importLog", list, null, 0);
-				run(rssService, "update", list, null, 0);
-				run(surveyService, "update", list, null, 0);
-				// run(importLocationsService, "importImages", list, null, 0);
+				run(eventService, "publishEvents", list, null, -1);
+				run(eventService, "notifyParticipation", list, null, -1);
+				run(importLogService, "importLog", list, null, -1);
+				run(rssService, "update", list, null, -1);
+				run(surveyService, "update", list, null, -1);
+				// run(importLocationsService, "importImages", list, null, -1);
 				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 						.map(CompletableFuture::join).collect(Collectors.toList())).join();
 				list.clear();
-				run(marketingService, "notificationClientMarketing", list, null, 0);
-				run(marketingService, "notificationClientMarketingResult", list, null, 0);
+				run(marketingService, "notificationClientMarketing", list, null, -1);
+				run(marketingService, "notificationClientMarketingResult", list, null, -1);
 				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 						.map(CompletableFuture::join).collect(Collectors.toList())).join();
-				run(engagementService, "sendNearBy", null, null, 0);
+				run(engagementService, "sendNearBy", null, null, -1);
 				list.clear();
-				run(engagementService, "sendChats", list, null, 0);
-				run(ipService, "lookupIps", list, null, 0);
+				run(engagementService, "sendChats", list, null, -1);
+				run(ipService, "lookupIps", list, null, -1);
 				run(sitemapService, "update", list, new int[] { 20 }, 0);
 				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 						.map(CompletableFuture::join).collect(Collectors.toList())).join();
-				run(dbService, "backup", null, null, 0);
+				run(dbService, "backup", null, null, -1);
 			} finally {
 				schedulerRunning = false;
 			}
@@ -313,11 +315,10 @@ public class SupportCenterApi {
 	@Async
 	private void run(final Object bean, String method, final List<CompletableFuture<Void>> list,
 			int[] hours, int minute) {
-		if (hours != null) {
-			final LocalDateTime now = LocalDateTime.now();
-			if (minute != now.getMinute() || !Arrays.stream(hours).anyMatch(e -> e == now.getHour()))
-				return;
-		}
+		if (hours != null && !Arrays.stream(hours).anyMatch(e -> e == now.getHour()))
+			return;
+		if (minute > -1 && minute != now.getMinute())
+			return;
 		final CompletableFuture<Void> e = CompletableFuture.supplyAsync(() -> {
 			final Log log = new Log();
 			log.setContactId(BigInteger.ZERO);

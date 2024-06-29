@@ -183,7 +183,7 @@ public class AuthenticationService {
 		return contact;
 	}
 
-	public void register(final InternalRegistration registration) throws Exception {
+	public Contact register(final InternalRegistration registration) throws Exception {
 		if (!registration.isAgb())
 			throw new IllegalAccessException("legal");
 		final int minimum = 5000;
@@ -218,6 +218,7 @@ public class AuthenticationService {
 					contact,
 					text.getText(contact, TextId.mail_contactWelcomeEmail), "r=" + generateLoginParam(contact));
 			saveRegistration(contact, registration);
+			return contact;
 		} catch (final SendFailedException ex) {
 			throw new IllegalAccessException("email");
 		}

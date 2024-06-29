@@ -1,0 +1,232 @@
+{
+	"prolog": "Lieber Sky Kunde,<br><br>unsere Community ist auf der suche nach den besten <b>Live-Sport-Locations</b> in ihrer Umgebung. Unsere App listet auch Deine Location.<br><br>Möchtest Du <b>mehr Gäste?</b><br><br><button-text label=\"meine Location anzeigen\" onclick=\"details.openLocationMarketing()\"></button-text><br><br><br><br><explain style=\"width:70%;margin-left:15%;\">Wir sind ein Münchner IT Unternehmen und begeisterte Fußball Fans. Wir möchten Fans besser vernetzen.</explain>",
+	"epilog": "Lieben Dank für Deine Teilnahme.",
+	"questions": [
+		{
+			"id": "name",
+			"question": "Stimmt der Name Deiner Location?",
+			"textField": "text",
+			"preset": "marketing.data._name"
+		},
+		{
+			"id": "address",
+			"question": "Stimmt die Adresse Deiner Location?",
+			"textField": "textarea",
+			"preset": "marketing.data._address"
+		},
+		{
+			"id": "telephone",
+			"question": "Stimmt die Telefonnummer Deiner Location?",
+			"textField": "text",
+			"presetdefault": "marketing.data._telephone"
+		},
+		{
+			"id": "url",
+			"question": "Stimmt die URL Deiner Location?",
+			"textField": "text",
+			"presetdefault": "marketing.data._url"
+		},
+		{
+			"id": "description",
+			"question": "Hier kannst Du Deine Location beschreiben:",
+			"textField": "textarea",
+			"presetdefault": "marketing.data._description"
+		},
+		{
+			"id": "skills",
+			"question": "Welche kulinarischen Attribute treffen auf Deine Location zu?",
+			"multiple": true,
+			"textField": "text",
+			"answers": [
+				{
+					"answer": "Afghanisch",
+					"key": "2.01"
+				},
+				{
+					"answer": "Bayerisch",
+					"key": "2.02"
+				},
+				{
+					"answer": "Bier",
+					"key": "2.03"
+				},
+				{
+					"answer": "Burger",
+					"key": "2.04"
+				},
+				{
+					"answer": "Chinesisch",
+					"key": "2.05"
+				},
+				{
+					"answer": "Cocktails",
+					"key": "2.29"
+				},
+				{
+					"answer": "Dessert",
+					"key": "2.06"
+				},
+				{
+					"answer": "Deutsch",
+					"key": "2.07"
+				},
+				{
+					"answer": "Fisch",
+					"key": "2.08"
+				},
+				{
+					"answer": "Fleisch",
+					"key": "2.09"
+				},
+				{
+					"answer": "Französisch",
+					"key": "2.10"
+				},
+				{
+					"answer": "Grill",
+					"key": "2.11"
+				},
+				{
+					"answer": "Italienisch",
+					"key": "2.12"
+				},
+				{
+					"answer": "Japanisch",
+					"key": "2.13"
+				},
+				{
+					"answer": "Kaffee",
+					"key": "2.14"
+				},
+				{
+					"answer": "Kuchen",
+					"key": "2.15"
+				},
+				{
+					"answer": "Libanesisch",
+					"key": "2.16"
+				},
+				{
+					"answer": "Pasta",
+					"key": "2.17"
+				},
+				{
+					"answer": "Persisch",
+					"key": "2.18"
+				},
+				{
+					"answer": "Pizza",
+					"key": "2.19"
+				},
+				{
+					"answer": "Spanisch",
+					"key": "2.20"
+				},
+				{
+					"answer": "Spirituosen",
+					"key": "2.21"
+				},
+				{
+					"answer": "Thai",
+					"key": "2.22"
+				},
+				{
+					"answer": "Vegan",
+					"key": "2.23"
+				},
+				{
+					"answer": "Vegetarisch",
+					"key": "2.24"
+				},
+				{
+					"answer": "Vietnamesisch",
+					"key": "2.25"
+				},
+				{
+					"answer": "Wein",
+					"key": "2.26"
+				},
+				{
+					"answer": "Whisky",
+					"key": "2.27"
+				},
+				{
+					"answer": "Zigarren",
+					"key": "2.28"
+				},
+				{
+					"answer": "Weitere Attribute",
+					"key": "0"
+				}
+			]
+		},
+		{
+			"id": "skills",
+			"question": "Welche weiteren Attribute treffen auf Deine Location zu?",
+			"multiple": true,
+			"textField": "text",
+			"answers": [
+				{
+					"answer": "Kino",
+					"key": "2.28"
+				},
+				{
+					"answer": "Museum",
+					"key": "2.28"
+				},
+				{
+					"answer": "Sportsbar",
+					"key": "x.1"
+				},
+				{
+					"answer": "Weitere Attribute",
+					"key": "0"
+				}
+			]
+		},
+		{
+			"id": "cards",
+			"question": "Möchtest Du Marketing-Aufkleber als Aushang für Gäste und/oder zum platzieren an prominanter Stelle, z.B. Sanitäranlagen, Eingang, etc.?",
+			"answers": [
+				{
+					"answer": "Ja, 20"
+				},
+				{
+					"answer": "Ja, 50"
+				},
+				{
+					"answer": "Nein Danke"
+				}
+			]
+		},
+		{
+			"id": "account",
+			"question": "Möchtest Du jetzt einen Zugang anlegen? Mit dem Zugang kannst Du Events einstellen, Deine Location pflegen und bekommst diverse Analysemöglichkeiten. Er is natürlich kostenlos.",
+			"answers": [
+				{
+					"answer": "Ja"
+				},
+				{
+					"answer": "Nein"
+				}
+			]
+		},
+		{
+			"id": "cooperation",
+			"question": "Bist Du an einer engeren Zusammenarbeit interessiert, um z.B. um Events in Deiner Location zu promoten?",
+			"answers": [
+				{
+					"answer": "Ja"
+				},
+				{
+					"answer": "Nein"
+				}
+			]
+		},
+		{
+			"id": "feedback",
+			"question": "Hast Du weitere Anmerkungen/Anregungen für uns?",
+			"textField": "textarea"
+		}
+	]
+}

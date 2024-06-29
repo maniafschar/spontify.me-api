@@ -1,0 +1,56 @@
+{
+	"q0": {
+		"a": [],
+		"t": "Hard Rock Cafe München"
+	},
+	"locationId": "{locationId}",
+	"hash": "{hash}",
+	"q1": {
+		"a": [],
+		"t": "Platzl 1\n80331 München\nDeutschland"
+	},
+	"q2": {
+		"a": [],
+		"t": "089/2429490"
+	},
+	"q3": {
+		"a": [],
+		"t": "https://www.hardrock.com"
+	},
+	"q4": {
+		"a": [],
+		"t": "1. Bundesliga, 2. Bundesliga, Football, UEFA Champions League, DFB Pokal"
+	},
+	"q5": {
+		"a": [
+			2,
+			3
+		]
+	},
+	"q6": {
+		"a": [
+			2,
+			3
+		],
+		"t": "hard rock"
+	},
+	"q7": {
+		"a": [
+			1
+		]
+	},
+	"q8": {
+		"a": [
+			1
+		]
+	},
+	"q9": {
+		"a": [
+			0
+		]
+	},
+	"q10": {
+		"a": [],
+		"t": "xyz"
+	}
+}

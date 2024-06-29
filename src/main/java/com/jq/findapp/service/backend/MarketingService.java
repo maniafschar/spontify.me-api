@@ -7,11 +7,13 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -233,7 +235,7 @@ public class MarketingService {
 					params.setSearch(
 							"location.email like '%@%' and location.skills like '%x.1%' and cast(REGEXP_LIKE('"
 									+ list.get(i).get("clientMarketing.id")
-									+ "',location.marketingMail) as integer)=0");
+									+ "',location.marketingMail) as integer)=0 and location.country='DE' and location.zipCode like '8%'");
 					params.setLimit(1);
 					final Result locations = repository.list(params);
 					for (int i2 = 0; i2 < locations.size(); i2++) {
@@ -324,6 +326,9 @@ public class MarketingService {
 							} else if ("description".equals(poll.questions.get(i).id)) {
 								location.setDescription(s);
 								email += "\n" + s + "\n\n";
+							} else if ("skills".equals(poll.questions.get(i).id)) {
+								location.setSkillsText(s);
+								email += "\n" + s + "\n\n";
 							} else if ("feedback".equals(poll.questions.get(i).id) && !Strings.isEmpty(s)) {
 								result += "Lieben Dank für Dein Feedback.";
 								email += "Dein Feedback:\n" + s;
@@ -340,8 +345,7 @@ public class MarketingService {
 						}
 						if (!Strings.isEmpty(s)) {
 							if ("skills".equals(poll.questions.get(i).id))
-								location.setSkills(
-										(Strings.isEmpty(location.getSkills()) ? "" : location.getSkills() + "|") + s);
+								location.setSkills(sanitizeSkills(location.getSkills(), s));
 							else if ("cards".equals(poll.questions.get(i).id)) {
 								result += "Marketing-Material senden wir Dir an die Adresse Deiner Location.\n";
 								email += "Marketing-Material senden wir Dir an die Adresse Deiner Location.\n\n";
@@ -359,7 +363,7 @@ public class MarketingService {
 								registration.setTimezone("Europe/Berlin");
 								registration.setVersion("0.6.8");
 								try {
-									// authenticationService.register(registration);
+									location.setContactId(authenticationService.register(registration).getId());
 									result += "Ein Zugang wurde für Dich angelegt, eine Email versendet.\n";
 								} catch (Exception ex) {
 									result += "Ein Zugang konnte nicht angelegt werden, die Email ist bereits registriert! Versuche Dich anzumelden oder über den \"Passwort vergessen\" Dialog Dir Dein Passwort zurücksetzen zu lassen.\n";
@@ -372,6 +376,7 @@ public class MarketingService {
 						}
 					}
 				}
+				location.setSecret(null);
 				repository.save(location);
 				final Client client = repository.one(Client.class, clientMarketing.getClientId());
 				email += "\n\n\n" + client.getUrl() + "?" + Strings.encodeParam("l=" + location.getId());
@@ -384,6 +389,12 @@ public class MarketingService {
 			}
 		}
 		return null;
+	}
+
+	private String sanitizeSkills(String skills, String newSkills) {
+		final List<String> list = Arrays
+				.asList((Strings.isEmpty(skills) ? newSkills.substring(1) : skills + newSkills).split("\\|"));
+		return String.join("|", list.stream().distinct().filter(e -> !"0".equals(e)).collect(Collectors.toList()));
 	}
 
 	public synchronized ClientMarketingResult synchronizeResult(final BigInteger clientMarketingId) throws Exception {

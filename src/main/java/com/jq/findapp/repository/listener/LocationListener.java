@@ -62,8 +62,6 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 	}
 
 	private void checkDuplicateLatLon(Location location) {
-		if (location.getId() != null)
-			return;
 		final float roundingFactor = 0.0005f;
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setSearch(
@@ -82,10 +80,8 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 	}
 
 	private void lookupAddress(final Location location) throws Exception {
-		if (location.getLatitude() != null) {
+		if (location.getLatitude() != null)
 			checkDuplicateLatLon(location);
-			return;
-		}
 		final JsonNode address = new ObjectMapper().readTree(
 				externalService.google("geocode/json?address="
 						+ location.getAddress().replaceAll("\n", ", ")));
