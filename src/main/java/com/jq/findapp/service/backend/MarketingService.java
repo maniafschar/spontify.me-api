@@ -256,6 +256,7 @@ public class MarketingService {
 										+ list.get(i).get("clientMarketing.id"));
 						repository.save(location);
 					}
+					result.result += list.get(i).get("clientMarketing.id") + ": " + locations.size() + "\n";
 				}
 			}
 		} catch (Exception ex) {

@@ -58,8 +58,7 @@ public class ExternalService {
 		final String value = WebClient.create("https://maps.googleapis.com/maps/api/" + param
 				+ (param.contains("?") ? "&" : "?") + "key=" + this.googleKey).get().retrieve().toEntity(String.class)
 				.block().getBody();
-		if (value != null && value.startsWith("{") && value.endsWith("}")
-				&& "OK".equals(new ObjectMapper().readTree(value).get("status").asText())) {
+		if (value != null && value.startsWith("{") && value.endsWith("}")) {
 			final Storage storage = result.size() == 0 ? new Storage()
 					: this.repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
 			storage.setLabel(label);

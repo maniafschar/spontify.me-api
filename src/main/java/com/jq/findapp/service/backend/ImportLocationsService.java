@@ -295,14 +295,10 @@ public class ImportLocationsService {
 
 	private boolean importImage(final Location location) throws Exception {
 		final String address = location.getAddress().replace("\n", ", ");
-		JsonNode json = new ObjectMapper().readTree(
+		final JsonNode json = new ObjectMapper().readTree(
 				externalService.google("place/textsearch/json?query="
 						+ URLEncoder.encode(location.getName() + ", " + address, StandardCharsets.UTF_8)
 								.replace("+", "%20")));
-		if (!"OK".equals(json.get("status").asText()))
-			json = new ObjectMapper().readTree(
-					externalService.google("place/textsearch/json?query="
-							+ URLEncoder.encode(address, StandardCharsets.UTF_8)));
 		if ("OK".equals(json.get("status").asText())) {
 			final JsonNode results = json.get("results");
 			for (int i2 = 0; i2 < results.size(); i2++) {

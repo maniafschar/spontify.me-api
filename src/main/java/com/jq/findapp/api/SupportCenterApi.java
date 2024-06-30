@@ -276,10 +276,10 @@ public class SupportCenterApi {
 				schedulerRunning = true;
 				now = LocalDateTime.now();
 				final List<CompletableFuture<Void>> list = new ArrayList<>();
-				run(importSportsBarService, "importSportsBars", list, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 0);
+				run(importSportsBarService, "importSportsBars", list, new int[] { 3 }, 0);
 				run(chatService, "answerAi", list, null, -1);
 				run(marketingService, "notificationSportbars", list,
-						new int[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 }, 10);
+						new int[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 }, 50);
 				run(dbService, "update", list, null, -1);
 				run(dbService, "cleanUpAttachments", list, new int[] { 0 }, 30);
 				run(engagementService, "sendRegistrationReminder", list, new int[] { 0 }, 40);
