@@ -38,10 +38,17 @@ public class LocationTest {
 	@Test
 	public void run() throws Exception {
 		try (final BufferedReader reader = new BufferedReader(new FileReader("sample.txt"))) {
+			final Pattern email = Pattern.compile(".*(\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,8}\\b).*", Pattern.CASE_INSENSITIVE);
 			String line;
 			while ((line = reader.readLine()) != null) {
-				Util.driver.get("https://www.google.com/search?q=" + line);
-				System.out.println(line);
+				final String s[] = line.split("\\|");
+				driver.get("https://www.google.com/search?q=" + s[0]);
+				((JavascriptExecutor) driver).executeScript("document.getElementById('center_col').querySelector('span>a').click()");
+				((JavascriptExecutor) driver).executeScript("Array.from(document.querySelectorAll('a')).find(el => el.textContent.toLowerCase().indexOf('impressum')>-1)");
+				final String html = ((JavascriptExecutor) driver).executeScript("document.body.innerHTML");
+				Matcher matcher = email.matcher(html);
+				if (matcher.find())
+					System.out.println(s[1] + ": " + matcher.group(1));
 			}
 		} catch (final Exception ex) {
 			ex.printStackTrace();
