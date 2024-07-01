@@ -21,11 +21,11 @@ import org.openqa.selenium.interactions.Actions;
 import com.jq.findapp.util.Utils;
 
 public class LocationTest {
-	private WebDriver driver;
+	private JavascriptExecutor driver;
 
 	@BeforeEach
 	public void start() throws Exception {
-		driver = new ChromeDriver();
+		driver = (JavascriptExecutor) new ChromeDriver();
 		driver.manage().timeouts().implicitlyWait(Duration.ofMillis(50));
 		driver.manage().window().setSize(new Dimension(1200, 900));
 	}
@@ -43,12 +43,17 @@ public class LocationTest {
 			while ((line = reader.readLine()) != null) {
 				final String s[] = line.split("\\|");
 				driver.get("https://www.google.com/search?q=" + s[0]);
-				((JavascriptExecutor) driver).executeScript("document.getElementById('center_col').querySelector('span>a').click()");
-				((JavascriptExecutor) driver).executeScript("Array.from(document.querySelectorAll('a')).find(el => el.textContent.toLowerCase().indexOf('impressum')>-1)");
-				final String html = ((JavascriptExecutor) driver).executeScript("document.body.innerHTML");
-				Matcher matcher = email.matcher(html);
-				if (matcher.find())
-					System.out.println(s[1] + ": " + matcher.group(1));
+				for (int i = 0; i < 5; i++) {
+					driver.executeScript("document.getElementById('center_col').querySelectorAll('span>a')[" + i + "].click()");
+					driver.executeScript("Array.from(document.querySelectorAll('a')).find(el => el.textContent.toLowerCase().indexOf('impressum')>-1)");
+					final String html = driver.executeScript("document.body.innerHTML");
+					final Matcher matcher = email.matcher(html);
+					if (matcher.find()) {
+						System.out.println(s[1] + ": " + matcher.group(1));
+						break;
+					} else
+						driver.executeScript("navigation.back()");
+				}
 			}
 		} catch (final Exception ex) {
 			ex.printStackTrace();
