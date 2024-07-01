@@ -119,44 +119,41 @@ public class ImportMunich {
 			try {
 				final String page = eventService.get(event.getUrl());
 				event.setLocationId(importLocation(page, externalPage, event.getUrl()));
-				if (event.getLocationId() != null) {
-					m = regexDatetime.matcher(li);
-					for (int i = 0; i < 3; i++)
-						m.find();
-					final Date date = new SimpleDateFormat("dd.MM.yyyy' - 'HH:mm").parse(m.group(2));
-					event.setStartDate(new Timestamp(date.getTime()));
-					event.setEndDate(new java.sql.Date(date.getTime()));
-					final QueryParams params = new QueryParams(Query.event_listId);
-					params.setSearch("event.startDate=cast('"
-							+ event.getStartDate().toInstant().toString().substring(0, 19)
-							+ "' as timestamp) and event.locationId=" + event.getLocationId() + " and event.contactId="
-							+ client.getAdminId());
-					if (repository.list(params).size() == 0) {
-						if (externalPage) {
-							m = regexPrice.matcher(page);
-							if (m.find())
-								event.setPrice(Double.valueOf(m.group(1).replace(".", "").replace(",", "")) / 100);
-						} else {
-							final String image = getField(regexImage, page, 2);
-							if (image.length() > 0) {
-								event.setImage(EntityUtil.getImage(url + image, EntityUtil.IMAGE_SIZE, 300));
-								if (event.getImage() != null)
-									event.setImageList(
-											EntityUtil.getImage(url + image, EntityUtil.IMAGE_THUMB_SIZE, 0));
-							}
-						}
-						event.setDescription(getField(regexDesc, page, 1));
-						m = regexTitle.matcher(li);
+				m = regexDatetime.matcher(li);
+				for (int i = 0; i < 3; i++)
+					m.find();
+				final Date date = new SimpleDateFormat("dd.MM.yyyy' - 'HH:mm").parse(m.group(2));
+				event.setStartDate(new Timestamp(date.getTime()));
+				event.setEndDate(new java.sql.Date(date.getTime()));
+				final QueryParams params = new QueryParams(Query.event_listId);
+				params.setSearch("event.startDate=cast('"
+						+ event.getStartDate().toInstant().toString().substring(0, 19)
+						+ "' as timestamp) and event.locationId=" + event.getLocationId() + " and event.contactId="
+						+ client.getAdminId());
+				if (repository.list(params).size() == 0) {
+					if (externalPage) {
+						m = regexPrice.matcher(page);
 						if (m.find())
-							event.setDescription(m.group(3) + "\n" + event.getDescription());
-						event.setDescription(Strings.sanitize(event.getDescription(), 1000));
-						event.setContactId(client.getAdminId());
-						event.setType(EventType.Location);
-						repository.save(event);
-						return true;
+							event.setPrice(Double.valueOf(m.group(1).replace(".", "").replace(",", "")) / 100);
+					} else {
+						final String image = getField(regexImage, page, 2);
+						if (image.length() > 0) {
+							event.setImage(EntityUtil.getImage(url + image, EntityUtil.IMAGE_SIZE, 300));
+							if (event.getImage() != null)
+								event.setImageList(
+										EntityUtil.getImage(url + image, EntityUtil.IMAGE_THUMB_SIZE, 0));
+						}
 					}
-				} else
-					failed.add("location: " + page);
+					event.setDescription(getField(regexDesc, page, 1));
+					m = regexTitle.matcher(li);
+					if (m.find())
+						event.setDescription(m.group(3) + "\n" + event.getDescription());
+					event.setDescription(Strings.sanitize(event.getDescription(), 1000));
+					event.setContactId(client.getAdminId());
+					event.setType(EventType.Location);
+					repository.save(event);
+					return true;
+				}
 			} catch (final RuntimeException ex) {
 				// if unable to access event, then ignore and continue, otherwise re-throw
 				if (ex instanceof IllegalArgumentException)
@@ -174,6 +171,8 @@ public class ImportMunich {
 		final Location location = new Location();
 		if (externalPage) {
 			location.setUrl(getField(regexAddressRefExternal, page, 2));
+			if (!location.getUrl().startsWith("https://"))
+				location.setUrl(externalUrl + location.getUrl());
 			final String[] s = getField(regexAddressExternal, page, 2).split(",");
 			location.setAddress(
 					(s.length > 1 ? s[s.length - 2].trim() + "\n" : "") + s[s.length - 1].trim().replace('+', ' '));
@@ -182,7 +181,8 @@ public class ImportMunich {
 			location.setName(getField(regexName, page, 2));
 			location.setUrl(getField(regexAddressRef, page, 2));
 			if (!Strings.isEmpty(location.getUrl())) {
-				location.setUrl(url + location.getUrl());
+				if (!location.getUrl().startsWith("https://"))
+					location.setUrl(url + location.getUrl());
 				page = eventService.get(location.getUrl());
 				location.setAddress(String.join("\n",
 						Arrays.asList(getField(regexAddress, page, 2)
@@ -190,14 +190,14 @@ public class ImportMunich {
 				location.setDescription(Strings.sanitize(getField(regexDesc, page, 1), 1000));
 			}
 		}
-		final QueryParams params = new QueryParams(Query.location_listId);
-		params.setSearch(
-				"location.name like '" + location.getName().replace("'", "_")
-						+ "' and location.country='DE'");
-		final Result list = repository.list(params);
-		if (list.size() > 0)
-			return (BigInteger) list.get(0).get("location.id");
 		if (!Strings.isEmpty(location.getAddress())) {
+			final QueryParams params = new QueryParams(Query.location_listId);
+			params.setSearch("location.name like '" + location.getName().replace("'", "_")
+					+ "' and '" + location.getAddress().toLowerCase().replace('\n', ' ')
+					+ "' like concat('%',LOWER(location.zipCode),'%')");
+			final Result list = repository.list(params);
+			if (list.size() > 0)
+				return (BigInteger) list.get(0).get("location.id");
 			location.setContactId(client.getAdminId());
 			try {
 				repository.save(location);
@@ -222,7 +222,9 @@ public class ImportMunich {
 					throw ex;
 			}
 		}
-		return null;
+		throw new RuntimeException(
+				"Name: " + location.getName() + " | URL: " + location.getUrl() + " | Address: " + location.getAddress()
+						+ " | Page: " + page);
 	}
 
 	private String getField(final Pattern pattern, final String text, final int group) {

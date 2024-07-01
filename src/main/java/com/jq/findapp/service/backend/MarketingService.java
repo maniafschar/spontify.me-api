@@ -217,10 +217,10 @@ public class MarketingService {
 		final Result list = repository.list(params);
 		params.setQuery(Query.location_listId);
 		final String text = "Lieber Sky Sportsbar Kunde,\n\n"
-				+ "unsere Fußball Community ist auf der Suche nach den besten Locations, in denen sie Live-Übertragungen gemeinsam feiern können. "
-				+ "Ist Deine Bar eine coole Location für Fußball-Fans?\n\nNähere Infos findest Du unter Deinen persönlichen Link:\n\n"
-				+ "{url}"
-				+ "\n\nWir freuen uns auf Dein Feedback\n"
+				+ "unsere Fußball Community ist auf der Suche nach den besten Locations, in denen sie Live-Übertragungen gemeinsam feiern können. Unsere App listet auch Deine Location.\n\n"
+				+ "Gerne kannst Du Deinen Location unter Deinen persönlichen Link verwalten:\n\n"
+				+ "{url}\n\n"
+				+ "Wir freuen uns über Feedback und weitere Anregungen.\n"
 				+ "Viele Grüße\n"
 				+ "Mani Afschar Yazdi\n"
 				+ "Geschäftsführer\n"
