@@ -39,10 +39,11 @@ public class LocationTest {
 	public void run() throws Exception {
 		try (final BufferedReader reader = new BufferedReader(new FileReader("sample.txt"))) {
 			final Pattern email = Pattern.compile(".*(\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,8}\\b).*", Pattern.CASE_INSENSITIVE);
+			final String url = "https://www.google.com/search";
 			String line;
 			while ((line = reader.readLine()) != null) {
 				final String s[] = line.split("\\|");
-				driver.get("https://www.google.com/search?q=" + s[0]);
+				driver.get(url + "?q=" + s[0]);
 				for (int i = 0; i < 5; i++) {
 					driver.executeScript("document.getElementById('center_col').querySelectorAll('span>a')[" + i + "].click()");
 					driver.executeScript("Array.from(document.querySelectorAll('a')).find(el => el.textContent.toLowerCase().indexOf('impressum')>-1)");
@@ -52,7 +53,7 @@ public class LocationTest {
 						System.out.println(s[1] + ": " + matcher.group(1));
 						break;
 					} else
-						driver.executeScript("navigation.back()");
+						driver.executeScript("navigation.back();if(document.location.href.indexOf('" + url + "')<0) navigation.back();");
 				}
 			}
 		} catch (final Exception ex) {
