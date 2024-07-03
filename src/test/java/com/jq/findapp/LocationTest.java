@@ -50,7 +50,13 @@ public class LocationTest {
 				final List<String> links = (List<String>) js.executeScript(
 						"return Array.from(document.getElementById('center_col').querySelectorAll('span>a')).map(e => e.getAttribute('href'))");
 				for (int i = 0; i < links.size(); i++) {
-					driver.get(links.get(i));
+					if (!links.get(i).contains("tripadvisor") &&
+							!links.get(i).contains("opentable") &&
+							!links.get(i).contains("dasoertliche") &&
+							!links.get(i).contains("lasertagarena-oftersheim") &&
+							!links.get(i).contains("yelp") &&
+							!links.get(i).contains("speisekarte"))
+						driver.get(links.get(i));
 					final String urlLocation = js.executeScript("return document.location.href").toString()
 							.toLowerCase();
 					js.executeScript(
@@ -70,7 +76,7 @@ public class LocationTest {
 						}
 					}
 					if (i == links.size() - 1)
-						System.out.println(s[1] + " not found - " + s[0] + " - "
+						System.out.println(s[1] + ": not found - " + s[0] + " - "
 								+ address.stream().filter(e -> html.contains(e.toString())).count());
 				}
 			}
