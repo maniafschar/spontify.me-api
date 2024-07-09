@@ -418,7 +418,6 @@ public class AuthenticationService {
 		final Contact contact = repository.one(Contact.class, new BigInteger(user.get("contact.id").toString()));
 		if (contact.getVerified() == null || !contact.getVerified()) {
 			contact.setVerified(Boolean.TRUE);
-			contact.setNotificationEngagement(Boolean.TRUE);
 			if (contact.getReferer() != null) {
 				params.setQuery(Query.contact_listFriends);
 				params.setUser(contact);

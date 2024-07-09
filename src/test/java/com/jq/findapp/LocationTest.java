@@ -76,9 +76,11 @@ public class LocationTest {
 								}
 							}
 						}
+						if (i == links.size() - 1)
+							System.out.print(
+									(int) (((double) address.stream().filter(e -> html.contains(e.toString())).count())
+											/ address.size() * 100 + 0.5) + "%");
 					}
-					if (i == links.size() - 1)
-						System.out.print((int) (((double) address.stream().filter(e -> html.contains(e.toString())).count()) / address.size() * 100 + 0.5) + "%");
 					System.out.println(" [" + s[0] + "]");
 				}
 			}

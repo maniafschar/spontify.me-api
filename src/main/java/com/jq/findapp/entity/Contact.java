@@ -18,14 +18,7 @@ public class Contact extends BaseEntity {
 	private BigInteger referer;
 	private Boolean authenticate = false;
 	private Boolean bluetooth = true;
-	private Boolean notificationBirthday = true;
-	private Boolean notificationChat = true;
-	private Boolean notificationEngagement = true;
-	private Boolean notificationFriendRequest = true;
-	private Boolean notificationMarkEvent = true;
-	private Boolean notificationNews = true;
-	private Boolean notificationVisitLocation = true;
-	private Boolean notificationVisitProfile = true;
+	private String notification;
 	private Boolean search = true;
 	private Boolean teaser = true;
 	private Boolean verified = false;
@@ -311,60 +304,12 @@ public class Contact extends BaseEntity {
 		this.pushSystem = pushSystem;
 	}
 
-	public Boolean getNotificationFriendRequest() {
-		return notificationFriendRequest;
+	public String getNotification() {
+		return notification;
 	}
 
-	public void setNotificationFriendRequest(final Boolean notificationFriendRequest) {
-		this.notificationFriendRequest = notificationFriendRequest;
-	}
-
-	public Boolean getNotificationChat() {
-		return notificationChat;
-	}
-
-	public void setNotificationChat(final Boolean notificationChat) {
-		this.notificationChat = notificationChat;
-	}
-
-	public Boolean getNotificationBirthday() {
-		return notificationBirthday;
-	}
-
-	public void setNotificationBirthday(final Boolean notificationBirthday) {
-		this.notificationBirthday = notificationBirthday;
-	}
-
-	public Boolean getNotificationVisitProfile() {
-		return notificationVisitProfile;
-	}
-
-	public void setNotificationVisitProfile(final Boolean notificationVisitProfile) {
-		this.notificationVisitProfile = notificationVisitProfile;
-	}
-
-	public Boolean getNotificationVisitLocation() {
-		return notificationVisitLocation;
-	}
-
-	public void setNotificationVisitLocation(final Boolean notificationVisitLocation) {
-		this.notificationVisitLocation = notificationVisitLocation;
-	}
-
-	public Boolean getNotificationMarkEvent() {
-		return notificationMarkEvent;
-	}
-
-	public void setNotificationMarkEvent(final Boolean notificationMarkEvent) {
-		this.notificationMarkEvent = notificationMarkEvent;
-	}
-
-	public Boolean getNotificationNews() {
-		return notificationNews;
-	}
-
-	public void setNotificationNews(final Boolean notificationNews) {
-		this.notificationNews = notificationNews;
+	public void setNotification(final String notification) {
+		this.notification = notification;
 	}
 
 	public String getAgeMale() {
@@ -501,14 +446,6 @@ public class Contact extends BaseEntity {
 
 	public void setLastLogin(final Timestamp lastLogin) {
 		this.lastLogin = lastLogin;
-	}
-
-	public Boolean getNotificationEngagement() {
-		return notificationEngagement;
-	}
-
-	public void setNotificationEngagement(final Boolean notificationEngagement) {
-		this.notificationEngagement = notificationEngagement;
 	}
 
 	public String getSkills() {

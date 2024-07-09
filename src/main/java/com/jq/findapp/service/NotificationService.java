@@ -95,6 +95,10 @@ public class NotificationService {
 		Production, Development
 	}
 
+	public enum NotificationType {
+		birthday, chat, engagement, friend, event, news, visitLocation, visitProfile
+	}
+
 	@Async
 	public void locationNotifyOnMatch(final Contact me, final BigInteger locationId,
 			final TextId textId, final String param) throws Exception {
@@ -316,21 +320,21 @@ public class NotificationService {
 
 	private boolean userWantsNotification(final TextId textId, final Contact contact) {
 		if (TextId.notification_chatNew == textId)
-			return contact.getNotificationChat();
+			return contact.getNotification().contains(NotificationType.chat.name());
 		if (TextId.notification_contactFriendRequest == textId
 				|| TextId.notification_contactFriendApproved == textId)
-			return contact.getNotificationFriendRequest();
+			return contact.getNotification().contains(NotificationType.friend.name());
 		if (TextId.notification_contactVisitLocation == textId)
-			return contact.getNotificationVisitLocation();
+			return contact.getNotification().contains(NotificationType.visitLocation.name());
 		if (TextId.notification_contactVisitProfile == textId)
-			return contact.getNotificationVisitProfile();
+			return contact.getNotification().contains(NotificationType.visitProfile.name());
 		if (TextId.notification_eventParticipate == textId)
-			return contact.getNotificationMarkEvent();
+			return contact.getNotification().contains(NotificationType.event.name());
 		if (TextId.notification_contactBirthday == textId)
-			return contact.getNotificationBirthday();
+			return contact.getNotification().contains(NotificationType.birthday.name());
 		if (TextId.notification_clientNews == textId ||
 				textId.name().startsWith(TextId.notification_clientMarketing.name()))
-			return contact.getNotificationNews();
+			return contact.getNotification().contains(NotificationType.news.name());
 		return true;
 	}
 

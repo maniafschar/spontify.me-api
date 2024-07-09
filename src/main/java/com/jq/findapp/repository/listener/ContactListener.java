@@ -18,6 +18,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.service.AuthenticationService;
+import com.jq.findapp.service.NotificationService.NotificationType;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text.TextId;
 
@@ -32,13 +33,17 @@ public class ContactListener extends AbstractRepositoryListener<Contact> {
 		contact.setAgeDivers("18,99");
 		contact.setAgeFemale("18,99");
 		contact.setAgeMale("18,99");
+		String notification = NotificationType.birthday + "," + NotificationType.chat + ","
+				+ NotificationType.engagement + "," + NotificationType.event + "," + NotificationType.friend + ",";
 		try {
 			final JsonNode props = new ObjectMapper()
 					.readTree(repository.one(com.jq.findapp.entity.Client.class, contact.getClientId()).getStorage());
-			contact.setNotificationNews(props.has("rss") && props.get("rss").size() == 1);
+			if (props.has("rss") && props.get("rss").size() == 1)
+				notification += NotificationType.news + ",";
 		} catch (Exception ex) {
-			contact.setNotificationNews(false);
 		}
+		notification += NotificationType.visitLocation + "," + NotificationType.visitProfile;
+		contact.setNotification(notification);
 	}
 
 	@Override
