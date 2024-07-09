@@ -245,13 +245,15 @@ public class Repository {
 			if (!dirs[i].equals(deleted)
 					&& !Attachment.PUBLIC.equals(dirs[i] + '/')) {
 				final String[] files = new File(dir + dirs[i]).list();
-				for (int i2 = 0; i2 < files.length; i2++) {
-					if (!ids.contains(dirs[i] + '/' + files[i2])) {
-						path = Path.of(dir + dirs[i] + '/' + files[i2]);
-						if (path.toFile().isFile() && path.toFile().lastModified() < time) {
-							Files.move(path, Path.of(dir + '/' + deleted + '/' + files[i2]),
-									StandardCopyOption.ATOMIC_MOVE);
-							count++;
+				if (files != null) {
+					for (int i2 = 0; i2 < files.length; i2++) {
+						if (!ids.contains(dirs[i] + '/' + files[i2])) {
+							path = Path.of(dir + dirs[i] + '/' + files[i2]);
+							if (path.toFile().isFile() && path.toFile().lastModified() < time) {
+								Files.move(path, Path.of(dir + '/' + deleted + '/' + files[i2]),
+										StandardCopyOption.ATOMIC_MOVE);
+								count++;
+							}
 						}
 					}
 				}
