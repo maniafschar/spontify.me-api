@@ -39,7 +39,6 @@ public class Location extends BaseEntity {
 	private String telephone;
 	private String town;
 	private String url;
-	private String urlInternal;
 	private String zipCode;
 	private Timestamp updatedAt;
 
@@ -161,14 +160,6 @@ public class Location extends BaseEntity {
 
 	public void setCountry(final String country) {
 		this.country = country;
-	}
-
-	public String getUrlInternal() {
-		return urlInternal;
-	}
-
-	public void setUrlInternal(final String urlInternal) {
-		this.urlInternal = urlInternal;
 	}
 
 	public String getEmail() {

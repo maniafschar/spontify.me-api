@@ -12,11 +12,14 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.repository.Repository.Attachment;
 
 @Component
 public class Text {
@@ -122,7 +125,8 @@ public class Text {
 		}
 	}
 
-	public String getText(final Contact contact, final TextId textId) {
+	public String getText(final Contact contact, final TextId textId)
+			throws JsonMappingException, JsonProcessingException {
 		final String label = textId.name();
 		String s;
 		try {
@@ -135,10 +139,11 @@ public class Text {
 		} catch (final NullPointerException ex) {
 			throw new RuntimeException("Missing label " + contact.getLanguage() + ": " + textId);
 		}
-		if (s.contains("APP_")) {
-			final Client client = repository.one(Client.class, contact.getClientId());
-			s = s.replaceAll("APP_TITLE", client.getName());
-		}
+		final Client client = repository.one(Client.class, contact.getClientId());
+		final JsonNode node = new ObjectMapper().readTree(Attachment.resolve(client.getStorage()));
+		s = s.replaceAll("APP_TITLE", client.getName());
+		s = s.replaceAll(" ${buddy}", node.get("lang").get(contact.getLanguage()).get("buddy").asText());
+		s = s.replaceAll(" ${buddies}", node.get("lang").get(contact.getLanguage()).get("buddies").asText());
 		return s;
 	}
 }

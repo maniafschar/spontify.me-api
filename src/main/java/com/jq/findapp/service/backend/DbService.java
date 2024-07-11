@@ -8,7 +8,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -119,6 +121,19 @@ public class DbService {
 				e -> client.setName(e)) || modified;
 		modified = updateField("<meta property=\\\"og:url\\\" content=\"([^\"].*)\"", html, client.getUrl(),
 				e -> client.setUrl(e)) || modified;
+		final ObjectMapper om = new ObjectMapper();
+		final ObjectNode node = (ObjectNode) om.readTree(Attachment.resolve(client.getStorage()));
+		if (!node.has("lang"))
+			node.set("lang", om.createObjectNode());
+		final List<String> langs = Arrays.asList("DE", "EN");
+		for (final String lang : langs) {
+			final JsonNode json = new ObjectMapper()
+					.readTree(IOUtils.toString(new FileInputStream(webDir + client.getId() + "/js/" + lang + ".json"),
+							StandardCharsets.UTF_8));
+			if (!node.get("lang").has(lang))
+				((ObjectNode) node.get("lang")).set(lang, om.createObjectNode());
+			((ObjectNode) node.get("lang").get(lang)).set("buddy", json.get("labels").get("buddy"));
+		}
 		String css = IOUtils.toString(new FileInputStream(webDir + client.getId() + "/css/main.css"),
 				StandardCharsets.UTF_8);
 		Matcher matcher = Pattern.compile(":root \\{([^}])*").matcher(css);
@@ -128,11 +143,9 @@ public class DbService {
 			css = "{";
 			while (matcher.find())
 				css += "\"" + matcher.group(1) + "\":\"" + matcher.group(2) + "\",";
-			final ObjectMapper om = new ObjectMapper();
 			css = css.substring(0, css.length() - 1) + "}";
-			final JsonNode node = om.readTree(Attachment.resolve(client.getStorage()));
 			if (!node.has("css") || !om.writeValueAsString(node.get("css")).equals(css)) {
-				((ObjectNode) node).set("css", om.readTree(css));
+				node.set("css", om.readTree(css));
 				client.setStorage(om.writeValueAsString(node));
 				modified = true;
 			}
