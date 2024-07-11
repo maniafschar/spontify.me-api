@@ -62,18 +62,22 @@ public class Location {
 						js.executeScript(
 								"Array.from(document.querySelectorAll('a')).find(e => e.textContent.toLowerCase().indexOf('impressum')>-1)?.click()");
 						final String html = ((String) js.executeScript("return document.body.innerHTML")).toLowerCase();
-						if (address.stream().filter(e -> html.contains(e.toString())).count() > address.size() * 0.7 && findEmail(html, urlLocation))
+						final int addressWordsCount = addressWordsCount(address, html);
+						if (addressWordsCount > 70 && findEmail(html, urlLocation))
 							break;
 						if (i == links.size() - 1)
-							System.out.print("-- " + (int) (((double) address.stream().filter(e -> html.contains(e.toString())).count())
-									/ address.size() * 100 + 0.5) + "%");
+							System.out.print("-- " + addressWordsCount + "%");
 					}
-					System.out.println(" -- " + s[1] + " | " + s[0]);
 				}
+				System.out.println(" -- " + s[1] + " | " + s[0]);
 			}
 		} catch (final Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	private int addressWordsCount(final List<Object> address, final String html) {
+		return (int) (((double) address.stream().filter(e -> html.contains(e.toString())).count()) / address.size() * 100 + 0.5);
 	}
 
 	private boolean findEmail(final String html, final String urlLocation) {
@@ -84,9 +88,9 @@ public class Location {
 			if (matcher.find() && urlLocation.contains(
 					matcher.group(1).toLowerCase().substring(matcher.group(1).indexOf("@") + 1))) {
 				System.out.print(matcher.group(1) + " " + urlLocation);
-				i = links.size();
-				break;
+				return true;
 			}
 		}
+		return false;
 	}
 }
