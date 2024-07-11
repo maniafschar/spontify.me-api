@@ -1,4 +1,4 @@
-package com.jq.findapp;
+package com.jq.findapp.it;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
