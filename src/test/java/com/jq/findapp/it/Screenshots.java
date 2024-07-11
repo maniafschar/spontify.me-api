@@ -1,4 +1,4 @@
-package com.jq.findapp;
+package com.jq.findapp.it;
 
 import java.io.File;
 import java.io.FileOutputStream;
