@@ -133,6 +133,7 @@ public class DbService {
 			if (!node.get("lang").has(lang))
 				((ObjectNode) node.get("lang")).set(lang, om.createObjectNode());
 			((ObjectNode) node.get("lang").get(lang)).set("buddy", json.get("labels").get("buddy"));
+			((ObjectNode) node.get("lang").get(lang)).set("buddies", json.get("labels").get("buddies"));
 		}
 		String css = IOUtils.toString(new FileInputStream(webDir + client.getId() + "/css/main.css"),
 				StandardCharsets.UTF_8);
