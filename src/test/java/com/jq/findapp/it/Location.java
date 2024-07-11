@@ -50,7 +50,6 @@ public class Location {
 				final List<String> links = (List<String>) js.executeScript(
 						"return Array.from(document.getElementById('center_col').querySelectorAll('span>a')).map(e => e.getAttribute('href'))");
 				for (int i = 0; i < links.size(); i++) {
-					System.out.print(s[1] + ": ");
 					if (!links.get(i).contains("tripadvisor") &&
 							!links.get(i).contains("opentable") &&
 							!links.get(i).contains("dasoertliche") &&
@@ -63,29 +62,31 @@ public class Location {
 						js.executeScript(
 								"Array.from(document.querySelectorAll('a')).find(e => e.textContent.toLowerCase().indexOf('impressum')>-1)?.click()");
 						final String html = ((String) js.executeScript("return document.body.innerHTML")).toLowerCase();
-						if (address.stream().filter(e -> html.contains(e.toString())).count() > address.size() * 0.7) {
-							int pos = html.length();
-							while ((pos = html.lastIndexOf('@', pos - 1)) > 0) {
-								final Matcher matcher = email.matcher(
-										html.substring(Math.max(0, pos - 200), Math.min(pos + 200, html.length())));
-								if (matcher.find() && urlLocation.contains(
-										matcher.group(1).toLowerCase().substring(matcher.group(1).indexOf("@") + 1))) {
-									System.out.print(matcher.group(1) + " " + urlLocation);
-									i = links.size();
-									break;
-								}
-							}
-						}
+						if (address.stream().filter(e -> html.contains(e.toString())).count() > address.size() * 0.7 && findEmail(html, urlLocation))
+							break;
 						if (i == links.size() - 1)
-							System.out.print(
-									(int) (((double) address.stream().filter(e -> html.contains(e.toString())).count())
-											/ address.size() * 100 + 0.5) + "%");
+							System.out.print("-- " + (int) (((double) address.stream().filter(e -> html.contains(e.toString())).count())
+									/ address.size() * 100 + 0.5) + "%");
 					}
-					System.out.println(" [" + s[0] + "]");
+					System.out.println(" -- " + s[1] + " | " + s[0]);
 				}
 			}
 		} catch (final Exception ex) {
 			ex.printStackTrace();
+		}
+	}
+
+	private boolean findEmail(final String html, final String urlLocation) {
+		int pos = html.length();
+		while ((pos = html.lastIndexOf('@', pos - 1)) > 0) {
+			final Matcher matcher = email.matcher(
+					html.substring(Math.max(0, pos - 200), Math.min(pos + 200, html.length())));
+			if (matcher.find() && urlLocation.contains(
+					matcher.group(1).toLowerCase().substring(matcher.group(1).indexOf("@") + 1))) {
+				System.out.print(matcher.group(1) + " " + urlLocation);
+				i = links.size();
+				break;
+			}
 		}
 	}
 }
