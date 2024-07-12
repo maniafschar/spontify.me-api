@@ -28,6 +28,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.jq.findapp.FindappApplication;
+import com.jq.findapp.TestConfig;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith(SpringExtension.class)

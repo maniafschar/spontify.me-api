@@ -271,7 +271,8 @@ public class EngagementService {
 			final GregorianCalendar gc = new GregorianCalendar();
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setSearch("contact.createdAt<cast('" + Instant.now().minus(Duration.ofHours(3))
-					+ "' as timestamp) and contact.verified=false and contact.notificationEngagement=true");
+					+ "' as timestamp) and contact.verified=false and contact.notification like '%"
+					+ NotificationService.NotificationType.engagement + "%'");
 			params.setLimit(0);
 			final Result list = repository.list(params);
 			final long DAY = 86400000;
@@ -421,7 +422,8 @@ public class EngagementService {
 		final SchedulerResult result = new SchedulerResult();
 		try {
 			final QueryParams params = new QueryParams(Query.contact_listId);
-			params.setSearch("contact.verified=true and contact.notificationEngagement=true and "
+			params.setSearch("contact.verified=true and contact.notification like '%" +
+					NotificationService.NotificationType.engagement + "%' and "
 					+ "contact.version is not null and contact.longitude is not null and "
 					+ "(length(contact.skills)>0 or length(contact.skillsText)>0)");
 			params.setLimit(0);

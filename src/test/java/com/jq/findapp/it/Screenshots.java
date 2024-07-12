@@ -19,7 +19,7 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
-import com.jq.findapp.IntegrationTest.Util;
+import com.jq.findapp.it.AppTest.Util;
 
 public class Screenshots {
 	private static final String dir = "screenshots/";

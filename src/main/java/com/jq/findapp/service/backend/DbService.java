@@ -1,5 +1,6 @@
 package com.jq.findapp.service.backend;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.math.BigInteger;
@@ -112,9 +113,11 @@ public class DbService {
 	}
 
 	private boolean updateClient(final Client client) throws Exception {
+		final File file = new File(webDir + client.getId() + "/index.html");
+		if (!file.exists())
+			return false;
 		client.historize();
-		final String html = IOUtils.toString(new FileInputStream(webDir + client.getId() + "/index.html"),
-				StandardCharsets.UTF_8);
+		final String html = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
 		boolean modified = updateField("<meta name=\"email\" content=\"([^\"].*)\"", html, client.getEmail(),
 				e -> client.setEmail(e));
 		modified = updateField("<meta property=\\\"og:title\\\" content=\"([^\"].*)\"", html, client.getName(),
@@ -128,7 +131,8 @@ public class DbService {
 		final List<String> langs = Arrays.asList("DE", "EN");
 		for (final String lang : langs) {
 			final JsonNode json = new ObjectMapper()
-					.readTree(IOUtils.toString(new FileInputStream(webDir + client.getId() + "/js/" + lang + ".json"),
+					.readTree(IOUtils.toString(
+							new FileInputStream(webDir + client.getId() + "/js/lang/" + lang + ".json"),
 							StandardCharsets.UTF_8));
 			if (!node.get("lang").has(lang))
 				((ObjectNode) node.get("lang")).set(lang, om.createObjectNode());

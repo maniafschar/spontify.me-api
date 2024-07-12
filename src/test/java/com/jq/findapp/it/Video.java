@@ -20,7 +20,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
-import com.jq.findapp.IntegrationTest.Util;
+import com.jq.findapp.it.AppTest.Util;
 
 public class Video {
 	private static final int width = 480, height = 720;

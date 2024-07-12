@@ -35,7 +35,7 @@ public class Location {
 	public void run() throws Exception {
 		try (final BufferedReader reader = new BufferedReader(
 				new InputStreamReader(getClass().getResourceAsStream("/sample.txt")))) {
-			final Pattern email = Pattern.compile(".*(\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,8}\\b).*",
+			final Pattern emailPattern = Pattern.compile(".*(\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,8}\\b).*",
 					Pattern.CASE_INSENSITIVE);
 			final String url = "https://www.google.com/search";
 			final JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -63,7 +63,7 @@ public class Location {
 								"Array.from(document.querySelectorAll('a')).find(e => e.textContent.toLowerCase().indexOf('impressum')>-1)?.click()");
 						final String html = ((String) js.executeScript("return document.body.innerHTML")).toLowerCase();
 						final int addressWordsCount = addressWordsCount(address, html);
-						if (addressWordsCount > 70 && findEmail(html, urlLocation))
+						if (addressWordsCount > 70 && findEmail(html, urlLocation, emailPattern))
 							break;
 						if (i == links.size() - 1)
 							System.out.print("-- " + addressWordsCount + "%");
@@ -77,10 +77,11 @@ public class Location {
 	}
 
 	private int addressWordsCount(final List<Object> address, final String html) {
-		return (int) (((double) address.stream().filter(e -> html.contains(e.toString())).count()) / address.size() * 100 + 0.5);
+		return (int) (((double) address.stream().filter(e -> html.contains(e.toString())).count()) / address.size()
+				* 100 + 0.5);
 	}
 
-	private boolean findEmail(final String html, final String urlLocation) {
+	private boolean findEmail(final String html, final String urlLocation, final Pattern email) {
 		int pos = html.length();
 		while ((pos = html.lastIndexOf('@', pos - 1)) > 0) {
 			final Matcher matcher = email.matcher(
