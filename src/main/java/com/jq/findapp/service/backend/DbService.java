@@ -126,8 +126,10 @@ public class DbService {
 				e -> client.setUrl(e)) || modified;
 		final ObjectMapper om = new ObjectMapper();
 		final ObjectNode node = (ObjectNode) om.readTree(Attachment.resolve(client.getStorage()));
-		if (!node.has("lang"))
+		if (!node.has("lang")) {
 			node.set("lang", om.createObjectNode());
+			modified = true;
+		}
 		final List<String> langs = Arrays.asList("DE", "EN");
 		for (final String lang : langs) {
 			final JsonNode json = new ObjectMapper()
@@ -136,8 +138,13 @@ public class DbService {
 							StandardCharsets.UTF_8));
 			if (!node.get("lang").has(lang))
 				((ObjectNode) node.get("lang")).set(lang, om.createObjectNode());
-			((ObjectNode) node.get("lang").get(lang)).set("buddy", json.get("labels").get("buddy"));
-			((ObjectNode) node.get("lang").get(lang)).set("buddies", json.get("labels").get("buddies"));
+			if (!node.get("lang").has("buddy") ||
+					!node.get("lang").get(lang).get("buddy").asText()
+							.equals(json.get("labels").get("buddies").asText())) {
+				((ObjectNode) node.get("lang").get(lang)).set("buddy", json.get("labels").get("buddy"));
+				((ObjectNode) node.get("lang").get(lang)).set("buddies", json.get("labels").get("buddies"));
+				modified = true;
+			}
 		}
 		String css = IOUtils.toString(new FileInputStream(webDir + client.getId() + "/css/main.css"),
 				StandardCharsets.UTF_8);
@@ -151,11 +158,11 @@ public class DbService {
 			css = css.substring(0, css.length() - 1) + "}";
 			if (!node.has("css") || !om.writeValueAsString(node.get("css")).equals(css)) {
 				node.set("css", om.readTree(css));
-				client.setStorage(om.writeValueAsString(node));
 				modified = true;
 			}
 		}
 		if (modified) {
+			client.setStorage(om.writeValueAsString(node));
 			repository.save(client);
 			return true;
 		}
