@@ -192,24 +192,24 @@ public class SupportCenterApi {
 				"log.clientId>0 and (log.uri='/action/teaser/contacts' or log.uri not like '/%') and LOWER(ip.org) not like '%google%' and LOWER(ip.org) not like '%facebook%' and LOWER(ip.org) not like '%amazon%' and log.createdAt>cast('"
 						+ Instant.now().minus(Duration.ofDays(days)) + "' as timestamp)");
 		final Result list = repository.list(params);
-		for (int i = 0; i < list.size(); i++) {
-			final Map<String, Object> log = list.get(i);
-			final String clientId = log.get("log.clientId").toString();
-			if (!result.containsKey(clientId)) {
-				result.put(clientId, new HashMap<>());
-				result.get(clientId).put(anonym, new HashMap<>());
-				result.get(clientId).put(login, new HashMap<>());
-				result.get(clientId).put(teaser, new HashMap<>());
+		for (int run = 0; run < 3; run++) {
+			for (int i = 0; i < list.size(); i++) {
+				final Map<String, Object> log = list.get(i);
+				final String clientId = log.get("log.clientId").toString();
+				if (!result.containsKey(clientId)) {
+					result.put(clientId, new HashMap<>());
+					result.get(clientId).put(anonym, new HashMap<>());
+					result.get(clientId).put(login, new HashMap<>());
+					result.get(clientId).put(teaser, new HashMap<>());
+				}
+				if (run == 0 && ((String) log.get("log.uri")).startsWith("/") && log.get("log.contactId") != null
+						&& !BigInteger.ZERO.equals(log.get("log.contactId")))
+					addLogEntry(result.get(clientId), login, log);
+				else if (run == 1 && ((String) log.get("log.uri")).startsWith("/") && log.get("log.contactId") == null)
+					addLogEntry(result.get(clientId), anonym, log, login);
+				else if (run == 2 && !((String) log.get("log.uri")).startsWith("/"))
+					addLogEntry(result.get(clientId), teaser, log, login, anonym);
 			}
-			final String key = Instant.ofEpochMilli(((Timestamp) log.get("log.createdAt")).getTime()).toString()
-					.substring(0, 10);
-			if (((String) log.get("log.uri")).startsWith("/")) {
-				if (log.get("log.contactId") == null)
-					addLogEntry(result.get(clientId).get(anonym), key, (String) log.get("log.ip"));
-				else if (!BigInteger.ZERO.equals(log.get("log.contactId")))
-					addLogEntry(result.get(clientId).get(login), key, log.get("log.contactId").toString());
-			} else
-				addLogEntry(result.get(clientId).get(teaser), key, (String) log.get("log.ip"));
 		}
 		return result;
 	}
@@ -243,10 +243,19 @@ public class SupportCenterApi {
 		return result;
 	}
 
-	private void addLogEntry(final Map<String, Set<String>> map, final String key, final String value) {
-		if (!map.containsKey(key))
-			map.put(key, new HashSet<>());
-		map.get(key).add(value);
+	private void addLogEntry(final Map<String, Map<String, Set<String>>> map, final String type,
+			final Map<String, Object> log, String... check) {
+		final String key = Instant.ofEpochMilli(((Timestamp) log.get("log.createdAt")).getTime()).toString()
+				.substring(0, 10);
+		final String value = log.get("log.ip").toString();
+		if (check != null) {
+			for (final String t : check)
+				if (map.get(t).containsKey(key) && map.get(t).get(key).contains(value))
+					return;
+		}
+		if (!map.get(type).containsKey(key))
+			map.get(type).put(key, new HashSet<>());
+		map.get(type).get(key).add(value);
 	}
 
 	@GetMapping("metrics")

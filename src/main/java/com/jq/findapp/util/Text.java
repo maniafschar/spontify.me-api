@@ -142,8 +142,8 @@ public class Text {
 		final Client client = repository.one(Client.class, contact.getClientId());
 		final JsonNode node = new ObjectMapper().readTree(Attachment.resolve(client.getStorage()));
 		s = s.replaceAll("APP_TITLE", client.getName());
-		s = s.replaceAll(" ${buddy}", node.get("lang").get(contact.getLanguage()).get("buddy").asText());
-		s = s.replaceAll(" ${buddies}", node.get("lang").get(contact.getLanguage()).get("buddies").asText());
+		s = s.replaceAll(" \\$\\{buddy}", node.get("lang").get(contact.getLanguage()).get("buddy").asText());
+		s = s.replaceAll(" \\$\\{buddies}", node.get("lang").get(contact.getLanguage()).get("buddies").asText());
 		return s;
 	}
 }
