@@ -243,8 +243,7 @@ public class SupportCenterApi {
 		return result;
 	}
 
-	private void addLogEntry(final Map<String, Set<String>> map, final String key,
-			final String value) {
+	private void addLogEntry(final Map<String, Set<String>> map, final String key, final String value) {
 		if (!map.containsKey(key))
 			map.put(key, new HashSet<>());
 		map.get(key).add(value);

@@ -21,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
@@ -37,6 +38,9 @@ public class ImportLogService {
 
 	@Autowired
 	private IpService ipService;
+
+	@Value("${app.importLog.ips2skip}")
+	private String ips2skip;
 
 	private static final Map<String, Integer> linesRead = new HashMap<>();
 
@@ -77,6 +81,7 @@ public class ImportLogService {
 			final String uri = filename.substring(3).replaceAll("\\d", "").toLowerCase();
 			String line;
 			int lines = 0;
+			final List<String> omitIps = Arrays.asList(ips2skip.split(","));
 			while ((line = reader.readLine()) != null) {
 				if (++lines > startFrom) {
 					final Matcher m = pattern.matcher(line.replaceAll("\\\\\"", ""));
@@ -91,35 +96,36 @@ public class ImportLogService {
 												&& !path.startsWith("/rest/")))) {
 							log.setCreatedAt(new Timestamp(dateParser.parse(m.group(4)).getTime()));
 							log.setIp(IpService.sanatizeIp(m.group(1)));
-
-							log.setBody(m.group(11).replace("&#39;", "'"));
-							if (log.getBody().length() > 255)
-								log.setBody(log.getBody().substring(0, 255));
-							log.setUri(uri);
-							log.setClientId(BigInteger.valueOf("afterwork".equals(uri) ? 1
-									: "fanclub".equals(uri) ? 4 : "offlinepoker".equals(uri) ? 6 : 0));
-							if (path.length() > 2) {
-								final String[] s = path.split("\\?");
-								if (s[0].length() > 1)
-									log.setUri(log.getUri() + URLDecoder.decode(s[0], StandardCharsets.UTF_8));
-								if (s.length > 1 && !Strings.isEmpty(s[1]))
-									log.setQuery(s[1].length() > 255 ? s[1].substring(0, 252) + "..." : s[1]);
-							}
-							params.setSearch("log.ip='" + log.getIp() + "' and log.uri='"
-									+ log.getUri().replace("'", "''")
-									+ "' and log.createdAt=cast('"
-									+ Instant.ofEpochMilli(log.getCreatedAt().getTime())
-									+ "' as timestamp) and log.body='" + log.getBody().replace("'", "''") + "'");
-							if (repository.list(params).size() == 0) {
-								log.setPort(80);
-								log.setMethod(m.group(5));
-								if (!"-".equals(m.group(10))) {
-									log.setReferer(m.group(10));
-									if (log.getReferer().length() > 255)
-										log.setReferer(log.getReferer().substring(0, 255));
+							if (!omitIps.contains(log.getIp())) {
+								log.setBody(m.group(11).replace("&#39;", "'"));
+								if (log.getBody().length() > 255)
+									log.setBody(log.getBody().substring(0, 255));
+								log.setUri(uri);
+								log.setClientId(BigInteger.valueOf("afterwork".equals(uri) ? 1
+										: "fanclub".equals(uri) ? 4 : "offlinepoker".equals(uri) ? 6 : 0));
+								if (path.length() > 2) {
+									final String[] s = path.split("\\?");
+									if (s[0].length() > 1)
+										log.setUri(log.getUri() + URLDecoder.decode(s[0], StandardCharsets.UTF_8));
+									if (s.length > 1 && !Strings.isEmpty(s[1]))
+										log.setQuery(s[1].length() > 255 ? s[1].substring(0, 252) + "..." : s[1]);
 								}
-								repository.save(log);
-								count++;
+								params.setSearch("log.ip='" + log.getIp() + "' and log.uri='"
+										+ log.getUri().replace("'", "''")
+										+ "' and log.createdAt=cast('"
+										+ Instant.ofEpochMilli(log.getCreatedAt().getTime())
+										+ "' as timestamp) and log.body='" + log.getBody().replace("'", "''") + "'");
+								if (repository.list(params).size() == 0) {
+									log.setPort(80);
+									log.setMethod(m.group(5));
+									if (!"-".equals(m.group(10))) {
+										log.setReferer(m.group(10));
+										if (log.getReferer().length() > 255)
+											log.setReferer(log.getReferer().substring(0, 255));
+									}
+									repository.save(log);
+									count++;
+								}
 							}
 						}
 					}
