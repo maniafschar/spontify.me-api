@@ -192,6 +192,7 @@ public class SupportCenterApi {
 				"log.clientId>0 and (log.uri='/action/teaser/contacts' or log.uri not like '/%') and LOWER(ip.org) not like '%google%' and LOWER(ip.org) not like '%facebook%' and LOWER(ip.org) not like '%amazon%' and log.createdAt>cast('"
 						+ Instant.now().minus(Duration.ofDays(days)) + "' as timestamp)");
 		final Result list = repository.list(params);
+		final Set<BigInteger> users = new HashSet<>();
 		for (int run = 0; run < 3; run++) {
 			for (int i = 0; i < list.size(); i++) {
 				final Map<String, Object> log = list.get(i);
@@ -203,9 +204,12 @@ public class SupportCenterApi {
 					result.get(clientId).put(teaser, new HashMap<>());
 				}
 				if (run == 0 && ((String) log.get("log.uri")).startsWith("/") && log.get("log.contactId") != null
-						&& !BigInteger.ZERO.equals(log.get("log.contactId")))
-					addLogEntry(result.get(clientId), login, log);
-				else if (run == 1 && ((String) log.get("log.uri")).startsWith("/") && log.get("log.contactId") == null)
+						&& !BigInteger.ZERO.equals(log.get("log.contactId"))) {
+					if (!users.contains(log.get("log.contactId"))) {
+						addLogEntry(result.get(clientId), login, log);
+						users.add(log.get("log.contactId"));
+					}
+				} else if (run == 1 && ((String) log.get("log.uri")).startsWith("/") && log.get("log.contactId") == null)
 					addLogEntry(result.get(clientId), anonym, log, login);
 				else if (run == 2 && !((String) log.get("log.uri")).startsWith("/"))
 					addLogEntry(result.get(clientId), teaser, log, login, anonym);
@@ -243,7 +247,7 @@ public class SupportCenterApi {
 		return result;
 	}
 
-	private void addLogEntry(final Map<String, Map<String, Set<String>>> map, final String type,
+	private boolean addLogEntry(final Map<String, Map<String, Set<String>>> map, final String type,
 			final Map<String, Object> log, String... check) {
 		final String key = Instant.ofEpochMilli(((Timestamp) log.get("log.createdAt")).getTime()).toString()
 				.substring(0, 10);
@@ -251,11 +255,12 @@ public class SupportCenterApi {
 		if (check != null) {
 			for (final String t : check)
 				if (map.get(t).containsKey(key) && map.get(t).get(key).contains(value))
-					return;
+					return false;
 		}
 		if (!map.get(type).containsKey(key))
 			map.get(type).put(key, new HashSet<>());
 		map.get(type).get(key).add(value);
+		return true;
 	}
 
 	@GetMapping("metrics")
