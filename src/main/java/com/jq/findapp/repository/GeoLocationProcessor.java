@@ -23,10 +23,6 @@ public class GeoLocationProcessor {
 	private static final double MAX_LON = Math.toRadians(180d);
 	private static final double radius = 6371.01;
 
-	private GeoLocationProcessor() {
-		super();
-	}
-
 	public GeoLocationProcessor(final QueryParams params) {
 		if (params.getLatitude() != null && params.getLongitude() != null) {
 			if (params.getDistance() == null)
