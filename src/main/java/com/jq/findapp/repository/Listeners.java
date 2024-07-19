@@ -42,7 +42,7 @@ import com.jq.findapp.repository.listener.LocationVisitListener;
 import com.jq.findapp.repository.listener.TicketListener;
 
 @Component
-public class Listeners {
+class Listeners {
 	@Autowired
 	private ApplicationContext applicationContext;
 
