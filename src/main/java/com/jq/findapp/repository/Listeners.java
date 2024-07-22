@@ -46,6 +46,8 @@ class Listeners {
 	@Autowired
 	private ApplicationContext applicationContext;
 
+	private static dinal AbstractRepositoryListener<Contact> LISTENER = new AbstractRepositoryListener<>() { };
+
 	private <T extends BaseEntity> AbstractRepositoryListener<T> entity2listener(final T entity) {
 		if (entity instanceof Block)
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(BlockListener.class);
@@ -81,42 +83,30 @@ class Listeners {
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(LocationVisitListener.class);
 		if (entity instanceof Ticket)
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(TicketListener.class);
-		return null;
+		return LISTENER;
 	}
 
 	<T extends BaseEntity> void prePersist(final T entity) throws Exception {
-		final AbstractRepositoryListener<T> listener = entity2listener(entity);
-		if (listener != null)
-			listener.prePersist(entity);
+		entity2listener(entity).prePersist(entity);
 	}
 
 	<T extends BaseEntity> void postPersist(final T entity) throws Exception {
-		final AbstractRepositoryListener<T> listener = entity2listener(entity);
-		if (listener != null)
-			listener.postPersist(entity);
+		entity2listener(entity).postPersist(entity);
 	}
 
 	<T extends BaseEntity> void preUpdate(final T entity) throws Exception {
-		final AbstractRepositoryListener<T> listener = entity2listener(entity);
-		if (listener != null)
-			listener.preUpdate(entity);
+		entity2listener(entity).preUpdate(entity);
 	}
 
 	<T extends BaseEntity> void postUpdate(final T entity) throws Exception {
-		final AbstractRepositoryListener<T> listener = entity2listener(entity);
-		if (listener != null)
-			listener.postUpdate(entity);
+		entity2listener(entity).postUpdate(entity);
 	}
 
 	<T extends BaseEntity> void preRemove(final T entity) throws Exception {
-		final AbstractRepositoryListener<T> listener = entity2listener(entity);
-		if (listener != null)
-			listener.preRemove(entity);
+		entity2listener(entity).preRemove(entity);
 	}
 
 	<T extends BaseEntity> void postRemove(final T entity) throws Exception {
-		final AbstractRepositoryListener<T> listener = entity2listener(entity);
-		if (listener != null)
-			listener.postRemove(entity);
+		entity2listener(entity).postRemove(entity);
 	}
 }
