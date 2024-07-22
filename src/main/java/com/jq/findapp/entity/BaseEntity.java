@@ -18,7 +18,7 @@ import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
 
 @MappedSuperclass
-abstract class BaseEntity {
+public abstract class BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private BigInteger id;
