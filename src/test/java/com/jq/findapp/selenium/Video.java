@@ -1,4 +1,4 @@
-package com.jq.findapp.it;
+package com.jq.findapp.selenium;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +20,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
-import com.jq.findapp.it.AppTest.Util;
+import com.jq.findapp.selenium.AppTest.Util;
 
 public class Video {
 	private static final int width = 480, height = 720;

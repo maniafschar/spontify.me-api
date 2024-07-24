@@ -1,4 +1,4 @@
-package com.jq.findapp.it;
+package com.jq.findapp.selenium;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,7 +19,7 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
-import com.jq.findapp.it.AppTest.Util;
+import com.jq.findapp.selenium.AppTest.Util;
 
 public class Screenshots {
 	private static final String dir = "screenshots/";

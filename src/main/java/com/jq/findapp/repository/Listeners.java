@@ -46,7 +46,7 @@ class Listeners {
 	@Autowired
 	private ApplicationContext applicationContext;
 
-	private static dinal AbstractRepositoryListener<Contact> LISTENER = new AbstractRepositoryListener<>() { };
+	private static final AbstractRepositoryListener<?> LISTENER = new AbstractRepositoryListener<>() { };
 
 	private <T extends BaseEntity> AbstractRepositoryListener<T> entity2listener(final T entity) {
 		if (entity instanceof Block)
@@ -83,7 +83,7 @@ class Listeners {
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(LocationVisitListener.class);
 		if (entity instanceof Ticket)
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(TicketListener.class);
-		return LISTENER;
+		return (AbstractRepositoryListener<T>) LISTENER;
 	}
 
 	<T extends BaseEntity> void prePersist(final T entity) throws Exception {

@@ -207,9 +207,10 @@ public class SupportCenterApi {
 						&& !BigInteger.ZERO.equals(log.get("log.contactId"))) {
 					if (!users.contains(log.get("log.contactId"))) {
 						addLogEntry(result.get(clientId), login, log);
-						users.add(log.get("log.contactId"));
+						users.add((BigInteger) log.get("log.contactId"));
 					}
-				} else if (run == 1 && ((String) log.get("log.uri")).startsWith("/") && log.get("log.contactId") == null)
+				} else if (run == 1 && ((String) log.get("log.uri")).startsWith("/")
+						&& log.get("log.contactId") == null)
 					addLogEntry(result.get(clientId), anonym, log, login);
 				else if (run == 2 && !((String) log.get("log.uri")).startsWith("/"))
 					addLogEntry(result.get(clientId), teaser, log, login, anonym);

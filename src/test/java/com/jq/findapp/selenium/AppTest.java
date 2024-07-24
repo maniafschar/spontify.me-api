@@ -1,4 +1,4 @@
-package com.jq.findapp.it;
+package com.jq.findapp.selenium;
 
 import java.io.File;
 import java.io.FileInputStream;
