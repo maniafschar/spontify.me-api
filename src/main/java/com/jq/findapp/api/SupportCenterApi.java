@@ -110,6 +110,12 @@ public class SupportCenterApi {
 	@Autowired
 	private MetricsEndpoint metricsEndpoint;
 
+	@Value("${app.buildClient}")
+	private String buildClient;
+
+	@Value("${app.buildServer}")
+	private String buildServer;
+
 	@Value("${app.scheduler.secret}")
 	private String schedulerSecret;
 
@@ -220,8 +226,7 @@ public class SupportCenterApi {
 	}
 
 	@GetMapping("report/{days}/api")
-	public Map<String, Map<String, BigInteger>> reportApi(@PathVariable final int days)
-			throws Exception {
+	public Map<String, Map<String, BigInteger>> reportApi(@PathVariable final int days) throws Exception {
 		final Map<String, Map<String, BigInteger>> result = new HashMap<>();
 		final QueryParams params = new QueryParams(Query.misc_listLog);
 		final String time = "time", count = "count";
@@ -246,6 +251,25 @@ public class SupportCenterApi {
 			map.put(count, map.get(count).add(BigInteger.ONE));
 		}
 		return result;
+	}
+
+	@PostMapping("build/{type}")
+	public String build(@PathVariable final String type) throws Exception {
+		if ("server".equals(type)) {
+			final ProcessBuilder pb = new ProcessBuilder(buildServer.split(" "));
+			pb.redirectErrorStream(true);
+			return IOUtils.toString(pb.start().getOutputStream());
+		}
+		if (type.startsWith("client/")) {
+			String result = "";
+			for (final String client : type.substring(7).split(",")) {
+				final ProcessBuilder pb = new ProcessBuilder((buildClient + " " + client).split(" "));
+				pb.redirectErrorStream(true);
+				result += IOUtils.toString(pb.start().getOutputStream()) + "\n\n";
+			}
+			return result.trim();
+		}
+		return null;
 	}
 
 	private boolean addLogEntry(final Map<String, Map<String, Set<String>>> map, final String type,
