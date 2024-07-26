@@ -272,7 +272,7 @@ public class ImportLocationsService {
 		return null;
 	}
 
-	public SchedulerResult importImages() {
+	public SchedulerResult run() {
 		final SchedulerResult result = new SchedulerResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setSearch("location.image is null");
