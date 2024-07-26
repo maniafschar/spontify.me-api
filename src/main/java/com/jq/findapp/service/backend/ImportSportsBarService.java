@@ -31,7 +31,7 @@ public class ImportSportsBarService {
 
 	private static final String URL = "https://skyfinder.sky.de/sf/skyfinder.servlet?detailedSearch=Suchen&group=H&group=B&group=A&country=de&action=search&zip=";
 
-	public SchedulerResult importSportsBars() {
+	public SchedulerResult run() {
 		final SchedulerResult result = new SchedulerResult();
 		final Results results = new Results();
 		try {
@@ -62,7 +62,7 @@ public class ImportSportsBarService {
 		return result;
 	}
 
-	public Results importZipCode(String zip) throws Exception {
+	private Results importZipCode(String zip) throws Exception {
 		final Results result = new Results();
 		final JsonNode list = new ObjectMapper().readTree(WebClient.create(URL + zip).get().retrieve()
 				.toEntity(String.class).block().getBody());
