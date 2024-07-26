@@ -52,7 +52,7 @@ public class RssService {
 
 	private final Set<String> failed = Collections.synchronizedSet(new HashSet<>());
 
-	public SchedulerResult update() {
+	public SchedulerResult run() {
 		final SchedulerResult result = new SchedulerResult();
 		final Result list = this.repository.list(new QueryParams(Query.misc_listClient));
 		final List<CompletableFuture<?>> futures = new ArrayList<>();
