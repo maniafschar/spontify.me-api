@@ -67,7 +67,7 @@ public class EventService {
 		return answers;
 	}
 
-	public SchedulerResult findMatchingBuddies() {
+	public SchedulerResult runMatch() {
 		final SchedulerResult result = new SchedulerResult();
 		try {
 			final QueryParams params = new QueryParams(Query.contact_listId);
@@ -125,7 +125,7 @@ public class EventService {
 		return result;
 	}
 
-	public SchedulerResult notifyParticipation() {
+	public SchedulerResult runParticipation() {
 		final SchedulerResult result = new SchedulerResult();
 		try {
 			final QueryParams params = new QueryParams(Query.event_listParticipateRaw);
@@ -232,7 +232,7 @@ public class EventService {
 		return repository.list(params).size() >= event.getMaxParticipants().intValue();
 	}
 
-	public SchedulerResult importEvents() {
+	public SchedulerResult runImport() {
 		final SchedulerResult result = new SchedulerResult();
 		try {
 			final BigInteger clientId = BigInteger.ONE;
@@ -243,7 +243,7 @@ public class EventService {
 		return result;
 	}
 
-	public SchedulerResult publishEvents() {
+	public SchedulerResult runPublis() {
 		final SchedulerResult result = new SchedulerResult();
 		try {
 			final BigInteger clientId = BigInteger.ONE;
