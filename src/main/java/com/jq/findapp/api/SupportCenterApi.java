@@ -335,8 +335,8 @@ public class SupportCenterApi {
 				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 						.map(CompletableFuture::join).collect(Collectors.toList())).join();
 				list.clear();
-				run(marketingService, "Marketing", list, null, -1);
-				run(marketingService, "MarketingResult", list, null, -1);
+				run(marketingService, null, list, null, -1);
+				run(marketingService, "Result", list, null, -1);
 				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 						.map(CompletableFuture::join).collect(Collectors.toList())).join();
 				run(engagementService, "NearBy", null, null, -1);
