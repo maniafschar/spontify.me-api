@@ -243,7 +243,7 @@ public class EventService {
 		return result;
 	}
 
-	public SchedulerResult runPublis() {
+	public SchedulerResult runPublish() {
 		final SchedulerResult result = new SchedulerResult();
 		try {
 			final BigInteger clientId = BigInteger.ONE;

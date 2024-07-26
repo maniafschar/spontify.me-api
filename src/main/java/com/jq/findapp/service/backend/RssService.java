@@ -96,19 +96,20 @@ public class RssService {
 		private final SimpleDateFormat dateParserPub = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ROOT);
 		private final Set<String> urls = new HashSet<>();
 		private final Set<String> failed = new HashSet<>();
-		private String success = null;
+		private String success = "";
 
 		private ImportFeed(final JsonNode json, final BigInteger clientId, final String publishingPostfix) {
 			try {
 				final String url = json.get("url").asText();
 				ArrayNode rss = null;
+				int i = 0;
 				while (rss == null) {
 					try {
 						rss = (ArrayNode) new XmlMapper().readTree(URI.create(url).toURL()).findValues("item")
 								.get(0);
 					} catch (JsonParseException ex) {
-						if (!ex.getMessage().contains("EOF"))
-							throw new RuntimeException(ex);
+						if (++i > 10 || !ex.getMessage().contains("EOF"))
+							throw new RuntimeException(url, ex);
 						Thread.sleep(1000);
 					}
 				}
@@ -123,7 +124,7 @@ public class RssService {
 					final boolean addDescription = json.has("description") && json.get("description").asBoolean();
 					final String source = json.has("source") ? json.get("source").asText() : null;
 					final String category = json.has("category") ? json.get("category").asText() : null;
-					for (int i = 0; i < rss.size(); i++) {
+					for (i = 0; i < rss.size(); i++) {
 						try {
 							final ClientNews clientNews = this.createNews(params, rss.get(i), addDescription, clientId,
 									url,
@@ -160,7 +161,7 @@ public class RssService {
 								"clientNews.publish>cast('" + first + "' as timestamp) and clientNews.clientId="
 										+ clientId);
 						final Result result = RssService.this.repository.list(params);
-						for (int i = 0; i < result.size(); i++) {
+						for (i = 0; i < result.size(); i++) {
 							if (!this.urls.contains(result.get(i).get("clientNews.url"))) {
 								RssService.this.repository.delete(RssService.this.repository.one(ClientNews.class,
 										(BigInteger) result.get(i).get("clientNews.id")));
