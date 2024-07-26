@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -50,20 +49,19 @@ public class RssService {
 	@Autowired
 	private NotificationService notificationService;
 
-	private final Set<String> failed = Collections.synchronizedSet(new HashSet<>());
-
 	public SchedulerResult run() {
-		failed.clear();
 		final SchedulerResult result = new SchedulerResult();
 		final Result list = this.repository.list(new QueryParams(Query.misc_listClient));
-		final List<CompletableFuture<?>> futures = new ArrayList<>();
+		final List<CompletableFuture<ImportFeed>> futures = new ArrayList<>();
 		for (int i = 0; i < list.size(); i++) {
 			try {
 				final JsonNode json = new ObjectMapper().readTree(list.get(i).get("client.storage").toString());
 				if (json.has("rss")) {
 					for (int i2 = 0; i2 < json.get("rss").size(); i2++)
-						futures.add(this.syncFeed(json.get("rss").get(i2), (BigInteger) list.get(i).get("client.id"),
+						futures.add(CompletableFuture.supplyAsync(() -> {
+							return new ImportFeed(json.get("rss").get(i2), (BigInteger) list.get(i).get("client.id"),
 								json.has("publishingPostfix") ? json.get("publishingPostfix").asText() : null));
+						});
 				}
 			} catch (final Exception e) {
 				if (result.exception == null)
@@ -75,28 +73,22 @@ public class RssService {
 				.thenApply(ignored -> futures.stream()
 						.map(CompletableFuture::join).collect(Collectors.toList()))
 				.join();
+		final List<String> failed = new ArrayList<>();
 		result.result = futures.stream().map(e -> {
 			try {
-				return e.get().toString();
+				failed.addAll(e.get().failed);
+				return e.get().success;
 			} catch (final Exception ex) {
 				return ex.getMessage();
 			}
 		}).collect(Collectors.joining("\n"));
 		while (result.result.contains("\n\n"))
 			result.result = result.result.replace("\n\n", "\n");
-		if (this.failed.size() > 0)
+		if (failed.size() > 0)
 			this.notificationService.createTicket(TicketType.ERROR, "ImportRss",
-					this.failed.size() + " errors:\n" + this.failed.stream().sorted().collect(Collectors.joining("\n")),
+					failed.size() + " errors:\n" + failed.stream().sorted().collect(Collectors.joining("\n")),
 					null);
 		return result;
-	}
-
-	@Async
-	private CompletableFuture<Object> syncFeed(final JsonNode json, final BigInteger clientId,
-			final String publishingPostfix) {
-		return CompletableFuture.supplyAsync(() -> {
-			return new ImportFeed().run(json, clientId, publishingPostfix);
-		});
 	}
 
 	private class ImportFeed {
@@ -108,8 +100,10 @@ public class RssService {
 		private final SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.ROOT);
 		private final SimpleDateFormat dateParserPub = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ROOT);
 		private final Set<String> urls = new HashSet<>();
+		private final Set<String> failed = new HashSet<>();
+		private String success = null;
 
-		private String run(final JsonNode json, final BigInteger clientId, final String publishingPostfix) {
+		private ImportFeed(final JsonNode json, final BigInteger clientId, final String publishingPostfix) {
 			try {
 				final String url = json.get("url").asText();
 				ArrayNode rss = null;
@@ -185,15 +179,14 @@ public class RssService {
 					}
 				}
 				if (count != 0 || deleted != 0)
-					return count + " on " + clientId + " " + url + (deleted > 0 ? ", " + deleted + " deleted" : "");
+					success = count + " on " + clientId + " " + url + (deleted > 0 ? ", " + deleted + " deleted" : "");
 			} catch (final Exception ex) {
 				this.addFailure(ex, json.get("url").asText());
 			}
-			return "";
 		}
 
-		private synchronized void addFailure(final Exception ex, final String url) {
-			RssService.this.failed.add((ex.getMessage().startsWith("IMAGE_") ? "" : ex.getClass().getName() + ": ")
+		private void addFailure(final Exception ex, final String url) {
+			failed.add((ex.getMessage().startsWith("IMAGE_") ? "" : ex.getClass().getName() + ": ")
 					+ ex.getMessage().replace("\n", "\n  ") + "\n  " + url);
 		}
 
