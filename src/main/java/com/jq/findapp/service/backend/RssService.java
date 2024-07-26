@@ -53,6 +53,7 @@ public class RssService {
 	private final Set<String> failed = Collections.synchronizedSet(new HashSet<>());
 
 	public SchedulerResult run() {
+		failed.clear();
 		final SchedulerResult result = new SchedulerResult();
 		final Result list = this.repository.list(new QueryParams(Query.misc_listClient));
 		final List<CompletableFuture<?>> futures = new ArrayList<>();
@@ -104,8 +105,8 @@ public class RssService {
 				Pattern.compile("\\<article.*?\\<figure.*?\\<img .*?src=\\\"(.*?)\\\""),
 				Pattern.compile("\\<div.*?\\<picture.*?\\<img .*?src=\\\"(.*?)\\\"")
 		};
-		private final SimpleDateFormat dateParser = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ROOT);
-		private final SimpleDateFormat dateParser2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.ROOT);
+		private final SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.ROOT);
+		private final SimpleDateFormat dateParserPub = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ROOT);
 		private final Set<String> urls = new HashSet<>();
 
 		private String run(final JsonNode json, final BigInteger clientId, final String publishingPostfix) {
@@ -234,9 +235,9 @@ public class RssService {
 			clientNews.setCategory(category);
 			clientNews.setUrl(uid);
 			if (rss.has("pubDate"))
-				clientNews.setPublish(new Timestamp(this.dateParser.parse(rss.get("pubDate").asText()).getTime()));
+				clientNews.setPublish(new Timestamp(this.dateParserPub.parse(rss.get("pubDate").asText()).getTime()));
 			else
-				clientNews.setPublish(new Timestamp(this.dateParser2.parse(rss.get("date").asText()).getTime()));
+				clientNews.setPublish(new Timestamp(this.dateParser.parse(rss.get("date").asText()).getTime()));
 			clientNews.setImage(null);
 			if (rss.has("media:content") && rss.get("media:content").has("url"))
 				clientNews.setImage(EntityUtil.getImage(rss.get("media:content").get("url").asText(),
