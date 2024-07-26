@@ -65,7 +65,7 @@ public class MarketingService {
 	@Autowired
 	private Text text;
 
-	public SchedulerResult runMarketing() {
+	public SchedulerResult run() {
 		final SchedulerResult result = new SchedulerResult();
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
 		params.setUser(new Contact());
@@ -138,7 +138,7 @@ public class MarketingService {
 		return result;
 	}
 
-	public SchedulerResult runMarketingResult() {
+	public SchedulerResult runResult() {
 		final SchedulerResult result = new SchedulerResult();
 		try {
 			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
