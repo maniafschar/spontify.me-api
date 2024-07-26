@@ -109,11 +109,11 @@ public class RssService {
 								.get(0);
 					} catch (JsonParseException ex) {
 						if (++i > 10 || !ex.getMessage().contains("EOF"))
-							throw new RuntimeException(url, ex);
+							addFailure(ex, url);
 						Thread.sleep(1000);
 					}
 				}
-				if (rss.size() > 0) {
+				if (rss != null && rss.size() > 0) {
 					final QueryParams params = new QueryParams(Query.misc_listNews);
 					params.setUser(new Contact());
 					params.getUser().setClientId(clientId);
