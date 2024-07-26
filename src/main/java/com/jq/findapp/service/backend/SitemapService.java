@@ -24,7 +24,7 @@ public class SitemapService {
 	@Autowired
 	private Repository repository;
 
-	public SchedulerResult update() {
+	public SchedulerResult run() {
 		final SchedulerResult result = new SchedulerResult();
 		final Result list = repository.list(new QueryParams(Query.misc_listClient));
 		for (int i = 0; i < list.size(); i++) {
