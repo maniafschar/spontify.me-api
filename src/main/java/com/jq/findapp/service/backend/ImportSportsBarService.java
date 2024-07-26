@@ -40,7 +40,7 @@ public class ImportSportsBarService {
 			for (int i = 0; i < zip.size(); i++) {
 				final String s = zip.get(i).get("zip").asText();
 				if (s.startsWith("" + zipCodePrefix)) {
-					final Results r = importZipCode(s);
+					final Results r = runZipCode(s);
 					results.imported += r.imported;
 					results.updated += r.updated;
 					results.processed += r.processed;
@@ -62,7 +62,7 @@ public class ImportSportsBarService {
 		return result;
 	}
 
-	private Results importZipCode(String zip) throws Exception {
+	Results runZipCode(String zip) throws Exception {
 		final Results result = new Results();
 		final JsonNode list = new ObjectMapper().readTree(WebClient.create(URL + zip).get().retrieve()
 				.toEntity(String.class).block().getBody());

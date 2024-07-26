@@ -355,7 +355,8 @@ public class SupportCenterApi {
 	}
 
 	@Async
-	private void run(final Object bean, String method, final List<CompletableFuture<Void>> list, int[] hours, int minute) {
+	private void run(final Object bean, final String method, final List<CompletableFuture<Void>> list, int[] hours,
+			int minute) {
 		if (hours != null && !Arrays.stream(hours).anyMatch(e -> e == now.getHour()))
 			return;
 		if (minute > -1 && minute != now.getMinute())
@@ -365,12 +366,12 @@ public class SupportCenterApi {
 			log.setContactId(BigInteger.ZERO);
 			try {
 				log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
-				method = "run" + (method == null ? "" : method);
-				final SchedulerResult result = (SchedulerResult) bean.getClass().getMethod(method).invoke(bean);
+				final String m = "run" + (method == null ? "" : method);
+				final SchedulerResult result = (SchedulerResult) bean.getClass().getMethod(m).invoke(bean);
 				String name = bean.getClass().getSimpleName();
 				if (name.contains("$"))
 					name = name.substring(0, name.indexOf('$'));
-				log.setUri("/support/scheduler/" + name + "/" + method);
+				log.setUri("/support/scheduler/" + name + "/" + m);
 				log.setStatus(Strings.isEmpty(result.exception) ? 200 : 500);
 				if (result.result != null)
 					log.setBody(result.result.trim());

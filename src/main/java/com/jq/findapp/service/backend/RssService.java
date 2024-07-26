@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -54,24 +53,21 @@ public class RssService {
 		final Result list = this.repository.list(new QueryParams(Query.misc_listClient));
 		final List<CompletableFuture<ImportFeed>> futures = new ArrayList<>();
 		for (int i = 0; i < list.size(); i++) {
+			final BigInteger clientId = (BigInteger) list.get(i).get("client.id");
 			try {
 				final JsonNode json = new ObjectMapper().readTree(list.get(i).get("client.storage").toString());
 				if (json.has("rss")) {
-					for (int i2 = 0; i2 < json.get("rss").size(); i2++)
-						futures.add(CompletableFuture.supplyAsync(() -> {
-							return new ImportFeed(json.get("rss").get(i2), (BigInteger) list.get(i).get("client.id"),
-								json.has("publishingPostfix") ? json.get("publishingPostfix").asText() : null));
-						});
+					for (final JsonNode rss : json.get("rss"))
+						futures.add(CompletableFuture.supplyAsync(() -> new ImportFeed(rss, clientId,
+								json.has("publishingPostfix") ? json.get("publishingPostfix").asText() : null)));
 				}
 			} catch (final Exception e) {
 				if (result.exception == null)
 					result.exception = e;
 			}
 		}
-		CompletableFuture
-				.allOf(futures.toArray(new CompletableFuture[futures.size()]))
-				.thenApply(ignored -> futures.stream()
-						.map(CompletableFuture::join).collect(Collectors.toList()))
+		CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
+				.thenApply(ignored -> futures.stream().map(CompletableFuture::join).collect(Collectors.toList()))
 				.join();
 		final List<String> failed = new ArrayList<>();
 		result.result = futures.stream().map(e -> {
@@ -86,8 +82,7 @@ public class RssService {
 			result.result = result.result.replace("\n\n", "\n");
 		if (failed.size() > 0)
 			this.notificationService.createTicket(TicketType.ERROR, "ImportRss",
-					failed.size() + " errors:\n" + failed.stream().sorted().collect(Collectors.joining("\n")),
-					null);
+					failed.size() + " errors:\n" + failed.stream().sorted().collect(Collectors.joining("\n")), null);
 		return result;
 	}
 
@@ -117,71 +112,73 @@ public class RssService {
 						Thread.sleep(1000);
 					}
 				}
-				if (rss.size() == 0)
-					return "";
-				final QueryParams params = new QueryParams(Query.misc_listNews);
-				params.setUser(new Contact());
-				params.getUser().setClientId(clientId);
-				int count = 0;
-				boolean chonological = true;
-				long lastPubDate = 0;
-				Timestamp first = new Timestamp(System.currentTimeMillis());
-				final boolean addDescription = json.has("description") && json.get("description").asBoolean();
-				final String source = json.has("source") ? json.get("source").asText() : null;
-				final String category = json.has("category") ? json.get("category").asText() : null;
-				for (int i = 0; i < rss.size(); i++) {
-					try {
-						final ClientNews clientNews = this.createNews(params, rss.get(i), addDescription, clientId, url,
-								source, category);
-						if (clientNews != null && clientNews.getImage() != null) {
-							if (clientNews.getPublish().getTime() > lastPubDate)
-								chonological = false;
-							else
-								lastPubDate = clientNews.getPublish().getTime();
-							if (clientNews.getId() == null)
-								count++;
-							clientNews.setLatitude((float) json.get("latitude").asDouble());
-							clientNews.setLongitude((float) json.get("longitude").asDouble());
-							final boolean b = json.get("publish").asBoolean() && clientNews.getId() == null;
-							RssService.this.repository.save(clientNews);
-							if (first.getTime() > clientNews.getPublish().getTime())
-								first = clientNews.getPublish();
-							this.urls.add(clientNews.getUrl());
-							if (b)
-								RssService.this.externalService.publishOnFacebook(clientId,
-										clientNews.getDescription()
-												+ (Strings.isEmpty(source) ? "" : "\n" + source)
-												+ (Strings.isEmpty(publishingPostfix) ? ""
-														: "\n\n" + publishingPostfix),
-										"/rest/marketing/news/" + clientNews.getId());
-						}
-					} catch (final Exception ex) {
-						this.addFailure(ex, url);
-					}
-				}
-				int deleted = 0;
-				if (chonological) {
-					params.setSearch(
-							"clientNews.publish>cast('" + first + "' as timestamp) and clientNews.clientId="
-									+ clientId);
-					final Result result = RssService.this.repository.list(params);
-					for (int i = 0; i < result.size(); i++) {
-						if (!this.urls.contains(result.get(i).get("clientNews.url"))) {
-							RssService.this.repository.delete(RssService.this.repository.one(ClientNews.class,
-									(BigInteger) result.get(i).get("clientNews.id")));
-							RssService.this.notificationService.createTicket(TicketType.ERROR, "RSS Deletion",
-									result.get(i).get("clientNews.id") + "\n"
-											+ result.get(i).get("clientNews.description")
-											+ "\n" + result.get(i).get("clientNews.url"),
-									clientId);
-							deleted++;
+				if (rss.size() > 0) {
+					final QueryParams params = new QueryParams(Query.misc_listNews);
+					params.setUser(new Contact());
+					params.getUser().setClientId(clientId);
+					int count = 0;
+					boolean chonological = true;
+					long lastPubDate = 0;
+					Timestamp first = new Timestamp(System.currentTimeMillis());
+					final boolean addDescription = json.has("description") && json.get("description").asBoolean();
+					final String source = json.has("source") ? json.get("source").asText() : null;
+					final String category = json.has("category") ? json.get("category").asText() : null;
+					for (int i = 0; i < rss.size(); i++) {
+						try {
+							final ClientNews clientNews = this.createNews(params, rss.get(i), addDescription, clientId,
+									url,
+									source, category);
+							if (clientNews != null && clientNews.getImage() != null) {
+								if (clientNews.getPublish().getTime() > lastPubDate)
+									chonological = false;
+								else
+									lastPubDate = clientNews.getPublish().getTime();
+								if (clientNews.getId() == null)
+									count++;
+								clientNews.setLatitude((float) json.get("latitude").asDouble());
+								clientNews.setLongitude((float) json.get("longitude").asDouble());
+								final boolean b = json.get("publish").asBoolean() && clientNews.getId() == null;
+								RssService.this.repository.save(clientNews);
+								if (first.getTime() > clientNews.getPublish().getTime())
+									first = clientNews.getPublish();
+								this.urls.add(clientNews.getUrl());
+								if (b)
+									RssService.this.externalService.publishOnFacebook(clientId,
+											clientNews.getDescription()
+													+ (Strings.isEmpty(source) ? "" : "\n" + source)
+													+ (Strings.isEmpty(publishingPostfix) ? ""
+															: "\n\n" + publishingPostfix),
+											"/rest/marketing/news/" + clientNews.getId());
+							}
+						} catch (final Exception ex) {
+							this.addFailure(ex, url);
 						}
 					}
+					int deleted = 0;
+					if (chonological) {
+						params.setSearch(
+								"clientNews.publish>cast('" + first + "' as timestamp) and clientNews.clientId="
+										+ clientId);
+						final Result result = RssService.this.repository.list(params);
+						for (int i = 0; i < result.size(); i++) {
+							if (!this.urls.contains(result.get(i).get("clientNews.url"))) {
+								RssService.this.repository.delete(RssService.this.repository.one(ClientNews.class,
+										(BigInteger) result.get(i).get("clientNews.id")));
+								RssService.this.notificationService.createTicket(TicketType.ERROR, "RSS Deletion",
+										result.get(i).get("clientNews.id") + "\n"
+												+ result.get(i).get("clientNews.description")
+												+ "\n" + result.get(i).get("clientNews.url"),
+										clientId);
+								deleted++;
+							}
+						}
+					}
+					if (count != 0 || deleted != 0)
+						success = count + " on " + clientId + " " + url
+								+ (deleted > 0 ? ", " + deleted + " deleted" : "");
 				}
-				if (count != 0 || deleted != 0)
-					success = count + " on " + clientId + " " + url + (deleted > 0 ? ", " + deleted + " deleted" : "");
 			} catch (final Exception ex) {
-				this.addFailure(ex, json.get("url").asText());
+				addFailure(ex, json.get("url").asText());
 			}
 		}
 

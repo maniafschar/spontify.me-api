@@ -54,11 +54,11 @@ public class SurveyServiceTest {
 	public void update_twice() throws Exception {
 		// given
 		utils.createContact(BigInteger.valueOf(4));
-		SchedulerResult result = surveyService.update();
+		SchedulerResult result = surveyService.run();
 		assertNull(result.exception);
 
 		// when
-		result = surveyService.update();
+		result = surveyService.run();
 
 		// then
 		assertNull(result.exception);

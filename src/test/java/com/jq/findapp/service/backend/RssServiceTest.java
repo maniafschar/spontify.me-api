@@ -209,7 +209,7 @@ public class RssServiceTest {
 		utils.createContact(BigInteger.ONE);
 
 		// when
-		final SchedulerResult result = rssService.update();
+		final SchedulerResult result = rssService.run();
 
 		// then
 		assertTrue(!Strings.isEmpty(result), result.result);
