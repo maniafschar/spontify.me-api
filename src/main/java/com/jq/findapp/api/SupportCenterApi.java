@@ -316,37 +316,37 @@ public class SupportCenterApi {
 				schedulerRunning = true;
 				now = LocalDateTime.now();
 				final List<CompletableFuture<Void>> list = new ArrayList<>();
-				run(importSportsBarService, "importSportsBars", list, new int[] { 3 }, 0);
-				run(chatService, "answerAi", list, null, -1);
-				// run(marketingService, "notificationSportbars", list,
+				run(importSportsBarService, null, list, new int[] { 3 }, 0);
+				run(chatService, null, list, null, -1);
+				// run(marketingService, "runSportbars", list,
 				// new int[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 },
 				// 50);
-				run(dbService, "update", list, null, -1);
-				run(dbService, "cleanUpAttachments", list, new int[] { 0 }, 30);
-				run(engagementService, "sendRegistrationReminder", list, new int[] { 0 }, 40);
-				run(eventService, "findMatchingBuddies", list, null, -1);
-				run(eventService, "importEvents", list, new int[] { 5 }, 40);
-				run(eventService, "publishEvents", list, null, -1);
-				run(eventService, "notifyParticipation", list, null, -1);
-				run(importLogService, "importLog", list, null, -1);
-				run(rssService, "update", list, null, -1);
-				run(surveyService, "update", list, null, -1);
-				run(importLocationsService, "importImages", list, null, 50);
+				run(dbService, null, list, null, -1);
+				run(dbService, "runCleanUp", list, new int[] { 0 }, 30);
+				run(engagementService, "runRegistration", list, new int[] { 0 }, 40);
+				run(eventService, "runMatch", list, null, -1);
+				run(eventService, "runImport", list, new int[] { 5 }, 40);
+				run(eventService, "runPublish", list, null, -1);
+				run(eventService, "runParticipation", list, null, -1);
+				run(importLogService, null, list, null, -1);
+				run(rssService, null, list, null, -1);
+				run(surveyService, null, list, null, -1);
+				run(importLocationsService, null, list, null, 50);
 				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 						.map(CompletableFuture::join).collect(Collectors.toList())).join();
 				list.clear();
-				run(marketingService, "notificationClientMarketing", list, null, -1);
-				run(marketingService, "notificationClientMarketingResult", list, null, -1);
+				run(marketingService, "runMarketing", list, null, -1);
+				run(marketingService, "runMarketingResult", list, null, -1);
 				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 						.map(CompletableFuture::join).collect(Collectors.toList())).join();
-				run(engagementService, "sendNearBy", null, null, -1);
+				run(engagementService, "runNearBy", null, null, -1);
 				list.clear();
-				run(engagementService, "sendChats", list, null, -1);
-				run(ipService, "lookupIps", list, null, -1);
-				run(sitemapService, "update", list, new int[] { 20 }, 0);
+				run(engagementService, "runChats", list, null, -1);
+				run(ipService, null, list, null, -1);
+				run(sitemapService, null, list, new int[] { 20 }, 0);
 				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 						.map(CompletableFuture::join).collect(Collectors.toList())).join();
-				run(dbService, "backup", null, null, -1);
+				run(dbService, "runBackup", null, null, -1);
 			} finally {
 				schedulerRunning = false;
 			}
@@ -355,8 +355,7 @@ public class SupportCenterApi {
 	}
 
 	@Async
-	private void run(final Object bean, String method, final List<CompletableFuture<Void>> list,
-			int[] hours, int minute) {
+	private void run(final Object bean, String method, final List<CompletableFuture<Void>> list, int[] hours, int minute) {
 		if (hours != null && !Arrays.stream(hours).anyMatch(e -> e == now.getHour()))
 			return;
 		if (minute > -1 && minute != now.getMinute())
@@ -366,6 +365,8 @@ public class SupportCenterApi {
 			log.setContactId(BigInteger.ZERO);
 			try {
 				log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
+				if (method == null)
+					method = "run";
 				final SchedulerResult result = (SchedulerResult) bean.getClass().getMethod(method).invoke(bean);
 				String name = bean.getClass().getSimpleName();
 				if (name.contains("$"))
