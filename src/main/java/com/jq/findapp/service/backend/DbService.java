@@ -126,10 +126,8 @@ public class DbService {
 				e -> client.setUrl(e)) || modified;
 		final ObjectMapper om = new ObjectMapper();
 		final ObjectNode node = (ObjectNode) om.readTree(Attachment.resolve(client.getStorage()));
-		if (!node.has("lang")) {
+		if (!node.has("lang"))
 			node.set("lang", om.createObjectNode());
-			modified = true;
-		}
 		final List<String> langs = Arrays.asList("DE", "EN");
 		for (final String lang : langs) {
 			final JsonNode json = new ObjectMapper()
@@ -138,7 +136,7 @@ public class DbService {
 							StandardCharsets.UTF_8));
 			if (!node.get("lang").has(lang))
 				((ObjectNode) node.get("lang")).set(lang, om.createObjectNode());
-			if (!node.get("lang").has("buddy") ||
+			if (!node.get("lang").get(lang).has("buddy") ||
 					!node.get("lang").get(lang).get("buddy").asText()
 							.equals(json.get("labels").get("buddies").asText())) {
 				((ObjectNode) node.get("lang").get(lang)).set("buddy", json.get("labels").get("buddy"));

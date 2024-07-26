@@ -102,15 +102,16 @@ public class RssService {
 			try {
 				final String url = json.get("url").asText();
 				ArrayNode rss = null;
-				int i = 0;
-				while (rss == null) {
+				for (int i = 0; i < 5 && rss == null; i++) {
 					try {
 						rss = (ArrayNode) new XmlMapper().readTree(URI.create(url).toURL()).findValues("item")
 								.get(0);
+						if (i > 0)
+							success = "[" + i + "] ";
 					} catch (JsonParseException ex) {
-						if (++i > 10 || !ex.getMessage().contains("EOF"))
-							addFailure(ex, url);
-						Thread.sleep(1000);
+						if (!ex.getMessage().contains("EOF"))
+							throw ex;
+						Thread.sleep(5000);
 					}
 				}
 				if (rss != null && rss.size() > 0) {
@@ -124,7 +125,7 @@ public class RssService {
 					final boolean addDescription = json.has("description") && json.get("description").asBoolean();
 					final String source = json.has("source") ? json.get("source").asText() : null;
 					final String category = json.has("category") ? json.get("category").asText() : null;
-					for (i = 0; i < rss.size(); i++) {
+					for (int i = 0; i < rss.size(); i++) {
 						try {
 							final ClientNews clientNews = this.createNews(params, rss.get(i), addDescription, clientId,
 									url,
@@ -161,7 +162,7 @@ public class RssService {
 								"clientNews.publish>cast('" + first + "' as timestamp) and clientNews.clientId="
 										+ clientId);
 						final Result result = RssService.this.repository.list(params);
-						for (i = 0; i < result.size(); i++) {
+						for (int i = 0; i < result.size(); i++) {
 							if (!this.urls.contains(result.get(i).get("clientNews.url"))) {
 								RssService.this.repository.delete(RssService.this.repository.one(ClientNews.class,
 										(BigInteger) result.get(i).get("clientNews.id")));
@@ -175,11 +176,11 @@ public class RssService {
 						}
 					}
 					if (count != 0 || deleted != 0)
-						success = count + " on " + clientId + " " + url
+						success += count + " on " + clientId + " " + url
 								+ (deleted > 0 ? ", " + deleted + " deleted" : "");
 				}
 			} catch (final Exception ex) {
-				addFailure(ex, json.get("url").asText());
+				addFailure(ex, success + json.get("url").asText());
 			}
 		}
 
