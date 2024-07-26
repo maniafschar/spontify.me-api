@@ -34,7 +34,7 @@ public class IpService {
 		return ip;
 	}
 
-	public SchedulerResult lookupIps() {
+	public SchedulerResult run() {
 		final SchedulerResult result = new SchedulerResult();
 		final QueryParams params = new QueryParams(Query.misc_listIp);
 		params.setSearch("ip.longitude=0 and ip.latitude=0");
