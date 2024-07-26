@@ -48,7 +48,7 @@ public class DbService {
 	@Value("${app.server.webDir}")
 	private String webDir;
 
-	public SchedulerResult update() {
+	public SchedulerResult run() {
 		final SchedulerResult result = new SchedulerResult();
 		try {
 			repository.executeUpdate(
@@ -92,7 +92,7 @@ public class DbService {
 		return result;
 	}
 
-	public SchedulerResult cleanUpAttachments() {
+	public SchedulerResult runCleanUp() {
 		final SchedulerResult result = new SchedulerResult();
 		try {
 			result.result = repository.cleanUpAttachments();
@@ -102,7 +102,7 @@ public class DbService {
 		return result;
 	}
 
-	public SchedulerResult backup() {
+	public SchedulerResult runBackup() {
 		final SchedulerResult result = new SchedulerResult();
 		try {
 			new ProcessBuilder("./backup.sh").start().waitFor();
