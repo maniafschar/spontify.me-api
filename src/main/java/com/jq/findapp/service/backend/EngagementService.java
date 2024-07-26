@@ -265,7 +265,7 @@ public class EngagementService {
 		chatTemplates.add(new ChatTemplate(TextId.engagement_like, null, null));
 	}
 
-	public SchedulerResult sendRegistrationReminder() {
+	public SchedulerResult runRegistration() {
 		final SchedulerResult result = new SchedulerResult();
 		try {
 			final GregorianCalendar gc = new GregorianCalendar();
@@ -317,7 +317,7 @@ public class EngagementService {
 		return result;
 	}
 
-	public SchedulerResult sendChats() {
+	public SchedulerResult runChats() {
 		final SchedulerResult result = new SchedulerResult();
 		try {
 			resetChatInstallCurrentVersion();
@@ -418,7 +418,7 @@ public class EngagementService {
 		}
 	}
 
-	public SchedulerResult sendNearBy() {
+	public SchedulerResult runNearBy() {
 		final SchedulerResult result = new SchedulerResult();
 		try {
 			final QueryParams params = new QueryParams(Query.contact_listId);
