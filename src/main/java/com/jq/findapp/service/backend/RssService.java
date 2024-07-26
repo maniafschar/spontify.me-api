@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -110,9 +111,18 @@ public class RssService {
 		private String run(final JsonNode json, final BigInteger clientId, final String publishingPostfix) {
 			try {
 				final String url = json.get("url").asText();
-				final ArrayNode rss = (ArrayNode) new XmlMapper().readTree(URI.create(url).toURL()).findValues("item")
-						.get(0);
-				if (rss == null || rss.size() == 0)
+				ArrayNode rss = null;
+				while (rss == null) {
+					try {
+						rss = (ArrayNode) new XmlMapper().readTree(URI.create(url).toURL()).findValues("item")
+								.get(0);
+					} catch (JsonParseException ex) {
+						if (!ex.getMessage().contains("EOF"))
+							throw new RuntimeException(ex);
+						Thread.sleep(1000);
+					}
+				}
+				if (rss.size() == 0)
 					return "";
 				final QueryParams params = new QueryParams(Query.misc_listNews);
 				params.setUser(new Contact());

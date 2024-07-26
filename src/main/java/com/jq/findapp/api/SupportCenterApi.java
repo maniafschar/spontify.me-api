@@ -1,6 +1,7 @@
 package com.jq.findapp.api;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
@@ -15,6 +16,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
@@ -110,10 +112,10 @@ public class SupportCenterApi {
 	@Autowired
 	private MetricsEndpoint metricsEndpoint;
 
-	@Value("${app.buildClient}")
+	@Value("${app.admin.buildClient}")
 	private String buildClient;
 
-	@Value("${app.buildServer}")
+	@Value("${app.admin.buildServer}")
 	private String buildServer;
 
 	@Value("${app.scheduler.secret}")
@@ -258,14 +260,14 @@ public class SupportCenterApi {
 		if ("server".equals(type)) {
 			final ProcessBuilder pb = new ProcessBuilder(buildServer.split(" "));
 			pb.redirectErrorStream(true);
-			return IOUtils.toString(pb.start().getOutputStream());
+			return IOUtils.toString(pb.start().getInputStream(), StandardCharsets.UTF_8);
 		}
-		if (type.startsWith("client/")) {
+		if (type.startsWith("client|")) {
 			String result = "";
 			for (final String client : type.substring(7).split(",")) {
 				final ProcessBuilder pb = new ProcessBuilder((buildClient + " " + client).split(" "));
 				pb.redirectErrorStream(true);
-				result += IOUtils.toString(pb.start().getOutputStream()) + "\n\n";
+				result += IOUtils.toString(pb.start().getInputStream(), StandardCharsets.UTF_8) + "\n\n";
 			}
 			return result.trim();
 		}
