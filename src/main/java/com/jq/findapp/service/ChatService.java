@@ -53,7 +53,7 @@ public class ChatService {
 								!list.get(0).get("contactLink.contactId").equals(contact.getId()));
 	}
 
-	public SchedulerResult answerAi() {
+	public SchedulerResult run() {
 		final SchedulerResult result = new SchedulerResult();
 		final QueryParams params = new QueryParams(Query.contact_chat);
 		params.setSearch(
