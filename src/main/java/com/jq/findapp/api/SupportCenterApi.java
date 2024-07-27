@@ -259,6 +259,11 @@ public class SupportCenterApi {
 	public Object build(@PathVariable final String type) throws Exception {
 		if ("state".equals(type))
 			return metrics();
+		if ("processes".equals(type)) {
+			final ProcessBuilder pb = new ProcessBuilder(("ps aux|grep java").split(" "));
+			pb.redirectErrorStream(true);
+			return IOUtils.toString(pb.start().getInputStream(), StandardCharsets.UTF_8);
+		}
 		if ("server".equals(type))
 			new ProcessBuilder(buildServer.split(" ")).start();
 		else if (type.startsWith("client|")) {
