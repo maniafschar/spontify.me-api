@@ -256,9 +256,9 @@ public class SupportCenterApi {
 	}
 
 	@PostMapping("build/{type}")
-	public String build(@PathVariable final String type) throws Exception {
+	public Object build(@PathVariable final String type) throws Exception {
 		if ("state".equals(type))
-			return "up and running";
+			return metrics();
 		if ("server".equals(type))
 			new ProcessBuilder(buildServer.split(" "));
 		else if (type.startsWith("client|")) {
