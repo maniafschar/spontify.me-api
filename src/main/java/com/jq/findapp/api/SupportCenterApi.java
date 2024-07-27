@@ -257,12 +257,11 @@ public class SupportCenterApi {
 
 	@PostMapping("build/{type}")
 	public String build(@PathVariable final String type) throws Exception {
-		if ("server".equals(type)) {
-			final ProcessBuilder pb = new ProcessBuilder(buildServer.split(" "));
-			pb.redirectErrorStream(true);
-			return IOUtils.toString(pb.start().getInputStream(), StandardCharsets.UTF_8);
-		}
-		if (type.startsWith("client|")) {
+		if ("state".equals(type))
+			return "up and running";
+		if ("server".equals(type))
+			new ProcessBuilder(buildServer.split(" "));
+		else if (type.startsWith("client|")) {
 			String result = "";
 			for (final String client : type.substring(7).split(",")) {
 				final ProcessBuilder pb = new ProcessBuilder((buildClient + " " + client).split(" "));
