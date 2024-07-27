@@ -269,7 +269,7 @@ public class SupportCenterApi {
 			String result = "";
 			for (final String client : type.substring(7).split(",")) {
 				final ProcessBuilder pb = new ProcessBuilder(
-						(buildScript.replace("{type}", type) + " " + client).split(" "));
+						(buildScript.replace("{type}", "client") + " " + client).split(" "));
 				pb.redirectErrorStream(true);
 				result += IOUtils.toString(pb.start().getInputStream(), StandardCharsets.UTF_8) + "\n\n";
 			}
