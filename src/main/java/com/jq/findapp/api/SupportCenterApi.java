@@ -260,7 +260,7 @@ public class SupportCenterApi {
 		if ("state".equals(type))
 			return metrics();
 		if ("server".equals(type))
-			new ProcessBuilder(buildServer.split(" "));
+			new ProcessBuilder(buildServer.split(" ")).start();
 		else if (type.startsWith("client|")) {
 			String result = "";
 			for (final String client : type.substring(7).split(",")) {
