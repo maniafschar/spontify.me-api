@@ -112,11 +112,8 @@ public class SupportCenterApi {
 	@Autowired
 	private MetricsEndpoint metricsEndpoint;
 
-	@Value("${app.admin.buildClient}")
-	private String buildClient;
-
-	@Value("${app.admin.buildServer}")
-	private String buildServer;
+	@Value("${app.admin.buildScript}")
+	private String buildScript;
 
 	@Value("${app.scheduler.secret}")
 	private String schedulerSecret;
@@ -265,11 +262,14 @@ public class SupportCenterApi {
 			return IOUtils.toString(pb.start().getInputStream(), StandardCharsets.UTF_8);
 		}
 		if ("server".equals(type))
-			new ProcessBuilder(buildServer.split(" ")).start();
+			new ProcessBuilder(buildScript.replace("{type}", type).split(" ")).start();
+		else if ("sc".equals(type))
+			new ProcessBuilder(buildScript.replace("{type}", type).split(" ")).start();
 		else if (type.startsWith("client|")) {
 			String result = "";
 			for (final String client : type.substring(7).split(",")) {
-				final ProcessBuilder pb = new ProcessBuilder((buildClient + " " + client).split(" "));
+				final ProcessBuilder pb = new ProcessBuilder(
+						(buildScript.replace("{type}", type) + " " + client).split(" "));
 				pb.redirectErrorStream(true);
 				result += IOUtils.toString(pb.start().getInputStream(), StandardCharsets.UTF_8) + "\n\n";
 			}
