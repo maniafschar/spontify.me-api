@@ -254,6 +254,7 @@ public class SupportCenterApi {
 
 	@PostMapping("build/{type}")
 	public Object build(@PathVariable final String type) throws Exception {
+		x
 		if ("state".equals(type))
 			return metrics();
 		if ("processes".equals(type)) {
