@@ -260,7 +260,7 @@ public class SupportCenterApi {
 		if ("state".equals(type))
 			return metrics();
 		if ("processes".equals(type)) {
-			final ProcessBuilder pb = new ProcessBuilder("ps aux|grep java");
+			final ProcessBuilder pb = new ProcessBuilder("/usr/bin/bash", "-c", "ps aux|grep java");
 			pb.redirectErrorStream(true);
 			return IOUtils.toString(pb.start().getInputStream(), StandardCharsets.UTF_8);
 		}
