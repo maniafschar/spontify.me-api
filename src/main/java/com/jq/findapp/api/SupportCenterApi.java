@@ -187,8 +187,7 @@ public class SupportCenterApi {
 	}
 
 	@GetMapping("report/{days}")
-	public Map<String, Map<String, Map<String, Set<String>>>> report(@PathVariable final int days)
-			throws Exception {
+	public Map<String, Map<String, Map<String, Set<String>>>> report(@PathVariable final int days) throws Exception {
 		final Map<String, Map<String, Map<String, Set<String>>>> result = new HashMap<>();
 		final QueryParams params = new QueryParams(Query.misc_listLog);
 		final String anonym = "anonym", login = "login", teaser = "teaser";
@@ -198,28 +197,33 @@ public class SupportCenterApi {
 						+ Instant.now().minus(Duration.ofDays(days)) + "' as timestamp)");
 		final Result list = repository.list(params);
 		final Set<BigInteger> users = new HashSet<>();
-		for (int run = 0; run < 3; run++) {
-			for (int i = 0; i < list.size(); i++) {
-				final Map<String, Object> log = list.get(i);
-				final String clientId = log.get("log.clientId").toString();
-				if (!result.containsKey(clientId)) {
-					result.put(clientId, new HashMap<>());
-					result.get(clientId).put(anonym, new HashMap<>());
-					result.get(clientId).put(login, new HashMap<>());
-					result.get(clientId).put(teaser, new HashMap<>());
-				}
-				if (run == 0 && ((String) log.get("log.uri")).startsWith("/") && log.get("log.contactId") != null
-						&& !BigInteger.ZERO.equals(log.get("log.contactId"))) {
-					if (!users.contains(log.get("log.contactId"))) {
-						addLogEntry(result.get(clientId), login, log);
-						users.add((BigInteger) log.get("log.contactId"));
-					}
-				} else if (run == 1 && ((String) log.get("log.uri")).startsWith("/")
-						&& log.get("log.contactId") == null)
-					addLogEntry(result.get(clientId), anonym, log, login);
-				else if (run == 2 && !((String) log.get("log.uri")).startsWith("/"))
-					addLogEntry(result.get(clientId), teaser, log, login, anonym);
+		for (int i = 0; i < list.size(); i++) {
+			final Map<String, Object> log = list.get(i);
+			final String clientId = log.get("log.clientId").toString();
+			if (!result.containsKey(clientId)) {
+				result.put(clientId, new HashMap<>());
+				result.get(clientId).put(anonym, new HashMap<>());
+				result.get(clientId).put(login, new HashMap<>());
+				result.get(clientId).put(teaser, new HashMap<>());
 			}
+			if (((String) log.get("log.uri")).startsWith("/") && log.get("log.contactId") != null
+					&& !BigInteger.ZERO.equals(log.get("log.contactId"))) {
+				if (!users.contains(log.get("log.contactId"))) {
+					addLogEntry(result.get(clientId), login, log);
+					users.add((BigInteger) log.get("log.contactId"));
+				}
+			}
+		}
+		for (int i = 0; i < list.size(); i++) {
+			final Map<String, Object> log = list.get(i);
+			if (((String) log.get("log.uri")).startsWith("/")
+					&& (log.get("log.contactId") == null || BigInteger.ZERO.equals(log.get("log.contactId"))))
+				addLogEntry(result.get(log.get("log.clientId").toString()), anonym, log, login);
+		}
+		for (int i = 0; i < list.size(); i++) {
+			final Map<String, Object> log = list.get(i);
+			if (!((String) log.get("log.uri")).startsWith("/"))
+				addLogEntry(result.get(log.get("log.clientId").toString()), teaser, log, login, anonym);
 		}
 		return result;
 	}
