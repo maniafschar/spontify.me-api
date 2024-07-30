@@ -168,7 +168,8 @@ public class MarketingApi {
 				result.put("_skills", location.getSkills());
 				result.put("_telephone", location.getTelephone());
 				result.put("_url", location.getUrl());
-			} else if (!((String) result.get("clientMarketing.storage")).contains("locationMarketing")
+			}
+			if ((locationId == null || !((String) result.get("clientMarketing.storage")).contains("locationMarketing"))
 					&& !finished(result, clientId, user, clientMarketingId, ip))
 				return result;
 		}
