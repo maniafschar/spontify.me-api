@@ -689,7 +689,6 @@ public class SurveyService {
 						if (s.length() > 0)
 							result.result += "\nresultAndNotify: " + s;
 						result.result += synchronize.updateMatchdays(clientId);
-
 					}
 				}
 			} catch (final Exception e) {
@@ -743,8 +742,10 @@ public class SurveyService {
 				|| fixture.has("errors") && fixture.get("errors").has("rateLimit"))
 			return true;
 		final JsonNode responses = fixture.get("response");
-		if (responses.get(responses.size() - 1).has("timestamp"))
-			return responses.get(responses.size() - 1).get("timestamp").asLong() < System.currentTimeMillis();
+		if (responses.get(responses.size() - 1).has("fixture")
+				&& responses.get(responses.size() - 1).get("fixture").has("timestamp"))
+			return responses.get(responses.size() - 1).get("fixture").get("timestamp").asLong() < System
+					.currentTimeMillis();
 		return false;
 	}
 }
