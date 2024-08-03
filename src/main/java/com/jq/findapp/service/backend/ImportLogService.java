@@ -56,7 +56,7 @@ public class ImportLogService {
 				if (!file.contains(".") && !new File("log/" + file).isDirectory()) {
 					final int x = importLog("log/" + file);
 					if (x > 0)
-						result.result += x + " " + file.substring(3) + "\n";
+						result.result += x + " " + file + "\n";
 				}
 			}
 			final long t = System.currentTimeMillis();
