@@ -55,6 +55,8 @@ public abstract class BaseEntity {
 
 	@Transient
 	public void historize() {
+		if (id == null)
+			return;
 		if (old == null)
 			old = new HashMap<>();
 		for (final Field field : getClass().getDeclaredFields()) {
