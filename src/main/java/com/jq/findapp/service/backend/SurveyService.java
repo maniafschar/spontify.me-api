@@ -74,6 +74,8 @@ public class SurveyService {
 	@Value("${app.sports.api.token}")
 	private String token;
 
+	private long lastCall = 0;
+
 	private static final String STORAGE_PREFIX = "api-sports-";
 
 	static class PollSurvey extends Poll {
@@ -729,6 +731,9 @@ public class SurveyService {
 				storage.setLabel(label);
 				storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
 				repository.save(storage);
+				lastCall = fixture.get("errors").has("rateLimit") || fixture.get("errors").has("requests")
+						? System.currentTimeMillis()
+						: 0;
 			} else
 				notificationService.createTicket(TicketType.ERROR, "FIXTURE not FOUND", url, null);
 		}
@@ -738,8 +743,11 @@ public class SurveyService {
 	}
 
 	private boolean needUpdate(final JsonNode fixture) {
+		if (System.currentTimeMillis() - lastCall < 24 * 60 * 60 * 1000)
+			return false;
 		if (fixture == null || fixture.get("results").intValue() == 0
-				|| fixture.has("errors") && fixture.get("errors").has("rateLimit"))
+				|| fixture.has("errors")
+						&& (fixture.get("errors").has("rateLimit") || fixture.get("errors").has("requests")))
 			return true;
 		final JsonNode responses = fixture.get("response");
 		if (responses.get(responses.size() - 1).has("fixture")
