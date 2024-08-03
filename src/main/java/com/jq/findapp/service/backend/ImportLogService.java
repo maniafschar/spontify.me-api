@@ -50,10 +50,10 @@ public class ImportLogService {
 			if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) < 1
 					&& Calendar.getInstance().get(Calendar.MINUTE) < 1)
 				linesRead.clear();
-			final List<String> files = Arrays.asList(new File(".").list());
+			final List<String> files = Arrays.asList(new File("log").list());
 			files.sort((a, b) -> a.compareTo(b));
 			for (final String file : files) {
-				if (file.startsWith("log") && !file.contains(".") && !new File(file).isDirectory()) {
+				if (!file.contains(".") && !new File(file).isDirectory()) {
 					final int x = importLog(file);
 					if (x > 0)
 						result.result += x + " " + file.substring(3) + "\n";

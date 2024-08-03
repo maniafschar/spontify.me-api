@@ -21,7 +21,7 @@ public class FindappApplication {
 		IIORegistry.getDefaultInstance().registerServiceProvider(new WebPImageReaderSpi());
 		final SpringApplicationBuilder app = new SpringApplicationBuilder(FindappApplication.class);
 		app.application().addListeners(new ApplicationPidFileWriter(
-				"./shutdown" + System.getProperties().getProperty("server.port") + ".pid"));
+				"pid/" + System.getProperties().getProperty("server.port") + ".pid"));
 		app.run(args);
 	}
 
