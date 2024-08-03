@@ -716,8 +716,7 @@ public class SurveyService {
 		final Result result = repository.list(params);
 		if (result.size() > 0 && !Strings.isEmpty(result.get(0).get("storage.storage")))
 			fixture = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
-		if (fixture == null || fixture.get("results").intValue() == 0
-				|| fixture.has("errors") && fixture.get("errors").has("rateLimit")) {
+		if (needUpdate(fixture)) {
 			fixture = WebClient
 					.create("https://v3.football.api-sports.io/fixtures?" + url)
 					.get()
@@ -737,5 +736,15 @@ public class SurveyService {
 		if (fixture == null)
 			throw new RuntimeException(url + " not found");
 		return fixture.get("response");
+	}
+
+	private boolean needUpdate(final JsonNode fixture) {
+		if (fixture == null || fixture.get("results").intValue() == 0
+				|| fixture.has("errors") && fixture.get("errors").has("rateLimit"))
+			return true;
+		final JsonNode responses = fixture.get("response");
+		if (responses.get(responses.size() - 1).has("timestamp"))
+			return responses.get(responses.size() - 1).get("timestamp").asLong() < System.currentTimeMillis();
+		return false;
 	}
 }
