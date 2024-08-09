@@ -209,7 +209,7 @@ public class SupportCenterApi {
 			}
 			if (((String) log.get("log.uri")).startsWith("/") && log.get("log.contactId") != null
 					&& !BigInteger.ZERO.equals(log.get("log.contactId"))) {
-				final String day = "-" + new SimpleDateFormat().format(log.get("log.createdAt"));
+				final String day = new SimpleDateFormat("-yyyy-MM-dd").format(log.get("log.createdAt"));
 				if (!users.contains(log.get("log.contactId") + day)) {
 					addLogEntry(result.get(clientId), login, log);
 					users.add(log.get("log.contactId") + day);

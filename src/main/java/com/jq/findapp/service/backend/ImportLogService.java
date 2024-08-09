@@ -79,7 +79,7 @@ public class ImportLogService {
 		try (final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filename)))) {
 			final int startFrom = linesRead.containsKey(filename) ? linesRead.get(filename) : 0;
 			final QueryParams params = new QueryParams(Query.misc_listLog);
-			final String uri = filename.substring(3).replaceAll("\\d", "").toLowerCase();
+			final String uri = filename.substring(filename.lastIndexOf('/') + 1).replaceAll("\\d", "").toLowerCase();
 			String line;
 			int lines = 0;
 			final List<String> omitIps = Arrays.asList(ips2skip.split(","));
