@@ -54,7 +54,7 @@ public class ImportLogService {
 			final List<String> files = Arrays.asList(new File(dir).list());
 			files.sort((a, b) -> a.compareTo(b));
 			for (final String file : files) {
-				if (!file.contains(".") && !new File(dir + file).isDirectory()) {
+				if (!file.contains(".") && new File(dir + file).exists() && !new File(dir + file).isDirectory()) {
 					final int x = importLog(dir + file);
 					if (x > 0)
 						result.result += x + " " + file + "\n";
