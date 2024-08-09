@@ -33,7 +33,7 @@ public class EngagementServiceTest {
 		this.utils.createContact(BigInteger.ONE);
 
 		// when
-		this.engagementService.runChats();
+		this.engagementService.run();
 
 		// then no exception
 	}
