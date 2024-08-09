@@ -29,7 +29,7 @@ public class Utils {
 				client.setEmail("abc@jq-consulting.de");
 				client.setUrl("https://fan-club.online");
 				client.setStorage(
-						"{\"rss\":[{\"url\":\"https://newsfeed.kicker.de/team/fc-bayern-muenchen\",\"publish\":false,\"latitude\":48.13684,\"longitude\":11.57685,\"descriptionPostfix\":\"Kicker\"}],\"css\":{\"bg1stop\":\"rgb(255,4,250)\",\"bg1start\":\"rgb(80,0,75)\",\"text\":\"rgb(255,255,255)\"},\"survey\":[0]}");
+						"{\"lang\":{\"DE\":{\"buddy\":\"Buddy\",\"buddies\":\"Buddies\"}},\"rss\":[{\"url\":\"https://newsfeed.kicker.de/team/fc-bayern-muenchen\",\"publish\":false,\"latitude\":48.13684,\"longitude\":11.57685,\"descriptionPostfix\":\"Kicker\"}],\"css\":{\"bg1stop\":\"rgb(255,4,250)\",\"bg1start\":\"rgb(80,0,75)\",\"text\":\"rgb(255,255,255)\"},\"survey\":[0]}");
 				client.setAdminId(id);
 				repository.save(client);
 			} while (client.getId().compareTo(id) < 0);
