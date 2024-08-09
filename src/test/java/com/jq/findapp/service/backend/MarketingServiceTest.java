@@ -102,7 +102,7 @@ public class MarketingServiceTest {
 		assertEquals("Deine Location wurde erfolgreich akualisiert.\n"
 				+ "Marketing-Material senden wir Dir an die Adresse Deiner Location.\n"
 				+ "Ein Zugang wurde für Dich angelegt, eine Email versendet.\n"
-				+ "Ein Zugang konnte nicht angelegt werden, die Email ist bereits registriert! Versuche Dich anzumelden oder über den \"Passwort vergessen\" Dialog Dir Dein Passwort zurücksetzen zu lassen.\n"
+				+ "Ein Zugang wurde für Dich angelegt, eine Email versendet.\n"
 				+ "Lieben Dank für Dein Feedback.", result);
 	}
 }
