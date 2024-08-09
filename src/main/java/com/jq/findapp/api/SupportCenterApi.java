@@ -3,6 +3,7 @@ package com.jq.findapp.api;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -196,7 +197,7 @@ public class SupportCenterApi {
 				"log.clientId>0 and (log.uri='/action/teaser/contacts' or log.uri not like '/%') and LOWER(ip.org) not like '%google%' and LOWER(ip.org) not like '%facebook%' and LOWER(ip.org) not like '%amazon%' and log.createdAt>cast('"
 						+ Instant.now().minus(Duration.ofDays(days)) + "' as timestamp)");
 		final Result list = repository.list(params);
-		final Set<BigInteger> users = new HashSet<>();
+		final Set<String> users = new HashSet<>();
 		for (int i = 0; i < list.size(); i++) {
 			final Map<String, Object> log = list.get(i);
 			final String clientId = log.get("log.clientId").toString();
@@ -208,9 +209,10 @@ public class SupportCenterApi {
 			}
 			if (((String) log.get("log.uri")).startsWith("/") && log.get("log.contactId") != null
 					&& !BigInteger.ZERO.equals(log.get("log.contactId"))) {
-				if (!users.contains(log.get("log.contactId"))) {
+				final String day = "-" + new SimpleDateFormat().format(log.get("log.createdAt"));
+				if (!users.contains(log.get("log.contactId") + day)) {
 					addLogEntry(result.get(clientId), login, log);
-					users.add((BigInteger) log.get("log.contactId"));
+					users.add(log.get("log.contactId") + day);
 				}
 			}
 		}

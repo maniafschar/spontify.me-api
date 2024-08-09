@@ -102,7 +102,7 @@ public class MarketingServiceTest {
 		assertEquals("Deine Location wurde erfolgreich akualisiert.\n"
 				+ "Marketing-Material senden wir Dir an die Adresse Deiner Location.\n"
 				+ "Ein Zugang wurde für Dich angelegt, eine Email versendet.\n"
-				+ "Ein Zugang wurde für Dich angelegt, eine Email versendet.\n"
+				+ "Wir freuen uns auf eine weitere Zusammenarbeit und melden uns in Bälde bei Dir.\n"
 				+ "Lieben Dank für Dein Feedback.", result);
 	}
 }
