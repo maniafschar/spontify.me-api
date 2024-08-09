@@ -8,7 +8,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -16,17 +15,16 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.MailSendException;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.OS;
 import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.Location;
-import com.jq.findapp.entity.Setting;
-import com.jq.findapp.entity.Ticket.TicketType;
+import com.jq.findapp.entity.Storage;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -268,7 +266,6 @@ public class EngagementService {
 	public SchedulerResult runRegistration() {
 		final SchedulerResult result = new SchedulerResult();
 		try {
-			final GregorianCalendar gc = new GregorianCalendar();
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setSearch("contact.createdAt<cast('" + Instant.now().minus(Duration.ofHours(3))
 					+ "' as timestamp) and contact.verified=false and contact.notification like '%"
@@ -276,48 +273,34 @@ public class EngagementService {
 			params.setLimit(0);
 			final Result list = repository.list(params);
 			final long DAY = 86400000;
-			String value = "", failedEmails = "";
-			params.setQuery(Query.misc_setting);
-			try {
-				for (int i = 0; i < list.size(); i++) {
-					final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
-					params.setSearch("setting.label='registration-reminder' and concat('|', setting.data, '|') like '%|"
-							+ to.getId() + "|%'");
-					final Result result2 = repository.list(params);
-					if (result2.size() == 0
-							|| ((Timestamp) result2.get(0).get("setting.createdAt")).getTime() + 9 * DAY < System
-									.currentTimeMillis()) {
-						try {
-							authenticationService.recoverSendEmailReminder(to);
-							value += "|" + to.getId();
-							if (value.length() > Setting.MAX_VALUE_LENGTH - 20)
-								break;
-							Thread.sleep(10000);
-						} catch (final MailSendException ex) {
-							failedEmails += "\n" + to.getEmail() + "\n" + Strings.stackTraceToString(ex);
-						}
-					}
+			int count = 0;
+			params.setQuery(Query.misc_listStorage);
+			params.setSearch("storage.label='registration-reminder'");
+			final Map<String, Object> history = repository.list(params).get(0);
+			@SuppressWarnings("unchecked")
+			final Map<BigInteger, Long> sent = new ObjectMapper()
+					.readValue((String) history.get("storage.storage"), Map.class);
+			for (int i = 0; i < list.size(); i++) {
+				final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
+				if (!sent.containsKey(to.getId())
+						|| (sent.get(to.getId()) + 9 * DAY < System.currentTimeMillis())) {
+					authenticationService.recoverSendEmailReminder(to);
+					sent.put(to.getId(), System.currentTimeMillis());
+					count++;
 				}
-			} finally {
-				if (value.length() > 0) {
-					final Setting s = new Setting();
-					s.setLabel("registration-reminder");
-					s.setData(value.substring(1));
-					repository.save(s);
-					result.result = "" + value.split("|").length;
-				} else
-					result.result = "0";
-				if (failedEmails.length() > 0)
-					notificationService.createTicket(TicketType.ERROR, "sendRegistrationReminder",
-							"Failed Emails:" + failedEmails, null);
 			}
+			result.result = "" + count;
+			final Storage storage = repository.one(Storage.class, (BigInteger) history.get("storage.id"));
+			storage.historize();
+			storage.setStorage(new ObjectMapper().writeValueAsString(sent));
+			repository.save(storage);
 		} catch (final Exception e) {
 			result.exception = e;
 		}
 		return result;
 	}
 
-	public SchedulerResult runChats() {
+	public SchedulerResult run() {
 		final SchedulerResult result = new SchedulerResult();
 		try {
 			resetChatInstallCurrentVersion();
@@ -358,35 +341,29 @@ public class EngagementService {
 	private boolean isTimeForNewChat(final Contact contact, final QueryParams params, final boolean nearBy) {
 		final int hour = Instant.now().atZone(TimeZone.getTimeZone(contact.getTimezone()).toZoneId()).getHour();
 		if (hour > 6 && hour < 22) {
-			final QueryParams paramsAdminBlocked = new QueryParams(Query.contact_block);
 			final BigInteger adminId = repository.one(Client.class, contact.getClientId()).getAdminId();
-			paramsAdminBlocked.setSearch("block.contactId=" + adminId + " and block.contactId2="
-					+ contact.getId()
-					+ " or block.contactId=" + contact.getId() + " and block.contactId2=" + adminId);
-			if (repository.list(paramsAdminBlocked).size() == 0) {
-				params.setSearch("contactChat.contactId=" + adminId + " and contactChat.contactId2=" + contact.getId()
-						+ " and contactChat.createdAt>cast('"
-						+ Instant.now().minus(Duration.ofDays(21 + (int) (Math.random() * 3)))
-								.minus(Duration.ofHours((int) (Math.random() * 12))).toString()
-						+ "' as timestamp)");
-				if (repository.list(params).size() == 0) {
-					params.setSearch(
-							"contactChat.textId is not null and contactChat.contactId=" + adminId
-									+ " and contactChat.contactId2="
-									+ contact.getId());
-					final Result lastChats = repository.list(params);
-					if (lastChats.size() == 0)
-						return true;
-					final boolean isLastChatNearBy = ((TextId) lastChats.get(0).get("contactChat.textId")).name()
-							.startsWith(
-									TextId.engagement_nearByLocation.name().substring(0,
-											TextId.engagement_nearByLocation.name().indexOf('L')));
-					if (!nearBy && isLastChatNearBy || nearBy && !isLastChatNearBy)
-						return true;
-					if (((Timestamp) lastChats.get(0).get("contactChat.createdAt"))
-							.before(new Timestamp(Instant.now().minus(Duration.ofDays(7)).toEpochMilli())))
-						return true;
-				}
+			params.setSearch("contactChat.contactId=" + adminId + " and contactChat.contactId2=" + contact.getId()
+					+ " and contactChat.createdAt>cast('"
+					+ Instant.now().minus(Duration.ofDays(28 + (int) (Math.random() * 3)))
+							.minus(Duration.ofHours((int) (Math.random() * 12))).toString()
+					+ "' as timestamp)");
+			if (repository.list(params).size() == 0) {
+				params.setSearch(
+						"contactChat.textId is not null and contactChat.contactId=" + adminId
+								+ " and contactChat.contactId2="
+								+ contact.getId());
+				final Result lastChats = repository.list(params);
+				if (lastChats.size() == 0)
+					return true;
+				final boolean isLastChatNearBy = ((TextId) lastChats.get(0).get("contactChat.textId")).name()
+						.startsWith(
+								TextId.engagement_nearByLocation.name().substring(0,
+										TextId.engagement_nearByLocation.name().indexOf('L')));
+				if (!nearBy && isLastChatNearBy || nearBy && !isLastChatNearBy)
+					return true;
+				if (((Timestamp) lastChats.get(0).get("contactChat.createdAt"))
+						.before(new Timestamp(Instant.now().minus(Duration.ofDays(7)).toEpochMilli())))
+					return true;
 			}
 		}
 		return false;

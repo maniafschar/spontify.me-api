@@ -35,7 +35,7 @@ public class ImportSportsBarService {
 		final SchedulerResult result = new SchedulerResult();
 		final Results results = new Results();
 		try {
-			final String zipCodePrefix = "" + (LocalDateTime.now().getDayOfMonth() % 10);
+			final String zipCodePrefix = "" + (LocalDateTime.now().getDayOfYear() % 10);
 			final JsonNode zip = new ObjectMapper().readTree(getClass().getResourceAsStream("/json/zip.json"));
 			for (int i = 0; i < zip.size(); i++) {
 				final String s = zip.get(i).get("zip").asText();

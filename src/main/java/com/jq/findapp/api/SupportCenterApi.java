@@ -350,7 +350,7 @@ public class SupportCenterApi {
 						.map(CompletableFuture::join).collect(Collectors.toList())).join();
 				run(engagementService, "NearBy", null, null, -1);
 				list.clear();
-				run(engagementService, "Chats", list, null, -1);
+				run(engagementService, null, list, null, -1);
 				run(ipService, null, list, null, -1);
 				run(sitemapService, null, list, new int[] { 20 }, 0);
 				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
