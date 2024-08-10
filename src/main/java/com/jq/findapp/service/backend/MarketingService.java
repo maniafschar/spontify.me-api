@@ -86,7 +86,7 @@ public class MarketingService {
 					boolean run = true;
 					final Contact contact = repository.one(Contact.class,
 							(BigInteger) contacts.get(i2).get("contact.id"));
-					if ("0.6.7".compareTo(contact.getVersion()) > 0)
+					if (Strings.isEmpty(contact.getVersion()) || "0.6.7".compareTo(contact.getVersion()) > 0)
 						run = false;
 					if (!Strings.isEmpty(clientMarketing.getLanguage())
 							&& !clientMarketing.getLanguage().contains(contact.getLanguage()))
