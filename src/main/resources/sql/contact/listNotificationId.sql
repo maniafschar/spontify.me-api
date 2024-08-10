@@ -7,4 +7,5 @@ FROM
 WHERE
 	contact.clientId={CLIENTID} and contactNotification.id is null
 GROUP BY
-	contact.id
+	contact.id,
+	contactNotification.id
