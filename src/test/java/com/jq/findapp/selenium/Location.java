@@ -26,6 +26,9 @@ import com.jq.findapp.util.Strings;
 public class Location {
 	private final Pattern emailPattern = Pattern.compile(".*(\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,8}\\b).*",
 			Pattern.CASE_INSENSITIVE);
+	private JavascriptExecutor js;
+	private List<String> address;
+	private List<String> blocked;
 
 	@Test
 	public void run() throws Exception {
@@ -40,7 +43,7 @@ public class Location {
 		}
 		file.delete();
 		final String url = "https://www.google.com/search";
-		final List<String> blocked = Arrays.asList(new ObjectMapper().readValue(
+		blocked = Arrays.asList(new ObjectMapper().readValue(
 				AuthenticationService.class.getResourceAsStream("/json/blockedTokens.json"),
 				String[].class));
 		WebDriver driver = null;
@@ -53,34 +56,26 @@ public class Location {
 				if (Integer.parseInt(s[1]) <= startId)
 					continue;
 				System.out.println(s[1]);
-				final List<String> address = Arrays
+				address = Arrays
 						.asList(s[0].toLowerCase().replace(".", "").replace("-", ",").replace(" ", ",")
 								.split(","));
 				write(out, "-- " + s[1] + " | " + s[0] + "\n");
 				try {
 					driver = AppTest.createWebDriver(800, 700, false);
-					final JavascriptExecutor js = (JavascriptExecutor) driver;
+					js = (JavascriptExecutor) driver;
 					driver.manage().timeouts().implicitlyWait(Duration.ofMillis(50));
 					driver.manage().window().setSize(new Dimension(1200, 900));
 					driver.get(url + "?q=" + s[0]);
-					@SuppressWarnings("unchecked")
-					final List<String> links = (List<String>) js.executeScript(
-							"return Array.from(document.getElementById('center_col').querySelectorAll('span>a')).map(e => e.getAttribute('href'))");
-					for (final String urlPage : links) {
-						if (!blocked.stream().anyMatch(e -> urlPage.toLowerCase().contains(e))) {
-							driver.get(urlPage);
-							final String urlLocation = js.executeScript("return document.location.href")
-									.toString().toLowerCase();
-							js.executeScript(
-									"Array.from(document.querySelectorAll('a')).find(e => e.textContent.toLowerCase().indexOf('impressum')>-1)?.click()");
-							final String html = ((String) js.executeScript("return document.body.innerHTML"))
-									.toLowerCase();
-							final int addressWordsCount = addressWordsCount(address, html);
-							write(out, "-- " + addressWordsCount + "% " + urlPage + "\n");
-							if (addressWordsCount > 70 && findEmail(html, urlLocation, s[1], out))
-								break;
-						}
-					}
+					String urlLocation = (String) js.executeScript(
+							"return document.getElementsByClassName('bkaPDb')[0]?.querySelector('a')?.getAttribute('href')");
+					if (!Strings.isEmpty(urlLocation)) {
+						driver.get(urlLocation);
+						if (!analysePage(out, s[1],
+								((String) js.executeScript("return document.body.innerHTML")).toLowerCase(),
+								urlLocation.toString().toLowerCase(), true))
+							lookupSearchResults(out, s[1]);
+					} else
+						lookupSearchResults(out, s[1]);
 					write(out, "\n");
 				} catch (Exception ex) {
 					if (ex.getMessage().contains("Could not start a new session. Response code 500.")) {
@@ -101,6 +96,48 @@ public class Location {
 		}
 	}
 
+	private void lookupSearchResults(final FileOutputStream out, final String id) throws IOException {
+		@SuppressWarnings("unchecked")
+		final List<String> links = (List<String>) js.executeScript(
+				"return Array.from(document.getElementById('center_col').querySelectorAll('span>a')).map(e => e.getAttribute('href'))");
+		for (final String urlPage : links) {
+			if (!blocked.stream().anyMatch(e -> urlPage.toLowerCase().contains(e))) {
+				((WebDriver) js).get(urlPage);
+				String urlLocation = js.executeScript("return document.location.href").toString()
+						.toLowerCase();
+				String html = null;
+				boolean found = false;
+				if (urlLocation.contains("falstaff.com")) {
+					html = ((String) js.executeScript("return document.body.innerHTML")).toLowerCase();
+					html = html.substring(html.indexOf("contact-details__content"));
+					final Matcher matcher = Pattern
+							.compile(".*(\\bhttps://[A-Z0-9._-]+\\b).*", Pattern.CASE_INSENSITIVE)
+							.matcher(html);
+					if (matcher.find()) {
+						urlLocation = matcher.group(1);
+						found = true;
+					}
+				}
+				if (analysePage(out, id, html, urlLocation, !found))
+					return;
+			}
+		}
+	}
+
+	private boolean analysePage(final FileOutputStream out, final String id, String html, final String urlLocation,
+			final boolean imprint) throws IOException {
+		if (imprint) {
+			js.executeScript(
+					"Array.from(document.querySelectorAll('a')).find(e => e.textContent.toLowerCase().indexOf('impressum')>-1)?.click()");
+			html = ((String) js.executeScript("return document.body.innerHTML")).toLowerCase();
+		}
+		final int addressWordsCount = addressWordsCount(address, html);
+		write(out, "-- " + addressWordsCount + "% " + urlLocation + "\n");
+		if (addressWordsCount > 70 && findEmail(html, urlLocation, id, out))
+			return true;
+		return false;
+	}
+
 	private int addressWordsCount(final List<String> address, final String html) {
 		return (int) (((double) address.stream().filter(e -> html.contains(e.toString())).count()) / address.size()
 				* 100 + 0.5);
@@ -116,13 +153,16 @@ public class Location {
 		while ((pos = html.lastIndexOf('@', pos - 1)) > 0) {
 			final Matcher matcher = emailPattern.matcher(
 					html.substring(Math.max(0, pos - 200), Math.min(pos + 200, html.length())));
-			if (matcher.find() && (urlLocation.contains(
-					matcher.group(1).toLowerCase().substring(matcher.group(1).indexOf("@") + 1)) ||
-					urlLocation.contains(
-							matcher.group(1).toLowerCase().substring(0, matcher.group(1).indexOf("@"))))) {
-				write(out, "update location set email='"
-						+ matcher.group(1) + "', url='" + urlLocation + "', modified_at=now() where id=" + id + ";\n");
-				return true;
+			if (matcher.find()) {
+				final String email = matcher.group(1).toLowerCase().replace("[at]", "@");
+				if (!email.endsWith(".png") && !email.endsWith(".jpg")
+						&& (urlLocation.contains(email.substring(matcher.group(1).indexOf("@") + 1)) ||
+								urlLocation.contains(email.substring(0, matcher.group(1).indexOf("@"))))) {
+					write(out, "update location set email='"
+							+ email + "', url='" + urlLocation + "', modified_at=now() where id=" + id
+							+ ";\n");
+					return true;
+				}
 			}
 		}
 		return false;
