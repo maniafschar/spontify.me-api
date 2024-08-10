@@ -17,6 +17,7 @@ public class ClientNews extends BaseEntity {
 	private String category;
 	private String description;
 	private String image;
+	private String publishId;
 	private String source;
 	private String url;
 	private Timestamp publish;
@@ -36,6 +37,14 @@ public class ClientNews extends BaseEntity {
 
 	public void setLatitude(final Float latitude) {
 		this.latitude = latitude;
+	}
+
+	public void setPublishId(String publishId) {
+		this.publishId = publishId;
+	}
+
+	public String getPublishId() {
+		return publishId;
 	}
 
 	public Boolean getNotified() {

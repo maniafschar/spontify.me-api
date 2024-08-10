@@ -182,7 +182,8 @@ public class MarketingService {
 	}
 
 	private void publish(final ClientMarketing clientMarketing, boolean result) throws Exception {
-		if (clientMarketing.getShare() && clientMarketing.isCreateResult()) {
+		if (clientMarketing.getShare() && clientMarketing.getCreateResult()
+				&& Strings.isEmpty(clientMarketing.getPublishId())) {
 			final ObjectMapper om = new ObjectMapper();
 			om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			final JsonNode clientJson = om.readTree(Attachment
@@ -202,8 +203,12 @@ public class MarketingService {
 			if (result)
 				s = text.getText(contact, TextId.notification_clientMarketingPollResult)
 						.replace("{0}", s);
-			externalService.publishOnFacebook(clientMarketing.getClientId(),
+			final String fbId = externalService.publishOnFacebook(clientMarketing.getClientId(),
 					s, "/rest/marketing/" + clientMarketing.getId() + (result ? "/result" : ""));
+			if (fbId != null) {
+				clientMarketing.setPublishId(fbId);
+				repository.save(clientMarketing);
+			}
 		}
 	}
 

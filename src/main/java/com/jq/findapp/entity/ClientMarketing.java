@@ -15,11 +15,12 @@ import jakarta.persistence.Transient;
 @Entity
 public class ClientMarketing extends BaseEntity {
 	private BigInteger clientId;
-	private boolean createResult;
+	private Boolean createResult;
 	private Boolean share = true;
 	private String age;
 	private String gender;
 	private String language;
+	private String publishId;
 	private String region;
 	private String storage;
 	private String image;
@@ -59,12 +60,20 @@ public class ClientMarketing extends BaseEntity {
 		this.clientId = clientId;
 	}
 
-	public boolean isCreateResult() {
+	public boolean getCreateResult() {
 		return createResult;
 	}
 
 	public void setCreateResult(boolean createResult) {
 		this.createResult = createResult;
+	}
+
+	public String getPublishId() {
+		return publishId;
+	}
+
+	public void setPublishId(String publishId) {
+		this.publishId = publishId;
 	}
 
 	public Timestamp getStartDate() {

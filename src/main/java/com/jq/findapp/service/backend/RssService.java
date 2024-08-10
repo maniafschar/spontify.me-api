@@ -128,8 +128,7 @@ public class RssService {
 					for (int i = 0; i < rss.size(); i++) {
 						try {
 							final ClientNews clientNews = this.createNews(params, rss.get(i), addDescription, clientId,
-									url,
-									source, category);
+									url, source, category);
 							if (clientNews != null && clientNews.getImage() != null) {
 								if (clientNews.getPublish().getTime() > lastPubDate)
 									chonological = false;
@@ -144,13 +143,18 @@ public class RssService {
 								if (first.getTime() > clientNews.getPublish().getTime())
 									first = clientNews.getPublish();
 								this.urls.add(clientNews.getUrl());
-								if (b)
-									RssService.this.externalService.publishOnFacebook(clientId,
+								if (b) {
+									final String fbId = RssService.this.externalService.publishOnFacebook(clientId,
 											clientNews.getDescription()
 													+ (Strings.isEmpty(source) ? "" : "\n" + source)
 													+ (Strings.isEmpty(publishingPostfix) ? ""
 															: "\n\n" + publishingPostfix),
 											"/rest/marketing/news/" + clientNews.getId());
+									if (fbId != null) {
+										clientNews.setPublishId(fbId);
+										repository.save(clientNews);
+									}
+								}
 							}
 						} catch (final Exception ex) {
 							this.addFailure(ex, url);

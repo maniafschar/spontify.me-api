@@ -18,7 +18,6 @@ public class Contact extends BaseEntity {
 	private BigInteger referer;
 	private Boolean authenticate = false;
 	private Boolean bluetooth = true;
-	private String notification;
 	private Boolean search = true;
 	private Boolean teaser = true;
 	private Boolean verified = false;
@@ -56,6 +55,7 @@ public class Contact extends BaseEntity {
 	private String imageList;
 	private String language;
 	private String loginLink;
+	private String notification;
 	@Column(columnDefinition = "TEXT")
 	private String password;
 	private String pseudonym;

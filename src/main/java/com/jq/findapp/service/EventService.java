@@ -179,6 +179,8 @@ public class EventService {
 	@Async
 	public void publish(final BigInteger id) throws Exception {
 		final Event event = repository.one(Event.class, id);
+		if (!Strings.isEmpty(event.getPublishId()))
+			return;
 		final Contact contact = repository.one(Contact.class, event.getContactId());
 		final Location location = event.getLocationId() == null ? null
 				: repository.one(Location.class, event.getLocationId());
