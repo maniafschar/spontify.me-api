@@ -181,8 +181,8 @@ public class SurveyService {
 					}
 				}
 			}
-			final Map<String, Integer> homeList = new HashMap<>();
-			final Map<String, Integer> awayList = new HashMap<>();
+			final Map<String, Double> homeList = new HashMap<>();
+			final Map<String, Double> awayList = new HashMap<>();
 			final List<String> labels = new ArrayList<>();
 			String added = "|";
 			for (int i = 0; i < matches.size(); i++) {
@@ -190,14 +190,14 @@ public class SurveyService {
 				for (int i2 = 0; i2 < json.get(0).get("statistics").size(); i2++) {
 					final String label = json.get(0).get("statistics").get(i2).get("type").asText();
 					if (!homeList.containsKey(label)) {
-						homeList.put(label, 0);
-						awayList.put(label, 0);
+						homeList.put(label, 0.0);
+						awayList.put(label, 0.0);
 						labels.add(label);
 					}
 					homeList.put(label,
-							homeList.get(label) + json.get(0).get("statistics").get(i2).get("value").asInt());
+							homeList.get(label) + json.get(0).get("statistics").get(i2).get("value").asDouble());
 					awayList.put(label,
-							awayList.get(label) + json.get(1).get("statistics").get(i2).get("value").asInt());
+							awayList.get(label) + json.get(1).get("statistics").get(i2).get("value").asDouble());
 				}
 				final String s = ((JsonNode) matches.get(i).get("goals")).get("home").intValue() + " : "
 						+ ((JsonNode) matches.get(i).get("goals")).get("away").intValue();
