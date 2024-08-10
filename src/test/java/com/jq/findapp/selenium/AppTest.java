@@ -8,7 +8,9 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -16,12 +18,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,13 +46,32 @@ public class AppTest {
 	@Autowired
 	private Utils utils;
 
+	static WebDriver createWebDriver(int width, int height, boolean mobile) {
+		final ChromeOptions options = new ChromeOptions();
+		final Map<String, Object> deviceMetrics = new HashMap<>();
+		deviceMetrics.put("pixelRatio", 1.0);
+		deviceMetrics.put("width", width);
+		deviceMetrics.put("height", height);
+		if (mobile) {
+			final Map<String, Object> userAgent = new HashMap<>();
+			userAgent.put("deviceMetrics", deviceMetrics);
+			userAgent.put("pixelRatio", 1.0);
+			userAgent.put("mobileEmulationEnabled", Boolean.TRUE);
+			userAgent.put("userAgent",
+					"Mozilla/5.0 (Linux; Android 7.0; SAMSUNG SM-A510F Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/5.4 Chrome/51.0.2704.106 Mobile Safari/537.36");
+			options.setExperimentalOption("mobileEmulation", userAgent);
+		}
+		options.addArguments("--remote-allow-origins=*");
+		options.addArguments("user-data-dir=./chrome");
+		return new ChromeDriver(options);
+	}
+
 	@BeforeEach
 	public void start() throws Exception {
 		new ProcessBuilder("./web.sh", "start").start();
 		Util.sleep(5000);
-		Util.driver = new ChromeDriver();
+		Util.driver = createWebDriver(450, 800, false);
 		Util.driver.manage().timeouts().implicitlyWait(Duration.ofMillis(50));
-		Util.driver.manage().window().setSize(new Dimension(450, 800));
 		this.init();
 	}
 

@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.service.AuthenticationService;
@@ -42,7 +41,7 @@ public class Location {
 				final List<String> address = Arrays
 						.asList(s[0].toLowerCase().replace(".", "").replace("-", ",").replace(" ", ",")
 								.split(","));
-				final WebDriver driver = new ChromeDriver();
+				final WebDriver driver = AppTest.createWebDriver(800, 700, false);
 				write(out, "-- " + s[1] + " | " + s[0] + "\n");
 				try {
 					final JavascriptExecutor js = (JavascriptExecutor) driver;

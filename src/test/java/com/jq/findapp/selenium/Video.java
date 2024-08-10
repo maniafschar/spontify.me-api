@@ -3,8 +3,6 @@ package com.jq.findapp.selenium;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,12 +11,9 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 
 import com.jq.findapp.selenium.AppTest.Util;
 
@@ -26,27 +21,12 @@ public class Video {
 	private static final int width = 480, height = 720;
 	private static final String dir = "screenshots/";
 	private static JavascriptExecutor js;
-	private static final Map<String, Object> userAgent = new HashMap<>();
-	private static final Map<String, Object> deviceMetrics = new HashMap<>();
-	private static final ChromeOptions options = new ChromeOptions();
 
 	@BeforeAll
 	public static void start() throws Exception {
 		new File(dir).mkdir();
-		System.setProperty("webdriver.chrome.driver", "../ChromeDriver");
-		deviceMetrics.put("pixelRatio", 1.0);
-		userAgent.put("deviceMetrics", deviceMetrics);
-		userAgent.put("pixelRatio", 1.0);
-		userAgent.put("mobileEmulationEnabled", Boolean.TRUE);
-		userAgent.put("userAgent",
-				"Mozilla/5.0 (Linux; Android 7.0; SAMSUNG SM-A510F Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/5.4 Chrome/51.0.2704.106 Mobile Safari/537.36");
-		options.addArguments("--remote-allow-origins=*");
-		options.setExperimentalOption("mobileEmulation", userAgent);
-		deviceMetrics.put("width", width);
-		deviceMetrics.put("height", height);
-		Util.driver = new ChromeDriver(options);
+		Util.driver = AppTest.createWebDriver(width, height + 200, true);
 		js = (JavascriptExecutor) Util.driver;
-		Util.driver.manage().window().setSize(new Dimension(width, height + 200));
 		Util.driver.manage().window().setPosition(new Point(100, 0));
 		Util.driver.get("https://after-work.events/");
 	}

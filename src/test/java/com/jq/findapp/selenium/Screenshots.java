@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,29 +15,17 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 
 import com.jq.findapp.selenium.AppTest.Util;
 
 public class Screenshots {
 	private static final String dir = "screenshots/";
 	private static JavascriptExecutor js;
-	private static final Map<String, Object> userAgent = new HashMap<>();
-	private static final Map<String, Object> deviceMetrics = new HashMap<>();
-	private static final ChromeOptions options = new ChromeOptions();
 	private static final double resolution = 1.0;
 
 	@BeforeAll
 	public static void start() throws Exception {
 		new File(dir).mkdir();
-		deviceMetrics.put("pixelRatio", resolution);
-		userAgent.put("deviceMetrics", deviceMetrics);
-		userAgent.put("pixelRatio", resolution);
-		userAgent.put("mobileEmulationEnabled", Boolean.TRUE);
-		userAgent.put("userAgent",
-				"Mozilla/5.0 (Linux; Android 7.0; SAMSUNG SM-A510F Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/5.4 Chrome/51.0.2704.106 Mobile Safari/537.36");
-		options.addArguments("--remote-allow-origins=*");
-		options.setExperimentalOption("mobileEmulation", userAgent);
 	}
 
 	@AfterAll
@@ -59,11 +45,9 @@ public class Screenshots {
 	}
 
 	private String openBrowser(final int width, final int height) {
-		deviceMetrics.put("width", width);
-		deviceMetrics.put("height", height);
 		if (Util.driver != null)
 			Util.driver.close();
-		Util.driver = new ChromeDriver(options);
+		Util.driver = AppTest.createWebDriver(width, height, true);
 		js = (JavascriptExecutor) Util.driver;
 		Util.driver.manage().window().setSize(new Dimension((int) (width / resolution), (int) (height / resolution)));
 		return width + "x" + height;
