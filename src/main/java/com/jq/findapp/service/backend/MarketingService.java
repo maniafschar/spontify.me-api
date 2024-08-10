@@ -408,7 +408,7 @@ public class MarketingService {
 		om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
 		final Poll poll = om.readValue(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
-		if (!clientMarketing.isCreateResult())
+		if (!clientMarketing.getCreateResult())
 			return null;
 		final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 		params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketingId);
