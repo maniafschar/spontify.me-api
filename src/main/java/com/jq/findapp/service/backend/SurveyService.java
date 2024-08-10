@@ -581,9 +581,9 @@ public class SurveyService {
 					if (labels.containsKey(s))
 						s = labels.get(s);
 					g2.drawString(s, padding + (int) w - g2.getFontMetrics().stringWidth(s) / 2, y + h);
-					s = poll.statistics.get(i).get("home").toString();
+					s = "" + (int) (((double) poll.statistics.get(i).get("home")) + 0.5);
 					g2.drawString(s, padding + (int) w * 0.4f - g2.getFontMetrics().stringWidth(s), y + h);
-					s = poll.statistics.get(i).get("away").toString();
+					s = "" + (int) (((double) poll.statistics.get(i).get("away")) + 0.5);
 					g2.drawString(s, padding + (int) w * 1.6f, y + h);
 					y += delta * padding;
 				}
