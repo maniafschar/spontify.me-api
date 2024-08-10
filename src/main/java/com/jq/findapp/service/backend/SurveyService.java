@@ -74,7 +74,7 @@ public class SurveyService {
 	@Value("${app.sports.api.token}")
 	private String token;
 
-	private long lastCall = 0;
+	private static volatile long lastErrorCall = 0;
 
 	private static final String STORAGE_PREFIX = "api-sports-";
 
@@ -732,7 +732,7 @@ public class SurveyService {
 				storage.setLabel(label);
 				storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
 				repository.save(storage);
-				lastCall = fixture.get("errors").has("rateLimit") || fixture.get("errors").has("requests")
+				lastErrorCall = fixture.get("errors").has("rateLimit") || fixture.get("errors").has("requests")
 						? System.currentTimeMillis()
 						: 0;
 			} else
@@ -744,7 +744,7 @@ public class SurveyService {
 	}
 
 	private boolean needUpdate(final JsonNode fixture) {
-		if (System.currentTimeMillis() - lastCall < 24 * 60 * 60 * 1000)
+		if (System.currentTimeMillis() - lastErrorCall < 10 * 60 * 1000)
 			return false;
 		if (fixture == null || fixture.get("results").intValue() == 0
 				|| fixture.has("errors")
