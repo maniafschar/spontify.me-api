@@ -753,8 +753,10 @@ public class SurveyService {
 		final JsonNode responses = fixture.get("response");
 		if (responses.get(responses.size() - 1).has("fixture")
 				&& responses.get(responses.size() - 1).get("fixture").has("timestamp"))
-			return responses.get(responses.size() - 1).get("fixture").get("timestamp").asLong() < System
-					.currentTimeMillis();
+			return !"FT".equals(
+					responses.get(responses.size() - 1).get("fixture").get("status").get("short").asText())
+					&& responses.get(responses.size() - 1).get("fixture").get("timestamp").asLong() < System
+							.currentTimeMillis();
 		return false;
 	}
 }
