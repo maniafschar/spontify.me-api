@@ -442,7 +442,7 @@ public class NotificationService {
 			email.send();
 			createTicket(TicketType.EMAIL, to, subject + "\n" + text, client.getAdminId());
 		} catch (final EmailException | MalformedURLException ex) {
-			if (ex.getMessage().contains("ACC"))
+			if (Strings.stackTraceToString(ex).contains("450 4.7.0"))
 				sendEmailAsync(client, name, to, subject, text, html);
 			else
 				createTicket(TicketType.ERROR, "Email exception: " + to,
