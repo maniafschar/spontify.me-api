@@ -199,8 +199,8 @@ public class SurveyService {
 					awayList.put(label,
 							awayList.get(label) + json.get(1).get("statistics").get(i2).get("value").asInt());
 				}
-				final String s = ((JsonNode) matches.get(i)).get("goals").get("home").intValue() + " : "
-						+ ((JsonNode) matches.get(i)).get("goals").get("away").intValue();
+				final String s = ((JsonNode) matches.get(i).get("goals")).get("home").intValue() + " : "
+						+ ((JsonNode) matches.get(i).get("goals")).get("away").intValue();
 				if (!added.contains("|" + s + "|")) {
 					final Answer answer = new Answer();
 					answer.answer = s;
@@ -209,7 +209,7 @@ public class SurveyService {
 				}
 				if (i < 8)
 					poll.matches.add(s + "|"
-							+ formatDate(((JsonNode) matches.get(i)).get("timestamp").asLong(), "d.M.yyyy H:mm"));
+							+ formatDate((Long) matches.get(i).get("timestamp"), "d.M.yyyy H:mm"));
 			}
 			final List<Map<String, Object>> statistics = new ArrayList<>();
 			for (int i = 0; i < labels.size(); i++) {
