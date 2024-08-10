@@ -64,6 +64,8 @@ import jakarta.ws.rs.NotFoundException;
 
 @Service
 public class NotificationService {
+	private static volatile boolean sendingEmailPaused = false;
+
 	@Autowired
 	private Repository repository;
 
@@ -423,6 +425,10 @@ public class NotificationService {
 
 	public void sendEmail(final Client client, final String name, final String to, final String subject,
 			final String text, final String html) {
+		if (sendingEmailPaused) {
+			sendEmailAsync(client, name, to, subject, text, html);
+			return;
+		}
 		final ImageHtmlEmail email = mailCreateor.create();
 		email.setHostName(emailHost);
 		email.setSmtpPort(emailPort);
@@ -442,9 +448,10 @@ public class NotificationService {
 			email.send();
 			createTicket(TicketType.EMAIL, to, subject + "\n" + text, client.getAdminId());
 		} catch (final EmailException | MalformedURLException ex) {
-			if (Strings.stackTraceToString(ex).contains("450 4.7.0"))
+			if (Strings.stackTraceToString(ex).contains("450 4.7.0")) {
+				sendingEmailPaused = true;
 				sendEmailAsync(client, name, to, subject, text, html);
-			else
+			} else
 				createTicket(TicketType.ERROR, "Email exception: " + to,
 						Strings.stackTraceToString(ex) + "\n\n" + text, client.getAdminId());
 		}
@@ -454,7 +461,8 @@ public class NotificationService {
 	private void sendEmailAsync(final Client client, final String name, final String to, final String subject,
 			final String text, final String html) {
 		try {
-			Thread.sleep(120000 + (long) (Math.random() * 60000));
+			Thread.sleep(300000);
+			sendingEmailPaused = false;
 			sendEmail(client, name, to, subject, text, html);
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
