@@ -2,6 +2,7 @@ package com.jq.findapp.selenium;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
@@ -19,6 +21,7 @@ import org.openqa.selenium.WebDriver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.service.AuthenticationService;
+import com.jq.findapp.util.Strings;
 
 public class Location {
 	private final Pattern emailPattern = Pattern.compile(".*(\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,8}\\b).*",
@@ -27,23 +30,35 @@ public class Location {
 	@Test
 	public void run() throws Exception {
 		final File file = new File("sample");
-		final String url = "https://www.google.com/search";
+		int startId = 0;
+		if (file.exists()) {
+			final String old = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
+			if (old.contains("\n\n-- ")) {
+				int p = old.lastIndexOf("\n\n-- ");
+				startId = Integer.parseInt(old.substring(p + 5, old.indexOf('|', p)).trim());
+			}
+		}
 		file.delete();
+		final String url = "https://www.google.com/search";
 		final List<String> blocked = Arrays.asList(new ObjectMapper().readValue(
 				AuthenticationService.class.getResourceAsStream("/json/blockedTokens.json"),
 				String[].class));
+		WebDriver driver = null;
 		try (final BufferedReader reader = new BufferedReader(
 				new InputStreamReader(getClass().getResourceAsStream("/sample.txt")));
 				final FileOutputStream out = new FileOutputStream(file);) {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				final String s[] = line.split("\\|");
+				if (Integer.parseInt(s[1]) <= startId)
+					continue;
+				System.out.println(s[1]);
 				final List<String> address = Arrays
 						.asList(s[0].toLowerCase().replace(".", "").replace("-", ",").replace(" ", ",")
 								.split(","));
-				final WebDriver driver = AppTest.createWebDriver(800, 700, false);
 				write(out, "-- " + s[1] + " | " + s[0] + "\n");
 				try {
+					driver = AppTest.createWebDriver(800, 700, false);
 					final JavascriptExecutor js = (JavascriptExecutor) driver;
 					driver.manage().timeouts().implicitlyWait(Duration.ofMillis(50));
 					driver.manage().window().setSize(new Dimension(1200, 900));
@@ -67,8 +82,18 @@ public class Location {
 						}
 					}
 					write(out, "\n");
+				} catch (Exception ex) {
+					if (ex.getMessage().contains("Could not start a new session. Response code 500.")) {
+						write(out, Strings.stackTraceToString(ex));
+						return;
+					}
+					write(out, "-- " + ex.getClass().getName() + ": " + ex.getMessage().replace('\n', ',') + "\n");
 				} finally {
-					driver.close();
+					if (driver != null)
+						try {
+							driver.close();
+						} catch (Exception ex) {
+						}
 				}
 			}
 		} catch (final Exception ex) {
