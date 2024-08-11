@@ -718,6 +718,8 @@ public class SurveyService {
 		if (result.size() > 0 && !Strings.isEmpty(result.get(0).get("storage.storage")))
 			fixture = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
 		if (needUpdate(fixture)) {
+			if (System.currentTimeMillis() - lastErrorCall < 0)
+				throw new RuntimeException("Too many requests!\nURL " + url);
 			fixture = WebClient
 					.create("https://v3.football.api-sports.io/fixtures?" + url)
 					.get()
@@ -732,9 +734,11 @@ public class SurveyService {
 				storage.setLabel(label);
 				storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
 				repository.save(storage);
-				lastErrorCall = fixture.get("errors").has("rateLimit") || fixture.get("errors").has("requests")
-						? System.currentTimeMillis()
-						: 0;
+				lastErrorCall = fixture.get("errors").has("rateLimit")
+						? System.currentTimeMillis() + 10 * 60 * 1000 + 60 * 1000
+						: fixture.get("errors").has("requests")
+								? System.currentTimeMillis() + 24 * 60 * 60 * 1000 + 60 * 1000
+								: 0;
 			} else
 				notificationService.createTicket(TicketType.ERROR, "FIXTURE not FOUND", url, null);
 		}
@@ -744,8 +748,6 @@ public class SurveyService {
 	}
 
 	private boolean needUpdate(final JsonNode fixture) {
-		if (System.currentTimeMillis() - lastErrorCall < 10 * 60 * 1000)
-			return false;
 		if (fixture == null || fixture.get("results").intValue() == 0
 				|| fixture.has("errors")
 						&& (fixture.get("errors").has("rateLimit") || fixture.get("errors").has("requests")))
