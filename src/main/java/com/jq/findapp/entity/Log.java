@@ -3,6 +3,8 @@ package com.jq.findapp.entity;
 import java.math.BigInteger;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 @Entity
 public class Log extends BaseEntity {
@@ -15,6 +17,7 @@ public class Log extends BaseEntity {
 	private String uri;
 	private BigInteger clientId;
 	private BigInteger contactId;
+	@Enumerated(EnumType.STRING)
 	private LogStatus status;
 	private int port;
 	private int time;
