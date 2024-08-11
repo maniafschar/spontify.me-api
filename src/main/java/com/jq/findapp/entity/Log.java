@@ -23,7 +23,7 @@ public class Log extends BaseEntity {
 		Error, Exception, Offline, Ok, Redirection, Running, Unauthorized;
 
 		public static LogStatus get(int httpCode) {
-			return httpCode < 300 ? Ok : httpCode < 500 ? Exception : Error;
+			return httpCode < 300 ? Ok : httpCode < 400 ? Redirection : httpCode < 500 ? Exception : Error;
 		}
 	}
 
