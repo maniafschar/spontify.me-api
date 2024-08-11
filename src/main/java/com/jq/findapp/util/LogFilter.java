@@ -10,13 +10,13 @@ import java.time.Instant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Log;
+import com.jq.findapp.entity.Log.LogStatus;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.AuthenticationService.AuthenticationException;
@@ -86,12 +86,12 @@ public class LogFilter implements Filter {
 			else if (req.getRequestURI().startsWith("/support/"))
 				log.setContactId(BigInteger.ZERO);
 		} catch (final AuthenticationException ex) {
-			log.setStatus(HttpStatus.UNAUTHORIZED.value());
+			log.setStatus(LogStatus.Unauthorized);
 			log.setBody(ex.getType().name());
 		} finally {
 			if (loggable && (!"/support/healthcheck".equals(log.getUri()) || res.getStatus() >= 400)) {
 				log.setTime((int) (System.currentTimeMillis() - time));
-				log.setStatus(res.getStatus());
+				log.setStatus(LogStatus.get(res.getStatus()));
 				log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
 				final byte[] b = req.getContentAsByteArray();
 				if (b != null && b.length > 0) {

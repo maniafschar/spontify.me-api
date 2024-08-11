@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Log;
+import com.jq.findapp.entity.Log.LogStatus;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
@@ -89,8 +90,8 @@ public class ImportLogService {
 					if (m.find()) {
 						final String path = m.group(6);
 						final Log log = new Log();
-						log.setStatus(Integer.parseInt(m.group(8)));
-						if (log.getStatus() < 400 &&
+						log.setStatus(LogStatus.get(Integer.parseInt(m.group(8))));
+						if (log.getStatus() == LogStatus.Ok &&
 								((path.endsWith(".html") && !path.startsWith("/js/")) || path.endsWith(".pdf") ||
 										(!path.contains(".")
 												&& !path.contains("apple-app-site-association")

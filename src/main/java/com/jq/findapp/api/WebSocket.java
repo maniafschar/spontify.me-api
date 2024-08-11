@@ -25,6 +25,7 @@ import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Log;
+import com.jq.findapp.entity.Log.LogStatus;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -70,17 +71,17 @@ public class WebSocket {
 			if (USERS.containsKey(message.getId())) {
 				message.setPassword(null);
 				message.setSalt(null);
-				log.setStatus(200);
+				log.setStatus(LogStatus.Ok);
 				messagingTemplate.convertAndSendToUser("" + message.getId(), "/video", message);
 			} else {
 				final VideoMessage answer = new VideoMessage();
 				answer.setAnswer(Collections.singletonMap("userState", "offline"));
 				answer.setId(message.getUser());
-				log.setStatus(204);
+				log.setStatus(LogStatus.Offline);
 				messagingTemplate.convertAndSendToUser("" + message.getUser(), "/video", answer);
 			}
 		} else
-			log.setStatus(500);
+			log.setStatus(LogStatus.Error);
 		log.setTime((int) (System.currentTimeMillis() - time));
 		log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
 		final QueryParams params = new QueryParams(Query.misc_listLog);

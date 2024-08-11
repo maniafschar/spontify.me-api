@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Log;
+import com.jq.findapp.entity.Log.LogStatus;
 import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
@@ -325,7 +326,8 @@ public class SupportCenterApi {
 			run(importSportsBarService, null, list, new int[] { 3 }, 0);
 			run(chatService, null, list, null, -1);
 			// run(marketingService, "Sportbars", list,
-			// new int[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 }, 50);
+			// new int[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 },
+			// 50);
 			run(dbService, null, list, null, -1);
 			run(dbService, "CleanUp", list, new int[] { 0 }, 30);
 			run(engagementService, "Registration", list, new int[] { 0 }, 40);
@@ -386,7 +388,8 @@ public class SupportCenterApi {
 								+ result.exception.getClass().getName() + ": " + result.exception.getMessage());
 						notificationService.createTicket(TicketType.ERROR, "scheduler",
 								(result.result == null ? "" : result.result + "\n")
-										+ Strings.stackTraceToString(result.exception), null);
+										+ Strings.stackTraceToString(result.exception),
+								null);
 					}
 				}
 			} catch (final Throwable ex) {

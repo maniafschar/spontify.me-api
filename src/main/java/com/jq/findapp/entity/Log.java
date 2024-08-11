@@ -20,7 +20,11 @@ public class Log extends BaseEntity {
 	private int time;
 
 	public enum LogStatus {
-		Error, Exception, Ok, Running
+		Error, Exception, Offline, Ok, Running, Unauthorized;
+
+		public static LogStatus get(int httpCode) {
+			return httpCode < 300 ? Ok : httpCode < 500 ? Exception : Error;
+		}
 	}
 
 	public String getMethod() {
