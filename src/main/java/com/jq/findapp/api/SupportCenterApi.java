@@ -313,23 +313,19 @@ public class SupportCenterApi {
 
 	@PutMapping("scheduler")
 	public synchronized void scheduler(@RequestHeader final String secret) throws Exception {
-		if (schedulerSecret.equals(secret)) {
-			if (schedulerRunning)
-				throw new RuntimeException("Failed to start, scheduler is currently running");
+		if (schedulerSecret.equals(secret))
 			run();
-		}
 	}
 
 	@Async
-	private CompletableFuture<Void> run() {
-		return CompletableFuture.supplyAsync(() -> {
+	private void run() {
+		CompletableFuture.supplyAsync(() -> {
 			now = LocalDateTime.now();
 			final List<CompletableFuture<Void>> list = new ArrayList<>();
 			run(importSportsBarService, null, list, new int[] { 3 }, 0);
 			run(chatService, null, list, null, -1);
 			// run(marketingService, "Sportbars", list,
-			// new int[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 },
-			// 50);
+			// new int[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 }, 50);
 			run(dbService, null, list, null, -1);
 			run(dbService, "CleanUp", list, new int[] { 0 }, 30);
 			run(engagementService, "Registration", list, new int[] { 0 }, 40);
@@ -361,8 +357,8 @@ public class SupportCenterApi {
 	}
 
 	@Async
-	private void run(final Object bean, final String method, final List<CompletableFuture<Void>> list, int[] hours,
-			int minute) {
+	private void run(final Object bean, final String method, final List<CompletableFuture<Void>> list,
+			int[] hours, int minute) {
 		if (hours != null && !Arrays.stream(hours).anyMatch(e -> e == now.getHour()))
 			return;
 		if (minute > -1 && minute != now.getMinute())
@@ -377,22 +373,21 @@ public class SupportCenterApi {
 				name = name.substring(0, name.indexOf('$'));
 			log.setUri("/support/scheduler/" + name + "/" + m);
 			try {
-				if (running.contains(name + '.' + m)) {
+				if (running.contains(name + '.' + m))
 					log.setStatus(LogStatus.Running);
-					return;
-				}
-				running.add(name + '.' + m);
-				final SchedulerResult result = (SchedulerResult) bean.getClass().getMethod(m).invoke(bean);
-				log.setStatus(Strings.isEmpty(result.exception) ? LogStatus.Ok : LogStatus.Error);
-				if (result.result != null)
-					log.setBody(result.result.trim());
-				if (result.exception != null) {
-					log.setBody((log.getBody() == null ? "" : log.getBody() + "\n")
-							+ result.exception.getClass().getName() + ": " + result.exception.getMessage());
-					notificationService.createTicket(TicketType.ERROR, "scheduler",
-							(result.result == null ? "" : result.result + "\n")
-									+ Strings.stackTraceToString(result.exception),
-							null);
+				else {
+					running.add(name + '.' + m);
+					final SchedulerResult result = (SchedulerResult) bean.getClass().getMethod(m).invoke(bean);
+					log.setStatus(Strings.isEmpty(result.exception) ? LogStatus.Ok : LogStatus.Error);
+					if (result.result != null)
+						log.setBody(result.result.trim());
+					if (result.exception != null) {
+						log.setBody((log.getBody() == null ? "" : log.getBody() + "\n")
+								+ result.exception.getClass().getName() + ": " + result.exception.getMessage());
+						notificationService.createTicket(TicketType.ERROR, "scheduler",
+								(result.result == null ? "" : result.result + "\n")
+										+ Strings.stackTraceToString(result.exception), null);
+					}
 				}
 			} catch (final Throwable ex) {
 				log.setStatus(LogStatus.Exception);
