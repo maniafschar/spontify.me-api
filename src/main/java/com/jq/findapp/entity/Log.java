@@ -15,9 +15,13 @@ public class Log extends BaseEntity {
 	private String uri;
 	private BigInteger clientId;
 	private BigInteger contactId;
-	private int time;
-	private int status;
+	private LogStatus status;
 	private int port;
+	private int time;
+
+	public enum LogStatus {
+		Error, Exception, Ok, Running
+	}
 
 	public String getMethod() {
 		return method;
@@ -59,11 +63,11 @@ public class Log extends BaseEntity {
 		this.time = time;
 	}
 
-	public int getStatus() {
+	public LogStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(final int status) {
+	public void setStatus(final LogStatus status) {
 		this.status = status;
 	}
 
