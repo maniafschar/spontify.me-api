@@ -119,7 +119,7 @@ public class SupportCenterApi {
 	@Value("${app.scheduler.secret}")
 	private String schedulerSecret;
 
-	private static volatile boolean schedulerRunning = false;
+	private static final Set<String> running = new HashSet<>();
 	private LocalDateTime now;
 
 	@DeleteMapping("user/{id}")
@@ -323,44 +323,39 @@ public class SupportCenterApi {
 	@Async
 	private CompletableFuture<Void> run() {
 		return CompletableFuture.supplyAsync(() -> {
-			try {
-				schedulerRunning = true;
-				now = LocalDateTime.now();
-				final List<CompletableFuture<Void>> list = new ArrayList<>();
-				run(importSportsBarService, null, list, new int[] { 3 }, 0);
-				run(chatService, null, list, null, -1);
-				// run(marketingService, "Sportbars", list,
-				// new int[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 },
-				// 50);
-				run(dbService, null, list, null, -1);
-				run(dbService, "CleanUp", list, new int[] { 0 }, 30);
-				run(engagementService, "Registration", list, new int[] { 0 }, 40);
-				run(eventService, "Match", list, null, -1);
-				run(eventService, "Import", list, new int[] { 5 }, 40);
-				run(eventService, "Publish", list, null, -1);
-				run(eventService, "Participation", list, null, -1);
-				run(importLogService, null, list, null, -1);
-				run(rssService, null, list, null, -1);
-				run(surveyService, null, list, null, -1);
-				run(importLocationsService, null, list, null, 50);
-				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
-						.map(CompletableFuture::join).collect(Collectors.toList())).join();
-				list.clear();
-				run(marketingService, null, list, null, -1);
-				run(marketingService, "Result", list, null, -1);
-				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
-						.map(CompletableFuture::join).collect(Collectors.toList())).join();
-				run(engagementService, "NearBy", null, null, -1);
-				list.clear();
-				run(engagementService, null, list, null, -1);
-				run(ipService, null, list, null, -1);
-				run(sitemapService, null, list, new int[] { 20 }, 0);
-				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
-						.map(CompletableFuture::join).collect(Collectors.toList())).join();
-				run(dbService, "Backup", null, null, -1);
-			} finally {
-				schedulerRunning = false;
-			}
+			now = LocalDateTime.now();
+			final List<CompletableFuture<Void>> list = new ArrayList<>();
+			run(importSportsBarService, null, list, new int[] { 3 }, 0);
+			run(chatService, null, list, null, -1);
+			// run(marketingService, "Sportbars", list,
+			// new int[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 },
+			// 50);
+			run(dbService, null, list, null, -1);
+			run(dbService, "CleanUp", list, new int[] { 0 }, 30);
+			run(engagementService, "Registration", list, new int[] { 0 }, 40);
+			run(eventService, "Match", list, null, -1);
+			run(eventService, "Import", list, new int[] { 5 }, 40);
+			run(eventService, "Publish", list, null, -1);
+			run(eventService, "Participation", list, null, -1);
+			run(importLogService, null, list, null, -1);
+			run(rssService, null, list, null, -1);
+			run(surveyService, null, list, null, -1);
+			run(importLocationsService, null, list, null, 50);
+			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
+					.map(CompletableFuture::join).collect(Collectors.toList())).join();
+			list.clear();
+			run(marketingService, null, list, null, -1);
+			run(marketingService, "Result", list, null, -1);
+			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
+					.map(CompletableFuture::join).collect(Collectors.toList())).join();
+			run(engagementService, "NearBy", null, null, -1);
+			list.clear();
+			run(engagementService, null, list, null, -1);
+			run(ipService, null, list, null, -1);
+			run(sitemapService, null, list, new int[] { 20 }, 0);
+			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
+					.map(CompletableFuture::join).collect(Collectors.toList())).join();
+			run(dbService, "Backup", null, null, -1);
 			return null;
 		});
 	}
@@ -375,15 +370,20 @@ public class SupportCenterApi {
 		final CompletableFuture<Void> e = CompletableFuture.supplyAsync(() -> {
 			final Log log = new Log();
 			log.setContactId(BigInteger.ZERO);
+			log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
+			final String m = "run" + (method == null ? "" : method);
+			String name = bean.getClass().getSimpleName();
+			if (name.contains("$"))
+				name = name.substring(0, name.indexOf('$'));
+			log.setUri("/support/scheduler/" + name + "/" + m);
 			try {
-				log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
-				final String m = "run" + (method == null ? "" : method);
+				if (running.contains(name + '.' + m)) {
+					log.setStatus(LogStatus.Running);
+					return;
+				}
+				running.add(name + '.' + m);
 				final SchedulerResult result = (SchedulerResult) bean.getClass().getMethod(m).invoke(bean);
-				String name = bean.getClass().getSimpleName();
-				if (name.contains("$"))
-					name = name.substring(0, name.indexOf('$'));
-				log.setUri("/support/scheduler/" + name + "/" + m);
-				log.setStatus(Strings.isEmpty(result.exception) ? 200 : 500);
+				log.setStatus(Strings.isEmpty(result.exception) ? LogStatus.Ok : LogStatus.Error);
 				if (result.result != null)
 					log.setBody(result.result.trim());
 				if (result.exception != null) {
@@ -395,6 +395,7 @@ public class SupportCenterApi {
 							null);
 				}
 			} catch (final Throwable ex) {
+				log.setStatus(LogStatus.Exception);
 				log.setBody("uncaught exception " + ex.getClass().getName() + ": " + ex.getMessage() +
 						(Strings.isEmpty(log.getBody()) ? "" : "\n" + log.getBody()));
 				notificationService.createTicket(TicketType.ERROR, "scheduler",
@@ -402,6 +403,7 @@ public class SupportCenterApi {
 								+ (Strings.isEmpty(log.getBody()) ? "" : "\n\n" + log.getBody()),
 						null);
 			} finally {
+				running.remove(name + '.' + m);
 				log.setTime((int) (System.currentTimeMillis() - log.getCreatedAt().getTime()));
 				if (log.getBody() != null && log.getBody().length() > 255)
 					log.setBody(log.getBody().substring(0, 252) + "...");
