@@ -75,7 +75,6 @@ public class SurveyService {
 	private String token;
 
 	private static volatile long lastErrorCall = 0;
-
 	private static final String STORAGE_PREFIX = "api-sports-";
 
 	static class PollSurvey extends Poll {
@@ -717,7 +716,7 @@ public class SurveyService {
 		final Result result = repository.list(params);
 		if (result.size() > 0 && !Strings.isEmpty(result.get(0).get("storage.storage")))
 			fixture = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
-		if (needUpdate(fixture)) {
+		if (needUpdate(fixture, (Timestamp) result.get(0).get("storage.modifiedAt"))) {
 			if (System.currentTimeMillis() - lastErrorCall < 0) {
 				String time;
 				double i = (lastErrorCall - System.currentTimeMillis()) / 1000;
@@ -761,11 +760,13 @@ public class SurveyService {
 		return fixture.get("response");
 	}
 
-	private boolean needUpdate(final JsonNode fixture) {
+	private boolean needUpdate(final JsonNode fixture, final Timestamp modifiedAt) {
 		if (fixture == null || fixture.get("results").intValue() == 0
 				|| fixture.has("errors")
 						&& (fixture.get("errors").has("rateLimit") || fixture.get("errors").has("requests")))
 			return true;
+		if (modifiedAt != null && System.currentTimeMillis() - modifiedAt.getTime() < 23 * 60 * 60 * 1000)
+			return false;
 		final JsonNode responses = fixture.get("response");
 		for (int i = 0; i < responses.size(); i++) {
 			if (responses.get(i).has("fixture")
