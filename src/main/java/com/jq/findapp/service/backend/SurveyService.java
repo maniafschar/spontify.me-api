@@ -769,11 +769,9 @@ public class SurveyService {
 			return false;
 		final JsonNode responses = fixture.get("response");
 		for (int i = 0; i < responses.size(); i++) {
-			if (responses.get(i).has("fixture")
-					&& responses.get(i).get("fixture").has("timestamp")
-					&& !"FT".equals(responses.get(i).get("fixture").get("status").get("short").asText()))
-				return responses.get(i).get("fixture").get("timestamp").asLong() - 2 * 24 * 60 * 60 * 1000 < System
-						.currentTimeMillis();
+			if (responses.get(i).has("fixture") &&
+					"TBD".equals(responses.get(i).get("fixture").get("status").get("short").asText()))
+				return true;
 		}
 		return false;
 	}
