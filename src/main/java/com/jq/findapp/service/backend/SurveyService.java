@@ -728,17 +728,19 @@ public class SurveyService {
 					.retrieve()
 					.toEntity(JsonNode.class).block().getBody();
 			if (fixture != null && fixture.get("response") != null) {
-				final Storage storage = result.size() == 0 ? new Storage()
-						: repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
-				storage.historize();
-				storage.setLabel(label);
-				storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
-				repository.save(storage);
 				lastErrorCall = fixture.get("errors").has("rateLimit")
 						? System.currentTimeMillis() + 10 * 60 * 1000 + 60 * 1000
 						: fixture.get("errors").has("requests")
 								? System.currentTimeMillis() + 24 * 60 * 60 * 1000 + 60 * 1000
 								: 0;
+				if (lastErrorCall == 0) {
+					final Storage storage = result.size() == 0 ? new Storage()
+							: repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
+					storage.historize();
+					storage.setLabel(label);
+					storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
+					repository.save(storage);
+				}
 			} else
 				notificationService.createTicket(TicketType.ERROR, "FIXTURE not FOUND", url, null);
 		}
