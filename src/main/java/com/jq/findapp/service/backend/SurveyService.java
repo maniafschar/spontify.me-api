@@ -718,8 +718,20 @@ public class SurveyService {
 		if (result.size() > 0 && !Strings.isEmpty(result.get(0).get("storage.storage")))
 			fixture = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
 		if (needUpdate(fixture)) {
-			if (System.currentTimeMillis() - lastErrorCall < 0)
-				throw new RuntimeException("Too many requests!\nURL " + url);
+			if (System.currentTimeMillis() - lastErrorCall < 0) {
+				String time;
+				double i = (System.currentTimeMillis() - lastErrorCall) / 1000;
+				time = " seconds";
+				if (i > 120) {
+					i /= 60;
+					time = " minutes";
+				}
+				if (i > 120) {
+					i /= 60;
+					time = " hours";
+				}
+				throw new RuntimeException("Too many requests!\nURL: " + url + "\nPause: " + ((int) (i + 0.5)) + time);
+			}
 			fixture = WebClient
 					.create("https://v3.football.api-sports.io/fixtures?" + url)
 					.get()
