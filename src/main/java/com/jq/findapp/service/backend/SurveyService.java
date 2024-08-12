@@ -767,12 +767,13 @@ public class SurveyService {
 						&& (fixture.get("errors").has("rateLimit") || fixture.get("errors").has("requests")))
 			return true;
 		final JsonNode responses = fixture.get("response");
-		if (responses.get(responses.size() - 1).has("fixture")
-				&& responses.get(responses.size() - 1).get("fixture").has("timestamp"))
-			return !"FT".equals(
-					responses.get(responses.size() - 1).get("fixture").get("status").get("short").asText())
-					&& responses.get(responses.size() - 1).get("fixture").get("timestamp").asLong() < System
-							.currentTimeMillis();
+		for (int i = 0; i < responses.size(); i++) {
+			if (responses.get(i).has("fixture")
+					&& responses.get(i).get("fixture").has("timestamp")
+					&& !"FT".equals(responses.get(i).get("fixture").get("status").get("short").asText()))
+				return responses.get(i).get("fixture").get("timestamp").asLong() - 2 * 24 * 60 * 60 * 1000 < System
+						.currentTimeMillis();
+		}
 		return false;
 	}
 }
