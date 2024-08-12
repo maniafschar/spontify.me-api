@@ -720,7 +720,7 @@ public class SurveyService {
 		if (needUpdate(fixture)) {
 			if (System.currentTimeMillis() - lastErrorCall < 0) {
 				String time;
-				double i = (System.currentTimeMillis() - lastErrorCall) / 1000;
+				double i = (lastErrorCall - System.currentTimeMillis()) / 1000;
 				time = " seconds";
 				if (i > 120) {
 					i /= 60;
@@ -741,9 +741,9 @@ public class SurveyService {
 					.toEntity(JsonNode.class).block().getBody();
 			if (fixture != null && fixture.get("response") != null) {
 				lastErrorCall = fixture.get("errors").has("rateLimit")
-						? System.currentTimeMillis() + 10 * 60 * 1000 + 60 * 1000
+						? System.currentTimeMillis() + 11 * 60 * 1000
 						: fixture.get("errors").has("requests")
-								? System.currentTimeMillis() + 24 * 60 * 60 * 1000 + 60 * 1000
+								? System.currentTimeMillis() + 24 * 60 * 60 * 1000
 								: 0;
 				if (lastErrorCall == 0) {
 					final Storage storage = result.size() == 0 ? new Storage()
