@@ -703,7 +703,7 @@ public class SurveyService {
 	}
 
 	private String formatDate(final long seconds, final String format) {
-		return LocalDateTime.ofInstant(Instant.ofEpochMilli(seconds * 1000),
+		return LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds),
 				TimeZone.getTimeZone(Strings.TIME_OFFSET).toZoneId())
 				.format(DateTimeFormatter.ofPattern(format == null ? "d.M.yyyy' um 'H:mm' Uhr'" : format));
 	}
@@ -717,7 +717,6 @@ public class SurveyService {
 		if (result.size() > 0 && !Strings.isEmpty(result.get(0).get("storage.storage")))
 			fixture = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
 		if (needUpdate(fixture, (Timestamp) result.get(0).get("storage.modifiedAt"))) {
-			System.out.println("update " + url + " : " + lastErrorCall);
 			if (System.currentTimeMillis() - lastErrorCall < 0) {
 				String time;
 				double i = (lastErrorCall - System.currentTimeMillis()) / 1000;
@@ -741,9 +740,9 @@ public class SurveyService {
 					.toEntity(JsonNode.class).block().getBody();
 			if (fixture != null && fixture.has("response")) {
 				lastErrorCall = fixture.get("errors").has("rateLimit")
-						? System.currentTimeMillis() + 11 * 60 * 1000
+						? Instant.now().plus(Duration.ofMinutes(11)).toEpochMilli()
 						: fixture.get("errors").has("requests")
-								? System.currentTimeMillis() + 24 * 60 * 60 * 1000
+								? Instant.now().plus(Duration.ofDays(1)).toEpochMilli()
 								: 0;
 				if (lastErrorCall == 0) {
 					final Storage storage = result.size() == 0 ? new Storage()
@@ -762,22 +761,19 @@ public class SurveyService {
 	}
 
 	private boolean needUpdate(final JsonNode fixture, final Timestamp modifiedAt) {
-		System.out.println("needUpdate");
 		if (fixture == null || fixture.has("errors")
 				&& (fixture.get("errors").has("rateLimit") || fixture.get("errors").has("requests")))
 			return true;
-		System.out.println("needUpdate no errors");
-		if (modifiedAt != null && System.currentTimeMillis() - modifiedAt.getTime() < 23 * 60 * 60 * 1000)
+		if (modifiedAt != null
+				&& Instant.ofEpochMilli(modifiedAt.getTime()).minus(Duration.ofHours(23)).isAfter(Instant.now()))
 			return false;
-		System.out.println("needUpdate no modifiedAt");
 		final JsonNode responses = fixture.get("response");
 		for (int i = 0; i < responses.size(); i++) {
 			if (responses.get(i).has("fixture")
 					&& responses.get(i).get("fixture").has("timestamp")
 					&& "TBD".equals(responses.get(i).get("fixture").get("status").get("short").asText())) {
-				System.out.println("needUpdate tbd " + responses.get(i).get("fixture").get("timestamp").asLong());
-				return responses.get(i).get("fixture").get("timestamp").asLong() - 4 * 24 * 60 * 60 * 1000 < System
-						.currentTimeMillis();
+				return Instant.ofEpochSecond(responses.get(i).get("fixture").get("timestamp").asLong())
+						.minus(Duration.ofDays(4)).isBefore(Instant.now());
 			}
 		}
 		return false;
