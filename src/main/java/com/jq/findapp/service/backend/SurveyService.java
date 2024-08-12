@@ -717,6 +717,7 @@ public class SurveyService {
 		if (result.size() > 0 && !Strings.isEmpty(result.get(0).get("storage.storage")))
 			fixture = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
 		if (needUpdate(fixture, (Timestamp) result.get(0).get("storage.modifiedAt"))) {
+			System.out.println("update " + url + " : " + lastErrorCall);
 			if (System.currentTimeMillis() - lastErrorCall < 0) {
 				String time;
 				double i = (lastErrorCall - System.currentTimeMillis()) / 1000;
@@ -738,7 +739,6 @@ public class SurveyService {
 					.header("x-rapidapi-host", "v3.football.api-sports.io")
 					.retrieve()
 					.toEntity(JsonNode.class).block().getBody();
-			System.out.println("update " + url + " : " + lastErrorCall);
 			if (fixture != null && fixture.has("response")) {
 				lastErrorCall = fixture.get("errors").has("rateLimit")
 						? System.currentTimeMillis() + 11 * 60 * 1000
@@ -762,18 +762,23 @@ public class SurveyService {
 	}
 
 	private boolean needUpdate(final JsonNode fixture, final Timestamp modifiedAt) {
+		System.out.println("needUpdate");
 		if (fixture == null || fixture.has("errors")
 				&& (fixture.get("errors").has("rateLimit") || fixture.get("errors").has("requests")))
 			return true;
+		System.out.println("needUpdate no errors");
 		if (modifiedAt != null && System.currentTimeMillis() - modifiedAt.getTime() < 23 * 60 * 60 * 1000)
 			return false;
+		System.out.println("needUpdate no modifiedAt");
 		final JsonNode responses = fixture.get("response");
 		for (int i = 0; i < responses.size(); i++) {
 			if (responses.get(i).has("fixture")
 					&& responses.get(i).get("fixture").has("timestamp")
-					&& "TBD".equals(responses.get(i).get("fixture").get("status").get("short").asText()))
+					&& "TBD".equals(responses.get(i).get("fixture").get("status").get("short").asText())) {
+				System.out.println("needUpdate tbd " + responses.get(i).get("fixture").get("timestamp").asLong());
 				return responses.get(i).get("fixture").get("timestamp").asLong() - 4 * 24 * 60 * 60 * 1000 < System
 						.currentTimeMillis();
+			}
 		}
 		return false;
 	}
