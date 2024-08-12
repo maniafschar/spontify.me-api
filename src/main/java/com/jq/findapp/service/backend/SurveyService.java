@@ -738,7 +738,8 @@ public class SurveyService {
 					.header("x-rapidapi-host", "v3.football.api-sports.io")
 					.retrieve()
 					.toEntity(JsonNode.class).block().getBody();
-			if (fixture != null && fixture.get("response") != null) {
+			System.out.println("update " + url + " : " + lastErrorCall);
+			if (fixture != null && fixture.has("response")) {
 				lastErrorCall = fixture.get("errors").has("rateLimit")
 						? System.currentTimeMillis() + 11 * 60 * 1000
 						: fixture.get("errors").has("requests")
@@ -761,9 +762,8 @@ public class SurveyService {
 	}
 
 	private boolean needUpdate(final JsonNode fixture, final Timestamp modifiedAt) {
-		if (fixture == null || fixture.get("results").intValue() == 0
-				|| fixture.has("errors")
-						&& (fixture.get("errors").has("rateLimit") || fixture.get("errors").has("requests")))
+		if (fixture == null || fixture.has("errors")
+				&& (fixture.get("errors").has("rateLimit") || fixture.get("errors").has("requests")))
 			return true;
 		if (modifiedAt != null && System.currentTimeMillis() - modifiedAt.getTime() < 23 * 60 * 60 * 1000)
 			return false;
