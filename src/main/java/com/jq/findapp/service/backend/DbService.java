@@ -111,7 +111,7 @@ public class DbService {
 	public SchedulerResult runBackup() {
 		final SchedulerResult result = new SchedulerResult();
 		try {
-			new ProcessBuilder("./backup.sh " + user + " " + password).start().waitFor();
+			new ProcessBuilder("./backup.sh", user, password).start().waitFor();
 		} catch (final Exception e) {
 			result.exception = e;
 		}
