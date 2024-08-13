@@ -64,16 +64,16 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 	private void checkDuplicateLatLon(Location location) {
 		final float roundingFactor = 0.0005f;
 		final QueryParams params = new QueryParams(Query.location_listId);
-		params.setSearch(
+		params.setSearch((location.getId() == null ? "" : "location.id<>" + location.getId() + " and ") +
 				"LOWER(location.name) like '%" + location.getName().toLowerCase().replace("'", "_").replace(" ", "%")
-						+ "%' and location.longitude<"
-						+ (location.getLongitude() + roundingFactor)
-						+ " and location.longitude>"
-						+ (location.getLongitude() - roundingFactor)
-						+ " and location.latitude<"
-						+ (location.getLatitude() + roundingFactor)
-						+ " and location.latitude>"
-						+ (location.getLatitude() - roundingFactor));
+				+ "%' and location.longitude<"
+				+ (location.getLongitude() + roundingFactor)
+				+ " and location.longitude>"
+				+ (location.getLongitude() - roundingFactor)
+				+ " and location.latitude<"
+				+ (location.getLatitude() + roundingFactor)
+				+ " and location.latitude>"
+				+ (location.getLatitude() - roundingFactor));
 		final Result list = repository.list(params);
 		if (list.size() > 0)
 			throw new IllegalArgumentException("location exists: " + list.get(0).get("location.id"));
