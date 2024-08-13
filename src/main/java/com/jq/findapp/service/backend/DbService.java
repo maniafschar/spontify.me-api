@@ -48,6 +48,12 @@ public class DbService {
 	@Value("${app.server.webDir}")
 	private String webDir;
 
+	@Value("${spring.datasource.username}")
+	private String user;
+
+	@Value("${spring.datasource.password}")
+	private String password;
+
 	public SchedulerResult run() {
 		final SchedulerResult result = new SchedulerResult();
 		try {
@@ -105,7 +111,7 @@ public class DbService {
 	public SchedulerResult runBackup() {
 		final SchedulerResult result = new SchedulerResult();
 		try {
-			new ProcessBuilder("./backup.sh").start().waitFor();
+			new ProcessBuilder("./backup.sh \"" + user + "\" \"" + password + "\"").start().waitFor();
 		} catch (final Exception e) {
 			result.exception = e;
 		}

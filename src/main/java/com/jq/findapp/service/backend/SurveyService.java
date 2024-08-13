@@ -17,6 +17,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
@@ -742,7 +743,7 @@ public class SurveyService {
 				lastErrorCall = fixture.get("errors").has("rateLimit")
 						? Instant.now().plus(Duration.ofMinutes(11)).toEpochMilli()
 						: fixture.get("errors").has("requests")
-								? Instant.now().plus(Duration.ofDays(1)).toEpochMilli()
+								? Instant.now().plus(Duration.ofDays(1)).truncatedTo(ChronoUnit.DAYS).toEpochMilli()
 								: 0;
 				if (lastErrorCall == 0) {
 					final Storage storage = result.size() == 0 ? new Storage()
