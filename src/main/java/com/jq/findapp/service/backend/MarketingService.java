@@ -309,7 +309,7 @@ public class MarketingService {
 					&& location.getSecret().hashCode() == answers.get("hash").asInt()) {
 				final Poll poll = om.readValue(Attachment.resolve(
 						clientMarketing.getStorage()), Poll.class);
-				String result = "Deine Location wurde erfolgreich akualisiert.\n";
+				String result = "<li>Deine Location wurde erfolgreich akualisiert.</li>";
 				String email = "Lieben Dank für Deine Teilnahme, Deine Location wurde erfolgreich akualisiert:\n\n";
 				location.historize();
 				location.setUpdatedAt(new Timestamp(Instant.now().toEpochMilli()));
@@ -336,8 +336,8 @@ public class MarketingService {
 								location.setSkillsText(s);
 								email += "\n" + s + "\n\n";
 							} else if ("feedback".equals(poll.questions.get(i).id) && !Strings.isEmpty(s)) {
-								result += "Lieben Dank für Dein Feedback.";
-								email += "Dein Feedback:\n" + s;
+								result += "<li>Lieben Dank für Dein Feedback.</li>";
+								email += "Dein Feedback:\n" + s + "\n\n";
 							}
 						}
 					}
@@ -353,7 +353,7 @@ public class MarketingService {
 							if ("skills".equals(poll.questions.get(i).id))
 								location.setSkills(sanitizeSkills(location.getSkills(), s));
 							else if ("cards".equals(poll.questions.get(i).id)) {
-								result += "Marketing-Material senden wir Dir an die Adresse Deiner Location.\n";
+								result += "<li>Marketing-Material senden wir Dir an die Adresse Deiner Location.</li>";
 								email += "Marketing-Material senden wir Dir an die Adresse Deiner Location.\n\n";
 							} else if ("account".equals(poll.questions.get(i).id)) {
 								final InternalRegistration registration = new InternalRegistration();
@@ -370,13 +370,13 @@ public class MarketingService {
 								registration.setVersion("0.6.8");
 								try {
 									location.setContactId(authenticationService.register(registration).getId());
-									result += "Ein Zugang wurde für Dich angelegt, eine Email versendet.\n";
+									result += "<li>Ein Zugang wurde für Dich angelegt, eine Email versendet.</li>";
 								} catch (Exception ex) {
-									result += "Ein Zugang konnte nicht angelegt werden, die Email ist bereits registriert! Versuche Dich anzumelden oder über den \"Passwort vergessen\" Dialog Dir Dein Passwort zurücksetzen zu lassen.\n";
+									result += "<li>Ein Zugang konnte nicht angelegt werden, die Email ist bereits registriert! Versuche Dich anzumelden oder über den \"Passwort vergessen\" Dialog Dir Dein Passwort zurücksetzen zu lassen.</li>";
 									email += "Ein Zugang konnte nicht angelegt werden, Deine Email ist bereits registriert! Versuche Dich anzumelden oder über den \"Passwort vergessen\" Dialog Dir Dein Passwort zurücksetzen zu lassen.\n\n";
 								}
 							} else if ("cooperation".equals(poll.questions.get(i).id)) {
-								result += "Wir freuen uns auf eine weitere Zusammenarbeit und melden uns in Bälde bei Dir.\n";
+								result += "<li>Wir freuen uns auf eine weitere Zusammenarbeit und melden uns in Bälde bei Dir.</li>";
 								email += "Wir freuen uns auf eine weitere Zusammenarbeit und melden uns in Bälde bei Dir.\n\n";
 							}
 						}

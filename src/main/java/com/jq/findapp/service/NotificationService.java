@@ -201,7 +201,7 @@ public class NotificationService {
 		final BigInteger fromId = contactFrom == null ? null : contactFrom.getId();
 		final QueryParams params = new QueryParams(Query.contact_notification);
 		params.setSearch("contactNotification.contactId=" + contactTo.getId() +
-				" and contactNotification.contactId2=" + fromId +
+				" and contactNotification.contactId2" + (fromId == null ? " is null" : "=" + fromId) +
 				" and TIMESTAMPDIFF(HOUR,contactNotification.createdAt,current_timestamp)<24" +
 				" and contactNotification.action='" + (action == null ? "" : action) +
 				"' and contactNotification.textId='" + textId.name() + "'");
