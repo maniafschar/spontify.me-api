@@ -68,9 +68,15 @@ public class AuthenticationApi {
 		contact.setClientId(clientId);
 		final Map<String, Object> user = authenticationService.login(contact, password, salt);
 		if (user != null) {
-			final QueryParams params = new QueryParams(Query.location_listId);
-			params.setSearch("location.contactId=" + user.get("contact.id"));
-			user.put("authority", repository.list(params).size() > 4 ? "editLocation" : "");
+			final QueryParams params = new QueryParams(Query.event_listId);
+			params.setSearch("event.contactId=" + user.get("contact.id"));
+			int i = repository.list(params).size();
+			if (i < 5) {
+				params.setQuery(Query.location_listId);
+				params.setSearch("location.contactId=" + user.get("contact.id"));
+				i += repository.list(params).size();
+			}
+			user.put("authority", i > 4 ? "editLocation" : "editLocation[" + i + "]");
 			if (getVideoTimeSlot((BigInteger) user.get("contact.id")))
 				user.put("login_video_call", Boolean.TRUE);
 			params.setQuery(Query.contact_listGeoLocationHistory);
