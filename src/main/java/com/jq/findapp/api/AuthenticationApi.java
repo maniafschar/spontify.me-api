@@ -104,7 +104,7 @@ public class AuthenticationApi {
 					t.setContactId((BigInteger) user.get("contact.id"));
 				} else {
 					t = repository.one(ContactToken.class, (BigInteger) u.get(0).get("contactToken.id"));
-					for (int i = 1; i < u.size(); i++)
+					for (i = 1; i < u.size(); i++)
 						repository.delete(
 								repository.one(ContactToken.class, (BigInteger) u.get(i).get("contactToken.id")));
 				}
