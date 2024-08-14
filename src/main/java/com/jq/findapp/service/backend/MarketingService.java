@@ -310,7 +310,7 @@ public class MarketingService {
 					&& location.getSecret().hashCode() == answers.get("hash").asInt()) {
 				final Poll poll = om.readValue(Attachment.resolve(
 						clientMarketing.getStorage()), Poll.class);
-				String result = "<li>Deine Location wurde erfolgreich akualisiert.</li>";
+				String result = "<ul><li>Deine Location wurde erfolgreich akualisiert.</li>";
 				String email = "Lieben Dank für Deine Teilnahme, Deine Location wurde erfolgreich akualisiert:\n\n";
 				location.historize();
 				location.setUpdatedAt(new Timestamp(Instant.now().toEpochMilli()));
@@ -353,10 +353,10 @@ public class MarketingService {
 						if (!Strings.isEmpty(s)) {
 							if ("skills".equals(poll.questions.get(i).id))
 								location.setSkills(sanitizeSkills(location.getSkills(), s));
-							else if ("cards".equals(poll.questions.get(i).id)) {
+							else if ("cards".equals(poll.questions.get(i).id) && !"|0".equals(s)) {
 								result += "<li>Marketing-Material senden wir Dir an die Adresse Deiner Location.</li>";
 								email += "Marketing-Material senden wir Dir an die Adresse Deiner Location.\n\n";
-							} else if ("account".equals(poll.questions.get(i).id)) {
+							} else if ("account".equals(poll.questions.get(i).id) && "|1".equals(s)) {
 								final InternalRegistration registration = new InternalRegistration();
 								registration.setAgb(true);
 								registration.setClientId(clientMarketing.getClientId());
@@ -368,7 +368,7 @@ public class MarketingService {
 										location.getEmail().substring(0, location.getEmail().indexOf('@')));
 								registration.setTime(6000);
 								registration.setTimezone("Europe/Berlin");
-								registration.setVersion("0.6.8");
+								registration.setVersion("0.6.9");
 								try {
 									location.setContactId(authenticationService.register(registration).getId());
 									result += "<li>Ein Zugang wurde für Dich angelegt, eine Email versendet.</li>";
@@ -376,7 +376,7 @@ public class MarketingService {
 									result += "<li>Ein Zugang konnte nicht angelegt werden, die Email ist bereits registriert! Versuche Dich anzumelden oder über den \"Passwort vergessen\" Dialog Dir Dein Passwort zurücksetzen zu lassen.</li>";
 									email += "Ein Zugang konnte nicht angelegt werden, Deine Email ist bereits registriert! Versuche Dich anzumelden oder über den \"Passwort vergessen\" Dialog Dir Dein Passwort zurücksetzen zu lassen.\n\n";
 								}
-							} else if ("cooperation".equals(poll.questions.get(i).id)) {
+							} else if ("cooperation".equals(poll.questions.get(i).id) && !"|1".equals(s)) {
 								result += "<li>Wir freuen uns auf eine weitere Zusammenarbeit und melden uns in Bälde bei Dir.</li>";
 								email += "Wir freuen uns auf eine weitere Zusammenarbeit und melden uns in Bälde bei Dir.\n\n";
 							}
@@ -392,7 +392,7 @@ public class MarketingService {
 						"Deine Location " + location.getName(), email,
 						createHtmlTemplate(repository.one(Client.class, clientMarketing.getClientId()))
 								.replace("<jq:text />", email.replace("\n", "<br />")));
-				return result;
+				return result + "</ul>";
 			}
 		}
 		return null;
