@@ -148,6 +148,7 @@ public class MarketingService {
 			for (int i = 0; i < clientMarketings.size(); i++) {
 				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 						(BigInteger) clientMarketings.get(i).get("clientMarketing.id"));
+				synchronizeResult(clientMarketing.getId());
 				params.setQuery(Query.contact_listMarketing);
 				params.setSearch(
 						"contactMarketing.finished=true and contactMarketing.contactId is not null and contactMarketing.clientMarketingId="
@@ -431,8 +432,10 @@ public class MarketingService {
 			final String answersText = (String) result.get(i2).get("contactMarketing.storage");
 			if (answersText != null && answersText.length() > 2) {
 				pollResult.finished++;
-				final PollResult contactAnswer = om.readValue(answersText, PollResult.class);
-				for (String key : contactAnswer.answers.keySet()) {
+				final JsonNode contactAnswer = om.readTree(answersText);
+				final Iterator<String> it = contactAnswer.fieldNames();
+				while (it.hasNext()) {
+					final String key = it.next();
 					if (Integer.valueOf(key.substring(1)) < poll.questions.size()) {
 						final Question question = poll.questions.get(Integer.valueOf(key.substring(1)));
 						if (!pollResult.answers.containsKey(key)) {
@@ -442,17 +445,17 @@ public class MarketingService {
 								a.add(0);
 							pollResult.answers.get(key).put("a", a);
 						}
-						for (int i = 0; i < ((List<?>) contactAnswer.answers.get(key).get("a")).size(); i++) {
-							final int index = (int) ((List<?>) contactAnswer.answers.get(key).get("a")).get(i);
+						for (int i = 0; i < contactAnswer.get(key).get("a").size(); i++) {
+							final int index = contactAnswer.get(key).get("a").get(i).asInt();
 							@SuppressWarnings("unchecked")
 							final List<Integer> totalAnswer = (List<Integer>) pollResult.answers.get(key).get("a");
 							totalAnswer.set(index, totalAnswer.get(index) + 1);
 						}
-						if (!Strings.isEmpty(contactAnswer.answers.get(key).containsKey("t"))) {
+						if (!Strings.isEmpty(contactAnswer.get(key).has("t"))) {
 							final Map<String, Object> o = pollResult.answers.get(key);
 							if (!o.containsKey("t"))
 								o.put("t", "");
-							o.put("t", o.get("t") + "<div>" + contactAnswer.answers.get(key).get("t") + "</div>");
+							o.put("t", o.get("t") + "<div>" + contactAnswer.get(key).get("t").asText() + "</div>");
 						}
 					}
 				}
