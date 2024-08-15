@@ -189,13 +189,16 @@
 			"question": "Möchtest Du Marketing-Aufkleber als Aushang für Gäste und/oder zum platzieren an prominanter Stelle, z.B. Sanitäranlagen, Eingang, etc.?",
 			"answers": [
 				{
-					"answer": "Ja, 20"
+					"answer": "Ja, 20",
+					"key": "20"
 				},
 				{
-					"answer": "Ja, 50"
+					"answer": "Ja, 50",
+					"key": "50"
 				},
 				{
-					"answer": "Nein Danke"
+					"answer": "Nein Danke",
+					"key": "0"
 				}
 			]
 		},
@@ -204,10 +207,12 @@
 			"question": "Möchtest Du jetzt einen Zugang anlegen? Mit dem Zugang kannst Du Events einstellen, Deine Location pflegen und bekommst diverse Analysemöglichkeiten. Er is natürlich kostenlos.",
 			"answers": [
 				{
-					"answer": "Ja"
+					"answer": "Ja",
+					"key": "1"
 				},
 				{
-					"answer": "Nein"
+					"answer": "Nein",
+					"key": "0"
 				}
 			]
 		},
@@ -216,10 +221,12 @@
 			"question": "Bist Du an einer engeren Zusammenarbeit interessiert, um z.B. um Events in Deiner Location zu promoten?",
 			"answers": [
 				{
-					"answer": "Ja"
+					"answer": "Ja",
+					"key": "1"
 				},
 				{
-					"answer": "Nein"
+					"answer": "Nein",
+					"key": "0"
 				}
 			]
 		},

@@ -160,10 +160,9 @@ public class MarketingServiceTest {
 		assertEquals("München", location.getTown());
 		assertEquals("https://www.hardrock.com", location.getUrl());
 		assertEquals("81479", location.getZipCode());
-		assertEquals("Deine Location wurde erfolgreich akualisiert.\n"
-				+ "Marketing-Material senden wir Dir an die Adresse Deiner Location.\n"
-				+ "Ein Zugang wurde für Dich angelegt, eine Email versendet.\n"
-				+ "Wir freuen uns auf eine weitere Zusammenarbeit und melden uns in Bälde bei Dir.\n"
-				+ "Lieben Dank für Dein Feedback.", result);
+		assertEquals("<ul><li>Deine Location wurde erfolgreich akualisiert.</li>"
+				+ "<li>Marketing-Material senden wir Dir an die Adresse Deiner Location.</li>"
+				+ "<li>Wir freuen uns auf eine weitere Zusammenarbeit und melden uns in Bälde bei Dir.</li>"
+				+ "<li>Lieben Dank für Dein Feedback.</li></ul>", result);
 	}
 }
