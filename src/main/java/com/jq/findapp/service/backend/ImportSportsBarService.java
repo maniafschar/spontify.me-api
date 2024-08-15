@@ -29,7 +29,7 @@ public class ImportSportsBarService {
 	@Autowired
 	private NotificationService notificationService;
 
-	private static final String URL = "https://skyfinder.sky.de/sf/skyfinder.servlet?detailedSearch=Suchen&group=H&group=B&group=A&country=de&action=search&zip=";
+	private static final String URL = "https://skyfinder.sky.de/sf/skyfinder.servlet?detailedSearch=Suchen&group=H&group=B&group=A&country=de&action=";
 
 	public SchedulerResult run() {
 		final SchedulerResult result = new SchedulerResult();
@@ -64,7 +64,7 @@ public class ImportSportsBarService {
 
 	Results runZipCode(String zip) throws Exception {
 		final Results result = new Results();
-		final JsonNode list = new ObjectMapper().readTree(WebClient.create(URL + zip).get().retrieve()
+		JsonNode list = new ObjectMapper().readTree(WebClient.create(URL + "search&zip=" + zip).get().retrieve()
 				.toEntity(String.class).block().getBody());
 		if (list.get("currentPageIndexEnd").intValue() > 0) {
 			final QueryParams params = new QueryParams(Query.misc_listStorage);
@@ -73,56 +73,64 @@ public class ImportSportsBarService {
 			@SuppressWarnings("unchecked")
 			final Set<String> imported = new ObjectMapper()
 					.readValue(storage.get("storage.storage").toString(), Set.class);
-			for (int i2 = list.get("currentPageIndexStart").intValue() - 1; i2 < list.get("currentPageIndexEnd")
-					.intValue(); i2++) {
-				result.processed++;
-				final JsonNode data = list.get("currentData").get("" + i2);
-				if (imported.contains(data.get("number").asText()))
-					result.alreadyImported++;
-				else {
-					final String street = data.get("description").get("street").asText();
-					Location location = new Location();
-					location.setName(data.get("name").asText());
-					if (street.contains(" ") && street.substring(street.lastIndexOf(' ')).trim().matches("\\d.*")) {
-						location.setStreet(street.substring(0, street.lastIndexOf(' ')));
-						location.setNumber(street.substring(street.lastIndexOf(' ')).trim());
-					} else
-						location.setStreet(street);
-					location.setZipCode(zip);
-					location.setTown(data.get("description").get("city").asText().replace(zip, "").trim());
-					location.setAddress(location.getStreet() + " " + location.getNumber() + "\n" + location.getZipCode()
-							+ " " + location.getTown() + "\nDeutschland");
-					location.setCountry("DE");
-					if (data.has("mapdata") && data.get("mapdata").has("latitude")) {
-						location.setLatitude(data.get("mapdata").get("latitude").floatValue());
-						location.setLongitude(data.get("mapdata").get("longitude").floatValue());
-					}
-					updateFields(location, data);
-					location.setContactId(BigInteger.ONE);
-					try {
-						repository.save(location);
-						imported.add(data.get("number").asText());
-						result.imported++;
-					} catch (IllegalArgumentException ex) {
-						if (ex.getMessage().startsWith("location exists: ")) {
-							location = repository.one(Location.class, new BigInteger(ex.getMessage().substring(17)));
-							location.historize();
-							if (updateFields(location, data)) {
-								repository.save(location);
-								result.updated++;
-							} else
-								result.unchanged++;
-							imported.add(data.get("number").asText());
-						} else {
-							result.errors++;
-							if (!ex.getMessage().contains("OVER_QUERY_LIMIT"))
-								notificationService.createTicket(TicketType.ERROR, "ImportSportsBar",
-										Strings.stackTraceToString(ex), null);
+			for (int i = 0; i < list.get("numberOfPages").asInt(); i++) {
+				if (i > 0)
+					list = new ObjectMapper()
+							.readTree(WebClient.create(URL + "scroll&page=" + (i + 1) + "&zip=" + zip).get().retrieve()
+									.toEntity(String.class).block().getBody());
+				for (int i2 = list.get("currentPageIndexStart").intValue() - 1; i2 < list.get("currentPageIndexEnd")
+						.intValue(); i2++) {
+					result.processed++;
+					final JsonNode data = list.get("currentData").get("" + i2);
+					if (imported.contains(data.get("number").asText()))
+						result.alreadyImported++;
+					else {
+						final String street = data.get("description").get("street").asText();
+						Location location = new Location();
+						location.setName(data.get("name").asText());
+						if (street.contains(" ") && street.substring(street.lastIndexOf(' ')).trim().matches("\\d.*")) {
+							location.setStreet(street.substring(0, street.lastIndexOf(' ')));
+							location.setNumber(street.substring(street.lastIndexOf(' ')).trim());
+						} else
+							location.setStreet(street);
+						location.setZipCode(zip);
+						location.setTown(data.get("description").get("city").asText().replace(zip, "").trim());
+						location.setAddress(
+								location.getStreet() + " " + location.getNumber() + "\n" + location.getZipCode()
+										+ " " + location.getTown() + "\nDeutschland");
+						location.setCountry("DE");
+						if (data.has("mapdata") && data.get("mapdata").has("latitude")) {
+							location.setLatitude(data.get("mapdata").get("latitude").floatValue());
+							location.setLongitude(data.get("mapdata").get("longitude").floatValue());
 						}
-					} catch (Exception ex) {
-						result.errors++;
-						notificationService.createTicket(TicketType.ERROR, "ImportSportsBar",
-								Strings.stackTraceToString(ex), null);
+						updateFields(location, data);
+						location.setContactId(BigInteger.ONE);
+						try {
+							repository.save(location);
+							imported.add(data.get("number").asText());
+							result.imported++;
+						} catch (IllegalArgumentException ex) {
+							if (ex.getMessage().startsWith("location exists: ")) {
+								location = repository.one(Location.class,
+										new BigInteger(ex.getMessage().substring(17)));
+								location.historize();
+								if (updateFields(location, data)) {
+									repository.save(location);
+									result.updated++;
+								} else
+									result.unchanged++;
+								imported.add(data.get("number").asText());
+							} else {
+								result.errors++;
+								if (!ex.getMessage().contains("OVER_QUERY_LIMIT"))
+									notificationService.createTicket(TicketType.ERROR, "ImportSportsBar",
+											Strings.stackTraceToString(ex), null);
+							}
+						} catch (Exception ex) {
+							result.errors++;
+							notificationService.createTicket(TicketType.ERROR, "ImportSportsBar",
+									Strings.stackTraceToString(ex), null);
+						}
 					}
 				}
 			}
