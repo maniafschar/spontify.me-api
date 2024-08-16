@@ -451,7 +451,7 @@ public class MarketingService {
 							final List<Integer> totalAnswer = (List<Integer>) pollResult.answers.get(key).get("a");
 							totalAnswer.set(index, totalAnswer.get(index) + 1);
 						}
-						if (!Strings.isEmpty(contactAnswer.get(key).has("t"))) {
+						if (contactAnswer.get(key).has("t")) {
 							final Map<String, Object> o = pollResult.answers.get(key);
 							if (!o.containsKey("t"))
 								o.put("t", "");

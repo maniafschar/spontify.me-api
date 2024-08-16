@@ -182,8 +182,8 @@ public class SurveyServiceTest {
 			contactMarketing.setClientMarketingId(clientMarketingId);
 			contactMarketing.setContactId(BigInteger.ONE);
 			contactMarketing.setFinished(Boolean.TRUE);
-			contactMarketing.setStorage("{\"answers\":{\"q0\":{\"a\":["
-					+ (int) (Math.random() * poll.questions.get(0).answers.size()) + "]}}}");
+			contactMarketing.setStorage("{\"q0\":{\"a\":["
+					+ (int) (Math.random() * poll.questions.get(0).answers.size()) + "]}}");
 			repository.save(contactMarketing);
 		}
 		clientMarketing.setEndDate(new Timestamp(System.currentTimeMillis() - 1000));

@@ -290,13 +290,13 @@ public class SurveyService {
 								poll.prolog = "Umfrage <b>Spieler des Spiels</b> zum "
 										+ matchDay.findPath("league").get("name").asText() +
 										" Spiel<div style=\"padding:1em 0;font-weight:bold;\">"
-										+ poll.homeName
-										+ " - "
-										+ poll.awayName
+										+ poll.homeName + " - " + poll.awayName
 										+ "</div>vom <b>"
 										+ formatDate(matchDay.findPath("fixture").get("timestamp").asLong(),
 												null)
 										+ "</b>. Möchtest Du teilnehmen?";
+								poll.subject = poll.homeName + " : " + poll.awayName + " (" + poll.city + " · "
+										+ poll.venue + " · " + formatDate(poll.timestamp, null) + ")";
 								final Question question = new Question();
 								question.question = "Wer war für Dich Spieler des Spiels?";
 								playerOfTheMatchAddAnswers(question.answers, players);
