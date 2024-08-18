@@ -58,15 +58,11 @@ public class DbService {
 		final SchedulerResult result = new SchedulerResult();
 		try {
 			repository.executeUpdate(
-					"update Contact set age=cast((YEAR(current_timestamp) - YEAR(birthday) - case when MONTH(current_timestamp) < MONTH(birthday) or MONTH(current_timestamp) = MONTH(birthday) and DAY(current_timestamp) < DAY(birthday) then 1 else 0 end) as short) where birthday is not null");
-			repository.executeUpdate(
-					"update Contact set version=null where (version='0.9.9' or version='0.9.3') and os='android' and language='EN'");
-			repository.executeUpdate(
 					"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and (select modifiedAt from Contact contact where contact.id=contactNotification.contactId)>contactNotification.createdAt and TIMESTAMPDIFF(MINUTE,contactNotification.createdAt,current_timestamp)>30");
 			repository.executeUpdate(
-					"update Contact set timezone='" + Strings.TIME_OFFSET + "' where timezone is null");
+					"update Contact set age=cast((YEAR(current_timestamp) - YEAR(birthday) - case when MONTH(current_timestamp) < MONTH(birthday) or MONTH(current_timestamp) = MONTH(birthday) and DAY(current_timestamp) < DAY(birthday) then 1 else 0 end) as short) where birthday is not null");
 			repository.executeUpdate(
-					"update Log set webCall=substring(webCall, 1, instr(webCall, '(')-1) where instr(webCall, '(')>0");
+					"update Contact set timezone='" + Strings.TIME_OFFSET + "' where timezone is null");
 			final LocalDate d = LocalDate.ofInstant(Instant.now().minus(Duration.ofDays(183)), ZoneId.systemDefault());
 			repository.executeUpdate(
 					"update ContactToken set token='' where modifiedAt is not null and modifiedAt<cast('" + d

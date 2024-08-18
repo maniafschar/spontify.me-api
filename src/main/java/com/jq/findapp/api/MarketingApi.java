@@ -225,7 +225,7 @@ public class MarketingApi {
 			params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketing.getId());
 			final Result result = repository.list(params);
 			if (result.size() == 0 || result.get(0).get("clientMarketingResult.image") == null)
-				return "";
+				return getHtml(repository.one(Client.class, clientMarketing.getClientId()), null, null, null);
 			image = result.get(0).get("clientMarketingResult.image").toString();
 		} else
 			image = Attachment.resolve(clientMarketing.getImage());
@@ -311,15 +311,18 @@ public class MarketingApi {
 		update();
 		String s = INDEXES.get(client.getId());
 		final String url = Strings.removeSubdomain(client.getUrl());
-		s = s.replaceFirst("<meta property=\"og:url\" content=\"([^\"].*)\"",
-				"<meta property=\"og:url\" content=\"" + url + "/rest/marketing/" + path + '"');
-		s = s.replaceFirst("<link rel=\"canonical\" href=\"([^\"].*)\"",
-				"<link rel=\"canonical\" href=\"" + url + "/rest/marketing/" + path + '"');
-		s = s.replaceFirst("<meta property=\"og:image\" content=\"([^\"].*)\"",
-				"<meta property=\"og:image\" content=\"" + url + "/med/" + image + "\"/><base href=\"" + client.getUrl()
-						+ "/\"");
-		while (s.contains("(<link rel=\"alternate\""))
-			s = s.replaceFirst("(<link rel=\"alternate\" ([^>].*)>)", "");
+		if (path != null) {
+			s = s.replaceFirst("<meta property=\"og:url\" content=\"([^\"].*)\"",
+					"<meta property=\"og:url\" content=\"" + url + "/rest/marketing/" + path + '"');
+			s = s.replaceFirst("<link rel=\"canonical\" href=\"([^\"].*)\"",
+					"<link rel=\"canonical\" href=\"" + url + "/rest/marketing/" + path + '"');
+		}
+		if (image != null)
+			s = s.replaceFirst("<meta property=\"og:image\" content=\"([^\"].*)\"",
+					"<meta property=\"og:image\" content=\"" + url + "/med/" + image + "\"/><base href=\""
+							+ client.getUrl()
+							+ "/\"");
+		s = s.replaceAll("(<link rel=\"alternate\" ([^>].*)>)", "");
 		if (!Strings.isEmpty(title)) {
 			title = Strings.sanitize(title.replace('\n', ' ').replace('\t', ' ').replace('\r', ' ').replace('"', '\''),
 					0).replace("null", "").trim();
