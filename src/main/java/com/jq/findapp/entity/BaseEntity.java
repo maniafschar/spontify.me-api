@@ -54,18 +54,18 @@ public abstract class BaseEntity {
 	}
 
 	@Transient
-	public String modified() {
-		String modified = "";
+	public boolean modified() {
+		if (old == null)
+			return true;
 		for (final Field field : getClass().getDeclaredFields()) {
 			try {
-				field.setAccessible(true);
-				if (old == null || field.get(this) != old.get(field.getName()))
-					modified += "|" + field.getName();
+				if (old(field.getName()) != null)
+					return true;
 			} catch (final Exception e) {
 				throw new RuntimeException("Failed to check modified on " + field.getName(), e);
 			}
 		}
-		return modified.length() > 0 ? modified.substring(1) : null;
+		return false;
 	}
 
 	@Transient
@@ -77,7 +77,8 @@ public abstract class BaseEntity {
 		for (final Field field : getClass().getDeclaredFields()) {
 			try {
 				field.setAccessible(true);
-				old.put(field.getName(), field.get(this));
+				if (!old.containsKey(field.getName()))
+					old.put(field.getName(), field.get(this));
 			} catch (final Exception e) {
 				throw new RuntimeException("Failed to historize on " + field.getName(), e);
 			}

@@ -122,14 +122,14 @@ public class DbService {
 		final File file = new File(webDir + client.getId() + "/index.html");
 		if (!file.exists())
 			return false;
+		client.setStorage(Attachment.resolve(client.getStorage()));
 		client.historize();
 		final String html = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
 		updateField("<meta name=\"email\" content=\"([^\"].*)\"", html, e -> client.setEmail(e));
 		updateField("<meta property=\\\"og:title\\\" content=\"([^\"].*)\"", html, e -> client.setName(e));
 		updateField("<meta property=\\\"og:url\\\" content=\"([^\"].*)\"", html, e -> client.setUrl(e));
 		final ObjectMapper om = new ObjectMapper();
-		final String attachment = Attachment.resolve(client.getStorage());
-		final ObjectNode node = (ObjectNode) om.readTree(attachment);
+		final ObjectNode node = (ObjectNode) om.readTree(client.getStorage());
 		if (!node.has("lang"))
 			node.set("lang", om.createObjectNode());
 		final List<String> langs = Arrays.asList("DE", "EN");
@@ -160,13 +160,8 @@ public class DbService {
 			if (!node.has("css") || !om.writeValueAsString(node.get("css")).equals(css))
 				node.set("css", om.readTree(css));
 		}
-		final String attachmentNew = om.writeValueAsString(node);
-		if (client.modified() == null || !attachment.equals(attachmentNew)) {
-			System.out.println(client.getId());
-			System.out.println(client.modified());
-			System.out.println(attachment);
-			System.out.println(attachmentNew);
-			client.setStorage(attachmentNew);
+		client.setStorage(om.writeValueAsString(node));
+		if (client.modified()) {
 			repository.save(client);
 			return true;
 		}
