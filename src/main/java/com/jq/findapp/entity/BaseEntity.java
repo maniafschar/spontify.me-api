@@ -118,15 +118,15 @@ public abstract class BaseEntity {
 	public Object old(final String name) {
 		if (old == null)
 			return null;
-		Object value = old.get(name);
+		final Object value = old.get(name);
 		if (value == null)
 			return null;
 		try {
 			final Field field = getClass().getDeclaredField(name);
 			field.setAccessible(true);
-			if (value instanceof String)
-				value = Attachment.resolve((String) value);
-			return value.equals(field.get(this)) ? null : value;
+			final Object compare = field.get(this);
+			return value.equals(compare)
+					|| value instanceof String && Attachment.resolve((String) value).equals(compare) ? null : value;
 		} catch (final Exception ex) {
 			throw new RuntimeException("Failed to read " + name, ex);
 		}
