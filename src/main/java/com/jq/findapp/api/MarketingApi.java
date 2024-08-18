@@ -311,6 +311,8 @@ public class MarketingApi {
 		update();
 		String s = INDEXES.get(client.getId());
 		final String url = Strings.removeSubdomain(client.getUrl());
+		s = s.replaceFirst("<head>",
+				"<head>\n\t<base href=\"" + url + "\" />");
 		if (path != null) {
 			s = s.replaceFirst("<meta property=\"og:url\" content=\"([^\"].*)\"",
 					"<meta property=\"og:url\" content=\"" + url + "/rest/marketing/" + path + '"');
