@@ -10,6 +10,7 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.repository.Repository.Attachment;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -117,12 +118,14 @@ public abstract class BaseEntity {
 	public Object old(final String name) {
 		if (old == null)
 			return null;
-		final Object value = old.get(name);
+		Object value = old.get(name);
 		if (value == null)
 			return null;
 		try {
 			final Field field = getClass().getDeclaredField(name);
 			field.setAccessible(true);
+			if (value instanceof String)
+				value = Attachment.resolve((String) value);
 			return value.equals(field.get(this)) ? null : value;
 		} catch (final Exception ex) {
 			throw new RuntimeException("Failed to read " + name, ex);
