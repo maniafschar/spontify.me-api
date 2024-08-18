@@ -54,19 +54,18 @@ public abstract class BaseEntity {
 	}
 
 	@Transient
-	public boolean modified() {
-		if (old == null)
-			return true;
+	public String modified() {
+		String modified = "";
 		for (final Field field : getClass().getDeclaredFields()) {
 			try {
 				field.setAccessible(true);
-				if (field.get(this) != old.get(field.getName()))
-					return true;
+				if (old == null || field.get(this) != old.get(field.getName()))
+					modified += "|" + field.getName();
 			} catch (final Exception e) {
 				throw new RuntimeException("Failed to check modified on " + field.getName(), e);
 			}
 		}
-		return false;
+		return modified.length() > 0 ? modified.substring(1) : null;
 	}
 
 	@Transient

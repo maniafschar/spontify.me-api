@@ -161,7 +161,11 @@ public class DbService {
 				node.set("css", om.readTree(css));
 		}
 		final String attachmentNew = om.writeValueAsString(node);
-		if (client.modified() || !attachment.equals(attachmentNew)) {
+		if (client.modified() == null || !attachment.equals(attachmentNew)) {
+			System.out.println(client.getId());
+			System.out.println(client.modified());
+			System.out.println(attachment);
+			System.out.println(attachmentNew);
 			client.setStorage(attachmentNew);
 			repository.save(client);
 			return true;
