@@ -322,8 +322,7 @@ public class MarketingApi {
 		if (image != null)
 			s = s.replaceFirst("<meta property=\"og:image\" content=\"([^\"].*)\"",
 					"<meta property=\"og:image\" content=\"" + url + "/med/" + image + "\"/><base href=\""
-							+ client.getUrl()
-							+ "/\"");
+							+ client.getUrl() + "/\"");
 		s = s.replaceAll("(<link rel=\"alternate\" ([^>].*)>)", "");
 		if (!Strings.isEmpty(title)) {
 			title = Strings.sanitize(title.replace('\n', ' ').replace('\t', ' ').replace('\r', ' ').replace('"', '\''),

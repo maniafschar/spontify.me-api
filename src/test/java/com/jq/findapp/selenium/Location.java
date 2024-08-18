@@ -66,14 +66,19 @@ public class Location {
 					driver.manage().timeouts().implicitlyWait(Duration.ofMillis(50));
 					driver.manage().window().setSize(new Dimension(1200, 900));
 					driver.get(url + "?q=" + s[0]);
-					String urlLocation = (String) js.executeScript(
+					final String urlLocation = (String) js.executeScript(
 							"return document.getElementsByClassName('bkaPDb')[0]?.querySelector('a')?.getAttribute('href')");
 					if (!Strings.isEmpty(urlLocation)) {
-						driver.get(urlLocation);
-						if (!analysePage(out, s[1],
-								((String) js.executeScript("return document.body.innerHTML")).toLowerCase(),
-								urlLocation.toString().toLowerCase(), true))
+						if (blocked.stream().anyMatch(e -> urlLocation.toLowerCase().contains(e))) {
+							write(out, "-- blocked " + urlLocation + "\n");
 							lookupSearchResults(out, s[1]);
+						} else {
+							driver.get(urlLocation);
+							if (!analysePage(out, s[1],
+									((String) js.executeScript("return document.body.innerHTML")),
+									urlLocation.toLowerCase(), true))
+								lookupSearchResults(out, s[1]);
+						}
 					} else
 						lookupSearchResults(out, s[1]);
 					write(out, "\n");
@@ -82,7 +87,7 @@ public class Location {
 						write(out, Strings.stackTraceToString(ex));
 						return;
 					}
-					write(out, "-- " + ex.getClass().getName() + ": " + ex.getMessage().replace('\n', ',') + "\n");
+					write(out, "-- " + ex.getClass().getName() + ": " + ex.getMessage().replace('\n', ',') + "\n\n");
 				} finally {
 					if (driver != null)
 						try {
@@ -99,29 +104,31 @@ public class Location {
 	private void lookupSearchResults(final FileOutputStream out, final String id) throws IOException {
 		@SuppressWarnings("unchecked")
 		final List<String> links = (List<String>) js.executeScript(
-				"return Array.from(document.getElementById('center_col').querySelectorAll('span>a')).map(e => e.getAttribute('href'))");
-		for (final String urlPage : links) {
-			if (!blocked.stream().anyMatch(e -> urlPage.toLowerCase().contains(e))) {
-				((WebDriver) js).get(urlPage);
-				String urlLocation = js.executeScript("return document.location.href").toString()
-						.toLowerCase();
-				String html = null;
-				boolean found = false;
-				if (urlLocation.contains("falstaff.com")) {
-					html = ((String) js.executeScript("return document.body.innerHTML")).toLowerCase();
-					html = html.substring(html.indexOf("contact-details__content"));
-					final Matcher matcher = Pattern
-							.compile(".*(\\bhttps://[A-Z0-9._-]+\\b).*", Pattern.CASE_INSENSITIVE)
-							.matcher(html);
-					if (matcher.find()) {
-						urlLocation = matcher.group(1);
-						found = true;
+				"var v=document.getElementById('center_col')?.querySelectorAll('span>a');return v?Array.from(v).map(e => e.getAttribute('href')):null;");
+		if (links != null)
+			for (final String urlPage : links) {
+				if (!blocked.stream().anyMatch(e -> urlPage.toLowerCase().contains(e))) {
+					((WebDriver) js).get(urlPage);
+					String urlLocation = js.executeScript("return document.location.href").toString()
+							.toLowerCase();
+					String html = null;
+					boolean found = false;
+					if (urlLocation.contains("falstaff.com") || urlLocation.contains("ich-will-essen.de")) {
+						html = ((String) js.executeScript("return document.body.innerHTML")).toLowerCase();
+						if (html.contains("contact-details__content"))
+							html = html.substring(html.indexOf("contact-details__content"));
+						final Matcher matcher = Pattern
+								.compile(".*(\\bhttps://[A-Z0-9._-]+\\b).*", Pattern.CASE_INSENSITIVE)
+								.matcher(html);
+						if (matcher.find()) {
+							urlLocation = matcher.group(1);
+							found = true;
+						}
 					}
+					if (analysePage(out, id, html, urlLocation, !found))
+						return;
 				}
-				if (analysePage(out, id, html, urlLocation, !found))
-					return;
 			}
-		}
 	}
 
 	private boolean analysePage(final FileOutputStream out, final String id, String html, final String urlLocation,
@@ -129,7 +136,7 @@ public class Location {
 		if (imprint) {
 			js.executeScript(
 					"Array.from(document.querySelectorAll('a')).find(e => e.textContent.toLowerCase().indexOf('impressum')>-1)?.click()");
-			html = ((String) js.executeScript("return document.body.innerHTML")).toLowerCase();
+			return findEmail((String) js.executeScript("return document.body.innerHTML"), urlLocation, id, out);
 		}
 		final int addressWordsCount = addressWordsCount(address, html);
 		write(out, "-- " + addressWordsCount + "% " + urlLocation + "\n");
@@ -147,16 +154,18 @@ public class Location {
 		out.write(msg.getBytes(StandardCharsets.UTF_8));
 	}
 
-	private boolean findEmail(final String html, final String urlLocation, final String id, final FileOutputStream out)
+	private boolean findEmail(String html, final String urlLocation, final String id, final FileOutputStream out)
 			throws IOException {
+		html = html.toLowerCase().replace("[at]", "@").replace("(*at*)", "@");
 		int pos = html.length();
 		while ((pos = html.lastIndexOf('@', pos - 1)) > 0) {
 			final Matcher matcher = emailPattern.matcher(
 					html.substring(Math.max(0, pos - 200), Math.min(pos + 200, html.length())));
 			if (matcher.find()) {
-				final String email = matcher.group(1).toLowerCase().replace("[at]", "@");
+				final String email = matcher.group(1);
 				if (!email.endsWith(".png") && !email.endsWith(".jpg")
-						&& (urlLocation.contains(email.substring(matcher.group(1).indexOf("@") + 1)) ||
+						&& (email.endsWith("@web.de") || email.endsWith("@gmx.de") || email.endsWith("@t-online.de")
+								|| urlLocation.contains(email.substring(matcher.group(1).indexOf("@") + 1)) ||
 								urlLocation.contains(email.substring(0, matcher.group(1).indexOf("@"))))) {
 					write(out, "update location set email='"
 							+ email + "', url='" + urlLocation + "', modified_at=now() where id=" + id

@@ -7,13 +7,11 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -318,25 +316,28 @@ public class MarketingService {
 					if (answers.get("q" + i).has("t")) {
 						String s = answers.get("q" + i).get("t").asText();
 						if (!Strings.isEmpty(s)) {
-							if ("name".equals(poll.questions.get(i).id)) {
+							if ("name".equals(poll.questions.get(i).id) && !Strings.isEmpty(s)) {
 								location.setName(s);
 								email += s + "\n";
-							} else if ("address".equals(poll.questions.get(i).id) && s.contains("\n")) {
+							} else if ("address".equals(poll.questions.get(i).id) && s.contains("\n")
+									&& !Strings.isEmpty(s)) {
 								location.setAddress(s);
 								email += s + "\n";
 							} else if ("telephone".equals(poll.questions.get(i).id)) {
 								location.setTelephone(s);
-								email += s + "\n";
-							} else if ("url".equals(poll.questions.get(i).id) && s.startsWith("https://")) {
+								if (!Strings.isEmpty(s))
+									email += s + "\n";
+							} else if ("url".equals(poll.questions.get(i).id) && s.startsWith("http")
+									&& s.contains("://")) {
 								location.setUrl(s);
 								email += s + "\n";
 							} else if ("description".equals(poll.questions.get(i).id)) {
 								location.setDescription(s);
-								email += "\n" + s + "\n\n";
-							} else if ("skills".equals(poll.questions.get(i).id)) {
+								if (!Strings.isEmpty(s))
+									email += "\n" + s + "\n\n";
+							} else if ("skills".equals(poll.questions.get(i).id))
 								location.setSkillsText(s);
-								email += "\n" + s + "\n\n";
-							} else if ("feedback".equals(poll.questions.get(i).id) && !Strings.isEmpty(s)) {
+							else if ("feedback".equals(poll.questions.get(i).id) && !Strings.isEmpty(s)) {
 								result += "<li>Lieben Dank für Dein Feedback.</li>";
 								email += "Dein Feedback:\n" + s + "\n\n";
 							}
@@ -352,7 +353,7 @@ public class MarketingService {
 						}
 						if (!Strings.isEmpty(s)) {
 							if ("skills".equals(poll.questions.get(i).id))
-								location.setSkills(sanitizeSkills(location.getSkills(), s));
+								location.setSkills(s.substring(1));
 							else if ("cards".equals(poll.questions.get(i).id) && !"|0".equals(s)) {
 								result += "<li>Marketing-Material senden wir Dir an die Adresse Deiner Location.</li>";
 								email += "Marketing-Material senden wir Dir an die Adresse Deiner Location.\n\n";
@@ -396,12 +397,6 @@ public class MarketingService {
 			}
 		}
 		return null;
-	}
-
-	private String sanitizeSkills(String skills, String newSkills) {
-		final List<String> list = Arrays
-				.asList((Strings.isEmpty(skills) ? newSkills.substring(1) : skills + newSkills).split("\\|"));
-		return String.join("|", list.stream().distinct().filter(e -> !"0".equals(e)).collect(Collectors.toList()));
 	}
 
 	public synchronized ClientMarketingResult synchronizeResult(final BigInteger clientMarketingId) throws Exception {
