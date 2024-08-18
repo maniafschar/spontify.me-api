@@ -54,6 +54,22 @@ public abstract class BaseEntity {
 	}
 
 	@Transient
+	public boolean modified() {
+		if (old == null)
+			return true;
+		for (final Field field : getClass().getDeclaredFields()) {
+			try {
+				field.setAccessible(true);
+				if (field.get(this) != old.get(field.getName()))
+					return true;
+			} catch (final Exception e) {
+				throw new RuntimeException("Failed to check modified on " + field.getName(), e);
+			}
+		}
+		return false;
+	}
+
+	@Transient
 	public void historize() {
 		if (id == null)
 			return;

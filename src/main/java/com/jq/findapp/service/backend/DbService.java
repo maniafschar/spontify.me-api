@@ -124,14 +124,12 @@ public class DbService {
 			return false;
 		client.historize();
 		final String html = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
-		boolean modified = updateField("<meta name=\"email\" content=\"([^\"].*)\"", html, client.getEmail(),
-				e -> client.setEmail(e));
-		modified = updateField("<meta property=\\\"og:title\\\" content=\"([^\"].*)\"", html, client.getName(),
-				e -> client.setName(e)) || modified;
-		modified = updateField("<meta property=\\\"og:url\\\" content=\"([^\"].*)\"", html, client.getUrl(),
-				e -> client.setUrl(e)) || modified;
+		updateField("<meta name=\"email\" content=\"([^\"].*)\"", html, e -> client.setEmail(e));
+		updateField("<meta property=\\\"og:title\\\" content=\"([^\"].*)\"", html, e -> client.setName(e));
+		updateField("<meta property=\\\"og:url\\\" content=\"([^\"].*)\"", html, e -> client.setUrl(e));
 		final ObjectMapper om = new ObjectMapper();
-		final ObjectNode node = (ObjectNode) om.readTree(Attachment.resolve(client.getStorage()));
+		final String attachment = Attachment.resolve(client.getStorage());
+		final ObjectNode node = (ObjectNode) om.readTree(attachment);
 		if (!node.has("lang"))
 			node.set("lang", om.createObjectNode());
 		final List<String> langs = Arrays.asList("DE", "EN");
@@ -147,7 +145,6 @@ public class DbService {
 							.equals(json.get("labels").get("buddies").asText())) {
 				((ObjectNode) node.get("lang").get(lang)).set("buddy", json.get("labels").get("buddy"));
 				((ObjectNode) node.get("lang").get(lang)).set("buddies", json.get("labels").get("buddies"));
-				modified = true;
 			}
 		}
 		String css = IOUtils.toString(new FileInputStream(webDir + client.getId() + "/css/main.css"),
@@ -160,27 +157,23 @@ public class DbService {
 			while (matcher.find())
 				css += "\"" + matcher.group(1) + "\":\"" + matcher.group(2) + "\",";
 			css = css.substring(0, css.length() - 1) + "}";
-			if (!node.has("css") || !om.writeValueAsString(node.get("css")).equals(css)) {
+			if (!node.has("css") || !om.writeValueAsString(node.get("css")).equals(css))
 				node.set("css", om.readTree(css));
-				modified = true;
-			}
 		}
-		if (modified) {
-			client.setStorage(om.writeValueAsString(node));
+		final String attachmentNew = om.writeValueAsString(node);
+		if (client.modified() || !attachment.equals(attachmentNew)) {
+			client.setStorage(attachmentNew);
 			repository.save(client);
 			return true;
 		}
 		return false;
 	}
 
-	private boolean updateField(final String pattern, final String html, final String compare,
+	private void updateField(final String pattern, final String html,
 			final Consumer<String> set) {
 		final Matcher matcher = Pattern.compile(pattern).matcher(html);
-		if (matcher.find() && !matcher.group(1).equals(compare)) {
+		if (matcher.find())
 			set.accept(matcher.group(1));
-			return true;
-		}
-		return false;
 	}
 
 	private void statistics(final BigInteger clientId) throws Exception {
