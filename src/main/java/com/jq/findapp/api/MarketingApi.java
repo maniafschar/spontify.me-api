@@ -333,7 +333,7 @@ public class MarketingApi {
 			matcher = patternImage.matcher(s);
 			if (matcher.find())
 				s = matcher.replaceFirst(
-						"<meta property=\"og:image\" content=\"" + url + "/med/" + image + "\"/>");
+						"<meta property=\"og:image\" content=\"" + url + "/med/" + image + '"');
 		}
 		matcher = patternAlternate.matcher(s);
 		if (matcher.find())

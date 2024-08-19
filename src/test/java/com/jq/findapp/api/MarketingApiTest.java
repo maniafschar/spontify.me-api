@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
 import com.jq.findapp.entity.ClientNews;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith(SpringExtension.class)
@@ -41,6 +43,8 @@ public class MarketingApiTest {
 		news.setDescription("abc");
 		news.setSource("xyz");
 		news.setUrl("https://def.gh");
+		news.setImage(Attachment.createImage(".jpg",
+				IOUtils.toByteArray(getClass().getResourceAsStream("/image/party.jpg"))));
 		repository.save(news);
 		marketingApi.news(news.getId());
 		long time = System.currentTimeMillis();
@@ -50,8 +54,11 @@ public class MarketingApiTest {
 
 		// then
 		time = System.currentTimeMillis() - time;
+		System.out.println(result);
 		assertTrue(time < 20, "time " + time);
 		assertTrue(result.contains("<article>abc"));
+		assertTrue(
+				result.contains("<link rel=\"canonical\" href=\"https://fan-club.online/rest/marketing/news/1\" />"));
 	}
 
 	@Test
