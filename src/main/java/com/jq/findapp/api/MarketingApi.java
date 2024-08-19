@@ -339,21 +339,19 @@ public class MarketingApi {
 		}
 	}
 
-	private String getHtml(final Client client, final String path, final String image, String title)
+	private String getHtml(final Client client, final String path, final String image, String description)
 			throws IOException {
 		update();
 		String s = INDEXES.get(client.getId());
-		if (path != null)
-			s = s.replace("{{og:url}}", path);
-		if (image != null)
-			s = s.replace("{{og:image}}", image);
-		if (!Strings.isEmpty(title)) {
-			title = Strings.sanitize(title.replace('\n', ' ').replace('\t', ' ').replace('\r', ' ').replace('"', '\''),
-					0).replace("null", "").trim();
-			s = s.replace("{{description}}", title);
-			s = s.replace("{{title}}",
-					(client.getName() + " · " + (title.length() > 200 ? title.substring(0, 200) : title)));
-		}
-		return s;
+		s = s.replace("{{og:url}}", path == null ? "" : path);
+		s = s.replace("{{og:image}}", image == null ? "" : image);
+		description = description == null ? ""
+				: Strings.sanitize(
+						description.replace('\n', ' ').replace('\t', ' ').replace('\r', ' ').replace('"', '\''),
+						0).replace("null", "").trim();
+		s = s.replace("{{description}}", description);
+		return s.replace("{{title}}",
+				(client.getName() + " · "
+						+ (description.length() > 200 ? description.substring(0, 200) : description)));
 	}
 }
