@@ -42,6 +42,7 @@ public class MarketingApiTest {
 		news.setSource("xyz");
 		news.setUrl("https://def.gh");
 		repository.save(news);
+		marketingApi.news(news.getId());
 		long time = System.currentTimeMillis();
 
 		// when
@@ -49,7 +50,7 @@ public class MarketingApiTest {
 
 		// then
 		time = System.currentTimeMillis() - time;
-		assertTrue(time < 600, "time " + time);
+		assertTrue(time < 20, "time " + time);
 		assertTrue(result.contains("<article>abc"));
 	}
 

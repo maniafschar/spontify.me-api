@@ -10,6 +10,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +55,11 @@ public class MarketingApi {
 	private static final Map<BigInteger, String> INDEXES = new HashMap<>();
 	private static final Map<BigInteger, String> MENU = new HashMap<>();
 	private static volatile long lastUpdate = 0;
+	private Pattern patternUrl = Pattern.compile("<meta property=\"og:url\" content=\"([^\"].*)\"");
+	private Pattern patternCanonical = Pattern.compile("<link rel=\"canonical\" href=\"([^\"].*)\"");
+	private Pattern patternImage = Pattern.compile("<meta property=\"og:image\" content=\"([^\"].*)\"");
+	private Pattern patternAlternate = Pattern.compile("(<link rel=\"alternate\" ([^>].*)>)");
+	private Pattern patternDescription = Pattern.compile("<meta name=\"description\" content=\"([^\"].*)\"");
 
 	@Autowired
 	private Repository repository;
@@ -311,29 +318,37 @@ public class MarketingApi {
 		update();
 		String s = INDEXES.get(client.getId());
 		final String url = Strings.removeSubdomain(client.getUrl());
-		s = s.replaceFirst("<head>",
-				"<head>\n\t<base href=\"" + url + "\" />");
+		s = s.replace("<head>", "<head>\n\t<base href=\"" + url + "\" />");
+		Matcher matcher;
 		if (path != null) {
-			s = s.replaceFirst("<meta property=\"og:url\" content=\"([^\"].*)\"",
-					"<meta property=\"og:url\" content=\"" + url + "/rest/marketing/" + path + '"');
-			s = s.replaceFirst("<link rel=\"canonical\" href=\"([^\"].*)\"",
-					"<link rel=\"canonical\" href=\"" + url + "/rest/marketing/" + path + '"');
+			matcher = patternUrl.matcher(s);
+			if (matcher.find())
+				s = matcher
+						.replaceFirst("<meta property=\"og:url\" content=\"" + url + "/rest/marketing/" + path + '"');
+			matcher = patternCanonical.matcher(s);
+			if (matcher.find())
+				s = matcher.replaceFirst("<link rel=\"canonical\" href=\"" + url + "/rest/marketing/" + path + '"');
 		}
-		if (image != null)
-			s = s.replaceFirst("<meta property=\"og:image\" content=\"([^\"].*)\"",
-					"<meta property=\"og:image\" content=\"" + url + "/med/" + image + "\"/><base href=\""
-							+ client.getUrl() + "/\"");
-		s = s.replaceAll("(<link rel=\"alternate\" ([^>].*)>)", "");
+		if (image != null) {
+			matcher = patternImage.matcher(s);
+			if (matcher.find())
+				s = matcher.replaceFirst(
+						"<meta property=\"og:image\" content=\"" + url + "/med/" + image + "\"/>");
+		}
+		matcher = patternAlternate.matcher(s);
+		if (matcher.find())
+			s = matcher.replaceAll("");
 		if (!Strings.isEmpty(title)) {
 			title = Strings.sanitize(title.replace('\n', ' ').replace('\t', ' ').replace('\r', ' ').replace('"', '\''),
 					0).replace("null", "").trim();
-			s = s.replaceFirst("</add>",
+			matcher = patternDescription.matcher(s);
+			if (matcher.find())
+				s = matcher.replaceFirst("<meta name=\"description\" content=\"" + title + '"');
+			s = s.replace("</add>",
 					"<style>article{opacity:0;position:absolute;}</style><article>" + title
 							+ "<figure><img src=\"" + url + "/med/" + image + "\"/></figure><menu><ul>"
 							+ MENU.get(client.getId()) + "</ul></menu></article></add>");
-			s = s.replaceFirst("<meta name=\"description\" content=\"([^\"].*)\"",
-					"<meta name=\"description\" content=\"" + title + '"');
-			s = s.replaceFirst("<title></title>", "<title>" +
+			s = s.replace("<title></title>", "<title>" +
 					(client.getName() + " · " + (title.length() > 200 ? title.substring(0, 200) : title)) + "</title>");
 		}
 		return s;
