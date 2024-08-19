@@ -55,11 +55,11 @@ public class MarketingApi {
 	private static final Map<BigInteger, String> INDEXES = new HashMap<>();
 	private static final Map<BigInteger, String> MENU = new HashMap<>();
 	private static volatile long lastUpdate = 0;
-	private Pattern patternUrl = Pattern.compile("<meta property=\"og:url\" content=\"([^\"].*)\"");
-	private Pattern patternCanonical = Pattern.compile("<link rel=\"canonical\" href=\"([^\"].*)\"");
-	private Pattern patternImage = Pattern.compile("<meta property=\"og:image\" content=\"([^\"].*)\"");
-	private Pattern patternAlternate = Pattern.compile("(<link rel=\"alternate\" ([^>].*)>)");
-	private Pattern patternDescription = Pattern.compile("<meta name=\"description\" content=\"([^\"].*)\"");
+	private static Pattern patternUrl = Pattern.compile("<meta property=\"og:url\" content=\"([^\"].*)\"");
+	private static Pattern patternCanonical = Pattern.compile("<link rel=\"canonical\" href=\"([^\"].*)\"");
+	private static Pattern patternImage = Pattern.compile("<meta property=\"og:image\" content=\"([^\"].*)\"");
+	private static Pattern patternAlternate = Pattern.compile("(<link rel=\"alternate\" ([^>].*)>)");
+	private static Pattern patternDescription = Pattern.compile("<meta name=\"description\" content=\"([^\"].*)\"");
 
 	@Autowired
 	private Repository repository;
