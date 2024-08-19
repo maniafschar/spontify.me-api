@@ -46,16 +46,18 @@ public class MarketingApiTest {
 		news.setImage(Attachment.createImage(".jpg",
 				IOUtils.toByteArray(getClass().getResourceAsStream("/image/party.jpg"))));
 		repository.save(news);
-		marketingApi.news(news.getId());
-		long time = System.currentTimeMillis();
+		long time1 = System.currentTimeMillis();
 
 		// when
+		marketingApi.news(news.getId());
+		time1 = System.currentTimeMillis() - time1;
+		long time2 = System.currentTimeMillis();
 		final String result = marketingApi.news(news.getId());
+		time2 = System.currentTimeMillis() - time2;
 
 		// then
-		time = System.currentTimeMillis() - time;
-		System.out.println(result);
-		assertTrue(time < 20, "time " + time);
+		assertTrue(time1 > 400, "time " + time1);
+		assertTrue(time2 < 20, "time " + time2);
 		assertTrue(result.contains("<article>abc"));
 		assertTrue(
 				result.contains("<link rel=\"canonical\" href=\"https://fan-club.online/rest/marketing/news/1\" />"));

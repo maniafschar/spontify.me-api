@@ -55,11 +55,6 @@ public class MarketingApi {
 	private static final Map<BigInteger, String> INDEXES = new HashMap<>();
 	private static final Map<BigInteger, String> MENU = new HashMap<>();
 	private static volatile long lastUpdate = 0;
-	private static Pattern patternUrl = Pattern.compile("<meta property=\"og:url\" content=\"([^\"].*)\"");
-	private static Pattern patternCanonical = Pattern.compile("<link rel=\"canonical\" href=\"([^\"].*)\"");
-	private static Pattern patternImage = Pattern.compile("<meta property=\"og:image\" content=\"([^\"].*)\"");
-	private static Pattern patternAlternate = Pattern.compile("(<link rel=\"alternate\" ([^>].*)>)");
-	private static Pattern patternDescription = Pattern.compile("<meta name=\"description\" content=\"([^\"].*)\"");
 
 	@Autowired
 	private Repository repository;
@@ -281,12 +276,43 @@ public class MarketingApi {
 		if (System.currentTimeMillis() - lastUpdate > 24 * 60 * 60 * 1000) {
 			lastUpdate = System.currentTimeMillis();
 			final Result list = repository.list(new QueryParams(Query.misc_listClient));
+			final Pattern patternUrl = Pattern.compile("<meta property=\"og:url\" content=\"([^\"].*)\"");
+			final Pattern patternCanonical = Pattern.compile("<link rel=\"canonical\" href=\"([^\"].*)\"");
+			final Pattern patternImage = Pattern.compile("<meta property=\"og:image\" content=\"([^\"].*)\"");
+			final Pattern patternAlternate = Pattern.compile("(<link rel=\"alternate\" ([^>].*)>)");
+			final Pattern patternDescription = Pattern.compile("<meta name=\"description\" content=\"([^\"].*)\"");
 			for (int i = 0; i < list.size(); i++) {
 				final Client client = repository.one(Client.class, (BigInteger) list.get(i).get("client.id"));
-				try (final InputStream in = URI.create(client.getUrl()).toURL().openStream()) {
-					INDEXES.put(client.getId(), IOUtils.toString(in, StandardCharsets.UTF_8));
-				}
 				final String url = Strings.removeSubdomain(client.getUrl());
+				try (final InputStream in = URI.create(client.getUrl()).toURL().openStream()) {
+					String s = IOUtils.toString(in, StandardCharsets.UTF_8);
+					s = s.replace("<head>", "<head>\n\t<base href=\"" + url + "\" />");
+					Matcher matcher = patternUrl.matcher(s);
+					if (matcher.find())
+						s = matcher
+								.replaceFirst(
+										"<meta property=\"og:url\" content=\"" + url + "/rest/marketing/{{og:url}}\"");
+					matcher = patternCanonical.matcher(s);
+					if (matcher.find())
+						s = matcher.replaceFirst(
+								"<link rel=\"canonical\" href=\"" + url + "/rest/marketing/{{og:url}}\"");
+					matcher = patternImage.matcher(s);
+					if (matcher.find())
+						s = matcher.replaceFirst(
+								"<meta property=\"og:image\" content=\"" + url + "/med/{{og:image}}\"");
+					matcher = patternAlternate.matcher(s);
+					if (matcher.find())
+						s = matcher.replaceAll("");
+					matcher = patternDescription.matcher(s);
+					if (matcher.find())
+						s = matcher.replaceFirst("<meta name=\"description\" content=\"{{description}}\"");
+					s = s.replace("</add>",
+							"<style>article{opacity:0;position:absolute;}</style><article>{{description}}<figure><img src=\""
+									+ url
+									+ "/med/{{og:image}}\"/></figure><menu><ul>{{MENU}}</ul></menu></article></add>");
+					s = s.replace("<title></title>", "<title>{{title}}</title>");
+					INDEXES.put(client.getId(), s);
+				}
 				final StringBuilder s = new StringBuilder();
 				final QueryParams params = new QueryParams(Query.location_listId);
 				params.setLimit(0);
@@ -317,39 +343,16 @@ public class MarketingApi {
 			throws IOException {
 		update();
 		String s = INDEXES.get(client.getId());
-		final String url = Strings.removeSubdomain(client.getUrl());
-		s = s.replace("<head>", "<head>\n\t<base href=\"" + url + "\" />");
-		Matcher matcher;
-		if (path != null) {
-			matcher = patternUrl.matcher(s);
-			if (matcher.find())
-				s = matcher
-						.replaceFirst("<meta property=\"og:url\" content=\"" + url + "/rest/marketing/" + path + '"');
-			matcher = patternCanonical.matcher(s);
-			if (matcher.find())
-				s = matcher.replaceFirst("<link rel=\"canonical\" href=\"" + url + "/rest/marketing/" + path + '"');
-		}
-		if (image != null) {
-			matcher = patternImage.matcher(s);
-			if (matcher.find())
-				s = matcher.replaceFirst(
-						"<meta property=\"og:image\" content=\"" + url + "/med/" + image + '"');
-		}
-		matcher = patternAlternate.matcher(s);
-		if (matcher.find())
-			s = matcher.replaceAll("");
+		if (path != null)
+			s = s.replace("{{og:url}}", path);
+		if (image != null)
+			s = s.replace("{{og:image}}", image);
 		if (!Strings.isEmpty(title)) {
 			title = Strings.sanitize(title.replace('\n', ' ').replace('\t', ' ').replace('\r', ' ').replace('"', '\''),
 					0).replace("null", "").trim();
-			matcher = patternDescription.matcher(s);
-			if (matcher.find())
-				s = matcher.replaceFirst("<meta name=\"description\" content=\"" + title + '"');
-			s = s.replace("</add>",
-					"<style>article{opacity:0;position:absolute;}</style><article>" + title
-							+ "<figure><img src=\"" + url + "/med/" + image + "\"/></figure><menu><ul>"
-							+ MENU.get(client.getId()) + "</ul></menu></article></add>");
-			s = s.replace("<title></title>", "<title>" +
-					(client.getName() + " · " + (title.length() > 200 ? title.substring(0, 200) : title)) + "</title>");
+			s = s.replace("{{description}}", title);
+			s = s.replace("{{title}}",
+					(client.getName() + " · " + (title.length() > 200 ? title.substring(0, 200) : title)));
 		}
 		return s;
 	}
