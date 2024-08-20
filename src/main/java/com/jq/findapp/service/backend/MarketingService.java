@@ -63,6 +63,9 @@ public class MarketingService {
 	@Autowired
 	private Text text;
 
+	@Value("${app.admin.email}")
+	private String adminEmail;
+
 	public SchedulerResult run() {
 		final SchedulerResult result = new SchedulerResult();
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
@@ -391,6 +394,11 @@ public class MarketingService {
 				notificationService.sendEmail(client, null,
 						location.getEmail(),
 						"Deine Location " + location.getName(), email,
+						createHtmlTemplate(repository.one(Client.class, clientMarketing.getClientId()))
+								.replace("<jq:text />", email.replace("\n", "<br />")));
+				notificationService.sendEmail(client, null,
+						adminEmail,
+						"Location Update " + location.getName(), email,
 						createHtmlTemplate(repository.one(Client.class, clientMarketing.getClientId()))
 								.replace("<jq:text />", email.replace("\n", "<br />")));
 				return result + "</ul>";
