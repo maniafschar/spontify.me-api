@@ -396,6 +396,7 @@ public class MarketingService {
 						"Deine Location " + location.getName(), email,
 						createHtmlTemplate(repository.one(Client.class, clientMarketing.getClientId()))
 								.replace("<jq:text />", email.replace("\n", "<br />")));
+				email += "<br /><br /><br />" + om.writerWithDefaultPrettyPrinter().writeValueAsString(answers);
 				notificationService.sendEmail(client, null,
 						adminEmail,
 						"Location Update " + location.getName(), email,
