@@ -74,10 +74,16 @@ public class ImportSportsBarService {
 			final Set<String> imported = new ObjectMapper()
 					.readValue(storage.get("storage.storage").toString(), Set.class);
 			for (int i = 0; i < list.get("numberOfPages").asInt(); i++) {
-				if (i > 0)
-					list = new ObjectMapper()
-							.readTree(WebClient.create(URL + "scroll&page=" + (i + 1) + "&zip=" + zip).get().retrieve()
-									.toEntity(String.class).block().getBody());
+				if (i > 0) {
+					try {
+						list = new ObjectMapper()
+								.readTree(WebClient.create(URL + "scroll&page=" + (i + 1) + "&zip=" + zip).get()
+										.retrieve()
+										.toEntity(String.class).block().getBody());
+					} catch (Exception ex) {
+						continue;
+					}
+				}
 				for (int i2 = list.get("currentPageIndexStart").intValue() - 1; i2 < list.get("currentPageIndexEnd")
 						.intValue(); i2++) {
 					result.processed++;
