@@ -55,6 +55,7 @@ import com.jq.findapp.service.backend.MarketingService;
 import com.jq.findapp.service.backend.RssService;
 import com.jq.findapp.service.backend.SitemapService;
 import com.jq.findapp.service.backend.SurveyService;
+import com.jq.findapp.util.LogFilter;
 import com.jq.findapp.util.Strings;
 
 import jakarta.transaction.Transactional;
@@ -185,7 +186,9 @@ public class SupportCenterApi {
 	public SchedulerResult run(@PathVariable final String classname, @PathVariable final String methodname)
 			throws Exception {
 		final Object clazz = getClass().getDeclaredField(classname).get(this);
-		return (SchedulerResult) clazz.getClass().getDeclaredMethod(methodname).invoke(clazz);
+		final SchedulerResult result = (SchedulerResult) clazz.getClass().getDeclaredMethod(methodname).invoke(clazz);
+		LogFilter.body.set(result.toString());
+		return result;
 	}
 
 	@GetMapping("report/{days}")
@@ -325,9 +328,8 @@ public class SupportCenterApi {
 			final List<CompletableFuture<Void>> list = new ArrayList<>();
 			run(importSportsBarService, null, list, new int[] { 3 }, 0);
 			run(chatService, null, list, null, -1);
-			// run(marketingService, "Sportbars", list,
-			// new int[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 },
-			// 50);
+			run(marketingService, "Sportbars", list,
+					new int[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 }, -1);
 			run(dbService, null, list, null, -1);
 			run(dbService, "CleanUp", list, new int[] { 0 }, 30);
 			run(engagementService, "Registration", list, new int[] { 0 }, 40);
@@ -381,13 +383,13 @@ public class SupportCenterApi {
 					running.add(name + '.' + m);
 					final SchedulerResult result = (SchedulerResult) bean.getClass().getMethod(m).invoke(bean);
 					log.setStatus(Strings.isEmpty(result.exception) ? LogStatus.Ok : LogStatus.Error);
-					if (result.result != null)
-						log.setBody(result.result.trim());
+					if (result.body != null)
+						log.setBody(result.body.trim());
 					if (result.exception != null) {
 						log.setBody((log.getBody() == null ? "" : log.getBody() + "\n")
 								+ result.exception.getClass().getName() + ": " + result.exception.getMessage());
 						notificationService.createTicket(TicketType.ERROR, "scheduler",
-								(result.result == null ? "" : result.result + "\n")
+								(result.body == null ? "" : result.body + "\n")
 										+ Strings.stackTraceToString(result.exception),
 								null);
 					}
@@ -420,8 +422,14 @@ public class SupportCenterApi {
 	}
 
 	public static class SchedulerResult {
-		public String result = "";
+		public String body = "";
 		public Exception exception;
+
+		@Override
+		public String toString() {
+			return (body == null ? "" : body)
+					+ (exception == null ? "" : "\n" + Strings.stackTraceToString(exception)).trim();
+		}
 	}
 
 	@GetMapping("healthcheck")
