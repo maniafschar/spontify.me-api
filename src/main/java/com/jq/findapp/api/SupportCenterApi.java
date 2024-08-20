@@ -329,7 +329,7 @@ public class SupportCenterApi {
 			run(importSportsBarService, null, list, new int[] { 3 }, 0);
 			run(chatService, null, list, null, -1);
 			run(marketingService, "Sportbars", list,
-					new int[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 }, -1);
+					new int[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 }, 10);
 			run(dbService, null, list, null, -1);
 			run(dbService, "CleanUp", list, new int[] { 0 }, 30);
 			run(engagementService, "Registration", list, new int[] { 0 }, 40);
