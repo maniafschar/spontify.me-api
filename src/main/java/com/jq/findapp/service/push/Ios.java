@@ -50,6 +50,9 @@ public class Ios {
 	@Value("${push.apns.url.test}")
 	private String urlTest;
 
+	@Value("${app.admin.email}")
+	private String adminEmail;
+
 	private static final String template;
 
 	static {
@@ -66,9 +69,6 @@ public class Ios {
 			send(from, contactTo, url, text, action, badge, notificationId);
 			return Environment.Production;
 		} catch (final NotFoundException ex) {
-			final String adminEmail = repository
-					.one(Contact.class, repository.one(Client.class, contactTo.getClientId()).getAdminId())
-					.getEmail();
 			if (contactTo.getEmail().contains(adminEmail.substring(adminEmail.indexOf("@")))) {
 				send(from, contactTo, urlTest, text, action, badge, notificationId);
 				return Environment.Development;
