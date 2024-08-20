@@ -64,7 +64,7 @@ public class IpService {
 				result.exception = ex;
 			}
 		}
-		result.result = "" + count;
+		result.body = "" + count;
 		return result;
 	}
 

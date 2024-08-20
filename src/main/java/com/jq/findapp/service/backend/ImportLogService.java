@@ -58,14 +58,14 @@ public class ImportLogService {
 				if (!file.contains(".") && new File(dir + file).exists() && !new File(dir + file).isDirectory()) {
 					final int x = importLog(dir + file);
 					if (x > 0)
-						result.result += x + " " + file + "\n";
+						result.body += x + " " + file + "\n";
 				}
 			}
 			final long t = System.currentTimeMillis();
 			final int x = ipService.lookupLogIps();
-			result.result += x + " ips updated";
+			result.body += x + " ips updated";
 			if (x > 0)
-				result.result += " in " + (System.currentTimeMillis() - t) + " ms";
+				result.body += " in " + (System.currentTimeMillis() - t) + " ms";
 		} catch (final Exception e) {
 			result.exception = e;
 		}
@@ -100,8 +100,6 @@ public class ImportLogService {
 							log.setIp(IpService.sanatizeIp(m.group(1)));
 							if (!omitIps.contains(log.getIp())) {
 								log.setBody(m.group(11).replace("&#39;", "'"));
-								if (log.getBody().length() > 255)
-									log.setBody(log.getBody().substring(0, 255));
 								log.setUri(uri);
 								log.setClientId(BigInteger.valueOf("afterwork".equals(uri) ? 1
 										: "fanclub".equals(uri) ? 4 : "offlinepoker".equals(uri) ? 6 : 0));

@@ -55,10 +55,10 @@ public class SitemapService {
 					sitemap.append("</sitemapindex>");
 					IOUtils.write(sitemap.toString().getBytes(StandardCharsets.UTF_8),
 							new FileOutputStream(json.get("path").asText() + File.separatorChar + "sitemap.xml"));
-					result.result += "updated " + list.get(i).get("client.id");
+					result.body += "updated " + list.get(i).get("client.id");
 				}
 			} catch (final Exception e) {
-				result.result += list.get(i).get("client.id") + ", error " + e.getMessage() + "\n";
+				result.body += list.get(i).get("client.id") + ", error " + e.getMessage() + "\n";
 				if (result.exception == null)
 					result.exception = e;
 			}

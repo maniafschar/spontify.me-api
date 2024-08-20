@@ -34,6 +34,8 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 @Order(1)
 public class LogFilter implements Filter {
+	public static final ThreadLocal<String> body = new ThreadLocal<>();
+
 	@Autowired
 	private Repository repository;
 
@@ -51,6 +53,7 @@ public class LogFilter implements Filter {
 			throws IOException, ServletException {
 		final ContentCachingRequestWrapper req = new ContentCachingRequestWrapper((HttpServletRequest) request);
 		final HttpServletResponse res = (HttpServletResponse) response;
+		body.set(null);
 		final Log log = new Log();
 		log.setWebCall(req.getHeader("webCall"));
 		final boolean loggable = !"OPTIONS".equals(req.getMethod()) && !"/action/ping".equals(req.getRequestURI());
@@ -94,12 +97,11 @@ public class LogFilter implements Filter {
 				log.setStatus(LogStatus.get(res.getStatus()));
 				log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
 				final byte[] b = req.getContentAsByteArray();
-				if (b != null && b.length > 0) {
-					log.setBody((log.getBody() == null ? "" : log.getBody() + "\n")
-							+ new String(b, StandardCharsets.UTF_8));
-					if (log.getBody().length() > 255)
-						log.setBody(log.getBody().substring(0, 255));
-				}
+				if (b != null && b.length > 0)
+					log.setBody(log.getBody() + "\n" + new String(b, StandardCharsets.UTF_8));
+				final String s = body.get();
+				if (s != null)
+					log.setBody(log.getBody() + "\n" + s);
 				try {
 					repository.save(log);
 				} catch (final Exception e) {

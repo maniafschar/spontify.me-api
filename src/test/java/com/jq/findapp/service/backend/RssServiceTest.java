@@ -212,6 +212,6 @@ public class RssServiceTest {
 		final SchedulerResult result = rssService.run();
 
 		// then
-		assertTrue(!Strings.isEmpty(result), result.result);
+		assertTrue(!Strings.isEmpty(result), result.body);
 	}
 }

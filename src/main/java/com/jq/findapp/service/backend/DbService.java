@@ -85,7 +85,7 @@ public class DbService {
 							repository.one(ClientNews.class, (BigInteger) news.get(i2).get("clientNews.id")));
 			}
 			if (clientUpdates.length() > 0)
-				result.result += (result.result.length() > 0 ? "\n" : "") + "ClientUpdate:"
+				result.body += (result.body.length() > 0 ? "\n" : "") + "ClientUpdate:"
 						+ clientUpdates.substring(1);
 			statistics(BigInteger.valueOf(4l));
 		} catch (final Exception e) {
@@ -97,7 +97,7 @@ public class DbService {
 	public SchedulerResult runCleanUp() {
 		final SchedulerResult result = new SchedulerResult();
 		try {
-			result.result = repository.cleanUpAttachments();
+			result.body = repository.cleanUpAttachments();
 		} catch (final Exception e) {
 			result.exception = e;
 		}

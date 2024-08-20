@@ -79,7 +79,7 @@ public class ChatService {
 				}
 			}
 		}
-		result.result = "" + count;
+		result.body = "" + count;
 		return result;
 	}
 

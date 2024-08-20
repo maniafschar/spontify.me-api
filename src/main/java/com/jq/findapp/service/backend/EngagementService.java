@@ -289,7 +289,7 @@ public class EngagementService {
 					count++;
 				}
 			}
-			result.result = "" + count;
+			result.body = "" + count;
 			final Storage storage = repository.one(Storage.class, (BigInteger) history.get("storage.id"));
 			storage.historize();
 			storage.setStorage(new ObjectMapper().writeValueAsString(sent));
@@ -323,7 +323,7 @@ public class EngagementService {
 					count++;
 				}
 			}
-			result.result += "welcome: " + count + ", time: " + (System.currentTimeMillis() - t);
+			result.body += "welcome: " + count + ", time: " + (System.currentTimeMillis() - t);
 			count = 0;
 			t = System.currentTimeMillis();
 			for (int i = 0; i < ids.size(); i++) {
@@ -331,7 +331,7 @@ public class EngagementService {
 				if (isTimeForNewChat(contact, params, false) && sendChatTemplate(contact))
 					count++;
 			}
-			result.result += "\ntemplate: " + count + ", time: " + (System.currentTimeMillis() - t);
+			result.body += "\ntemplate: " + count + ", time: " + (System.currentTimeMillis() - t);
 		} catch (final Exception e) {
 			result.exception = e;
 		}
@@ -416,7 +416,7 @@ public class EngagementService {
 						count++;
 				}
 			}
-			result.result = "" + count;
+			result.body = "" + count;
 		} catch (final Exception e) {
 			result.exception = e;
 		}

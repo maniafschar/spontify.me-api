@@ -9,7 +9,7 @@ import jakarta.persistence.Enumerated;
 @Entity
 public class Log extends BaseEntity {
 	private String method;
-	private String body;
+	private String body = "";
 	private String webCall;
 	private String referer;
 	private String query;

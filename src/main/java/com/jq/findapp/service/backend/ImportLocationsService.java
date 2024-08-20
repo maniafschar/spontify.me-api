@@ -278,7 +278,7 @@ public class ImportLocationsService {
 		params.setSearch("location.image is null");
 		params.setLimit(5);
 		final Result list = repository.list(params);
-		result.result = list.size() + " locations for update\n";
+		result.body = list.size() + " locations for update\n";
 		int updated = 0, exceptions = 0;
 		for (int i = 0; i < list.size(); i++) {
 			try {
@@ -289,7 +289,7 @@ public class ImportLocationsService {
 				result.exception = ex;
 			}
 		}
-		result.result += updated + " updated\n" + exceptions + " exceptions";
+		result.body += updated + " updated\n" + exceptions + " exceptions";
 		return result;
 	}
 

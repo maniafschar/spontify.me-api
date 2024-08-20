@@ -62,7 +62,7 @@ public class SurveyServiceTest {
 
 		// then
 		assertNull(result.exception);
-		assertTrue(result.result.contains("prediction"), result.result);
+		assertTrue(result.body.contains("prediction"), result.body);
 	}
 
 	@Test

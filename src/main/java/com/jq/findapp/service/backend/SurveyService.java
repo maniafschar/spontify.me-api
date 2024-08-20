@@ -685,14 +685,14 @@ public class SurveyService {
 						final int teamId = json.get("survey").get(i2).asInt();
 						BigInteger id = synchronize.prediction(clientId, teamId);
 						if (id != null)
-							result.result += "\nprediction: " + id;
+							result.body += "\nprediction: " + id;
 						id = synchronize.playerOfTheMatch(clientId, teamId);
 						if (id != null)
-							result.result += "\npoll: " + id;
+							result.body += "\npoll: " + id;
 						final String s = synchronize.result(clientId);
 						if (s.length() > 0)
-							result.result += "\nresultAndNotify: " + s;
-						result.result += synchronize.updateMatchdays(clientId);
+							result.body += "\nresultAndNotify: " + s;
+						result.body += synchronize.updateMatchdays(clientId);
 					}
 				}
 			} catch (final Exception e) {

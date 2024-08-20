@@ -103,7 +103,7 @@ public class MarketingServiceTest {
 
 		// then
 		assertNull(result.exception);
-		assertEquals("sent 1 for " + clientMarketing.getId(), result.result.trim());
+		assertEquals("sent 1 for " + clientMarketing.getId(), result.body.trim());
 		final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 		params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketing.getId());
 		final Result list = repository.list(params);

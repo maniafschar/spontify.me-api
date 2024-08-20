@@ -21,6 +21,7 @@ import com.jq.findapp.entity.EventRating;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.LocationFavorite;
 import com.jq.findapp.entity.LocationVisit;
+import com.jq.findapp.entity.Log;
 import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.repository.listener.AbstractRepositoryListener;
 import com.jq.findapp.repository.listener.BlockListener;
@@ -39,6 +40,7 @@ import com.jq.findapp.repository.listener.EventRatingListener;
 import com.jq.findapp.repository.listener.LocationFavoriteListener;
 import com.jq.findapp.repository.listener.LocationListener;
 import com.jq.findapp.repository.listener.LocationVisitListener;
+import com.jq.findapp.repository.listener.LogListener;
 import com.jq.findapp.repository.listener.TicketListener;
 
 @Component
@@ -46,7 +48,8 @@ class Listeners {
 	@Autowired
 	private ApplicationContext applicationContext;
 
-	private static final AbstractRepositoryListener<?> LISTENER = new AbstractRepositoryListener<>() { };
+	private static final AbstractRepositoryListener<?> LISTENER = new AbstractRepositoryListener<>() {
+	};
 
 	private <T extends BaseEntity> AbstractRepositoryListener<T> entity2listener(final T entity) {
 		if (entity instanceof Block)
@@ -81,6 +84,8 @@ class Listeners {
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(LocationFavoriteListener.class);
 		if (entity instanceof LocationVisit)
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(LocationVisitListener.class);
+		if (entity instanceof Log)
+			return (AbstractRepositoryListener<T>) applicationContext.getBean(LogListener.class);
 		if (entity instanceof Ticket)
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(TicketListener.class);
 		return (AbstractRepositoryListener<T>) LISTENER;

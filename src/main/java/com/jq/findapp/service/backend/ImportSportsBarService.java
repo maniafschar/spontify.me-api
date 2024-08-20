@@ -50,7 +50,7 @@ public class ImportSportsBarService {
 					results.unchanged += r.unchanged;
 				}
 			}
-			result.result = "prefix " + zipCodePrefix + "*" +
+			result.body = "prefix " + zipCodePrefix + "*" +
 					"\nprocessed " + results.processed +
 					"\nimported " + results.imported +
 					"\nupdated " + results.updated +

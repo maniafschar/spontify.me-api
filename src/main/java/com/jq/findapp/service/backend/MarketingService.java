@@ -77,7 +77,7 @@ public class MarketingService {
 				params.setSearch("m=" + list.get(i).get("clientMarketing.id"));
 				params.getUser().setClientId((BigInteger) list.get(i).get("clientMarketing.clientId"));
 				final Result contacts = repository.list(params);
-				result.result += list.get(i).get("clientMarketing.id") + ": " + contacts.size() + "\n";
+				result.body += list.get(i).get("clientMarketing.id") + ": " + contacts.size() + "\n";
 				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 						(BigInteger) list.get(i).get("clientMarketing.id"));
 				for (int i2 = 0; i2 < contacts.size(); i2++) {
@@ -172,7 +172,7 @@ public class MarketingService {
 				clientMarketingResult.setPublished(true);
 				publish(clientMarketing, true);
 				repository.save(clientMarketingResult);
-				result.result = "sent " + sent.size() + " for " + clientMarketing.getId() + "\n";
+				result.body = "sent " + sent.size() + " for " + clientMarketing.getId() + "\n";
 			}
 		} catch (Exception ex) {
 			result.exception = ex;
@@ -260,7 +260,7 @@ public class MarketingService {
 										+ list.get(i).get("clientMarketing.id"));
 						repository.save(location);
 					}
-					result.result += list.get(i).get("clientMarketing.id") + ": " + locations.size() + "\n";
+					result.body += list.get(i).get("clientMarketing.id") + ": " + locations.size() + "\n";
 				}
 			}
 		} catch (Exception ex) {

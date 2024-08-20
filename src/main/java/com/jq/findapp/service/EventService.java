@@ -118,7 +118,7 @@ public class EventService {
 					}
 				}
 			}
-			result.result = "" + count;
+			result.body = "" + count;
 		} catch (final Exception e) {
 			result.exception = e;
 		}
@@ -169,7 +169,7 @@ public class EventService {
 					}
 				}
 			}
-			result.result = "" + count;
+			result.body = "" + count;
 		} catch (final Exception e) {
 			result.exception = e;
 		}
@@ -238,7 +238,7 @@ public class EventService {
 		final SchedulerResult result = new SchedulerResult();
 		try {
 			final BigInteger clientId = BigInteger.ONE;
-			result.result = "Munich: " + importMunich.run(this, clientId);
+			result.body = "Munich: " + importMunich.run(this, clientId);
 		} catch (final Exception e) {
 			result.exception = e;
 		}
@@ -249,7 +249,7 @@ public class EventService {
 		final SchedulerResult result = new SchedulerResult();
 		try {
 			final BigInteger clientId = BigInteger.ONE;
-			result.result = publishClient(clientId) + "\n" + publishUser() + " user events published";
+			result.body = publishClient(clientId) + "\n" + publishUser() + " user events published";
 		} catch (final Exception e) {
 			result.exception = e;
 		}

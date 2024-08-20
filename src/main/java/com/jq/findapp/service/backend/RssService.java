@@ -70,7 +70,7 @@ public class RssService {
 				.thenApply(ignored -> futures.stream().map(CompletableFuture::join).collect(Collectors.toList()))
 				.join();
 		final List<String> failed = new ArrayList<>();
-		result.result = futures.stream().map(e -> {
+		result.body = futures.stream().map(e -> {
 			try {
 				failed.addAll(e.get().failed);
 				return e.get().success;
@@ -78,8 +78,8 @@ public class RssService {
 				return ex.getMessage();
 			}
 		}).collect(Collectors.joining("\n"));
-		while (result.result.contains("\n\n"))
-			result.result = result.result.replace("\n\n", "\n");
+		while (result.body.contains("\n\n"))
+			result.body = result.body.replace("\n\n", "\n");
 		if (failed.size() > 0)
 			this.notificationService.createTicket(TicketType.ERROR, "ImportRss",
 					failed.size() + " errors:\n" + failed.stream().sorted().collect(Collectors.joining("\n")), null);
