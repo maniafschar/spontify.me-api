@@ -257,7 +257,7 @@ public class MarketingService {
 								+ location.getId() + "&h=" + location.getSecret().hashCode();
 						notificationService.sendEmail(client, null, location.getEmail(),
 								"Sky Sport Events: möchtest Du mehr Gäste?", text.replace("{url}", url),
-								html.replace("<jq:text />", text.replace("\n", "<br />").replace("{url}",
+								html.replace("<jq:text />", text.replace("\n", "<br/>").replace("{url}",
 										"<a href=\"" + url + "\">" + client.getUrl() + "</a>")));
 						location.setMarketingMail(
 								(Strings.isEmpty(location.getMarketingMail()) ? "" : location.getMarketingMail() + "|")
@@ -396,14 +396,15 @@ public class MarketingService {
 						location.getEmail(),
 						"Deine Location " + location.getName(), email,
 						createHtmlTemplate(repository.one(Client.class, clientMarketing.getClientId()))
-								.replace("<jq:text />", email.replace("\n", "<br />")));
-				email += "<div style=\"text-align:left;padding-top:2em;\">" + location.getEmail() + "<br /><br />"
+								.replace("<jq:text />", email.replace("\n", "<br/>")));
+				email += "<div style=\"text-align:left;padding-top:2em;\">"
+						+ clientMarketing.getClientId() + " · " + location.getEmail() + "<br/>"
 						+ om.writerWithDefaultPrettyPrinter().writeValueAsString(answers) + "</div>";
 				notificationService.sendEmail(client, null,
 						adminEmail,
 						"Location Update " + location.getName(), email,
 						createHtmlTemplate(repository.one(Client.class, clientMarketing.getClientId()))
-								.replace("<jq:text />", email.replace("\n", "<br />")));
+								.replace("<jq:text />", email.replace("\n", "<br/>")));
 				return result + "</ul>";
 			}
 		}
