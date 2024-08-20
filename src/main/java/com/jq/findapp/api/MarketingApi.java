@@ -272,7 +272,7 @@ public class MarketingApi {
 						+ (location == null ? "" : " " + location.getAddress() + " " + location.getDescription()));
 	}
 
-	private synchronized void update() throws IOException {
+	private void update() throws IOException {
 		if (System.currentTimeMillis() - lastUpdate > 24 * 60 * 60 * 1000) {
 			lastUpdate = System.currentTimeMillis();
 			final Result list = repository.list(new QueryParams(Query.misc_listClient));
