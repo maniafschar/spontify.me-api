@@ -45,6 +45,7 @@ public class ImportSportsBarService {
 					results.updated += r.updated;
 					results.processed += r.processed;
 					results.errors += r.errors;
+					results.errorsScroll += r.errorsScroll;
 					results.alreadyImported += r.alreadyImported;
 					results.unchanged += r.unchanged;
 				}
@@ -55,7 +56,8 @@ public class ImportSportsBarService {
 					"\nupdated " + results.updated +
 					"\nunchanged " + results.unchanged +
 					"\nalreadyImported " + results.alreadyImported +
-					"\nerrors " + results.errors;
+					"\nerrors " + results.errors +
+					"\nerrorsScroll " + results.errorsScroll;
 		} catch (final Exception e) {
 			result.exception = e;
 		}
@@ -81,6 +83,7 @@ public class ImportSportsBarService {
 										.retrieve()
 										.toEntity(String.class).block().getBody());
 					} catch (Exception ex) {
+						result.errorsScroll++;
 						continue;
 					}
 				}
@@ -182,6 +185,7 @@ public class ImportSportsBarService {
 		int imported = 0;
 		int updated = 0;
 		int errors = 0;
+		int errorsScroll = 0;
 		int unchanged = 0;
 		int alreadyImported = 0;
 	}
