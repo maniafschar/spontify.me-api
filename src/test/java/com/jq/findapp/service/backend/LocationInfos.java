@@ -2,6 +2,7 @@ package com.jq.findapp.service.backend;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
@@ -130,14 +131,14 @@ public class LocationInfos {
 			"Heimeranplatz 1, 80339 München, Deutschland, Alpaladino|820";
 
 	@Test
-	public void run() throws Exception {
+	public void run() {
 		final String url = "https://www.google.com/search";
 		final String[] lines = data.split("\n");
 		final String token = "href=\"/url?q=http";
 		for (String line : lines) {
 			final String s[] = line.split("\\|");
 			try {
-				String html = IOUtils.toString(new URI(url + "?q=" + UriEncoder.encode(s[0])).toURL(),
+				String html = IOUtils.toString(new URI(url + "?q=" + URLEncoder.encode(s[0], StandardCharsets.UTF_8.name())).toURL(),
 						StandardCharsets.UTF_8);
 				final Set<String> processed = new HashSet<>();
 				while (html.contains(token)) {
@@ -156,8 +157,7 @@ public class LocationInfos {
 		}
 	}
 
-	private boolean findEmail(String html, final String urlLocation, final String id)
-			throws IOException {
+	private boolean findEmail(String html, final String urlLocation, final String id) {
 		html = html.toLowerCase().replace("[at]", "@").replace("(*at*)", "@");
 		int pos = html.length();
 		while ((pos = html.lastIndexOf('@', pos - 1)) > 0) {
