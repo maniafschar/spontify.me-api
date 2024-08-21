@@ -312,7 +312,6 @@ public class ImportLocationsService {
 									.replace("<A HREF=", "<a href=");
 							final Matcher matcher = href.matcher(html);
 							if (matcher.find()) {
-								location.historize();
 								final String image = matcher.group(1);
 								try {
 									location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, 0));
