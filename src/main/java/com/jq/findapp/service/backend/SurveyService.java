@@ -419,7 +419,6 @@ public class SurveyService {
 								if (list.size() > 0) {
 									final Storage storage = repository.one(Storage.class,
 											(BigInteger) list.get(0).get("storage.id"));
-									storage.historize();
 									storage.setStorage("");
 									repository.save(storage);
 									get(label);
@@ -748,7 +747,6 @@ public class SurveyService {
 				if (lastErrorCall == 0) {
 					final Storage storage = result.size() == 0 ? new Storage()
 							: repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
-					storage.historize();
 					storage.setLabel(label);
 					storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
 					repository.save(storage);
