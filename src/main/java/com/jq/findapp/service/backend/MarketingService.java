@@ -216,15 +216,8 @@ public class MarketingService {
 	}
 
 	public SchedulerResult runSportbars() {
-		final SchedulerResult result = new SchedulerResult();
-		final QueryParams params = new QueryParams(Query.misc_listMarketing);
-		params.setUser(new Contact());
-		final String today = Instant.now().toString().substring(0, 19);
-		params.setSearch("clientMarketing.startDate<=cast('" + today
-				+ "' as timestamp) and clientMarketing.endDate>=cast('" + today + "' as timestamp)");
-		final Result list = repository.list(params);
-		params.setQuery(Query.location_listId);
-		final String text = "Lieber Sky Sportsbar Kunde,\n\n"
+		return locationMarketing(new BigInteger("180"), "Sky Sport Events: möchtest Du mehr Gäste?",
+				"Lieber Sky Sportsbar Kunde,\n\n"
 				+ "unsere neue Fußball-Fan-Community ist auf der Suche nach den besten Locations, in denen sie Live-Übertragungen gemeinsam feiern können. Unsere App listet auch Deine Location.\n\n"
 				+ "Hier kannst Du Deine Location vervollständigen:\n\n"
 				+ "{url}\n\n"
@@ -233,40 +226,46 @@ public class MarketingService {
 				+ "Mani Afschar Yazdi\n"
 				+ "Geschäftsführer\n"
 				+ "JNet Quality Consulting GmbH\n"
-				+ "0172 6379434";
+				+ "0172 6379434");
+	}
+
+	private SchedulerResult locationMarketing(final BigInteger , final String subject, final String text) {
+		final SchedulerResult result = new SchedulerResult();
+		final QueryParams params = new QueryParams(Query.location_listId);
 		try {
-			for (int i = 0; i < list.size(); i++) {
-				if (((String) list.get(i).get("clientMarketing.storage")).contains("Sky Kunde")) {
-					final Client client = repository.one(Client.class,
-							(BigInteger) list.get(i).get("clientMarketing.clientId"));
-					final String html = createHtmlTemplate(client);
-					params.setSearch(
-							"location.email like '%@%' and location.skills like '%x.1%' and (length(location.marketingMail)=0 or cast(REGEXP_LIKE('"
-									+ list.get(i).get("clientMarketing.id")
-									+ "',location.marketingMail) as integer)=0) and location.country='DE' and location.zipCode like '8%'");
-					params.setLimit(1);
-					final Result locations = repository.list(params);
-					for (int i2 = 0; i2 < locations.size(); i2++) {
-						final Location location = repository.one(Location.class,
-								(BigInteger) locations.get(i2).get("location.id"));
-						if (location.getSecret() == null) {
-							location.setSecret(Strings.generatePin(64));
-							repository.save(location);
-						}
-						final String url = client.getUrl() + "/?m=" + list.get(i).get("clientMarketing.id") + "&i="
-								+ location.getId() + "&h=" + location.getSecret().hashCode();
-						notificationService.sendEmail(client, null, location.getEmail(),
-								"Sky Sport Events: möchtest Du mehr Gäste?", text.replace("{url}", url),
-								html.replace("<jq:text />", text.replace("\n", "<br/>").replace("{url}",
-										"<a href=\"" + url + "\">" + client.getUrl() + "</a>")));
-						location.setMarketingMail(
-								(Strings.isEmpty(location.getMarketingMail()) ? "" : location.getMarketingMail() + "|")
-										+ list.get(i).get("clientMarketing.id"));
+			final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
+			final Client client = repository.one(Client.class, clientMarketing.getClientId());
+			final String html = createHtmlTemplate(client);
+			params.setSearch("location.email like '%@%' and location.skills like '%x.1%' and (length(location.marketingMail)=0 or cast(REGEXP_LIKE('"
+					+ clientMarketing.getId() + "',location.marketingMail) as integer)=0) and location.country='DE' and location.zipCode like '8%'");
+			final Result locations = repository.list(params);
+			params.setQuery(Query.misc_listTicket);
+			int count = 0;
+			for (int i = 0; i < locations.size(); i++) {
+				final Location location = repository.one(Location.class,
+						(BigInteger) locations.get(i).get("location.id"));
+				params.setSearch("ticket.type='EMAIL' and ticket.subject='" + location.getEmail() + "' and ticket.subject like '"
+						 + title + "%'");
+				if (repositoty.list(params).size() == 0) {
+					if (location.getSecret() == null) {
+						location.setSecret(Strings.generatePin(64));
 						repository.save(location);
 					}
-					result.body += list.get(i).get("clientMarketing.id") + ": " + locations.size() + "\n";
+					final String url = client.getUrl() + "/?m=" + list.get(i).get("clientMarketing.id") + "&i="
+							+ location.getId() + "&h=" + location.getSecret().hashCode();
+					notificationService.sendEmail(client, null, location.getEmail(),
+							subject, text.replace("{url}", url),
+							html.replace("<jq:text />", text.replace("\n", "<br/>").replace("{url}",
+									"<a href=\"" + url + "\">" + client.getUrl() + "</a>")));
+					location.setMarketingMail(
+							(Strings.isEmpty(location.getMarketingMail()) ? "" : location.getMarketingMail() + "|")
+									+ list.get(i).get("clientMarketing.id"));
+					repository.save(location);
+					count++;
+					break;
 				}
 			}
+			result.body += clientMarketing.getId() + ": " + count + "\n";
 		} catch (Exception ex) {
 			result.exception = ex;
 		}
