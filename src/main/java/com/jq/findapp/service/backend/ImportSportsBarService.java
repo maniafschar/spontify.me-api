@@ -143,7 +143,6 @@ public class ImportSportsBarService {
 				}
 			}
 			final Storage s = repository.one(Storage.class, (BigInteger) storage.get("storage.id"));
-			s.historize();
 			s.setStorage(new ObjectMapper().writeValueAsString(imported));
 			repository.save(s);
 		}
