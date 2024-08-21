@@ -122,7 +122,6 @@ public class ImportSportsBarService {
 							if (ex.getMessage().startsWith("location exists: ")) {
 								location = repository.one(Location.class,
 										new BigInteger(ex.getMessage().substring(17)));
-								location.historize();
 								if (updateFields(location, data)) {
 									repository.save(location);
 									result.updated++;
