@@ -319,7 +319,6 @@ public class MarketingService {
 						clientMarketing.getStorage()), Poll.class);
 				String result = "<ul><li>Deine Location wurde erfolgreich akualisiert.</li>";
 				String email = "Lieben Dank für Deine Teilnahme, Deine Location wurde erfolgreich akualisiert:\n\n";
-				location.historize();
 				location.setUpdatedAt(new Timestamp(Instant.now().toEpochMilli()));
 				for (int i = 0; i < poll.questions.size(); i++) {
 					if (answers.get("q" + i).has("t")) {
