@@ -118,7 +118,6 @@ public class DbService {
 		final File file = new File(webDir + client.getId() + "/index.html");
 		if (!file.exists())
 			return false;
-		client.historize();
 		final String html = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
 		updateField("<meta name=\"email\" content=\"([^\"].*)\"", html, e -> client.setEmail(e));
 		updateField("<meta property=\\\"og:title\\\" content=\"([^\"].*)\"", html, e -> client.setName(e));
