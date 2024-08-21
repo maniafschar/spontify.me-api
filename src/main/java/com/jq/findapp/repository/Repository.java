@@ -161,7 +161,9 @@ public class Repository {
 	}
 
 	public <T extends BaseEntity> T one(final Class<T> clazz, final BigInteger id) {
-		return em.find(clazz, id);
+		final T entity = em.find(clazz, id);
+		entity.historize();
+		return entity;
 	}
 
 	public Map<String, Object> one(final QueryParams params) {
