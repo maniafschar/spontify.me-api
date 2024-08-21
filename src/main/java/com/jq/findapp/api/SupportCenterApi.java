@@ -363,6 +363,7 @@ public class SupportCenterApi {
 	@Async
 	private void run(final Object bean, final String method, final List<CompletableFuture<Void>> list,
 			int[] hours, int minute) {
+		System.out.println(method);
 		if (hours != null && !Arrays.stream(hours).anyMatch(e -> e == now.atZone(ZoneId.of("Europe/Berlin")).getHour()))
 			return;
 		if (minute > -1 && minute != now.atZone(ZoneId.of("Europe/Berlin")).getMinute())
