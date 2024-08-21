@@ -243,9 +243,16 @@ public class MarketingService {
 			int count = 0;
 			for (int i = 0; i < locations.size(); i++) {
 				final Location location = repository.one(Location.class, (BigInteger) locations.get(i).get("location.id"));
-				params.setSearch("ticket.type='EMAIL' and ticket.subject='" + location.getEmail()
-						 + "' and ticket.note like '" + subject + "%'");
-				if (repository.list(params).size() == 0) {
+				params.setSearch("ticket.type='EMAIL' and ticket.subject='" + location.getEmail() + "'");
+				final Result emails = repository.list(params);
+				boolean sent = false;
+				for (int i2 = 0; i2 < emails.size(); i2++) {
+					if (((String) emails.get(i2).get("ticket.note")).startsWith(subject)) {
+						sent = true;
+						break;
+					}
+				}
+				if (!sent) {
 					if (location.getSecret() == null) {
 						location.setSecret(Strings.generatePin(64));
 						repository.save(location);
