@@ -6,7 +6,8 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -122,7 +123,7 @@ public class SupportCenterApi {
 	private String schedulerSecret;
 
 	private static final Set<String> running = new HashSet<>();
-	private LocalDateTime now;
+	private ZonedDateTime now;
 
 	@DeleteMapping("user/{id}")
 	public void userDelete(@PathVariable final BigInteger id) throws Exception {
@@ -324,7 +325,7 @@ public class SupportCenterApi {
 	@Async
 	private void run() {
 		CompletableFuture.supplyAsync(() -> {
-			now = LocalDateTime.now();
+			now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
 			final List<CompletableFuture<Void>> list = new ArrayList<>();
 			run(importSportsBarService, null, list, new int[] { 3 }, 0);
 			run(chatService, null, list, null, -1);
@@ -363,14 +364,14 @@ public class SupportCenterApi {
 	@Async
 	private void run(final Object bean, final String method, final List<CompletableFuture<Void>> list,
 			int[] hours, int minute) {
-		if (hours != null && !Arrays.stream(hours).anyMatch(e -> e == now.getHour()))
+		if (hours != null && !Arrays.stream(hours)
+				.anyMatch(e -> e == now.getHour()))
 			return;
 		if (minute > -1 && minute != now.getMinute())
 			return;
 		final CompletableFuture<Void> e = CompletableFuture.supplyAsync(() -> {
 			final Log log = new Log();
 			log.setContactId(BigInteger.ZERO);
-			log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
 			final String m = "run" + (method == null ? "" : method);
 			String name = bean.getClass().getSimpleName();
 			if (name.contains("$"))
