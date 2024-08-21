@@ -217,19 +217,19 @@ public class MarketingService {
 
 	public SchedulerResult runSportbars() {
 		return locationMarketing(new BigInteger("180"), "Sky Sport Events: möchtest Du mehr Gäste?",
-				"Lieber Sky Sportsbar Kunde,\n\n"
-				+ "unsere neue Fußball-Fan-Community ist auf der Suche nach den besten Locations, in denen sie Live-Übertragungen gemeinsam feiern können. Unsere App listet auch Deine Location.\n\n"
-				+ "Hier kannst Du Deine Location vervollständigen:\n\n"
-				+ "{url}\n\n"
-				+ "Für Feedback und weitere Anregungen kannst Du auch gerne auf diese Email antworten.\n"
-				+ "Viele Grüße\n"
-				+ "Mani Afschar Yazdi\n"
-				+ "Geschäftsführer\n"
-				+ "JNet Quality Consulting GmbH\n"
-				+ "0172 6379434");
+				"Lieber Sky Sportsbar Kunde,\n\n" +
+				"unsere neue Fußball-Fan-Community ist auf der Suche nach den besten Locations, in denen sie Live-Übertragungen gemeinsam feiern können. Unsere App listet auch Deine Location.\n\n" +
+				"Hier kannst Du Deine Location vervollständigen:\n\n" +
+				"{url}\n\n" +
+				"Für Feedback und weitere Anregungen kannst Du auch gerne auf diese Email antworten.\n" +
+				"Viele Grüße\n" +
+				"Mani Afschar Yazdi\n" +
+				"Geschäftsführer\n" +
+				"JNet Quality Consulting GmbH\n" +
+				"0172 6379434");
 	}
 
-	private SchedulerResult locationMarketing(final BigInteger , final String subject, final String text) {
+	private SchedulerResult locationMarketing(final BigInteger clientMarketingId, final String subject, final String text) {
 		final SchedulerResult result = new SchedulerResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
 		try {
@@ -242,8 +242,7 @@ public class MarketingService {
 			params.setQuery(Query.misc_listTicket);
 			int count = 0;
 			for (int i = 0; i < locations.size(); i++) {
-				final Location location = repository.one(Location.class,
-						(BigInteger) locations.get(i).get("location.id"));
+				final Location location = repository.one(Location.class, (BigInteger) locations.get(i).get("location.id"));
 				params.setSearch("ticket.type='EMAIL' and ticket.subject='" + location.getEmail() + "' and ticket.subject like '"
 						 + title + "%'");
 				if (repositoty.list(params).size() == 0) {
