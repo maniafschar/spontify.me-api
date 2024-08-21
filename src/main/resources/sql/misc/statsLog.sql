@@ -7,7 +7,6 @@ WHERE
 	log.clientId={CLIENTID} and
 	log.uri like '/%' and
 	log.uri not like '/support/%' and
-	log.uri not like '/marketing/%' and
 	log.uri not like '/ws/%' and
 	cast(TO_DAYS(log.createdAt) as integer)>cast(TO_DAYS(current_timestamp) as integer)-90
 GROUP BY
