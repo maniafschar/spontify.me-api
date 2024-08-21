@@ -363,15 +363,15 @@ public class SupportCenterApi {
 	@Async
 	private void run(final Object bean, final String method, final List<CompletableFuture<Void>> list,
 			int[] hours, int minute) {
-		System.out.println(method);
 		if (hours != null && !Arrays.stream(hours).anyMatch(e -> e == now.atZone(ZoneId.of("Europe/Berlin")).getHour()))
 			return;
 		if (minute > -1 && minute != now.atZone(ZoneId.of("Europe/Berlin")).getMinute())
 			return;
+		System.out.println(method);
 		final CompletableFuture<Void> e = CompletableFuture.supplyAsync(() -> {
 			final Log log = new Log();
 			log.setContactId(BigInteger.ZERO);
-			log.setCreatedAt(new Timestamp(now.getEpochSecond() * 1000));
+			log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
 			final String m = "run" + (method == null ? "" : method);
 			String name = bean.getClass().getSimpleName();
 			if (name.contains("$"))
