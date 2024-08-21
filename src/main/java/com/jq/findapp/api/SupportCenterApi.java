@@ -325,7 +325,12 @@ public class SupportCenterApi {
 	@Async
 	private void run() {
 		CompletableFuture.supplyAsync(() -> {
-			now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
+			try {
+				now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				now = Instant.now().atZone(ZoneId.of("UTC"));
+			}
 			final List<CompletableFuture<Void>> list = new ArrayList<>();
 			run(importSportsBarService, null, list, new int[] { 3 }, 0);
 			run(chatService, null, list, null, -1);
@@ -364,8 +369,7 @@ public class SupportCenterApi {
 	@Async
 	private void run(final Object bean, final String method, final List<CompletableFuture<Void>> list,
 			int[] hours, int minute) {
-		if (hours != null && !Arrays.stream(hours)
-				.anyMatch(e -> e == now.getHour()))
+		if (hours != null && !Arrays.stream(hours).anyMatch(e -> e == now.getHour()))
 			return;
 		if (minute > -1 && minute != now.getMinute())
 			return;
