@@ -7,7 +7,6 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -123,7 +122,7 @@ public class SupportCenterApi {
 	private String schedulerSecret;
 
 	private static final Set<String> running = new HashSet<>();
-	private ZonedDateTime now;
+	private Instant now;
 
 	@DeleteMapping("user/{id}")
 	public void userDelete(@PathVariable final BigInteger id) throws Exception {
@@ -270,8 +269,7 @@ public class SupportCenterApi {
 		if ("status".equals(type)) {
 			final ProcessBuilder pb = new ProcessBuilder("/usr/bin/bash", "-c", "ps aux|grep java");
 			pb.redirectErrorStream(true);
-			return IOUtils.toString(pb.start().getInputStream(), StandardCharsets.UTF_8)
-					+ Instant.now().atZone(ZoneId.of("Europe/Berlin"));
+			return IOUtils.toString(pb.start().getInputStream(), StandardCharsets.UTF_8);
 		}
 		if ("server".equals(type) || "sc".equals(type)) {
 			final ProcessBuilder pb = new ProcessBuilder(buildScript.replace("{type}", type).split(" "));
@@ -326,12 +324,7 @@ public class SupportCenterApi {
 	@Async
 	private void run() {
 		CompletableFuture.supplyAsync(() -> {
-			try {
-				now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				now = Instant.now().atZone(ZoneId.of("UTC"));
-			}
+			now = Instant.now();
 			final List<CompletableFuture<Void>> list = new ArrayList<>();
 			run(importSportsBarService, null, list, new int[] { 3 }, 0);
 			run(chatService, null, list, null, -1);
@@ -370,13 +363,14 @@ public class SupportCenterApi {
 	@Async
 	private void run(final Object bean, final String method, final List<CompletableFuture<Void>> list,
 			int[] hours, int minute) {
-		if (hours != null && !Arrays.stream(hours).anyMatch(e -> e == now.getHour()))
+		if (hours != null && !Arrays.stream(hours).anyMatch(e -> e == now.atZone(ZoneId.of("Europe/Berlin")).getHour()))
 			return;
-		if (minute > -1 && minute != now.getMinute())
+		if (minute > -1 && minute != now.atZone(ZoneId.of("Europe/Berlin")).getMinute())
 			return;
 		final CompletableFuture<Void> e = CompletableFuture.supplyAsync(() -> {
 			final Log log = new Log();
 			log.setContactId(BigInteger.ZERO);
+			log.setCreatedAt(new Timestamp(now.getEpochSecond() * 1000));
 			final String m = "run" + (method == null ? "" : method);
 			String name = bean.getClass().getSimpleName();
 			if (name.contains("$"))
