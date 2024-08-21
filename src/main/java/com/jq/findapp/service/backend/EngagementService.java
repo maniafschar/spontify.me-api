@@ -291,7 +291,6 @@ public class EngagementService {
 			}
 			result.body = "" + count;
 			final Storage storage = repository.one(Storage.class, (BigInteger) history.get("storage.id"));
-			storage.historize();
 			storage.setStorage(new ObjectMapper().writeValueAsString(sent));
 			repository.save(storage);
 		} catch (final Exception e) {
