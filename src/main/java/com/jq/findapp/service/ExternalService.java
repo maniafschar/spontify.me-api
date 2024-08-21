@@ -63,7 +63,6 @@ public class ExternalService {
 		if (value != null && value.startsWith("{") && value.endsWith("}")) {
 			final Storage storage = result.size() == 0 ? new Storage()
 					: this.repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
-			storage.historize();
 			storage.setLabel(label);
 			storage.setStorage(value);
 			this.repository.save(storage);
