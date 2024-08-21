@@ -243,14 +243,14 @@ public class MarketingService {
 			int count = 0;
 			for (int i = 0; i < locations.size(); i++) {
 				final Location location = repository.one(Location.class, (BigInteger) locations.get(i).get("location.id"));
-				params.setSearch("ticket.type='EMAIL' and ticket.subject='" + location.getEmail() + "' and ticket.subject like '"
-						 + title + "%'");
-				if (repositoty.list(params).size() == 0) {
+				params.setSearch("ticket.type='EMAIL' and ticket.subject='" + location.getEmail()
+						 + "' and ticket.note like '" + subject + "%'");
+				if (repository.list(params).size() == 0) {
 					if (location.getSecret() == null) {
 						location.setSecret(Strings.generatePin(64));
 						repository.save(location);
 					}
-					final String url = client.getUrl() + "/?m=" + list.get(i).get("clientMarketing.id") + "&i="
+					final String url = client.getUrl() + "/?m=" + clientMarketing.getId() + "&i="
 							+ location.getId() + "&h=" + location.getSecret().hashCode();
 					notificationService.sendEmail(client, null, location.getEmail(),
 							subject, text.replace("{url}", url),
@@ -258,7 +258,7 @@ public class MarketingService {
 									"<a href=\"" + url + "\">" + client.getUrl() + "</a>")));
 					location.setMarketingMail(
 							(Strings.isEmpty(location.getMarketingMail()) ? "" : location.getMarketingMail() + "|")
-									+ list.get(i).get("clientMarketing.id"));
+									+ clientMarketing.getId());
 					repository.save(location);
 					count++;
 					break;
