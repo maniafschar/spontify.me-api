@@ -220,11 +220,9 @@ public class RssService {
 			}
 			if (result.size() == 0)
 				clientNews = new ClientNews();
-			else {
+			else
 				clientNews = RssService.this.repository.one(ClientNews.class,
 						(BigInteger) result.get(0).get("clientNews.id"));
-				clientNews.historize();
-			}
 			clientNews.setSource(source);
 			clientNews.setClientId(clientId);
 			clientNews.setDescription(description);
