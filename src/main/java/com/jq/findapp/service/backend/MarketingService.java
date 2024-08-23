@@ -217,32 +217,36 @@ public class MarketingService {
 
 	public SchedulerResult runSportbars() {
 		return locationMarketing(new BigInteger("180"), "Sky Sport Events: möchtest Du mehr Gäste?",
-				"Lieber Sky Sportsbar Kunde,\n\n" +
-				"unsere neue Fußball-Fan-Community ist auf der Suche nach den besten Locations, in denen sie Live-Übertragungen gemeinsam feiern können. Unsere App listet auch Deine Location.\n\n" +
-				"Hier kannst Du Deine Location vervollständigen:\n\n" +
-				"{url}\n\n" +
-				"Für Feedback und weitere Anregungen kannst Du auch gerne auf diese Email antworten.\n" +
-				"Viele Grüße\n" +
-				"Mani Afschar Yazdi\n" +
-				"Geschäftsführer\n" +
-				"JNet Quality Consulting GmbH\n" +
-				"0172 6379434");
+				"Lieber Sky Sportsbar Kunde,\n\n"
+						+ "unsere neue Fußball-Fan-Community ist auf der Suche nach den besten Locations, in denen sie Live-Übertragungen gemeinsam feiern können. Unsere App listet auch Deine Location.\n\n"
+						+ "Hier kannst Du Deine Location vervollständigen:\n\n"
+						+ "{url}\n\n"
+						+ "Für Feedback und weitere Anregungen kannst Du auch gerne auf diese Email antworten.\n"
+						+ "Viele Grüße\n"
+						+ "Mani Afschar Yazdi\n"
+						+ "Geschäftsführer\n"
+						+ "JNet Quality Consulting GmbH\n"
+						+ "0172 6379434");
 	}
 
-	private SchedulerResult locationMarketing(final BigInteger clientMarketingId, final String subject, final String text) {
+	private SchedulerResult locationMarketing(final BigInteger clientMarketingId, final String subject,
+			final String text) {
 		final SchedulerResult result = new SchedulerResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
 		try {
 			final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
 			final Client client = repository.one(Client.class, clientMarketing.getClientId());
 			final String html = createHtmlTemplate(client);
-			params.setSearch("location.email like '%@%' and location.skills like '%x.1%' and (length(location.marketingMail)=0 or cast(REGEXP_LIKE('"
-					+ clientMarketing.getId() + "',location.marketingMail) as integer)=0) and location.country='DE' and location.zipCode like '8%'");
+			params.setSearch(
+					"location.email like '%@%' and location.skills like '%x.1%' and (length(location.marketingMail)=0 or cast(REGEXP_LIKE('"
+							+ clientMarketing.getId()
+							+ "',location.marketingMail) as integer)=0) and location.country='DE' and location.zipCode like '8%'");
 			final Result locations = repository.list(params);
 			params.setQuery(Query.misc_listTicket);
 			int count = 0;
 			for (int i = 0; i < locations.size(); i++) {
-				final Location location = repository.one(Location.class, (BigInteger) locations.get(i).get("location.id"));
+				final Location location = repository.one(Location.class,
+						(BigInteger) locations.get(i).get("location.id"));
 				params.setSearch("ticket.type='EMAIL' and ticket.subject='" + location.getEmail() + "'");
 				final Result emails = repository.list(params);
 				boolean sent = false;
@@ -362,7 +366,9 @@ public class MarketingService {
 						}
 						if (!Strings.isEmpty(s)) {
 							if ("skills".equals(poll.questions.get(i).id))
-								location.setSkills(Strings.isEmpty(location.getSkills() ? "" : location.getSkills() + "|") + s.replace("|0", "").substring(1));
+								location.setSkills(
+										(Strings.isEmpty(location.getSkills()) ? "" : location.getSkills() + "|")
+												+ s.replace("|0", "").substring(1));
 							else if ("cards".equals(poll.questions.get(i).id) && !"|0".equals(s)) {
 								result += "<li>Marketing-Material senden wir Dir an die Adresse Deiner Location.</li>";
 								email += "Marketing-Material senden wir Dir an die Adresse Deiner Location.\n\n";
