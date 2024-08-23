@@ -320,6 +320,7 @@ public class MarketingService {
 				String result = "<ul><li>Deine Location wurde erfolgreich akualisiert.</li>";
 				String email = "Lieben Dank für Deine Teilnahme, Deine Location wurde erfolgreich akualisiert:\n\n";
 				location.setUpdatedAt(new Timestamp(Instant.now().toEpochMilli()));
+				location.setSkills(null);
 				for (int i = 0; i < poll.questions.size(); i++) {
 					if (answers.get("q" + i).has("t")) {
 						String s = answers.get("q" + i).get("t").asText();
@@ -361,7 +362,7 @@ public class MarketingService {
 						}
 						if (!Strings.isEmpty(s)) {
 							if ("skills".equals(poll.questions.get(i).id))
-								location.setSkills(s.replace("|0", "").substring(1));
+								location.setSkills(Strings.isEmpty(location.getSkills() ? "" : location.getSkills() + "|") + s.replace("|0", "").substring(1));
 							else if ("cards".equals(poll.questions.get(i).id) && !"|0".equals(s)) {
 								result += "<li>Marketing-Material senden wir Dir an die Adresse Deiner Location.</li>";
 								email += "Marketing-Material senden wir Dir an die Adresse Deiner Location.\n\n";
