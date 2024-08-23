@@ -133,7 +133,7 @@ public class SupportCenterApi {
 	@GetMapping("user")
 	public List<Object[]> user() {
 		final QueryParams params = new QueryParams(Query.contact_listSupportCenter);
-		params.setLimit(Integer.MAX_VALUE);
+		params.setLimit(0);
 		return repository.list(params).getList();
 	}
 
@@ -141,7 +141,7 @@ public class SupportCenterApi {
 	public List<Object[]> ticket(final String search) {
 		final QueryParams params = new QueryParams(Query.misc_listTicket);
 		params.setSearch(search);
-		params.setLimit(Integer.MAX_VALUE);
+		params.setLimit(0);
 		return repository.list(params).getList();
 	}
 
@@ -154,7 +154,15 @@ public class SupportCenterApi {
 	public List<Object[]> log(final String search) {
 		final QueryParams params = new QueryParams(Query.misc_listLog);
 		params.setSearch(search);
-		params.setLimit(Integer.MAX_VALUE);
+		params.setLimit(0);
+		return repository.list(params).getList();
+	}
+
+	@GetMapping("marketing")
+	public List<Object[]> marketing(final BigInteger id) {
+		final QueryParams params = new QueryParams(Query.contact_listMarketing);
+		params.setSearch("contactMarketing.clientMarketingId=" + id);
+		params.setLimit(0);
 		return repository.list(params).getList();
 	}
 
@@ -197,7 +205,7 @@ public class SupportCenterApi {
 		final Map<String, Map<String, Map<String, Set<String>>>> result = new HashMap<>();
 		final QueryParams params = new QueryParams(Query.misc_listLog);
 		final String anonym = "anonym", login = "login", teaser = "teaser";
-		params.setLimit(Integer.MAX_VALUE);
+		params.setLimit(0);
 		params.setSearch(
 				"log.clientId>0 and (log.uri='/action/teaser/contacts' or log.uri not like '/%') and LOWER(ip.org) not like '%google%' and LOWER(ip.org) not like '%facebook%' and LOWER(ip.org) not like '%amazon%' and log.createdAt>cast('"
 						+ Instant.now().minus(Duration.ofDays(days)) + "' as timestamp)");
@@ -240,7 +248,7 @@ public class SupportCenterApi {
 		final Map<String, Map<String, BigInteger>> result = new HashMap<>();
 		final QueryParams params = new QueryParams(Query.misc_listLog);
 		final String time = "time", count = "count";
-		params.setLimit(Integer.MAX_VALUE);
+		params.setLimit(0);
 		params.setSearch(
 				"log.clientId>0 and log.uri like '/%' and log.uri not like '/support/%' and log.uri not like '/marketing/%' and log.uri not like '/ws/%' and log.createdAt>cast('"
 						+ Instant.now().minus(Duration.ofDays(days)) + "' as timestamp)");

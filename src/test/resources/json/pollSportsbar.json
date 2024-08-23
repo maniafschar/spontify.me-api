@@ -1,6 +1,6 @@
 {
-	"prolog": "Lieber Sky Kunde,<br><br>unsere neue Community ist auf der suche nach den besten <b>Live-Sport-Locations</b> in ihrer Umgebung. Unsere App listet auch Deine Location.<br><br>Möchtest Du <b>mehr Gäste?</b><br><br><button-text label=\"meine Location anzeigen\" onclick=\"details.openLocationMarketing()\"></button-text><br><br><br><br><explain style=\"width:70%;margin-left:15%;\">Wir sind ein Münchner IT Unternehmen und begeisterte Fußball Fans. Wir möchten Fans besser vernetzen, so dass sie gemeinsam in Kneipen und Restaurants Fußball anschauen und z.B. regelmäßige Stammtische organisieren.</explain>",
-	"epilog": "Lieben Dank für Deine Teilnahme.",
+	"prolog": "Lieber Sky Kunde,<br><br>unsere neue Fußball Fan-Community ist auf der suche nach den besten <b>Live-Sport-Locations</b> in ihrer Umgebung. Unsere App listet auch Deine Location.<br><br>Möchtest Du Deine Location updaten?<br><br><br><explain style=\"width:70%;margin-left:15%;\">Wir sind ein Münchner IT Unternehmen und begeisterte Fußball Fans. Wir möchten Fans besser vernetzen, so dass sie gemeinsam in Kneipen und Restaurants Fußball anschauen und z.B. regelmäßige Stammtische organisieren.</explain>",
+	"epilog": "Lieben Dank für Deine Teilnahme.<br><br><br><button-text label=\"meine Location anzeigen\" onclick=\"details.openLocationMarketing()\"></button-text><br>",
 	"questions": [
 		{
 			"id": "name",
@@ -18,19 +18,19 @@
 			"id": "telephone",
 			"question": "Stimmt die Telefonnummer Deiner Location?",
 			"textField": "text",
-			"presetdefault": "marketing.data._telephone"
+			"preset": "marketing.data._telephone"
 		},
 		{
 			"id": "url",
 			"question": "Stimmt die URL Deiner Location?",
 			"textField": "text",
-			"presetdefault": "marketing.data._url"
+			"preset": "marketing.data._url"
 		},
 		{
 			"id": "description",
 			"question": "Hier kannst Du Deine Location beschreiben:",
 			"textField": "textarea",
-			"presetdefault": "marketing.data._description"
+			"preset": "marketing.data._description"
 		},
 		{
 			"id": "skills",
@@ -168,11 +168,11 @@
 			"answers": [
 				{
 					"answer": "Kino",
-					"key": "2.28"
+					"key": "x.2"
 				},
 				{
 					"answer": "Museum",
-					"key": "2.28"
+					"key": "x.3"
 				},
 				{
 					"answer": "Sportsbar",

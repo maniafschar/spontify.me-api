@@ -1,8 +1,10 @@
 SELECT
-	contactMarketing.id,
+	contactMarketing.createdAt,
 	contactMarketing.contactId,
 	contactMarketing.clientMarketingId,
 	contactMarketing.finished,
+	contactMarketing.id,
+	contactMarketing.modifiedAt,
 	contactMarketing.storage
 FROM
 	ContactMarketing contactMarketing
