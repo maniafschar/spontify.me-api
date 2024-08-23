@@ -158,8 +158,8 @@ public class SupportCenterApi {
 		return repository.list(params).getList();
 	}
 
-	@GetMapping("marketing")
-	public List<Object[]> marketing(final BigInteger id) {
+	@GetMapping("marketing/{id}")
+	public List<Object[]> marketing(@PathVariable final BigInteger id) {
 		final QueryParams params = new QueryParams(Query.contact_listMarketing);
 		params.setSearch("contactMarketing.clientMarketingId=" + id);
 		params.setLimit(0);
