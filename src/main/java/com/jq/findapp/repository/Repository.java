@@ -162,7 +162,8 @@ public class Repository {
 
 	public <T extends BaseEntity> T one(final Class<T> clazz, final BigInteger id) {
 		final T entity = em.find(clazz, id);
-		entity.historize();
+		if (entity != null)
+			entity.historize();
 		return entity;
 	}
 
