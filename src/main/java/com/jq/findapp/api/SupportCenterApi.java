@@ -159,11 +159,16 @@ public class SupportCenterApi {
 	}
 
 	@GetMapping("marketing/{id}")
-	public List<Object[]> marketing(@PathVariable final BigInteger id) {
+	public Map<String, List<Object[]>> marketing(@PathVariable final BigInteger id) {
+		final Map<String, List<Object[]>> result = new HashMap<>();
 		final QueryParams params = new QueryParams(Query.contact_listMarketing);
 		params.setSearch("contactMarketing.clientMarketingId=" + id);
 		params.setLimit(0);
-		return repository.list(params).getList();
+		result.put("contactMarketing", repository.list(params).getList());
+		params.setQuery(Query.misc_listMarketing);
+		params.setSearch("clientMarketing.id=" + id);
+		result.put("clientMarketing", repository.list(params).getList());
+		return result;
 	}
 
 	@PostMapping("email")
