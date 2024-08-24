@@ -340,8 +340,10 @@ public class MarketingService {
 								location.setTelephone(s);
 								if (!Strings.isEmpty(s))
 									email += s + "\n";
-							} else if ("url".equals(poll.questions.get(i).id) && s.startsWith("http")
-									&& s.contains("://")) {
+							} else if ("url".equals(poll.questions.get(i).id)) {
+								s = s.toLowerCase();
+								if (!s.startsWith("http"))
+									s = "https://" + s;
 								location.setUrl(s);
 								email += s + "\n";
 							} else if ("description".equals(poll.questions.get(i).id)) {
