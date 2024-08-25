@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -165,7 +167,8 @@ public class SupportCenterApi {
 		final QueryParams params = new QueryParams(Query.contact_listMarketing);
 		params.setSearch("contactMarketing.clientMarketingId=" + id);
 		params.setLimit(0);
-		result.put("contactMarketing", repository.list(params).getList());
+		final Result contactMarketing = repository.list(params);
+		result.put("contactMarketing", contactMarketing.getList());
 		params.setQuery(Query.misc_listMarketing);
 		params.setSearch("clientMarketing.id=" + id);
 		result.put("clientMarketing", repository.list(params).getList());
@@ -173,7 +176,22 @@ public class SupportCenterApi {
 		params.setSearch("log.uri='/marketing' and log.query like 'm=" + id + "&%' and log.createdAt>=cast('"
 				+ Instant.ofEpochMilli(repository.one(ClientMarketing.class, id).getStartDate().getTime())
 				+ "' as timestamp)");
-		result.put("log", repository.list(params).getList());
+		final Result log = repository.list(params);
+		final Pattern locationId = Pattern.compile("");
+		final List<String> processed = new ArrayList<>();
+		for (int i = 0; i < contactMarketing.size(); i++) {
+			final Matcher matcher = locationId
+					.matcher((String) contactMarketing.get(i).get("contactMarketing.storage"));
+			if (matcher.find())
+				processed.add(matcher.group(1));
+		}
+		final List<Object[]> logs = new ArrayList<>();
+		logs.add(log.getList().get(0));
+		for (int i = 0; i < log.size(); i++) {
+			if (!processed.contains(((String) log.get(i).get("log.query")).split("&")[1].substring(2)))
+				logs.add(log.getList().get(i + 1));
+		}
+		result.put("log", logs);
 		return result;
 	}
 
