@@ -389,8 +389,6 @@ public class ActionApi {
 		contact.setLatitude(position.getLatitude());
 		contact.setLongitude(position.getLongitude());
 		repository.save(contact);
-		if (position.isManual())
-			return null;
 		final QueryParams params = new QueryParams(Query.contact_listGeoLocationHistory);
 		params.setSearch("contactGeoLocationHistory.createdAt>cast('" + Instant.now().minus(Duration.ofSeconds(5))
 				+ "' as timestamp) and contactGeoLocationHistory.contactId=" + contact.getId());
@@ -405,15 +403,17 @@ public class ActionApi {
 					result.put("street", geoLocation.getStreet());
 				result.put("town",
 						geoLocation.getTown() != null ? geoLocation.getTown() : geoLocation.getCountry());
-				final ContactGeoLocationHistory contactGeoLocationHistory = new ContactGeoLocationHistory();
-				contactGeoLocationHistory.setContactId(contact.getId());
-				contactGeoLocationHistory.setGeoLocationId(geoLocation.getId());
-				contactGeoLocationHistory.setAccuracy(position.getAccuracy());
-				contactGeoLocationHistory.setAltitude(position.getAltitude());
-				contactGeoLocationHistory.setHeading(position.getHeading());
-				contactGeoLocationHistory.setSpeed(position.getSpeed());
-				contactGeoLocationHistory.setManual(position.isManual());
-				repository.save(contactGeoLocationHistory);
+				if (!position.isManual()) {
+					final ContactGeoLocationHistory contactGeoLocationHistory = new ContactGeoLocationHistory();
+					contactGeoLocationHistory.setContactId(contact.getId());
+					contactGeoLocationHistory.setGeoLocationId(geoLocation.getId());
+					contactGeoLocationHistory.setAccuracy(position.getAccuracy());
+					contactGeoLocationHistory.setAltitude(position.getAltitude());
+					contactGeoLocationHistory.setHeading(position.getHeading());
+					contactGeoLocationHistory.setSpeed(position.getSpeed());
+					contactGeoLocationHistory.setManual(position.isManual());
+					repository.save(contactGeoLocationHistory);
+				}
 				return result;
 			}
 		}
