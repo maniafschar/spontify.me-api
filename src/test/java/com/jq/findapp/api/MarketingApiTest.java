@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
@@ -86,5 +89,21 @@ public class MarketingApiTest {
 
 		// then
 		assertEquals("<htmtl>\n\t<body>\n\t\t\n\t</body>\n</html>", result);
+	}
+
+	@Test
+	public void locationId() throws Exception {
+		// given
+		final String id = "1234567890";
+		final String s = IOUtils.toString(getClass().getResourceAsStream("/json/pollSportsbarResult.json"),
+				StandardCharsets.UTF_8).replace("{locationId}", id);
+		final Matcher matcher = Pattern.compile("\"locationId\":.?\"(\\d+)\"", Pattern.MULTILINE).matcher(s);
+
+		// when
+		matcher.find();
+		final String result = matcher.group(1);
+
+		// then
+		assertEquals(id, result);
 	}
 }
