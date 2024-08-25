@@ -189,18 +189,18 @@ public class SupportCenterApi {
 		final int length = log.getList().get(0).length;
 		final List<Object[]> logs = new ArrayList<>();
 		final Object[] header = Arrays.copyOf(log.getList().get(0), length + 3);
-		header[length - 3] = "log.name";
-		header[length - 2] = "log.address";
-		header[length - 1] = "log.feedback";
+		header[length] = "log.name";
+		header[length + 1] = "log.address";
+		header[length + 2] = "log.feedback";
 		logs.add(header);
 		for (int i = 0; i < log.size(); i++) {
 			final String locationId = ((String) log.get(i).get("log.query")).split("&")[1].substring(2);
 			if (!processed.contains(locationId)) {
 				final Object[] row = Arrays.copyOf(log.getList().get(1), length + 3);
 				final Location location = repository.one(Location.class, new BigInteger(locationId));
-				row[length - 3] = location.getName();
-				row[length - 2] = location.getAddress();
-				row[length - 1] = log.get(i).get("log.createdAt");
+				row[length] = location.getName();
+				row[length + 1] = location.getAddress();
+				row[length + 2] = log.get(i).get("log.createdAt");
 				logs.add(row);
 				processed.add(locationId);
 			}
