@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Log;
 import com.jq.findapp.entity.Log.LogStatus;
@@ -169,7 +170,8 @@ public class SupportCenterApi {
 		params.setSearch("clientMarketing.id=" + id);
 		result.put("clientMarketing", repository.list(params).getList());
 		params.setQuery(Query.misc_listLog);
-		params.setSearch("log.uri='/marketing' and log.query like 'm=" + id + "&%'");
+		params.setSearch("log.uri='/marketing' and log.query like 'm=" + id + "&%' and createdAt>='"
+				+ Instant.ofEpochMilli(repository.one(ClientMarketing.class, id).getStartDate().getTime()) + "'");
 		result.put("log", repository.list(params).getList());
 		return result;
 	}
