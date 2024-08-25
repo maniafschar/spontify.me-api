@@ -269,8 +269,7 @@ public class EngagementService {
 		try {
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setSearch("contact.createdAt<cast('" + Instant.now().minus(Duration.ofHours(3))
-					+ "' as timestamp) and contact.verified=false and contact.notification like '%"
-					+ NotificationService.NotificationType.engagement + "%'");
+					+ "' as timestamp) and contact.verified=false");
 			params.setLimit(0);
 			final Result list = repository.list(params);
 			int count = 0;
