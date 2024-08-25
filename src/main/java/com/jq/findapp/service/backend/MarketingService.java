@@ -413,14 +413,6 @@ public class MarketingService {
 						"Deine Location " + location.getName(), email,
 						createHtmlTemplate(repository.one(Client.class, clientMarketing.getClientId()))
 								.replace("<jq:text />", email.replace("\n", "<br/>")));
-				email += "<div style=\"text-align:left;padding-top:2em;\">"
-						+ clientMarketing.getClientId() + " · " + location.getEmail() + "<br/>"
-						+ om.writerWithDefaultPrettyPrinter().writeValueAsString(answers) + "</div>";
-				notificationService.sendEmail(client, null,
-						adminEmail,
-						"Location Update " + location.getName(), email,
-						createHtmlTemplate(repository.one(Client.class, clientMarketing.getClientId()))
-								.replace("<jq:text />", email.replace("\n", "<br/>")));
 				return result + "</ul>";
 			}
 		}
