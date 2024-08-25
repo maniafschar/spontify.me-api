@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Log;
 import com.jq.findapp.entity.Log.LogStatus;
 import com.jq.findapp.entity.Ticket;
@@ -177,19 +178,31 @@ public class SupportCenterApi {
 				+ Instant.ofEpochMilli(repository.one(ClientMarketing.class, id).getStartDate().getTime())
 				+ "' as timestamp)");
 		final Result log = repository.list(params);
-		final Pattern locationId = Pattern.compile("");
+		final Pattern locationIdPattern = Pattern.compile("");
 		final List<String> processed = new ArrayList<>();
 		for (int i = 0; i < contactMarketing.size(); i++) {
-			final Matcher matcher = locationId
+			final Matcher matcher = locationIdPattern
 					.matcher((String) contactMarketing.get(i).get("contactMarketing.storage"));
 			if (matcher.find())
 				processed.add(matcher.group(1));
 		}
+		final int length = log.getList().get(0).length;
 		final List<Object[]> logs = new ArrayList<>();
-		logs.add(log.getList().get(0));
+		final Object[] header = Arrays.copyOf(log.getList().get(0), length + 3);
+		header[length - 3] = "log.name";
+		header[length - 2] = "log.address";
+		header[length - 1] = "log.feedback";
+		logs.add(header);
 		for (int i = 0; i < log.size(); i++) {
-			if (!processed.contains(((String) log.get(i).get("log.query")).split("&")[1].substring(2)))
-				logs.add(log.getList().get(i + 1));
+			final String locationId = ((String) log.get(i).get("log.query")).split("&")[1].substring(2);
+			if (!processed.contains(locationId)) {
+				final Object[] row = Arrays.copyOf(log.getList().get(1), length + 3);
+				final Location location = repository.one(Location.class, new BigInteger(locationId));
+				row[length - 3] = location.getName();
+				row[length - 2] = location.getAddress();
+				row[length - 1] = log.get(i).get("log.createdAt");
+				logs.add(row);
+			}
 		}
 		result.put("log", logs);
 		return result;
