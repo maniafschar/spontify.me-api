@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -272,7 +273,6 @@ public class EngagementService {
 					+ NotificationService.NotificationType.engagement + "%'");
 			params.setLimit(0);
 			final Result list = repository.list(params);
-			final long DAY = 86400000;
 			int count = 0;
 			params.setQuery(Query.misc_listStorage);
 			params.setSearch("storage.label='registration-reminder'");
@@ -282,8 +282,7 @@ public class EngagementService {
 					.readValue((String) history.get("storage.storage"), Map.class);
 			for (int i = 0; i < list.size(); i++) {
 				final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
-				if (!sent.containsKey(to.getId())
-						|| (sent.get(to.getId()) + 9 * DAY < System.currentTimeMillis())) {
+				if (timeToSendNewRegistrationReminder(sent.get(to.getId()), to)) {
 					authenticationService.recoverSendEmailReminder(to);
 					sent.put(to.getId(), System.currentTimeMillis());
 					count++;
@@ -297,6 +296,21 @@ public class EngagementService {
 			result.exception = e;
 		}
 		return result;
+	}
+
+	boolean timeToSendNewRegistrationReminder(final Long last, final Contact contact) {
+		if (last == null)
+			return true;
+		final List<Integer> weeks = Arrays.asList(1, 4, 12, 26);
+		for (int i = weeks.size() - 1; i >= 0; i--) {
+			final int w = weeks.get(i);
+			final int days = weeks.stream().filter(e -> e <= w).mapToInt(e -> e).sum() * 7;
+			final Instant createdAtPlusDays = Instant.ofEpochMilli(contact.getCreatedAt().getTime())
+					.plus(Duration.ofDays(days));
+			if (createdAtPlusDays.isBefore(Instant.now()))
+				return Instant.ofEpochMilli(last).isBefore(createdAtPlusDays);
+		}
+		return false;
 	}
 
 	public SchedulerResult run() {

@@ -216,7 +216,9 @@ public class MarketingService {
 	}
 
 	public SchedulerResult runSportbars() {
-		return locationMarketing(new BigInteger("180"), "Sky Sport Events: möchtest Du mehr Gäste?",
+		return locationMarketing(new BigInteger("180"),
+				"location.skills like '%x.1%'", 5,
+				"Sky Sport Events: möchtest Du mehr Gäste?",
 				"Lieber Sky Sportsbar Kunde,\n\n"
 						+ "unsere neue Fußball-Fan-Community ist auf der Suche nach den besten Locations, in denen sie Live-Übertragungen gemeinsam feiern können. Unsere App listet auch Deine Location.\n\n"
 						+ "Hier kannst Du Deine Location vervollständigen:\n\n"
@@ -229,8 +231,8 @@ public class MarketingService {
 						+ "0172 6379434");
 	}
 
-	private SchedulerResult locationMarketing(final BigInteger clientMarketingId, final String subject,
-			final String text) {
+	private SchedulerResult locationMarketing(final BigInteger clientMarketingId, final String search,
+			final int max, final String subject, final String text) {
 		final SchedulerResult result = new SchedulerResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
 		try {
@@ -238,9 +240,9 @@ public class MarketingService {
 			final Client client = repository.one(Client.class, clientMarketing.getClientId());
 			final String html = createHtmlTemplate(client);
 			params.setSearch(
-					"location.email like '%@%' and location.skills like '%x.1%' and (length(location.marketingMail)=0 or cast(REGEXP_LIKE('"
-							+ clientMarketing.getId()
-							+ "',location.marketingMail) as integer)=0) and location.country='DE' and location.zipCode like '8%'");
+					"location.email like '%@%' and (length(location.marketingMail)=0 or cast(REGEXP_LIKE('"
+							+ clientMarketing.getId() + "',location.marketingMail) as integer)=0)"
+							+ (Strings.isEmpty(search) ? "" : " and " + search));
 			final Result locations = repository.list(params);
 			params.setQuery(Query.misc_listTicket);
 			int count = 0;
@@ -271,8 +273,8 @@ public class MarketingService {
 							(Strings.isEmpty(location.getMarketingMail()) ? "" : location.getMarketingMail() + "|")
 									+ clientMarketing.getId());
 					repository.save(location);
-					count++;
-					break;
+					if (++count >= max)
+						break;
 				}
 			}
 			result.body += clientMarketing.getId() + ": " + count + "\n";
@@ -350,7 +352,8 @@ public class MarketingService {
 								location.setDescription(s);
 								if (!Strings.isEmpty(s))
 									email += "\n" + s + "\n\n";
-							} else if ("skills".equals(poll.questions.get(i).id))
+							} else if (poll.questions.get(i).id != null
+									&& poll.questions.get(i).id.startsWith("skills"))
 								location.setSkillsText(s);
 							else if ("feedback".equals(poll.questions.get(i).id) && !Strings.isEmpty(s)) {
 								result += "<li>Lieben Dank für Dein Feedback.</li>";
@@ -367,7 +370,7 @@ public class MarketingService {
 									: poll.questions.get(i).answers.get(index).key);
 						}
 						if (!Strings.isEmpty(s)) {
-							if ("skills".equals(poll.questions.get(i).id))
+							if (poll.questions.get(i).id != null && poll.questions.get(i).id.startsWith("skills"))
 								location.setSkills(
 										(Strings.isEmpty(location.getSkills()) ? "" : location.getSkills() + "|")
 												+ s.replace("|0", "").substring(1));

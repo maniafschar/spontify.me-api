@@ -3,6 +3,9 @@ package com.jq.findapp.service.backend;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
+import com.jq.findapp.entity.Contact;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith(SpringExtension.class)
@@ -50,5 +54,51 @@ public class EngagementServiceTest {
 
 		// then
 		assertEquals("0.1.8", match);
+	}
+
+	@Test
+	public void timeToSendNewRegistrationReminder_first() {
+		timeToSendNewRegistrationReminder(6, -1, true);
+	}
+
+	@Test
+	public void timeToSendNewRegistrationReminder_second_false() {
+		timeToSendNewRegistrationReminder(6, 1, false);
+	}
+
+	@Test
+	public void timeToSendNewRegistrationReminder_second_true() {
+		timeToSendNewRegistrationReminder(7, 1, true);
+	}
+
+	@Test
+	public void timeToSendNewRegistrationReminder_third_false() {
+		timeToSendNewRegistrationReminder(15, 7, false);
+	}
+
+	@Test
+	public void timeToSendNewRegistrationReminder_third_false2() {
+		timeToSendNewRegistrationReminder(34, 7, false);
+	}
+
+	@Test
+	public void timeToSendNewRegistrationReminder_third_true() {
+		timeToSendNewRegistrationReminder(35, 7, true);
+	}
+
+	private void timeToSendNewRegistrationReminder(int createdBeforeDays, int lastReminderDays, boolean expected) {
+		// given
+		final Contact contact = new Contact();
+		contact.setCreatedAt(new Timestamp(Instant.now().minus(Duration.ofDays(createdBeforeDays)).toEpochMilli()));
+
+		// when
+		final boolean send = engagementService.timeToSendNewRegistrationReminder(
+				lastReminderDays < 0 ? null
+						: Instant.ofEpochMilli(contact.getCreatedAt().getTime())
+								.plus(Duration.ofDays(lastReminderDays)).plus(Duration.ofHours(1)).toEpochMilli(),
+				contact);
+
+		// then
+		assertEquals(expected, send);
 	}
 }

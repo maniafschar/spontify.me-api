@@ -4,6 +4,7 @@ import java.math.BigInteger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,7 +26,8 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 	@Override
 	public void prePersist(final Location location)
 			throws Exception {
-		location.setName(sanitize(location.getName()));
+		location.setName(sanitizeName(location.getName()));
+		location.setUrl(sanitizeUrl(location.getUrl()));
 		lookupAddress(location);
 		final QueryParams params = new QueryParams(Query.location_list);
 		params.setUser(new Contact());
@@ -47,7 +49,9 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 
 	@Override
 	public void preUpdate(final Location location) throws Exception {
-		location.setName(sanitize(location.getName()));
+		location.setName(sanitizeName(location.getName()));
+		if (location.old("url") != null)
+			location.setUrl(sanitizeUrl(location.getUrl()));
 		if (location.old("address") != null)
 			lookupAddress(location);
 	}
@@ -138,13 +142,31 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		return false;
 	}
 
-	private String sanitize(String name) {
+	private String sanitizeName(String name) {
 		if (name != null) {
 			while (name.contains("  "))
 				name = name.replace("  ", " ");
 			name = name.replace('\t', ' ').replace('\r', ' ').replace('\n', ' ');
 		}
 		return name;
+	}
+
+	private String sanitizeUrl(String url) {
+		if (!Strings.isEmpty(url)) {
+			if (!url.contains("://")) {
+				try {
+					WebClient.create("https://" + url)
+							.get()
+							.retrieve()
+							.bodyToMono(String.class).block();
+					url = "https://" + url.trim();
+				} catch (Exception ex) {
+					url = "http://" + url.trim();
+				}
+			} else
+				url = url.trim();
+		}
+		return url;
 	}
 
 	private String prepare(String s) {
