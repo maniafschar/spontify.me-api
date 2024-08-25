@@ -178,7 +178,7 @@ public class SupportCenterApi {
 				+ Instant.ofEpochMilli(repository.one(ClientMarketing.class, id).getStartDate().getTime())
 				+ "' as timestamp)");
 		final Result log = repository.list(params);
-		final Pattern locationIdPattern = Pattern.compile("\"locationId\": (\\d+),", Pattern.MULTILINE);
+		final Pattern locationIdPattern = Pattern.compile("\"locationId\": \"(\\d+)\"", Pattern.MULTILINE);
 		final List<String> processed = new ArrayList<>();
 		for (int i = 0; i < contactMarketing.size(); i++) {
 			final Matcher matcher = locationIdPattern
