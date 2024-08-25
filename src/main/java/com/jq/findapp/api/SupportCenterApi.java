@@ -178,7 +178,7 @@ public class SupportCenterApi {
 				+ Instant.ofEpochMilli(repository.one(ClientMarketing.class, id).getStartDate().getTime())
 				+ "' as timestamp)");
 		final Result log = repository.list(params);
-		final Pattern locationIdPattern = Pattern.compile("");
+		final Pattern locationIdPattern = Pattern.compile("\"locationId\": (\\d+),", Pattern.MULTILINE);
 		final List<String> processed = new ArrayList<>();
 		for (int i = 0; i < contactMarketing.size(); i++) {
 			final Matcher matcher = locationIdPattern
@@ -202,6 +202,7 @@ public class SupportCenterApi {
 				row[length - 2] = location.getAddress();
 				row[length - 1] = log.get(i).get("log.createdAt");
 				logs.add(row);
+				processed.add(locationId);
 			}
 		}
 		result.put("log", logs);
