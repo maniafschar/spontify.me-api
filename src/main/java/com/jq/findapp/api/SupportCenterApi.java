@@ -168,6 +168,9 @@ public class SupportCenterApi {
 		params.setQuery(Query.misc_listMarketing);
 		params.setSearch("clientMarketing.id=" + id);
 		result.put("clientMarketing", repository.list(params).getList());
+		params.setQuery(Query.misc_listLog);
+		params.setSearch("log.uri='/marketing' and log.query like 'm=" + id + "&%'");
+		result.put("log", repository.list(params).getList());
 		return result;
 	}
 
