@@ -150,32 +150,21 @@ public class ImportSportsBarService {
 	}
 
 	private boolean updateFields(final Location location, final JsonNode data) {
-		boolean changed = false;
-		if (!("|" + location.getSkills() + "|").contains("|x.1|")) {
+		if (!("|" + location.getSkills() + "|").contains("|x.1|"))
 			location.setSkills(Strings.isEmpty(location.getSkills()) ? "x.1" : location.getSkills() + "|x.1");
-			changed = true;
-		}
-		if (Strings.isEmpty(location.getDescription()) && data.get("description").has("program")) {
+		if (Strings.isEmpty(location.getDescription()) && data.get("description").has("program"))
 			location.setDescription(data.get("description").get("program").asText());
-			changed = true;
-		}
 		if (data.has("contactData")) {
-			if (Strings.isEmpty(location.getTelephone()) && data.get("contactData").has("phoneNumber")) {
+			if (Strings.isEmpty(location.getTelephone()) && data.get("contactData").has("phoneNumber"))
 				location.setTelephone((data.get("contactData").has("phoneAreaCode")
 						? data.get("contactData").get("phoneAreaCode").asText() + "/"
 						: "") + data.get("contactData").get("phoneNumber").asText());
-				changed = true;
-			}
-			if (Strings.isEmpty(location.getUrl()) && data.get("contactData").has("homepageUrl")) {
+			if (Strings.isEmpty(location.getUrl()) && data.get("contactData").has("homepageUrl"))
 				location.setUrl(data.get("contactData").get("homepageUrl").asText());
-				changed = true;
-			}
-			if (Strings.isEmpty(location.getEmail()) && data.get("contactData").has("mail")) {
+			if (Strings.isEmpty(location.getEmail()) && data.get("contactData").has("mail"))
 				location.setEmail(data.get("contactData").get("mail").asText());
-				changed = true;
-			}
 		}
-		return changed;
+		return location.modified();
 	}
 
 	class Results {
