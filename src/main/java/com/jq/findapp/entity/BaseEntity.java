@@ -87,9 +87,8 @@ public abstract class BaseEntity {
 	}
 
 	@Transient
-	public boolean populate(final Map<String, Object> values) {
+	public void populate(final Map<String, Object> values) {
 		final BaseEntity ref = new ObjectMapper().convertValue(values, this.getClass());
-		old = new HashMap<>();
 		values.forEach((name, value) -> {
 			if (!"id".equals(name) && !"createdAt".equals(name) && !"modifiedAt".equals(name)) {
 				try {
@@ -97,7 +96,7 @@ public abstract class BaseEntity {
 							.getDeclaredMethod("get" + name.substring(0, 1).toUpperCase() + name.substring(1));
 					final Object valueOld = m.invoke(this), valueNew = m.invoke(ref);
 					if (!Objects.equals(valueOld, valueNew)) {
-						if (getId() != null)
+						if (old != null)
 							old.put(name, valueOld);
 						if (value instanceof String && ((String) value).contains("<"))
 							value = ((String) value).replace("<", "&lt;");
@@ -111,7 +110,6 @@ public abstract class BaseEntity {
 				}
 			}
 		});
-		return old.size() > 0;
 	}
 
 	@Transient

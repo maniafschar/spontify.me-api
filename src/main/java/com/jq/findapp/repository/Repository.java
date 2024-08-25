@@ -178,20 +178,22 @@ public class Repository {
 	}
 
 	public void save(final BaseEntity entity) throws Exception {
-		Attachment.save(entity);
-		if (entity.getId() == null) {
-			if (entity.getCreatedAt() == null)
-				entity.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
-			listeners.prePersist(entity);
-			em.persist(entity);
-			listeners.postPersist(entity);
-		} else {
-			entity.setModifiedAt(new Timestamp(Instant.now().toEpochMilli()));
-			listeners.preUpdate(entity);
-			em.merge(entity);
-			listeners.postUpdate(entity);
+		if (entity.modified()) {
+			Attachment.save(entity);
+			if (entity.getId() == null) {
+				if (entity.getCreatedAt() == null)
+					entity.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
+				listeners.prePersist(entity);
+				em.persist(entity);
+				listeners.postPersist(entity);
+			} else {
+				entity.setModifiedAt(new Timestamp(Instant.now().toEpochMilli()));
+				listeners.preUpdate(entity);
+				em.merge(entity);
+				listeners.postUpdate(entity);
+			}
+			em.flush();
 		}
-		em.flush();
 	}
 
 	public void delete(final BaseEntity entity) throws Exception {

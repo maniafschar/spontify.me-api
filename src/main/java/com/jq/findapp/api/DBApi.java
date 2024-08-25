@@ -63,8 +63,8 @@ public class DBApi {
 				entity.getValues().put("passwordReset", BigInteger.valueOf(System.currentTimeMillis()));
 			}
 			EntityUtil.addImageList(entity);
-			if (e.populate(entity.getValues()))
-				repository.save(e);
+			e.populate(entity.getValues());
+			repository.save(e);
 		}
 	}
 
