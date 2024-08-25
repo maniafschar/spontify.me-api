@@ -15,7 +15,6 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -63,9 +62,6 @@ public class MarketingService {
 
 	@Autowired
 	private Text text;
-
-	@Value("${app.admin.email}")
-	private String adminEmail;
 
 	public SchedulerResult run() {
 		final SchedulerResult result = new SchedulerResult();
