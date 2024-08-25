@@ -170,7 +170,7 @@ public class SupportCenterApi {
 		params.setSearch("clientMarketing.id=" + id);
 		result.put("clientMarketing", repository.list(params).getList());
 		params.setQuery(Query.misc_listLog);
-		params.setSearch("log.uri='/marketing' and log.query like 'm=" + id + "&%' and createdAt>='"
+		params.setSearch("log.uri='/marketing' and log.query like 'm=" + id + "&%' and log.createdAt>='"
 				+ Instant.ofEpochMilli(repository.one(ClientMarketing.class, id).getStartDate().getTime()) + "'");
 		result.put("log", repository.list(params).getList());
 		return result;
