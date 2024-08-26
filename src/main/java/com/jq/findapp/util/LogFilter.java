@@ -125,7 +125,7 @@ public class LogFilter implements Filter {
 	}
 
 	private BigInteger resolveClientId(final String host) {
-		final Client client = clients.stream().filter(e -> e.getUrl().contains(host)).findFirst();
+		final Client client = clients.stream().filter(e -> e.getUrl().contains(host)).findFirst().orElseGet(null);
 		return client == null ? null : client.getId();
 	}
 
