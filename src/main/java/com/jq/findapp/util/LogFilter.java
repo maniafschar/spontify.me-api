@@ -93,7 +93,7 @@ public class LogFilter implements Filter {
 			if (req.getHeader("clientId") != null)
 				log.setClientId(new BigInteger(req.getHeader("clientId")));
 			else
-				log.setClientId(resolveClientId(req.getHeader("X-Forwarded-Host"));
+				log.setClientId(resolveClientId(req.getHeader("X-Forwarded-Host")));
 			if (req.getHeader("user") != null)
 				log.setContactId(new BigInteger(req.getHeader("user")));
 			else if (req.getRequestURI().startsWith("/support/"))
