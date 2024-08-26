@@ -110,7 +110,7 @@ public class LogFilter implements Filter {
 				if (b != null && b.length > 0)
 					log.setBody(log.getBody() + "\n" + new String(b, StandardCharsets.UTF_8));
 				final String s = body.get();
-				if (s != null)
+				if (!Strings.isEmpty(s))
 					log.setBody(log.getBody() + "\n" + s);
 				try {
 					repository.save(log);
