@@ -93,10 +93,10 @@ public class LogFilter implements Filter {
 		try {
 			authenticate(req);
 			chain.doFilter(req, res);
-			if (req.getHeader("clientId") != null)
-				log.setClientId(new BigInteger(req.getHeader("clientId")));
-			else
+			if (req.getHeader("clientId") == null)
 				log.setClientId(resolveClientId(req.getHeader("X-Forwarded-Host")));
+			else
+				log.setClientId(new BigInteger(req.getHeader("clientId")));
 			if (req.getHeader("user") != null)
 				log.setContactId(new BigInteger(req.getHeader("user")));
 			else if (req.getRequestURI().startsWith("/support/"))
@@ -116,6 +116,7 @@ public class LogFilter implements Filter {
 				if (!Strings.isEmpty(s))
 					log.setBody(log.getBody() + "\n" + s);
 				try {
+					log.setBody(log.getBody() + "\n" + req.getHeaderNames());
 					repository.save(log);
 				} catch (final Exception e) {
 					e.printStackTrace();
