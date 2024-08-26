@@ -117,10 +117,10 @@ public class LogFilter implements Filter {
 					log.setBody(log.getBody() + "\n" + s);
 				try {
 					java.util.Enumeration<String> e = req.getHeaderNames();
-					String s = "";
+					String s2 = "";
 					while (e.hasMoreElements())
-						s += "\n" + e.nextElement();
-					log.setBody(log.getBody() + s);
+						s2 += "\n" + e.nextElement();
+					log.setBody(log.getBody() + s2);
 					repository.save(log);
 				} catch (final Exception e) {
 					e.printStackTrace();
