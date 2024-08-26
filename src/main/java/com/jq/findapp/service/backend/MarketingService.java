@@ -366,11 +366,13 @@ public class MarketingService {
 									: poll.questions.get(i).answers.get(index).key);
 						}
 						if (!Strings.isEmpty(s)) {
-							if (poll.questions.get(i).id != null && poll.questions.get(i).id.startsWith("skills"))
-								location.setSkills(
-										(Strings.isEmpty(location.getSkills()) ? "" : location.getSkills() + "|")
-												+ s.replace("|0", "").substring(1));
-							else if ("cards".equals(poll.questions.get(i).id) && !"|0".equals(s)) {
+							if (poll.questions.get(i).id != null && poll.questions.get(i).id.startsWith("skills")) {
+								s = (Strings.isEmpty(location.getSkills()) ? "" : location.getSkills() + "|")
+										+ s.replace("|0", "");
+								if (s.length() > 0)
+									s = s.substring(1);
+								location.setSkills(s);
+							} else if ("cards".equals(poll.questions.get(i).id) && !"|0".equals(s)) {
 								result += "<li>Marketing-Material senden wir Dir an die Adresse Deiner Location.</li>";
 								email += "Marketing-Material senden wir Dir an die Adresse Deiner Location.\n\n";
 							} else if ("account".equals(poll.questions.get(i).id) && "|1".equals(s)) {
