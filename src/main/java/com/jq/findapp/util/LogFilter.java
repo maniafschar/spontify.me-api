@@ -116,11 +116,7 @@ public class LogFilter implements Filter {
 				if (!Strings.isEmpty(s))
 					log.setBody(log.getBody() + "\n" + s);
 				try {
-					java.util.Enumeration<String> e = req.getHeaderNames();
-					String s2 = "";
-					while (e.hasMoreElements())
-						s2 += "\n" + e.nextElement();
-					log.setBody(log.getBody() + s2);
+					log.setBody(log.getBody() + "\n"+req.getHeader("X-Forwarded-Host")+ "\n"+req.getHeader("X-Forwarded-For")+ "\n"+req.getHeader("X-Forwarded-Server"));
 					repository.save(log);
 				} catch (final Exception e) {
 					e.printStackTrace();
