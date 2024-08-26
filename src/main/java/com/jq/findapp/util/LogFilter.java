@@ -96,6 +96,8 @@ public class LogFilter implements Filter {
 				log.setTime((int) (System.currentTimeMillis() - time));
 				log.setStatus(LogStatus.get(res.getStatus()));
 				log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
+				if (log.getClientId() == null && res.getHeader("clientId") != null)
+					log.setClientId(new BigInteger(res.getHeader("clientId")));
 				final byte[] b = req.getContentAsByteArray();
 				if (b != null && b.length > 0)
 					log.setBody(log.getBody() + "\n" + new String(b, StandardCharsets.UTF_8));
