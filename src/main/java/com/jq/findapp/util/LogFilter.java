@@ -6,6 +6,8 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +37,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Order(1)
 public class LogFilter implements Filter {
 	public static final ThreadLocal<String> body = new ThreadLocal<>();
+	private static final List<Client> clients = new ArrayList<>();
 
 	@Autowired
 	private Repository repository;
@@ -51,6 +54,11 @@ public class LogFilter implements Filter {
 	@Override
 	public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
 			throws IOException, ServletException {
+		if (clients.size() == 0) {
+			final Result list = repository.list(new QueryParams(Query.misc_listClient));
+			for (int i = 0; i < list.size(); i++)
+				clients.add(repository.one(Client.class, (BigInteger) list.get(i).get("client.id")));
+		}
 		final ContentCachingRequestWrapper req = new ContentCachingRequestWrapper((HttpServletRequest) request);
 		final HttpServletResponse res = (HttpServletResponse) response;
 		body.set(null);
@@ -84,6 +92,8 @@ public class LogFilter implements Filter {
 			chain.doFilter(req, res);
 			if (req.getHeader("clientId") != null)
 				log.setClientId(new BigInteger(req.getHeader("clientId")));
+			else
+				log.setClientId(resolveClientId(req.getHeader("X-Forwarded-Host"));
 			if (req.getHeader("user") != null)
 				log.setContactId(new BigInteger(req.getHeader("user")));
 			else if (req.getRequestURI().startsWith("/support/"))
@@ -96,8 +106,6 @@ public class LogFilter implements Filter {
 				log.setTime((int) (System.currentTimeMillis() - time));
 				log.setStatus(LogStatus.get(res.getStatus()));
 				log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
-				if (log.getClientId() == null && res.getHeader("clientId") != null)
-					log.setClientId(new BigInteger(res.getHeader("clientId")));
 				final byte[] b = req.getContentAsByteArray();
 				if (b != null && b.length > 0)
 					log.setBody(log.getBody() + "\n" + new String(b, StandardCharsets.UTF_8));
@@ -111,6 +119,11 @@ public class LogFilter implements Filter {
 				}
 			}
 		}
+	}
+
+	private BigInteger resolveClientId(final String host) {
+		final Client client = clients.stream().filter(e -> e.getUrl().contains(host)).findFirst();
+		return client == null ? null : client.getId();
 	}
 
 	private void authenticate(final ContentCachingRequestWrapper req) {
