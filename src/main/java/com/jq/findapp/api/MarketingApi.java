@@ -53,8 +53,6 @@ import jakarta.transaction.Transactional;
 @RequestMapping("marketing")
 public class MarketingApi {
 	private static final Map<BigInteger, String> INDEXES = new HashMap<>();
-	private static final Map<BigInteger, String> MENU = new HashMap<>();
-	private static volatile long lastUpdate = 0;
 
 	@Autowired
 	private Repository repository;
@@ -273,8 +271,7 @@ public class MarketingApi {
 	}
 
 	private void update() throws IOException {
-		if (System.currentTimeMillis() - lastUpdate > 24 * 60 * 60 * 1000) {
-			lastUpdate = System.currentTimeMillis();
+		if (INDEXES.size() == 0) {
 			final Result list = repository.list(new QueryParams(Query.misc_listClient));
 			final Pattern patternUrl = Pattern.compile("<meta property=\"og:url\" content=\"([^\"].*)\"");
 			final Pattern patternCanonical = Pattern.compile("<link rel=\"canonical\" href=\"([^\"].*)\"");
@@ -313,28 +310,6 @@ public class MarketingApi {
 					s = s.replace("<title></title>", "<title>{{title}}</title>");
 					INDEXES.put(client.getId(), s);
 				}
-				final StringBuilder s = new StringBuilder();
-				final QueryParams params = new QueryParams(Query.location_listId);
-				params.setLimit(0);
-				Result result = repository.list(params);
-				for (int i2 = 0; i2 < result.size(); i2++)
-					s.append("<li><a href=\"" + url + "/rest/marketing/location/" + result.get(i2).get("location.id")
-							+ "\">" + result.get(i2).get("location.name") + "</a></li>");
-				params.setQuery(Query.event_listId);
-				params.setSearch("event.endDate>now() and contact.clientId=" + client.getId());
-				result = repository.list(params);
-				for (int i2 = 0; i2 < result.size(); i2++)
-					s.append("<li><a href=\"" + url + "/rest/marketing/event/" + result.get(i2).get("event.id")
-							+ "\">" + result.get(i2).get("event.description") + "</a></li>");
-				params.setQuery(Query.misc_listNews);
-				params.setSearch(null);
-				params.setUser(new Contact());
-				params.getUser().setClientId(client.getId());
-				result = repository.list(params);
-				for (int i2 = 0; i2 < result.size(); i2++)
-					s.append("<li><a href=\"" + url + "/rest/marketing/news/" + result.get(i2).get("clientNews.id")
-							+ "\">" + result.get(i2).get("clientNews.description") + "</a></li>");
-				MENU.put(client.getId(), s.toString());
 			}
 		}
 	}
