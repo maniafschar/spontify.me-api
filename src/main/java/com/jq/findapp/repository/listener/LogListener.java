@@ -11,7 +11,7 @@ public class LogListener extends AbstractRepositoryListener<Log> {
 		if (log.getBody() != null) {
 			log.setBody(log.getBody().trim());
 			if (log.getBody().length() > 255)
-				log.setBody(log.getBody().substring(0, 255));
+				log.setBody(log.getBody().substring(0, 252) + "...");
 			else if (log.getBody().length() == 0)
 				log.setBody(null);
 		}
