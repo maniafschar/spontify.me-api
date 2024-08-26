@@ -107,8 +107,8 @@ public class DbService {
 						new BigInteger(log.getUri().substring(log.getUri().lastIndexOf('/') + 1)));
 				log.setClientId(clientNews.getClientId());
 				repository.save(log);
+				result.body += " " + log.getId();
 			}
-			result.body = "updated " + list.size() + " entries";
 		} catch (Exception ex) {
 			result.exception = ex;
 		}
