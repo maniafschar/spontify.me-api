@@ -116,7 +116,11 @@ public class LogFilter implements Filter {
 				if (!Strings.isEmpty(s))
 					log.setBody(log.getBody() + "\n" + s);
 				try {
-					log.setBody(log.getBody() + "\n" + req.getHeaderNames());
+					java.util.Enumeration<String> e = req.getHeaderNames();
+					String s = "";
+					while (e.hasMoreElements())
+						s += "\n" + e.nextElement();
+					log.setBody(log.getBody() + s);
 					repository.save(log);
 				} catch (final Exception e) {
 					e.printStackTrace();
