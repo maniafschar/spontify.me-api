@@ -99,15 +99,16 @@ public class DbService {
 		final SchedulerResult result = new SchedulerResult();
 		final QueryParams params = new QueryParams(Query.misc_listLog);
 		params.setSearch("log.clientId is null and log.uri like '/marketing/news/%' and log.uri not like '%.%'");
-		final Result list2 = repository.list(params);
+		final Result list = repository.list(params);
 		try {
-			for (int i = 0; i < list2.size(); i++) {
-				final Log log = repository.one(Log.class, (BigInteger) list2.get(i).get("log.id"));
+			for (int i = 0; i < list.size(); i++) {
+				final Log log = repository.one(Log.class, (BigInteger) list.get(i).get("log.id"));
 				final ClientNews clientNews = repository.one(ClientNews.class,
 						new BigInteger(log.getUri().substring(log.getUri().lastIndexOf('/') + 1)));
 				log.setClientId(clientNews.getClientId());
 				repository.save(log);
 			}
+			result.body = "updated " + list.size() + " entries";
 		} catch (Exception ex) {
 			result.exception = ex;
 		}
