@@ -229,7 +229,9 @@ public class MarketingService {
 		final Map<BigInteger, String> htmls = new HashMap<>();
 		final QueryParams params = new QueryParams(Query.contact_listMarketing);
 		params.setSearch("contactMarketing.finished=false and contactMarketing.createdAt>cast('"
-				+ Instant.now().minus(Duration.ofDays(14)).toString() + "' as timestamp)");
+				+ Instant.now().minus(Duration.ofDays(14)).toString()
+				+ "' as timestamp) and contactMarketing.createdAt<cast('" +
+				Instant.now().minus(Duration.ofHours(6)).toString() + "' as timestamp)");
 		try {
 			final Result list = repository.list(params);
 			final long end = Instant.now().plus(Duration.ofDays(1)).toEpochMilli();
