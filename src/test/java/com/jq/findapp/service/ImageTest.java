@@ -21,12 +21,12 @@ public class ImageTest {
 
 	@Test
 	public void createFanclub() throws Exception {
-		create("fanclub", "Wer wird denn alleine schauen?", 1, Color.BLACK);
+		create("fanclub", "Wer schaut denn gerne alleine?", 1, Color.BLACK);
 	}
 
 	@Test
 	public void createAfterwork() throws Exception {
-		create("afterwork", "Wer feiert denn alleine?", 1, Color.WHITE);
+		create("afterwork", "Wer geht denn alleine in den Feierabend?", 1, Color.WHITE);
 	}
 
 	private void create(String prefix, String claim, int no, Color textColor) throws Exception {

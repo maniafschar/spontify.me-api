@@ -153,9 +153,9 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 
 	private String sanitizeUrl(String url) {
 		if (!Strings.isEmpty(url)) {
-			if (!url.contains("://")) {
+			if (!url.contains("://") && url.contains(".")) {
 				try {
-					WebClient.create("https://" + url)
+					WebClient.create("https://" + url.trim())
 							.get()
 							.retrieve()
 							.bodyToMono(String.class).block();
@@ -166,7 +166,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 			} else
 				url = url.trim();
 		}
-		return url;
+		return url.toLowerCase();
 	}
 
 	private String prepare(String s) {
