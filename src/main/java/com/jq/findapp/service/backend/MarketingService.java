@@ -260,12 +260,12 @@ public class MarketingService {
 								final String date = df.format(list.get(i).get("contactMarketing.modifiedAt"));
 								if (!htmls.containsKey(client.getId()))
 									htmls.put(client.getId(), createHtmlTemplate(client));
+								final String s = text.replace("{date}", date).replace("{location}", location.getName());
 								notificationService.sendEmail(client, null, "mani.afschar@jq-consulting.de", // location.getEmail(),
 										subject,
-										text.replace("{url}", url).replace("{date}", date).replace("{location}",
-												location.getName()),
+										s.replace("{url}", url),
 										htmls.get(client.getId()).replace("<jq:text />",
-												text.replace("\n", "<br/>").replace("{url}",
+												s.replace("\n", "<br/>").replace("{url}",
 														"<a href=\"" + url + "\">" + client.getUrl() + "</a>")));
 								break;
 							}
