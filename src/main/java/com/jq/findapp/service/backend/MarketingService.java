@@ -268,7 +268,6 @@ public class MarketingService {
 										htmls.get(client.getId()).replace("<jq:text />",
 												s.replace("\n", "<br/>").replace("{url}",
 														"<a href=\"" + url + "\">" + client.getUrl() + "</a>")));
-								break;
 							}
 						}
 					}
