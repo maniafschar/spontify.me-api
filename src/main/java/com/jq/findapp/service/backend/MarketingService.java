@@ -211,6 +211,19 @@ public class MarketingService {
 		}
 	}
 
+	public SchedulerResult runUnfinished() {
+		final QueryParams params = new QueryParams(Query.contact_listMarketing);
+		params.setSearch("contactMarketing.finished=false and contactMarketing.createdAt>cast('"
+				+ Instant.now().minus(Duration.ofDays(14)).toString() + "' as timestamp)");
+		final long end = Instant.now().plus(Duration.ofDays(1)).toEpochMillis();
+		for (int i = 0; i < list.size(); i++) {
+			final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, (BigInteger) list.get(i).get("contactMarketing.clientMarketingId"));
+			if (clientMarketing.getEndDate().getTime() > end) {
+				// TODO send email
+			}
+		}
+	}
+
 	public SchedulerResult runSportbars() {
 		return locationMarketing(new BigInteger("180"),
 				"location.skills like '%x.1%'", 5,
