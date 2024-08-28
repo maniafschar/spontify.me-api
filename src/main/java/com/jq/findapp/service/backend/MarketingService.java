@@ -261,9 +261,8 @@ public class MarketingService {
 								if (!htmls.containsKey(client.getId()))
 									htmls.put(client.getId(), createHtmlTemplate(client));
 								final String s = text.replace("{date}", date).replace("{location}", location.getName());
-								notificationService.sendEmail(client, null, "mani.afschar@jq-consulting.de", // location.getEmail(),
-										subject,
-										s.replace("{url}", url),
+								notificationService.sendEmail(client, null, location.getEmail(),
+										subject, s.replace("{url}", url),
 										htmls.get(client.getId()).replace("<jq:text />",
 												s.replace("\n", "<br/>").replace("{url}",
 														"<a href=\"" + url + "\">" + client.getUrl() + "</a>")));
