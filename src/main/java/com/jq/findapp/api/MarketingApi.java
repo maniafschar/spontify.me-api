@@ -145,7 +145,7 @@ public class MarketingApi {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
 		if (clientMarketing != null && clientId.equals(clientMarketing.getClientId())) {
 			if (clientMarketing.getEndDate() != null
-					&& clientMarketing.getEndDate().getTime() < Instant.now().getEpochSecond() * 1000) {
+					&& clientMarketing.getEndDate().getTime() < Instant.now().toEpochMilli()) {
 				final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 				params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketing.getId());
 				return repository.one(params);
@@ -170,14 +170,14 @@ public class MarketingApi {
 				result.put("_url", location.getUrl());
 			}
 			if ((locationId == null || !((String) result.get("clientMarketing.storage")).contains("locationMarketing"))
-					&& !finished(result, clientId, user, clientMarketingId, ip))
+					&& !finished(result, clientId, user, clientMarketingId, ip, locationId))
 				return result;
 		}
 		return null;
 	}
 
 	private boolean finished(final Map<String, Object> result, final BigInteger clientId,
-			final BigInteger user, final BigInteger clientMarketingId, final String ip) {
+			final BigInteger user, final BigInteger clientMarketingId, final String ip, final BigInteger locationId) {
 		if (user == null) {
 			final QueryParams params = new QueryParams(Query.misc_listLog);
 			params.setSearch("log.ip='" + IpService.sanatizeIp(ip)
@@ -198,6 +198,16 @@ public class MarketingApi {
 				final Result list2 = repository.list(params);
 				if (list2.size() > 0)
 					result.put("_answer", list2.get(0));
+			}
+			if (!result.contains("_answer") && locationId != null) {
+				params.setSearch("contactMarketing.finished=false and contactMarketing.clientMarketingId=" + clientMarketingId);
+				final Result list2 = repository.list(params);
+				for (int i = 0; i < list2.size(); i++) {
+					if (list2.get(i).get("contactMarketing.storage").contains("\"locationId\":\"" + locationId + "\"")) {
+						result.put("_answer", list2.get(i));
+						break;
+					}
+				}
 			}
 		} else {
 			final QueryParams params = new QueryParams(Query.contact_listMarketing);
