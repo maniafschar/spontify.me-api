@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -212,16 +213,59 @@ public class MarketingService {
 	}
 
 	public SchedulerResult runUnfinished() {
+		final SchedulerResult result = new SchedulerResult();
+		final String subject = "Sky Sport Events: Vervollständigung Deiner Location Daten...";
+		final String text = "Lieber Sky Sportsbar Kunde,\n\n"
+				+ "lieben Dank für das Update Deiner Location {location} vom {date}.\n\n"
+				+ "Deine Daten sind noch nicht ganz vollständig, deshalb sind die eingegebenen Daten auch noch nicht in der App sichtbar. Hier kannst Du die Daten vervollständigen:\n\n"
+				+ "{url}\n\n"
+				+ "Viele Grüße\n"
+				+ "Mani Afschar Yazdi\n"
+				+ "Geschäftsführer\n"
+				+ "JNet Quality Consulting GmbH\n"
+				+ "0172 6379434";
+		final SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 		final QueryParams params = new QueryParams(Query.contact_listMarketing);
 		params.setSearch("contactMarketing.finished=false and contactMarketing.createdAt>cast('"
 				+ Instant.now().minus(Duration.ofDays(14)).toString() + "' as timestamp)");
-		final long end = Instant.now().plus(Duration.ofDays(1)).toEpochMillis();
-		for (int i = 0; i < list.size(); i++) {
-			final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, (BigInteger) list.get(i).get("contactMarketing.clientMarketingId"));
-			if (clientMarketing.getEndDate().getTime() > end) {
-				// TODO send email
+		try {
+			final Result list = repository.list(params);
+			final long end = Instant.now().plus(Duration.ofDays(1)).toEpochMillis();
+			final ObjectMapper om = new ObjectMapper();
+			params.setQuery(Query.misc_listTicket);
+			for (int i = 0; i < list.size(); i++) {
+				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, (BigInteger) list.get(i).get("contactMarketing.clientMarketingId"));
+				if (clientMarketing.getEndDate().getTime() > end) {
+					final JsonNode answer = om.readTree((String) list.get(i).get("contactMarketing.storage"));
+					if (answer.has("locationId")) {
+						final Location location = repository.one(Location.class, new BigInteger(answer.get("locationId").asText()));
+						if (!Strings.isEmpty(location.getSecret())) {
+							params.setSearch("ticket.type='EMAIL' and ticket.subject='" + location.getEmail() + "'");
+							final Result emails = repository.list(params);
+							boolean sent = false;
+							for (int i2 = 0; i2 < emails.size(); i2++) {
+								if (((String) emails.get(i2).get("ticket.note")).startsWith(subject)) {
+									sent = true;
+									break;
+								}
+							}
+							if (!sent) {
+								final String url = repository.one(Client.class, clientMarketing.getClientId()).getUrl() + "/?m=" + clientMarketing.getId() + "&i="
+										+ location.getId() + "&h=" + location.getSecret().hashCode();
+								final String date = df.format(list.get(i).get("contactMarketing.modifiedAt"));
+								notificationService.sendEmail(client, null, location.getEmail(),
+										subject, text.replace("{url}", url).replace("{date}", date).replace("{location}", location.getName()),
+										html.replace("<jq:text />", text.replace("\n", "<br/>").replace("{url}",
+												"<a href=\"" + url + "\">" + client.getUrl() + "</a>")));
+							}
+						}
+					}
+				}
 			}
+		} catch (Exception ex) {
+			result.exception = ex;
 		}
+		return result;
 	}
 
 	public SchedulerResult runSportbars() {
