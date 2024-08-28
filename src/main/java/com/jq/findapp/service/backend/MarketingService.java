@@ -237,6 +237,7 @@ public class MarketingService {
 			final long end = Instant.now().plus(Duration.ofDays(1)).toEpochMilli();
 			final ObjectMapper om = new ObjectMapper();
 			params.setQuery(Query.misc_listTicket);
+			int count = 0;
 			for (int i = 0; i < list.size(); i++) {
 				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 						(BigInteger) list.get(i).get("contactMarketing.clientMarketingId"));
@@ -268,11 +269,14 @@ public class MarketingService {
 										htmls.get(client.getId()).replace("<jq:text />",
 												s.replace("\n", "<br/>").replace("{url}",
 														"<a href=\"" + url + "\">" + client.getUrl() + "</a>")));
+								count++;
 							}
 						}
 					}
 				}
 			}
+			if (count > 0)
+				result.body = count + " sent";
 		} catch (Exception ex) {
 			result.exception = ex;
 		}
