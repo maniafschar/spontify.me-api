@@ -29,7 +29,6 @@ import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientNews;
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.Log;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -91,26 +90,6 @@ public class DbService {
 			statistics(BigInteger.valueOf(4l));
 		} catch (final Exception e) {
 			result.exception = e;
-		}
-		return result;
-	}
-
-	public SchedulerResult runLogFix() {
-		final SchedulerResult result = new SchedulerResult();
-		final QueryParams params = new QueryParams(Query.misc_listLog);
-		params.setSearch("log.clientId is null and log.uri like '/marketing/news/%' and log.uri not like '%.%'");
-		final Result list = repository.list(params);
-		try {
-			for (int i = 0; i < list.size(); i++) {
-				final Log log = repository.one(Log.class, (BigInteger) list.get(i).get("log.id"));
-				final ClientNews clientNews = repository.one(ClientNews.class,
-						new BigInteger(log.getUri().substring(log.getUri().lastIndexOf('/') + 1)));
-				log.setClientId(clientNews.getClientId());
-				repository.save(log);
-				result.body += " " + log.getId();
-			}
-		} catch (Exception ex) {
-			result.exception = ex;
 		}
 		return result;
 	}

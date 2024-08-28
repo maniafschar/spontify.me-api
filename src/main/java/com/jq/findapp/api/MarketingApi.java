@@ -199,11 +199,13 @@ public class MarketingApi {
 				if (list2.size() > 0)
 					result.put("_answer", list2.get(0));
 			}
-			if (!result.contains("_answer") && locationId != null) {
-				params.setSearch("contactMarketing.finished=false and contactMarketing.clientMarketingId=" + clientMarketingId);
+			if (!result.containsKey("_answer") && locationId != null) {
+				params.setSearch(
+						"contactMarketing.finished=false and contactMarketing.clientMarketingId=" + clientMarketingId);
 				final Result list2 = repository.list(params);
 				for (int i = 0; i < list2.size(); i++) {
-					if (list2.get(i).get("contactMarketing.storage").contains("\"locationId\":\"" + locationId + "\"")) {
+					if (((String) list2.get(i).get("contactMarketing.storage"))
+							.contains("\"locationId\":\"" + locationId + "\"")) {
 						result.put("_answer", list2.get(i));
 						break;
 					}

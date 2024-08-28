@@ -6,6 +6,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -225,20 +226,23 @@ public class MarketingService {
 				+ "JNet Quality Consulting GmbH\n"
 				+ "0172 6379434";
 		final SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+		final Map<BigInteger, String> htmls = new HashMap<>();
 		final QueryParams params = new QueryParams(Query.contact_listMarketing);
 		params.setSearch("contactMarketing.finished=false and contactMarketing.createdAt>cast('"
 				+ Instant.now().minus(Duration.ofDays(14)).toString() + "' as timestamp)");
 		try {
 			final Result list = repository.list(params);
-			final long end = Instant.now().plus(Duration.ofDays(1)).toEpochMillis();
+			final long end = Instant.now().plus(Duration.ofDays(1)).toEpochMilli();
 			final ObjectMapper om = new ObjectMapper();
 			params.setQuery(Query.misc_listTicket);
 			for (int i = 0; i < list.size(); i++) {
-				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, (BigInteger) list.get(i).get("contactMarketing.clientMarketingId"));
+				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
+						(BigInteger) list.get(i).get("contactMarketing.clientMarketingId"));
 				if (clientMarketing.getEndDate().getTime() > end) {
 					final JsonNode answer = om.readTree((String) list.get(i).get("contactMarketing.storage"));
 					if (answer.has("locationId")) {
-						final Location location = repository.one(Location.class, new BigInteger(answer.get("locationId").asText()));
+						final Location location = repository.one(Location.class,
+								new BigInteger(answer.get("locationId").asText()));
 						if (!Strings.isEmpty(location.getSecret())) {
 							params.setSearch("ticket.type='EMAIL' and ticket.subject='" + location.getEmail() + "'");
 							final Result emails = repository.list(params);
@@ -250,13 +254,20 @@ public class MarketingService {
 								}
 							}
 							if (!sent) {
-								final String url = repository.one(Client.class, clientMarketing.getClientId()).getUrl() + "/?m=" + clientMarketing.getId() + "&i="
+								final Client client = repository.one(Client.class, clientMarketing.getClientId());
+								final String url = client.getUrl() + "/?m=" + clientMarketing.getId() + "&i="
 										+ location.getId() + "&h=" + location.getSecret().hashCode();
 								final String date = df.format(list.get(i).get("contactMarketing.modifiedAt"));
-								notificationService.sendEmail(client, null, location.getEmail(),
-										subject, text.replace("{url}", url).replace("{date}", date).replace("{location}", location.getName()),
-										html.replace("<jq:text />", text.replace("\n", "<br/>").replace("{url}",
-												"<a href=\"" + url + "\">" + client.getUrl() + "</a>")));
+								if (!htmls.containsKey(client.getId()))
+									htmls.put(client.getId(), createHtmlTemplate(client));
+								notificationService.sendEmail(client, null, "mani.afschar@jq-consulting.de", // location.getEmail(),
+										subject,
+										text.replace("{url}", url).replace("{date}", date).replace("{location}",
+												location.getName()),
+										htmls.get(client.getId()).replace("<jq:text />",
+												text.replace("\n", "<br/>").replace("{url}",
+														"<a href=\"" + url + "\">" + client.getUrl() + "</a>")));
+								break;
 							}
 						}
 					}
@@ -425,9 +436,7 @@ public class MarketingService {
 						if (!Strings.isEmpty(s)) {
 							if (poll.questions.get(i).id != null && poll.questions.get(i).id.startsWith("skills")) {
 								s = (Strings.isEmpty(location.getSkills()) ? "" : location.getSkills() + "|")
-										+ s.replace("|0", "");
-								if (s.length() > 0)
-									s = s.substring(1);
+										+ s.replace("|0", "").substring(1);
 								location.setSkills(s);
 							} else if ("cards".equals(poll.questions.get(i).id) && !"|0".equals(s)) {
 								result += "<li>Marketing-Material senden wir Dir an die Adresse Deiner Location.</li>";
