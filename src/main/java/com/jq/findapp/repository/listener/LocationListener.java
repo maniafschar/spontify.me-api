@@ -165,8 +165,9 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 				}
 			} else
 				url = url.trim();
+			return url.toLowerCase();
 		}
-		return url.toLowerCase();
+		return null;
 	}
 
 	private String prepare(String s) {
