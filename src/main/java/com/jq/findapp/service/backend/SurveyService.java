@@ -710,6 +710,18 @@ public class SurveyService {
 				.format(DateTimeFormatter.ofPattern(format == null ? "d.M.yyyy' um 'H:mm' Uhr'" : format));
 	}
 
+	public static List<FutureEvent> futureEvents(final int teamId) throws Exception {
+		final List<FutureEvent> events = new ArrayList<>();
+		final JsonNode json = get("team=" + teamId + "&season=" + currentSeason());
+		for (int i = 0; i < json.size(); i++) {
+			if ("NS".equals(json.get(i).get("fixture").get("status").get("short").asText()))
+				event.add(new FutureEvent(json.get(i).get("fixture").get("timestamp").asLong()),
+					json.get(i).get("teams").get("home").get("name") + " : " + json.get(i).get("teams").get("away").get("name"),
+					json.get(i).get("teams").get("home").get("id").asInt() == teamId);
+		}
+		return events;
+	}
+
 	protected JsonNode get(final String url) throws Exception {
 		JsonNode fixture = null;
 		final String label = STORAGE_PREFIX + url;
@@ -780,5 +792,17 @@ public class SurveyService {
 			}
 		}
 		return fixture;
+	}
+
+	public static class FutureEvent {
+		public final long time;
+		public final boolean home;
+		public final String subject;
+
+		private FutureEvent(final long time, final String subject, final boolean home) {
+			this.time = time;
+			this.subject = subject;
+			this.home = home;
+		}
 	}
 }
