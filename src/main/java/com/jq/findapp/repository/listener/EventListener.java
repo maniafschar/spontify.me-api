@@ -21,6 +21,8 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.service.EventService;
+import com.jq.findapp.service.backend.SurveyService;
+import com.jq.findapp.service.backend.SurveyService.FutureEvent;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text.TextId;
 
@@ -133,7 +135,18 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 		}
 	}
 
-	public static void updateSeries(final Event event, final List<FutureEvent> futureEvents) {
-		
+	public static void updateSeries(final Event event) {
+		if (!String.isEmpty(event.getSkills()) && event.getSkills().contains("X")) {
+			for (String skill : event.getSkills().split("\\|")) {
+				if (skill.startsWith("9.")) {
+					final List<FutureEvent> futureEvents = SurveyService.futureEvents(Integer.valueOf(skill.substring(2)));
+					for (FutureEvent futureEvent : futureEvents)
+						updateFutureEvent(event, futureEvent);
+				}
+			}
+		}
+	}
+
+	private static void updateFutureEvent(final Event event, FutureEvent futureEvent) {
 	}
 }
