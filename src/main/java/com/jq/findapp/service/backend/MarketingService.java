@@ -260,7 +260,9 @@ public class MarketingService {
 								final Client client = repository.one(Client.class, clientMarketing.getClientId());
 								final String url = client.getUrl() + "/?m=" + clientMarketing.getId() + "&i="
 										+ location.getId() + "&h=" + location.getSecret().hashCode();
-								final String date = df.format(list.get(i).get("contactMarketing.modifiedAt"));
+								final String date = df.format(list.get(i).get("contactMarketing.modifiedAt") == null
+										? list.get(i).get("contactMarketing.createdAt")
+										: list.get(i).get("contactMarketing.modifiedAt"));
 								if (!htmls.containsKey(client.getId()))
 									htmls.put(client.getId(), createHtmlTemplate(client));
 								final String s = text.replace("{date}", date).replace("{location}", location.getName());
