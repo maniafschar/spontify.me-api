@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,6 +31,9 @@ import com.jq.findapp.util.Text.TextId;
 public class EventListener extends AbstractRepositoryListener<Event> {
 	@Autowired
 	private EventService eventService;
+
+	@Autowired
+	private SurveyService surveyService;
 
 	@Override
 	public void prePersist(final Event event) throws Exception {
@@ -135,11 +139,12 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 		}
 	}
 
-	public static void updateSeries(final Event event) {
-		if (!String.isEmpty(event.getSkills()) && event.getSkills().contains("X")) {
+	public void updateSeries(final Event event) throws Exception {
+		if (!Strings.isEmpty(event.getSkills()) && event.getSkills().contains("X")) {
 			for (String skill : event.getSkills().split("\\|")) {
 				if (skill.startsWith("9.")) {
-					final List<FutureEvent> futureEvents = SurveyService.futureEvents(Integer.valueOf(skill.substring(2)));
+					final List<FutureEvent> futureEvents = surveyService
+							.futureEvents(Integer.valueOf(skill.substring(2)));
 					for (FutureEvent futureEvent : futureEvents)
 						updateFutureEvent(event, futureEvent);
 				}
@@ -148,7 +153,5 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	}
 
 	private static void updateFutureEvent(final Event event, FutureEvent futureEvent) {
-		if (futureEvent.home) {
-		}
 	}
 }
