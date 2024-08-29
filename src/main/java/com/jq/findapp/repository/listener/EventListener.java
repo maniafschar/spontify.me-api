@@ -133,7 +133,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 		}
 	}
 
-	public static void updateSeries(final String skill, List<FutureEvent> eutureEvents) {
+	public static void updateSeries(final Event event, final List<FutureEvent> futureEvents) {
 		
 	}
 
