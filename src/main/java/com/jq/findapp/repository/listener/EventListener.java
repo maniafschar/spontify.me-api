@@ -148,5 +148,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	}
 
 	private static void updateFutureEvent(final Event event, FutureEvent futureEvent) {
+		if (futureEvent.home) {
+		}
 	}
 }
