@@ -21,15 +21,15 @@ public class ImageTest {
 
 	@Test
 	public void createFanclub() throws Exception {
-		create("fanclub", "Wer schaut denn gerne alleine?", 1, Color.BLACK);
+		create("fanclub", "Fanclub", "Wer schaut denn gerne alleine?", 1, Color.BLACK);
 	}
 
 	@Test
 	public void createAfterwork() throws Exception {
-		create("afterwork", "Wer geht denn alleine in den Feierabend?", 1, Color.WHITE);
+		create("afterwork", "Afterwork", "Wer geht denn alleine in den Feierabend?", 1, Color.WHITE);
 	}
 
-	private void create(String prefix, String claim, int no, Color textColor) throws Exception {
+	private void create(String prefix, String appName, String claim, int no, Color textColor) throws Exception {
 		prefix = "/image/marketing/" + prefix + "/";
 		final int width = 5568, height = 3712;
 		final BufferedImage output = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -39,11 +39,10 @@ public class ImageTest {
 		g2.drawImage(image, 0, 0, width, height, 0, 0, image.getWidth(),
 				image.getHeight(), null);
 		image = ImageIO.read(getClass().getResourceAsStream(prefix + "qr" + no + ".png"));
-		g2.drawImage(image, width - (int) (0.8 * image.getWidth()) - 50, height - (int) (0.8 * image.getHeight()) - 50,
-				width - 50, height - 50, 0, 0, image.getWidth(), image.getHeight(), null);
+		final int size = (int) (0.4 * height);
+		g2.drawImage(image, width - size - 50, height - size - 50, width - 50, height - 50, 0, 0, image.getWidth(), image.getHeight(), null);
 		image = ImageIO.read(getClass().getResourceAsStream(prefix + "logo.png"));
-		g2.drawImage(image, 50, height - 100 - (int) (3 * image.getHeight()), 50 + (int) (3 * image.getWidth()),
-				height - 100, 0, 0,
+		g2.drawImage(image, 50, height - 100 - size, 50 + size, height - 100, 0, 0,
 				image.getWidth(), image.getHeight(), null);
 		final Font font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"))
 				.deriveFont(325f);
@@ -52,6 +51,7 @@ public class ImageTest {
 		g2.setFont(font);
 		g2.drawString(claim, (width - g2.getFontMetrics().stringWidth(claim)) / 2,
 				50 + g2.getFontMetrics().getHeight());
+		g2.drawString(appName, 50 + (size - g2.getFontMetrics().stringWidth(appName)) / 2, height - 50 - g2.getFontMetrics().getHeight());
 		output.flush();
 		ImageIO.write(output, "png", new FileOutputStream("test.png"));
 	}
