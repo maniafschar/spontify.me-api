@@ -136,9 +136,4 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	public static void updateSeries(final Event event, final List<FutureEvent> futureEvents) {
 		
 	}
-
-	public static class FutureEvent {
-		public Timestamp time;
-		public String subject;
-	}
 }
