@@ -132,4 +132,13 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 			repository.delete(eventParticipate);
 		}
 	}
+
+	public static void updateSeries(final String skill, List<FutureEvent> eutureEvents) {
+		
+	}
+
+	public static class FutureEvent {
+		public Timestamp time;
+		public String subject;
+	}
 }
