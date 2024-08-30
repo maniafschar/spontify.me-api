@@ -322,7 +322,7 @@ public class MarketingService {
 									+ (Strings.isEmpty(poll.locationSearch) ? "" : " and " + poll.locationSearch));
 					final Result locations = repository.list(params);
 					params.setQuery(Query.misc_listTicket);
-					int count = 0, countSent = 0;
+					int count = 0;
 					for (int i2 = 0; i2 < locations.size(); i2++) {
 						final Location location = repository.one(Location.class,
 								(BigInteger) locations.get(i2).get("location.id"));
@@ -338,7 +338,6 @@ public class MarketingService {
 						for (int i3 = 0; i3 < emails.size(); i3++) {
 							if (((String) emails.get(i3).get("ticket.note")).startsWith(subject)) {
 								sent = true;
-								countSent++;
 								break;
 							}
 						}
@@ -367,8 +366,7 @@ public class MarketingService {
 								break;
 						}
 					}
-					result.body += clientMarketing.getId() + ": " + count + " - " + locations.size() + " - " + countSent
-							+ "\n";
+					result.body += clientMarketing.getId() + ": " + count + "\n";
 				}
 			}
 
