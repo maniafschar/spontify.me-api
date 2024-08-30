@@ -240,8 +240,7 @@ public class MarketingService {
 					int count = 0;
 					final JsonNode answer = om.readTree((String) list.get(i).get("contactMarketing.storage"));
 					if (answer.has("locationId")) {
-						final JsonNode json = om.readTree((String) list.get(i).get("clientMarketing.storage"));
-						final String prefix = json.has("locationPrefix") ? json.get("locationPrefix").asText() : null;
+						final Poll poll = om.readValue((String) list.get(i).get("clientMarketing.storage"), Poll.class);
 						final Location location = repository.one(Location.class,
 								new BigInteger(answer.get("locationId").asText()));
 						if (!Strings.isEmpty(location.getSecret())) {
@@ -252,7 +251,7 @@ public class MarketingService {
 							contact.setLanguage("DE");
 							contact.setClientId(clientMarketing.getClientId());
 							final String subject = text.getText(contact,
-									TextId.valueOf("marketing_" + prefix + "SubjectPrefix"))
+									TextId.valueOf("marketing_" + poll.locationPrefix + "SubjectPrefix"))
 									+ "Vervollständigung Deiner Location Daten...";
 							for (int i2 = 0; i2 < emails.size(); i2++) {
 								if (((String) emails.get(i2).get("ticket.note")).startsWith(subject)) {
@@ -270,9 +269,11 @@ public class MarketingService {
 								if (!htmls.containsKey(client.getId()))
 									htmls.put(client.getId(), createHtmlTemplate(client));
 								final String s = text
-										.getText(contact, TextId.valueOf("marketing_" + prefix + "TextUnfinished"))
+										.getText(contact,
+												TextId.valueOf("marketing_" + poll.locationPrefix + "TextUnfinished"))
 										.replace("{date}", date).replace("{location}", location.getName())
-										+ text.getText(contact, TextId.valueOf("marketing_" + prefix + "Postfix"));
+										+ text.getText(contact,
+												TextId.valueOf("marketing_" + poll.locationPrefix + "Postfix"));
 								notificationService.sendEmail(client, null, location.getEmail(),
 										subject, s.replace("{url}", url),
 										htmls.get(client.getId()).replace("<jq:text />",
@@ -303,9 +304,8 @@ public class MarketingService {
 			final Result list = repository.list(params);
 			params.setQuery(Query.location_listId);
 			for (int i = 0; i < list.size(); i++) {
-				final JsonNode json = om.readTree((String) list.get(i).get("clientMarketing.storage"));
-				final String prefix = json.has("locationPrefix") ? json.get("locationPrefix").asText() : null;
-				if (!Strings.isEmpty(prefix)) {
+				final Poll poll = om.readValue((String) list.get(i).get("clientMarketing.storage"), Poll.class);
+				if (!Strings.isEmpty(poll.locationPrefix)) {
 					final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 							(BigInteger) list.get(i).get("clientMarketing.id"));
 					final Client client = repository.one(Client.class, clientMarketing.getClientId());
@@ -313,8 +313,7 @@ public class MarketingService {
 					params.setSearch(
 							"location.email like '%@%' and (length(location.marketingMail)=0 or cast(REGEXP_LIKE('"
 									+ clientMarketing.getId() + "',location.marketingMail) as integer)=0)"
-									+ (json.has("locationSearch") ? " and " + json.get("locationSearch").asText()
-											: ""));
+									+ (Strings.isEmpty(poll.locationSearch) ? "" : " and " + poll.locationSearch));
 					final Result locations = repository.list(params);
 					params.setQuery(Query.misc_listTicket);
 					int count = 0;
@@ -328,7 +327,7 @@ public class MarketingService {
 						contact.setLanguage("DE");
 						contact.setClientId(clientMarketing.getClientId());
 						final String subject = text.getText(contact,
-								TextId.valueOf("marketing_" + prefix + "SubjectPrefix"))
+								TextId.valueOf("marketing_" + poll.locationPrefix + "SubjectPrefix"))
 								+ "möchtest Du mehr Gäste?";
 						for (int i3 = 0; i3 < emails.size(); i3++) {
 							if (((String) emails.get(i3).get("ticket.note")).startsWith(subject)) {
@@ -343,8 +342,10 @@ public class MarketingService {
 							}
 							final String url = client.getUrl() + "/?m=" + clientMarketing.getId() + "&i="
 									+ location.getId() + "&h=" + location.getSecret().hashCode();
-							final String body = text.getText(contact, TextId.valueOf("marketing_" + prefix + "Text"))
-									+ text.getText(contact, TextId.valueOf("marketing_" + prefix + "Postfix"));
+							final String body = text.getText(contact,
+									TextId.valueOf("marketing_" + poll.locationPrefix + "Text"))
+									+ text.getText(contact,
+											TextId.valueOf("marketing_" + poll.locationPrefix + "Postfix"));
 							notificationService.sendEmail(client, null, location.getEmail(),
 									subject, body.replace("{url}", url),
 									html.replace("<jq:text />",
