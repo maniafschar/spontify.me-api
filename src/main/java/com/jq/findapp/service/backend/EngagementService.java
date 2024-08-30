@@ -277,13 +277,13 @@ public class EngagementService {
 			params.setSearch("storage.label='registration-reminder'");
 			final Map<String, Object> history = repository.list(params).get(0);
 			@SuppressWarnings("unchecked")
-			final Map<BigInteger, Long> sent = new ObjectMapper()
+			final Map<String, String> sent = new ObjectMapper()
 					.readValue((String) history.get("storage.storage"), Map.class);
 			for (int i = 0; i < list.size(); i++) {
 				final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
-				if (timeToSendNewRegistrationReminder(sent.get(to.getId()), to)) {
+				if (timeToSendNewRegistrationReminder(sent.get("" + to.getId()), to)) {
 					authenticationService.recoverSendEmailReminder(to);
-					sent.put(to.getId(), System.currentTimeMillis());
+					sent.put("" + to.getId(), "" + System.currentTimeMillis());
 					count++;
 				}
 			}
@@ -297,7 +297,7 @@ public class EngagementService {
 		return result;
 	}
 
-	boolean timeToSendNewRegistrationReminder(final Long last, final Contact contact) {
+	boolean timeToSendNewRegistrationReminder(final String last, final Contact contact) {
 		if (last == null)
 			return true;
 		final List<Integer> weeks = Arrays.asList(1, 4, 12, 26);
@@ -307,7 +307,7 @@ public class EngagementService {
 			final Instant createdAtPlusDays = Instant.ofEpochMilli(contact.getCreatedAt().getTime())
 					.plus(Duration.ofDays(days));
 			if (createdAtPlusDays.isBefore(Instant.now()))
-				return Instant.ofEpochMilli(last).isBefore(createdAtPlusDays);
+				return Instant.ofEpochMilli(Long.valueOf(last)).isBefore(createdAtPlusDays);
 		}
 		return false;
 	}

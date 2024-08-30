@@ -94,7 +94,7 @@ public class EngagementServiceTest {
 		// when
 		final boolean send = engagementService.timeToSendNewRegistrationReminder(
 				lastReminderDays < 0 ? null
-						: Instant.ofEpochMilli(contact.getCreatedAt().getTime())
+						: "" + Instant.ofEpochMilli(contact.getCreatedAt().getTime())
 								.plus(Duration.ofDays(lastReminderDays)).plus(Duration.ofHours(1)).toEpochMilli(),
 				contact);
 
