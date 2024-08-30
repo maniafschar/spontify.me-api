@@ -235,6 +235,7 @@ public class MarketingService {
 			final Result list = repository.list(params);
 			final long end = Instant.now().plus(Duration.ofDays(1)).toEpochMilli();
 			final ObjectMapper om = new ObjectMapper();
+			om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			params.setQuery(Query.misc_listTicket);
 			for (int i = 0; i < list.size(); i++) {
 				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
@@ -301,6 +302,7 @@ public class MarketingService {
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
 		params.setLimit(0);
 		final ObjectMapper om = new ObjectMapper();
+		om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		try {
 			final String today = Instant.now().toString().substring(0, 19);
 			params.setSearch("clientMarketing.startDate<=cast('" + today
