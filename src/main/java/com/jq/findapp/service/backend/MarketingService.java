@@ -213,7 +213,7 @@ public class MarketingService {
 		}
 	}
 
-	public SchedulerResult runResult() {
+	public SchedulerResult runMarketingSent() {
 		final SchedulerResult result = new SchedulerResult();
 		final String text = "Lieber Sky Sportsbar Kunde,\n\n"
 				+ "lieben Dank für Dein Feedback vom {date}, haben wir Dir soeben die Marketing-Aufkleber zugesendet. Weitere Schritte, um die besten Fans Deiner Region bei Dir feiern zu lassen:\n"
@@ -221,7 +221,7 @@ public class MarketingService {
 				+ "<li>erstelle auch Events außerhalb von Spielen, z.B. Stammtische am Montag zum Nachtarock des Bundesligawochenendes, vielleicht sogar mit einem Happy Hour Getränk oder ähnliches</li>"
 				+ "<li>alle Veranstalltungen können mit einem zusätzlichen Klick automatisch auf unseren Social Media Seiten veröffentlicht werden, so dass noch mehr Leute außerhalb unserer Community davon erfahen</li>"
 				+ "<li>platziere den einen oder anderen Aufkleber prominent in Deiner Location</li></ul>"
-				+ "Wir helfen Dir gerne bei der Einrichtung.\n"
+				+ "{createUser}Wir helfen Dir gerne bei der Einrichtung.\n"
 				+ "Liebe Grüße";
 // Lieber Sky Sportsbar Kunde,
 // lieben Dank für Dein Feedback vom 29.8.2024, wie gewünscht senden wir Dir die Marketing-Aufkleber zu. Weitere Schritte, um die besten Fans Deiner Region bei Dir feiern zu lassen, natürlich alles kostenlos:
