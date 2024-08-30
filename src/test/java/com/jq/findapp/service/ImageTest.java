@@ -21,7 +21,7 @@ public class ImageTest {
 
 	@Test
 	public void createFanclub() throws Exception {
-		create("fanclub", "Fanclub", "Wer schaut denn gerne alleine?", 1, Color.BLACK);
+		create("fanclub", "Fanclub", "Auch kein Bock allein zu schauen?", 1, Color.BLACK);
 	}
 
 	@Test
@@ -39,19 +39,35 @@ public class ImageTest {
 		g2.drawImage(image, 0, 0, width, height, 0, 0, image.getWidth(),
 				image.getHeight(), null);
 		image = ImageIO.read(getClass().getResourceAsStream(prefix + "qr" + no + ".png"));
-		final int size = (int) (0.4 * height);
-		g2.drawImage(image, width - size - 50, height - size - 50, width - 50, height - 50, 0, 0, image.getWidth(), image.getHeight(), null);
+		final int size = (int) (0.4 * height), padding = 50, extraPaddingLogo = 20;
+		final double logoFactor = 0.8;
+		g2.drawImage(image,
+				width - size - padding,
+				height - size - padding,
+				width - padding,
+				height - padding, 0, 0,
+				image.getWidth(), image.getHeight(), null);
 		image = ImageIO.read(getClass().getResourceAsStream(prefix + "logo.png"));
-		g2.drawImage(image, 50, height - 100 - size, 50 + size, height - 100, 0, 0,
+		g2.drawImage(image,
+				padding,
+				height - size - padding + extraPaddingLogo,
+				padding + (int) (size * logoFactor),
+				height - padding - (int) (size * (1 - logoFactor)) + extraPaddingLogo, 0, 0,
 				image.getWidth(), image.getHeight(), null);
 		final Font font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"))
-				.deriveFont(325f);
+				.deriveFont(225f);
 		GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(font);
-		g2.setColor(textColor);
 		g2.setFont(font);
+		g2.setColor(new Color(0, 0, 0, 75));
+		final int textPadding = 10;
+		g2.drawString(claim, (width - g2.getFontMetrics().stringWidth(claim)) / 2 + textPadding,
+				padding + g2.getFontMetrics().getHeight() + textPadding);
+		g2.setColor(Color.yellow);
 		g2.drawString(claim, (width - g2.getFontMetrics().stringWidth(claim)) / 2,
-				50 + g2.getFontMetrics().getHeight());
-		g2.drawString(appName, 50 + (size - g2.getFontMetrics().stringWidth(appName)) / 2, height - 50 - g2.getFontMetrics().getHeight());
+				padding + g2.getFontMetrics().getHeight());
+		g2.setColor(textColor);
+		g2.drawString(appName, padding + ((int) (size * logoFactor) - g2.getFontMetrics().stringWidth(appName)) / 2,
+				height - g2.getFontMetrics().getHeight() + padding * 2 + extraPaddingLogo);
 		output.flush();
 		ImageIO.write(output, "png", new FileOutputStream("test.png"));
 	}
