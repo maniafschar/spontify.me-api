@@ -273,15 +273,11 @@ public class EngagementService {
 			params.setLimit(0);
 			final Result list = repository.list(params);
 			int count = 0;
-			params.setQuery(Query.misc_listStorage);
-			params.setSearch("storage.label='registration-reminder'");
-			final Map<String, Object> history = repository.list(params).get(0);
-			@SuppressWarnings("unchecked")
-			final Map<String, String> sent = new ObjectMapper()
-					.readValue((String) history.get("storage.storage"), Map.class);
+			params.setQuery(Query.misc_listTicket);
 			for (int i = 0; i < list.size(); i++) {
 				final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
-				if (timeToSendNewRegistrationReminder(sent.get("" + to.getId()), to)) {
+				params.setSearch("ticket.type='EMAIL' and ticket.subject='" + location.getEmail() + "'");
+				if (timeToSendNewRegistrationReminder(repository.list(params), to)) {
 					authenticationService.recoverSendEmailReminder(to);
 					sent.put("" + to.getId(), "" + System.currentTimeMillis());
 					count++;
@@ -297,8 +293,8 @@ public class EngagementService {
 		return result;
 	}
 
-	boolean timeToSendNewRegistrationReminder(final String last, final Contact contact) {
-		if (last == null)
+	boolean timeToSendNewRegistrationReminder(final Result emails, final Contact contact) {
+		if (emails.size() == 0)
 			return true;
 		final List<Integer> weeks = Arrays.asList(1, 4, 12, 26);
 		for (int i = weeks.size() - 1; i >= 0; i--) {
