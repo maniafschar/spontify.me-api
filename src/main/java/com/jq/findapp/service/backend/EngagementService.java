@@ -297,13 +297,14 @@ public class EngagementService {
 		if (emails.size() == 0)
 			return true;
 		final List<Integer> weeks = Arrays.asList(1, 4, 12, 26);
+		final Instant lastEmail = Instant.ofEpochMilli(((Timestamp) emails.get(0).get("ticket.createdAt")).getTime());
 		for (int i = weeks.size() - 1; i >= 0; i--) {
 			final int w = weeks.get(i);
 			final int days = weeks.stream().filter(e -> e <= w).mapToInt(e -> e).sum() * 7;
 			final Instant createdAtPlusDays = Instant.ofEpochMilli(contact.getCreatedAt().getTime())
 					.plus(Duration.ofDays(days));
 			if (createdAtPlusDays.isBefore(Instant.now()))
-				return Instant.ofEpochMilli(Long.valueOf(last)).isBefore(createdAtPlusDays);
+				return lastEmail.isBefore(createdAtPlusDays);
 		}
 		return false;
 	}
