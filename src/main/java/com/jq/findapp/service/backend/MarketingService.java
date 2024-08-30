@@ -367,7 +367,7 @@ public class MarketingService {
 								break;
 						}
 					}
-					result.body += clientMarketing.getId() + ": " + count + " - " + list.size() + " - " + countSent
+					result.body += clientMarketing.getId() + ": " + count + " - " + locations.size() + " - " + countSent
 							+ "\n";
 				}
 			}
