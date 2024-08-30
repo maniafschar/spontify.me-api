@@ -18,14 +18,12 @@ import java.util.TimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.OS;
 import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.Location;
-import com.jq.findapp.entity.Storage;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -42,9 +40,6 @@ import com.jq.findapp.util.Text.TextId;
 public class EngagementService {
 	@Autowired
 	private Repository repository;
-
-	@Autowired
-	private NotificationService notificationService;
 
 	@Autowired
 	private AuthenticationService authenticationService;
@@ -276,35 +271,32 @@ public class EngagementService {
 			params.setQuery(Query.misc_listTicket);
 			for (int i = 0; i < list.size(); i++) {
 				final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
-				params.setSearch("ticket.type='EMAIL' and ticket.subject='" + location.getEmail() + "'");
-				if (timeToSendNewRegistrationReminder(repository.list(params), to)) {
+				params.setSearch("ticket.type='EMAIL' and ticket.subject='" + to.getEmail() + "'");
+				final Result emails = repository.list(params);
+				if (timeToSendNewRegistrationReminder(
+						emails.size() == 0 ? null : (Timestamp) emails.get(0).get("ticket.createdAt"), to)) {
 					authenticationService.recoverSendEmailReminder(to);
-					sent.put("" + to.getId(), "" + System.currentTimeMillis());
 					count++;
 				}
 			}
 			result.body = "" + count;
-			final Storage storage = repository.one(Storage.class, (BigInteger) history.get("storage.id"));
-			storage.setStorage(new ObjectMapper().writeValueAsString(sent));
-			repository.save(storage);
 		} catch (final Exception e) {
 			result.exception = e;
 		}
 		return result;
 	}
 
-	boolean timeToSendNewRegistrationReminder(final Result emails, final Contact contact) {
-		if (emails.size() == 0)
+	boolean timeToSendNewRegistrationReminder(final Timestamp lastEmail, final Contact contact) {
+		if (lastEmail == null)
 			return true;
 		final List<Integer> weeks = Arrays.asList(1, 4, 12, 26);
-		final Instant lastEmail = Instant.ofEpochMilli(((Timestamp) emails.get(0).get("ticket.createdAt")).getTime());
 		for (int i = weeks.size() - 1; i >= 0; i--) {
 			final int w = weeks.get(i);
 			final int days = weeks.stream().filter(e -> e <= w).mapToInt(e -> e).sum() * 7;
 			final Instant createdAtPlusDays = Instant.ofEpochMilli(contact.getCreatedAt().getTime())
 					.plus(Duration.ofDays(days));
 			if (createdAtPlusDays.isBefore(Instant.now()))
-				return lastEmail.isBefore(createdAtPlusDays);
+				return Instant.ofEpochMilli(lastEmail.getTime()).isBefore(createdAtPlusDays);
 		}
 		return false;
 	}

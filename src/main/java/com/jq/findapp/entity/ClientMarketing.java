@@ -32,6 +32,11 @@ public class ClientMarketing extends BaseEntity {
 		public String prolog;
 		public String epilog;
 		public String subject;
+		public String emailSearch;
+		public String emailSubjectPrefix;
+		public String emailText;
+		public String emailTextSent;
+		public String emailTextUnfinished;
 		public String publishingPostfix;
 		public TextId textId;
 		public final List<Question> questions = new ArrayList<>();
