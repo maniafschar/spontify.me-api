@@ -286,8 +286,8 @@ public class MarketingService {
 	}
 
 	public SchedulerResult runSportbars() {
-		return locationMarketing(new BigInteger("180"),
-				"location.skills like '%x.1%'", 5,
+		return locationMarketing(new BigInteger("180"), 10,
+				"location.skills like '%x.1%'",
 				"Sky Sport Events: möchtest Du mehr Gäste?",
 				"Lieber Sky Sportsbar Kunde,\n\n"
 						+ "unsere neue Fußball-Fan-Community ist auf der Suche nach den besten Locations, in denen sie Live-Übertragungen gemeinsam feiern können. Unsere App listet auch Deine Location.\n\n"
@@ -301,8 +301,8 @@ public class MarketingService {
 						+ "0172 6379434");
 	}
 
-	private SchedulerResult locationMarketing(final BigInteger clientMarketingId, final String search,
-			final int max, final String subject, final String text) {
+	private SchedulerResult locationMarketing(final BigInteger clientMarketingId, final int max,
+			final String search, final String subject, final String text) {
 		final SchedulerResult result = new SchedulerResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
 		try {
