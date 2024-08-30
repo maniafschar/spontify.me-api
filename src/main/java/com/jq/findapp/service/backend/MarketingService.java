@@ -144,6 +144,7 @@ public class MarketingService {
 			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 			params.setSearch("clientMarketingResult.published=false and clientMarketing.endDate<=cast('" + Instant.now()
 					+ "' as timestamp)");
+			params.setLimit(0);
 			final Result clientMarketings = repository.list(params);
 			for (int i = 0; i < clientMarketings.size(); i++) {
 				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
@@ -216,6 +217,7 @@ public class MarketingService {
 	public SchedulerResult runSent() {
 		final SchedulerResult result = new SchedulerResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
+		params.setLimit(0);
 		return result;
 	}
 
@@ -224,6 +226,7 @@ public class MarketingService {
 		final SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 		final Map<BigInteger, String> htmls = new HashMap<>();
 		final QueryParams params = new QueryParams(Query.contact_listMarketing);
+		params.setLimit(0);
 		params.setSearch("contactMarketing.finished=false and contactMarketing.createdAt>cast('"
 				+ Instant.now().minus(Duration.ofDays(14)).toString()
 				+ "' as timestamp) and contactMarketing.createdAt<cast('" +
@@ -296,6 +299,7 @@ public class MarketingService {
 	public SchedulerResult runLocation() {
 		final SchedulerResult result = new SchedulerResult();
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
+		params.setLimit(0);
 		final ObjectMapper om = new ObjectMapper();
 		try {
 			final String today = Instant.now().toString().substring(0, 19);
@@ -316,7 +320,7 @@ public class MarketingService {
 									+ (Strings.isEmpty(poll.locationSearch) ? "" : " and " + poll.locationSearch));
 					final Result locations = repository.list(params);
 					params.setQuery(Query.misc_listTicket);
-					int count = 0;
+					int count = 0, countSent = 0;
 					for (int i2 = 0; i2 < locations.size(); i2++) {
 						final Location location = repository.one(Location.class,
 								(BigInteger) locations.get(i2).get("location.id"));
@@ -332,6 +336,7 @@ public class MarketingService {
 						for (int i3 = 0; i3 < emails.size(); i3++) {
 							if (((String) emails.get(i3).get("ticket.note")).startsWith(subject)) {
 								sent = true;
+								countSent++;
 								break;
 							}
 						}
@@ -346,7 +351,7 @@ public class MarketingService {
 									TextId.valueOf("marketing_" + poll.locationPrefix + "Text"))
 									+ text.getText(contact,
 											TextId.valueOf("marketing_" + poll.locationPrefix + "Postfix"));
-							notificationService.sendEmail(client, null, location.getEmail(),
+							notificationService.sendEmail(client, null, "mani.afschar@jq-consulting.de", // location.getEmail(),
 									subject, body.replace("{url}", url),
 									html.replace("<jq:text />",
 											body.replace("\n", "<br/>").replace("{url}",
@@ -355,12 +360,13 @@ public class MarketingService {
 									(Strings.isEmpty(location.getMarketingMail()) ? ""
 											: location.getMarketingMail() + "|")
 											+ clientMarketing.getId());
-							repository.save(location);
+							// repository.save(location);
 							if (++count >= 10)
 								break;
 						}
 					}
-					result.body += clientMarketing.getId() + ": " + count + "\n";
+					result.body += clientMarketing.getId() + ": " + count + " - " + list.size() + " - " + countSent
+							+ "\n";
 				}
 			}
 
@@ -472,7 +478,7 @@ public class MarketingService {
 										location.getEmail().substring(0, location.getEmail().indexOf('@')));
 								registration.setTime(6000);
 								registration.setTimezone("Europe/Berlin");
-								registration.setVersion("0.6.9");
+								registration.setVersion("0.7.1");
 								try {
 									location.setContactId(authenticationService.register(registration).getId());
 									result += "<li>Ein Zugang wurde für Dich angelegt, eine Email versendet.</li>";
