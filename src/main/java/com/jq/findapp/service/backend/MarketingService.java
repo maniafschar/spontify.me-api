@@ -244,7 +244,7 @@ public class MarketingService {
 					int count = 0;
 					final JsonNode answer = om.readTree((String) list.get(i).get("contactMarketing.storage"));
 					if (answer.has("locationId")) {
-						final Poll poll = om.readValue((String) list.get(i).get("clientMarketing.storage"), Poll.class);
+						final Poll poll = om.readValue(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
 						final Location location = repository.one(Location.class,
 								new BigInteger(answer.get("locationId").asText()));
 						if (!Strings.isEmpty(location.getSecret())) {
@@ -353,7 +353,7 @@ public class MarketingService {
 									TextId.valueOf("marketing_" + poll.locationPrefix + "Text"))
 									+ text.getText(contact,
 											TextId.valueOf("marketing_" + poll.locationPrefix + "Postfix"));
-							notificationService.sendEmail(client, null, "mani.afschar@jq-consulting.de", // location.getEmail(),
+							notificationService.sendEmail(client, null, location.getEmail(),
 									subject, body.replace("{url}", url),
 									html.replace("<jq:text />",
 											body.replace("\n", "<br/>").replace("{url}",
@@ -362,7 +362,7 @@ public class MarketingService {
 									(Strings.isEmpty(location.getMarketingMail()) ? ""
 											: location.getMarketingMail() + "|")
 											+ clientMarketing.getId());
-							// repository.save(location);
+							repository.save(location);
 							if (++count >= 10)
 								break;
 						}
