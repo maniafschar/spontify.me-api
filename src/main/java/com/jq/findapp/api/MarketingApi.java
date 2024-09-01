@@ -142,14 +142,20 @@ public class MarketingApi {
 		return null;
 	}
 
-	@PostMapping(path = "location/user/{locationId}/{hash}")
-	public String createLocationUser(@RequestHeader final BigInteger clientId,
-			@PathVariable final BigInteger locationId,
-			@PathVariable final Integer hash) throws Exception {
+	@GetMapping(path = "user/{locationId}/{hash}")
+	public String createLocationUserAllowed(@PathVariable final BigInteger locationId, @PathVariable final int hash) {
 		final Location location = repository.one(Location.class, locationId);
-		if (location.getSecret().hashCode() == hash) {
-			if (location.getContactId() != null && location.getContactId().compareTo(BigInteger.ONE) > 0)
-				return "errorContactId";
+		if (location.getSecret().hashCode() == hash
+				&& (location.getContactId() == null || location.getContactId().compareTo(BigInteger.ONE) <= 0))
+			return location.getName();
+		return null;
+	}
+
+	@PostMapping(path = "user/{locationId}/{hash}")
+	public boolean createLocationUser(@RequestHeader final BigInteger clientId,
+			@PathVariable final BigInteger locationId, @PathVariable final int hash) throws Exception {
+		if (createLocationUserAllowed(locationId, hash) != null) {
+			final Location location = repository.one(Location.class, locationId);
 			final InternalRegistration registration = new InternalRegistration();
 			registration.setAgb(true);
 			registration.setClientId(clientId);
@@ -165,9 +171,9 @@ public class MarketingApi {
 			location.setContactId(authenticationService.register(registration).getId());
 			location.setSecret(null);
 			repository.save(location);
-			return "noError";
+			return true;
 		}
-		return "errorHash";
+		return false;
 	}
 
 	@GetMapping
