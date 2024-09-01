@@ -232,23 +232,26 @@ public class MarketingService {
 				+ "' as timestamp) and contactMarketing.createdAt<cast('" +
 				Instant.now().minus(Duration.ofHours(6)).toString() + "' as timestamp)");
 		try {
-			final Result list = repository.list(params);
+			final Result contactMarketings = repository.list(params);
 			final long end = Instant.now().plus(Duration.ofDays(1)).toEpochMilli();
+			final Map<BigInteger, Integer> counts = new HashMap<>();
 			final ObjectMapper om = new ObjectMapper();
 			om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			params.setQuery(Query.misc_listTicket);
-			for (int i = 0; i < list.size(); i++) {
+			for (int i = 0; i < contactMarketings.size(); i++) {
 				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
-						(BigInteger) list.get(i).get("contactMarketing.clientMarketingId"));
+						(BigInteger) contactMarketings.get(i).get("contactMarketing.clientMarketingId"));
 				if (clientMarketing.getEndDate().getTime() > end) {
-					int count = 0;
-					final JsonNode answer = om.readTree((String) list.get(i).get("contactMarketing.storage"));
+					final JsonNode answer = om
+							.readTree((String) contactMarketings.get(i).get("contactMarketing.storage"));
 					if (answer.has("locationId")) {
-						final Poll poll = om.readValue(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
+						final Poll poll = om.readValue(Attachment.resolve(clientMarketing.getStorage()),
+								Poll.class);
 						final Location location = repository.one(Location.class,
 								new BigInteger(answer.get("locationId").asText()));
 						if (!Strings.isEmpty(location.getSecret())) {
-							params.setSearch("ticket.type='EMAIL' and ticket.subject='" + location.getEmail() + "'");
+							params.setSearch(
+									"ticket.type='EMAIL' and ticket.subject='" + location.getEmail() + "'");
 							final Result emails = repository.list(params);
 							boolean sent = false;
 							final Contact contact = new Contact();
@@ -267,14 +270,16 @@ public class MarketingService {
 								final Client client = repository.one(Client.class, clientMarketing.getClientId());
 								final String url = client.getUrl() + "/?m=" + clientMarketing.getId() + "&i="
 										+ location.getId() + "&h=" + location.getSecret().hashCode();
-								final String date = df.format(list.get(i).get("contactMarketing.modifiedAt") == null
-										? list.get(i).get("contactMarketing.createdAt")
-										: list.get(i).get("contactMarketing.modifiedAt"));
+								final String date = df
+										.format(contactMarketings.get(i).get("contactMarketing.modifiedAt") == null
+												? contactMarketings.get(i).get("contactMarketing.createdAt")
+												: contactMarketings.get(i).get("contactMarketing.modifiedAt"));
 								if (!htmls.containsKey(client.getId()))
 									htmls.put(client.getId(), createHtmlTemplate(client));
 								final String s = text
 										.getText(contact,
-												TextId.valueOf("marketing_" + poll.locationPrefix + "TextUnfinished"))
+												TextId.valueOf(
+														"marketing_" + poll.locationPrefix + "TextUnfinished"))
 										.replace("{date}", date).replace("{location}", location.getName())
 										+ text.getText(contact,
 												TextId.valueOf("marketing_" + poll.locationPrefix + "Postfix"));
@@ -283,15 +288,19 @@ public class MarketingService {
 										htmls.get(client.getId()).replace("<jq:text />",
 												s.replace("\n", "<br/>").replace("{url}",
 														"<a href=\"" + url + "\">" + client.getUrl() + "</a>")));
-								count++;
+								if (!counts.containsKey(clientMarketing.getId()))
+									counts.put(clientMarketing.getId(), 0);
+								counts.put(clientMarketing.getId(), counts.get(clientMarketing.getId()) + 1);
 							}
 						}
 					}
-					if (count > 0)
-						result.body += clientMarketing.getId() + ": " + count + "\n";
 				}
 			}
-		} catch (Exception ex) {
+			if (!counts.isEmpty())
+				result.body = counts.toString();
+		} catch (
+
+		Exception ex) {
 			result.exception = ex;
 		}
 		return result;
@@ -482,6 +491,7 @@ public class MarketingService {
 								try {
 									location.setContactId(authenticationService.register(registration).getId());
 									result += "<li>Ein Zugang wurde für Dich angelegt, eine Email versendet.</li>";
+									location.setSecret(null);
 								} catch (Exception ex) {
 									result += "<li>Ein Zugang konnte nicht angelegt werden, die Email ist bereits registriert! Versuche Dich anzumelden oder über den \"Passwort vergessen\" Dialog Dir Dein Passwort zurücksetzen zu lassen.</li>";
 									email += "Ein Zugang konnte nicht angelegt werden, Deine Email ist bereits registriert! Versuche Dich anzumelden oder über den \"Passwort vergessen\" Dialog Dir Dein Passwort zurücksetzen zu lassen.\n\n";
@@ -493,7 +503,6 @@ public class MarketingService {
 						}
 					}
 				}
-				location.setSecret(null);
 				repository.save(location);
 				final Client client = repository.one(Client.class, clientMarketing.getClientId());
 				email += "\n\n\n" + client.getUrl() + "?" + Strings.encodeParam("l=" + location.getId());

@@ -116,11 +116,11 @@ public class MarketingCards {
 		private void addAddress(final JsonNode address) {
 			createPage();
 			int y = 0;
-			addText(usAddress, 26, 45, 2);
+			addText(usAddress, 26, 45, 1.8f);
 			System.out.println(address.get("name").asText());
-			addText(address.get("name").asText(), 26, 38, 3.5f);
+			addText(address.get("name").asText(), 26, 39, 3.5f);
 			for (String s : address.get("address").asText().split("\n"))
-				addText(s, 26, 33 - (y++ * 5), 3.5f);
+				addText(s, 26, 34 - (y++ * 5), 3.5f);
 			for (String s : us.split("\n"))
 				addText(s, (int) page.getBBox().getWidth() - 60, (int) page.getBBox().getHeight() - (y++ * 4),
 						2.5f);
