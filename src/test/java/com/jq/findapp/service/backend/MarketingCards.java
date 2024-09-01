@@ -79,16 +79,16 @@ public class MarketingCards {
 				+ "+49 172 6379434\n"
 				+ "support@fan-club.online";
 		private final String text = "Lieber Sky Sportsbar Kunde,\n\n"
-				+ "vielen Dank für Dein Feedback vom {date}, anbei die {cards} Marketing-Aufkleber.\n"
-				+ "Weitere Schritte, um die besten Fans Deiner Region bei Dir feiern zu lassen:\n\n"
-				+ "•   erstelle ein Serien-Termin für alle Spiele Eures Lieblingsklubs\n"
-				+ "•   erstelle auch Events außerhalb von Spielen, z.B. Stammtische am Montag zum Nachtarock\n"
-				+ "    des Bundesligawochenendes, vielleicht sogar mit einem Happy Hour Getränk oder ähnliches\n"
-				+ "•   alle Veranstalltungen können mit einem zusätzlichen Klick automatisch auf unseren Social Media\n"
-				+ "    Seiten veröffentlicht werden, so dass noch mehr Leute außerhalb unserer Community davon erfahen\n"
-				+ "•   platziere den einen oder anderen Aufkleber prominent in Deiner Location\n"
-				+ "•   lege die restlichen Aufkleber aus, so dass Deine Gäste sie sehen und mitnehmen können\n\n"
-				+ "Wir helfen Dir gerne bei der Einrichtung, unsere Kontaktdaten stehen auf der Rückseite.";
+				+ "vielen Dank für Dein Feedback vom {date}, anbei die {cards} Marketing-Sticker die Dir,\n"
+				+ "helfen, die besten Fans Deiner Region in Dein Lokal zu locken. Weitere Tipps:\n\n"
+				+ "•   Plane Serienevents für alle Spiele Eures Lieblingsklubs.\n"
+				+ "•   Organisiere Events außerhalb von Spieltagen, z.B. Stammtische um das Bundesligawochenende\n"
+				+ "    Revue passieren zu lassen. Ein Happy Hour Getränk könnte zusätzlichen Anreiz bieten.\n"
+				+ "•   Nutze unsere Reichweite: mit nur einem zusätzlichen Klick teilst Du Deine Events automatisch auf\n"
+				+ "    unseren Social Media Kanälen, so dass noch mehr Leute außerhalb unserer Community davon erfahen.\n"
+				+ "•   Setze Deine Sticker strategisch ein: platziere einige Sticker gut sichtbar in Deiner Sportsbar und\n"
+				+ "    lege die restlichen Sticker aus, damit Deine Gäste sie mitnehmen und die Botschaft weitertragen können.\n\n"
+				+ "Wir sind für Dich da: Hast Du Fragen rund um die App? Unsere Kontaktdaten findest Du auf der Rückseite.";
 
 		private PDF(final JsonNode addresses) throws IOException {
 			font = PDType0Font.load(document, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"),
@@ -140,7 +140,7 @@ public class MarketingCards {
 				for (String s : text
 						.replace("{date}", df.format(dfReader.parse(address.get("createdAt").asText())))
 						.replace("{cards}", "" + address.get("cards").get(0).asInt()).split("\n"))
-					addText(s, 10, 85 - (y++ * 5), 3.5f);
+					addText(s, 7, 85 - (y++ * 5.5f), 3.5f);
 			} catch (ParseException ex) {
 				throw new RuntimeException(ex);
 			}
@@ -195,7 +195,7 @@ public class MarketingCards {
 			}
 		}
 
-		private void addText(String text, int x, int y, float size) {
+		private void addText(String text, float x, float y, float size) {
 			try {
 				stream.beginText();
 				stream.newLineAtOffset(x, y);
