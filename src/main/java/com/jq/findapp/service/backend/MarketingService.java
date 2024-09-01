@@ -371,7 +371,7 @@ public class MarketingService {
 											: location.getMarketingMail() + "|")
 											+ clientMarketing.getId());
 							repository.save(location);
-							if (++count >= 10)
+							if (++count >= 20)
 								break;
 						}
 					}
