@@ -473,6 +473,10 @@ public class MarketingService {
 										+ s.replace("|0", "").substring(1);
 								location.setSkills(s);
 							} else if ("cards".equals(poll.questions.get(i).id) && !"|0".equals(s)) {
+								if (Strings.isEmpty(location.getSkills()))
+									location.setSkills("x.1");
+								else if (!location.getSkills().contains("x.1"))
+									location.setSkills(location.getSkills() + "|x.1");
 								result += "<li>Marketing-Material senden wir Dir an die Adresse Deiner Location.</li>";
 								email += "Marketing-Material senden wir Dir an die Adresse Deiner Location.\n\n";
 							} else if ("account".equals(poll.questions.get(i).id) && "|1".equals(s)) {

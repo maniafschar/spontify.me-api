@@ -1,4 +1,4 @@
-package com.jq.findapp.service;
+package com.jq.findapp.service.backend;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -11,17 +11,25 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
 import org.junit.jupiter.api.Test;
 
-public class ImageTest {
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+
+public class MarketingImage {
 	private final int factor = 2;
 
 	@Test
 	public void createFanclub() throws Exception {
-		create("fanclub", "Fanclub", "Auch kein Bock allein zu schauen?", 1, Color.BLACK);
+		create("fanclub", "Fanclub", "Auch kein Bock allein zu schauen?", 1, new Color(0, 0, 74));
 	}
 
 	@Test
@@ -38,38 +46,62 @@ public class ImageTest {
 		BufferedImage image = ImageIO.read(getClass().getResourceAsStream(prefix + "background" + no + ".jpg"));
 		g2.drawImage(image, 0, 0, width, height, 0, 0, image.getWidth(),
 				image.getHeight(), null);
-		image = ImageIO.read(getClass().getResourceAsStream(prefix + "qr" + no + ".png"));
-		final int size = (int) (0.4 * height), padding = 50, extraPaddingLogo = 20;
-		final double logoFactor = 0.8;
+		image = createQRCode("https://fan-club.online", textColor);
+		final int size = (int) (0.4 * height), padding = 50, extraPaddingLogo = 160;
 		g2.drawImage(image,
-				width - size - padding,
-				height - size - padding,
-				width - padding,
-				height - padding, 0, 0,
+				width - size,
+				height - size,
+				width,
+				height, 0, 0,
 				image.getWidth(), image.getHeight(), null);
 		image = ImageIO.read(getClass().getResourceAsStream(prefix + "logo.png"));
+		final double logoFactor = 0.61;
 		g2.drawImage(image,
-				padding,
-				height - size - padding + extraPaddingLogo,
-				padding + (int) (size * logoFactor),
-				height - padding - (int) (size * (1 - logoFactor)) + extraPaddingLogo, 0, 0,
+				6 * padding,
+				height - size + extraPaddingLogo,
+				6 * padding + (int) (size * logoFactor),
+				height - (int) (size * (1 - logoFactor)) + extraPaddingLogo, 0, 0,
 				image.getWidth(), image.getHeight(), null);
 		final Font font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"))
-				.deriveFont(225f);
+				.deriveFont(295f);
 		GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(font);
 		g2.setFont(font);
-		g2.setColor(new Color(0, 0, 0, 75));
-		final int textPadding = 10;
-		g2.drawString(claim, (width - g2.getFontMetrics().stringWidth(claim)) / 2 + textPadding,
-				padding + g2.getFontMetrics().getHeight() + textPadding);
-		g2.setColor(Color.yellow);
+		g2.setColor(new Color(255, 255, 255, 75));
+		final int shadow = 8;
+		g2.drawString(claim, (width - g2.getFontMetrics().stringWidth(claim)) / 2 + shadow,
+				padding + g2.getFontMetrics().getHeight() + shadow);
+		g2.setColor(textColor);
 		g2.drawString(claim, (width - g2.getFontMetrics().stringWidth(claim)) / 2,
 				padding + g2.getFontMetrics().getHeight());
 		g2.setColor(textColor);
-		g2.drawString(appName, padding + ((int) (size * logoFactor) - g2.getFontMetrics().stringWidth(appName)) / 2,
-				height - g2.getFontMetrics().getHeight() + padding * 2 + extraPaddingLogo);
+		g2.drawString(appName, 6 * padding + ((int) (size * logoFactor) - g2.getFontMetrics().stringWidth(appName)) / 2,
+				height - g2.getFontMetrics().getHeight() + extraPaddingLogo - padding / 2);
 		output.flush();
 		ImageIO.write(output, "png", new FileOutputStream("test.png"));
+	}
+
+	private BufferedImage createQRCode(final String url, final Color color) {
+		try {
+			final Map<EncodeHintType, ErrorCorrectionLevel> hintMap = new HashMap<>();
+			hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
+			final QRCodeWriter qrCodeWriter = new QRCodeWriter();
+			final BitMatrix byteMatrix = qrCodeWriter.encode(url, BarcodeFormat.QR_CODE, 500, 500, hintMap);
+			final int matrixWidth = byteMatrix.getWidth();
+			final BufferedImage image = new BufferedImage(matrixWidth, matrixWidth, BufferedImage.TYPE_INT_ARGB);
+			image.createGraphics();
+			final Graphics2D graphics = (Graphics2D) image.getGraphics();
+			graphics.setColor(color);
+			for (int i = 0; i < matrixWidth; i++) {
+				for (int j = 0; j < matrixWidth; j++) {
+					if (byteMatrix.get(i, j))
+						graphics.fillRect(i, j, 1, 1);
+				}
+			}
+			graphics.dispose();
+			return image;
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 	@Test

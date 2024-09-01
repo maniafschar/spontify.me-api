@@ -165,6 +165,7 @@ public class MarketingCards {
 							graphics.fillRect(i, j, 1, 1);
 					}
 				}
+				graphics.dispose();
 				final ByteArrayOutputStream out = new ByteArrayOutputStream();
 				ImageIO.write(image, "png", out);
 				final PDImageXObject pdImage = PDImageXObject.createFromByteArray(document,
