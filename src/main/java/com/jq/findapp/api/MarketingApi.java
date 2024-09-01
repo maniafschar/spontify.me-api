@@ -28,11 +28,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jq.findapp.api.model.InternalRegistration;
 import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ClientNews;
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.Contact.Device;
+import com.jq.findapp.entity.Contact.OS;
 import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.Location;
@@ -41,6 +44,7 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.backend.IpService;
 import com.jq.findapp.service.backend.MarketingService;
@@ -59,6 +63,9 @@ public class MarketingApi {
 
 	@Autowired
 	private MarketingService marketingService;
+
+	@Autowired
+	private AuthenticationService authenticationService;
 
 	@Autowired
 	private NotificationService notificationService;
@@ -133,6 +140,34 @@ public class MarketingApi {
 			return marketingService.locationUpdate(contactMarketing);
 		}
 		return null;
+	}
+
+	@PostMapping(path = "location/user/{locationId}/{hash}")
+	public String createLocationUser(@RequestHeader final BigInteger clientId,
+			@PathVariable final BigInteger locationId,
+			@PathVariable final Integer hash) throws Exception {
+		final Location location = repository.one(Location.class, locationId);
+		if (location.getSecret().hashCode() == hash) {
+			if (location.getContactId() != null && location.getContactId().compareTo(BigInteger.ONE) > 0)
+				return "errorContactId";
+			final InternalRegistration registration = new InternalRegistration();
+			registration.setAgb(true);
+			registration.setClientId(clientId);
+			registration.setDevice(Device.computer);
+			registration.setEmail(location.getEmail());
+			registration.setLanguage("DE");
+			registration.setOs(OS.web);
+			registration.setPseudonym(
+					location.getEmail().substring(0, location.getEmail().indexOf('@')));
+			registration.setTime(6000);
+			registration.setTimezone("Europe/Berlin");
+			registration.setVersion("0.7.1");
+			location.setContactId(authenticationService.register(registration).getId());
+			location.setSecret(null);
+			repository.save(location);
+			return "noError";
+		}
+		return "errorHash";
 	}
 
 	@GetMapping
