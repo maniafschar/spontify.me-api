@@ -141,7 +141,7 @@ public class MarketingCards {
 				for (String s : text
 						.replace("{date}", df.format(dfReader.parse(address.get("createdAt").asText())))
 						.replace("{cards}", "" + address.get("cards").get(0).asInt()).split("\n"))
-					addText(s, 7, 85 - (y++ * 5.5f), 3.5f);
+					addText(s, 10, 85 - (y++ * 5.5f), 3.2f);
 			} catch (ParseException ex) {
 				throw new RuntimeException(ex);
 			}
