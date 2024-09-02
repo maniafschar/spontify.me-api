@@ -121,8 +121,9 @@ public class MarketingCards {
 			addText(address.get("name").asText(), 26, 39, 3.5f);
 			for (String s : address.get("address").asText().split("\n"))
 				addText(s, 26, 34 - (y++ * 5), 3.5f);
+			y = 0;
 			for (String s : us.split("\n"))
-				addText(s, (int) page.getBBox().getWidth() - 60, (int) page.getBBox().getHeight() - (y++ * 4),
+				addText(s, (int) page.getBBox().getWidth() - 60, (int) page.getBBox().getHeight() - 14 -(y++ * 4),
 						2.5f);
 			addQRCode("https://fan-club.online?c=1" +
 					(address.get("account").get(0).asInt() == 1 ? ""
