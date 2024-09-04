@@ -84,6 +84,8 @@ public class ImportSportsBarService {
 										.toEntity(String.class).block().getBody());
 					} catch (Exception ex) {
 						result.errorsScroll++;
+						notificationService.createTicket(TicketType.ERROR, "ImportSportsBarService.scroll",
+								Strings.stackTraceToString(ex), null);
 						continue;
 					}
 				}
