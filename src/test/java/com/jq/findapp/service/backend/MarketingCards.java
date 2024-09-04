@@ -79,13 +79,13 @@ public class MarketingCards {
 				+ "+49 172 6379434\n"
 				+ "support@fan-club.online";
 		private final String text = "Lieber Sky Sportsbar Kunde,\n\n"
-				+ "vielen Dank für Dein Feedback vom {date}, anbei die {cards} Marketing-Sticker die Dir,\n"
-				+ "helfen, die besten Fans Deiner Region in Dein Lokal zu locken. Weitere Tipps:\n\n"
-				+ "•   Plane Serienevents für alle Spiele Eures Lieblingsklubs.\n"
-				+ "•   Organisiere Events außerhalb von Spieltagen, z.B. Stammtische um das Bundesligawochenende\n"
+				+ "vielen Dank für Dein Feedback vom {date}. Anbei findest Du die {cards} Marketing-Sticker,\n"
+				+ "die Dir helfen, die besten Fans Deiner Region in Dein Lokal zu locken. Weitere Tipps:\n\n"
+				+ "•   Plane Serienevents für alle Spiele Eures Lieblingsklubs\n"
+				+ "•   Organisiere Events außerhalb von Spieltagen, z.B. Stammtische, um das Bundesligawochenende\n"
 				+ "    Revue passieren zu lassen. Ein Happy Hour Getränk könnte zusätzlichen Anreiz bieten.\n"
 				+ "•   Nutze unsere Reichweite: mit nur einem zusätzlichen Klick teilst Du Deine Events automatisch auf\n"
-				+ "    unseren Social Media Kanälen, so dass noch mehr Leute außerhalb unserer Community davon erfahen.\n"
+				+ "    unseren Social Media Kanälen, sodass noch mehr Leute außerhalb unserer Community davon erfahen.\n"
 				+ "•   Setze Deine Sticker strategisch ein: platziere einige Sticker gut sichtbar in Deiner Sportsbar und\n"
 				+ "    lege die restlichen Sticker aus, damit Deine Gäste sie mitnehmen und die Botschaft weitertragen können.\n\n"
 				+ "Wir sind für Dich da: Hast Du Fragen rund um die App? Unsere Kontaktdaten findest Du auf der Rückseite.";
@@ -101,7 +101,7 @@ public class MarketingCards {
 					countAddresses++;
 				}
 			});
-			addStatistics();
+			// addStatistics();
 		}
 
 		private byte[] toBytes() throws Exception {
@@ -123,7 +123,7 @@ public class MarketingCards {
 				addText(s, 26, 34 - (y++ * 5), 3.5f);
 			y = 0;
 			for (String s : us.split("\n"))
-				addText(s, (int) page.getBBox().getWidth() - 60, (int) page.getBBox().getHeight() - 14 -(y++ * 4),
+				addText(s, (int) page.getBBox().getWidth() - 70, (int) page.getBBox().getHeight() - 15 - (y++ * 4),
 						2.5f);
 			addQRCode("https://fan-club.online?c=1" +
 					(address.get("account").get(0).asInt() == 1 ? ""
@@ -134,14 +134,14 @@ public class MarketingCards {
 		private void addMarketing(final JsonNode address) {
 			createPage();
 			addBackground(new Color(246, 194, 166), new Color(245, 239, 232));
-			addImage("/image/marketing/fanclub/logo.png", (int) page.getBBox().getWidth() - 38,
+			addImage("/image/marketing/fanclub/logo.png", (int) page.getBBox().getWidth() - 40,
 					(int) page.getBBox().getHeight() - 38, 30);
 			try {
 				int y = 0;
 				for (String s : text
 						.replace("{date}", df.format(dfReader.parse(address.get("createdAt").asText())))
 						.replace("{cards}", "" + address.get("cards").get(0).asInt()).split("\n"))
-					addText(s, 10, 85 - (y++ * 5.5f), 3.2f);
+					addText(s, 11, 94 - (y++ * 6.2f), 3.3f);
 			} catch (ParseException ex) {
 				throw new RuntimeException(ex);
 			}
@@ -171,7 +171,7 @@ public class MarketingCards {
 				ImageIO.write(image, "png", out);
 				final PDImageXObject pdImage = PDImageXObject.createFromByteArray(document,
 						out.toByteArray(), "qr");
-				stream.drawImage(pdImage, (int) page.getBBox().getWidth() - 65, 11.5f, 40, 40);
+				stream.drawImage(pdImage, (int) page.getBBox().getWidth() - 75, 11.5f, 40, 40);
 			} catch (Exception ex) {
 				throw new RuntimeException(ex);
 			}
@@ -188,7 +188,7 @@ public class MarketingCards {
 			try {
 				if (stream != null)
 					stream.close();
-				page = new PDPage(new PDRectangle(210, 99));
+				page = new PDPage(new PDRectangle(210, 108));
 				document.addPage(page);
 				stream = new PDPageContentStream(document, page);
 			} catch (Exception ex) {

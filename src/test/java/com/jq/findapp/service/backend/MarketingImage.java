@@ -29,7 +29,7 @@ public class MarketingImage {
 
 	@Test
 	public void createFanclub() throws Exception {
-		create("Fanclub", "Auch kein Bock allein zu schauen?", new Color(0, 0, 74), 295f, "https://fan-club.online");
+		create("Fanclub", "Auch kein Bock, allein zu schauen?", new Color(0, 0, 74), 218f, "https://fan-club.online");
 	}
 
 	@Test
@@ -39,22 +39,24 @@ public class MarketingImage {
 
 	private void create(String appName, String claim, Color textColor, float textSize, String url) throws Exception {
 		final String prefix = "/image/marketing/" + appName.toLowerCase() + "/";
-		final int width = 5568, height = 3712;
-		final BufferedImage output = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-		final Graphics2D g2 = (Graphics2D) output.getGraphics();
-		final int size = (int) (0.4 * height), padding = 150, extraPaddingLogo = 160;
 		final Font font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"))
 				.deriveFont(textSize);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		// background
 		BufferedImage image = ImageIO.read(getClass().getResourceAsStream(prefix + "background.jpg"));
-		g2.drawImage(image, 0, 0, width, height, 0, 0, image.getWidth(), image.getHeight() * width / image.getWidth(), null);
+		final int width = image.getWidth(), height = image.getHeight();
+		final BufferedImage output = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		final Graphics2D g2 = (Graphics2D) output.getGraphics();
+		final int size = (int) (0.4 * height), padding = 150, extraPaddingLogo = 55;
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2.drawImage(image, 0, 0, width, height, 0, 0, image.getWidth(), image.getHeight() * width / image.getWidth(),
+				null);
 
 		// qr code
 		image = createQRCode(url, textColor);
-		g2.drawImage(image, width - size, height - size, width, height, 
-			     	0, 0, image.getWidth(), image.getHeight(), null);
+		final int p = padding / 2;
+		g2.drawImage(image, width - size - p, height - size - p, width - p, height - p,
+				0, 0, image.getWidth(), image.getHeight(), null);
 
 		// claim & shadow
 		GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(font);
@@ -70,12 +72,14 @@ public class MarketingImage {
 		// logo & app name
 		image = ImageIO.read(getClass().getResourceAsStream(prefix + "logo.png"));
 		final double logoFactor = 0.61;
-		g2.drawImage(image, 6 * padding, height - size + extraPaddingLogo,
-			     	6 * padding + (int) (size * logoFactor), height - (int) (size * (1 - logoFactor)) + extraPaddingLogo,
-			     	0, 0, image.getWidth(), image.getHeight(), null);
+		g2.drawImage(image, 2 * padding, height - size + extraPaddingLogo,
+				2 * padding + (int) (size * logoFactor),
+				height - (int) (size * (1 - logoFactor)) + extraPaddingLogo,
+				0, 0, image.getWidth(), image.getHeight(), null);
 		g2.setColor(textColor);
-		g2.drawString(appName, 6 * padding + ((int) (size * logoFactor) - g2.getFontMetrics().stringWidth(appName)) / 2,
-				height - g2.getFontMetrics().getHeight() + extraPaddingLogo - padding / 2);
+		g2.drawString(appName,
+				2 * padding + ((int) (size * logoFactor) - g2.getFontMetrics().stringWidth(appName)) / 2,
+				height - g2.getFontMetrics().getHeight() + extraPaddingLogo - 40);
 
 		output.flush();
 		ImageIO.write(output, "png", new FileOutputStream("test.png"));

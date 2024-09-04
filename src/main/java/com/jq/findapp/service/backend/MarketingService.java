@@ -469,9 +469,11 @@ public class MarketingService {
 						}
 						if (!Strings.isEmpty(s)) {
 							if (poll.questions.get(i).id != null && poll.questions.get(i).id.startsWith("skills")) {
-								s = (Strings.isEmpty(location.getSkills()) ? "" : location.getSkills() + "|")
-										+ s.replace("|0", "").substring(1);
-								location.setSkills(s);
+								s = s.replace("|0", "");
+								if (!Strings.isEmpty(s))
+									location.setSkills(
+											(Strings.isEmpty(location.getSkills()) ? "" : location.getSkills() + "|")
+													+ s.substring(1));
 							} else if ("cards".equals(poll.questions.get(i).id) && !"|0".equals(s)) {
 								if (Strings.isEmpty(location.getSkills()))
 									location.setSkills("x.1");
