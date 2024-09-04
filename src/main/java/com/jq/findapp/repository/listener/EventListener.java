@@ -145,11 +145,12 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 				if (skill.startsWith("9.")) {
 					boolean canceled = event.getSkills().contains("X");
 					final QueryParams params = new QueryParams(Query.event_listId);
-					params.setSearch("event.contactId=" + event.getContactId() + " and cast(REGEXP_LIKE('" + skill + "', event.skills) as integer)=1");
+					params.setSearch("event.contactId=" + event.getContactId() + " and cast(REGEXP_LIKE('" + skill
+							+ "', event.skills) as integer)=1");
 					final Result events = repository.list(params);
 					if (!canceled) {
 						for (int i = 0; i < events.size(); i++) {
-							if (events.get(i).get("event.skills").contains("X")) {
+							if (((String) events.get(i).get("event.skills")).contains("X")) {
 								canceled = true;
 								break;
 							}
@@ -157,12 +158,12 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 					}
 					if (canceled) {
 						for (int i = 0; i < events.size(); i++) {
-							if (!events.get(i).get("event.skills").contains("X") && 
-									event.getId().compareTo(events.get(i).get("event.id")) != 0) {
-								final Event e = repository.one(Event.class, 
+							if (!((String) events.get(i).get("event.skills")).contains("X") &&
+									event.getId().compareTo((BigInteger) events.get(i).get("event.id")) != 0) {
+								final Event e = repository.one(Event.class,
 										(BigInteger) events.get(i).get("event.id"));
 								e.setSkills(e.getSkills() + "|X");
-								repsitory.save(e);
+								repository.save(e);
 							}
 						}
 					} else
@@ -173,13 +174,14 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 		}
 	}
 
-	private static void updateFutureEvents(final Event event, final Result events, final String skill) {
+	private void updateFutureEvents(final Event event, final Result events, final String skill) throws Exception {
 		final List<FutureEvent> futureEvents = surveyService.futureEvents(Integer.valueOf(skill.substring(2)));
 		for (FutureEvent futureEvent : futureEvents) {
 			boolean create = true;
 			for (int i = 0; i < events.size(); i++) {
 				if (event.getSeriesId() != null && event.getSeriesId() == futureEvent.time) {
 					create = false;
+					break;
 				}
 			}
 			if (create) {
