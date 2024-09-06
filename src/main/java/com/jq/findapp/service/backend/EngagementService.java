@@ -329,7 +329,7 @@ public class EngagementService {
 			t = System.currentTimeMillis();
 			for (int i = 0; i < ids.size(); i++) {
 				final Contact contact = repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id"));
-				if (isTimeForNewChat(contact, params, false) && sendChatTemplate(contact))
+				if (timeForNewChat(contact, params, false) && sendChatTemplate(contact))
 					count++;
 			}
 			result.body += "\ntemplate: " + count + ", time: " + (System.currentTimeMillis() - t);
@@ -339,27 +339,23 @@ public class EngagementService {
 		return result;
 	}
 
-	private boolean isTimeForNewChat(final Contact contact, final QueryParams params, final boolean nearBy) {
+	private boolean timeForNewChat(final Contact contact, final QueryParams params, final boolean nearBy) {
 		final int hour = Instant.now().atZone(TimeZone.getTimeZone(contact.getTimezone()).toZoneId()).getHour();
 		if (hour > 6 && hour < 22) {
 			final BigInteger adminId = repository.one(Client.class, contact.getClientId()).getAdminId();
 			params.setSearch("contactChat.contactId=" + adminId + " and contactChat.contactId2=" + contact.getId()
 					+ " and contactChat.createdAt>cast('"
-					+ Instant.now().minus(Duration.ofDays(28 + (int) (Math.random() * 3)))
-							.minus(Duration.ofHours((int) (Math.random() * 12))).toString()
+					+ Instant.now().minus(Duration.ofDays(32)).toString()
 					+ "' as timestamp)");
 			if (repository.list(params).size() == 0) {
-				params.setSearch(
-						"contactChat.textId is not null and contactChat.contactId=" + adminId
-								+ " and contactChat.contactId2="
-								+ contact.getId());
+				params.setSearch("contactChat.textId is not null and contactChat.contactId=" + adminId
+						+ " and contactChat.contactId2=" + contact.getId());
 				final Result lastChats = repository.list(params);
 				if (lastChats.size() == 0)
 					return true;
 				final boolean isLastChatNearBy = ((TextId) lastChats.get(0).get("contactChat.textId")).name()
-						.startsWith(
-								TextId.engagement_nearByLocation.name().substring(0,
-										TextId.engagement_nearByLocation.name().indexOf('L')));
+						.startsWith(TextId.engagement_nearByLocation.name().substring(0,
+								TextId.engagement_nearByLocation.name().indexOf('L')));
 				if (!nearBy && isLastChatNearBy || nearBy && !isLastChatNearBy)
 					return true;
 				if (((Timestamp) lastChats.get(0).get("contactChat.createdAt"))
@@ -411,7 +407,7 @@ public class EngagementService {
 			for (int i = 0; i < ids.size(); i++) {
 				final Contact contact = repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id"));
 				if (!contact.getId().equals(repository.one(Client.class, contact.getClientId()).getAdminId())
-						&& isTimeForNewChat(contact, params, true)) {
+						&& timeForNewChat(contact, params, true)) {
 					final String action = getLastNearByAction(params, (BigInteger) ids.get(i).get("contact.id"));
 					if (!action.startsWith("p=") && sendContact(contact))
 						count++;
