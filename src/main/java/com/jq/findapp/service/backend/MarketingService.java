@@ -215,11 +215,11 @@ public class MarketingService {
 	}
 
 	public SchedulerResult runSent() {
-		final Instant until = Instant.now();
+		final Instant until = Instant.parse("2024-09-04T05:00:00.00Z");
 		final SchedulerResult result = new SchedulerResult();
 		final QueryParams params = new QueryParams(Query.contact_listMarketing);
 		params.setLimit(0);
-		params.setSearch("contactMarketing.createdAt<=cast('" + until.toString() + "' as timestamp)");
+		params.setSearch("contactMarketing.createdAt<cast('" + until.toString() + "' as timestamp)");
 		try {
 			final Result contactMarketings = repository.list(params);
 			final Map<BigInteger, Integer> counts = new HashMap<>();
@@ -244,9 +244,8 @@ public class MarketingService {
 						if (!htmls.containsKey(client.getId()))
 							htmls.put(client.getId(), createHtmlTemplate(client));
 						final String s = text
-								.getText(contact,
-										TextId.valueOf(
-												"marketing_" + poll.locationPrefix + "TextUnfinished"))
+								.getText(contact, TextId.valueOf(
+										"marketing_" + poll.locationPrefix + "TextSent"))
 								.replace("{date}", date).replace("{location}", location.getName())
 								+ text.getText(contact,
 										TextId.valueOf("marketing_" + poll.locationPrefix + "Postfix"));
