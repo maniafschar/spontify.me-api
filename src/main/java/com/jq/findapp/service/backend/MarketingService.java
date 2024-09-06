@@ -215,10 +215,90 @@ public class MarketingService {
 	}
 
 	public SchedulerResult runSent() {
+		final Instant until = Instant.now();
 		final SchedulerResult result = new SchedulerResult();
-		final QueryParams params = new QueryParams(Query.location_listId);
+		final QueryParams params = new QueryParams(Query.contact_listMarketing);
 		params.setLimit(0);
+		params.setSearch("contactMarketing.createdAt<=cast('" + until.toString() + "' as timestamp)");
+		try {
+			final Result contactMarketings = repository.list(params);
+			final Map<BigInteger, Integer> counts = new HashMap<>();
+			final ObjectMapper om = new ObjectMapper();
+			om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+			params.setQuery(Query.misc_listTicket);
+			for (int i = 0; i < contactMarketings.size(); i++) {
+				final int cards = cards(contactMarketings.get(i));
+				if (cards > 0) {
+					final Contact contact = new Contact();
+					contact.setLanguage("DE");
+					contact.setClientId(clientMarketing.getClientId());
+					final Poll poll = om.readValue(Attachment.resolve(repository.one(ClientMarketing.class,
+							(BigInteger) contactMarketing.get("contactMarketing.clientMarketingId")).getStorage()), Poll.class);
+					final String subject = text.getText(contact,
+							TextId.valueOf("marketing_" + poll.locationPrefix + "SubjectPrefix"))
+							+ "Deine Marketing-Sticker wurden soeben versendet";
+					final Location location = repository.one(Location.class,
+							new BigInteger(answer.get("locationId").asText()));
+					if (!sent(location.getEmail(), subject)) {
+						final Client client = repository.one(Client.class, clientMarketing.getClientId());
+						if (!htmls.containsKey(client.getId()))
+							htmls.put(client.getId(), createHtmlTemplate(client));
+						final String s = text
+								.getText(contact,
+										TextId.valueOf(
+												"marketing_" + poll.locationPrefix + "TextUnfinished"))
+								.replace("{date}", date).replace("{location}", location.getName())
+								+ text.getText(contact,
+										TextId.valueOf("marketing_" + poll.locationPrefix + "Postfix"));
+						notificationService.sendEmail(client, null, location.getEmail(),
+								subject, s,
+								htmls.get(client.getId()).replace("<jq:text />",
+										s.replace("\n", "<br/>")));
+						if (!counts.containsKey(clientMarketing.getId()))
+							counts.put(clientMarketing.getId(), 0);
+						counts.put(clientMarketing.getId(), counts.get(clientMarketing.getId()) + 1);
+					}
+				}
+			}
+			if (!counts.isEmpty())
+				result.body = counts.toString();
+		} catch (Exception ex) {
+			result.exception = ex;
+		}
 		return result;
+	}
+
+	private int cards(final Map<String, Object> contactMarketing) {
+		final Poll poll = om.readValue(Attachment.resolve(repository.one(ClientMarketing.class,
+				(BigInteger) contactMarketing.get("contactMarketing.clientMarketingId")).getStorage()), Poll.class);
+		for (int i = 0; i < poll.questions.size(); i++) {
+			if ("cards".equals(poll.questions.get(i).id)) {
+				final JsonNode answer = om
+						.readTree((String) contactMarketing.get("contactMarketing.storage"));
+				final int index = answers.get("q" + i).get("a").get(i2).asInt();
+				return Integer.valueOf(poll.questions.get(i).answers.get(index).key);
+			}
+		}
+		return -1;
+	}
+
+	private boolean sent(final String email, final String subject) {
+		final QueryParams params = new QueryParams(Query.misc_listTicket);
+		params.setLimit(0);
+		params.setSearch("ticket.type='EMAIL' and ticket.subject='" + email + "'");
+		final Result emails = repository.list(params);
+		boolean sent = false;
+		final Contact contact = new Contact();
+		contact.setLanguage("DE");
+		contact.setClientId(clientMarketing.getClientId());
+		final String subject = text.getText(contact,
+				TextId.valueOf("marketing_" + poll.locationPrefix + "SubjectPrefix"))
+				+ "Vervollständigung Deiner Location Daten...";
+		for (int i2 = 0; i2 < emails.size(); i2++) {
+			if (((String) emails.get(i2).get("ticket.note")).startsWith(subject))
+				return true;
+		}
+		return false;
 	}
 
 	public SchedulerResult runUnfinished() {
@@ -237,7 +317,6 @@ public class MarketingService {
 			final Map<BigInteger, Integer> counts = new HashMap<>();
 			final ObjectMapper om = new ObjectMapper();
 			om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-			params.setQuery(Query.misc_listTicket);
 			for (int i = 0; i < contactMarketings.size(); i++) {
 				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 						(BigInteger) contactMarketings.get(i).get("contactMarketing.clientMarketingId"));
@@ -250,23 +329,13 @@ public class MarketingService {
 						final Location location = repository.one(Location.class,
 								new BigInteger(answer.get("locationId").asText()));
 						if (!Strings.isEmpty(location.getSecret())) {
-							params.setSearch(
-									"ticket.type='EMAIL' and ticket.subject='" + location.getEmail() + "'");
-							final Result emails = repository.list(params);
-							boolean sent = false;
 							final Contact contact = new Contact();
 							contact.setLanguage("DE");
 							contact.setClientId(clientMarketing.getClientId());
 							final String subject = text.getText(contact,
 									TextId.valueOf("marketing_" + poll.locationPrefix + "SubjectPrefix"))
 									+ "Vervollständigung Deiner Location Daten...";
-							for (int i2 = 0; i2 < emails.size(); i2++) {
-								if (((String) emails.get(i2).get("ticket.note")).startsWith(subject)) {
-									sent = true;
-									break;
-								}
-							}
-							if (!sent) {
+							if (!sent(location.getEmail(), subject)) {
 								final Client client = repository.one(Client.class, clientMarketing.getClientId());
 								final String url = client.getUrl() + "/?m=" + clientMarketing.getId() + "&i="
 										+ location.getId() + "&h=" + location.getSecret().hashCode();
@@ -298,9 +367,7 @@ public class MarketingService {
 			}
 			if (!counts.isEmpty())
 				result.body = counts.toString();
-		} catch (
-
-		Exception ex) {
+		} catch (Exception ex) {
 			result.exception = ex;
 		}
 		return result;
