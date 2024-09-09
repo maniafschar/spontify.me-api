@@ -72,7 +72,8 @@ public class Strings {
 	public static String sanitize(String s, final int limit) {
 		if (s == null)
 			return s;
-		s = HtmlUtils.htmlUnescape(s.replaceAll("<[^>]*>", "\n")
+		s = HtmlUtils.htmlUnescape(s.replaceAll("<li>", "\n* ")
+				.replaceAll("<[^>]*>", "\n")
 				.replace("&nbsp;", " ")
 				.replace("\t", " ")).trim();
 		while (s.contains("  "))

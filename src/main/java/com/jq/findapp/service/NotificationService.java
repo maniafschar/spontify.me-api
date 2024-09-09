@@ -439,7 +439,7 @@ public class NotificationService {
 			email.setFrom(client.getEmail(), (Strings.isEmpty(name) ? "" : name + " · ") + client.getName());
 			email.addTo(to);
 			email.setSubject(subject);
-			email.setTextMsg(text);
+			email.setTextMsg(Strings.sanitize(text, 0));
 			if (html != null) {
 				email.setDataSourceResolver(new DataSourceUrlResolver(
 						URI.create(Strings.removeSubdomain(client.getUrl())).toURL()));
