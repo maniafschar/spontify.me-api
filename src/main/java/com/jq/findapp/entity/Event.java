@@ -23,7 +23,7 @@ public class Event extends BaseEntity {
 	private Double price;
 	private Short maxParticipants;
 	private Short rating;
-	private long seriesId;
+	private Long seriesId;
 	@Column(columnDefinition = "TEXT")
 	private String description;
 	private String image;
