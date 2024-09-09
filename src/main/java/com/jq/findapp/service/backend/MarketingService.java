@@ -138,49 +138,6 @@ public class MarketingService {
 		return result;
 	}
 
-	public SchedulerResult runCleanup() {
-		final SchedulerResult result = new SchedulerResult();
-		final QueryParams params = new QueryParams(Query.contact_listMarketing);
-		params.setLimit(0);
-		try {
-			final ObjectMapper om = new ObjectMapper();
-			om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-			final Result contactMarketings = repository.list(params);
-			params.setQuery(Query.misc_listTicket);
-			int count = 0;
-			for (int i = 0; i < contactMarketings.size(); i++) {
-				final JsonNode answer = om
-						.readTree((String) contactMarketings.get(i).get("contactMarketing.storage"));
-				if (answer.has("locationId")) {
-					final Location location = repository.one(Location.class,
-							new BigInteger(answer.get("locationId").asText()));
-					String status = "";
-					params.setSearch("ticket.type='EMAIL' and ticket.subject='" + location.getEmail() + "'");
-					final Result emails = repository.list(params);
-					for (int i2 = 0; i2 < emails.size(); i2++) {
-						if (((String) emails.get(i2).get("ticket.note"))
-								.startsWith("Sky Sport Events: Vervollständigung Deiner Location Daten..."))
-							status += "|Unfinished";
-						if (((String) emails.get(i2).get("ticket.note"))
-								.contains("wir haben Dir soeben die Marketing-Aufkleber zugesendet"))
-							status += "|Sent";
-					}
-					if (!Strings.isEmpty(status)) {
-						final ContactMarketing contactMarketing = repository.one(ContactMarketing.class,
-								(BigInteger) contactMarketings.get(i).get("contactMarketing.id"));
-						contactMarketing.setStatus((Strings.isEmpty(contactMarketing.getStatus()) ? ""
-								: contactMarketing.getStatus() + "|") + status.substring(1));
-						repository.save(contactMarketing);
-						result.body = "" + ++count;
-					}
-				}
-			}
-		} catch (Exception ex) {
-			result.exception = ex;
-		}
-		return result;
-	}
-
 	public SchedulerResult runResult() {
 		final SchedulerResult result = new SchedulerResult();
 		try {
