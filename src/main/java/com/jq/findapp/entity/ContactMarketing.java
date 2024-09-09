@@ -11,6 +11,7 @@ import jakarta.persistence.Transient;
 public class ContactMarketing extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger clientMarketingId;
+	private String status;
 	private String storage;
 	private Boolean finished = false;
 
@@ -36,6 +37,14 @@ public class ContactMarketing extends BaseEntity {
 
 	public void setStorage(final String storage) {
 		this.storage = storage;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(final String status) {
+		this.status = status;
 	}
 
 	public Boolean getFinished() {
