@@ -321,7 +321,6 @@ public class MarketingService {
 							if (!counts.containsKey(clientMarketing.getId()))
 								counts.put(clientMarketing.getId(), 0);
 							counts.put(clientMarketing.getId(), counts.get(clientMarketing.getId()) + 1);
-							break;
 						}
 					}
 				}
