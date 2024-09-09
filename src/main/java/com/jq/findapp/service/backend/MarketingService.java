@@ -269,7 +269,7 @@ public class MarketingService {
 		public String apply(X x, Y y, Z z);
 	}
 
-	private SchedulerResult sendEmails(final String search, String subject, final String postfixText,
+	private SchedulerResult sendEmails(final String search, final String subject, final String postfixText,
 			final Decide<Location, Poll, JsonNode> decide, final Url<String, BigInteger, Location> url) {
 		final SchedulerResult result = new SchedulerResult();
 		final SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
@@ -297,9 +297,9 @@ public class MarketingService {
 						final Contact contact = new Contact();
 						contact.setLanguage("DE");
 						contact.setClientId(clientMarketing.getClientId());
-						subject = text.getText(contact,
+						final String subject2 = text.getText(contact,
 								TextId.valueOf("marketing_" + poll.locationPrefix + "SubjectPrefix")) + subject;
-						if (!sent(location.getEmail(), subject)) {
+						if (!sent(location.getEmail(), subject2)) {
 							final Client client = repository.one(Client.class, clientMarketing.getClientId());
 							final String u = url.apply(client.getUrl(), clientMarketing.getId(), location);
 							final String date = df
@@ -308,7 +308,7 @@ public class MarketingService {
 											: contactMarketings.get(i).get("contactMarketing.modifiedAt"));
 							if (!htmls.containsKey(client.getId()))
 								htmls.put(client.getId(), createHtmlTemplate(client));
-							final String s = text
+							final String body = text
 									.getText(contact,
 											TextId.valueOf(
 													"marketing_" + poll.locationPrefix + postfixText))
@@ -316,9 +316,9 @@ public class MarketingService {
 									+ text.getText(contact,
 											TextId.valueOf("marketing_" + poll.locationPrefix + "Postfix"));
 							notificationService.sendEmail(client, null, location.getEmail(),
-									subject, s.replace("{url}", u),
+									subject2, body.replace("{url}", u),
 									htmls.get(client.getId()).replace("<jq:text />",
-											s.replace("\n", "<br/>").replace("{url}",
+											body.replace("\n", "<br/>").replace("{url}",
 													"<a href=\"" + u + "\">" + client.getUrl() + "</a>")));
 							if (!counts.containsKey(clientMarketing.getId()))
 								counts.put(clientMarketing.getId(), 0);
