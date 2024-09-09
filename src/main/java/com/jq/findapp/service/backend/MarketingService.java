@@ -245,7 +245,7 @@ public class MarketingService {
 				(location, poll, answer) -> {
 					for (int i = 0; i < poll.questions.size(); i++) {
 						if ("cards".equals(poll.questions.get(i).id)) {
-							if (answer.get("q" + i).get("a").size() == 0)
+							if (!answer.has("q" + i) || answer.get("q" + i).get("a").size() == 0)
 								return false;
 							final int index = answer.get("q" + i).get("a").get(0).asInt();
 							return Integer.valueOf(poll.questions.get(i).answers.get(index).key) > 0;
