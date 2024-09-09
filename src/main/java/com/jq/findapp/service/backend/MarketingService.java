@@ -282,46 +282,44 @@ public class MarketingService {
 			for (int i = 0; i < contactMarketings.size(); i++) {
 				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 						(BigInteger) contactMarketings.get(i).get("contactMarketing.clientMarketingId"));
-				if (clientMarketing.getEndDate().getTime() > end) {
-					final JsonNode answer = om
-							.readTree((String) contactMarketings.get(i).get("contactMarketing.storage"));
-					if (answer.has("locationId")) {
-						final Poll poll = om.readValue(Attachment.resolve(clientMarketing.getStorage()),
-								Poll.class);
-						final Location location = repository.one(Location.class,
-								new BigInteger(answer.get("locationId").asText()));
-						if (decide.apply(location, poll, answer)) {
-							final Contact contact = new Contact();
-							contact.setLanguage("DE");
-							contact.setClientId(clientMarketing.getClientId());
-							subject = text.getText(contact,
-									TextId.valueOf("marketing_" + poll.locationPrefix + "SubjectPrefix")) + subject;
-							if (!sent(location.getEmail(), subject)) {
-								final Client client = repository.one(Client.class, clientMarketing.getClientId());
-								final String u = url.apply(client.getUrl(), clientMarketing.getId(), location);
-								final String date = df
-										.format(contactMarketings.get(i).get("contactMarketing.modifiedAt") == null
-												? contactMarketings.get(i).get("contactMarketing.createdAt")
-												: contactMarketings.get(i).get("contactMarketing.modifiedAt"));
-								if (!htmls.containsKey(client.getId()))
-									htmls.put(client.getId(), createHtmlTemplate(client));
-								final String s = text
-										.getText(contact,
-												TextId.valueOf(
-														"marketing_" + poll.locationPrefix + postfixText))
-										.replace("{date}", date).replace("{location}", location.getName())
-										+ text.getText(contact,
-												TextId.valueOf("marketing_" + poll.locationPrefix + "Postfix"));
-								notificationService.sendEmail(client, null, "support@fan-club.online", // location.getEmail(),
-										subject, s.replace("{url}", u),
-										htmls.get(client.getId()).replace("<jq:text />",
-												s.replace("\n", "<br/>").replace("{url}",
-														"<a href=\"" + u + "\">" + client.getUrl() + "</a>")));
-								if (!counts.containsKey(clientMarketing.getId()))
-									counts.put(clientMarketing.getId(), 0);
-								counts.put(clientMarketing.getId(), counts.get(clientMarketing.getId()) + 1);
-								break;
-							}
+				final JsonNode answer = om
+						.readTree((String) contactMarketings.get(i).get("contactMarketing.storage"));
+				if (answer.has("locationId") && clientMarketing.getEndDate().getTime() > end) {
+					final Poll poll = om.readValue(Attachment.resolve(clientMarketing.getStorage()),
+							Poll.class);
+					final Location location = repository.one(Location.class,
+							new BigInteger(answer.get("locationId").asText()));
+					if (decide.apply(location, poll, answer)) {
+						final Contact contact = new Contact();
+						contact.setLanguage("DE");
+						contact.setClientId(clientMarketing.getClientId());
+						subject = text.getText(contact,
+								TextId.valueOf("marketing_" + poll.locationPrefix + "SubjectPrefix")) + subject;
+						if (!sent(location.getEmail(), subject)) {
+							final Client client = repository.one(Client.class, clientMarketing.getClientId());
+							final String u = url.apply(client.getUrl(), clientMarketing.getId(), location);
+							final String date = df
+									.format(contactMarketings.get(i).get("contactMarketing.modifiedAt") == null
+											? contactMarketings.get(i).get("contactMarketing.createdAt")
+											: contactMarketings.get(i).get("contactMarketing.modifiedAt"));
+							if (!htmls.containsKey(client.getId()))
+								htmls.put(client.getId(), createHtmlTemplate(client));
+							final String s = text
+									.getText(contact,
+											TextId.valueOf(
+													"marketing_" + poll.locationPrefix + postfixText))
+									.replace("{date}", date).replace("{location}", location.getName())
+									+ text.getText(contact,
+											TextId.valueOf("marketing_" + poll.locationPrefix + "Postfix"));
+							notificationService.sendEmail(client, null, "support@fan-club.online", // location.getEmail(),
+									subject, s.replace("{url}", u),
+									htmls.get(client.getId()).replace("<jq:text />",
+											s.replace("\n", "<br/>").replace("{url}",
+													"<a href=\"" + u + "\">" + client.getUrl() + "</a>")));
+							if (!counts.containsKey(clientMarketing.getId()))
+								counts.put(clientMarketing.getId(), 0);
+							counts.put(clientMarketing.getId(), counts.get(clientMarketing.getId()) + 1);
+							break;
 						}
 					}
 				}
