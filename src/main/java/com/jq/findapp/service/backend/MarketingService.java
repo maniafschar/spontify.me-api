@@ -214,18 +214,6 @@ public class MarketingService {
 		}
 	}
 
-	private boolean sent(final String email, final String subject) {
-		final QueryParams params = new QueryParams(Query.misc_listTicket);
-		params.setLimit(0);
-		params.setSearch("ticket.type='EMAIL' and ticket.subject='" + email + "'");
-		final Result emails = repository.list(params);
-		for (int i2 = 0; i2 < emails.size(); i2++) {
-			if (((String) emails.get(i2).get("ticket.note")).startsWith(subject))
-				return true;
-		}
-		return false;
-	}
-
 	public SchedulerResult runUnfinished() {
 		return sendEmails("contactMarketing.finished=false and contactMarketing.createdAt>cast('"
 				+ Instant.now().minus(Duration.ofDays(14)).toString()
@@ -253,10 +241,8 @@ public class MarketingService {
 					}
 					return false;
 				},
-				(url, clientMarketingId,
-						location) -> url + (Strings.isEmpty(location.getSecret()) ? ""
-								: "/?i=" + location.getId() + "&h="
-										+ location.getSecret().hashCode()));
+				(url, clientMarketingId, location) -> url + (Strings.isEmpty(location.getSecret()) ? ""
+						: "/?i=" + location.getId() + "&h=" + location.getSecret().hashCode()));
 	}
 
 	@FunctionalInterface
@@ -323,16 +309,27 @@ public class MarketingService {
 							if (!counts.containsKey(clientMarketing.getId()))
 								counts.put(clientMarketing.getId(), 0);
 							counts.put(clientMarketing.getId(), counts.get(clientMarketing.getId()) + 1);
+							result.body = counts.toString();
 						}
 					}
 				}
 			}
-			if (!counts.isEmpty())
-				result.body = counts.toString();
 		} catch (Exception ex) {
 			result.exception = ex;
 		}
 		return result;
+	}
+
+	private boolean sent(final String email, final String subject) {
+		final QueryParams params = new QueryParams(Query.misc_listTicket);
+		params.setLimit(0);
+		params.setSearch("ticket.type='EMAIL' and ticket.subject='" + email + "'");
+		final Result emails = repository.list(params);
+		for (int i2 = 0; i2 < emails.size(); i2++) {
+			if (((String) emails.get(i2).get("ticket.note")).startsWith(subject))
+				return true;
+		}
+		return false;
 	}
 
 	public SchedulerResult runLocation() {
