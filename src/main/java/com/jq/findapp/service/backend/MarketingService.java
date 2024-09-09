@@ -251,8 +251,10 @@ public class MarketingService {
 					}
 					return false;
 				},
-				(url, clientMarketingId, location) -> url + "/?i=" + location.getId() + "&h="
-						+ location.getSecret().hashCode());
+				(url, clientMarketingId,
+						location) -> url + (Strings.isEmpty(location.getSecret()) ? ""
+								: "/?i=" + location.getId() + "&h="
+										+ location.getSecret().hashCode()));
 	}
 
 	@FunctionalInterface
@@ -311,7 +313,7 @@ public class MarketingService {
 									.replace("{date}", date).replace("{location}", location.getName())
 									+ text.getText(contact,
 											TextId.valueOf("marketing_" + poll.locationPrefix + "Postfix"));
-							notificationService.sendEmail(client, null, "support@fan-club.online", // location.getEmail(),
+							notificationService.sendEmail(client, null, location.getEmail(),
 									subject, s.replace("{url}", u),
 									htmls.get(client.getId()).replace("<jq:text />",
 											s.replace("\n", "<br/>").replace("{url}",

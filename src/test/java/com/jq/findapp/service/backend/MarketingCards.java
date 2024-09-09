@@ -101,7 +101,7 @@ public class MarketingCards {
 					countAddresses++;
 				}
 			});
-			// addStatistics();
+			addStatistics();
 		}
 
 		private byte[] toBytes() throws Exception {
