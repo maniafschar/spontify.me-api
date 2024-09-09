@@ -2,12 +2,14 @@ package com.jq.findapp.service.backend;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -67,15 +69,17 @@ public class ImportSportsBarService {
 
 	Results runZipCode(String zip) throws Exception {
 		final Results result = new Results();
-		final Map<String, String> cookies = new HashMap<>();
-		JsonNode list = new ObjectMapper().readTree(WebClient.create(URL + "search&zip=" + zip).get().retrieve()
-				.exchangeToMono(response -> {
-					if (response.statusCode().is2xxSuccessful()) {
-						response.cookies().forEach((key, respCookies) -> cookies.add(key, respCookies.get(0).getValue()));
-						return response.bodyToMono(String.class);
-					}
-					return response.createException().flatMap(e -> Mono.error(new MyException("Something went wrong")));
-				}).block());
+		final MultiValueMap<String, String> cookies = new LinkedMultiValueMap<>();
+		JsonNode list = new ObjectMapper()
+				.readTree(WebClient.create(URL + "search&zip=" + zip).get().accept(MediaType.APPLICATION_JSON)
+						.exchangeToMono(response -> {
+							if (response.statusCode().is2xxSuccessful()) {
+								response.cookies()
+										.forEach((key, respCookies) -> cookies.add(key, respCookies.get(0).getValue()));
+								return response.bodyToMono(String.class);
+							}
+							return response.createError();
+						}).block());
 		if (list.get("currentPageIndexEnd").intValue() > 0) {
 			final QueryParams params = new QueryParams(Query.misc_listStorage);
 			params.setSearch("storage.label='importSportBars'");
@@ -88,8 +92,8 @@ public class ImportSportsBarService {
 					try {
 						list = new ObjectMapper()
 								.readTree(WebClient.create(URL + "scroll&page=" + (i + 1) + "&zip=" + zip)
-										.cookies(cookieMap -> cookieMap.addAll(cookies))
 										.get()
+										.cookies(cookieMap -> cookieMap.addAll(cookies))
 										.retrieve()
 										.toEntity(String.class).block().getBody());
 					} catch (Exception ex) {
