@@ -233,8 +233,8 @@ public class SupportCenterApi {
 	}
 
 	@PostMapping("run/{classname}/{methodname}")
-	public SchedulerResult run(@PathVariable final String classname, @PathVariable final String methodname)
-			throws Exception {
+	public SchedulerResult run(@PathVariable final String classname,
+			@PathVariable(required = false) final String methodname) throws Exception {
 		final Object clazz = getClass().getDeclaredField(classname).get(this);
 		final SchedulerResult result = (SchedulerResult) clazz.getClass().getDeclaredMethod("run" + methodname)
 				.invoke(clazz);
