@@ -43,7 +43,8 @@ public class ImportSportsBarService {
 			for (int i = 0; i < zip.size(); i++) {
 				final String s = zip.get(i).get("zip").asText();
 				if (s.startsWith("" + zipCodePrefix)) {
-					final Results r = runZipCode(s);
+					result.body += s + "\n";
+					final Results r = zipCode(s);
 					results.imported += r.imported;
 					results.updated += r.updated;
 					results.processed += r.processed;
@@ -67,7 +68,7 @@ public class ImportSportsBarService {
 		return result;
 	}
 
-	Results runZipCode(String zip) throws Exception {
+	Results zipCode(String zip) throws Exception {
 		final Results result = new Results();
 		final MultiValueMap<String, String> cookies = new LinkedMultiValueMap<>();
 		JsonNode list = new ObjectMapper()
@@ -100,6 +101,7 @@ public class ImportSportsBarService {
 										.cookies(cookieMap -> cookieMap.addAll(cookies))
 										.retrieve()
 										.toEntity(String.class).block().getBody());
+
 					} catch (Exception ex) {
 						result.errorsScroll++;
 						notificationService.createTicket(TicketType.ERROR, "ImportSportsBarService.scroll",

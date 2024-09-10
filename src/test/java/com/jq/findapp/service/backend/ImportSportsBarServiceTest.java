@@ -41,7 +41,7 @@ public class ImportSportsBarServiceTest {
 		repository.save(storage);
 
 		// when
-		final Results result = importSportsBarService.runZipCode("80331");
+		final Results result = importSportsBarService.zipCode("80331");
 
 		// then
 		assertTrue(result.processed == 20);
