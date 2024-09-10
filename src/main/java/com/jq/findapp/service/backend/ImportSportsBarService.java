@@ -109,8 +109,8 @@ public class ImportSportsBarService {
 						continue;
 					}
 				}
-				for (int i2 = list.get("currentPageIndexStart").intValue() - 1; i2 < list.get("currentPageIndexEnd")
-						.intValue(); i2++) {
+				for (int i2 = 0; i2 < list.get("currentPageIndexEnd").intValue()
+						- list.get("currentPageIndexStart").intValue() + 1; i2++) {
 					result.processed++;
 					final JsonNode data = list.get("currentData").get("" + i2);
 					if (imported.contains(data.get("number").asText()))
