@@ -236,7 +236,8 @@ public class SupportCenterApi {
 	public SchedulerResult run(@PathVariable final String classname, @PathVariable final String methodname)
 			throws Exception {
 		final Object clazz = getClass().getDeclaredField(classname).get(this);
-		final SchedulerResult result = (SchedulerResult) clazz.getClass().getDeclaredMethod(methodname).invoke(clazz);
+		final SchedulerResult result = (SchedulerResult) clazz.getClass().getDeclaredMethod("run" + methodname)
+				.invoke(clazz);
 		LogFilter.body.set(result.toString());
 		return result;
 	}
