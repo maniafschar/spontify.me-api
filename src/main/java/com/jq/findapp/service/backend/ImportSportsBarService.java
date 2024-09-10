@@ -32,7 +32,7 @@ public class ImportSportsBarService {
 	@Autowired
 	private NotificationService notificationService;
 
-	private static final String URL = "https://skyfinder.sky.de/sf/skyfinder.servlet?detailedSearch=Suchen&group=H&group=B&group=A&country=de&action=";
+	private static final String URL = "https://skyfinder.sky.de/sf/skyfinder.servlet?";
 
 	public SchedulerResult run() {
 		final SchedulerResult result = new SchedulerResult();
@@ -71,7 +71,11 @@ public class ImportSportsBarService {
 		final Results result = new Results();
 		final MultiValueMap<String, String> cookies = new LinkedMultiValueMap<>();
 		JsonNode list = new ObjectMapper()
-				.readTree(WebClient.create(URL + "search&zip=" + zip).get().accept(MediaType.APPLICATION_JSON)
+				.readTree(WebClient
+						.create(URL + "detailedSearch=Suchen&group=H&group=B&group=A&country=de&action=search&zip="
+								+ zip)
+						.get()
+						.accept(MediaType.APPLICATION_JSON)
 						.exchangeToMono(response -> {
 							if (response.statusCode().is2xxSuccessful()) {
 								response.cookies()
@@ -91,7 +95,7 @@ public class ImportSportsBarService {
 				if (i > 0) {
 					try {
 						list = new ObjectMapper()
-								.readTree(WebClient.create(URL + "scroll&page=" + (i + 1) + "&zip=" + zip)
+								.readTree(WebClient.create(URL + "action=scroll&page=" + (i + 1))
 										.get()
 										.cookies(cookieMap -> cookieMap.addAll(cookies))
 										.retrieve()
