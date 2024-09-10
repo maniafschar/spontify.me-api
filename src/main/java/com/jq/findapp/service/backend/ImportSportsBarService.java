@@ -43,7 +43,6 @@ public class ImportSportsBarService {
 			for (int i = 0; i < zip.size(); i++) {
 				final String s = zip.get(i).get("zip").asText();
 				if (s.startsWith("" + zipCodePrefix)) {
-					result.body += s + "\n";
 					final Results r = zipCode(s);
 					results.imported += r.imported;
 					results.updated += r.updated;
