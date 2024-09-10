@@ -232,11 +232,12 @@ public class SupportCenterApi {
 		repository.save(contact);
 	}
 
-	@PostMapping("run/{classname}/{methodname}")
-	public SchedulerResult run(@PathVariable final String classname,
-			@PathVariable(required = false) final String methodname) throws Exception {
-		final Object clazz = getClass().getDeclaredField(classname).get(this);
-		final SchedulerResult result = (SchedulerResult) clazz.getClass().getDeclaredMethod("run" + methodname)
+	@PostMapping("run/{classname}")
+	public SchedulerResult run(@PathVariable final String classname) throws Exception {
+		final String[] s = classname.split("\\.");
+		final Object clazz = getClass().getDeclaredField(s[0]).get(this);
+		final SchedulerResult result = (SchedulerResult) clazz.getClass()
+				.getDeclaredMethod("run" + (s.length > 1 ? s[1] : ""))
 				.invoke(clazz);
 		LogFilter.body.set(result.toString());
 		return result;
