@@ -63,4 +63,25 @@ public class EventListenerTest {
 		assertEquals("2024-06-06", event.getEndDate().toString());
 		assertEquals("2024-06-06", eventDate.toString());
 	}
+
+	@Test
+	public void save_series() throws Exception {
+		// given
+		final long millis = 1717711200000l;
+		utils.createContact(BigInteger.ONE);
+		final Event event = new Event();
+		event.setContactId(contact.getId());
+		event.setDescription("abc");
+		event.setRepetition("c");
+		event.setSkills("9.157");
+		event.setStartDate(new Timestamp(millis));
+		event.setType(EventType.Location);
+
+		// when
+		repository.save(event);
+
+		// then
+		assertEquals(millis, event.getStartDate().getTime());
+		assertNoNull(event.getSeriesId());
+	}
 }
