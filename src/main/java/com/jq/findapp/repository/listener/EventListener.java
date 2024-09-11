@@ -16,6 +16,7 @@ import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.Event.EventType;
+import com.jq.findapp.entity.Event.Repetition;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.repository.Query;
@@ -38,15 +39,15 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	@Override
 	public void prePersist(final Event event) throws Exception {
 		preUpdate(event);
-		if ("c".equals(event.getRepetition()))
-			event.setSeries(System.currentTimeMillis());
+		if (event.getRepetition() == Repetition.Games)
+			event.setSeriesId(System.currentTimeMillis());
 	}
 
 	@Override
 	public void preUpdate(final Event event) throws Exception {
 		if (event.getRepetition() == null)
-			event.setRepetition("o");
-		if ("o".equals(event.getRepetition()))
+			event.setRepetition(Repetition.Once);
+		if (event.getRepetition() == Repetition.Once || event.getRepetition() == Repetition.Games)
 			event.setEndDate(getDate(event.getStartDate()));
 	}
 
@@ -62,6 +63,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 			eventParticipate.setEventDate(getDate(event.getStartDate()));
 			repository.save(eventParticipate);
 		}
+		updateSeries(event);
 	}
 
 	private Date getDate(Timestamp timestamp) {
@@ -109,6 +111,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 				}
 			}
 		}
+		updateSeries(event);
 	}
 
 	@Override
@@ -142,7 +145,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	}
 
 	public void updateSeries(final Event event) throws Exception {
-		if (!Strings.isEmpty(event.getSkills())) {
+		if (event.getRepetition() == Repetition.Games && !Strings.isEmpty(event.getSkills())) {
 			for (String skill : event.getSkills().split("\\|")) {
 				if (skill.startsWith("9.")) {
 					boolean canceled = event.getSkills().contains("X");

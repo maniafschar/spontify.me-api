@@ -1,6 +1,7 @@
 package com.jq.findapp.repository.listener;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
@@ -17,6 +18,7 @@ import com.jq.findapp.TestConfig;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.Event.EventType;
+import com.jq.findapp.entity.Event.Repetition;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -44,7 +46,7 @@ public class EventListenerTest {
 		final Event event = new Event();
 		event.setContactId(contact.getId());
 		event.setDescription("abc");
-		event.setRepetition("o");
+		event.setRepetition(Repetition.Once);
 		event.setStartDate(new Timestamp(millis));
 		event.setType(EventType.Location);
 
@@ -68,11 +70,13 @@ public class EventListenerTest {
 	public void save_series() throws Exception {
 		// given
 		final long millis = 1717711200000l;
-		utils.createContact(BigInteger.ONE);
+		final long now = System.currentTimeMillis();
+		final Contact contact = utils.createContact(BigInteger.ONE);
 		final Event event = new Event();
 		event.setContactId(contact.getId());
+		event.setLocationId(BigInteger.ZERO);
 		event.setDescription("abc");
-		event.setRepetition("c");
+		event.setRepetition(Repetition.Games);
 		event.setSkills("9.157");
 		event.setStartDate(new Timestamp(millis));
 		event.setType(EventType.Location);
@@ -82,6 +86,15 @@ public class EventListenerTest {
 
 		// then
 		assertEquals(millis, event.getStartDate().getTime());
-		assertNoNull(event.getSeriesId());
+		assertNotNull(event.getSeriesId() >= now);
+		final QueryParams params = new QueryParams(Query.event_listId);
+		params.setSearch("event.contactId=" + contact.getId());
+		final Result result = repository.list(params);
+		assertEquals(8, result.size());
+		final Event last = repository.one(Event.class, (BigInteger) result.get(result.size() - 1).get("event.id"));
+		assertEquals(contact.getId(), last.getContactId());
+		assertEquals(event.getSeriesId(), last.getSeriesId());
+		assertEquals(event.getDescription(), last.getDescription());
+		assertEquals(event.getLocationId(), last.getLocationId());
 	}
 }

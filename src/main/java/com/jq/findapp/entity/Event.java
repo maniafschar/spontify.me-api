@@ -31,12 +31,17 @@ public class Event extends BaseEntity {
 	private String publishId;
 	private String skills;
 	private String skillsText;
-	private String repetition;
+	@Enumerated(EnumType.STRING)
+	private Repetition repetition;
 	private String url;
 	private Timestamp startDate;
 
 	public enum EventType {
 		Location, Online, Inquiry, Poll
+	}
+
+	public enum Repetition {
+		Once, Week, TwoWeeks, Month, Year, Games
 	}
 
 	public BigInteger getLocationId() {
@@ -159,11 +164,11 @@ public class Event extends BaseEntity {
 		this.publish = publish;
 	}
 
-	public String getRepetition() {
+	public Repetition getRepetition() {
 		return repetition;
 	}
 
-	public void setRepetition(final String repetition) {
+	public void setRepetition(final Repetition repetition) {
 		this.repetition = repetition;
 	}
 
