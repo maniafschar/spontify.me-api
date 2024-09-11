@@ -715,9 +715,9 @@ public class SurveyService {
 		final JsonNode json = get("team=" + teamId + "&season=" + currentSeason());
 		for (int i = 0; i < json.size(); i++) {
 			if ("NS".equals(json.get(i).get("fixture").get("status").get("short").asText()))
-				events.add(new FutureEvent(json.get(i).get("fixture").get("timestamp").asLong(),
-						json.get(i).get("teams").get("home").get("name") + " : "
-								+ json.get(i).get("teams").get("away").get("name"),
+				events.add(new FutureEvent(json.get(i).get("fixture").get("timestamp").asLong() * 1000,
+						json.get(i).get("teams").get("home").get("name").asText() + " : "
+								+ json.get(i).get("teams").get("away").get("name").asText(),
 						json.get(i).get("teams").get("home").get("id").asInt() == teamId));
 		}
 		return events;
