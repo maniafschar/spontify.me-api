@@ -263,7 +263,7 @@ public class EventService {
 				+ "' as timestamp) and event.contactId=" + clientId
 				+ " and (event.image is not null or location.image is not null)"
 				+ " and event.url is not null"
-				+ " and event.repetition='o'"
+				+ " and event.repetition='Once'"
 				+ " and event.maxParticipants is null"
 				+ " and event.publishId is null");
 		final Result result = repository.list(params);
