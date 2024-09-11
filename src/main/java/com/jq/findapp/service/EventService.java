@@ -26,6 +26,7 @@ import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Event;
+import com.jq.findapp.entity.Event.Repetition;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.repository.Query;
@@ -209,13 +210,13 @@ public class EventService {
 	private LocalDateTime getRealDate(final Event event, final LocalDateTime now) {
 		LocalDateTime realDate = Instant.ofEpochMilli(event.getStartDate().getTime())
 				.atZone(ZoneId.systemDefault()).toLocalDateTime();
-		if (!"o".equals(event.getRepetition())) {
+		if (event.getRepetition() != Repetition.Once && event.getRepetition() != Repetition.Games) {
 			while (realDate.isBefore(now)) {
-				if ("w1".equals(event.getRepetition()))
+				if (event.getRepetition() == Repetition.Week)
 					realDate = realDate.plusWeeks(1);
-				else if ("w2".equals(event.getRepetition()))
+				else if (event.getRepetition() == Repetition.TwoWeeks)
 					realDate = realDate.plusWeeks(2);
-				else if ("m".equals(event.getRepetition()))
+				else if (event.getRepetition() == Repetition.Month)
 					realDate = realDate.plusMonths(1);
 				else
 					realDate = realDate.plusYears(1);

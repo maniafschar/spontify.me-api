@@ -83,7 +83,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 				final EventParticipate eventParticipate = repository.one(EventParticipate.class,
 						(BigInteger) result.get(i).get("eventParticipate.id"));
 				if (event.old("startDate") != null) {
-					if ("o".equals(event.getRepetition()))
+					if (event.getRepetition() == Repetition.Once || event.getRepetition() == Repetition.Games)
 						eventParticipate
 								.setEventDate(new java.sql.Date(event.getStartDate().toInstant().toEpochMilli()));
 					else
