@@ -38,6 +38,8 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	@Override
 	public void prePersist(final Event event) throws Exception {
 		preUpdate(event);
+		if ("c".equals(event.getRepetition()))
+			event.setSeries(System.currentTimeMillis());
 	}
 
 	@Override
@@ -194,7 +196,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 				e.setMaxParticipants(event.getMaxParticipants());
 				e.setPrice(event.getPrice());
 				e.setPublish(event.getPublish());
-				e.setSeriesId(futureEvent.time);
+				e.setSeriesId(event.getSeriesId());
 				e.setSkills(event.getSkills());
 				e.setSkillsText(event.getSkillsText());
 				e.setStartDate(new Timestamp(futureEvent.time - 30 * 60 * 1000));
