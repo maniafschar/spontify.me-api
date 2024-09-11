@@ -36,11 +36,22 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	@Autowired
 	private SurveyService surveyService;
 
+	private static final long seriesTimelaps = 30 * 60 * 1000;
+
 	@Override
 	public void prePersist(final Event event) throws Exception {
 		preUpdate(event);
-		if (event.getRepetition() == Repetition.Games)
+		if (event.getRepetition() == Repetition.Games) {
 			event.setSeriesId(System.currentTimeMillis());
+			final List<FutureEvent> futureEvents = surveyService
+					.futureEvents(Integer.valueOf(event.getSkills().substring(2)));
+			if (!futureEvents.isEmpty()) {
+				final FutureEvent futureEvent = futureEvents.get(0);
+				event.setStartDate(new Timestamp(futureEvent.time - seriesTimelaps));
+				event.setSeriesId(futureEvent.time);
+				event.setDescription(futureEvent.subject + "\n" + event.getDescription());
+			}
+		}
 	}
 
 	@Override
@@ -67,6 +78,8 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	}
 
 	private Date getDate(Timestamp timestamp) {
+		if (timestamp == null)
+			return null;
 		final Instant instant = timestamp.toInstant();
 		return new Date(instant.minus(Duration.ofHours(instant.atOffset(ZoneOffset.UTC).getHour())).toEpochMilli());
 	}
@@ -181,6 +194,9 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 
 	private void updateFutureEvents(final Event event, final Result events, final String skill) throws Exception {
 		final List<FutureEvent> futureEvents = surveyService.futureEvents(Integer.valueOf(skill.substring(2)));
+		final String description = event.getDescription().contains("\n")
+				? event.getDescription().substring(event.getDescription().indexOf("\n"))
+				: "\n" + event.getDescription();
 		for (FutureEvent futureEvent : futureEvents) {
 			boolean create = true;
 			for (int i = 0; i < events.size(); i++) {
@@ -192,17 +208,17 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 			if (create) {
 				final Event e = new Event();
 				e.setContactId(event.getContactId());
-				e.setDescription(event.getDescription());
+				e.setDescription(futureEvent.subject + description);
 				e.setImage(event.getImage());
 				e.setImageList(event.getImageList());
 				e.setLocationId(event.getLocationId());
 				e.setMaxParticipants(event.getMaxParticipants());
 				e.setPrice(event.getPrice());
 				e.setPublish(event.getPublish());
-				e.setSeriesId(event.getSeriesId());
+				e.setSeriesId(futureEvent.time);
 				e.setSkills(event.getSkills());
 				e.setSkillsText(event.getSkillsText());
-				e.setStartDate(new Timestamp(futureEvent.time - 30 * 60 * 1000));
+				e.setStartDate(new Timestamp(futureEvent.time - seriesTimelaps));
 				e.setType(event.getType());
 				e.setUrl(event.getUrl());
 				repository.save(e);

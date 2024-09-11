@@ -2,6 +2,7 @@ package com.jq.findapp.repository.listener;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
@@ -69,7 +70,6 @@ public class EventListenerTest {
 	@Test
 	public void save_series() throws Exception {
 		// given
-		final long millis = 1717711200000l;
 		final long now = System.currentTimeMillis();
 		final Contact contact = utils.createContact(BigInteger.ONE);
 		final Event event = new Event();
@@ -78,14 +78,13 @@ public class EventListenerTest {
 		event.setDescription("abc");
 		event.setRepetition(Repetition.Games);
 		event.setSkills("9.157");
-		event.setStartDate(new Timestamp(millis));
 		event.setType(EventType.Location);
 
 		// when
 		repository.save(event);
 
 		// then
-		assertEquals(millis, event.getStartDate().getTime());
+		assertNotNull(event.getStartDate());
 		assertNotNull(event.getSeriesId() >= now);
 		final QueryParams params = new QueryParams(Query.event_listId);
 		params.setSearch("event.contactId=" + contact.getId());
@@ -93,8 +92,8 @@ public class EventListenerTest {
 		assertEquals(8, result.size());
 		final Event last = repository.one(Event.class, (BigInteger) result.get(result.size() - 1).get("event.id"));
 		assertEquals(contact.getId(), last.getContactId());
-		assertEquals(event.getSeriesId(), last.getSeriesId());
-		assertEquals(event.getDescription(), last.getDescription());
+		assertTrue(
+				last.getDescription().endsWith(event.getDescription().substring(event.getDescription().indexOf("\n"))));
 		assertEquals(event.getLocationId(), last.getLocationId());
 	}
 }
