@@ -163,7 +163,8 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 				if (skill.startsWith("9.")) {
 					boolean canceled = event.getSkills().contains("X");
 					final QueryParams params = new QueryParams(Query.event_listId);
-					params.setSearch("event.contactId=" + event.getContactId() + " and cast(REGEXP_LIKE('" + skill
+					params.setSearch("event.contactId=" + event.getContactId()
+							+ " and length(event.skills)>0 and cast(REGEXP_LIKE('" + skill
 							+ "', event.skills) as integer)=1");
 					final Result events = repository.list(params);
 					if (!canceled) {
