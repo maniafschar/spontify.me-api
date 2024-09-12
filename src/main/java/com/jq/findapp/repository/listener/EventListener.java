@@ -73,7 +73,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 			eventParticipate.setEventDate(getDate(event.getStartDate()));
 			repository.save(eventParticipate);
 		}
-		updateSeries(event);
+		eventService.updateSeries(event);
 	}
 
 	private Date getDate(Timestamp timestamp) {
@@ -123,7 +123,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 				}
 			}
 		}
-		updateSeries(event);
+		eventService.updateSeries(event);
 	}
 
 	@Override
@@ -156,70 +156,4 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 		}
 	}
 
-	public void updateSeries(final Event event) throws Exception {
-		if (event.getRepetition() == Repetition.Games && !Strings.isEmpty(event.getSkills())) {
-			for (String skill : event.getSkills().split("\\|")) {
-				if (skill.startsWith("9.")) {
-					boolean canceled = event.getSkills().contains("X");
-					final QueryParams params = new QueryParams(Query.event_listId);
-					params.setSearch("event.contactId=" + event.getContactId()
-							+ " and length(event.skills)>0 and cast(REGEXP_LIKE('" + skill
-							+ "', event.skills) as integer)=1");
-					final Result events = repository.list(params);
-					if (!canceled) {
-						for (int i = 0; i < events.size(); i++) {
-							if (((String) events.get(i).get("event.skills")).contains("X")) {
-								canceled = true;
-								break;
-							}
-						}
-					}
-					if (canceled) {
-						for (int i = 0; i < events.size(); i++) {
-							if (!((String) events.get(i).get("event.skills")).contains("X") &&
-									event.getId().compareTo((BigInteger) events.get(i).get("event.id")) != 0) {
-								final Event e = repository.one(Event.class,
-										(BigInteger) events.get(i).get("event.id"));
-								e.setSkills(e.getSkills() + "|X");
-								repository.save(e);
-							}
-						}
-					} else
-						updateFutureEvents(event, events, skill);
-					break;
-				}
-			}
-		}
-	}
-
-	private void updateFutureEvents(final Event event, final Result events, final String skill) throws Exception {
-		final List<FutureEvent> futureEvents = surveyService.futureEvents(Integer.valueOf(skill.substring(2)));
-		final String description = event.getDescription().contains("\n")
-				? event.getDescription().substring(event.getDescription().indexOf("\n"))
-				: "\n" + event.getDescription();
-		long last = event.getLastSeriesId();
-		for (FutureEvent futureEvent : futureEvents) {
-			if (event.getLastSeriesId() < futureEvent.time) {
-				final Event e = new Event();
-				e.setContactId(event.getContactId());
-				e.setDescription(futureEvent.subject + description);
-				e.setImage(event.getImage());
-				e.setImageList(event.getImageList());
-				e.setLocationId(event.getLocationId());
-				e.setMaxParticipants(event.getMaxParticipants());
-				e.setPrice(event.getPrice());
-				e.setPublish(event.getPublish());
-				e.setSkills(event.getSkills());
-				e.setSkillsText(event.getSkillsText());
-				e.setStartDate(new Timestamp(futureEvent.time - seriesTimelaps));
-				e.setType(event.getType());
-				e.setUrl(event.getUrl());
-				repository.save(e);
-				if (last < futureEvent.time)
-					last = futureEvent.time;
-			}
-		}
-		repository.executeUpdate("update Event event set event.lastSeriesId=" + last + " where event.contactId=" + event.getContactId()
-				+ " and length(event.skills)>0 and cast(REGEXP_LIKE('" + skill + "', event.skills) as integer)=1");
-	}
 }
