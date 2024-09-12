@@ -260,8 +260,15 @@ public class EventService {
 	public SchedulerResult runMatchDays() {
 		final SchedulerResult result = new SchedulerResult();
 		try {
-			final BigInteger clientId = BigInteger.ONE;
-			result.body = "z";
+			final QueryParams params = new QueryParams(Query.event_listId);
+			params.setSearch("event.repetition='Games' and length(event.skills)>0 and event.skills not like '%X%'");
+			final Map<String, Integer> processed = new HashMap<>();
+			repository.list(params).forEach(e -> {
+				final String key = event.getContactId() + "." + event.getSkills();
+				if (!processed.containsKey(key))
+					processed.put(key, updateSeries(repository.one(Event.class, (BigInteger) e.get("event.id"))));
+			});
+			result.body = "" + processed;
 		} catch (final Exception e) {
 			result.exception = e;
 		}
@@ -311,7 +318,7 @@ public class EventService {
 		}
 	}
 
-	public void updateSeries(final Event event) throws Exception {
+	public int updateSeries(final Event event) throws Exception {
 		if (event.getRepetition() == Repetition.Games && !Strings.isEmpty(event.getSkills())) {
 			for (String skill : event.getSkills().split("\\|")) {
 				if (skill.startsWith("9.")) {
@@ -339,20 +346,21 @@ public class EventService {
 								repository.save(e);
 							}
 						}
-					} else
-						updateFutureEvents(event, events, skill);
-					break;
+						return 0;
+					}
+					return updateFutureEvents(event, events, skill);
 				}
 			}
 		}
 	}
 
-	private void updateFutureEvents(final Event event, final Result events, final String skill) throws Exception {
+	private int updateFutureEvents(final Event event, final Result events, final String skill) throws Exception {
 		final List<FutureEvent> futureEvents = surveyService.futureEvents(Integer.valueOf(skill.substring(2)));
 		final String description = event.getDescription().contains("\n")
 				? event.getDescription().substring(event.getDescription().indexOf("\n"))
 				: "\n" + event.getDescription();
 		long last = event.getLastSeriesId();
+		int count = 0;
 		for (FutureEvent futureEvent : futureEvents) {
 			if (event.getLastSeriesId() < futureEvent.time) {
 				final Event e = new Event();
@@ -372,9 +380,11 @@ public class EventService {
 				repository.save(e);
 				if (last < futureEvent.time)
 					last = futureEvent.time;
+				count++;
 			}
 		}
 		repository.executeUpdate("update Event event set event.lastSeriesId=" + last + " where event.contactId=" + event.getContactId()
 				+ " and length(event.skills)>0 and cast(REGEXP_LIKE('" + skill + "', event.skills) as integer)=1");
+		return count;
 	}
 }
