@@ -388,6 +388,7 @@ public class SupportCenterApi {
 			run(dbService, "CleanUp", list, new int[] { 0 }, 30);
 			run(engagementService, "Registration", list, new int[] { 10 }, 40);
 			run(eventService, "Match", list, null, -1);
+			run(eventService, "MatchDays", list, new int[] { 9 }, 20);
 			run(eventService, "Import", list, new int[] { 5 }, 40);
 			run(eventService, "Publish", list, null, -1);
 			run(eventService, "Participation", list, null, -1);
