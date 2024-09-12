@@ -24,7 +24,6 @@ public class Event extends BaseEntity {
 	private Short maxParticipants;
 	private Short rating;
 	private Long lastSeriesId;
-	private Long seriesId;
 	@Column(columnDefinition = "TEXT")
 	private String description;
 	private String image;
@@ -187,14 +186,6 @@ public class Event extends BaseEntity {
 
 	public void setLastSeriesId(Long lastSeriesId) {
 		this.lastSeriesId = lastSeriesId;
-	}
-
-	public Long getSeriesId() {
-		return seriesId;
-	}
-
-	public void setSeriesId(Long seriesId) {
-		this.seriesId = seriesId;
 	}
 
 	@Transient
