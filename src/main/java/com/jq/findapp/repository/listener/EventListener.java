@@ -42,13 +42,11 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	public void prePersist(final Event event) throws Exception {
 		preUpdate(event);
 		if (event.getRepetition() == Repetition.Games) {
-			event.setSeriesId(System.currentTimeMillis());
 			final List<FutureEvent> futureEvents = surveyService
 					.futureEvents(Integer.valueOf(event.getSkills().substring(2)));
 			if (!futureEvents.isEmpty()) {
 				final FutureEvent futureEvent = futureEvents.get(0);
 				event.setStartDate(new Timestamp(futureEvent.time - seriesTimelaps));
-				event.setSeriesId(futureEvent.time);
 				event.setLastSeriesId(futureEvent.time);
 				event.setDescription(futureEvent.subject + "\n" + event.getDescription());
 			}
@@ -199,16 +197,9 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 		final String description = event.getDescription().contains("\n")
 				? event.getDescription().substring(event.getDescription().indexOf("\n"))
 				: "\n" + event.getDescription();
-		long last = event.getLastSeriesId() == null ? 0 : event.getLastSeriesId();
+		long last = event.getLastSeriesId();
 		for (FutureEvent futureEvent : futureEvents) {
-			boolean create = true;
-			for (int i = 0; i < events.size(); i++) {
-				if (event.getSeriesId() != null && event.getSeriesId() == futureEvent.time) {
-					create = false;
-					break;
-				}
-			}
-			if (create) {
+			if (event.getLastSeriesId() < futureEvent.time) {
 				final Event e = new Event();
 				e.setContactId(event.getContactId());
 				e.setDescription(futureEvent.subject + description);
@@ -218,7 +209,6 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 				e.setMaxParticipants(event.getMaxParticipants());
 				e.setPrice(event.getPrice());
 				e.setPublish(event.getPublish());
-				e.setSeriesId(futureEvent.time);
 				e.setSkills(event.getSkills());
 				e.setSkillsText(event.getSkillsText());
 				e.setStartDate(new Timestamp(futureEvent.time - seriesTimelaps));
