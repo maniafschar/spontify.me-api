@@ -257,6 +257,17 @@ public class EventService {
 		return result;
 	}
 
+	public SchedulerResult runMatchDays() {
+		final SchedulerResult result = new SchedulerResult();
+		try {
+			final BigInteger clientId = BigInteger.ONE;
+			result.body = "z";
+		} catch (final Exception e) {
+			result.exception = e;
+		}
+		return result;
+	}
+
 	private String publishClient(final BigInteger clientId) throws Exception {
 		final QueryParams params = new QueryParams(Query.event_listId);
 		params.setSearch("event.startDate>cast('" + Instant.now().plus(Duration.ofHours(2))
