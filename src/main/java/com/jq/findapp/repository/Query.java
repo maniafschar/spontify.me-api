@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.apache.commons.io.IOUtils;
 
@@ -100,6 +101,11 @@ public enum Query {
 			for (int i = 0; i < list.get(0).length; i++)
 				one.put(list.get(0)[i].toString(), list.get(index + 1)[i]);
 			return one;
+		}
+
+		public void forEach(Consumer<Map<String, Object>> action) {
+			for (int i = 0; i < size(); i++)
+				action.accept(get(i));
 		}
 	}
 
