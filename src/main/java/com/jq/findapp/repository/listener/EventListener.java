@@ -49,6 +49,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 				final FutureEvent futureEvent = futureEvents.get(0);
 				event.setStartDate(new Timestamp(futureEvent.time - seriesTimelaps));
 				event.setSeriesId(futureEvent.time);
+				event.setLastSeriesId(futureEvent.time);
 				event.setDescription(futureEvent.subject + "\n" + event.getDescription());
 			}
 		}
@@ -198,6 +199,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 		final String description = event.getDescription().contains("\n")
 				? event.getDescription().substring(event.getDescription().indexOf("\n"))
 				: "\n" + event.getDescription();
+		long last = event.getLastSeriesId() == null ? 0 : event.getLastSeriesId();
 		for (FutureEvent futureEvent : futureEvents) {
 			boolean create = true;
 			for (int i = 0; i < events.size(); i++) {
@@ -223,7 +225,11 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 				e.setType(event.getType());
 				e.setUrl(event.getUrl());
 				repository.save(e);
+				if (last < futureEvent.time)
+					last = futureEvent.time;
 			}
 		}
+		repository.executeUpdate("update Event event set event.lastSeriesId=" + last + " where event.contactId=" + event.getContactId()
+				+ " and length(event.skills)>0 and cast(REGEXP_LIKE('" + skill + "', event.skills) as integer)=1");
 	}
 }
