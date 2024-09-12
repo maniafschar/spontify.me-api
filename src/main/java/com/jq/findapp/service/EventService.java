@@ -268,7 +268,9 @@ public class EventService {
 				if (!processed.containsKey(key))
 					processed.put(key, updateSeries(repository.one(Event.class, (BigInteger) e.get("event.id"))));
 			});
-			result.body = "" + processed;
+			result.body = "" + processed.entrySet().stream()
+					.filter(e -> e.getValue() > 0)
+					.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 		} catch (final Exception e) {
 			result.exception = e;
 		}
