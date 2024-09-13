@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Location;
@@ -16,6 +15,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.service.ExternalService;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 
 @Component
@@ -86,13 +86,13 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 	private void lookupAddress(final Location location) throws Exception {
 		if (location.getLatitude() != null)
 			checkDuplicateLatLon(location);
-		final JsonNode address = new ObjectMapper().readTree(
+		final JsonNode address = Json.toNode(
 				externalService.google("geocode/json?address="
 						+ location.getAddress().replaceAll("\n", ", ")));
 		if (!"OK".equals(address.get("status").asText()))
 			throw new IllegalArgumentException(
 					"invalid address:\n" + location.getName() + "\n" + location.getAddress() + "\n"
-							+ new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(address));
+							+ Json.toPrettyString(address));
 		final JsonNode result = address.get("results").get(0);
 		JsonNode n = result.get("geometry").get("location");
 		final GeoLocation geoLocation = externalService.convertAddress(address).get(0);
