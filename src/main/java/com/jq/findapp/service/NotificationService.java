@@ -40,7 +40,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import org.springframework.web.reactive.function.client.WebClientResponseException.NotFound;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.ContactType;
@@ -56,6 +55,7 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.push.Android;
 import com.jq.findapp.service.push.Ios;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
 import com.jq.findapp.util.Text.TextId;
@@ -286,8 +286,7 @@ public class NotificationService {
 			String setting = "\n\n";
 			try {
 				for (int i = 0; i < settings.size(); i++)
-					setting += new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(settings.get(i))
-							+ "\n\n";
+					setting += Json.toPrettyString(settings.get(i)) + "\n\n";
 				createTicket(TicketType.ERROR, "Push Notification",
 						contactTo.getId() + "\n\n"
 								+ IOUtils.toString(getClass().getResourceAsStream("/template/push.android"),
@@ -387,8 +386,7 @@ public class NotificationService {
 								+ "\" width=\"150\" height=\"150\" style=\"height:150px;min-height:150px;max-height:150px;width:150px;min-width:150px;max-width:150px;border-radius:75px;\" />");
 			else
 				Strings.replaceString(html, "<jq:image />", "");
-			final JsonNode css = new ObjectMapper()
-					.readTree(Attachment.resolve(repository.one(Client.class, contactTo.getClientId()).getStorage()))
+			final JsonNode css = Json.toNode(Attachment.resolve(repository.one(Client.class, contactTo.getClientId()).getStorage()))
 					.get("css");
 			css.fieldNames().forEachRemaining(key -> Strings.replaceString(html, "--" + key, css.get(key).asText()));
 			message = sanatizeHtml(message);
