@@ -284,24 +284,28 @@ public class NotificationService {
 			params.setSearch("setting.label like 'push.gen.%'");
 			final Result settings = repository.list(params);
 			String setting = "\n\n";
-			for (int i = 0; i < settings.size(); i++)
-				setting += new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(settings.get(i))
-						+ "\n\n";
-			createTicket(TicketType.ERROR, "Push Notification",
-					contactTo.getId() + "\n\n"
-							+ IOUtils.toString(getClass().getResourceAsStream("/template/push.android"),
-									StandardCharsets.UTF_8)
-									.replace("{from}", from)
-									.replace("{to}", contactTo.getPushToken())
-									.replace("{text}", text)
-									.replace("{notificationId}",
-											"" + (notification == null ? null : notification.getId()))
-									.replace("{exec}", Strings.isEmpty(action) ? "" : action)
-							+ (ex instanceof WebClientResponseException
-									? "\n\n" + ((WebClientResponseException) ex).getResponseBodyAsString()
-									: "")
-							+ setting + Strings.stackTraceToString(ex),
-					notification == null ? null : notification.getContactId2());
+			try {
+				for (int i = 0; i < settings.size(); i++)
+					setting += new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(settings.get(i))
+							+ "\n\n";
+				createTicket(TicketType.ERROR, "Push Notification",
+						contactTo.getId() + "\n\n"
+								+ IOUtils.toString(getClass().getResourceAsStream("/template/push.android"),
+										StandardCharsets.UTF_8)
+										.replace("{from}", from)
+										.replace("{to}", contactTo.getPushToken())
+										.replace("{text}", text)
+										.replace("{notificationId}",
+												"" + (notification == null ? null : notification.getId()))
+										.replace("{exec}", Strings.isEmpty(action) ? "" : action)
+								+ (ex instanceof WebClientResponseException
+										? "\n\n" + ((WebClientResponseException) ex).getResponseBodyAsString()
+										: "")
+								+ setting + Strings.stackTraceToString(ex),
+						notification == null ? null : notification.getContactId2());
+			} catch (Exception ex2) {
+				throw new RuntimeException(ex.getMessage(), ex2);
+			}
 			return false;
 		}
 	}
