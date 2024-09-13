@@ -20,7 +20,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
 import com.jq.findapp.TestConfig.SurveyServiceMock;
@@ -30,6 +29,7 @@ import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.backend.SurveyService.PollSurvey;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith(SpringExtension.class)
@@ -123,7 +123,7 @@ public class SurveyServiceTest {
 	@Test
 	public void errors() throws Exception {
 		// given
-		final JsonNode json = new ObjectMapper().readTree(
+		final JsonNode json = Json.toNode(
 				"{\"get\":\"fixtures\",\"parameters\":{\"id\":\"209214\"},\"errors\":{\"rateLimit\":\"Too many requests. Your rate limit is 10 requests per minute.\"},\"results\":0,\"paging\":{\"current\":1,\"total\":1},\"response\":[]}");
 
 		// when
@@ -140,7 +140,7 @@ public class SurveyServiceTest {
 				StandardCharsets.UTF_8);
 
 		// when
-		final PollSurvey result = new ObjectMapper().readValue(json, PollSurvey.class);
+		final PollSurvey result = Json.toObject(json, PollSurvey.class);
 
 		// then
 		assertEquals("Prediction", result.type);
@@ -174,7 +174,7 @@ public class SurveyServiceTest {
 
 	private String result(final BigInteger clientMarketingId) throws Exception {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
-		final PollSurvey poll = new ObjectMapper().readValue(Attachment.resolve(clientMarketing.getStorage()),
+		final PollSurvey poll = Json.toObject(Attachment.resolve(clientMarketing.getStorage()),
 				PollSurvey.class);
 		final int max = (int) (10 + Math.random() * 100);
 		for (int i = 0; i < max; i++) {
