@@ -44,9 +44,8 @@ public class IpService {
 				final Ip ip = repository.one(Ip.class, (BigInteger) list.get(i).get("ip.id"));
 				final String json = WebClient.create(lookupIp.replace("{ip}", ip.getIp())).get().retrieve()
 						.toEntity(String.class).block().getBody();
-				final Ip ip2 = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-						.readValue(json, Ip.class);
-				final String location = new ObjectMapper().readTree(json.getBytes(StandardCharsets.UTF_8)).get("loc")
+				final Ip ip2 = Json.toObject(json, Ip.class);
+				final String location = Json.toNode(json.getBytes(StandardCharsets.UTF_8)).get("loc")
 						.asText();
 				ip.setCity(ip2.getCity());
 				ip.setCountry(ip2.getCountry());
@@ -82,7 +81,7 @@ public class IpService {
 						.retrieve().toEntity(String.class).block().getBody();
 				try {
 					final Ip ip2 = Json.toObject(json, Ip.class);
-					final String location = new ObjectMapper().readTree(json).get("loc").asText();
+					final String location = Json.toNode(json).get("loc").asText();
 					ip2.setLatitude(Float.parseFloat(location.split(",")[0]));
 					ip2.setLongitude(Float.parseFloat(location.split(",")[1]));
 					save(ip2);
