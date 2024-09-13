@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -12,10 +13,15 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.glassfish.hk2.runlevel.RunLevelException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -34,6 +40,9 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.repository.listener.EventListener;
+import com.jq.findapp.service.backend.SurveyService;
+import com.jq.findapp.service.backend.SurveyService.FutureEvent;
 import com.jq.findapp.service.backend.events.ImportMunich;
 import com.jq.findapp.util.Score;
 import com.jq.findapp.util.Strings;
@@ -56,6 +65,9 @@ public class EventService {
 
 	@Autowired
 	private ImportMunich importMunich;
+
+	@Autowired
+	private SurveyService surveyService;
 
 	public static List<String> getAnswers(JsonNode poll, long state) {
 		final List<String> answers = new ArrayList<>();
@@ -264,9 +276,14 @@ public class EventService {
 			params.setSearch("event.repetition='Games' and length(event.skills)>0 and event.skills not like '%X%'");
 			final Map<String, Integer> processed = new HashMap<>();
 			repository.list(params).forEach(e -> {
+				final Event event = repository.one(Event.class, (BigInteger) e.get("event.id"));
 				final String key = event.getContactId() + "." + event.getSkills();
 				if (!processed.containsKey(key))
-					processed.put(key, updateSeries(repository.one(Event.class, (BigInteger) e.get("event.id"))));
+					try {
+						processed.put(key, updateSeries(event));
+					} catch (Exception ex) {
+						throw new RunLevelException(ex);
+					}
 			});
 			result.body = "" + processed.entrySet().stream()
 					.filter(e -> e.getValue() > 0)
@@ -354,6 +371,7 @@ public class EventService {
 				}
 			}
 		}
+		return 0;
 	}
 
 	private int updateFutureEvents(final Event event, final Result events, final String skill) throws Exception {
@@ -376,7 +394,7 @@ public class EventService {
 				e.setPublish(event.getPublish());
 				e.setSkills(event.getSkills());
 				e.setSkillsText(event.getSkillsText());
-				e.setStartDate(new Timestamp(futureEvent.time - seriesTimelaps));
+				e.setStartDate(new Timestamp(futureEvent.time - EventListener.SERIES_TIMELAP));
 				e.setType(event.getType());
 				e.setUrl(event.getUrl());
 				repository.save(e);
@@ -385,7 +403,8 @@ public class EventService {
 				count++;
 			}
 		}
-		repository.executeUpdate("update Event event set event.lastSeriesId=" + last + " where event.contactId=" + event.getContactId()
+		repository.executeUpdate("update Event event set event.lastSeriesId=" + last + " where event.contactId="
+				+ event.getContactId()
 				+ " and length(event.skills)>0 and cast(REGEXP_LIKE('" + skill + "', event.skills) as integer)=1");
 		return count;
 	}

@@ -2,11 +2,13 @@ package com.jq.findapp.service.backend;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
 import org.apache.commons.io.IOUtils;
+import org.glassfish.hk2.runlevel.RunLevelException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +17,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Query;
-import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 
@@ -56,10 +57,10 @@ public class SitemapService {
 							new FileOutputStream(json.get("path").asText() + File.separatorChar + "sitemap.xml"));
 					result.body += "updated " + e.get("client.id");
 				}
-			} catch (final Exception e) {
-				result.body += e.get("client.id") + ", error " + e.getMessage() + "\n";
+			} catch (final Exception ex) {
+				result.body += e.get("client.id") + ", error " + ex.getMessage() + "\n";
 				if (result.exception == null)
-					result.exception = e;
+					result.exception = ex;
 			}
 		});
 		return result;
@@ -73,8 +74,15 @@ public class SitemapService {
 		final String filename = json.get("path").asText() + File.separatorChar + name;
 		new File(filename).delete();
 		try (final FileOutputStream out = new FileOutputStream(filename)) {
-			repository.list(params).forEach(e -> out.write((urlList + e.get(("news".equals(type) ? "clientNews" : type) + ".id") + "\n")
-					.getBytes(StandardCharsets.UTF_8)));
+			repository.list(params).forEach(
+					e -> {
+						try {
+							out.write((urlList + e.get(("news".equals(type) ? "clientNews" : type) + ".id") + "\n")
+									.getBytes(StandardCharsets.UTF_8));
+						} catch (IOException ex) {
+							throw new RunLevelException(ex);
+						}
+					});
 		}
 		sitemap.append("<sitemap><loc>" + url + "/" + name + "</loc></sitemap>");
 	}

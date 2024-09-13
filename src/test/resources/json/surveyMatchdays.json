@@ -1173,7 +1173,7 @@
 				"referee": null,
 				"timezone": "UTC",
 				"date": "2023-11-24T19:30:00+00:00",
-				"timestamp": 1700854200,
+				"timestamp": "{date1}",
 				"periods": {
 					"first": null,
 					"second": null
@@ -1241,7 +1241,7 @@
 				"referee": null,
 				"timezone": "UTC",
 				"date": "2023-12-02T14:30:00+00:00",
-				"timestamp": 1701527400,
+				"timestamp": "{date2}",
 				"periods": {
 					"first": null,
 					"second": null

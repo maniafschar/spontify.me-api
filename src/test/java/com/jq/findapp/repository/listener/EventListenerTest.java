@@ -89,7 +89,7 @@ public class EventListenerTest {
 		final QueryParams params = new QueryParams(Query.event_listId);
 		params.setSearch("event.contactId=" + contact.getId());
 		final Result result = repository.list(params);
-		assertEquals(8, result.size());
+		assertEquals(3, result.size());
 		final Event last = repository.one(Event.class, (BigInteger) result.get(result.size() - 1).get("event.id"));
 		assertEquals(contact.getId(), last.getContactId());
 		assertTrue(

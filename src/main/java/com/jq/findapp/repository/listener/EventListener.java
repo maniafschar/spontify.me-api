@@ -30,13 +30,13 @@ import com.jq.findapp.util.Text.TextId;
 
 @Component
 public class EventListener extends AbstractRepositoryListener<Event> {
+	public static final long SERIES_TIMELAP = 30 * 60 * 1000;
+
 	@Autowired
 	private EventService eventService;
 
 	@Autowired
 	private SurveyService surveyService;
-
-	private static final long seriesTimelaps = 30 * 60 * 1000;
 
 	@Override
 	public void prePersist(final Event event) throws Exception {
@@ -46,7 +46,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 					.futureEvents(Integer.valueOf(event.getSkills().substring(2)));
 			if (!futureEvents.isEmpty()) {
 				final FutureEvent futureEvent = futureEvents.get(0);
-				event.setStartDate(new Timestamp(futureEvent.time - seriesTimelaps));
+				event.setStartDate(new Timestamp(futureEvent.time - SERIES_TIMELAP));
 				event.setLastSeriesId(futureEvent.time);
 				event.setDescription(futureEvent.subject + "\n" + event.getDescription());
 			}
