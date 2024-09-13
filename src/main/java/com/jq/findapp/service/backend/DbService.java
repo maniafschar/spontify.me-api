@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
@@ -35,6 +34,7 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.repository.listener.ClientNewsListener;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 
 @Service
@@ -122,18 +122,16 @@ public class DbService {
 		updateField("<meta name=\"email\" content=\"([^\"].*)\"", html, e -> client.setEmail(e));
 		updateField("<meta property=\\\"og:title\\\" content=\"([^\"].*)\"", html, e -> client.setName(e));
 		updateField("<meta property=\\\"og:url\\\" content=\"([^\"].*)\"", html, e -> client.setUrl(e));
-		final ObjectMapper om = new ObjectMapper();
-		final ObjectNode node = (ObjectNode) om.readTree(Attachment.resolve(client.getStorage()));
+		final ObjectNode node = (ObjectNode) Json.toNode(Attachment.resolve(client.getStorage()));
 		if (!node.has("lang"))
-			node.set("lang", om.createObjectNode());
+			node.set("lang", Json.createObject());
 		final List<String> langs = Arrays.asList("DE", "EN");
 		for (final String lang : langs) {
-			final JsonNode json = new ObjectMapper()
-					.readTree(IOUtils.toString(
+			final JsonNode json = Json.toNode(IOUtils.toString(
 							new FileInputStream(webDir + client.getId() + "/js/lang/" + lang + ".json"),
 							StandardCharsets.UTF_8));
 			if (!node.get("lang").has(lang))
-				((ObjectNode) node.get("lang")).set(lang, om.createObjectNode());
+				((ObjectNode) node.get("lang")).set(lang, Json.createObject());
 			if (!node.get("lang").get(lang).has("buddy") ||
 					!node.get("lang").get(lang).get("buddy").asText()
 							.equals(json.get("labels").get("buddies").asText())) {
@@ -151,10 +149,10 @@ public class DbService {
 			while (matcher.find())
 				css += "\"" + matcher.group(1) + "\":\"" + matcher.group(2) + "\",";
 			css = css.substring(0, css.length() - 1) + "}";
-			if (!node.has("css") || !om.writeValueAsString(node.get("css")).equals(css))
-				node.set("css", om.readTree(css));
+			if (!node.has("css") || !Json.toString(node.get("css")).equals(css))
+				node.set("css", Json.toNode(css));
 		}
-		client.setStorage(om.writeValueAsString(node));
+		client.setStorage(Json.toString(node));
 		if (client.modified()) {
 			repository.save(client);
 			return true;
@@ -184,7 +182,7 @@ public class DbService {
 		params.setLimit(15);
 		data.put("locations", repository.list(params).getList());
 		data.put("update", Instant.now().toString());
-		IOUtils.write(new ObjectMapper().writeValueAsString(data),
+		IOUtils.write(Json.toString(data),
 				new FileOutputStream("statistics" + clientId + ".json"), StandardCharsets.UTF_8);
 	}
 }
