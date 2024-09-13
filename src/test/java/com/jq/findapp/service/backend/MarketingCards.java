@@ -36,20 +36,19 @@ import org.apache.pdfbox.pdmodel.graphics.shading.PDShadingType2;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import com.jq.findapp.util.Json;
 
 public class MarketingCards {
 
 	@Test
 	public void createPdf() throws Exception {
 		// given
-		final JsonNode addresses = new ObjectMapper()
-				.readTree(getClass().getResourceAsStream("/json/marketingAddresses.json"));
+		final JsonNode addresses = Json.toNode(getClass().getResourceAsStream("/json/marketingAddresses.json"));
 		final PDF pdf = new PDF(addresses);
 
 		// when
