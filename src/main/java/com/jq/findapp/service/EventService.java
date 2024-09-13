@@ -190,7 +190,7 @@ public class EventService {
 	}
 
 	@Async
-	public void publish(final BigInteger id) throws Exception {
+	public void publish(final BigInteger id) {
 		final Event event = repository.one(Event.class, id);
 		if (!Strings.isEmpty(event.getPublishId()))
 			return;
