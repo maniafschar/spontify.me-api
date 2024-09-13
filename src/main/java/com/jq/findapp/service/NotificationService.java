@@ -103,7 +103,7 @@ public class NotificationService {
 
 	@Async
 	public void locationNotifyOnMatch(final Contact me, final BigInteger locationId,
-			final TextId textId, final String param) throws Exception {
+			final TextId textId, final String param) {
 		final QueryParams params = new QueryParams(Query.location_listFavorite);
 		params.setSearch("locationFavorite.locationId=" + locationId);
 		final Result favorites = repository.list(params);
@@ -116,7 +116,7 @@ public class NotificationService {
 
 	@Async
 	public void sendNotificationOnMatch(final TextId textId, final Contact me, final Contact other,
-			final String... param) throws Exception {
+			final String... param) {
 		if (me != null && other != null && !me.getId().equals(other.getId()) && me.getAge() != null
 				&& me.getGender() != null) {
 			final String s2 = me.getGender().intValue() == 1 ? other.getAgeMale()
@@ -144,7 +144,7 @@ public class NotificationService {
 	}
 
 	public boolean sendNotificationSync(final Contact contactFrom, final Contact contactTo,
-			final TextId textId, final String action, final String... param) throws Exception {
+			final TextId textId, final String action, final String... param) {
 		if (contactTo == null || !contactTo.getVerified())
 			return false;
 		if (contactFrom != null && contactTo.getId() != null) {
@@ -192,12 +192,12 @@ public class NotificationService {
 
 	@Async
 	public void sendNotification(final Contact contactFrom, final Contact contactTo,
-			final TextId textId, final String action, final String... param) throws Exception {
+			final TextId textId, final String action, final String... param) {
 		sendNotificationSync(contactFrom, contactTo, textId, action, param);
 	}
 
 	private ContactNotification save(final Contact contactTo, final Contact contactFrom, final String text,
-			final String action, final TextId textId) throws Exception {
+			final String action, final TextId textId) {
 		final BigInteger fromId = contactFrom == null ? null : contactFrom.getId();
 		final QueryParams params = new QueryParams(Query.contact_notification);
 		params.setSearch("contactNotification.contactId=" + contactTo.getId() +
@@ -246,7 +246,7 @@ public class NotificationService {
 	}
 
 	private boolean sendNotificationDevice(final Contact contactFrom, final Contact contactTo, final StringBuilder text,
-			final String action, final ContactNotification notification) throws Exception {
+			final String action, final ContactNotification notification) {
 		if (Strings.isEmpty(text) || Strings.isEmpty(contactTo.getPushSystem())
 				|| Strings.isEmpty(contactTo.getPushToken()))
 			return false;
@@ -341,7 +341,7 @@ public class NotificationService {
 	}
 
 	public void sendNotificationEmail(final Contact contactFrom, final Contact contactTo, String message,
-			final String action) throws Exception {
+			final String action) {
 		try (final InputStream inHtml = getClass().getResourceAsStream("/template/email.html");
 				final InputStream inText = getClass().getResourceAsStream("/template/email.txt")) {
 			final StringBuilder html = new StringBuilder(IOUtils.toString(inHtml, StandardCharsets.UTF_8));
@@ -411,6 +411,8 @@ public class NotificationService {
 					contactFrom == null || contactFrom.getId().equals(client.getAdminId()) ? null
 							: contactFrom.getPseudonym(),
 					contactTo.getEmail(), message, s.toString(), html.toString());
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
 		}
 	}
 
