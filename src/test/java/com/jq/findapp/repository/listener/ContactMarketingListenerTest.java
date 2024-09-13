@@ -5,14 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.jq.findapp.util.Json;
 
 public class ContactMarketingListenerTest {
 	@Test
 	public void fillJson() throws Exception {
 		// given
-		final JsonNode json = new ObjectMapper().readTree("{\"q0\":{\"a\":[],\"t\":\"3:0 für Bayern 💪🔥\"}}");
+		final JsonNode json = Json.toNode("{\"q0\":{\"a\":[],\"t\":\"3:0 für Bayern 💪🔥\"}}");
 		json.fieldNames().forEachRemaining(key -> {
 			if (json.get(key).has("t"))
 
