@@ -13,10 +13,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
 import com.jq.findapp.entity.GeoLocation;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.service.ExternalService;
 
 @ExtendWith(SpringExtension.class)
@@ -33,7 +33,7 @@ public class ActionApiTest {
 				StandardCharsets.UTF_8);
 
 		// when
-		final JsonNode data = new ObjectMapper().readTree(response);
+		final JsonNode data = Json.toNode(response);
 		final GeoLocation address = externalService.convertAddress(data).get((0));
 
 		// then
@@ -53,8 +53,7 @@ public class ActionApiTest {
 	@Test
 	public void paypal_refund() throws Exception {
 		// given
-		final JsonNode n = new ObjectMapper()
-				.readTree(IOUtils.toString(getClass().getResourceAsStream("/json/paypalWebhook.json"),
+		final JsonNode n = Json.toNode(IOUtils.toString(getClass().getResourceAsStream("/json/paypalWebhook.json"),
 						StandardCharsets.UTF_8));
 
 		// when
