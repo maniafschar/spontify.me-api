@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Ip;
 import com.jq.findapp.entity.Ticket;
@@ -18,6 +16,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 
 @Service
@@ -82,9 +81,7 @@ public class IpService {
 						.create(lookupIp.replace("{ip}", (String) result.get(i).get("log.ip"))).get()
 						.retrieve().toEntity(String.class).block().getBody();
 				try {
-					final Ip ip2 = new ObjectMapper()
-							.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-							.readValue(json, Ip.class);
+					final Ip ip2 = Json.toObject(json, Ip.class);
 					final String location = new ObjectMapper().readTree(json).get("loc").asText();
 					ip2.setLatitude(Float.parseFloat(location.split(",")[0]));
 					ip2.setLongitude(Float.parseFloat(location.split(",")[1]));
