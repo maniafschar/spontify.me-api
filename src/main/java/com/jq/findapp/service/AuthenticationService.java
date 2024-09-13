@@ -256,11 +256,7 @@ public class AuthenticationService {
 				contact.setReferer(contactReferer.getContactId());
 				if (contactReferer.getCreatedAt()
 						.after(new Date(Instant.now().minus(Duration.ofHours(12)).toEpochMilli())))
-					try {
-						repository.delete(contactReferer);
-					} catch (Exception ex) {
-						throw new RunLevelException(ex);
-					}
+					repository.delete(contactReferer);
 			});
 		}
 		if (contact.getIdDisplay() == null) {
@@ -478,17 +474,13 @@ public class AuthenticationService {
 			return;
 		final String[] sqls = accountDeleteSql.split(";");
 		for (String sql : sqls) {
-			try {
-				sql = sql.replaceAll("\\{ID}", "" + contact.getId()).trim();
-				if (sql.startsWith("from ")) {
-					final List<?> list = repository.list(sql);
-					for (final Object e : list)
-						repository.delete((BaseEntity) e);
-				} else
-					repository.executeUpdate(sql);
-			} catch (final Exception ex) {
-				throw new RuntimeException("ERROR SQL on account delete: " + ex.getMessage() + "\n" + sql);
-			}
+			sql = sql.replaceAll("\\{ID}", "" + contact.getId()).trim();
+			if (sql.startsWith("from ")) {
+				final List<?> list = repository.list(sql);
+				for (final Object e : list)
+					repository.delete((BaseEntity) e);
+			} else
+				repository.executeUpdate(sql);
 		}
 	}
 }
