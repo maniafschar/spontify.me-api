@@ -9,13 +9,13 @@ import java.util.Date;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.Event.EventType;
 import com.jq.findapp.entity.EventParticipate;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.service.EventService;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text.TextId;
 
@@ -48,7 +48,7 @@ public class EventParticipateListener extends AbstractRepositoryListener<EventPa
 								contactTo.getTimezone()),
 						event.getDescription());
 			else if (event.getType() == EventType.Poll) {
-				final JsonNode json = new ObjectMapper().readTree(event.getDescription());
+				final JsonNode json = Json.toNode(event.getDescription());
 				notificationService.sendNotification(contactFrom, contactTo,
 						TextId.notification_eventParticipatePoll,
 						Strings.encodeParam("e=" + event.getId()),
