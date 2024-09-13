@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.glassfish.hk2.runlevel.RunLevelException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -170,8 +171,7 @@ public class ActionApi {
 		final Result result = repository.list(params);
 		params.setSearch(
 				"contactChat.seen=false and contactChat.contactId=" + id + " and contactChat.contactId2=" + user);
-		final Result unseen = repository.list(params);
-		if (unseen.size() > 0) {
+		if (repository.list(params).size() > 0) {
 			repository.executeUpdate(
 					"update ContactChat contactChat set contactChat.seen=true, contactChat.modifiedAt=now() where (contactChat.seen is null or contactChat.seen=false) and contactChat.contactId="
 							+ id + " and contactChat.contactId2=" + user);
@@ -449,14 +449,17 @@ public class ActionApi {
 			id = id.substring(id.lastIndexOf('/') + 1);
 			final QueryParams params = new QueryParams(Query.event_listParticipateRaw);
 			params.setSearch("eventParticipate.payment like '%" + id + "%'");
-			final Result result = repository.list(params);
-			for (int i = 0; i < result.size(); i++) {
+			repository.list(params).forEach(e -> {
 				final EventParticipate eventParticipate = repository.one(EventParticipate.class,
-						(BigInteger) result.get(i).get("eventParticipate.id"));
+						(BigInteger) e.get("eventParticipate.id"));
 				eventParticipate.setState(-1);
 				eventParticipate.setReason("Paypal " + n.get("resource").get("note_to_payer").asText());
-				repository.save(eventParticipate);
-			}
+				try {
+					repository.save(eventParticipate);
+				} catch (Exception ex) {
+					throw new RunLevelException(ex);
+				}
+			});
 		}
 	}
 

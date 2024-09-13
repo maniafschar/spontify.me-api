@@ -61,8 +61,8 @@ public class ChatService {
 						+ TextId.engagement_ai.name()
 						+ "' and contactChat.createdAt>cast('"
 						+ Instant.now().minus(Duration.ofDays(3)) + "' as timestamp)");
-		final Result result2 = repository.list(params);
 		int count = 0;
+		final Result result2 = repository.list(params);
 		for (int i = 0; i < result2.size(); i++) {
 			params.setSearch(
 					"contactChat.contactId=(select adminId from Client client, Contact contact where client.id=contact.clientId and contact.id=contactChat.contactId) and contactChat.id>"

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.glassfish.hk2.runlevel.RunLevelException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -36,7 +37,6 @@ import com.jq.findapp.entity.ContactReferer;
 import com.jq.findapp.entity.ContactToken;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
-import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService.AuthenticationException.AuthenticationExceptionType;
@@ -250,15 +250,18 @@ public class AuthenticationService {
 			final QueryParams params = new QueryParams(Query.contact_listReferer);
 			params.setSearch("contactReferer.ip='" + registration.getIp() + "' and contactReferer.footprint='"
 					+ registration.getFootprint() + "'");
-			final Result result = repository.list(params);
-			if (result.size() > 0) {
+			repository.list(params).forEach(e -> {
 				final ContactReferer contactReferer = repository.one(ContactReferer.class,
-						(BigInteger) result.get(0).get("contactReferer.id"));
+						(BigInteger) e.get("contactReferer.id"));
 				contact.setReferer(contactReferer.getContactId());
 				if (contactReferer.getCreatedAt()
 						.after(new Date(Instant.now().minus(Duration.ofHours(12)).toEpochMilli())))
-					repository.delete(contactReferer);
-			}
+					try {
+						repository.delete(contactReferer);
+					} catch (Exception ex) {
+						throw new RunLevelException(ex);
+					}
+			});
 		}
 		if (contact.getIdDisplay() == null) {
 			final String[] name = contact.getPseudonym().split(" ");

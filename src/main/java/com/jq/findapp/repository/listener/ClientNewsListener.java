@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import com.jq.findapp.entity.ClientNews;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Query;
-import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.util.Text.TextId;
 
@@ -32,35 +31,37 @@ public class ClientNewsListener extends AbstractRepositoryListener<ClientNews> {
 				&& clientNews.getPublish().getTime() <= Instant.now().atZone(ZoneOffset.UTC).toEpochSecond() * 1000
 				&& (clientNews.getNotified() == null || !clientNews.getNotified())) {
 			try {
-				clientNews = repository.one(ClientNews.class, clientNews.getId());
-				if (clientNews != null) {
-					clientNews.setNotified(true);
-					this.repository.save(clientNews);
-					if (clientNews.getCategory() != null) {
+				final ClientNews clientNews2 = repository.one(ClientNews.class, clientNews.getId());
+				if (clientNews2 != null) {
+					clientNews2.setNotified(true);
+					this.repository.save(clientNews2);
+					if (clientNews2.getCategory() != null) {
 						final QueryParams params = new QueryParams(Query.contact_listId);
-						params.setSearch("contact.clientId=" + clientNews.getClientId() + " and contact.verified=true");
-						final Result users = this.repository.list(params);
-						final String cat = "|" + clientNews.getCategory() + "|";
-						for (int i2 = 0; i2 < users.size(); i2++) {
+						params.setSearch(
+								"contact.clientId=" + clientNews2.getClientId() + " and contact.verified=true");
+						final String cat = "|" + clientNews2.getCategory() + "|";
+						repository.list(params).forEach(e -> {
 							final Contact contact = this.repository.one(Contact.class,
-									(BigInteger) users.get(i2).get("contact.id"));
+									(BigInteger) e.get("contact.id"));
 							if (("|" + contact.getSkills() + "|").contains(cat))
-								this.notificationService.sendNotificationSync(null,
-										contact,
-										TextId.notification_clientNews, "news=" + clientNews.getId(),
-										clientNews.getSource() + ": " + clientNews.getDescription());
-						}
+								try {
+									this.notificationService.sendNotificationSync(null,
+											contact,
+											TextId.notification_clientNews, "news=" + clientNews2.getId(),
+											clientNews2.getSource() + ": " + clientNews2.getDescription());
+								} catch (Exception ex) {
+									throw new RuntimeException(ex);
+								}
+						});
 					}
 				}
 			} catch (final Exception e) {
-				if (clientNews != null) {
-					try {
-						clientNews.setNotified(false);
-						this.repository.save(clientNews);
-					} catch (final Exception e1) {
-					}
-					throw new RuntimeException(e);
+				try {
+					clientNews.setNotified(false);
+					this.repository.save(clientNews);
+				} catch (final Exception e1) {
 				}
+				throw new RuntimeException(e);
 			}
 		}
 	}

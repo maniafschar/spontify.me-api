@@ -81,19 +81,17 @@ public class AuthenticationApi {
 				user.put("login_video_call", Boolean.TRUE);
 			params.setQuery(Query.contact_listGeoLocationHistory);
 			params.setSearch("contactGeoLocationHistory.contactId=" + user.get("contact.id"));
-			final Result result = repository.list(params);
-			if (result.size() > 0) {
-				final Map<String, Object> geoLocationHistory = result.get(0);
-				if (geoLocationHistory.containsKey("contactGeoLocationHistory.manual")
-						&& ((Boolean) geoLocationHistory.get("contactGeoLocationHistory.manual"))) {
+			repository.list(params).forEach(e -> {
+				if (e.containsKey("contactGeoLocationHistory.manual")
+						&& ((Boolean) e.get("contactGeoLocationHistory.manual"))) {
 					final GeoLocation geoLocation = repository.one(GeoLocation.class,
-							(BigInteger) geoLocationHistory.get("contactGeoLocationHistory.geoLocationId"));
+							(BigInteger) e.get("contactGeoLocationHistory.geoLocationId"));
 					user.put("geo_location", "{\"lat\":" + geoLocation.getLatitude() +
 							",\"lon\":" + geoLocation.getLongitude()
 							+ ",\"street\":\"" + geoLocation.getStreet() +
 							"\",\"town\":\"" + geoLocation.getTown() + "\"}");
 				}
-			}
+			});
 			if (publicKey != null) {
 				final ContactToken t;
 				params.setQuery(Query.contact_token);

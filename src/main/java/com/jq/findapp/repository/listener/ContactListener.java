@@ -15,7 +15,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactLink;
 import com.jq.findapp.repository.Query;
-import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.NotificationService.NotificationType;
@@ -94,16 +93,19 @@ public class ContactListener extends AbstractRepositoryListener<Contact> {
 		params.setLimit(0);
 		params.setSearch("(contactLink.contactId=" + contact.getId() + " or contactLink.contactId2=" + contact.getId()
 				+ ") and contactLink.status='Friends'");
-		final Result result = repository.list(params);
-		for (int i = 0; i < result.size(); i++) {
+		repository.list(params).forEach(e -> {
 			final ContactLink contactLink = repository.one(ContactLink.class,
-					(BigInteger) result.get(i).get("contactLink.id"));
-			notificationService.sendNotification(contact,
-					repository.one(Contact.class,
-							contactLink.getContactId().equals(contact.getId()) ? contactLink.getContactId2()
-									: contactLink.getContactId()),
-					TextId.notification_contactDelete, null);
-		}
+					(BigInteger) e.get("contactLink.id"));
+			try {
+				notificationService.sendNotification(contact,
+						repository.one(Contact.class,
+								contactLink.getContactId().equals(contact.getId()) ? contactLink.getContactId2()
+										: contactLink.getContactId()),
+						TextId.notification_contactDelete, null);
+			} catch (Exception ex) {
+				throw new RuntimeException(ex);
+			}
+		});
 	}
 
 	private String sanitizePseudonym(String pseudonym) {
