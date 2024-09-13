@@ -13,12 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.util.Json;
 
 @Service
 public class SitemapService {
@@ -29,8 +29,7 @@ public class SitemapService {
 		final SchedulerResult result = new SchedulerResult();
 		repository.list(new QueryParams(Query.misc_listClient)).forEach(e -> {
 			try {
-				final JsonNode json = new ObjectMapper().readTree(e.get("client.storage").toString())
-						.get("sitemap");
+				final JsonNode json = Json.toNode(e.get("client.storage").toString()).get("sitemap");
 				if (json != null) {
 					final StringBuilder sitemap = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 					sitemap.append("<sitemapindex xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">");
