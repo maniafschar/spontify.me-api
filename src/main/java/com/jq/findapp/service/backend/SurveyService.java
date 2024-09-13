@@ -710,7 +710,7 @@ public class SurveyService {
 				.format(DateTimeFormatter.ofPattern(format == null ? "d.M.yyyy' um 'H:mm' Uhr'" : format));
 	}
 
-	public List<FutureEvent> futureEvents(final int teamId) throws Exception {
+	public List<FutureEvent> futureEvents(final int teamId) {
 		final List<FutureEvent> events = new ArrayList<>();
 		final JsonNode json = get("team=" + teamId + "&season=" + currentSeason());
 		for (int i = 0; i < json.size(); i++) {
@@ -723,7 +723,7 @@ public class SurveyService {
 		return events;
 	}
 
-	protected JsonNode get(final String url) throws Exception {
+	protected JsonNode get(final String url) {
 		JsonNode fixture = null;
 		final String label = STORAGE_PREFIX + url;
 		final QueryParams params = new QueryParams(Query.misc_listStorage);
