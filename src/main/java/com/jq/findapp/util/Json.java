@@ -10,7 +10,7 @@ public class Json {
 		om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
 
-	public static JsonNode toNode(String json) {
+	public static JsonNode toNode(final String json) {
 		try {
 			return om.readTree(json);
 		} catch (Exception ex) {
@@ -18,15 +18,15 @@ public class Json {
 		}
 	}
 
-	public static <T> T toObject(String json, Class<T> class) {
+	public static <T> T toObject(final String json, final Class<T> clazz) {
 		try {
-			return om.readValue(json, class);
+			return om.readValue(json, clazz);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
 	}
 
-	public static String toString(Object object) {
+	public static String toString(final Object object) {
 		try {
 			return om.writeValueAsString(object);
 		} catch (Exception ex) {
@@ -34,7 +34,7 @@ public class Json {
 		}
 	}
 
-	public static String toPrettyString(Object object) {
+	public static String toPrettyString(final Object object) {
 		try {
 			return om.writerWithDefaultPrettyPrinter().writeValueAsString(object);
 		} catch (Exception ex) {
