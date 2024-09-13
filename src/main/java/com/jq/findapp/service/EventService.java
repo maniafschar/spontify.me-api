@@ -357,10 +357,9 @@ public class EventService {
 						events.forEach(e -> {
 							if (!((String) e.get("event.skills")).contains("X") &&
 									event.getId().compareTo((BigInteger) e.get("event.id")) != 0) {
-								final Event e = repository.one(Event.class,
-										(BigInteger) e.get("event.id"));
-								e.setSkills(e.getSkills() + "|X");
-								repository.save(e);
+								final Event e2 = repository.one(Event.class, (BigInteger) e.get("event.id"));
+								e2.setSkills(e2.getSkills() + "|X");
+								repository.save(e2);
 							}
 						});
 						return 0;
