@@ -130,8 +130,7 @@ public class Text {
 		}
 	}
 
-	public String getText(final Contact contact, final TextId textId)
-			throws JsonMappingException, JsonProcessingException {
+	public String getText(final Contact contact, final TextId textId) {
 		final String label = textId.name();
 		String s;
 		try {
@@ -141,14 +140,16 @@ public class Text {
 						.get(label.substring(label.indexOf('_') + 1)).asText();
 			else
 				s = languages.get(contact.getLanguage()).get(label).asText();
+			final Client client = repository.one(Client.class, contact.getClientId());
+			final JsonNode node = new ObjectMapper().readTree(Attachment.resolve(client.getStorage()));
+			s = s.replaceAll("APP_TITLE", client.getName());
+			s = s.replaceAll(" \\$\\{buddy}", node.get("lang").get(contact.getLanguage()).get("buddy").asText());
+			s = s.replaceAll(" \\$\\{buddies}", node.get("lang").get(contact.getLanguage()).get("buddies").asText());
+			return s;
 		} catch (final NullPointerException ex) {
 			throw new RuntimeException("Missing label " + contact.getLanguage() + ": " + textId);
+		} catch (final Exception ex) {
+			throw new RuntimeException("Error on " + contact.getLanguage() + ": " + textId, ex);
 		}
-		final Client client = repository.one(Client.class, contact.getClientId());
-		final JsonNode node = new ObjectMapper().readTree(Attachment.resolve(client.getStorage()));
-		s = s.replaceAll("APP_TITLE", client.getName());
-		s = s.replaceAll(" \\$\\{buddy}", node.get("lang").get(contact.getLanguage()).get("buddy").asText());
-		s = s.replaceAll(" \\$\\{buddies}", node.get("lang").get(contact.getLanguage()).get("buddies").asText());
-		return s;
 	}
 }
