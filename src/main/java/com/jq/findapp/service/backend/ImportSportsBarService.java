@@ -13,7 +13,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Storage;
@@ -22,6 +21,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.NotificationService;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 
 @Service
@@ -39,7 +39,7 @@ public class ImportSportsBarService {
 		final Results results = new Results();
 		try {
 			final String zipCodePrefix = "" + (LocalDateTime.now().getDayOfYear() % 10);
-			final JsonNode zip = new ObjectMapper().readTree(getClass().getResourceAsStream("/json/zip.json"));
+			final JsonNode zip = Json.toNode(getClass().getResourceAsStream("/json/zip.json"));
 			for (int i = 0; i < zip.size(); i++) {
 				final String s = zip.get(i).get("zip").asText();
 				if (s.startsWith("" + zipCodePrefix)) {
@@ -70,8 +70,7 @@ public class ImportSportsBarService {
 	Results zipCode(String zip) throws Exception {
 		final Results result = new Results();
 		final MultiValueMap<String, String> cookies = new LinkedMultiValueMap<>();
-		JsonNode list = new ObjectMapper()
-				.readTree(WebClient
+		JsonNode list = Json.toNode(WebClient
 						.create(URL + "detailedSearch=Suchen&group=H&group=B&group=A&country=de&action=search&zip="
 								+ zip)
 						.get()
@@ -89,13 +88,11 @@ public class ImportSportsBarService {
 			params.setSearch("storage.label='importSportBars'");
 			final Map<String, Object> storage = repository.one(params);
 			@SuppressWarnings("unchecked")
-			final Set<String> imported = new ObjectMapper()
-					.readValue(storage.get("storage.storage").toString(), Set.class);
+			final Set<String> imported = Json.toObject(storage.get("storage.storage").toString(), Set.class);
 			for (int i = 0; i < list.get("numberOfPages").asInt(); i++) {
 				if (i > 0) {
 					try {
-						list = new ObjectMapper()
-								.readTree(WebClient.create(URL + "action=scroll&page=" + (i + 1))
+						list = Json.toNode(WebClient.create(URL + "action=scroll&page=" + (i + 1))
 										.get()
 										.cookies(cookieMap -> cookieMap.addAll(cookies))
 										.retrieve()
@@ -164,7 +161,7 @@ public class ImportSportsBarService {
 				}
 			}
 			final Storage s = repository.one(Storage.class, (BigInteger) storage.get("storage.id"));
-			s.setStorage(new ObjectMapper().writeValueAsString(imported));
+			s.setStorage(Json.toString(imported));
 			repository.save(s);
 		}
 		return result;
