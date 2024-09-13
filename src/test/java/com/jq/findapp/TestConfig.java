@@ -36,7 +36,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
@@ -44,6 +43,7 @@ import com.jq.findapp.service.EventService;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService.MailCreateor;
 import com.jq.findapp.service.backend.SurveyService;
+import com.jq.findapp.util.Json;
 
 @Profile("test")
 @TestConfiguration
@@ -149,7 +149,7 @@ public class TestConfig {
 					getClass().getResourceAsStream(
 							url.startsWith("id=") ? "/json/surveyLastMatch.json" : "/json/surveyMatchdays.json"),
 					StandardCharsets.UTF_8);
-			return new ObjectMapper().readTree(
+			return Json.toNode(
 					s.replace("\"{date}\"", "" + (long) (Instant.now().getEpochSecond() + (offset == -1 ? 0 : offset)))
 							.replace("\"{date1}\"",
 									"" + (long) (Instant.now().plus(Duration.ofDays(7)).getEpochSecond()
