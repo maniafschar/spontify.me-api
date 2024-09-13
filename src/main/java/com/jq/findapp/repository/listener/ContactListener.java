@@ -96,15 +96,11 @@ public class ContactListener extends AbstractRepositoryListener<Contact> {
 		repository.list(params).forEach(e -> {
 			final ContactLink contactLink = repository.one(ContactLink.class,
 					(BigInteger) e.get("contactLink.id"));
-			try {
-				notificationService.sendNotification(contact,
-						repository.one(Contact.class,
-								contactLink.getContactId().equals(contact.getId()) ? contactLink.getContactId2()
-										: contactLink.getContactId()),
-						TextId.notification_contactDelete, null);
-			} catch (Exception ex) {
-				throw new RuntimeException(ex);
-			}
+			notificationService.sendNotification(contact,
+					repository.one(Contact.class,
+							contactLink.getContactId().equals(contact.getId()) ? contactLink.getContactId2()
+									: contactLink.getContactId()),
+					TextId.notification_contactDelete, null);
 		});
 	}
 
