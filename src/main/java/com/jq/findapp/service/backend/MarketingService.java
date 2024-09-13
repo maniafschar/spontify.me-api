@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.api.model.InternalRegistration;
 import com.jq.findapp.entity.Client;
@@ -44,6 +43,7 @@ import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
 import com.jq.findapp.util.Text.TextId;
@@ -123,9 +123,7 @@ public class MarketingService {
 							run = false;
 					}
 					if (run) {
-						final ObjectMapper om = new ObjectMapper();
-						om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-						final Poll poll = om.readValue(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
+						final Poll poll = Json.toObject(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
 						notificationService.sendNotification(null, contact,
 								poll.textId, "m=" + clientMarketing.getId(), poll.subject);
 					}
@@ -155,9 +153,7 @@ public class MarketingService {
 						"contactMarketing.finished=true and contactMarketing.contactId is not null and contactMarketing.clientMarketingId="
 								+ clientMarketing.getId());
 				final Result users = repository.list(params);
-				final ObjectMapper om = new ObjectMapper();
-				om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-				final Poll poll = om.readValue(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
+				final Poll poll = Json.toNode(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
 				final List<Object> sent = new ArrayList<>();
 				final String field = "contactMarketing.contactId";
 				for (int i2 = 0; i2 < users.size(); i2++) {
@@ -186,11 +182,9 @@ public class MarketingService {
 	private void publish(final ClientMarketing clientMarketing, boolean result) throws Exception {
 		if (clientMarketing.getShare() && clientMarketing.getCreateResult()
 				&& Strings.isEmpty(clientMarketing.getPublishId())) {
-			final ObjectMapper om = new ObjectMapper();
-			om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-			final JsonNode clientJson = om.readTree(Attachment
+			final JsonNode clientJson = Json.toNode(Attachment
 					.resolve(repository.one(Client.class, clientMarketing.getClientId()).getStorage()));
-			final Poll poll = om.readValue(Attachment.resolve(clientMarketing.getStorage()),
+			final Poll poll = Json.toObject(Attachment.resolve(clientMarketing.getStorage()),
 					Poll.class);
 			final Contact contact = new Contact();
 			contact.setLanguage("DE");
@@ -292,15 +286,12 @@ public class MarketingService {
 			final Result contactMarketings = repository.list(params);
 			final long end = Instant.now().plus(Duration.ofDays(1)).toEpochMilli();
 			final Map<BigInteger, Integer> counts = new HashMap<>();
-			final ObjectMapper om = new ObjectMapper();
-			om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			for (int i = 0; i < contactMarketings.size(); i++) {
 				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 						(BigInteger) contactMarketings.get(i).get("contactMarketing.clientMarketingId"));
-				final JsonNode answer = om
-						.readTree((String) contactMarketings.get(i).get("contactMarketing.storage"));
+				final JsonNode answer = Json.toNode((String) contactMarketings.get(i).get("contactMarketing.storage"));
 				if (answer.has("locationId") && clientMarketing.getEndDate().getTime() > end) {
-					final Poll poll = om.readValue(Attachment.resolve(clientMarketing.getStorage()),
+					final Poll poll = Json.toObject(Attachment.resolve(clientMarketing.getStorage()),
 							Poll.class);
 					final Location location = repository.one(Location.class,
 							new BigInteger(answer.get("locationId").asText()));
@@ -355,8 +346,6 @@ public class MarketingService {
 		final SchedulerResult result = new SchedulerResult();
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
 		params.setLimit(0);
-		final ObjectMapper om = new ObjectMapper();
-		om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		try {
 			final String today = Instant.now().toString().substring(0, 19);
 			params.setSearch("clientMarketing.startDate<=cast('" + today
@@ -364,7 +353,7 @@ public class MarketingService {
 			final Result list = repository.list(params);
 			params.setQuery(Query.location_listId);
 			for (int i = 0; i < list.size(); i++) {
-				final Poll poll = om.readValue((String) list.get(i).get("clientMarketing.storage"), Poll.class);
+				final Poll poll = Json.toObject((String) list.get(i).get("clientMarketing.storage"), Poll.class);
 				if (!Strings.isEmpty(poll.locationPrefix)) {
 					final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 							(BigInteger) list.get(i).get("clientMarketing.id"));
@@ -445,9 +434,7 @@ public class MarketingService {
 		final int a = html.indexOf("</a>");
 		html = html.substring(0, a + 4) + html.substring(html.indexOf("<jq:text"));
 		html = html.substring(0, html.lastIndexOf("<div>", a)) + html.substring(a);
-		final JsonNode css = new ObjectMapper()
-				.readTree(Attachment.resolve(client.getStorage()))
-				.get("css");
+		final JsonNode css = Json.toNode(Attachment.resolve(client.getStorage())).get("css");
 		final Iterator<String> it = css.fieldNames();
 		while (it.hasNext()) {
 			final String key = it.next();
@@ -459,15 +446,13 @@ public class MarketingService {
 	public String locationUpdate(final ContactMarketing contactMarketing) throws Exception {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 				contactMarketing.getClientMarketingId());
-		final ObjectMapper om = new ObjectMapper();
-		om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		final JsonNode answers = om.readTree(Attachment.resolve(contactMarketing.getStorage()));
+		final JsonNode answers = Json.toNode(Attachment.resolve(contactMarketing.getStorage()));
 		if (answers.has("locationId")) {
 			final Location location = repository.one(Location.class,
 					new BigInteger(answers.get("locationId").asText()));
 			if ((location.getUpdatedAt() == null || location.getUpdatedAt().before(clientMarketing.getStartDate()))
 					&& location.getSecret().hashCode() == answers.get("hash").asInt()) {
-				final Poll poll = om.readValue(Attachment.resolve(
+				final Poll poll = Json.toObject(Attachment.resolve(
 						clientMarketing.getStorage()), Poll.class);
 				String result = "<ul><li>Deine Location wurde erfolgreich akualisiert.</li>";
 				String email = "Lieben Dank für Deine Teilnahme, Deine Location wurde erfolgreich akualisiert:\n\n";
@@ -569,10 +554,8 @@ public class MarketingService {
 	}
 
 	public synchronized ClientMarketingResult synchronizeResult(final BigInteger clientMarketingId) throws Exception {
-		final ObjectMapper om = new ObjectMapper();
-		om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
-		final Poll poll = om.readValue(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
+		final Poll poll = Json.toObject(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
 		if (!clientMarketing.getCreateResult())
 			return null;
 		final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
@@ -596,7 +579,7 @@ public class MarketingService {
 			final String answersText = (String) result.get(i2).get("contactMarketing.storage");
 			if (answersText != null && answersText.length() > 2) {
 				pollResult.finished++;
-				final JsonNode contactAnswer = om.readTree(answersText);
+				final JsonNode contactAnswer = Json.toNode(answersText);
 				final Iterator<String> it = contactAnswer.fieldNames();
 				while (it.hasNext()) {
 					final String key = it.next();
@@ -625,7 +608,7 @@ public class MarketingService {
 				}
 			}
 		}
-		clientMarketingResult.setStorage(om.writeValueAsString(pollResult));
+		clientMarketingResult.setStorage(Json.toString(pollResult));
 		repository.save(clientMarketingResult);
 		return clientMarketingResult;
 	}
