@@ -206,6 +206,8 @@ public class ExternalService {
 					.bodyValue(IOUtils.toString(in, StandardCharsets.UTF_8).replace("{prompt}", prompt))
 					.retrieve().toEntity(String.class).block().getBody();
 			return new ObjectMapper().readTree(s).get("choices").get(0).get("text").asText().trim();
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
 		}
 	}
 
