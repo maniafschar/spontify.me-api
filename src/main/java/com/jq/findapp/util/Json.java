@@ -42,4 +42,8 @@ public class Json {
 			throw new RuntimeException(ex);
 		}
 	}
+
+	public static String createObject() {
+		return om.createObjectNode();
+	}
 }
