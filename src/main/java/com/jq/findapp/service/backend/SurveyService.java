@@ -36,8 +36,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
@@ -761,7 +759,11 @@ public class SurveyService {
 					final Storage storage = result.size() == 0 ? new Storage()
 							: repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
 					storage.setLabel(label);
-					storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
+					try {
+						storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
+					} catch (Exception ex) {
+						throw new RuntimeException(ex);
+					}
 					repository.save(storage);
 				}
 			} else
@@ -772,27 +774,31 @@ public class SurveyService {
 		return fixture.get("response");
 	}
 
-	private JsonNode needUpdate(final Result result) throws JsonMappingException, JsonProcessingException {
-		JsonNode fixture = null;
-		if (result.size() > 0 && !Strings.isEmpty(result.get(0).get("storage.storage")))
-			fixture = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
-		if (fixture == null || fixture.has("errors")
-				&& (fixture.get("errors").has("rateLimit") || fixture.get("errors").has("requests")))
-			return null;
-		if (result.get(0).get("storage.modifiedAt") == null
-				|| Instant.ofEpochMilli(((Timestamp) result.get(0).get("storage.modifiedAt")).getTime())
-						.plus(Duration.ofHours(23)).isBefore(Instant.now())) {
-			final JsonNode responses = fixture.get("response");
-			for (int i = 0; i < responses.size(); i++) {
-				if (responses.get(i).has("fixture")
-						&& responses.get(i).get("fixture").has("timestamp")
-						&& "TBD".equals(responses.get(i).get("fixture").get("status").get("short").asText())
-						&& Instant.ofEpochSecond(responses.get(i).get("fixture").get("timestamp").asLong())
-								.minus(Duration.ofDays(4)).isBefore(Instant.now()))
-					return null;
+	private JsonNode needUpdate(final Result result) {
+		try {
+			JsonNode fixture = null;
+			if (result.size() > 0 && !Strings.isEmpty(result.get(0).get("storage.storage")))
+				fixture = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
+			if (fixture == null || fixture.has("errors")
+					&& (fixture.get("errors").has("rateLimit") || fixture.get("errors").has("requests")))
+				return null;
+			if (result.get(0).get("storage.modifiedAt") == null
+					|| Instant.ofEpochMilli(((Timestamp) result.get(0).get("storage.modifiedAt")).getTime())
+							.plus(Duration.ofHours(23)).isBefore(Instant.now())) {
+				final JsonNode responses = fixture.get("response");
+				for (int i = 0; i < responses.size(); i++) {
+					if (responses.get(i).has("fixture")
+							&& responses.get(i).get("fixture").has("timestamp")
+							&& "TBD".equals(responses.get(i).get("fixture").get("status").get("short").asText())
+							&& Instant.ofEpochSecond(responses.get(i).get("fixture").get("timestamp").asLong())
+									.minus(Duration.ofDays(4)).isBefore(Instant.now()))
+						return null;
+				}
 			}
+			return fixture;
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
 		}
-		return fixture;
 	}
 
 	public static class FutureEvent {
