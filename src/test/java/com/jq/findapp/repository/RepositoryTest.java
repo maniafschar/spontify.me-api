@@ -22,7 +22,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
@@ -35,6 +34,7 @@ import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Utils;
 
@@ -104,7 +104,7 @@ public class RepositoryTest {
 		map.put("contactId2", "213");
 
 		// when
-		final ContactBluetooth cb = new ObjectMapper().convertValue(map, ContactBluetooth.class);
+		final ContactBluetooth cb = Json.toObject(map, ContactBluetooth.class);
 
 		// then
 		assertEquals(BigInteger.valueOf(213), cb.getContactId2());
@@ -265,11 +265,11 @@ public class RepositoryTest {
 		final Contact contact = new Contact();
 		contact.setSkills("xyz");
 		contact.setDescription("about others");
-		final JsonNode node = new ObjectMapper().convertValue(contact, JsonNode.class);
+		final JsonNode node = Json.toObject(contact, JsonNode.class);
 		((ObjectNode) node).put("skills", "abc");
 
 		// when
-		final String result = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(node);
+		final String result = Json.toPrettyString(node);
 
 		// then
 		assertTrue(result.contains("abc"));
