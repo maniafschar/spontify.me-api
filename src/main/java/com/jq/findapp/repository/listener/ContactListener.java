@@ -11,13 +11,13 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactLink;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.NotificationService.NotificationType;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text.TextId;
 
@@ -35,8 +35,7 @@ public class ContactListener extends AbstractRepositoryListener<Contact> {
 		String notification = NotificationType.birthday + "," + NotificationType.chat + ","
 				+ NotificationType.engagement + "," + NotificationType.event + "," + NotificationType.friend + ",";
 		try {
-			final JsonNode props = new ObjectMapper()
-					.readTree(repository.one(com.jq.findapp.entity.Client.class, contact.getClientId()).getStorage());
+			final JsonNode props = Json.toNode(repository.one(com.jq.findapp.entity.Client.class, contact.getClientId()).getStorage());
 			if (props.has("rss") && props.get("rss").size() == 1)
 				notification += NotificationType.news + ",";
 		} catch (Exception ex) {
