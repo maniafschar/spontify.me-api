@@ -279,11 +279,7 @@ public class EventService {
 				final Event event = repository.one(Event.class, (BigInteger) e.get("event.id"));
 				final String key = event.getContactId() + "." + event.getSkills();
 				if (!processed.containsKey(key))
-					try {
-						processed.put(key, updateSeries(event));
-					} catch (Exception ex) {
-						throw new RunLevelException(ex);
-					}
+					processed.put(key, updateSeries(event));
 			});
 			result.body = "" + processed.entrySet().stream()
 					.filter(e -> e.getValue() > 0)
@@ -305,8 +301,9 @@ public class EventService {
 				+ " and event.maxParticipants is null"
 				+ " and event.publishId is null");
 		final Result result = repository.list(params);
-		for (int i = 0; i < result.size(); i++)
-			publish((BigInteger) result.get(i).get("event.id"));
+		result.forEach(e -> {
+			publish((BigInteger) e.get("event.id"));
+		});
 		return result.size() + " published";
 	}
 
@@ -319,8 +316,9 @@ public class EventService {
 				+ " and (event.modifiedAt is null or event.modifiedAt<cast('"
 				+ Instant.now().minus(Duration.ofMinutes(15)) + "' as timestamp))");
 		final Result result = repository.list(params);
-		for (int i = 0; i < result.size(); i++)
-			publish((BigInteger) result.get(i).get("event.id"));
+		result.forEach(e -> {
+			publish((BigInteger) e.get("event.id"));
+		});
 		return result.size();
 	}
 
@@ -337,7 +335,7 @@ public class EventService {
 		}
 	}
 
-	public int updateSeries(final Event event) throws Exception {
+	public int updateSeries(final Event event) {
 		if (event.getRepetition() == Repetition.Games && !Strings.isEmpty(event.getSkills())) {
 			for (String skill : event.getSkills().split("\\|")) {
 				if (skill.startsWith("9.")) {
@@ -356,15 +354,15 @@ public class EventService {
 						}
 					}
 					if (canceled) {
-						for (int i = 0; i < events.size(); i++) {
-							if (!((String) events.get(i).get("event.skills")).contains("X") &&
-									event.getId().compareTo((BigInteger) events.get(i).get("event.id")) != 0) {
+						events.forEach(e -> {
+							if (!((String) e.get("event.skills")).contains("X") &&
+									event.getId().compareTo((BigInteger) e.get("event.id")) != 0) {
 								final Event e = repository.one(Event.class,
-										(BigInteger) events.get(i).get("event.id"));
+										(BigInteger) e.get("event.id"));
 								e.setSkills(e.getSkills() + "|X");
 								repository.save(e);
 							}
-						}
+						});
 						return 0;
 					}
 					return updateFutureEvents(event, events, skill);
@@ -374,7 +372,7 @@ public class EventService {
 		return 0;
 	}
 
-	private int updateFutureEvents(final Event event, final Result events, final String skill) throws Exception {
+	private int updateFutureEvents(final Event event, final Result events, final String skill) {
 		final List<FutureEvent> futureEvents = surveyService.futureEvents(Integer.valueOf(skill.substring(2)));
 		final String description = event.getDescription().contains("\n")
 				? event.getDescription().substring(event.getDescription().indexOf("\n"))
