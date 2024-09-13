@@ -198,20 +198,24 @@ public class EventService {
 		final Location location = event.getLocationId() == null ? null
 				: repository.one(Location.class, event.getLocationId());
 		final String date = new SimpleDateFormat("d.M.yyyy H:mm").format(event.getStartDate());
-		final JsonNode json = new ObjectMapper()
-				.readTree(Attachment.resolve(repository.one(Client.class, contact.getClientId()).getStorage()));
-		final String fbId = externalService.publishOnFacebook(contact.getClientId(),
-				(location == null
-						? text.getText(contact, TextId.event_fbWithoutLocation)
-								.replace("{pseudonym}", contact.getPseudonym()).replace("{date}", date)
-								.replace("{description}", event.getDescription())
-						: date + "\n" + event.getDescription() + "\n\n" + location.getName() + "\n"
-								+ location.getAddress())
-						+ (json.has("publishingPostfix") ? "\n\n" + json.get("publishingPostfix").asText() : ""),
-				"/rest/marketing/event/" + id);
-		if (fbId != null) {
-			event.setPublishId(fbId);
-			repository.save(event);
+		try {
+			final JsonNode json = new ObjectMapper()
+					.readTree(Attachment.resolve(repository.one(Client.class, contact.getClientId()).getStorage()));
+			final String fbId = externalService.publishOnFacebook(contact.getClientId(),
+					(location == null
+							? text.getText(contact, TextId.event_fbWithoutLocation)
+									.replace("{pseudonym}", contact.getPseudonym()).replace("{date}", date)
+									.replace("{description}", event.getDescription())
+							: date + "\n" + event.getDescription() + "\n\n" + location.getName() + "\n"
+									+ location.getAddress())
+							+ (json.has("publishingPostfix") ? "\n\n" + json.get("publishingPostfix").asText() : ""),
+					"/rest/marketing/event/" + id);
+			if (fbId != null) {
+				event.setPublishId(fbId);
+				repository.save(event);
+			}
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
 		}
 	}
 
