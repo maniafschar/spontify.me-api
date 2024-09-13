@@ -44,14 +44,10 @@ public class ClientNewsListener extends AbstractRepositoryListener<ClientNews> {
 							final Contact contact = this.repository.one(Contact.class,
 									(BigInteger) e.get("contact.id"));
 							if (("|" + contact.getSkills() + "|").contains(cat))
-								try {
-									this.notificationService.sendNotificationSync(null,
-											contact,
-											TextId.notification_clientNews, "news=" + clientNews2.getId(),
-											clientNews2.getSource() + ": " + clientNews2.getDescription());
-								} catch (Exception ex) {
-									throw new RuntimeException(ex);
-								}
+								this.notificationService.sendNotificationSync(null,
+										contact,
+										TextId.notification_clientNews, "news=" + clientNews2.getId(),
+										clientNews2.getSource() + ": " + clientNews2.getDescription());
 						});
 					}
 				}
