@@ -20,11 +20,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Setting;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.util.Json;
 
 @Component
 public class JwtGenerator {
@@ -65,10 +65,10 @@ public class JwtGenerator {
 		if (!token.containsKey(keyId)) {
 			final StringBuilder result = new StringBuilder();
 			result.append(
-					jwtEncoding(new ObjectMapper().writeValueAsString(header).getBytes(StandardCharsets.UTF_8)));
+					jwtEncoding(Json.toString(header).getBytes(StandardCharsets.UTF_8)));
 			result.append('.');
 			result.append(
-					jwtEncoding(new ObjectMapper().writeValueAsString(claims).getBytes(StandardCharsets.UTF_8)));
+					jwtEncoding(Json.toString(claims).getBytes(StandardCharsets.UTF_8)));
 			final PrivateKey key = getSigningKey(keyId, algorithm);
 			final Signature signature = Signature
 					.getInstance("RSA".equals(algorithm) ? "SHA256withRSA" : "SHA256withECDSA");
