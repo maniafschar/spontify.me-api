@@ -19,8 +19,8 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.service.AuthenticationService;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 
 public class Location {
@@ -43,7 +43,7 @@ public class Location {
 		}
 		file.delete();
 		final String url = "https://www.google.com/search";
-		blocked = Arrays.asList(new ObjectMapper().readValue(
+		blocked = Arrays.asList(Json.toObject(
 				AuthenticationService.class.getResourceAsStream("/json/blockedTokens.json"),
 				String[].class));
 		WebDriver driver = null;
