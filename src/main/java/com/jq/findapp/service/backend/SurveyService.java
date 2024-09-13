@@ -37,7 +37,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketing;
@@ -141,7 +140,7 @@ public class SurveyService {
 							clientMarketing.setStartDate(new Timestamp(end
 									.minus(Duration.ofDays(1)).toEpochMilli()));
 							clientMarketing.setEndDate(new Timestamp(end.toEpochMilli()));
-							clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
+							clientMarketing.setStorage(Json.toString(poll));
 							clientMarketing.setImage(Attachment.createImage(".png",
 									image.create(poll, "Ergebnistipps",
 											repository.one(Client.class, clientId), null)));
@@ -311,7 +310,7 @@ public class SurveyService {
 										image.create(poll, "Spieler", repository.one(Client.class, clientId), null)));
 								poll.epilog = "Lieben Dank für die Teilnahme!\nDas Ergebnis wird am " + endDate
 										+ " hier bekanntgegeben.\n\nLust auf mehr <b>Fan Feeling</b>? In unserer neuen App bauen wir eine neue <b>Fußball Fan Community</b> auf.\n\nMit ein paar wenigen Klicks kannst auch Du dabei sein.";
-								clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
+								clientMarketing.setStorage(Json.toString(poll));
 								repository.save(clientMarketing);
 								return clientMarketing.getId();
 							}
@@ -374,11 +373,11 @@ public class SurveyService {
 			for (int i = 0; i < list.size(); i++) {
 				final ClientMarketingResult clientMarketingResult = marketingService.synchronizeResult(
 						(BigInteger) list.get(i).get("clientMarketing.id"));
-				final PollSurvey poll = new ObjectMapper().readValue(Attachment.resolve(
+				final PollSurvey poll = Json.toObject(Attachment.resolve(
 						repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId())
 								.getStorage()),
 						PollSurvey.class);
-				if (new ObjectMapper().readValue(Attachment.resolve(clientMarketingResult.getStorage()),
+				if (Json.toObject(Attachment.resolve(clientMarketingResult.getStorage()),
 						PollResult.class).answers.size() > 0) {
 					String prefix;
 					if ("Prediction".equals(poll.type))
@@ -398,8 +397,7 @@ public class SurveyService {
 		}
 
 		private String updateMatchdays(final BigInteger clientId) throws Exception {
-			final JsonNode json = new ObjectMapper()
-					.readTree(Attachment.resolve(repository.one(Client.class, clientId).getStorage()));
+			final JsonNode json = Json.toNode(Attachment.resolve(repository.one(Client.class, clientId).getStorage()));
 			String result = "";
 			if (json.has("survey")) {
 				for (int i2 = 0; i2 < json.get("survey").size(); i2++) {
@@ -441,7 +439,7 @@ public class SurveyService {
 
 		private byte[] create(final PollSurvey poll, final String subtitlePrefix, final Client client,
 				final ClientMarketingResult clientMarketingResult) throws Exception {
-			final JsonNode json = new ObjectMapper().readTree(Attachment.resolve(client.getStorage())).get("css");
+			final JsonNode json = Json.toNode(Attachment.resolve(client.getStorage())).get("css");
 			final String[] color1 = json.get("bg1stop").asText().replace("rgb(", "").replace(")", "").split(",");
 			final String[] color2 = json.get("bg1start").asText().replace("rgb(", "").replace(")", "").split(",");
 			final String[] color3 = json.get("text").asText().replace("rgb(", "").replace(")", "").split(",");
@@ -494,9 +492,7 @@ public class SurveyService {
 				g2.drawString(s, width - g2.getFontMetrics().stringWidth(s) - padding, height - padding);
 				if (clientMarketingResult != null)
 					result(g2, customFont, poll,
-							new ObjectMapper()
-									.readValue(
-											Attachment.resolve(clientMarketingResult.getStorage()), PollResult.class),
+							Json.toObject(Attachment.resolve(clientMarketingResult.getStorage()), PollResult.class),
 							colorText);
 				else if ("Prediction".equals(poll.type))
 					prediction(g2, customFont, poll, colorText, client.getId());
@@ -676,7 +672,7 @@ public class SurveyService {
 		for (int i = 0; i < list.size(); i++) {
 			try {
 				final BigInteger clientId = (BigInteger) list.get(i).get("client.id");
-				final JsonNode json = new ObjectMapper().readTree(list.get(i).get("client.storage").toString());
+				final JsonNode json = Json.toNode(list.get(i).get("client.storage").toString());
 				if (json.has("survey")) {
 					for (int i2 = 0; i2 < json.get("survey").size(); i2++) {
 						final int teamId = json.get("survey").get(i2).asInt();
@@ -760,7 +756,7 @@ public class SurveyService {
 							: repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
 					storage.setLabel(label);
 					try {
-						storage.setStorage(new ObjectMapper().writeValueAsString(fixture));
+						storage.setStorage(Json.toString(fixture));
 					} catch (Exception ex) {
 						throw new RuntimeException(ex);
 					}
@@ -778,7 +774,7 @@ public class SurveyService {
 		try {
 			JsonNode fixture = null;
 			if (result.size() > 0 && !Strings.isEmpty(result.get(0).get("storage.storage")))
-				fixture = new ObjectMapper().readTree(result.get(0).get("storage.storage").toString());
+				fixture = Json.toNode(result.get(0).get("storage.storage").toString());
 			if (fixture == null || fixture.has("errors")
 					&& (fixture.get("errors").has("rateLimit") || fixture.get("errors").has("requests")))
 				return null;
