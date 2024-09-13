@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Ticket;
@@ -26,6 +25,7 @@ import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.EntityUtil;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 
 @Service
@@ -171,9 +171,7 @@ public class ImportLocationsService {
 				"%' and ticket.type='" + TicketType.LOCATION.name() + "'");
 		if (repository.list(params).size() == 0) {
 			String importResult = null;
-			final ObjectMapper om = new ObjectMapper();
-			JsonNode json = om
-					.readTree(externalService.google("place/nearbysearch/json?radius=600&sensor=false&location="
+			JsonNode json = Json.toNode(externalService.google("place/nearbysearch/json?radius=600&sensor=false&location="
 							+ latitude + "," + longitude));
 			if ("OK".equals(json.get("status").asText())) {
 				importResult = importLocations(json.get("results").elements());
@@ -195,7 +193,7 @@ public class ImportLocationsService {
 		final Ticket ticket = repository.one(Ticket.class, ticketId);
 		String result = null;
 		try {
-			importLocation(new ObjectMapper().readTree(Attachment.resolve(ticket.getNote())), category);
+			importLocation(Json.toNode(Attachment.resolve(ticket.getNote())), category);
 		} catch (final IllegalArgumentException ex) {
 			result = ex.getMessage();
 		} catch (final Exception ex) {
@@ -205,7 +203,6 @@ public class ImportLocationsService {
 	}
 
 	private String importLocations(final Iterator<JsonNode> result) {
-		final ObjectMapper om = new ObjectMapper();
 		int imported = 0, total = 0;
 		String town = null;
 		Location location;
@@ -217,11 +214,11 @@ public class ImportLocationsService {
 					(!json.has("permanently_closed") || !json.get("permanently_closed").asBoolean()) &&
 					json.has("rating") && json.get("rating").asDouble() > 3) {
 				try {
-					final String jsonLower = om.writeValueAsString(json).toLowerCase();
+					final String jsonLower = Json.toString(json).toLowerCase();
 					if (jsonLower.contains("sex") || jsonLower.contains("domina") || jsonLower.contains("bordel")) {
 						notificationService.createTicket(TicketType.LOCATION,
 								location.getCategory() + " " + location.getName(),
-								om.writerWithDefaultPrettyPrinter().writeValueAsString(json), null);
+								Json.toPrettyString(json), null);
 					} else {
 						try {
 							if ((location = importLocation(json, null)) != null) {
@@ -239,7 +236,7 @@ public class ImportLocationsService {
 													.contains("duplicate entry")))) {
 								notificationService.createTicket(TicketType.LOCATION,
 										location.getCategory() + " " + location.getName(),
-										om.writerWithDefaultPrettyPrinter().writeValueAsString(json), null);
+										Json.toPrettyString(json), null);
 							}
 						}
 					}
@@ -295,7 +292,7 @@ public class ImportLocationsService {
 
 	private boolean importImage(final Location location) throws Exception {
 		final String address = location.getAddress().replace("\n", ", ");
-		final JsonNode json = new ObjectMapper().readTree(
+		final JsonNode json = Json.toNode(
 				externalService.google("place/textsearch/json?query="
 						+ URLEncoder.encode(location.getName() + ", " + address, StandardCharsets.UTF_8)
 								.replace("+", "%20")));
