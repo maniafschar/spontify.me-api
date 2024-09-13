@@ -15,11 +15,11 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.util.Json;
 
 @Component
 public class Text {
@@ -115,14 +115,13 @@ public class Text {
 					languages.put(
 							entry.getName().substring(entry.getName().lastIndexOf("/") + 1,
 									entry.getName().lastIndexOf(".")),
-							new ObjectMapper()
-									.readTree(IOUtils.toString(zip.getInputStream(entry), StandardCharsets.UTF_8)));
+							Json.toNode(IOUtils.toString(zip.getInputStream(entry), StandardCharsets.UTF_8)));
 				}
 			}
 		} catch (final Exception e) {
 			try (final InputStream in = Text.class.getResourceAsStream("/lang/DE.json")) {
 				// Test environment, only german is tested
-				languages.put("DE", new ObjectMapper().readTree(
+				languages.put("DE", Json.toNode(
 						IOUtils.toString(in, StandardCharsets.UTF_8)));
 			} catch (final Exception e1) {
 				new RuntimeException(e);
@@ -141,7 +140,7 @@ public class Text {
 			else
 				s = languages.get(contact.getLanguage()).get(label).asText();
 			final Client client = repository.one(Client.class, contact.getClientId());
-			final JsonNode node = new ObjectMapper().readTree(Attachment.resolve(client.getStorage()));
+			final JsonNode node = Json.toNode(Attachment.resolve(client.getStorage()));
 			s = s.replaceAll("APP_TITLE", client.getName());
 			s = s.replaceAll(" \\$\\{buddy}", node.get("lang").get(contact.getLanguage()).get("buddy").asText());
 			s = s.replaceAll(" \\$\\{buddies}", node.get("lang").get(contact.getLanguage()).get("buddies").asText());
