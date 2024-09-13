@@ -47,7 +47,7 @@ public class ExternalService {
 	@Value("${app.chatGPT.key}")
 	private String chatGpt;
 
-	public synchronized String google(final String param) throws Exception {
+	public synchronized String google(final String param) {
 		final String label = STORAGE_PREFIX + param.hashCode();
 		final QueryParams params = new QueryParams(Query.misc_listStorage);
 		params.setSearch("storage.label='" + label + "'");
@@ -115,7 +115,7 @@ public class ExternalService {
 		return null;
 	}
 
-	public List<GeoLocation> getLatLng(final String town) throws Exception {
+	public List<GeoLocation> getLatLng(final String town) {
 		final QueryParams params = new QueryParams(Query.misc_geoLocation);
 		if (town.contains("\n")) {
 			final String[] s = town.split("\n");
@@ -149,7 +149,7 @@ public class ExternalService {
 		return geoLocations;
 	}
 
-	public GeoLocation getAddress(final float latitude, final float longitude, boolean exact) throws Exception {
+	public GeoLocation getAddress(final float latitude, final float longitude, boolean exact) {
 		final QueryParams params = new QueryParams(Query.misc_listGeoLocation);
 		final float roundingFactor = exact ? 0.0005f : 0.005f;
 		params.setSearch("geoLocation.latitude<" + (latitude + roundingFactor)
@@ -196,7 +196,7 @@ public class ExternalService {
 				WebClient.create(url).get().retrieve().toEntity(byte[].class).block().getBody());
 	}
 
-	public String chatGpt(final String prompt) throws Exception {
+	public String chatGpt(final String prompt) {
 		try (final InputStream in = this.getClass().getResourceAsStream("/template/gpt.json")) {
 			final String s = WebClient
 					.create("https://api.openai.com/v1/completions")
@@ -209,8 +209,7 @@ public class ExternalService {
 		}
 	}
 
-	public String publishOnFacebook(final BigInteger clientId, final String message, final String link)
-			throws Exception {
+	public String publishOnFacebook(final BigInteger clientId, final String message, final String link) {
 		final Client client = this.repository.one(Client.class, clientId);
 		if (!Strings.isEmpty(client.getFbPageAccessToken()) && !Strings.isEmpty(client.getFbPageId())) {
 			final Map<String, String> body = new HashMap<>();
