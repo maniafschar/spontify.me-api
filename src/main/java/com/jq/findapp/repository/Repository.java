@@ -155,9 +155,13 @@ public class Repository {
 		return params.getSearch();
 	}
 
-	public List<BaseEntity> list(final String hql) throws ClassNotFoundException {
-		return (List<BaseEntity>) em.createQuery(hql,
-				Class.forName(BaseEntity.class.getPackage().getName() + "." + hql.split(" ")[1])).getResultList();
+	public List<BaseEntity> list(final String hql) {
+		try {
+			return (List<BaseEntity>) em.createQuery(hql,
+					Class.forName(BaseEntity.class.getPackage().getName() + "." + hql.split(" ")[1])).getResultList();
+		} catch (ClassNotFoundException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 	public <T extends BaseEntity> T one(final Class<T> clazz, final BigInteger id) {
@@ -177,30 +181,38 @@ public class Repository {
 		return result.get(0);
 	}
 
-	public void save(final BaseEntity entity) throws Exception {
+	public void save(final BaseEntity entity) {
 		if (entity.modified()) {
-			Attachment.save(entity);
-			if (entity.getId() == null) {
-				if (entity.getCreatedAt() == null)
-					entity.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
-				listeners.prePersist(entity);
-				em.persist(entity);
-				listeners.postPersist(entity);
-			} else {
-				entity.setModifiedAt(new Timestamp(Instant.now().toEpochMilli()));
-				listeners.preUpdate(entity);
-				em.merge(entity);
-				listeners.postUpdate(entity);
+			try {
+				Attachment.save(entity);
+				if (entity.getId() == null) {
+					if (entity.getCreatedAt() == null)
+						entity.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
+					listeners.prePersist(entity);
+					em.persist(entity);
+					listeners.postPersist(entity);
+				} else {
+					entity.setModifiedAt(new Timestamp(Instant.now().toEpochMilli()));
+					listeners.preUpdate(entity);
+					em.merge(entity);
+					listeners.postUpdate(entity);
+				}
+				em.flush();
+			} catch (Exception ex) {
+				throw new RuntimeException(ex);
 			}
-			em.flush();
 		}
 	}
 
-	public void delete(final BaseEntity entity) throws Exception {
-		listeners.preRemove(entity);
-		em.remove(em.contains(entity) ? entity : em.merge(entity));
-		Attachment.delete(entity);
-		listeners.postRemove(entity);
+	public void delete(final BaseEntity entity) {
+		try {
+			listeners.preRemove(entity);
+			em.remove(em.contains(entity) ? entity : em.merge(entity));
+			Attachment.delete(entity);
+			listeners.postRemove(entity);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 	public void executeUpdate(final String hql, final Object... params) {
