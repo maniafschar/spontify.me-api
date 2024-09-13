@@ -347,20 +347,16 @@ public class ImportLocationsService {
 			throw new IllegalArgumentException("no image in json");
 		try {
 			String image;
-			try {
-				if (!json.has("photos"))
-					throw new IllegalArgumentException("no image in json");
-				final String html = externalService.google(
-						"place/photo?maxheight=1200&photoreference="
-								+ json.get("photos").get(0).get("photo_reference").asText())
-						.replace("<A HREF=", "<a href=");
-				final Matcher matcher = href.matcher(html);
-				if (!matcher.find())
-					throw new IllegalArgumentException("no image in html: " + html);
-				image = matcher.group(1);
-			} catch (final JsonProcessingException e) {
-				throw new RuntimeException(e);
-			}
+			if (!json.has("photos"))
+				throw new IllegalArgumentException("no image in json");
+			final String html = externalService.google(
+					"place/photo?maxheight=1200&photoreference="
+							+ json.get("photos").get(0).get("photo_reference").asText())
+					.replace("<A HREF=", "<a href=");
+			final Matcher matcher = href.matcher(html);
+			if (!matcher.find())
+				throw new IllegalArgumentException("no image in html: " + html);
+			image = matcher.group(1);
 			location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, 0));
 			if (location.getImage() != null)
 				location.setImageList(EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
