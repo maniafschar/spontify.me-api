@@ -454,11 +454,7 @@ public class ActionApi {
 						(BigInteger) e.get("eventParticipate.id"));
 				eventParticipate.setState(-1);
 				eventParticipate.setReason("Paypal " + n.get("resource").get("note_to_payer").asText());
-				try {
-					repository.save(eventParticipate);
-				} catch (Exception ex) {
-					throw new RunLevelException(ex);
-				}
+				repository.save(eventParticipate);
 			});
 		}
 	}
