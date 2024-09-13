@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.model.Position;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
@@ -57,6 +56,7 @@ import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.NotificationService.Ping;
 import com.jq.findapp.service.backend.IpService;
 import com.jq.findapp.util.Encryption;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
 import com.jq.findapp.util.Text.TextId;
@@ -439,10 +439,9 @@ public class ActionApi {
 
 	@PostMapping("paypal")
 	public void paypal(@RequestHeader final BigInteger clientId, @RequestBody final String data) throws Exception {
-		final ObjectMapper m = new ObjectMapper();
-		final JsonNode n = m.readTree(data);
+		final JsonNode n = Json.toNode(data);
 		notificationService.createTicket(TicketType.PAYPAL, "webhook",
-				m.writerWithDefaultPrettyPrinter().writeValueAsString(n),
+				Json.toPrettyString(n),
 				repository.one(Client.class, clientId).getAdminId());
 		if ("PAYMENT.CAPTURE.REFUNDED".equals(n.get("event_type").asText())) {
 			String id = n.get("resource").get("links").get(1).get("href").asText();
