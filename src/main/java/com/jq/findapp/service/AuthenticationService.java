@@ -23,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.model.AbstractRegistration;
 import com.jq.findapp.api.model.InternalRegistration;
 import com.jq.findapp.entity.BaseEntity;
@@ -41,6 +40,7 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService.AuthenticationException.AuthenticationExceptionType;
 import com.jq.findapp.util.Encryption;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
 import com.jq.findapp.util.Text.TextId;
@@ -122,7 +122,7 @@ public class AuthenticationService {
 
 	static {
 		try {
-			BLOCKED_EMAIL_DOMAINS.addAll(Arrays.asList(new ObjectMapper().readValue(
+			BLOCKED_EMAIL_DOMAINS.addAll(Arrays.asList(Json.toObject(
 					AuthenticationService.class.getResourceAsStream("/blockedEmailDomains.json"),
 					String[].class)));
 		} catch (final Exception ex) {
