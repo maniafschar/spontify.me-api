@@ -15,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
 import com.jq.findapp.entity.Location;
@@ -25,6 +24,7 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith(SpringExtension.class)
@@ -81,7 +81,7 @@ public class ImportLocationsServiceTest {
 				StandardCharsets.UTF_8);
 
 		// when
-		final Location location = importLocationsService.importLocation(new ObjectMapper().readTree(json), "2");
+		final Location location = importLocationsService.importLocation(Json.toNode(json), "2");
 
 		// then
 		assertNotNull(location);
