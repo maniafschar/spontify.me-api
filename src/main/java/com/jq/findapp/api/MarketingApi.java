@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.model.InternalRegistration;
 import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.entity.Client;
@@ -48,6 +47,7 @@ import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.backend.IpService;
 import com.jq.findapp.service.backend.MarketingService;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 
 import jakarta.transaction.Transactional;
@@ -91,11 +91,11 @@ public class MarketingApi {
 		contactMarketing.populate(entity.getValues());
 		repository.save(contactMarketing);
 		if (contactMarketing.getFinished()) {
-			final JsonNode questions = new ObjectMapper().readTree(
+			final JsonNode questions = Json.toNode(
 					Attachment.resolve(
 							repository.one(ClientMarketing.class, contactMarketing.getClientMarketingId())
 									.getStorage()));
-			final JsonNode answers = new ObjectMapper().readTree(Attachment.resolve(contactMarketing.getStorage()));
+			final JsonNode answers = Json.toNode(Attachment.resolve(contactMarketing.getStorage()));
 			final JsonNode email = answers.get("q" + (questions.get("questions").size() - 1)).get("t");
 			if (email != null && Strings.isEmail(email.asText())) {
 				final Contact to = new Contact();
