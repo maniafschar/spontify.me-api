@@ -30,6 +30,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 
 @Service
@@ -51,21 +52,21 @@ public class ExternalService {
 		final String label = STORAGE_PREFIX + param.hashCode();
 		final QueryParams params = new QueryParams(Query.misc_listStorage);
 		params.setSearch("storage.label='" + label + "'");
-		final Result result = this.repository.list(params);
+		final Result result = repository.list(params);
 		if (result.size() > 0 && !Strings.isEmpty(result.get(0).get("storage.storage"))) {
 			final String json = (String) result.get(0).get("storage.storage");
 			if (!json.contains("OVER_QUERY_LIMIT") && !json.contains("not authorized to use this API key"))
 				return json;
 		}
 		final String value = WebClient.create("https://maps.googleapis.com/maps/api/" + param
-				+ (param.contains("?") ? "&" : "?") + "key=" + this.googleKey).get().retrieve().toEntity(String.class)
+				+ (param.contains("?") ? "&" : "?") + "key=" + googleKey).get().retrieve().toEntity(String.class)
 				.block().getBody();
 		if (value != null && value.startsWith("{") && value.endsWith("}")) {
 			final Storage storage = result.size() == 0 ? new Storage()
-					: this.repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
+					: repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
 			storage.setLabel(label);
 			storage.setStorage(value);
-			this.repository.save(storage);
+			repository.save(storage);
 		}
 		return value;
 	}
@@ -102,7 +103,7 @@ public class ExternalService {
 							geoLocation.setLongitude((float) data.get("lng").asDouble());
 							if (geoLocation.getTown() != null)
 								try {
-									this.repository.save(geoLocation);
+									repository.save(geoLocation);
 								} catch (final Exception e) {
 								}
 						}
@@ -137,15 +138,14 @@ public class ExternalService {
 				params.setSearch(params.getSearch() + "geoLocation.town like '%" + s2 + "%'");
 		} else
 			params.setSearch("geoLocation.town like '%" + town + "%'");
-		final Map<String, Object> persistedAddress = this.repository.one(params);
+		final Map<String, Object> persistedAddress = repository.one(params);
 		if (persistedAddress.get("_id") != null)
-			return Arrays.asList(this.repository.one(GeoLocation.class, (BigInteger) persistedAddress.get("_id")));
-		final List<GeoLocation> geoLocations = this.convertAddress(
-				new ObjectMapper().readTree(
-						this.google("geocode/json?components=administrative_area:"
-								+ URLEncoder.encode(town, StandardCharsets.UTF_8))));
+			return Arrays.asList(repository.one(GeoLocation.class, (BigInteger) persistedAddress.get("_id")));
+		final List<GeoLocation> geoLocations = convertAddress(
+				Json.toNode(google("geocode/json?components=administrative_area:"
+						+ URLEncoder.encode(town, StandardCharsets.UTF_8))));
 		if (geoLocations == null)
-			this.notificationService.createTicket(TicketType.ERROR, "No google address", town, null);
+			notificationService.createTicket(TicketType.ERROR, "No google address", town, null);
 		return geoLocations;
 	}
 
@@ -156,7 +156,7 @@ public class ExternalService {
 				+ " and geoLocation.latitude>" + (latitude - roundingFactor)
 				+ " and geoLocation.longitude<" + (longitude + roundingFactor)
 				+ " and geoLocation.longitude>" + (longitude - roundingFactor));
-		final Result persistedAddress = this.repository.list(params);
+		final Result persistedAddress = repository.list(params);
 		if (persistedAddress.size() > 0) {
 			double distance = Double.MAX_VALUE, d;
 			BigInteger id = null;
@@ -169,18 +169,18 @@ public class ExternalService {
 					id = (BigInteger) persistedAddress.get(i).get("geoLocation.id");
 				}
 			}
-			return this.repository.one(GeoLocation.class, id);
+			return repository.one(GeoLocation.class, id);
 		}
-		final List<GeoLocation> geoLocations = this.convertAddress(
-				new ObjectMapper().readTree(this.google("geocode/json?latlng=" + latitude + ',' + longitude)));
+		final List<GeoLocation> geoLocations = convertAddress(
+				Json.toNode(google("geocode/json?latlng=" + latitude + ',' + longitude)));
 		if (geoLocations != null)
 			return geoLocations.get(0);
-		this.notificationService.createTicket(TicketType.ERROR, "No google address", latitude + "\n" + longitude, null);
+		notificationService.createTicket(TicketType.ERROR, "No google address", latitude + "\n" + longitude, null);
 		return null;
 	}
 
 	public String map(final String source, final String destination, final Contact contact) {
-		String url = Strings.removeSubdomain(this.repository.one(Client.class, contact.getClientId()).getUrl());
+		String url = Strings.removeSubdomain(repository.one(Client.class, contact.getClientId()).getUrl());
 		if (source == null || source.length() == 0)
 			url = "https://maps.googleapis.com/maps/api/staticmap?{destination}&markers=icon:" + url
 					+ "/images/mapMe.png|shadow:false|{destination}&scale=2&size=200x200&maptype=roadmap&key=";
@@ -191,18 +191,18 @@ public class ExternalService {
 					+ "/images/mapLoc.png|shadow:false|{destination}&scale=2&size=600x200&maptype=roadmap&sensor=true&key=";
 			url = url.replace("{source}", source);
 		}
-		url = url.replace("{destination}", destination) + this.googleKey;
+		url = url.replace("{destination}", destination) + googleKey;
 		return Base64.getEncoder().encodeToString(
 				WebClient.create(url).get().retrieve().toEntity(byte[].class).block().getBody());
 	}
 
 	public String chatGpt(final String prompt) {
-		try (final InputStream in = this.getClass().getResourceAsStream("/template/gpt.json")) {
+		try (final InputStream in = getClass().getResourceAsStream("/template/gpt.json")) {
 			final String s = WebClient
 					.create("https://api.openai.com/v1/completions")
 					.post().accept(MediaType.APPLICATION_JSON)
 					.header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-					.header("Authorization", "Bearer " + this.chatGpt)
+					.header("Authorization", "Bearer " + chatGpt)
 					.bodyValue(IOUtils.toString(in, StandardCharsets.UTF_8).replace("{prompt}", prompt))
 					.retrieve().toEntity(String.class).block().getBody();
 			return new ObjectMapper().readTree(s).get("choices").get(0).get("text").asText().trim();
@@ -212,7 +212,7 @@ public class ExternalService {
 	}
 
 	public String publishOnFacebook(final BigInteger clientId, final String message, final String link) {
-		final Client client = this.repository.one(Client.class, clientId);
+		final Client client = repository.one(Client.class, clientId);
 		if (!Strings.isEmpty(client.getFbPageAccessToken()) && !Strings.isEmpty(client.getFbPageId())) {
 			final Map<String, String> body = new HashMap<>();
 			body.put("message", message);
@@ -223,9 +223,9 @@ public class ExternalService {
 					.post().bodyValue(body).retrieve()
 					.toEntity(String.class).block().getBody();
 			if (response == null || !response.contains("\"id\":"))
-				this.notificationService.createTicket(TicketType.ERROR, "FB", response, null);
+				notificationService.createTicket(TicketType.ERROR, "FB", response, null);
 			else
-				return new ObjectMapper().readTree(response).get("id").asText();
+				return Json.toNode(response).get("id").asText();
 		}
 		return null;
 	}
