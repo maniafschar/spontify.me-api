@@ -46,10 +46,20 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 				final QueryParams params = new QueryParams(Query.event_listId);
 				params.setSearch("event.contactId=" + event.getContactId()
 						+ " and length(event.skills)>0 and cast(REGEXP_LIKE('" + event.getSkills()
-						+ "', event.skills) as integer)=1 and event.repetition='" + Repetition.Games.name() + "'");
+						+ "', event.skills) as integer)=1 and event.repetition='" + Repetition.Games.name()
+						+ "' and event.startDate>'" + Instant.now() + "'");
 				final Result events = repository.list(params);
-				if (events.size() > 0)
-					throw new IllegalArgumentException("event series exists: " + events.get(0).get("event.id"));
+				if (events.size() > 0) {
+					long max = Long.MAX_VALUE;
+					Object id = null;
+					for (int i = 0; i < events.size(); i++) {
+						if (max > ((Timestamp) events.get(i).get("event.startDate")).getTime()) {
+							max = ((Timestamp) events.get(i).get("event.startDate")).getTime();
+							id = events.get(i).get("event.id");
+						}
+					}
+					throw new IllegalArgumentException("event series exists: " + id);
+				}
 			}
 			final List<FutureEvent> futureEvents = surveyService
 					.futureEvents(Integer.valueOf(event.getSkills().substring(2)));
