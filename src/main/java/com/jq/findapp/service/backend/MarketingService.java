@@ -280,7 +280,7 @@ public class MarketingService {
 		final Map<BigInteger, String> htmls = new HashMap<>();
 		final QueryParams params = new QueryParams(Query.contact_listMarketing);
 		params.setLimit(0);
-		params.setSearch(search);
+		params.setSearch(search + " and contactMarketing.status not like '%" + postfixText + "%'");
 		try {
 			final Result contactMarketings = repository.list(params);
 			final long end = Instant.now().plus(Duration.ofDays(1)).toEpochMilli();
