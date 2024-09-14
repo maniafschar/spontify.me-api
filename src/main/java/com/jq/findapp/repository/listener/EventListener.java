@@ -42,6 +42,13 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	public void prePersist(final Event event) {
 		preUpdate(event);
 		if (event.getRepetition() == Repetition.Games) {
+			final QueryParams params = new QueryParams(Query.event_listId);
+			params.setSearch("event.contactId=" + event.getContactId()
+					+ " and length(event.skills)>0 and cast(REGEXP_LIKE('" + event.getSkills()
+					+ "', event.skills) as integer)=1");
+			final Result events = repository.list(params);
+			if (events.size() > 0)
+				throw new IllegalArgumentException("event series exists: " + events.get(0).get("event.id"));
 			final List<FutureEvent> futureEvents = surveyService
 					.futureEvents(Integer.valueOf(event.getSkills().substring(2)));
 			if (!futureEvents.isEmpty()) {

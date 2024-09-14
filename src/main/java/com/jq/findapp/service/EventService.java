@@ -386,12 +386,17 @@ public class EventService {
 		final String storage = contact.getStorage();
 		final ObjectNode imported = Strings.isEmpty(storage) ? Json.createObject()
 				: (ObjectNode) Json.toNode(Attachment.resolve(storage));
-		if (!imported.has("eventSeries"))
+		final String importedIds;
+		if (imported.has("eventSeries"))
+			importedIds = imported.get("eventSeries").toString();
+		else {
 			imported.putArray("eventSeries");
+			importedIds = "";
+		}
 		int count = 0;
 		for (FutureEvent futureEvent : futureEvents) {
 			if (futureEvent.time > System.currentTimeMillis()
-					&& !imported.get("eventSeries").has(skill + futureEvent.time)) {
+					&& !importedIds.contains(skill + "." + futureEvent.time)) {
 				final Event e = new Event();
 				e.setContactId(event.getContactId());
 				e.setDescription(futureEvent.subject + description);
@@ -409,7 +414,7 @@ public class EventService {
 				e.setUrl(event.getUrl());
 				repository.save(e);
 				count++;
-				((ArrayNode) imported.get("eventSeries")).add(skill + futureEvent.time);
+				((ArrayNode) imported.get("eventSeries")).add(skill + "." + futureEvent.time);
 			}
 		}
 		repository.executeUpdate("update Event event set event.repetition='" + Repetition.Games.name()

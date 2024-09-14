@@ -97,4 +97,28 @@ public class EventListenerTest {
 		assertEquals(event.getLocationId(), last.getLocationId());
 		assertEquals(Repetition.Games, last.getRepetition());
 	}
+
+	@Test
+	public void save_seriesTwice() throws Exception {
+		// given
+		save_series();
+		final Event event = new Event();
+		event.setContactId(BigInteger.ONE);
+		event.setLocationId(BigInteger.ZERO);
+		event.setDescription("abc");
+		event.setRepetition(Repetition.Games);
+		event.setSkills("9.157");
+		event.setType(EventType.Location);
+
+		// when
+		try {
+			repository.save(event);
+			throw new RuntimeException("IllegalArgumentException expected");
+		} catch (IllegalArgumentException ex) {
+
+			// then exact exception
+			if (!ex.getMessage().startsWith("event series exists: "))
+				throw new RuntimeException("wrong exception message: " + ex.getMessage());
+		}
+	}
 }
