@@ -27,6 +27,8 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
@@ -43,6 +45,7 @@ import com.jq.findapp.repository.listener.EventListener;
 import com.jq.findapp.service.backend.SurveyService;
 import com.jq.findapp.service.backend.SurveyService.FutureEvent;
 import com.jq.findapp.service.backend.events.ImportMunich;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Score;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
@@ -367,22 +370,28 @@ public class EventService {
 						});
 						return 0;
 					}
-					return updateFutureEvents(event, events, skill);
+					return updateFutureEvents(event, skill);
 				}
 			}
 		}
 		return 0;
 	}
 
-	private int updateFutureEvents(final Event event, final Result events, final String skill) {
+	private int updateFutureEvents(final Event event, final String skill) {
 		final List<FutureEvent> futureEvents = surveyService.futureEvents(Integer.valueOf(skill.substring(2)));
 		final String description = event.getDescription().contains("\n")
 				? event.getDescription().substring(event.getDescription().indexOf("\n"))
 				: "\n" + event.getDescription();
-		long last = event.getLastSeriesId();
+		final Contact contact = repository.one(Contact.class, event.getContactId());
+		final String storage = contact.getStorage();
+		final ObjectNode imported = Strings.isEmpty(storage) ? Json.createObject()
+				: (ObjectNode) Json.toNode(Attachment.resolve(storage));
+		if (!imported.has("eventSeries"))
+			imported.putArray("eventSeries");
 		int count = 0;
 		for (FutureEvent futureEvent : futureEvents) {
-			if (event.getLastSeriesId() < futureEvent.time) {
+			if (futureEvent.time > System.currentTimeMillis()
+					&& !imported.get("eventSeries").has(skill + futureEvent.time)) {
 				final Event e = new Event();
 				e.setContactId(event.getContactId());
 				e.setDescription(futureEvent.subject + description);
@@ -392,20 +401,22 @@ public class EventService {
 				e.setMaxParticipants(event.getMaxParticipants());
 				e.setPrice(event.getPrice());
 				e.setPublish(event.getPublish());
+				e.setSeriesId(futureEvent.time);
 				e.setSkills(event.getSkills());
 				e.setSkillsText(event.getSkillsText());
 				e.setStartDate(new Timestamp(futureEvent.time - EventListener.SERIES_TIMELAP));
 				e.setType(event.getType());
 				e.setUrl(event.getUrl());
 				repository.save(e);
-				if (last < futureEvent.time)
-					last = futureEvent.time;
 				count++;
+				((ArrayNode) imported.get("eventSeries")).add(skill + futureEvent.time);
 			}
 		}
 		repository.executeUpdate("update Event event set event.repetition='" + Repetition.Games.name()
-				+ "', event.lastSeriesId=" + last + " where event.contactId=" + event.getContactId()
+				+ "' where event.contactId=" + event.getContactId()
 				+ " and length(event.skills)>0 and cast(REGEXP_LIKE('" + skill + "', event.skills) as integer)=1");
+		contact.setStorage(Json.toString(imported));
+		repository.save(contact);
 		return count;
 	}
 }

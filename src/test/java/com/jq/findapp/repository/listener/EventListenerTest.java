@@ -85,7 +85,7 @@ public class EventListenerTest {
 
 		// then
 		assertNotNull(event.getStartDate());
-		assertNotNull(event.getLastSeriesId() >= now);
+		assertNotNull(event.getSeriesId() >= now);
 		final QueryParams params = new QueryParams(Query.event_listId);
 		params.setSearch("event.contactId=" + contact.getId());
 		final Result result = repository.list(params);

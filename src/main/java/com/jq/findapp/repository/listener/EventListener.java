@@ -47,7 +47,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 			if (!futureEvents.isEmpty()) {
 				final FutureEvent futureEvent = futureEvents.get(0);
 				event.setStartDate(new Timestamp(futureEvent.time - SERIES_TIMELAP));
-				event.setLastSeriesId(futureEvent.time);
+				event.setSeriesId(futureEvent.time);
 				event.setDescription(futureEvent.subject + "\n" + event.getDescription());
 			}
 		}
