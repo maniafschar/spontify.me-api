@@ -423,6 +423,8 @@ public class EventService {
 		repository.executeUpdate("update Event event set event.repetition='" + Repetition.Games.name()
 				+ "' where event.contactId=" + event.getContactId()
 				+ " and length(event.skills)>0 and cast(REGEXP_LIKE('" + skill + "', event.skills) as integer)=1");
+		if (!importedIds.contains(skill + "." + event.getSeriesId()))
+			((ArrayNode) imported.get("eventSeries")).add(skill + "." + event.getSeriesId());
 		contact.setStorage(Json.toString(imported));
 		repository.save(contact);
 		return count;

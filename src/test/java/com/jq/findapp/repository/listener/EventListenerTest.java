@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
 import com.jq.findapp.entity.Contact;
@@ -24,6 +25,8 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith(SpringExtension.class)
@@ -127,5 +130,27 @@ public class EventListenerTest {
 			if (!ex.getMessage().startsWith("event series exists: "))
 				throw new RuntimeException("wrong exception message: " + ex.getMessage());
 		}
+	}
+
+	@Test
+	public void save_seriesContactStorage() throws Exception {
+		// given
+		final Event event = new Event();
+		event.setContactId(utils.createContact(BigInteger.ONE).getId());
+		event.setLocationId(BigInteger.ZERO);
+		event.setDescription("abc");
+		event.setRepetition(Repetition.Games);
+		event.setSkills("9.157");
+		event.setType(EventType.Location);
+		repository.save(event);
+
+		// when
+		repository.save(event);
+
+		// then
+		final JsonNode storage = Json
+				.toNode(Attachment.resolve(repository.one(Contact.class, BigInteger.ONE).getStorage()));
+		assertTrue(storage.has("eventSeries"), storage.toPrettyString());
+		assertEquals(3, storage.get("eventSeries").size());
 	}
 }

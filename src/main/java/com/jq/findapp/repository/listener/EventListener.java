@@ -42,7 +42,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	public void prePersist(final Event event) {
 		preUpdate(event);
 		if (event.getRepetition() == Repetition.Games) {
-			if (event.getStartDate() == null) {
+			if (event.getSeriesId() == null) {
 				final QueryParams params = new QueryParams(Query.event_listId);
 				params.setSearch("event.contactId=" + event.getContactId()
 						+ " and length(event.skills)>0 and cast(REGEXP_LIKE('" + event.getSkills()
