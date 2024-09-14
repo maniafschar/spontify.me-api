@@ -47,7 +47,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 				params.setSearch("event.contactId=" + event.getContactId()
 						+ " and length(event.skills)>0 and cast(REGEXP_LIKE('" + event.getSkills()
 						+ "', event.skills) as integer)=1 and event.repetition='" + Repetition.Games.name()
-						+ "' and event.startDate>'" + Instant.now() + "'");
+						+ "' and event.startDate>cast('" + Instant.now() + "'' as timestamp)");
 				final Result events = repository.list(params);
 				if (events.size() > 0) {
 					long max = Long.MAX_VALUE;
