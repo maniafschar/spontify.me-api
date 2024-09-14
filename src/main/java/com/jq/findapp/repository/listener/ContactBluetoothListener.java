@@ -16,7 +16,7 @@ public class ContactBluetoothListener extends AbstractRepositoryListener<Contact
 	}
 
 	@Override
-	public void postPersist(final ContactBluetooth contactBlutooth) throws Exception {
+	public void postPersist(final ContactBluetooth contactBlutooth) {
 		final Contact me = repository.one(Contact.class, contactBlutooth.getContactId());
 		final Contact other = repository.one(Contact.class, contactBlutooth.getContactId2());
 		if (me.getBluetooth() != null && me.getBluetooth() && other.getBluetooth() != null && other.getBluetooth()) {

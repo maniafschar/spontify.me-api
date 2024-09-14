@@ -1,10 +1,12 @@
 package com.jq.findapp.service.backend;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -39,7 +41,8 @@ public class ImportSportsBarService {
 		final Results results = new Results();
 		try {
 			final String zipCodePrefix = "" + (LocalDateTime.now().getDayOfYear() % 10);
-			final JsonNode zip = Json.toNode(getClass().getResourceAsStream("/json/zip.json"));
+			final JsonNode zip = Json
+					.toNode(IOUtils.toString(getClass().getResourceAsStream("/json/zip.json"), StandardCharsets.UTF_8));
 			for (int i = 0; i < zip.size(); i++) {
 				final String s = zip.get(i).get("zip").asText();
 				if (s.startsWith("" + zipCodePrefix)) {
@@ -71,18 +74,18 @@ public class ImportSportsBarService {
 		final Results result = new Results();
 		final MultiValueMap<String, String> cookies = new LinkedMultiValueMap<>();
 		JsonNode list = Json.toNode(WebClient
-						.create(URL + "detailedSearch=Suchen&group=H&group=B&group=A&country=de&action=search&zip="
-								+ zip)
-						.get()
-						.accept(MediaType.APPLICATION_JSON)
-						.exchangeToMono(response -> {
-							if (response.statusCode().is2xxSuccessful()) {
-								response.cookies()
-										.forEach((key, respCookies) -> cookies.add(key, respCookies.get(0).getValue()));
-								return response.bodyToMono(String.class);
-							}
-							return response.createError();
-						}).block());
+				.create(URL + "detailedSearch=Suchen&group=H&group=B&group=A&country=de&action=search&zip="
+						+ zip)
+				.get()
+				.accept(MediaType.APPLICATION_JSON)
+				.exchangeToMono(response -> {
+					if (response.statusCode().is2xxSuccessful()) {
+						response.cookies()
+								.forEach((key, respCookies) -> cookies.add(key, respCookies.get(0).getValue()));
+						return response.bodyToMono(String.class);
+					}
+					return response.createError();
+				}).block());
 		if (list.get("currentPageIndexEnd").intValue() > 0) {
 			final QueryParams params = new QueryParams(Query.misc_listStorage);
 			params.setSearch("storage.label='importSportBars'");
@@ -93,10 +96,10 @@ public class ImportSportsBarService {
 				if (i > 0) {
 					try {
 						list = Json.toNode(WebClient.create(URL + "action=scroll&page=" + (i + 1))
-										.get()
-										.cookies(cookieMap -> cookieMap.addAll(cookies))
-										.retrieve()
-										.toEntity(String.class).block().getBody());
+								.get()
+								.cookies(cookieMap -> cookieMap.addAll(cookies))
+								.retrieve()
+								.toEntity(String.class).block().getBody());
 
 					} catch (Exception ex) {
 						result.errorsScroll++;

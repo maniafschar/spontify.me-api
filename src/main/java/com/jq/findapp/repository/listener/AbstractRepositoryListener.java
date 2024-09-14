@@ -13,21 +13,21 @@ public abstract class AbstractRepositoryListener<T extends BaseEntity> {
 	@Autowired
 	protected NotificationService notificationService;
 
-	public void prePersist(final T entity) throws Exception {
+	public void prePersist(final T entity) throws IllegalArgumentException {
 	}
 
-	public void postPersist(final T entity) throws Exception {
+	public void postPersist(final T entity) throws IllegalArgumentException {
 	}
 
-	public void preUpdate(final T entity) throws Exception {
+	public void preUpdate(final T entity) throws IllegalArgumentException {
 	}
 
-	public void postUpdate(final T entity) throws Exception {
+	public void postUpdate(final T entity) throws IllegalArgumentException {
 	}
 
-	public void preRemove(final T entity) throws Exception {
+	public void preRemove(final T entity) throws IllegalArgumentException {
 	}
 
-	public void postRemove(final T entity) throws Exception {
+	public void postRemove(final T entity) throws IllegalArgumentException {
 	}
 }

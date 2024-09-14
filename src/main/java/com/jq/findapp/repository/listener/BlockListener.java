@@ -8,7 +8,7 @@ import com.jq.findapp.entity.Ticket.TicketType;
 @Component
 public class BlockListener extends AbstractRepositoryListener<Block> {
 	@Override
-	public void postPersist(final Block block) throws Exception {
+	public void postPersist(final Block block) {
 		if (block.getReason() != null && block.getReason() > 0) {
 			notificationService.createTicket(TicketType.BLOCK,
 					block.getContactId() + " > " +

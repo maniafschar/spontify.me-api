@@ -19,7 +19,6 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.api.model.InternalRegistration;
@@ -153,7 +152,7 @@ public class MarketingService {
 						"contactMarketing.finished=true and contactMarketing.contactId is not null and contactMarketing.clientMarketingId="
 								+ clientMarketing.getId());
 				final Result users = repository.list(params);
-				final Poll poll = Json.toNode(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
+				final Poll poll = Json.toObject(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
 				final List<Object> sent = new ArrayList<>();
 				final String field = "contactMarketing.contactId";
 				for (int i2 = 0; i2 < users.size(); i2++) {
@@ -179,7 +178,7 @@ public class MarketingService {
 		return result;
 	}
 
-	private void publish(final ClientMarketing clientMarketing, boolean result) throws Exception {
+	private void publish(final ClientMarketing clientMarketing, boolean result) {
 		if (clientMarketing.getShare() && clientMarketing.getCreateResult()
 				&& Strings.isEmpty(clientMarketing.getPublishId())) {
 			final JsonNode clientJson = Json.toNode(Attachment
@@ -419,7 +418,7 @@ public class MarketingService {
 		return result;
 	}
 
-	String createHtmlTemplate(Client client) throws IOException {
+	String createHtmlTemplate(Client client) {
 		String html;
 		try (final InputStream inHtml = getClass().getResourceAsStream("/template/email.html")) {
 			html = IOUtils.toString(inHtml, StandardCharsets.UTF_8)
@@ -430,6 +429,8 @@ public class MarketingService {
 					.replace("<jq:url />", "")
 					.replace("<jq:newsTitle />", "")
 					.replace("<jq:image />", "");
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
 		}
 		final int a = html.indexOf("</a>");
 		html = html.substring(0, a + 4) + html.substring(html.indexOf("<jq:text"));
@@ -443,7 +444,7 @@ public class MarketingService {
 		return html;
 	}
 
-	public String locationUpdate(final ContactMarketing contactMarketing) throws Exception {
+	public String locationUpdate(final ContactMarketing contactMarketing) {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 				contactMarketing.getClientMarketingId());
 		final JsonNode answers = Json.toNode(Attachment.resolve(contactMarketing.getStorage()));
@@ -553,7 +554,7 @@ public class MarketingService {
 		return null;
 	}
 
-	public synchronized ClientMarketingResult synchronizeResult(final BigInteger clientMarketingId) throws Exception {
+	public synchronized ClientMarketingResult synchronizeResult(final BigInteger clientMarketingId) {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
 		final Poll poll = Json.toObject(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
 		if (!clientMarketing.getCreateResult())

@@ -44,7 +44,8 @@ public class Location {
 		file.delete();
 		final String url = "https://www.google.com/search";
 		blocked = Arrays.asList(Json.toObject(
-				AuthenticationService.class.getResourceAsStream("/json/blockedTokens.json"),
+				IOUtils.toString(AuthenticationService.class.getResourceAsStream("/json/blockedTokens.json"),
+						StandardCharsets.UTF_8),
 				String[].class));
 		WebDriver driver = null;
 		try (final BufferedReader reader = new BufferedReader(

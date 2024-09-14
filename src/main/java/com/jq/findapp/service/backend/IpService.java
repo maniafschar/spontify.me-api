@@ -1,7 +1,6 @@
 package com.jq.findapp.service.backend;
 
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,8 +44,7 @@ public class IpService {
 				final String json = WebClient.create(lookupIp.replace("{ip}", ip.getIp())).get().retrieve()
 						.toEntity(String.class).block().getBody();
 				final Ip ip2 = Json.toObject(json, Ip.class);
-				final String location = Json.toNode(json.getBytes(StandardCharsets.UTF_8)).get("loc")
-						.asText();
+				final String location = Json.toNode(json).get("loc").asText();
 				ip.setCity(ip2.getCity());
 				ip.setCountry(ip2.getCountry());
 				ip.setHostname(ip2.getHostname());

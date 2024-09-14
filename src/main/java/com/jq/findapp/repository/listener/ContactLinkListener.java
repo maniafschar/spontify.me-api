@@ -11,13 +11,13 @@ import com.jq.findapp.util.Text.TextId;
 @Component
 public class ContactLinkListener extends AbstractRepositoryListener<ContactLink> {
 	@Override
-	public void prePersist(ContactLink contactLink) throws Exception {
+	public void prePersist(ContactLink contactLink) {
 		if (contactLink.getStatus() == null)
 			contactLink.setStatus(Status.Pending);
 	}
 
 	@Override
-	public void postPersist(final ContactLink contactLink) throws Exception {
+	public void postPersist(final ContactLink contactLink) {
 		if (contactLink.getStatus() == Status.Pending)
 			notificationService.sendNotification(
 					repository.one(Contact.class, contactLink.getContactId()),
@@ -27,7 +27,7 @@ public class ContactLinkListener extends AbstractRepositoryListener<ContactLink>
 	}
 
 	@Override
-	public void postUpdate(final ContactLink contactLink) throws Exception {
+	public void postUpdate(final ContactLink contactLink) {
 		if (contactLink.getStatus() == Status.Friends) {
 			notificationService.sendNotification(
 					repository.one(Contact.class, contactLink.getContactId2()),

@@ -18,7 +18,7 @@ public class LogListener extends AbstractRepositoryListener<Log> {
 	}
 
 	@Override
-	public void preUpdate(Log entity) throws Exception {
+	public void preUpdate(Log entity) {
 		prePersist(entity);
 	}
 }

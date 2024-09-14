@@ -3,7 +3,6 @@ package com.jq.findapp.repository.listener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.entity.Client;
@@ -20,10 +19,9 @@ public class TicketListener extends AbstractRepositoryListener<Ticket> {
 	private NotificationService notificationService;
 
 	@Override
-	public void prePersist(final Ticket ticket) throws JsonProcessingException {
+	public void prePersist(final Ticket ticket) {
 		if (ticket.getType() == TicketType.REGISTRATION && !ticket.getSubject().contains("@")) {
-			final JsonNode contact = Json.toObject(
-					repository.one(Contact.class, ticket.getContactId()), JsonNode.class);
+			final JsonNode contact = Json.toNode(Json.toString(repository.one(Contact.class, ticket.getContactId())));
 			((ObjectNode) contact).put("password", "");
 			ticket.setNote(
 					Attachment.resolve(ticket.getNote()) + "\n" + Json.toPrettyString(contact));
@@ -32,7 +30,7 @@ public class TicketListener extends AbstractRepositoryListener<Ticket> {
 	}
 
 	@Override
-	public void postPersist(final Ticket entity) throws Exception {
+	public void postPersist(final Ticket entity) {
 		if (entity.getType() == TicketType.BLOCK) {
 			final Client client = repository.one(Client.class,
 					repository.one(Contact.class, entity.getContactId()).getClientId());

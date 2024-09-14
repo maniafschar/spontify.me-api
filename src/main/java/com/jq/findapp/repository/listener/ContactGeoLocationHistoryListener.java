@@ -13,7 +13,7 @@ public class ContactGeoLocationHistoryListener extends AbstractRepositoryListene
 	private ImportLocationsService importLocationsService;
 
 	@Override
-	public void postPersist(final ContactGeoLocationHistory contactGeoLocationHistory) throws Exception {
+	public void postPersist(final ContactGeoLocationHistory contactGeoLocationHistory) {
 		final GeoLocation geoLocation = repository.one(GeoLocation.class, contactGeoLocationHistory.getGeoLocationId());
 		importLocationsService.lookup(geoLocation.getLatitude(), geoLocation.getLongitude());
 	}

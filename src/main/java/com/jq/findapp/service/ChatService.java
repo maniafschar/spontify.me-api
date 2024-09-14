@@ -36,7 +36,7 @@ public class ChatService {
 	private Text text;
 
 	@Async
-	public void createGptAnswer(final ContactChat contactChat) throws Exception {
+	public void createGptAnswer(final ContactChat contactChat) {
 		createGptAnswerIntern(contactChat);
 	}
 
@@ -83,7 +83,7 @@ public class ChatService {
 		return result;
 	}
 
-	private void createGptAnswerIntern(final ContactChat contactChat) throws Exception {
+	private void createGptAnswerIntern(final ContactChat contactChat) {
 		final QueryParams params = new QueryParams(Query.contact_chat);
 		params.setSearch("cast(contactChat.textId as text)='" + TextId.engagement_ai.name()
 				+ "' and (contactChat.contactId="
@@ -108,7 +108,7 @@ public class ChatService {
 		repository.save(chat);
 	}
 
-	public void notifyContact(final ContactChat contactChat) throws Exception {
+	public void notifyContact(final ContactChat contactChat) {
 		final Contact contactFrom = repository.one(Contact.class, contactChat.getContactId());
 		final Contact contactTo = repository.one(Contact.class, contactChat.getContactId2());
 		String s = null;

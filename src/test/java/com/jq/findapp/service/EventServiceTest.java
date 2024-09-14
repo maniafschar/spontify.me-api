@@ -46,22 +46,22 @@ public class EventServiceTest {
 	@Test
 	public void importEvents() throws Exception {
 		// given
-		this.utils.createContact(BigInteger.ONE);
+		utils.createContact(BigInteger.ONE);
 		final QueryParams params = new QueryParams(Query.event_listId);
 		params.setSearch("event.startDate=cast('2024-06-28 09:00:00' as timestamp)");
 
 		// when
-		final int result = this.importMunich.run(this.eventService, BigInteger.ONE);
+		final int result = importMunich.run(eventService, BigInteger.ONE);
 
 		// then
 		assertEquals(27, result);
-		assertEquals(1, this.repository.list(params).size());
+		assertEquals(1, repository.list(params).size());
 	}
 
 	@Test
 	public void importEvents_error() throws Exception {
 		// given
-		String page = IOUtils.toString(this.getClass().getResourceAsStream("/html/eventError.html"),
+		String page = IOUtils.toString(getClass().getResourceAsStream("/html/eventError.html"),
 				StandardCharsets.UTF_8);
 		page = page.replace('\n', ' ').replace('\r', ' ').replace('\u0013', ' ');
 		page = page.substring(page.indexOf("<ul class=\"m-listing__list\""));

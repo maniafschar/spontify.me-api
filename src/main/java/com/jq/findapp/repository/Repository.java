@@ -40,6 +40,7 @@ import com.jq.findapp.util.Strings;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.PersistenceException;
 
 @org.springframework.stereotype.Repository
 @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -198,7 +199,7 @@ public class Repository {
 					listeners.postUpdate(entity);
 				}
 				em.flush();
-			} catch (Exception ex) {
+			} catch (PersistenceException ex) {
 				throw new RuntimeException(ex);
 			}
 		}
@@ -356,9 +357,13 @@ public class Repository {
 			return max;
 		}
 
-		public static byte[] getFile(final String id) throws Exception {
-			return IOUtils.toByteArray(new FileInputStream(PATH + (id.contains(".") ? PUBLIC : "")
-					+ (id.contains(SEPARATOR) ? getFilename(id) : id)));
+		public static byte[] getFile(final String id) {
+			try {
+				return IOUtils.toByteArray(new FileInputStream(PATH + (id.contains(".") ? PUBLIC : "")
+						+ (id.contains(SEPARATOR) ? getFilename(id) : id)));
+			} catch (IOException ex) {
+				throw new RuntimeException(ex);
+			}
 		}
 
 		private static String getFilename(final String id) {

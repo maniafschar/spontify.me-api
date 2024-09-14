@@ -144,20 +144,25 @@ public class TestConfig {
 		public int offset = 0;
 
 		@Override
-		protected JsonNode get(final String url) throws Exception {
-			String s = IOUtils.toString(
-					getClass().getResourceAsStream(
-							url.startsWith("id=") ? "/json/surveyLastMatch.json" : "/json/surveyMatchdays.json"),
-					StandardCharsets.UTF_8);
-			return Json.toNode(
-					s.replace("\"{date}\"", "" + (long) (Instant.now().getEpochSecond() + (offset == -1 ? 0 : offset)))
-							.replace("\"{date1}\"",
-									"" + (long) (Instant.now().plus(Duration.ofDays(7)).getEpochSecond()
-											+ (offset == -1 ? 0 : offset)))
-							.replace("\"{date2}\"",
-									"" + (long) (Instant.now().plus(Duration.ofDays(14)).getEpochSecond()
-											+ (offset == -1 ? 0 : offset))))
-					.get("response");
+		protected JsonNode get(final String url) {
+			try {
+				final String s = IOUtils.toString(
+						getClass().getResourceAsStream(
+								url.startsWith("id=") ? "/json/surveyLastMatch.json" : "/json/surveyMatchdays.json"),
+						StandardCharsets.UTF_8);
+				return Json.toNode(
+						s.replace("\"{date}\"",
+								"" + (long) (Instant.now().getEpochSecond() + (offset == -1 ? 0 : offset)))
+								.replace("\"{date1}\"",
+										"" + (long) (Instant.now().plus(Duration.ofDays(7)).getEpochSecond()
+												+ (offset == -1 ? 0 : offset)))
+								.replace("\"{date2}\"",
+										"" + (long) (Instant.now().plus(Duration.ofDays(14)).getEpochSecond()
+												+ (offset == -1 ? 0 : offset))))
+						.get("response");
+			} catch (Exception ex) {
+				throw new RuntimeException(ex);
+			}
 		}
 	}
 

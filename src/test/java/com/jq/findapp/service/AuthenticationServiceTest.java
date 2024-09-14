@@ -128,7 +128,7 @@ public class AuthenticationServiceTest {
 		try {
 			this.authenticationService.register(registration);
 			throw new RuntimeException("no exception thrown");
-		} catch (final IllegalAccessException ex) {
+		} catch (final IllegalArgumentException ex) {
 
 			// then
 			assertEquals("domain", ex.getMessage());
@@ -149,7 +149,7 @@ public class AuthenticationServiceTest {
 		try {
 			this.authenticationService.register(registration);
 			throw new RuntimeException("no exception thrown");
-		} catch (final IllegalAccessException ex) {
+		} catch (final IllegalArgumentException ex) {
 
 			// then
 			assertEquals("email", ex.getMessage());
@@ -197,7 +197,7 @@ public class AuthenticationServiceTest {
 		try {
 			this.authenticationService.register(registration);
 			throw new RuntimeException("no exception thrown");
-		} catch (final IllegalAccessException ex) {
+		} catch (final IllegalArgumentException ex) {
 
 			// then
 			assertEquals("time", ex.getMessage());
@@ -218,7 +218,7 @@ public class AuthenticationServiceTest {
 		try {
 			this.authenticationService.register(registration);
 			throw new RuntimeException("no exception thrown");
-		} catch (final IllegalAccessException ex) {
+		} catch (final IllegalArgumentException ex) {
 
 			// then
 			assertEquals("legal", ex.getMessage());

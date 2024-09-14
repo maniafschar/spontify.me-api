@@ -14,7 +14,7 @@ import com.jq.findapp.util.Text.TextId;
 public class EventRatingListener extends AbstractRepositoryListener<EventRating> {
 	@Async
 	@Override
-	public void postPersist(final EventRating eventRating) throws Exception {
+	public void postPersist(final EventRating eventRating) {
 		final EventParticipate eventParticipate = repository.one(EventParticipate.class,
 				eventRating.getEventParticipateId());
 		final Event event = repository.one(Event.class, eventParticipate.getEventId());

@@ -13,7 +13,7 @@ import com.jq.findapp.repository.QueryParams;
 @Component
 public class ClientMarketingListener extends AbstractRepositoryListener<ClientMarketing> {
 	@Override
-	public void postPersist(final ClientMarketing clientMarketing) throws Exception {
+	public void postPersist(final ClientMarketing clientMarketing) {
 		final ClientMarketingResult clientMarketingResult = new ClientMarketingResult();
 		clientMarketingResult.setClientMarketingId(clientMarketing.getId());
 		clientMarketingResult.setPublished(false);
@@ -21,7 +21,7 @@ public class ClientMarketingListener extends AbstractRepositoryListener<ClientMa
 	}
 
 	@Override
-	public void postRemove(final ClientMarketing clientMarketing) throws Exception {
+	public void postRemove(final ClientMarketing clientMarketing) {
 		final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 		params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketing.getId());
 		final Result result = repository.list(params);

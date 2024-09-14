@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -48,7 +49,8 @@ public class MarketingCards {
 	@Test
 	public void createPdf() throws Exception {
 		// given
-		final JsonNode addresses = Json.toNode(getClass().getResourceAsStream("/json/marketingAddresses.json"));
+		final JsonNode addresses = Json.toNode(IOUtils
+				.toString(getClass().getResourceAsStream("/json/marketingAddresses.json"), StandardCharsets.UTF_8));
 		final PDF pdf = new PDF(addresses);
 
 		// when

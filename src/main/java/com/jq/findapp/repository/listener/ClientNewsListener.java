@@ -16,12 +16,12 @@ import com.jq.findapp.util.Text.TextId;
 @Component
 public class ClientNewsListener extends AbstractRepositoryListener<ClientNews> {
 	@Override
-	public void postPersist(final ClientNews clientNews) throws Exception {
+	public void postPersist(final ClientNews clientNews) {
 		this.execute(clientNews);
 	}
 
 	@Override
-	public void postUpdate(final ClientNews clientNews) throws Exception {
+	public void postUpdate(final ClientNews clientNews) {
 		this.execute(clientNews);
 	}
 

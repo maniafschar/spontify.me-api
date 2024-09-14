@@ -39,7 +39,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	private SurveyService surveyService;
 
 	@Override
-	public void prePersist(final Event event) throws Exception {
+	public void prePersist(final Event event) {
 		preUpdate(event);
 		if (event.getRepetition() == Repetition.Games) {
 			final List<FutureEvent> futureEvents = surveyService
@@ -54,7 +54,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	}
 
 	@Override
-	public void preUpdate(final Event event) throws Exception {
+	public void preUpdate(final Event event) {
 		if (event.getRepetition() == null)
 			event.setRepetition(Repetition.Once);
 		if (event.getRepetition() == Repetition.Once || event.getRepetition() == Repetition.Games)
@@ -62,7 +62,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	}
 
 	@Override
-	public void postPersist(final Event event) throws Exception {
+	public void postPersist(final Event event) {
 		if (event.getType() != EventType.Poll &&
 				!repository.one(Client.class, repository.one(Contact.class, event.getContactId()).getClientId())
 						.getAdminId().equals(event.getContactId())) {
@@ -84,7 +84,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	}
 
 	@Override
-	public void postUpdate(final Event event) throws Exception {
+	public void postUpdate(final Event event) {
 		if (event.old("startDate") != null || event.old("price") != null) {
 			final QueryParams params = new QueryParams(Query.event_listParticipateRaw);
 			params.setSearch(
@@ -127,7 +127,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	}
 
 	@Override
-	public void postRemove(final Event event) throws Exception {
+	public void postRemove(final Event event) {
 		final QueryParams params = new QueryParams(Query.event_listParticipateRaw);
 		params.setSearch("eventParticipate.eventId=" + event.getId());
 		final Result result = repository.list(params);

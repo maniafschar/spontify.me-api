@@ -22,13 +22,13 @@ public class ContactChatListener extends AbstractRepositoryListener<ContactChat>
 	private ChatService chatService;
 
 	@Override
-	public void prePersist(final ContactChat contactChat) throws Exception {
+	public void prePersist(final ContactChat contactChat) {
 		if (duplicateCheck(contactChat))
 			throw new IllegalArgumentException("duplicate chat");
 	}
 
 	@Override
-	public void postPersist(final ContactChat contactChat) throws Exception {
+	public void postPersist(final ContactChat contactChat) {
 		if (duplicateCheck(contactChat)) {
 			repository.delete(contactChat);
 			throw new IllegalArgumentException("duplicate chat");
@@ -45,7 +45,7 @@ public class ContactChatListener extends AbstractRepositoryListener<ContactChat>
 			chatService.createGptAnswer(contactChat);
 	}
 
-	private boolean duplicateCheck(final ContactChat contactChat) throws Exception {
+	private boolean duplicateCheck(final ContactChat contactChat) {
 		final QueryParams params = new QueryParams(Query.contact_chat);
 		params.setLimit(1);
 		params.setSearch("contactChat.contactId=" + contactChat.getContactId() + " and contactChat.contactId2="

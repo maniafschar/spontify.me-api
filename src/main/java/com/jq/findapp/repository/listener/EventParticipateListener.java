@@ -22,7 +22,7 @@ import com.jq.findapp.util.Text.TextId;
 @Component
 public class EventParticipateListener extends AbstractRepositoryListener<EventParticipate> {
 	@Override
-	public void postPersist(final EventParticipate eventParticipate) throws Exception {
+	public void postPersist(final EventParticipate eventParticipate) {
 		final Event event = repository.one(Event.class, eventParticipate.getEventId());
 		if (event != null && !event.getContactId().equals(eventParticipate.getContactId())) {
 			final Contact contactTo = repository.one(Contact.class, event.getContactId());

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.glassfish.hk2.runlevel.RunLevelException;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -44,8 +44,6 @@ import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
 import com.jq.findapp.util.Text.TextId;
-
-import jakarta.mail.SendFailedException;
 
 @Service
 public class AuthenticationService {
@@ -123,7 +121,8 @@ public class AuthenticationService {
 	static {
 		try {
 			BLOCKED_EMAIL_DOMAINS.addAll(Arrays.asList(Json.toObject(
-					AuthenticationService.class.getResourceAsStream("/blockedEmailDomains.json"),
+					IOUtils.toString(AuthenticationService.class.getResourceAsStream("/blockedEmailDomains.json"),
+							StandardCharsets.UTF_8),
 					String[].class)));
 		} catch (final Exception ex) {
 			throw new RuntimeException(ex);
@@ -183,20 +182,20 @@ public class AuthenticationService {
 		return contact;
 	}
 
-	public Contact register(final InternalRegistration registration) throws Exception {
+	public Contact register(final InternalRegistration registration) {
 		if (!registration.isAgb())
-			throw new IllegalAccessException("legal");
+			throw new IllegalArgumentException("legal");
 		final int minimum = 5000;
 		if (registration.getTime() < minimum)
-			throw new IllegalAccessException("time");
+			throw new IllegalArgumentException("time");
 		if (!Strings.isEmail(registration.getEmail()))
-			throw new IllegalAccessException("email");
+			throw new IllegalArgumentException("email");
 		final Unique unique = unique(registration.getClientId(), registration.getEmail());
 		if (!unique.unique)
-			throw new IllegalAccessException("email");
+			throw new IllegalArgumentException("email");
 		if (unique.blocked) {
 			notificationService.createTicket(TicketType.ERROR, "denied email blocked", registration.toString(), null);
-			throw new IllegalAccessException("domain");
+			throw new IllegalArgumentException("domain");
 		}
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.email='" + registration.getEmail().toLowerCase().trim() + "' and contact.clientId="
@@ -219,8 +218,8 @@ public class AuthenticationService {
 					text.getText(contact, TextId.mail_contactWelcomeEmail), "r=" + generateLoginParam(contact));
 			saveRegistration(contact, registration);
 			return contact;
-		} catch (final SendFailedException ex) {
-			throw new IllegalAccessException("email");
+		} catch (final IllegalArgumentException ex) {
+			throw new IllegalArgumentException("email");
 		}
 	}
 
@@ -232,7 +231,7 @@ public class AuthenticationService {
 				.contains(email.substring(email.indexOf('@') + 1)));
 	}
 
-	void saveRegistration(final Contact contact, final AbstractRegistration registration) throws Exception {
+	void saveRegistration(final Contact contact, final AbstractRegistration registration) {
 		contact.setDevice(registration.getDevice());
 		contact.setLanguage(registration.getLanguage());
 		contact.setClientId(registration.getClientId());
@@ -271,10 +270,10 @@ public class AuthenticationService {
 				} catch (final Throwable ex) {
 					if (isDuplicateIdDisplay(ex)) {
 						if (i++ > max)
-							throw new IllegalAccessException(
+							throw new IllegalArgumentException(
 									"reg failed: " + i + " tries to find id_display | " + ex.getMessage());
 					} else
-						throw new IllegalAccessException("reg failed: " + Strings.stackTraceToString(ex));
+						throw new IllegalArgumentException("reg failed: " + Strings.stackTraceToString(ex));
 				}
 			}
 		} else
@@ -291,7 +290,7 @@ public class AuthenticationService {
 		return false;
 	}
 
-	public Map<String, Object> login(final Contact contact, final String password, final String salt) throws Exception {
+	public Map<String, Object> login(final Contact contact, final String password, final String salt) {
 		final QueryParams params = new QueryParams(Query.contact_list);
 		params.setSearch("contact.email='" + contact.getEmail() + "' and contact.clientId=" + contact.getClientId());
 		params.setUser(new Contact());
@@ -369,7 +368,7 @@ public class AuthenticationService {
 		}
 	}
 
-	public void logoff(final Contact contact, final String token) throws Exception {
+	public void logoff(final Contact contact, final String token) {
 		if (token != null) {
 			final QueryParams params = new QueryParams(Query.contact_token);
 			params.setSearch("contactToken.token='" + Encryption.decryptBrowser(token) + "'");
@@ -379,7 +378,7 @@ public class AuthenticationService {
 		}
 	}
 
-	public void recoverSendEmailReminder(final Contact contact) throws Exception {
+	public void recoverSendEmailReminder(final Contact contact) {
 		final String s;
 		if (Strings.isEmpty(contact.getLoginLink())) {
 			s = generateLoginParam(contact);
@@ -393,7 +392,7 @@ public class AuthenticationService {
 				"r=" + s);
 	}
 
-	public String recoverSendEmail(final String email, BigInteger clientId) throws Exception {
+	public String recoverSendEmail(final String email, BigInteger clientId) {
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.email='" + email + "' and contact.clientId=" + clientId);
 		final Map<String, Object> user = repository.one(params);
@@ -408,7 +407,7 @@ public class AuthenticationService {
 		return "nok:Email";
 	}
 
-	public Contact recoverVerifyEmail(final String token, BigInteger clientId) throws Exception {
+	public Contact recoverVerifyEmail(final String token, BigInteger clientId) {
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.loginLink like '%" + token + "%' and contact.clientId=" + clientId);
 		final Map<String, Object> user = repository.one(params);
@@ -469,7 +468,7 @@ public class AuthenticationService {
 		}
 	}
 
-	public void deleteAccount(final Contact contact) throws Exception {
+	public void deleteAccount(final Contact contact) {
 		if (contact.getId() == repository.one(Client.class, contact.getClientId()).getAdminId())
 			return;
 		final String[] sqls = accountDeleteSql.split(";");

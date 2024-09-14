@@ -3,6 +3,7 @@ package com.jq.findapp.util;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class Json {
 	private static final ObjectMapper om = new ObjectMapper();
@@ -43,7 +44,7 @@ public class Json {
 		}
 	}
 
-	public static String createObject() {
+	public static ObjectNode createObject() {
 		return om.createObjectNode();
 	}
 }

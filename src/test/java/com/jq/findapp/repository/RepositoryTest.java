@@ -104,7 +104,7 @@ public class RepositoryTest {
 		map.put("contactId2", "213");
 
 		// when
-		final ContactBluetooth cb = Json.toObject(map, ContactBluetooth.class);
+		final ContactBluetooth cb = Json.toObject(Json.toString(map), ContactBluetooth.class);
 
 		// then
 		assertEquals(BigInteger.valueOf(213), cb.getContactId2());
@@ -265,7 +265,7 @@ public class RepositoryTest {
 		final Contact contact = new Contact();
 		contact.setSkills("xyz");
 		contact.setDescription("about others");
-		final JsonNode node = Json.toObject(contact, JsonNode.class);
+		final JsonNode node = Json.toObject(Json.toString(contact), JsonNode.class);
 		((ObjectNode) node).put("skills", "abc");
 
 		// when

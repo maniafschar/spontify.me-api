@@ -24,8 +24,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 	private ExternalService externalService;
 
 	@Override
-	public void prePersist(final Location location)
-			throws Exception {
+	public void prePersist(final Location location) {
 		location.setName(sanitizeName(location.getName()));
 		location.setUrl(sanitizeUrl(location.getUrl()));
 		lookupAddress(location);
@@ -48,7 +47,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 	}
 
 	@Override
-	public void preUpdate(final Location location) throws Exception {
+	public void preUpdate(final Location location) {
 		location.setName(sanitizeName(location.getName()));
 		if (location.old("url") != null)
 			location.setUrl(sanitizeUrl(location.getUrl()));
@@ -57,7 +56,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 	}
 
 	@Override
-	public void postPersist(final Location location) throws Exception {
+	public void postPersist(final Location location) {
 		final LocationFavorite locationFavorite = new LocationFavorite();
 		locationFavorite.setContactId(location.getContactId());
 		locationFavorite.setLocationId(location.getId());
@@ -83,7 +82,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 			throw new IllegalArgumentException("location exists: " + list.get(0).get("location.id"));
 	}
 
-	private void lookupAddress(final Location location) throws Exception {
+	private void lookupAddress(final Location location) {
 		if (location.getLatitude() != null)
 			checkDuplicateLatLon(location);
 		final JsonNode address = Json.toNode(

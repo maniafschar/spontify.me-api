@@ -35,7 +35,8 @@ public class ContactListener extends AbstractRepositoryListener<Contact> {
 		String notification = NotificationType.birthday + "," + NotificationType.chat + ","
 				+ NotificationType.engagement + "," + NotificationType.event + "," + NotificationType.friend + ",";
 		try {
-			final JsonNode props = Json.toNode(repository.one(com.jq.findapp.entity.Client.class, contact.getClientId()).getStorage());
+			final JsonNode props = Json
+					.toNode(repository.one(com.jq.findapp.entity.Client.class, contact.getClientId()).getStorage());
 			if (props.has("rss") && props.get("rss").size() == 1)
 				notification += NotificationType.news + ",";
 		} catch (Exception ex) {
@@ -45,7 +46,7 @@ public class ContactListener extends AbstractRepositoryListener<Contact> {
 	}
 
 	@Override
-	public void preUpdate(final Contact contact) throws Exception {
+	public void preUpdate(final Contact contact) {
 		if (contact.old("email") != null)
 			contact.setAuthenticate(Boolean.FALSE);
 		if (contact.old("visitPage") != null)
@@ -80,13 +81,13 @@ public class ContactListener extends AbstractRepositoryListener<Contact> {
 
 	@Async
 	@Override
-	public void postUpdate(final Contact contact) throws Exception {
+	public void postUpdate(final Contact contact) {
 		if (contact.old("email") != null)
 			authenticationService.recoverSendEmail(contact.getEmail(), contact.getClientId());
 	}
 
 	@Override
-	public void preRemove(final Contact contact) throws Exception {
+	public void preRemove(final Contact contact) {
 		final QueryParams params = new QueryParams(Query.contact_listFriends);
 		params.setUser(contact);
 		params.setLimit(0);

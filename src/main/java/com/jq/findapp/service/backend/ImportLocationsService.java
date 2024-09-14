@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Location;
@@ -161,7 +160,7 @@ public class ImportLocationsService {
 	}
 
 	@Async
-	public void lookup(final float latitude, final float longitude) throws Exception {
+	public void lookup(final float latitude, final float longitude) {
 		final float roundingFactor = 1000f;
 		final float lat = ((int) (latitude * roundingFactor) / roundingFactor);
 		final float lon = ((int) (longitude * roundingFactor) / roundingFactor);
@@ -171,12 +170,13 @@ public class ImportLocationsService {
 				"%' and ticket.type='" + TicketType.LOCATION.name() + "'");
 		if (repository.list(params).size() == 0) {
 			String importResult = null;
-			JsonNode json = Json.toNode(externalService.google("place/nearbysearch/json?radius=600&sensor=false&location="
+			JsonNode json = Json
+					.toNode(externalService.google("place/nearbysearch/json?radius=600&sensor=false&location="
 							+ latitude + "," + longitude));
 			if ("OK".equals(json.get("status").asText())) {
 				importResult = importLocations(json.get("results").elements());
 				while (json.has("next_page_token")) {
-					json = om.readTree(externalService.google(
+					json = Json.toNode(externalService.google(
 							"place/nearbysearch/json?pagetoken=" + json.get("next_page_token").asText()));
 					if ("OK".equals(json.get("status").asText()))
 						importResult += "\n" + importLocations(json.get("results").elements());
