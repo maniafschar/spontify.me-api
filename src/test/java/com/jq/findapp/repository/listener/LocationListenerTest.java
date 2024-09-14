@@ -28,9 +28,9 @@ public class LocationListenerTest {
 	@Test
 	public void save_errorDuplicateLatLng() throws Exception {
 		// given
-		this.utils.createContact(BigInteger.ONE);
+		utils.createContact(BigInteger.ONE);
 		try {
-			this.repository.save(createLocation());
+			repository.save(createLocation());
 		} catch (IllegalArgumentException ex) {
 		}
 		final Location location = createLocation();
@@ -52,9 +52,9 @@ public class LocationListenerTest {
 	@Test
 	public void save_errorDuplicateNameLongVersion() throws Exception {
 		// given
-		this.utils.createContact(BigInteger.ONE);
+		utils.createContact(BigInteger.ONE);
 		try {
-			this.repository.save(createLocation());
+			repository.save(createLocation());
 		} catch (IllegalArgumentException ex) {
 		}
 		final Location location = createLocation();
@@ -77,9 +77,9 @@ public class LocationListenerTest {
 	@Test
 	public void save_errorDuplicateNameShortVersion() throws Exception {
 		// given
-		this.utils.createContact(BigInteger.ONE);
+		utils.createContact(BigInteger.ONE);
 		try {
-			this.repository.save(createLocation());
+			repository.save(createLocation());
 		} catch (IllegalArgumentException ex) {
 		}
 		final Location location = createLocation();
@@ -102,9 +102,9 @@ public class LocationListenerTest {
 	@Test
 	public void save_errorDuplicateNameDifferentOrder() throws Exception {
 		// given
-		this.utils.createContact(BigInteger.ONE);
+		utils.createContact(BigInteger.ONE);
 		try {
-			this.repository.save(createLocation());
+			repository.save(createLocation());
 		} catch (IllegalArgumentException ex) {
 		}
 		final Location location = createLocation();
@@ -127,9 +127,9 @@ public class LocationListenerTest {
 	@Test
 	public void save_almostDuplicateNameShortVersion() throws Exception {
 		// given
-		this.utils.createContact(BigInteger.ONE);
+		utils.createContact(BigInteger.ONE);
 		try {
-			this.repository.save(createLocation());
+			repository.save(createLocation());
 		} catch (IllegalArgumentException ex) {
 		}
 		final Location location = createLocation();
@@ -146,9 +146,9 @@ public class LocationListenerTest {
 	@Test
 	public void save_nearby() throws Exception {
 		// given
-		this.utils.createContact(BigInteger.ONE);
+		utils.createContact(BigInteger.ONE);
 		try {
-			this.repository.save(createLocation());
+			repository.save(createLocation());
 		} catch (IllegalArgumentException ex) {
 		}
 		final Location location = createLocation();

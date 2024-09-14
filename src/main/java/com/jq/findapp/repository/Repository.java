@@ -182,7 +182,7 @@ public class Repository {
 		return result.get(0);
 	}
 
-	public void save(final BaseEntity entity) {
+	public void save(final BaseEntity entity) throws IllegalArgumentException {
 		if (entity.modified()) {
 			try {
 				Attachment.save(entity);
@@ -205,13 +205,13 @@ public class Repository {
 		}
 	}
 
-	public void delete(final BaseEntity entity) {
+	public void delete(final BaseEntity entity) throws IllegalArgumentException {
 		try {
 			listeners.preRemove(entity);
 			em.remove(em.contains(entity) ? entity : em.merge(entity));
 			Attachment.delete(entity);
 			listeners.postRemove(entity);
-		} catch (Exception ex) {
+		} catch (PersistenceException ex) {
 			throw new RuntimeException(ex);
 		}
 	}

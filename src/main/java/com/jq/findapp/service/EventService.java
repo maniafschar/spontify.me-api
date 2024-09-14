@@ -403,8 +403,8 @@ public class EventService {
 				count++;
 			}
 		}
-		repository.executeUpdate("update Event event set event.lastSeriesId=" + last + " where event.contactId="
-				+ event.getContactId()
+		repository.executeUpdate("update Event event set event.repetition='" + Repetition.Games.name()
+				+ "', event.lastSeriesId=" + last + " where event.contactId=" + event.getContactId()
 				+ " and length(event.skills)>0 and cast(REGEXP_LIKE('" + skill + "', event.skills) as integer)=1");
 		return count;
 	}

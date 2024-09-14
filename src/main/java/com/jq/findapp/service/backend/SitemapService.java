@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
 import org.apache.commons.io.IOUtils;
-import org.glassfish.hk2.runlevel.RunLevelException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -79,7 +78,7 @@ public class SitemapService {
 							out.write((urlList + e.get(("news".equals(type) ? "clientNews" : type) + ".id") + "\n")
 									.getBytes(StandardCharsets.UTF_8));
 						} catch (IOException ex) {
-							throw new RunLevelException(ex);
+							throw new RuntimeException(ex);
 						}
 					});
 		}

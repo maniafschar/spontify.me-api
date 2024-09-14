@@ -95,5 +95,6 @@ public class EventListenerTest {
 		assertTrue(
 				last.getDescription().endsWith(event.getDescription().substring(event.getDescription().indexOf("\n"))));
 		assertEquals(event.getLocationId(), last.getLocationId());
+		assertEquals(Repetition.Games, last.getRepetition());
 	}
 }
