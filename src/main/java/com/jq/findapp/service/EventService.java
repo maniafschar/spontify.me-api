@@ -14,9 +14,11 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
@@ -370,14 +372,14 @@ public class EventService {
 						});
 						return 0;
 					}
-					return updateFutureEvents(event, skill);
+					return updateFutureEvents(event, events, skill);
 				}
 			}
 		}
 		return 0;
 	}
 
-	private int updateFutureEvents(final Event event, final String skill) {
+	private int updateFutureEvents(final Event event, final Result events, final String skill) {
 		final List<FutureEvent> futureEvents = surveyService.futureEvents(Integer.valueOf(skill.substring(2)));
 		final String description = event.getDescription().contains("\n")
 				? event.getDescription().substring(event.getDescription().indexOf("\n"))
@@ -386,16 +388,17 @@ public class EventService {
 		final String storage = contact.getStorage();
 		final ObjectNode imported = Strings.isEmpty(storage) ? Json.createObject()
 				: (ObjectNode) Json.toNode(Attachment.resolve(storage));
-		final String importedIds;
+		final Set<Long> eventSeriesIds = new HashSet<>();
+		events.forEach(e -> eventSeriesIds.add((Long) e.get("event.seriesId")));
+		String importedIds = event.getSeriesId() + "|";
 		if (imported.has("eventSeries"))
-			importedIds = imported.get("eventSeries").toString();
-		else {
+			importedIds += imported.get("eventSeries").toString();
+		else
 			imported.putArray("eventSeries");
-			importedIds = "";
-		}
 		int count = 0;
 		for (FutureEvent futureEvent : futureEvents) {
 			if (futureEvent.time > System.currentTimeMillis()
+					&& !eventSeriesIds.contains(futureEvent.time)
 					&& !importedIds.contains(skill + "." + futureEvent.time)) {
 				final Event e = new Event();
 				e.setContactId(event.getContactId());

@@ -71,7 +71,7 @@ public class EventListenerTest {
 	public void save_series() throws Exception {
 		// given
 		final long now = System.currentTimeMillis();
-		final Contact contact = utils.createContact(BigInteger.ONE);
+		final Contact contact = utils.createContact(new BigInteger("99"));
 		final Event event = new Event();
 		event.setContactId(contact.getId());
 		event.setLocationId(BigInteger.ZERO);
@@ -101,8 +101,15 @@ public class EventListenerTest {
 	@Test
 	public void save_seriesTwice() throws Exception {
 		// given
-		save_series();
-		final Event event = new Event();
+		Event event = new Event();
+		event.setContactId(utils.createContact(BigInteger.ONE).getId());
+		event.setLocationId(BigInteger.ZERO);
+		event.setDescription("abc");
+		event.setRepetition(Repetition.Games);
+		event.setSkills("9.157");
+		event.setType(EventType.Location);
+		repository.save(event);
+		event = new Event();
 		event.setContactId(BigInteger.ONE);
 		event.setLocationId(BigInteger.ZERO);
 		event.setDescription("abc");

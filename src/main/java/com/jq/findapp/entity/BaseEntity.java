@@ -62,10 +62,12 @@ public abstract class BaseEntity {
 			try {
 				if (old(field.getName()) != null)
 					return true;
-				final Field fieldActual = getClass().getDeclaredField(field.getName());
-				fieldActual.setAccessible(true);
-				if (fieldActual.get(this) != null && old.get(field.getName()) == null)
-					return true;
+				if (old.get(field.getName()) == null) {
+					final Field fieldActual = getClass().getDeclaredField(field.getName());
+					fieldActual.setAccessible(true);
+					if (fieldActual.get(this) != null)
+						return true;
+				}
 			} catch (final Exception e) {
 				throw new RuntimeException("Failed to check modified on " + field.getName(), e);
 			}
