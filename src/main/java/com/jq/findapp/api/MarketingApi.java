@@ -46,7 +46,7 @@ import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.backend.IpService;
-import com.jq.findapp.service.backend.MarketingService;
+import com.jq.findapp.service.backend.MarketingLocationService;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 
@@ -62,7 +62,7 @@ public class MarketingApi {
 	private Repository repository;
 
 	@Autowired
-	private MarketingService marketingService;
+	private MarketingLocationService marketingLocationService;
 
 	@Autowired
 	private AuthenticationService authenticationService;
@@ -137,7 +137,7 @@ public class MarketingApi {
 				s.append(questions.get("epilog").asText().replaceAll("\n", "<br/>") + "</div>");
 				notificationService.sendNotificationEmail(null, to, s.toString(), null);
 			}
-			return marketingService.locationUpdate(contactMarketing);
+			return marketingLocationService.locationUpdate(contactMarketing);
 		}
 		return null;
 	}

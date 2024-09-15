@@ -136,7 +136,7 @@ public class EventListenerTest {
 	public void save_seriesContactStorage() throws Exception {
 		// given
 		final Event event = new Event();
-		event.setContactId(utils.createContact(BigInteger.ONE).getId());
+		event.setContactId(utils.createContact(BigInteger.valueOf(98l)).getId());
 		event.setLocationId(BigInteger.ZERO);
 		event.setDescription("abc");
 		event.setRepetition(Repetition.Games);

@@ -257,8 +257,7 @@ public class SurveyService {
 							final QueryParams params = new QueryParams(Query.misc_listMarketing);
 							params.setSearch(
 									"clientMarketing.startDate=cast('" + startDate
-											+ "' as timestamp) and clientMarketing.clientId="
-											+ clientId);
+											+ "' as timestamp) and clientMarketing.clientId=" + clientId);
 							if (repository.list(params).size() > 0)
 								break;
 							final JsonNode matchDay = get("id=" + matchDays.get(i).get("fixture").get("id").asText())

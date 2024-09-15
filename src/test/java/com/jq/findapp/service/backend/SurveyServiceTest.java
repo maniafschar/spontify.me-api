@@ -83,7 +83,6 @@ public class SurveyServiceTest {
 	public void prediction() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
-		((SurveyServiceMock) surveyService).offset = -1;
 		final BigInteger clientMarketingId = surveyService.synchronize.prediction(BigInteger.ONE, 0);
 
 		// when

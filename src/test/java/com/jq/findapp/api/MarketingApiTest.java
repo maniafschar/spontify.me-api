@@ -59,11 +59,11 @@ public class MarketingApiTest {
 		time2 = System.currentTimeMillis() - time2;
 
 		// then
-		assertTrue(time1 > 400, "time " + time1);
-		assertTrue(time2 < 20, "time " + time2);
 		assertTrue(result.contains("<article>abc"));
 		assertTrue(
 				result.contains("<link rel=\"canonical\" href=\"https://fan-club.online/rest/marketing/news/1\" />"));
+		assertTrue(time1 > 400, "time " + time1);
+		assertTrue(time2 < 20, "time " + time2);
 	}
 
 	@Test

@@ -56,6 +56,7 @@ import com.jq.findapp.service.backend.ImportLocationsService;
 import com.jq.findapp.service.backend.ImportLogService;
 import com.jq.findapp.service.backend.ImportSportsBarService;
 import com.jq.findapp.service.backend.IpService;
+import com.jq.findapp.service.backend.MarketingLocationService;
 import com.jq.findapp.service.backend.MarketingService;
 import com.jq.findapp.service.backend.RssService;
 import com.jq.findapp.service.backend.SitemapService;
@@ -116,6 +117,9 @@ public class SupportCenterApi {
 
 	@Autowired
 	private MarketingService marketingService;
+
+	@Autowired
+	private MarketingLocationService marketingLocationService;
 
 	@Autowired
 	private MetricsEndpoint metricsEndpoint;
@@ -380,10 +384,10 @@ public class SupportCenterApi {
 			final List<CompletableFuture<Void>> list = new ArrayList<>();
 			run(importSportsBarService, null, list, new int[] { 3 }, 0);
 			run(chatService, null, list, null, -1);
-			run(marketingService, "Location", list,
+			run(marketingLocationService, null, list,
 					new int[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 }, -1);
-			run(marketingService, "Sent", list, new int[] { 19 }, 10);
-			run(marketingService, "Unfinished", list, new int[] { 17 }, 30);
+			run(marketingLocationService, "Sent", list, new int[] { 19 }, 10);
+			run(marketingLocationService, "Unfinished", list, new int[] { 17 }, 30);
 			run(dbService, null, list, null, -1);
 			run(dbService, "CleanUp", list, new int[] { 0 }, 30);
 			run(engagementService, "Registration", list, new int[] { 10 }, 40);

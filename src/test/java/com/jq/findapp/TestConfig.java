@@ -15,7 +15,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -147,20 +146,18 @@ public class TestConfig {
 		@Override
 		protected JsonNode get(final String url) {
 			try {
-				final Instant now = Instant.now().truncatedTo(ChronoUnit.DAYS);
+				final Instant now = Instant.now();
 				final String s = IOUtils.toString(
 						getClass().getResourceAsStream(
 								url.startsWith("id=") ? "/json/surveyLastMatch.json" : "/json/surveyMatchdays.json"),
 						StandardCharsets.UTF_8);
 				return Json.toNode(
 						s.replace("\"{date}\"",
-								"" + (long) (now.getEpochSecond() + (offset == -1 ? 0 : offset)))
+								"" + (long) (now.getEpochSecond() + offset))
 								.replace("\"{date1}\"",
-										"" + (long) (now.plus(Duration.ofDays(7)).getEpochSecond()
-												+ (offset == -1 ? 0 : offset)))
+										"" + (long) (now.plus(Duration.ofDays(7)).getEpochSecond() + offset))
 								.replace("\"{date2}\"",
-										"" + (long) (now.plus(Duration.ofDays(14)).getEpochSecond()
-												+ (offset == -1 ? 0 : offset))))
+										"" + (long) (now.plus(Duration.ofDays(14)).getEpochSecond() + offset)))
 						.get("response");
 			} catch (Exception ex) {
 				throw new RuntimeException(ex);
