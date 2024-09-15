@@ -1,6 +1,7 @@
 package com.jq.findapp.service.backend;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -19,6 +20,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
+import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.entity.Location;
@@ -86,5 +88,20 @@ public class MarketingLocationServiceTest {
 				+ "<li>Marketing-Material senden wir Dir an die Adresse Deiner Location.</li>"
 				+ "<li>Wir freuen uns auf eine weitere Zusammenarbeit und melden uns in Bälde bei Dir.</li>"
 				+ "<li>Lieben Dank für Dein Feedback.</li></ul>", result);
+	}
+
+	@Test
+	public void html() throws Exception {
+		// given
+		utils.createContact(BigInteger.ONE);
+		final String text = "abc\n\ndef";
+		String html = marketingLocationService.createHtmlTemplate(repository.one(Client.class, BigInteger.ONE));
+
+		// when
+		html = html.replace("<jq:text />", text);
+
+		// then
+		assertTrue(html.contains(text));
+		assertTrue(html.indexOf(text) == html.lastIndexOf(text));
 	}
 }

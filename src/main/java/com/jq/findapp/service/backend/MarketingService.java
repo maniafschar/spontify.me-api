@@ -1,18 +1,13 @@
 package com.jq.findapp.service.backend;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +26,6 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
-import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Json;
@@ -43,9 +37,6 @@ import com.jq.findapp.util.Text.TextId;
 public class MarketingService {
 	@Autowired
 	private Repository repository;
-
-	@Autowired
-	private AuthenticationService authenticationService;
 
 	@Autowired
 	private ExternalService externalService;
@@ -197,32 +188,6 @@ public class MarketingService {
 				repository.save(clientMarketing);
 			}
 		}
-	}
-
-	String createHtmlTemplate(Client client) {
-		String html;
-		try (final InputStream inHtml = getClass().getResourceAsStream("/template/email.html")) {
-			html = IOUtils.toString(inHtml, StandardCharsets.UTF_8)
-					.replace("<jq:logo />", client.getUrl() + "/images/logo.png")
-					.replace("<jq:pseudonym />", "")
-					.replace("<jq:time />", Strings.formatDate(null, new Date(), "Europe/Berlin"))
-					.replace("<jq:link />", "")
-					.replace("<jq:url />", "")
-					.replace("<jq:newsTitle />", "")
-					.replace("<jq:image />", "");
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		}
-		final int a = html.indexOf("</a>");
-		html = html.substring(0, a + 4) + html.substring(html.indexOf("<jq:text"));
-		html = html.substring(0, html.lastIndexOf("<div>", a)) + html.substring(a);
-		final JsonNode css = Json.toNode(Attachment.resolve(client.getStorage())).get("css");
-		final Iterator<String> it = css.fieldNames();
-		while (it.hasNext()) {
-			final String key = it.next();
-			html = html.replace("--" + key, css.get(key).asText());
-		}
-		return html;
 	}
 
 	public synchronized ClientMarketingResult synchronizeResult(final BigInteger clientMarketingId) {
