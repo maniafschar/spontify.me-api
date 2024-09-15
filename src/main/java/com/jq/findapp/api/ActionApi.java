@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -314,7 +313,7 @@ public class ActionApi {
 						ip2.setLongitude(0f);
 						ip2.setIp(IpService.sanatizeIp(ip));
 						repository.save(ip2);
-					} catch (final ConstraintViolationException ex) {
+					} catch (final RuntimeException ex) {
 						// most probably added meanwhile, just continue
 					}
 				}
