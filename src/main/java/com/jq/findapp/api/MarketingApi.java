@@ -145,7 +145,7 @@ public class MarketingApi {
 	@GetMapping(path = "user/{locationId}/{hash}")
 	public String createLocationUserAllowed(@PathVariable final BigInteger locationId, @PathVariable final int hash) {
 		final Location location = repository.one(Location.class, locationId);
-		if (location.getSecret().hashCode() == hash
+		if (location.getSecret() != null && location.getSecret().hashCode() == hash
 				&& (location.getContactId() == null || location.getContactId().compareTo(BigInteger.ONE) <= 0))
 			return location.getName();
 		return null;
