@@ -143,8 +143,7 @@ public class MarketingService {
 						final Contact contact = repository.one(Contact.class, (BigInteger) users.get(i2).get(field));
 						notificationService.sendNotification(null, contact,
 								TextId.notification_clientMarketingPollResult, "m=" + clientMarketing.getId(),
-								text.getText(contact, TextId.notification_clientMarketingPollResult).replace("{0}",
-										text.getText(contact, poll.textId).replace("{0}", poll.subject)));
+								text.getText(contact, poll.textId).replace("<jq:EXTRA_1 />", poll.subject));
 						sent.add(users.get(i2).get(field));
 					}
 				}
