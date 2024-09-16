@@ -53,7 +53,7 @@ public class Text {
 		mail_titleFrom,
 		marketing_playerOfTheMatch,
 		marketing_prediction,
-		marketing_skySportCoorperation,
+		marketing_skySportCooperation,
 		marketing_skySportPostfix,
 		marketing_skySportSent,
 		marketing_skySportSubjectPrefix,

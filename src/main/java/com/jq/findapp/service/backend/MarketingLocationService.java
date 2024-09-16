@@ -179,7 +179,7 @@ public class MarketingLocationService {
 	public SchedulerResult runCooperation() {
 		return sendEmails(
 				"",
-				"Dauerhaft mehr Gäste durch Fanclub!", "Coorperation",
+				"Dauerhaft mehr Gäste durch Fanclub!", "Cooperation",
 				(location, poll, answer) -> {
 					boolean cards = false, cooperation = false;
 					for (int i = 0; i < poll.questions.size(); i++) {
@@ -252,20 +252,18 @@ public class MarketingLocationService {
 								.replace("{date}", date).replace("{location}", location.getName())
 								+ text.getText(contact,
 										TextId.valueOf("marketing_" + poll.locationPrefix + "Postfix"));
-						notificationService.sendEmail(client, null, "mani.afschar@jq-consulting.de", // location.getEmail(),
+						notificationService.sendEmail(client, null, location.getEmail(),
 								subject2, body.replace("{url}", u),
 								htmls.get(client.getId()).replace("<jq:text />",
 										body.replace("\n", "<br/>").replace("{url}",
 												"<a href=\"" + u + "\">" + client.getUrl() + "</a>")));
-						break;
-						// contactMarketing.setStatus((Strings.isEmpty(contactMarketing.getStatus()) ?
-						// ""
-						// : contactMarketing.getStatus() + "|") + postfixText);
-						// repository.save(contactMarketing);
-						// if (!counts.containsKey(clientMarketing.getId()))
-						// counts.put(clientMarketing.getId(), 0);
-						// counts.put(clientMarketing.getId(), counts.get(clientMarketing.getId()) + 1);
-						// result.body = counts.toString();
+						contactMarketing.setStatus((Strings.isEmpty(contactMarketing.getStatus()) ? ""
+								: contactMarketing.getStatus() + "|") + postfixText);
+						repository.save(contactMarketing);
+						if (!counts.containsKey(clientMarketing.getId()))
+							counts.put(clientMarketing.getId(), 0);
+						counts.put(clientMarketing.getId(), counts.get(clientMarketing.getId()) + 1);
+						result.body = counts.toString();
 					}
 				}
 			}
