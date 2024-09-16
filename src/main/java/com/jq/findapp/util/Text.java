@@ -12,14 +12,11 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
-import com.jq.findapp.util.Json;
 
 @Component
 public class Text {
@@ -56,6 +53,7 @@ public class Text {
 		mail_titleFrom,
 		marketing_playerOfTheMatch,
 		marketing_prediction,
+		marketing_skySportCoorperation,
 		marketing_skySportPostfix,
 		marketing_skySportSent,
 		marketing_skySportSubjectPrefix,

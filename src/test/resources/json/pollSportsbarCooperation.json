@@ -1,0 +1,235 @@
+{
+	"prolog": "Lieber Sky Kunde,<br><br>gerne helfen Dir, die besten Fans Deiner Region in Dein Lokal zu locken. Erster Schritt: <b>Serienevents zu den Spielen!</b><br/><br/>Klicke auf weiter, um sie automatisch anzulegen.",
+	"epilog": "Lieben Dank für Deine Teilnahme.<br><br><br><button-text label=\"meine Location anzeigen\" onclick=\"details.openLocationMarketing()\"></button-text><br>",
+	"type": "createEvents",
+	"questions": [
+		{
+			"id": "clubs",
+			"question": "Die Spiele welcher Mannschaften zeigt Ihr live in Eurer Sky-Sportsbar?",
+			"answers": [
+				{
+					"answer": "1. FC Heidenheim",
+					"key": "9.180"
+				},
+				{
+					"answer": "1. FC Kaiserslautern",
+					"key": "9.745"
+				},
+				{
+					"answer": "1. FC Köln",
+					"key": "9.192"
+				},
+				{
+					"answer": "1. FC Magdeburg",
+					"key": "9.179"
+				},
+				{
+					"answer": "1. FC Nürnberg",
+					"key": "9.171"
+				},
+				{
+					"answer": "1. FC Saarbruecken",
+					"key": "9.1639"
+				},
+				{
+					"answer": "1. FC Union Berlin",
+					"key": "9.182"
+				},
+				{
+					"answer": "1. FSV Mainz 05",
+					"key": "9.164"
+				},
+				{
+					"answer": "Arminia Bielefeld",
+					"key": "9.188"
+				},
+				{
+					"answer": "Bayer 04 Leverkusen",
+					"key": "9.168"
+				},
+				{
+					"answer": "Borussia Dortmund",
+					"key": "9.165"
+				},
+				{
+					"answer": "Borussia Mönchengladbach",
+					"key": "9.163"
+				},
+				{
+					"answer": "Dynamo Dresden",
+					"key": "9.183"
+				},
+				{
+					"answer": "Eintracht Braunschweig",
+					"key": "9.744"
+				},
+				{
+					"answer": "Eintracht Frankfurt",
+					"key": "9.169"
+				},
+				{
+					"answer": "Erzgebirge Aue",
+					"key": "9.190"
+				},
+				{
+					"answer": "FC Augsburg",
+					"key": "9.170"
+				},
+				{
+					"answer": "FC Bayern München",
+					"key": "9.157"
+				},
+				{
+					"answer": "FC Ingolstadt 04",
+					"key": "9.184"
+				},
+				{
+					"answer": "FC Schalke 04",
+					"key": "9.174"
+				},
+				{
+					"answer": "FC St. Pauli",
+					"key": "9.186"
+				},
+				{
+					"answer": "FC Viktoria Köln",
+					"key": "9.1620"
+				},
+				{
+					"answer": "Fortuna Düsseldorf",
+					"key": "9.158"
+				},
+				{
+					"answer": "FSV Zwickau",
+					"key": "9.1315"
+				},
+				{
+					"answer": "Hallescher FC",
+					"key": "9.1316"
+				},
+				{
+					"answer": "Hamburger SV",
+					"key": "9.175"
+				},
+				{
+					"answer": "Hannover 96",
+					"key": "9.166"
+				},
+				{
+					"answer": "Hansa Rostock",
+					"key": "9.1321"
+				},
+				{
+					"answer": "Hertha BSC",
+					"key": "9.159"
+				},
+				{
+					"answer": "Holstein Kiel",
+					"key": "9.191"
+				},
+				{
+					"answer": "Jahn Regensburg",
+					"key": "9.177"
+				},
+				{
+					"answer": "Karlsruher SC",
+					"key": "9.785"
+				},
+				{
+					"answer": "KfC Ürdingen 05",
+					"key": "9.1322"
+				},
+				{
+					"answer": "MSV Duisburg",
+					"key": "9.187"
+				},
+				{
+					"answer": "RB Leipzig",
+					"key": "9.173"
+				},
+				{
+					"answer": "SC Freiburg",
+					"key": "9.160"
+				},
+				{
+					"answer": "SC Paderborn 07",
+					"key": "9.185"
+				},
+				{
+					"answer": "SpVgg Greuther Fuerth",
+					"key": "9.178"
+				},
+				{
+					"answer": "SpVgg Unterhaching",
+					"key": "9.1314"
+				},
+				{
+					"answer": "SV Darmstadt 98",
+					"key": "9.181"
+				},
+				{
+					"answer": "SV Meppen",
+					"key": "9.1318"
+				},
+				{
+					"answer": "SV Sandhausen",
+					"key": "9.189"
+				},
+				{
+					"answer": "SV Wehen Wiesbaden",
+					"key": "9.1319"
+				},
+				{
+					"answer": "TSG Hoffenheim",
+					"key": "9.167"
+				},
+				{
+					"answer": "TSV 1860 München",
+					"key": "9.786"
+				},
+				{
+					"answer": "VfB Lübeck",
+					"key": "9.1625"
+				},
+				{
+					"answer": "VfB Stuttgart",
+					"key": "9.172"
+				},
+				{
+					"answer": "VfL Bochum",
+					"key": "9.176"
+				},
+				{
+					"answer": "VfL Osnabrück",
+					"key": "9.1324"
+				},
+				{
+					"answer": "VfL Wolfsburg",
+					"key": "9.161"
+				},
+				{
+					"answer": "Waldhof Mannheim",
+					"key": "9.4268"
+				},
+				{
+					"answer": "Werder Bremen",
+					"key": "9.162"
+				},
+				{
+					"answer": "Würzburger Kickers",
+					"key": "9.784"
+				}
+			]
+		},
+		{
+			"id": "maxParticipants",
+			"question": "Für wieviele Gäste habt Ihr Platz?",
+			"textField": "textarea"
+		},
+		{
+			"id": "description",
+			"question": "Beschreibe Dein Event",
+			"textField": "text"
+		}
+	]
+}

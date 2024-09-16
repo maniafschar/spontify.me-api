@@ -80,7 +80,7 @@ public class MarketingLocationService {
 			params.setQuery(Query.location_listId);
 			for (int i = 0; i < list.size(); i++) {
 				final Poll poll = Json.toObject((String) list.get(i).get("clientMarketing.storage"), Poll.class);
-				if (!Strings.isEmpty(poll.locationPrefix)) {
+				if ("updateLocation".equals(poll.type)) {
 					final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 							(BigInteger) list.get(i).get("clientMarketing.id"));
 					final Client client = repository.one(Client.class, clientMarketing.getClientId());
@@ -195,10 +195,16 @@ public class MarketingLocationService {
 							}
 						}
 					}
-					return !cards && cooperation;
+					return cards || cooperation;
 				},
-				(url, clientMarketingId, location) -> url + (Strings.isEmpty(location.getSecret()) ? ""
-						: "/?i=" + location.getId() + "&h=" + location.getSecret().hashCode()));
+				(url, clientMarketingId, location) -> {
+					if (Strings.isEmpty(location.getSecret())) {
+						location.setSecret(Strings.generatePin(64));
+						repository.save(location);
+					}
+					return url + "/?m=" + clientMarketingId + "&i=" + location.getId() + "&h="
+							+ location.getSecret().hashCode();
+				});
 	}
 
 	private SchedulerResult sendEmails(final String search, final String subject, final String postfixText,
@@ -208,7 +214,8 @@ public class MarketingLocationService {
 		final Map<BigInteger, String> htmls = new HashMap<>();
 		final QueryParams params = new QueryParams(Query.contact_listMarketing);
 		params.setLimit(0);
-		params.setSearch(search + " and contactMarketing.status not like '%" + postfixText + "%'");
+		params.setSearch(search + " and (contactMarketing.status is null or contactMarketing.status not like '%"
+				+ postfixText + "%')");
 		try {
 			final Result contactMarketings = repository.list(params);
 			final long end = Instant.now().plus(Duration.ofDays(1)).toEpochMilli();
@@ -230,36 +237,35 @@ public class MarketingLocationService {
 								TextId.valueOf("marketing_" + poll.locationPrefix + "SubjectPrefix")) + subject;
 						final ContactMarketing contactMarketing = repository.one(ContactMarketing.class,
 								(BigInteger) contactMarketings.get(i).get("contactMarketing.id"));
-						if (Strings.isEmpty(contactMarketing.getStatus())
-								|| !contactMarketing.getStatus().contains(postfixText)) {
-							final Client client = repository.one(Client.class, clientMarketing.getClientId());
-							final String u = url.apply(client.getUrl(), clientMarketing.getId(), location);
-							final String date = df
-									.format(contactMarketing.getModifiedAt() == null
-											? contactMarketing.getCreatedAt()
-											: contactMarketing.getModifiedAt());
-							if (!htmls.containsKey(client.getId()))
-								htmls.put(client.getId(), createHtmlTemplate(client));
-							final String body = text
-									.getText(contact,
-											TextId.valueOf(
-													"marketing_" + poll.locationPrefix + postfixText))
-									.replace("{date}", date).replace("{location}", location.getName())
-									+ text.getText(contact,
-											TextId.valueOf("marketing_" + poll.locationPrefix + "Postfix"));
-							notificationService.sendEmail(client, null, location.getEmail(),
-									subject2, body.replace("{url}", u),
-									htmls.get(client.getId()).replace("<jq:text />",
-											body.replace("\n", "<br/>").replace("{url}",
-													"<a href=\"" + u + "\">" + client.getUrl() + "</a>")));
-							contactMarketing.setStatus((Strings.isEmpty(contactMarketing.getStatus()) ? ""
-									: contactMarketing.getStatus() + "|") + postfixText);
-							repository.save(contactMarketing);
-							if (!counts.containsKey(clientMarketing.getId()))
-								counts.put(clientMarketing.getId(), 0);
-							counts.put(clientMarketing.getId(), counts.get(clientMarketing.getId()) + 1);
-							result.body = counts.toString();
-						}
+						final Client client = repository.one(Client.class, clientMarketing.getClientId());
+						final String u = url.apply(client.getUrl(), clientMarketing.getId(), location);
+						final String date = df
+								.format(contactMarketing.getModifiedAt() == null
+										? contactMarketing.getCreatedAt()
+										: contactMarketing.getModifiedAt());
+						if (!htmls.containsKey(client.getId()))
+							htmls.put(client.getId(), createHtmlTemplate(client));
+						final String body = text
+								.getText(contact,
+										TextId.valueOf(
+												"marketing_" + poll.locationPrefix + postfixText))
+								.replace("{date}", date).replace("{location}", location.getName())
+								+ text.getText(contact,
+										TextId.valueOf("marketing_" + poll.locationPrefix + "Postfix"));
+						notificationService.sendEmail(client, null, "mani.afschar@jq-consulting.de", // location.getEmail(),
+								subject2, body.replace("{url}", u),
+								htmls.get(client.getId()).replace("<jq:text />",
+										body.replace("\n", "<br/>").replace("{url}",
+												"<a href=\"" + u + "\">" + client.getUrl() + "</a>")));
+						break;
+						// contactMarketing.setStatus((Strings.isEmpty(contactMarketing.getStatus()) ?
+						// ""
+						// : contactMarketing.getStatus() + "|") + postfixText);
+						// repository.save(contactMarketing);
+						// if (!counts.containsKey(clientMarketing.getId()))
+						// counts.put(clientMarketing.getId(), 0);
+						// counts.put(clientMarketing.getId(), counts.get(clientMarketing.getId()) + 1);
+						// result.body = counts.toString();
 					}
 				}
 			}
@@ -320,7 +326,7 @@ public class MarketingLocationService {
 				try {
 					location.setContactId(createUser(clientMarketing.getClientId(), location));
 					repository.save(location);
-					s = "Ein Benutzer wurde für Dich angelegt, eine Email zur Verifizierung zugesendet. Sobald Du den Nutzer bestätigst, sind Deine Events online.";
+					s = "Ein Benutzer wurde für Dich angelegt, eine Email zur Verifizierung zugesendet. Bestätige den Link in der Email und Deine Events sind online und für jeden sichtbar.";
 				} catch (Exception ex) {
 					notificationService.createTicket(TicketType.ERROR, "MarketingLocation",
 							Strings.stackTraceToString(ex), clientMarketing.getClientId());
@@ -330,9 +336,8 @@ public class MarketingLocationService {
 					}
 				}
 			}
-			final String description = answers.get("q1").get("t").asText();
+			final String description = answers.get("q2").get("t").asText();
 			for (int i = 0; i < answers.get("q0").get("a").size(); i++) {
-				final int index = answers.get("q0").get("a").get(i).asInt();
 				final Event event = new Event();
 				event.setContactId(location.getContactId());
 				event.setLocationId(location.getId());
@@ -340,17 +345,18 @@ public class MarketingLocationService {
 				event.setPublish(true);
 				if (answers.get("q2").has("t")) {
 					try {
-						event.setMaxParticipants(Short.parseShort(answers.get("q2").get("t").asText()));
+						event.setMaxParticipants(Short.parseShort(answers.get("q1").get("t").asText()));
 					} catch (NumberFormatException ex) {
 					}
 				}
 				event.setRepetition(Repetition.Games);
+				final int index = answers.get("q0").get("a").get(i).asInt();
 				event.setSkills(poll.questions.get(0).answers.get(index).key);
 				event.setType(EventType.Location);
 				repository.save(event);
 			}
 			return (s == null ? "Deine Events wurden angelegt." : s)
-					+ "\nAuch zukünftige Spiele werden als Event automatisch für Dich angelegt.";
+					+ "\n\nÜbrigens, Du musst nichts mehr einstellen, auch zukünftige Spiele werden als Event automatisch für Dich angelegt.";
 		}
 		return null;
 	}
