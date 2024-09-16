@@ -334,14 +334,16 @@ public class MarketingLocationService {
 					}
 				}
 			}
-			final String description = answers.get("q2").get("t").asText();
+			String description = answers.get("q2").get("t").asText();
+			if (Strings.isEmpty(description))
+				description = "Wir lieben Fußball!";
 			for (int i = 0; i < answers.get("q0").get("a").size(); i++) {
 				final Event event = new Event();
 				event.setContactId(location.getContactId());
 				event.setLocationId(location.getId());
 				event.setDescription(description);
 				event.setPublish(true);
-				if (answers.get("q2").has("t")) {
+				if (answers.get("q1").has("t")) {
 					try {
 						event.setMaxParticipants(Short.parseShort(answers.get("q1").get("t").asText()));
 					} catch (NumberFormatException ex) {
