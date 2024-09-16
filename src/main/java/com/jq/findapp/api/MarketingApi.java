@@ -137,7 +137,7 @@ public class MarketingApi {
 				s.append(questions.get("epilog").asText().replaceAll("\n", "<br/>") + "</div>");
 				notificationService.sendNotificationEmail(null, to, s.toString(), null);
 			}
-			return marketingLocationService.locationUpdate(contactMarketing);
+			return marketingLocationService.update(contactMarketing);
 		}
 		return null;
 	}
