@@ -178,7 +178,7 @@ public class MarketingLocationService {
 
 	public SchedulerResult runCooperation() {
 		return sendEmails(
-				"",
+				"1=1",
 				"Dauerhaft mehr Gäste durch Fanclub!", "Cooperation",
 				(location, poll, answer) -> {
 					boolean cards = false, cooperation = false;
