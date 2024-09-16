@@ -291,7 +291,35 @@ public class MarketingLocationService {
 		return html;
 	}
 
-	public String locationUpdate(final ContactMarketing contactMarketing) {
+	public String createEvents(final ContactMarketing contactMarketing) {
+		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
+				contactMarketing.getClientMarketingId());
+		final JsonNode answers = Json.toNode(Attachment.resolve(contactMarketing.getStorage()));
+		if (answers.has("locationId") && answers.get("q0").has("a")) {
+			final Poll poll = Json.toObject(Attachment.resolve(
+					clientMarketing.getStorage()), Poll.class);
+			final Location location = repository.one(Location.class,
+					new BigInteger(answers.get("locationId").asText()));
+			if (location.getContactId() == null || location.getContactId().intValue() < 10) {
+				location.setContactId(createUser(clientMarketing.getClientId(), location));
+				repository.save(location);
+			}
+			final String description = answers.get("q1").get("t").asText();
+			for (int i = 0; i < answers.get("q0").get("a").size(); i++) {
+				final int index = answers.get("q0").get("a").get(i).asInt();
+				final Event event = new Event();
+				event.setContactId(location.getContactId());
+				event.setLocationId(location.getId());
+				event.setDescription(description);
+				event.setRepetition(Repetition.Games);
+				event.setSkills(poll.questions.get(0).answers.get(index).key);
+				event.setType(EventType.Location);
+				repository.save(event);
+			}
+		}
+	}
+
+	public String update(final ContactMarketing contactMarketing) {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 				contactMarketing.getClientMarketingId());
 		final JsonNode answers = Json.toNode(Attachment.resolve(contactMarketing.getStorage()));
@@ -360,20 +388,8 @@ public class MarketingLocationService {
 								result += "<li>Marketing-Material senden wir Dir an die Adresse Deiner Location.</li>";
 								email += "Marketing-Material senden wir Dir an die Adresse Deiner Location.\n\n";
 							} else if ("account".equals(poll.questions.get(i).id) && "|1".equals(s)) {
-								final InternalRegistration registration = new InternalRegistration();
-								registration.setAgb(true);
-								registration.setClientId(clientMarketing.getClientId());
-								registration.setDevice(Device.computer);
-								registration.setEmail(location.getEmail());
-								registration.setLanguage("DE");
-								registration.setOs(OS.web);
-								registration.setPseudonym(
-										location.getEmail().substring(0, location.getEmail().indexOf('@')));
-								registration.setTime(6000);
-								registration.setTimezone("Europe/Berlin");
-								registration.setVersion("0.7.1");
 								try {
-									location.setContactId(authenticationService.register(registration).getId());
+									location.setContactId(createUser(clientMarketing.getClientId(), location));
 									result += "<li>Ein Zugang wurde für Dich angelegt, eine Email versendet.</li>";
 									location.setSecret(null);
 								} catch (Exception ex) {
@@ -399,5 +415,21 @@ public class MarketingLocationService {
 			}
 		}
 		return null;
+	}
+
+	private BigInteger createUser(final BigInteger clientId, final Location location) throws Exception {
+		final InternalRegistration registration = new InternalRegistration();
+		registration.setAgb(true);
+		registration.setClientId(clientId);
+		registration.setDevice(Device.computer);
+		registration.setEmail(location.getEmail());
+		registration.setLanguage("DE");
+		registration.setOs(OS.web);
+		registration.setPseudonym(
+				location.getEmail().substring(0, location.getEmail().indexOf('@')));
+		registration.setTime(6000);
+		registration.setTimezone("Europe/Berlin");
+		registration.setVersion("0.7.1");
+		location.setContactId(authenticationService.register(registration).getId());
 	}
 }
