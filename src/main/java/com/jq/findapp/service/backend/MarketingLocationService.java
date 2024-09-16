@@ -298,10 +298,10 @@ public class MarketingLocationService {
 				clientMarketing.getStorage()), Poll.class);
 		final JsonNode answers = Json.toNode(Attachment.resolve(contactMarketing.getStorage()));
 		if (answers.has("locationId") && poll.has("type") &&
-				("updateLocation".equals(poll.has("type").asText()) || "createEvents".equals(poll.has("type").asText()))) {
+				("updateLocation".equals(poll.get("type").asText()) || "createEvents".equals(poll.get("type").asText()))) {
 			final Location location = repository.one(Location.class,
 					new BigInteger(answers.get("locationId").asText()));
-			if ("updateLocation".equals(poll.has("type").asText()))
+			if ("updateLocation".equals(poll.get("type").asText()))
 				return update(contactMarketing, clientMarketing, poll, answers, location);
 			return createEvents(contactMarketing, clientMarketing, poll, answers, location);
 		}
@@ -311,9 +311,11 @@ public class MarketingLocationService {
 	private String createEvents(final ContactMarketing contactMarketing, final ClientMarketing clientMarketing,
 			final Poll poll, final JsonNode answers, final Location location) {
 		if (answers.get("q0").has("a")) {
+			String s = null;
 			if (location.getContactId() == null || location.getContactId().intValue() < 10) {
 				location.setContactId(createUser(clientMarketing.getClientId(), location));
 				repository.save(location);
+				s = "Ein Benutzer wurde für Dich angelegt, eine Email zur Verifizierung zugesendet. Sobald Du den Nutzer bestätigst, sind Deine Events online.";
 			}
 			final String description = answers.get("q1").get("t").asText();
 			for (int i = 0; i < answers.get("q0").get("a").size(); i++) {
@@ -323,11 +325,17 @@ public class MarketingLocationService {
 				event.setLocationId(location.getId());
 				event.setDescription(description);
 				event.setPublish(true);
+				if (answers.get("q2").has("t"))) {
+					try {
+						event.setParticipants(Integer.parse(answers.get("q2").get("t").asText()));
+					} catch (ParseException ex) { }
+				}
 				event.setRepetition(Repetition.Games);
 				event.setSkills(poll.questions.get(0).answers.get(index).key);
 				event.setType(EventType.Location);
 				repository.save(event);
 			}
+			return (s == null ? "Deine Events wurden angelegt." : s) + "\nAuch zukünftige Spiele werden als Event automatisch für Dich angelegt.";
 		}
 		return null;
 	}
