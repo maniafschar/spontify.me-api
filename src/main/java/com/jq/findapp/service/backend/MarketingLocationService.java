@@ -291,15 +291,24 @@ public class MarketingLocationService {
 		return html;
 	}
 
-	public String createEvents(final ContactMarketing contactMarketing) {
+	public String pollFinished(final ContactMarketing contactMarketing) {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 				contactMarketing.getClientMarketingId());
 		final JsonNode answers = Json.toNode(Attachment.resolve(contactMarketing.getStorage()));
-		if (answers.has("locationId") && answers.get("q0").has("a")) {
+		if (answers.has("locationId")) {
 			final Poll poll = Json.toObject(Attachment.resolve(
 					clientMarketing.getStorage()), Poll.class);
 			final Location location = repository.one(Location.class,
 					new BigInteger(answers.get("locationId").asText()));
+			if (poll.size() == 2)
+				return createEvents(contactMarketing, clientMarketing, poll, answers, location);
+			return update(contactMarketing, clientMarketing, poll, answers, location);
+		}
+	}
+
+	private String createEvents(final ContactMarketing contactMarketing, final ClientMarketing clientMarketing,
+			final Poll poll, final JsonNode answers, final Location location) {
+		if (answers.get("q0").has("a")) {
 			if (location.getContactId() == null || location.getContactId().intValue() < 10) {
 				location.setContactId(createUser(clientMarketing.getClientId(), location));
 				repository.save(location);
@@ -317,102 +326,95 @@ public class MarketingLocationService {
 				repository.save(event);
 			}
 		}
+		return null;
 	}
 
-	public String update(final ContactMarketing contactMarketing) {
-		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
-				contactMarketing.getClientMarketingId());
-		final JsonNode answers = Json.toNode(Attachment.resolve(contactMarketing.getStorage()));
-		if (answers.has("locationId")) {
-			final Location location = repository.one(Location.class,
-					new BigInteger(answers.get("locationId").asText()));
-			if ((location.getUpdatedAt() == null || location.getUpdatedAt().before(clientMarketing.getStartDate()))
-					&& location.getSecret().hashCode() == answers.get("hash").asInt()) {
-				final Poll poll = Json.toObject(Attachment.resolve(
-						clientMarketing.getStorage()), Poll.class);
-				String result = "<ul><li>Deine Location wurde erfolgreich akualisiert.</li>";
-				String email = "Lieben Dank für Deine Teilnahme, Deine Location wurde erfolgreich akualisiert:\n\n";
-				location.setUpdatedAt(new Timestamp(Instant.now().toEpochMilli()));
-				location.setSkills(null);
-				for (int i = 0; i < poll.questions.size(); i++) {
-					if (answers.get("q" + i).has("t")) {
-						String s = answers.get("q" + i).get("t").asText();
-						if (!Strings.isEmpty(s)) {
-							if ("name".equals(poll.questions.get(i).id) && !Strings.isEmpty(s)) {
-								location.setName(s);
+	private String update(final ContactMarketing contactMarketing, final ClientMarketing clientMarketing,
+			final Poll poll, final JsonNode answers, final Location location) {
+		if ((location.getUpdatedAt() == null || location.getUpdatedAt().before(clientMarketing.getStartDate()))
+				&& location.getSecret().hashCode() == answers.get("hash").asInt()) {
+			String result = "<ul><li>Deine Location wurde erfolgreich akualisiert.</li>";
+			String email = "Lieben Dank für Deine Teilnahme, Deine Location wurde erfolgreich akualisiert:\n\n";
+			location.setUpdatedAt(new Timestamp(Instant.now().toEpochMilli()));
+			location.setSkills(null);
+			for (int i = 0; i < poll.questions.size(); i++) {
+				if (answers.get("q" + i).has("t")) {
+					String s = answers.get("q" + i).get("t").asText();
+					if (!Strings.isEmpty(s)) {
+						if ("name".equals(poll.questions.get(i).id) && !Strings.isEmpty(s)) {
+							location.setName(s);
+							email += s + "\n";
+						} else if ("address".equals(poll.questions.get(i).id) && s.contains("\n")
+								&& !Strings.isEmpty(s)) {
+							location.setAddress(s);
+							email += s + "\n";
+						} else if ("telephone".equals(poll.questions.get(i).id)) {
+							location.setTelephone(s);
+							if (!Strings.isEmpty(s))
 								email += s + "\n";
-							} else if ("address".equals(poll.questions.get(i).id) && s.contains("\n")
-									&& !Strings.isEmpty(s)) {
-								location.setAddress(s);
-								email += s + "\n";
-							} else if ("telephone".equals(poll.questions.get(i).id)) {
-								location.setTelephone(s);
-								if (!Strings.isEmpty(s))
-									email += s + "\n";
-							} else if ("url".equals(poll.questions.get(i).id)) {
-								location.setUrl(s);
-								email += s + "\n";
-							} else if ("description".equals(poll.questions.get(i).id)) {
-								location.setDescription(s);
-								if (!Strings.isEmpty(s))
-									email += "\n" + s + "\n\n";
-							} else if (poll.questions.get(i).id != null
-									&& poll.questions.get(i).id.startsWith("skills"))
-								location.setSkillsText(s);
-							else if ("feedback".equals(poll.questions.get(i).id) && !Strings.isEmpty(s)) {
-								result += "<li>Lieben Dank für Dein Feedback.</li>";
-								email += "Dein Feedback:\n" + s + "\n\n";
-							}
-						}
-					}
-					if (answers.get("q" + i).has("a")) {
-						String s = "";
-						for (int i2 = 0; i2 < answers.get("q" + i).get("a").size(); i2++) {
-							final int index = answers.get("q" + i).get("a").get(i2).asInt();
-							s += "|" + (poll.questions.get(i).answers.get(index).key == null
-									? poll.questions.get(i).answers.get(index).answer
-									: poll.questions.get(i).answers.get(index).key);
-						}
-						if (!Strings.isEmpty(s)) {
-							if (poll.questions.get(i).id != null && poll.questions.get(i).id.startsWith("skills")) {
-								s = s.replace("|0", "");
-								if (!Strings.isEmpty(s))
-									location.setSkills(
-											(Strings.isEmpty(location.getSkills()) ? "" : location.getSkills() + "|")
-													+ s.substring(1));
-							} else if ("cards".equals(poll.questions.get(i).id) && !"|0".equals(s)) {
-								if (Strings.isEmpty(location.getSkills()))
-									location.setSkills("x.1");
-								else if (!location.getSkills().contains("x.1"))
-									location.setSkills(location.getSkills() + "|x.1");
-								result += "<li>Marketing-Material senden wir Dir an die Adresse Deiner Location.</li>";
-								email += "Marketing-Material senden wir Dir an die Adresse Deiner Location.\n\n";
-							} else if ("account".equals(poll.questions.get(i).id) && "|1".equals(s)) {
-								try {
-									location.setContactId(createUser(clientMarketing.getClientId(), location));
-									result += "<li>Ein Zugang wurde für Dich angelegt, eine Email versendet.</li>";
-									location.setSecret(null);
-								} catch (Exception ex) {
-									result += "<li>Ein Zugang konnte nicht angelegt werden, die Email ist bereits registriert! Versuche Dich anzumelden oder über den \"Passwort vergessen\" Dialog Dir Dein Passwort zurücksetzen zu lassen.</li>";
-									email += "Ein Zugang konnte nicht angelegt werden, Deine Email ist bereits registriert! Versuche Dich anzumelden oder über den \"Passwort vergessen\" Dialog Dir Dein Passwort zurücksetzen zu lassen.\n\n";
-								}
-							} else if ("cooperation".equals(poll.questions.get(i).id) && "|1".equals(s)) {
-								result += "<li>Wir freuen uns auf eine weitere Zusammenarbeit und melden uns in Bälde bei Dir.</li>";
-								email += "Wir freuen uns auf eine weitere Zusammenarbeit und melden uns in Bälde bei Dir.\n\n";
-							}
+						} else if ("url".equals(poll.questions.get(i).id)) {
+							location.setUrl(s);
+							email += s + "\n";
+						} else if ("description".equals(poll.questions.get(i).id)) {
+							location.setDescription(s);
+							if (!Strings.isEmpty(s))
+								email += "\n" + s + "\n\n";
+						} else if (poll.questions.get(i).id != null
+								&& poll.questions.get(i).id.startsWith("skills"))
+							location.setSkillsText(s);
+						else if ("feedback".equals(poll.questions.get(i).id) && !Strings.isEmpty(s)) {
+							result += "<li>Lieben Dank für Dein Feedback.</li>";
+							email += "Dein Feedback:\n" + s + "\n\n";
 						}
 					}
 				}
-				repository.save(location);
-				final Client client = repository.one(Client.class, clientMarketing.getClientId());
-				email += "\n\n\n" + client.getUrl() + "?" + Strings.encodeParam("l=" + location.getId());
-				notificationService.sendEmail(client, null,
-						location.getEmail(),
-						"Deine Location " + location.getName(), email,
-						createHtmlTemplate(repository.one(Client.class, clientMarketing.getClientId()))
-								.replace("<jq:text />", email.replace("\n", "<br/>")));
-				return result + "</ul>";
+				if (answers.get("q" + i).has("a")) {
+					String s = "";
+					for (int i2 = 0; i2 < answers.get("q" + i).get("a").size(); i2++) {
+						final int index = answers.get("q" + i).get("a").get(i2).asInt();
+						s += "|" + (poll.questions.get(i).answers.get(index).key == null
+								? poll.questions.get(i).answers.get(index).answer
+								: poll.questions.get(i).answers.get(index).key);
+					}
+					if (!Strings.isEmpty(s)) {
+						if (poll.questions.get(i).id != null && poll.questions.get(i).id.startsWith("skills")) {
+							s = s.replace("|0", "");
+							if (!Strings.isEmpty(s))
+								location.setSkills(
+										(Strings.isEmpty(location.getSkills()) ? "" : location.getSkills() + "|")
+												+ s.substring(1));
+						} else if ("cards".equals(poll.questions.get(i).id) && !"|0".equals(s)) {
+							if (Strings.isEmpty(location.getSkills()))
+								location.setSkills("x.1");
+							else if (!location.getSkills().contains("x.1"))
+								location.setSkills(location.getSkills() + "|x.1");
+							result += "<li>Marketing-Material senden wir Dir an die Adresse Deiner Location.</li>";
+							email += "Marketing-Material senden wir Dir an die Adresse Deiner Location.\n\n";
+						} else if ("account".equals(poll.questions.get(i).id) && "|1".equals(s)) {
+							try {
+								location.setContactId(createUser(clientMarketing.getClientId(), location));
+								result += "<li>Ein Zugang wurde für Dich angelegt, eine Email versendet.</li>";
+								location.setSecret(null);
+							} catch (Exception ex) {
+								result += "<li>Ein Zugang konnte nicht angelegt werden, die Email ist bereits registriert! Versuche Dich anzumelden oder über den \"Passwort vergessen\" Dialog Dir Dein Passwort zurücksetzen zu lassen.</li>";
+								email += "Ein Zugang konnte nicht angelegt werden, Deine Email ist bereits registriert! Versuche Dich anzumelden oder über den \"Passwort vergessen\" Dialog Dir Dein Passwort zurücksetzen zu lassen.\n\n";
+							}
+						} else if ("cooperation".equals(poll.questions.get(i).id) && "|1".equals(s)) {
+							result += "<li>Wir freuen uns auf eine weitere Zusammenarbeit und melden uns in Bälde bei Dir.</li>";
+							email += "Wir freuen uns auf eine weitere Zusammenarbeit und melden uns in Bälde bei Dir.\n\n";
+						}
+					}
+				}
 			}
+			repository.save(location);
+			final Client client = repository.one(Client.class, clientMarketing.getClientId());
+			email += "\n\n\n" + client.getUrl() + "?" + Strings.encodeParam("l=" + location.getId());
+			notificationService.sendEmail(client, null,
+					location.getEmail(),
+					"Deine Location " + location.getName(), email,
+					createHtmlTemplate(repository.one(Client.class, clientMarketing.getClientId()))
+							.replace("<jq:text />", email.replace("\n", "<br/>")));
+			return result + "</ul>";
 		}
 		return null;
 	}
