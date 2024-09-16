@@ -5,6 +5,7 @@
 	"questions": [
 		{
 			"id": "clubs",
+			"multiple": true,
 			"question": "Die Spiele welcher Mannschaften zeigt Ihr live in Eurer Sky-Sportsbar?",
 			"answers": [
 				{
@@ -224,12 +225,12 @@
 		{
 			"id": "maxParticipants",
 			"question": "Für wieviele Gäste habt Ihr Platz?",
-			"textField": "textarea"
+			"textField": "text"
 		},
 		{
 			"id": "description",
 			"question": "Beschreibe Dein Event",
-			"textField": "text"
+			"textField": "textarea"
 		}
 	]
 }
