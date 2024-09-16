@@ -294,16 +294,18 @@ public class MarketingLocationService {
 	public String pollFinished(final ContactMarketing contactMarketing) {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 				contactMarketing.getClientMarketingId());
+		final Poll poll = Json.toObject(Attachment.resolve(
+				clientMarketing.getStorage()), Poll.class);
 		final JsonNode answers = Json.toNode(Attachment.resolve(contactMarketing.getStorage()));
-		if (answers.has("locationId")) {
-			final Poll poll = Json.toObject(Attachment.resolve(
-					clientMarketing.getStorage()), Poll.class);
+		if (answers.has("locationId") && poll.has("type") &&
+				("update".equals(poll.has("type").asText()) || "createEvents".equals(poll.has("type").asText()))) {
 			final Location location = repository.one(Location.class,
 					new BigInteger(answers.get("locationId").asText()));
-			if (poll.size() == 2)
-				return createEvents(contactMarketing, clientMarketing, poll, answers, location);
-			return update(contactMarketing, clientMarketing, poll, answers, location);
+			if ("update".equals(poll.has("type").asText()))
+				return update(contactMarketing, clientMarketing, poll, answers, location);
+			return createEvents(contactMarketing, clientMarketing, poll, answers, location);
 		}
+		return null;
 	}
 
 	private String createEvents(final ContactMarketing contactMarketing, final ClientMarketing clientMarketing,
