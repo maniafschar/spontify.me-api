@@ -320,6 +320,7 @@ public class MarketingLocationService {
 				event.setContactId(location.getContactId());
 				event.setLocationId(location.getId());
 				event.setDescription(description);
+				event.setPublish(true);
 				event.setRepetition(Repetition.Games);
 				event.setSkills(poll.questions.get(0).answers.get(index).key);
 				event.setType(EventType.Location);
