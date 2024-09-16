@@ -334,7 +334,7 @@ public class MarketingLocationService {
 					}
 				}
 			}
-			String description = answers.get("q2").get("t").asText();
+			String description = answers.get("q2").has("t") ? answers.get("q2").get("t").asText() : null;
 			if (Strings.isEmpty(description))
 				description = "Wir lieben Fußball!";
 			for (int i = 0; i < answers.get("q0").get("a").size(); i++) {
