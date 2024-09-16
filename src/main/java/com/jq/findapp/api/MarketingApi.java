@@ -198,6 +198,11 @@ public class MarketingApi {
 				final Location location = repository.one(Location.class, locationId);
 				if (location == null || location.getSecret() == null || location.getSecret().hashCode() != hash)
 					return null;
+				if (location.getUpdatedAt() != null) {
+					// temporary fix unti end of Octobre 2024
+					params.setSearch("clientMarketing.id=181");
+					return repository.one(params);
+				}
 				result.put("_address", location.getAddress());
 				result.put("_description", location.getDescription());
 				result.put("_name", location.getName());
