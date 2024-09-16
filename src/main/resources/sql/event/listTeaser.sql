@@ -31,5 +31,5 @@ FROM
 WHERE
 	contact.id=event.contactId and
 	contact.clientId={CLIENTID} and
-	(event.type='Poll' or event.image is not null or location.image is not null or contact.image is not null) and
+	(event.type='Poll' or length(event.image)>0 or length(location.image)>0 or length(contact.image)>0) and
 	{search}
