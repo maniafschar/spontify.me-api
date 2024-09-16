@@ -298,10 +298,10 @@ public class MarketingLocationService {
 				clientMarketing.getStorage()), Poll.class);
 		final JsonNode answers = Json.toNode(Attachment.resolve(contactMarketing.getStorage()));
 		if (answers.has("locationId") && poll.has("type") &&
-				("update".equals(poll.has("type").asText()) || "createEvents".equals(poll.has("type").asText()))) {
+				("updateLocation".equals(poll.has("type").asText()) || "createEvents".equals(poll.has("type").asText()))) {
 			final Location location = repository.one(Location.class,
 					new BigInteger(answers.get("locationId").asText()));
-			if ("update".equals(poll.has("type").asText()))
+			if ("updateLocation".equals(poll.has("type").asText()))
 				return update(contactMarketing, clientMarketing, poll, answers, location);
 			return createEvents(contactMarketing, clientMarketing, poll, answers, location);
 		}
