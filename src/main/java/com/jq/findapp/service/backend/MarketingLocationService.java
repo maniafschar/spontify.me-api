@@ -430,6 +430,6 @@ public class MarketingLocationService {
 		registration.setTime(6000);
 		registration.setTimezone("Europe/Berlin");
 		registration.setVersion("0.7.1");
-		location.setContactId(authenticationService.register(registration).getId());
+		return authenticationService.register(registration).getId();
 	}
 }
