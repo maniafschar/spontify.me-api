@@ -41,7 +41,7 @@ public class MarketingLocationServiceTest {
 	private Utils utils;
 
 	@Test
-	public void locationUpdate() throws Exception {
+	public void update() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
 		Location location = new Location();
@@ -67,7 +67,7 @@ public class MarketingLocationServiceTest {
 				.replace("{hash}", "" + location.getSecret().hashCode()));
 
 		// when
-		final String result = marketingLocationService.locationUpdate(contactMarketing);
+		final String result = marketingLocationService.update(contactMarketing);
 		location = repository.one(Location.class, location.getId());
 
 		// then
