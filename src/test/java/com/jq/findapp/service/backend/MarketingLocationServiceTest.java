@@ -67,7 +67,7 @@ public class MarketingLocationServiceTest {
 				.replace("{hash}", "" + location.getSecret().hashCode()));
 
 		// when
-		final String result = marketingLocationService.update(contactMarketing);
+		final String result = marketingLocationService.pollFinished(contactMarketing);
 		location = repository.one(Location.class, location.getId());
 
 		// then

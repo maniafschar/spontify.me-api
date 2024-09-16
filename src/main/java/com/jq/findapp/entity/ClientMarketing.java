@@ -29,6 +29,7 @@ public class ClientMarketing extends BaseEntity {
 
 	public static class Poll {
 		public String html;
+		public String type;
 		public String prolog;
 		public String epilog;
 		public String subject;

@@ -27,7 +27,11 @@ import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.Device;
 import com.jq.findapp.entity.Contact.OS;
 import com.jq.findapp.entity.ContactMarketing;
+import com.jq.findapp.entity.Event;
+import com.jq.findapp.entity.Event.EventType;
+import com.jq.findapp.entity.Event.Repetition;
 import com.jq.findapp.entity.Location;
+import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -297,11 +301,11 @@ public class MarketingLocationService {
 		final Poll poll = Json.toObject(Attachment.resolve(
 				clientMarketing.getStorage()), Poll.class);
 		final JsonNode answers = Json.toNode(Attachment.resolve(contactMarketing.getStorage()));
-		if (answers.has("locationId") && poll.has("type") &&
-				("updateLocation".equals(poll.get("type").asText()) || "createEvents".equals(poll.get("type").asText()))) {
+		if (answers.has("locationId") &&
+				("updateLocation".equals(poll.type) || "createEvents".equals(poll.type))) {
 			final Location location = repository.one(Location.class,
 					new BigInteger(answers.get("locationId").asText()));
-			if ("updateLocation".equals(poll.get("type").asText()))
+			if ("updateLocation".equals(poll.type))
 				return update(contactMarketing, clientMarketing, poll, answers, location);
 			return createEvents(contactMarketing, clientMarketing, poll, answers, location);
 		}
@@ -313,9 +317,18 @@ public class MarketingLocationService {
 		if (answers.get("q0").has("a")) {
 			String s = null;
 			if (location.getContactId() == null || location.getContactId().intValue() < 10) {
-				location.setContactId(createUser(clientMarketing.getClientId(), location));
-				repository.save(location);
-				s = "Ein Benutzer wurde für Dich angelegt, eine Email zur Verifizierung zugesendet. Sobald Du den Nutzer bestätigst, sind Deine Events online.";
+				try {
+					location.setContactId(createUser(clientMarketing.getClientId(), location));
+					repository.save(location);
+					s = "Ein Benutzer wurde für Dich angelegt, eine Email zur Verifizierung zugesendet. Sobald Du den Nutzer bestätigst, sind Deine Events online.";
+				} catch (Exception ex) {
+					notificationService.createTicket(TicketType.ERROR, "MarketingLocation",
+							Strings.stackTraceToString(ex), clientMarketing.getClientId());
+					if (location.getContactId() == null) {
+						location.setContactId(clientMarketing.getClientId());
+						repository.save(location);
+					}
+				}
 			}
 			final String description = answers.get("q1").get("t").asText();
 			for (int i = 0; i < answers.get("q0").get("a").size(); i++) {
@@ -325,17 +338,19 @@ public class MarketingLocationService {
 				event.setLocationId(location.getId());
 				event.setDescription(description);
 				event.setPublish(true);
-				if (answers.get("q2").has("t"))) {
+				if (answers.get("q2").has("t")) {
 					try {
-						event.setParticipants(Integer.parse(answers.get("q2").get("t").asText()));
-					} catch (ParseException ex) { }
+						event.setMaxParticipants(Short.parseShort(answers.get("q2").get("t").asText()));
+					} catch (NumberFormatException ex) {
+					}
 				}
 				event.setRepetition(Repetition.Games);
 				event.setSkills(poll.questions.get(0).answers.get(index).key);
 				event.setType(EventType.Location);
 				repository.save(event);
 			}
-			return (s == null ? "Deine Events wurden angelegt." : s) + "\nAuch zukünftige Spiele werden als Event automatisch für Dich angelegt.";
+			return (s == null ? "Deine Events wurden angelegt." : s)
+					+ "\nAuch zukünftige Spiele werden als Event automatisch für Dich angelegt.";
 		}
 		return null;
 	}
