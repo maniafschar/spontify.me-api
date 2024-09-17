@@ -337,21 +337,22 @@ public class MarketingLocationService {
 			String description = answers.get("q2").has("t") ? answers.get("q2").get("t").asText() : null;
 			if (Strings.isEmpty(description))
 				description = "Wir lieben Fußball!";
+			Short maxParticipants = null
+			if (answers.get("q1").has("t"))
+				try {
+					maxParticipants = Short.parseShort(answers.get("q1").get("t").asText());
+				} catch (NumberFormatException ex) {
+				}
 			for (int i = 0; i < answers.get("q0").get("a").size(); i++) {
 				final Event event = new Event();
 				event.setContactId(location.getContactId());
-				event.setLocationId(location.getId());
 				event.setDescription(description);
+				event.setLocationId(location.getId());
+				event.setMaxParticipants(maxParticipants);
 				event.setPublish(true);
-				if (answers.get("q1").has("t")) {
-					try {
-						event.setMaxParticipants(Short.parseShort(answers.get("q1").get("t").asText()));
-					} catch (NumberFormatException ex) {
-					}
-				}
 				event.setRepetition(Repetition.Games);
-				final int index = answers.get("q0").get("a").get(i).asInt();
-				event.setSkills(poll.questions.get(0).answers.get(index).key);
+				event.setSkills(poll.questions.get(0).answers.get(
+						answers.get("q0").get("a").get(i).asInt()).key);
 				event.setType(EventType.Location);
 				repository.save(event);
 			}
