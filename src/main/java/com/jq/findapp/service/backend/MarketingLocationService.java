@@ -337,7 +337,7 @@ public class MarketingLocationService {
 			String description = answers.get("q2").has("t") ? answers.get("q2").get("t").asText() : null;
 			if (Strings.isEmpty(description))
 				description = "Wir lieben Fußball!";
-			Short maxParticipants = null
+			Short maxParticipants = null;
 			if (answers.get("q1").has("t"))
 				try {
 					maxParticipants = Short.parseShort(answers.get("q1").get("t").asText());
