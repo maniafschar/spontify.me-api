@@ -142,7 +142,6 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 				}
 			}
 		}
-		eventService.updateSeries(event);
 	}
 
 	@Override
