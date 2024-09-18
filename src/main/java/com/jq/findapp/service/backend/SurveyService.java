@@ -717,7 +717,7 @@ public class SurveyService {
 		return events;
 	}
 
-	protected JsonNode get(final String url) {
+	protected synchronized JsonNode get(final String url) {
 		JsonNode fixture = null;
 		final String label = STORAGE_PREFIX + url;
 		final QueryParams params = new QueryParams(Query.misc_listStorage);
