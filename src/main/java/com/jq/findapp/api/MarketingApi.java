@@ -317,6 +317,8 @@ public class MarketingApi {
 			image = location.getImage();
 		if (image == null)
 			image = contact.getImage();
+		if (image == null)
+			image = "/images/eventPublishDefault.png";
 		return getHtml(repository.one(Client.class, contact.getClientId()), "event/" + id,
 				Attachment.resolve(image),
 				event.getDescription()
