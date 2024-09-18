@@ -354,8 +354,6 @@ public class EventService {
 			final String storage = contact.getStorage();
 			final ObjectNode imported = Strings.isEmpty(storage) ? Json.createObject()
 					: (ObjectNode) Json.toNode(Attachment.resolve(storage));
-			final Set<Long> eventSeriesIds = new HashSet<>();
-			events.forEach(e -> eventSeriesIds.add((Long) e.get("event.seriesId")));
 			String importedIds = event.getSeriesId() + "|";
 			if (imported.has("eventSeries"))
 				importedIds += imported.get("eventSeries").toString();
@@ -364,7 +362,6 @@ public class EventService {
 			int count = 0;
 			for (FutureEvent futureEvent : futureEvents) {
 				if (futureEvent.time > System.currentTimeMillis()
-						&& !eventSeriesIds.contains(futureEvent.time)
 						&& !importedIds.contains(event.getSkills() + "." + futureEvent.time)) {
 					final Event e = new Event();
 					e.setContactId(event.getContactId());
