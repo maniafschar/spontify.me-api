@@ -1309,7 +1309,7 @@
 				"referee": null,
 				"timezone": "UTC",
 				"date": "2023-12-09T00:00:00+00:00",
-				"timestamp": 1702080000,
+				"timestamp": "{dateTBD}",
 				"periods": {
 					"first": null,
 					"second": null

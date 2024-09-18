@@ -1,12 +1,17 @@
 package com.jq.findapp.service.backend;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -130,6 +135,62 @@ public class SurveyServiceTest {
 
 		// then
 		assertTrue(result);
+	}
+
+	@Test
+	public void needUpdate_15DaysAhead() throws Exception {
+		// given
+		final Map<String, Object> storage = new HashMap<>();
+		storage.put("storage.createdAt", new Timestamp(Instant.now().toEpochMilli()));
+		storage.put("storage.storage", IOUtils.toString(
+				getClass().getResourceAsStream(
+						"/json/surveyMatchdays.json"),
+				StandardCharsets.UTF_8).replace("\"{dateTBD}\"",
+						"" + (long) (Instant.now().plus(Duration.ofDays(15)).getEpochSecond())));
+
+		// when
+		final JsonNode cache = surveyService.needUpdate(storage);
+
+		// then
+		assertNotNull(cache);
+	}
+
+	@Test
+	public void needUpdate_14DaysAhead() throws Exception {
+		// given
+		final Map<String, Object> storage = new HashMap<>();
+		storage.put("storage.createdAt", new Timestamp(Instant.now().minus(Duration.ofHours(26)).toEpochMilli()));
+		storage.put("storage.modifiedAt", new Timestamp(Instant.now().minus(Duration.ofHours(25)).toEpochMilli()));
+		storage.put("storage.storage", IOUtils.toString(
+				getClass().getResourceAsStream(
+						"/json/surveyMatchdays.json"),
+				StandardCharsets.UTF_8).replace("\"{dateTBD}\"",
+						"" + (long) (Instant.now().plus(Duration.ofDays(14)).getEpochSecond())));
+
+		// when
+		final JsonNode cache = surveyService.needUpdate(storage);
+
+		// then
+		assertNull(cache);
+	}
+
+	@Test
+	public void needUpdate_justModified() throws Exception {
+		// given
+		final Map<String, Object> storage = new HashMap<>();
+		storage.put("storage.createdAt", new Timestamp(Instant.now().minus(Duration.ofHours(2)).toEpochMilli()));
+		storage.put("storage.modifiedAt", new Timestamp(Instant.now().minus(Duration.ofHours(1)).toEpochMilli()));
+		storage.put("storage.storage", IOUtils.toString(
+				getClass().getResourceAsStream(
+						"/json/surveyMatchdays.json"),
+				StandardCharsets.UTF_8).replace("\"{dateTBD}\"",
+						"" + (long) (Instant.now().plus(Duration.ofDays(14)).getEpochSecond())));
+
+		// when
+		final JsonNode cache = surveyService.needUpdate(storage);
+
+		// then
+		assertNotNull(cache);
 	}
 
 	@Test

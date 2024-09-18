@@ -717,13 +717,13 @@ public class SurveyService {
 		return events;
 	}
 
-	protected synchronized JsonNode get(final String url) {
+	protected JsonNode get(final String url) {
 		JsonNode fixture = null;
 		final String label = STORAGE_PREFIX + url;
 		final QueryParams params = new QueryParams(Query.misc_listStorage);
 		params.setSearch("storage.label='" + label + "'");
 		final Result result = repository.list(params);
-		if ((fixture = needUpdate(result)) == null) {
+		if ((fixture = needUpdate(result.size() == 0 ? null : result.get(0))) == null) {
 			if (System.currentTimeMillis() - lastErrorCall < 0) {
 				String time;
 				double i = (lastErrorCall - System.currentTimeMillis()) / 1000;
@@ -770,31 +770,32 @@ public class SurveyService {
 		return fixture.get("response");
 	}
 
-	private JsonNode needUpdate(final Result result) {
-		try {
-			JsonNode fixture = null;
-			if (result.size() > 0 && !Strings.isEmpty(result.get(0).get("storage.storage")))
-				fixture = Json.toNode(result.get(0).get("storage.storage").toString());
-			if (fixture == null || fixture.has("errors")
-					&& (fixture.get("errors").has("rateLimit") || fixture.get("errors").has("requests")))
-				return null;
-			if (result.get(0).get("storage.modifiedAt") == null
-					|| Instant.ofEpochMilli(((Timestamp) result.get(0).get("storage.modifiedAt")).getTime())
-							.plus(Duration.ofHours(23)).isBefore(Instant.now())) {
-				final JsonNode responses = fixture.get("response");
-				for (int i = 0; i < responses.size(); i++) {
-					if (responses.get(i).has("fixture")
-							&& responses.get(i).get("fixture").has("timestamp")
-							&& "TBD".equals(responses.get(i).get("fixture").get("status").get("short").asText())
-							&& Instant.ofEpochSecond(responses.get(i).get("fixture").get("timestamp").asLong())
-									.minus(Duration.ofDays(4)).isBefore(Instant.now()))
+	JsonNode needUpdate(final Map<String, Object> storage) {
+		if (storage == null)
+			return null;
+		JsonNode fixture = null;
+		if (!Strings.isEmpty(storage.get("storage.storage")))
+			fixture = Json.toNode(storage.get("storage.storage").toString());
+		if (fixture == null || fixture.has("errors")
+				&& (fixture.get("errors").has("rateLimit") || fixture.get("errors").has("requests")))
+			return null;
+		if (Instant.ofEpochMilli(((Timestamp) storage.get("storage.createdAt")).getTime())
+				.plus(Duration.ofHours(23)).isBefore(Instant.now())
+				&& (storage.get("storage.modifiedAt") == null
+						|| Instant.ofEpochMilli(((Timestamp) storage.get("storage.modifiedAt")).getTime())
+								.plus(Duration.ofHours(23)).isBefore(Instant.now()))) {
+			final JsonNode responses = fixture.get("response");
+			for (int i = 0; i < responses.size(); i++) {
+				final JsonNode f = responses.get(i).has("fixture") ? responses.get(i).get("fixture") : null;
+				if (f != null && f.has("timestamp") && "TBD".equals(f.get("status").get("short").asText())) {
+					if (Instant.ofEpochSecond(f.get("timestamp").asLong())
+							.minus(Duration.ofDays(14)).isBefore(Instant.now()))
 						return null;
+					break;
 				}
 			}
-			return fixture;
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
 		}
+		return fixture;
 	}
 
 	public static class FutureEvent {
