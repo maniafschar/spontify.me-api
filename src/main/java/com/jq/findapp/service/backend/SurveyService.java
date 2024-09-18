@@ -75,7 +75,7 @@ public class SurveyService {
 	@Value("${app.sports.api.token}")
 	private String token;
 
-	private static volatile long lastErrorCall = 0;
+	private static volatile long pauseUntil = 0;
 	private static final String STORAGE_PREFIX = "api-sports-";
 
 	static class PollSurvey extends Poll {
@@ -724,19 +724,20 @@ public class SurveyService {
 		params.setSearch("storage.label='" + label + "'");
 		final Result result = repository.list(params);
 		if ((fixture = needUpdate(result.size() == 0 ? null : result.get(0))) == null) {
-			if (System.currentTimeMillis() - lastErrorCall < 0) {
-				String time;
-				double i = (lastErrorCall - System.currentTimeMillis()) / 1000;
-				time = " seconds";
+			if (System.currentTimeMillis() - pauseUntil < 0) {
+				String unit;
+				double i = (pauseUntil - System.currentTimeMillis()) / 1000;
+				unit = " seconds";
 				if (i > 120) {
 					i /= 60;
-					time = " minutes";
+					unit = " minutes";
 				}
 				if (i > 120) {
 					i /= 60;
-					time = " hours";
+					unit = " hours";
 				}
-				throw new RuntimeException("Too many requests!\nURL: " + url + "\nPause: " + ((int) (i + 0.5)) + time);
+				throw new RuntimeException(
+						"Too many requests!\nURL: " + url + "\nRemaining pause " + ((int) (i + 0.5)) + unit);
 			}
 			fixture = WebClient
 					.create("https://v3.football.api-sports.io/fixtures?" + url)
@@ -746,20 +747,16 @@ public class SurveyService {
 					.retrieve()
 					.toEntity(JsonNode.class).block().getBody();
 			if (fixture != null && fixture.has("response")) {
-				lastErrorCall = fixture.get("errors").has("rateLimit")
+				pauseUntil = fixture.get("errors").has("rateLimit")
 						? Instant.now().plus(Duration.ofMinutes(11)).toEpochMilli()
 						: fixture.get("errors").has("requests")
 								? Instant.now().plus(Duration.ofDays(1)).truncatedTo(ChronoUnit.DAYS).toEpochMilli()
 								: 0;
-				if (lastErrorCall == 0) {
+				if (pauseUntil == 0) {
 					final Storage storage = result.size() == 0 ? new Storage()
 							: repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
 					storage.setLabel(label);
-					try {
-						storage.setStorage(Json.toString(fixture));
-					} catch (Exception ex) {
-						throw new RuntimeException(ex);
-					}
+					storage.setStorage(Json.toString(fixture));
 					repository.save(storage);
 				}
 			} else
