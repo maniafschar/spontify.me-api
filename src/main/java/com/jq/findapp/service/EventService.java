@@ -345,87 +345,56 @@ public class EventService {
 
 	public int updateSeries(final Event event) {
 		if (event.getRepetition() == Repetition.Games && !Strings.isEmpty(event.getSkills())
-				&& event.getSkills().startsWith("9.") && event.getLocationId() != null) {
-			boolean canceled = event.getSkills().contains("X");
-			final QueryParams params = new QueryParams(Query.event_listId);
-			params.setSearch("event.contactId=" + event.getContactId()
-					+ " and length(event.skills)>0 and event.locationId="
-					+ event.getLocationId());
-			final Result events = repository.list(params);
-			if (!canceled) {
-				for (int i = 0; i < events.size(); i++) {
-					if (("|" + events.get(i).get("event.skills") + "|").contains("|" + skill + "|")
-							&& ((String) events.get(i).get("event.skills")).contains("X")) {
-						canceled = true;
-						break;
-					}
+				&& event.getSkills().startsWith("9.") && event.getLocationId() != null && !event.getSkills().contains("X")) {
+			final List<FutureEvent> futureEvents = surveyService.futureEvents(Integer.valueOf(skill.substring(2)));
+			final String description = event.getDescription().contains("\n")
+					? event.getDescription().substring(event.getDescription().indexOf("\n"))
+					: "\n" + event.getDescription();
+			final Contact contact = repository.one(Contact.class, event.getContactId());
+			final String storage = contact.getStorage();
+			final ObjectNode imported = Strings.isEmpty(storage) ? Json.createObject()
+					: (ObjectNode) Json.toNode(Attachment.resolve(storage));
+			final Set<Long> eventSeriesIds = new HashSet<>();
+			events.forEach(e -> eventSeriesIds.add((Long) e.get("event.seriesId")));
+			String importedIds = event.getSeriesId() + "|";
+			if (imported.has("eventSeries"))
+				importedIds += imported.get("eventSeries").toString();
+			else
+				imported.putArray("eventSeries");
+			int count = 0;
+			for (FutureEvent futureEvent : futureEvents) {
+				if (futureEvent.time > System.currentTimeMillis()
+						&& !eventSeriesIds.contains(futureEvent.time)
+						&& !importedIds.contains(skill + "." + futureEvent.time)) {
+					final Event e = new Event();
+					e.setContactId(event.getContactId());
+					e.setDescription(futureEvent.subject + description);
+					e.setImage(event.getImage());
+					e.setImageList(event.getImageList());
+					e.setLocationId(event.getLocationId());
+					e.setMaxParticipants(event.getMaxParticipants());
+					e.setPrice(event.getPrice());
+					e.setPublish(event.getPublish());
+					e.setSeriesId(futureEvent.time);
+					e.setSkills(event.getSkills());
+					e.setSkillsText(event.getSkillsText());
+					e.setStartDate(new Timestamp(futureEvent.time - EventListener.SERIES_TIMELAP));
+					e.setType(event.getType());
+					e.setUrl(event.getUrl());
+					repository.save(e);
+					count++;
+					((ArrayNode) imported.get("eventSeries")).add(skill + "." + futureEvent.time);
 				}
 			}
-			if (canceled) {
-				events.forEach(e -> {
-					if (("|" + events.get(i).get("event.skills") + "|").contains("|" + skill + "|")
-							&& !((String) e.get("event.skills")).contains("X")
-							&& event.getId().compareTo((BigInteger) e.get("event.id")) != 0) {
-						final Event e2 = repository.one(Event.class, (BigInteger) e.get("event.id"));
-						e2.setSkills(e2.getSkills() + "|X");
-						repository.save(e2);
-					}
-				});
-				return 0;
-			}
-			return updateFutureEvents(event, events, skill);
+			repository.executeUpdate("update Event event set event.repetition='" + Repetition.Games.name()
+					+ "' where event.contactId=" + event.getContactId()
+					+ " and length(event.skills)>0 and cast(REGEXP_LIKE('" + skill + "', event.skills) as integer)=1");
+			if (!importedIds.contains(skill + "." + event.getSeriesId()))
+				((ArrayNode) imported.get("eventSeries")).add(skill + "." + event.getSeriesId());
+			contact.setStorage(Json.toString(imported));
+			repository.save(contact);
+			return count;
 		}
 		return 0;
-	}
-
-	private int updateFutureEvents(final Event event, final Result events, final String skill) {
-		final List<FutureEvent> futureEvents = surveyService.futureEvents(Integer.valueOf(skill.substring(2)));
-		final String description = event.getDescription().contains("\n")
-				? event.getDescription().substring(event.getDescription().indexOf("\n"))
-				: "\n" + event.getDescription();
-		final Contact contact = repository.one(Contact.class, event.getContactId());
-		final String storage = contact.getStorage();
-		final ObjectNode imported = Strings.isEmpty(storage) ? Json.createObject()
-				: (ObjectNode) Json.toNode(Attachment.resolve(storage));
-		final Set<Long> eventSeriesIds = new HashSet<>();
-		events.forEach(e -> eventSeriesIds.add((Long) e.get("event.seriesId")));
-		String importedIds = event.getSeriesId() + "|";
-		if (imported.has("eventSeries"))
-			importedIds += imported.get("eventSeries").toString();
-		else
-			imported.putArray("eventSeries");
-		int count = 0;
-		for (FutureEvent futureEvent : futureEvents) {
-			if (futureEvent.time > System.currentTimeMillis()
-					&& !eventSeriesIds.contains(futureEvent.time)
-					&& !importedIds.contains(skill + "." + futureEvent.time)) {
-				final Event e = new Event();
-				e.setContactId(event.getContactId());
-				e.setDescription(futureEvent.subject + description);
-				e.setImage(event.getImage());
-				e.setImageList(event.getImageList());
-				e.setLocationId(event.getLocationId());
-				e.setMaxParticipants(event.getMaxParticipants());
-				e.setPrice(event.getPrice());
-				e.setPublish(event.getPublish());
-				e.setSeriesId(futureEvent.time);
-				e.setSkills(event.getSkills());
-				e.setSkillsText(event.getSkillsText());
-				e.setStartDate(new Timestamp(futureEvent.time - EventListener.SERIES_TIMELAP));
-				e.setType(event.getType());
-				e.setUrl(event.getUrl());
-				repository.save(e);
-				count++;
-				((ArrayNode) imported.get("eventSeries")).add(skill + "." + futureEvent.time);
-			}
-		}
-		repository.executeUpdate("update Event event set event.repetition='" + Repetition.Games.name()
-				+ "' where event.contactId=" + event.getContactId()
-				+ " and length(event.skills)>0 and cast(REGEXP_LIKE('" + skill + "', event.skills) as integer)=1");
-		if (!importedIds.contains(skill + "." + event.getSeriesId()))
-			((ArrayNode) imported.get("eventSeries")).add(skill + "." + event.getSeriesId());
-		contact.setStorage(Json.toString(imported));
-		repository.save(contact);
-		return count;
 	}
 }
