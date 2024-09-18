@@ -346,7 +346,7 @@ public class EventService {
 	public int updateSeries(final Event event) {
 		if (event.getRepetition() == Repetition.Games && !Strings.isEmpty(event.getSkills())
 				&& event.getSkills().startsWith("9.") && event.getLocationId() != null && !event.getSkills().contains("X")) {
-			final List<FutureEvent> futureEvents = surveyService.futureEvents(Integer.valueOf(skill.substring(2)));
+			final List<FutureEvent> futureEvents = surveyService.futureEvents(Integer.valueOf(event.getSkills().substring(2)));
 			final String description = event.getDescription().contains("\n")
 					? event.getDescription().substring(event.getDescription().indexOf("\n"))
 					: "\n" + event.getDescription();
@@ -365,7 +365,7 @@ public class EventService {
 			for (FutureEvent futureEvent : futureEvents) {
 				if (futureEvent.time > System.currentTimeMillis()
 						&& !eventSeriesIds.contains(futureEvent.time)
-						&& !importedIds.contains(skill + "." + futureEvent.time)) {
+						&& !importedIds.contains(event.getSkills() + "." + futureEvent.time)) {
 					final Event e = new Event();
 					e.setContactId(event.getContactId());
 					e.setDescription(futureEvent.subject + description);
@@ -383,14 +383,14 @@ public class EventService {
 					e.setUrl(event.getUrl());
 					repository.save(e);
 					count++;
-					((ArrayNode) imported.get("eventSeries")).add(skill + "." + futureEvent.time);
+					((ArrayNode) imported.get("eventSeries")).add(event.getSkills() + "." + futureEvent.time);
 				}
 			}
 			repository.executeUpdate("update Event event set event.repetition='" + Repetition.Games.name()
 					+ "' where event.contactId=" + event.getContactId()
-					+ " and length(event.skills)>0 and cast(REGEXP_LIKE('" + skill + "', event.skills) as integer)=1");
-			if (!importedIds.contains(skill + "." + event.getSeriesId()))
-				((ArrayNode) imported.get("eventSeries")).add(skill + "." + event.getSeriesId());
+					+ " and length(event.skills)>0 and cast(REGEXP_LIKE('" + event.getSkills() + "', event.skills) as integer)=1");
+			if (!importedIds.contains(event.getSkills() + "." + event.getSeriesId()))
+				((ArrayNode) imported.get("eventSeries")).add(event.getSkills() + "." + event.getSeriesId());
 			contact.setStorage(Json.toString(imported));
 			repository.save(contact);
 			return count;
