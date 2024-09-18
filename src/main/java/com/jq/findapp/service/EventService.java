@@ -344,37 +344,36 @@ public class EventService {
 	}
 
 	public int updateSeries(final Event event) {
-		if (event.getRepetition() == Repetition.Games && !Strings.isEmpty(event.getSkills())) {
-			for (String skill : event.getSkills().split("\\|")) {
-				if (skill.startsWith("9.")) {
-					boolean canceled = event.getSkills().contains("X");
-					final QueryParams params = new QueryParams(Query.event_listId);
-					params.setSearch("event.contactId=" + event.getContactId()
-							+ " and length(event.skills)>0 and cast(REGEXP_LIKE('" + skill
-							+ "', event.skills) as integer)=1");
-					final Result events = repository.list(params);
-					if (!canceled) {
-						for (int i = 0; i < events.size(); i++) {
-							if (((String) events.get(i).get("event.skills")).contains("X")) {
-								canceled = true;
-								break;
-							}
-						}
+		if (event.getRepetition() == Repetition.Games && !Strings.isEmpty(event.getSkills())
+				&& event.getSkills().startsWith("9.") && event.getLocationId() != null) {
+			boolean canceled = event.getSkills().contains("X");
+			final QueryParams params = new QueryParams(Query.event_listId);
+			params.setSearch("event.contactId=" + event.getContactId()
+					+ " and length(event.skills)>0 and event.locationId="
+					+ event.getLocationId());
+			final Result events = repository.list(params);
+			if (!canceled) {
+				for (int i = 0; i < events.size(); i++) {
+					if (("|" + events.get(i).get("event.skills") + "|").contains("|" + skill + "|")
+							&& ((String) events.get(i).get("event.skills")).contains("X")) {
+						canceled = true;
+						break;
 					}
-					if (canceled) {
-						events.forEach(e -> {
-							if (!((String) e.get("event.skills")).contains("X") &&
-									event.getId().compareTo((BigInteger) e.get("event.id")) != 0) {
-								final Event e2 = repository.one(Event.class, (BigInteger) e.get("event.id"));
-								e2.setSkills(e2.getSkills() + "|X");
-								repository.save(e2);
-							}
-						});
-						return 0;
-					}
-					return updateFutureEvents(event, events, skill);
 				}
 			}
+			if (canceled) {
+				events.forEach(e -> {
+					if (("|" + events.get(i).get("event.skills") + "|").contains("|" + skill + "|")
+							&& !((String) e.get("event.skills")).contains("X")
+							&& event.getId().compareTo((BigInteger) e.get("event.id")) != 0) {
+						final Event e2 = repository.one(Event.class, (BigInteger) e.get("event.id"));
+						e2.setSkills(e2.getSkills() + "|X");
+						repository.save(e2);
+					}
+				});
+				return 0;
+			}
+			return updateFutureEvents(event, events, skill);
 		}
 		return 0;
 	}
