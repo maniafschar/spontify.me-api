@@ -142,6 +142,12 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 				}
 			}
 		}
+		if (event.getRepetition() == Repetition.Games && !Strings.isEmpty(event.getSkills())
+				&& event.getSkills().startsWith("9.") && event.getSkills().contains("X"))
+			repository.executeUpdate("update Event event set event.skills='" + event.getSkills()
+					+ "' where event.locationId=" + event.getLocationId()
+					+ " and event.contactId=" + event.getContactId()
+					+ " and event.skills='" + event.getSkills().replace("X", "").replace("|", "") + "'");
 	}
 
 	@Override
