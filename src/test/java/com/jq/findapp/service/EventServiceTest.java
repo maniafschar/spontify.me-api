@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.StringReader;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -19,6 +21,8 @@ import org.springframework.web.util.HtmlUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
 import com.jq.findapp.repository.Query;
@@ -122,5 +126,29 @@ public class EventServiceTest {
 				+ "In Grünland beginnt ein wunderschöner Sonnentag, den unser Tabaluga in vollen Zügen genießen möchte. Faul sein, in der Sonne liegen und mit den Schmetterlingen spielen, ist sein Plan. Aber da gibt es einen, der etwas dagegen hat: Arktos, der Herrscher der Eiswelt! Mit einem gewaltigen Schnee- und Eissturm beendet Arktos den schönen Sonnenmorgen. Tabaluga wird von den Schneemassen verschüttet. Mit der Ankündigung, er werde Grünland „frosten“ verlässt Arktos triumphierend Grünland. Tabaluga verliert sein Gedächtnis und hat vergessen wer er ist.\n"
 				+ "Wie so oft im Leben, wenn man glaubt, es gibt keinen Ausweg mehr, naht die Rettung: Für Tabaluga ist es ein Glückskäfer, der sich mit ihm auf eine Reise durch sein Gedächtnis begibt.",
 				result);
+	}
+
+	@Test
+	public void duplicateEvents() throws Exception {
+		// given
+		final JsonNode events = new ObjectMapper()
+				.readTree(getClass().getResourceAsStream("/json/duplicateEvents.json"));
+		final Set<String> processed = new HashSet<>();
+		final StringBuffer result = new StringBuffer();
+
+		// when
+		for (int i = 0; i < events.size(); i++) {
+			final String key = events.get(i).get("CONTACT_ID").asText() + "-"
+					+ events.get(i).get("LOCATION_ID").asText() + "-"
+					+ events.get(i).get("series_id").asText() + "-"
+					+ events.get(i).get("description").asText();
+			if (processed.contains(key))
+				result.append("delete from event where id=" + events.get(i).get("id").asText() + ";\n");
+			else
+				processed.add(key);
+		}
+
+		// then
+		assertEquals("", result.toString());
 	}
 }

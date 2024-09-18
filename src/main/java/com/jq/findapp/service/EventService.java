@@ -14,11 +14,9 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
@@ -277,6 +275,25 @@ public class EventService {
 		return result;
 	}
 
+	public SchedulerResult runSeries() {
+		final SchedulerResult result = new SchedulerResult();
+		try {
+			final QueryParams params = new QueryParams(Query.event_listId);
+			params.setSearch("event.repetition='" + Repetition.Games.name()
+					+ "' and event.startDate is null and event.skills like '9.%'");
+			final Result events = repository.list(params);
+			for (int i = 0; i < events.size(); i++) {
+				final Event event = repository.one(Event.class, (BigInteger) events.get(i).get("event.id"));
+				event.setDescription(event.getDescription() + " ");
+				repository.save(event);
+			}
+			result.body = events.size() + " initialized";
+		} catch (final Exception e) {
+			result.exception = e;
+		}
+		return result;
+	}
+
 	public SchedulerResult runMatchDays() {
 		final SchedulerResult result = new SchedulerResult();
 		try {
@@ -345,8 +362,10 @@ public class EventService {
 
 	public int updateSeries(final Event event) {
 		if (event.getRepetition() == Repetition.Games && !Strings.isEmpty(event.getSkills())
-				&& event.getSkills().startsWith("9.") && event.getLocationId() != null && !event.getSkills().contains("X")) {
-			final List<FutureEvent> futureEvents = surveyService.futureEvents(Integer.valueOf(event.getSkills().substring(2)));
+				&& event.getSkills().startsWith("9.") && event.getLocationId() != null
+				&& !event.getSkills().contains("X")) {
+			final List<FutureEvent> futureEvents = surveyService
+					.futureEvents(Integer.valueOf(event.getSkills().substring(2)));
 			final String description = event.getDescription().contains("\n")
 					? event.getDescription().substring(event.getDescription().indexOf("\n"))
 					: "\n" + event.getDescription();
@@ -354,14 +373,16 @@ public class EventService {
 			final String storage = contact.getStorage();
 			final ObjectNode imported = Strings.isEmpty(storage) ? Json.createObject()
 					: (ObjectNode) Json.toNode(Attachment.resolve(storage));
-			String importedIds = event.getSeriesId() + "|";
+			final String importedIds;
 			if (imported.has("eventSeries"))
-				importedIds += imported.get("eventSeries").toString();
-			else
+				importedIds = imported.get("eventSeries").toString();
+			else {
 				imported.putArray("eventSeries");
+				importedIds = "";
+			}
 			int count = 0;
 			for (FutureEvent futureEvent : futureEvents) {
-				if (futureEvent.time > System.currentTimeMillis()
+				if (futureEvent.time > event.getSeriesId()
 						&& !importedIds.contains(event.getSkills() + "." + futureEvent.time)) {
 					final Event e = new Event();
 					e.setContactId(event.getContactId());
@@ -385,7 +406,8 @@ public class EventService {
 			}
 			repository.executeUpdate("update Event event set event.repetition='" + Repetition.Games.name()
 					+ "' where event.contactId=" + event.getContactId()
-					+ " and length(event.skills)>0 and cast(REGEXP_LIKE('" + event.getSkills() + "', event.skills) as integer)=1");
+					+ " and length(event.skills)>0 and cast(REGEXP_LIKE('" + event.getSkills()
+					+ "', event.skills) as integer)=1");
 			if (!importedIds.contains(event.getSkills() + "." + event.getSeriesId()))
 				((ArrayNode) imported.get("eventSeries")).add(event.getSkills() + "." + event.getSeriesId());
 			contact.setStorage(Json.toString(imported));

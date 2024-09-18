@@ -397,6 +397,7 @@ public class SupportCenterApi {
 			run(eventService, "Import", list, new int[] { 5 }, 40);
 			run(eventService, "Publish", list, null, -1);
 			run(eventService, "Participation", list, null, -1);
+			run(eventService, "Series", list, new int[] { 23 }, 40);
 			run(importLogService, null, list, null, -1);
 			run(rssService, null, list, null, -1);
 			run(surveyService, null, list, null, -1);

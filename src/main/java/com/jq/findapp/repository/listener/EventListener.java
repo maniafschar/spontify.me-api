@@ -40,26 +40,26 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 
 	@Override
 	public void prePersist(final Event event) {
+		if (event.getRepetition() == null)
+			event.setRepetition(Repetition.Once);
 		preUpdate(event);
-		if (event.getRepetition() == Repetition.Games) {
-			if (event.getSeriesId() == null) {
-				final QueryParams params = new QueryParams(Query.event_listId);
-				params.setSearch("event.contactId=" + event.getContactId()
-						+ " and length(event.skills)>0 and cast(REGEXP_LIKE('" + event.getSkills()
-						+ "', event.skills) as integer)=1 and event.repetition='" + Repetition.Games.name()
-						+ "' and event.startDate>cast('" + Instant.now() + "' as timestamp)");
-				final Result events = repository.list(params);
-				if (events.size() > 0) {
-					long max = Long.MAX_VALUE;
-					Object id = null;
-					for (int i = 0; i < events.size(); i++) {
-						if (max > ((Timestamp) events.get(i).get("event.startDate")).getTime()) {
-							max = ((Timestamp) events.get(i).get("event.startDate")).getTime();
-							id = events.get(i).get("event.id");
-						}
+		if (event.getRepetition() == Repetition.Games && !Strings.isEmpty(event.getSkills())) {
+			final QueryParams params = new QueryParams(Query.event_listId);
+			params.setSearch("event.contactId=" + event.getContactId()
+					+ " event.skills='" + event.getSkills()
+					+ "' and event.repetition='" + Repetition.Games.name()
+					+ "' and event.startDate>cast('" + Instant.now() + "' as timestamp)");
+			final Result events = repository.list(params);
+			if (events.size() > 0) {
+				long max = Long.MAX_VALUE;
+				Object id = null;
+				for (int i = 0; i < events.size(); i++) {
+					if (max > ((Timestamp) events.get(i).get("event.startDate")).getTime()) {
+						max = ((Timestamp) events.get(i).get("event.startDate")).getTime();
+						id = events.get(i).get("event.id");
 					}
-					throw new IllegalArgumentException("event series exists: " + id);
 				}
+				throw new IllegalArgumentException("event series exists: " + id);
 			}
 			final List<FutureEvent> futureEvents = surveyService
 					.futureEvents(Integer.valueOf(event.getSkills().substring(2)));
@@ -67,16 +67,14 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 				final FutureEvent futureEvent = futureEvents.get(0);
 				event.setStartDate(new Timestamp(futureEvent.time - SERIES_TIMELAP));
 				event.setSeriesId(futureEvent.time);
-				event.setDescription(futureEvent.subject + "\n" + event.getDescription());
+				event.setDescription(futureEvent.subject + "\n" + event.getDescription().trim());
 			}
 		}
 	}
 
 	@Override
 	public void preUpdate(final Event event) {
-		if (event.getRepetition() == null)
-			event.setRepetition(Repetition.Once);
-		if (event.getRepetition() == Repetition.Once || event.getRepetition() == Repetition.Games)
+		if (event.getRepetition() == Repetition.Once)
 			event.setEndDate(getDate(event.getStartDate()));
 	}
 
