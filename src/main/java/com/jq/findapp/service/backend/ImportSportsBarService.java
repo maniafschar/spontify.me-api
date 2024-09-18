@@ -35,6 +35,8 @@ public class ImportSportsBarService {
 	private NotificationService notificationService;
 
 	private static final String URL = "https://skyfinder.sky.de/sf/skyfinder.servlet?";
+	private static final String URL2 = "https://api.sportsbarfinder.net/map?rq=";
+	// {"region":{"zoomLevel":15,"minLon":11.538975286077866,"minLat":48.13194161850865,"maxLon":11.59755473096312,"maxLat":48.1562533027202}}
 
 	public SchedulerResult run() {
 		final SchedulerResult result = new SchedulerResult();
