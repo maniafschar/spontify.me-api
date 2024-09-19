@@ -382,25 +382,25 @@ public class SupportCenterApi {
 		CompletableFuture.supplyAsync(() -> {
 			now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
 			final List<CompletableFuture<Void>> list = new ArrayList<>();
-			run(importSportsBarService, null, list, "* 3 * * *");
+			run(importSportsBarService, null, list, "0 3");
 			run(chatService, null, list, null);
-			run(marketingLocationService, null, list, "* 6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21 * * *");
-			run(marketingLocationService, "Sent", list, "10 19 * * *");
-			run(marketingLocationService, "Unfinished", list, "30 17 * * *");
-			run(marketingLocationService, "Cooperation", list, "30 17 * * *");
+			run(marketingLocationService, null, list, "* 6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21");
+			run(marketingLocationService, "Sent", list, "10 19");
+			run(marketingLocationService, "Unfinished", list, "30 17");
+			run(marketingLocationService, "Cooperation", list, "40 17");
 			run(dbService, null, list, null);
-			run(dbService, "CleanUp", list, "30 0 * * *");
-			run(engagementService, "Registration", list, "40 10 * * *");
+			run(dbService, "CleanUp", list, "30 0");
+			run(engagementService, "Registration", list, "40 10");
 			run(eventService, "Match", list, null);
-			run(eventService, "MatchDays", list, "20 9 * * *");
-			run(eventService, "Import", list, new "40 5 * * *");
+			run(eventService, "MatchDays", list, "20 9");
+			run(eventService, "Import", list, new "40 5");
 			run(eventService, "Publish", list, null);
 			run(eventService, "Participation", list, null);
-			run(eventService, "Series", list, "40 23 * * *");
+			run(eventService, "Series", list, "40 23");
 			run(importLogService, null, list, null);
 			run(rssService, null, list, null);
 			run(surveyService, null, list, null);
-			run(importLocationsService, null, list, "50 * * * *");
+			run(importLocationsService, null, list, "50 0");
 			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 					.map(CompletableFuture::join).collect(Collectors.toList())).join();
 			list.clear();
@@ -412,7 +412,7 @@ public class SupportCenterApi {
 			list.clear();
 			run(engagementService, null, list, null);
 			run(ipService, null, list, null);
-			run(sitemapService, null, list, "0 20 * * *");
+			run(sitemapService, null, list, "0 20");
 			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 					.map(CompletableFuture::join).collect(Collectors.toList())).join();
 			run(dbService, "Backup", null, null);
@@ -491,7 +491,7 @@ public class SupportCenterApi {
 	boolean cron(final String cron) {
 		if (cron == null)
 			return true;
-		final String[] s = cron.split(" ");
+		final String[] s = (cron.trim() + " * * * *").split(" ");
 		return match(s[0], now.getMinute())
 				&& match(s[1], now.getHour())
 				&& match(s[2], now.getDayOfMonth())
