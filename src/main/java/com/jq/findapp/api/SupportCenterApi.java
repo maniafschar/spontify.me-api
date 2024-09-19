@@ -382,51 +382,47 @@ public class SupportCenterApi {
 		CompletableFuture.supplyAsync(() -> {
 			now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
 			final List<CompletableFuture<Void>> list = new ArrayList<>();
-			run(importSportsBarService, null, list, new int[] { 3 }, 0);
-			run(chatService, null, list, null, -1);
-			run(marketingLocationService, null, list,
-					new int[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 }, -1);
-			run(marketingLocationService, "Sent", list, new int[] { 19 }, 10);
-			run(marketingLocationService, "Unfinished", list, new int[] { 17 }, 30);
-			run(marketingLocationService, "Cooperation", list, new int[] { 17 }, 30);
-			run(dbService, null, list, null, -1);
-			run(dbService, "CleanUp", list, new int[] { 0 }, 30);
-			run(engagementService, "Registration", list, new int[] { 10 }, 40);
-			run(eventService, "Match", list, null, -1);
-			run(eventService, "MatchDays", list, new int[] { 9 }, 20);
-			run(eventService, "Import", list, new int[] { 5 }, 40);
-			run(eventService, "Publish", list, null, -1);
-			run(eventService, "Participation", list, null, -1);
-			run(eventService, "Series", list, new int[] { 23 }, 40);
-			run(importLogService, null, list, null, -1);
-			run(rssService, null, list, null, -1);
-			run(surveyService, null, list, null, -1);
-			run(importLocationsService, null, list, null, 50);
+			run(importSportsBarService, null, list, "* 3 * * *");
+			run(chatService, null, list, null);
+			run(marketingLocationService, null, list, "* 6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21 * * *");
+			run(marketingLocationService, "Sent", list, "10 19 * * *");
+			run(marketingLocationService, "Unfinished", list, "30 17 * * *");
+			run(marketingLocationService, "Cooperation", list, "30 17 * * *");
+			run(dbService, null, list, null);
+			run(dbService, "CleanUp", list, "30 0 * * *");
+			run(engagementService, "Registration", list, "40 10 * * *");
+			run(eventService, "Match", list, null);
+			run(eventService, "MatchDays", list, "20 9 * * *");
+			run(eventService, "Import", list, new "40 5 * * *");
+			run(eventService, "Publish", list, null);
+			run(eventService, "Participation", list, null);
+			run(eventService, "Series", list, "40 23 * * *");
+			run(importLogService, null, list, null);
+			run(rssService, null, list, null);
+			run(surveyService, null, list, null);
+			run(importLocationsService, null, list, "50 * * * *");
 			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 					.map(CompletableFuture::join).collect(Collectors.toList())).join();
 			list.clear();
-			run(marketingService, null, list, null, -1);
-			run(marketingService, "Result", list, null, -1);
+			run(marketingService, null, list, null);
+			run(marketingService, "Result", list, null);
 			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 					.map(CompletableFuture::join).collect(Collectors.toList())).join();
-			run(engagementService, "NearBy", null, null, -1);
+			run(engagementService, "NearBy", null, null);
 			list.clear();
-			run(engagementService, null, list, null, -1);
-			run(ipService, null, list, null, -1);
-			run(sitemapService, null, list, new int[] { 20 }, 0);
+			run(engagementService, null, list, null);
+			run(ipService, null, list, null);
+			run(sitemapService, null, list, "0 20 * * *");
 			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 					.map(CompletableFuture::join).collect(Collectors.toList())).join();
-			run(dbService, "Backup", null, null, -1);
+			run(dbService, "Backup", null, null);
 			return null;
 		});
 	}
 
 	@Async
-	private void run(final Object bean, final String method, final List<CompletableFuture<Void>> list,
-			int[] hours, int minute) {
-		if (hours != null && !Arrays.stream(hours).anyMatch(e -> e == now.getHour()))
-			return;
-		if (minute > -1 && minute != now.getMinute())
+	private void run(final Object bean, final String method, final List<CompletableFuture<Void>> list, final String cron) {
+		if (!cron(cron))
 			return;
 		final CompletableFuture<Void> e = CompletableFuture.supplyAsync(() -> {
 			final Log log = new Log();
@@ -480,6 +476,40 @@ public class SupportCenterApi {
 			e.join();
 		else
 			list.add(e);
+	}
+
+	/**
+	 * 1 2 3 4 5
+	 * ┬ ┬ ┬ ┬ ┬
+	 * │ │ │ │ │
+	 * │ │ │ │ └──── Weekday (0-7, Sunday is 0 or 7)
+	 * │ │ │ └────── Month (1-12)
+	 * │ │ └──────── Day (1-31)
+	 * │ └────────── Hour (0-23)
+	 * └──────────── Minute (0-59)
+	 */
+	boolean cron(final String cron) {
+		if (cron == null)
+			return true;
+		final String[] s = cron.split(" ");
+		return match(s[0], now.getMinute())
+				&& match(s[0], now.getHour())
+				&& match(s[0], now.getDayOfMonth())
+				&& match(s[0], now.getMonth())
+				&& match(s[0], now.getDayOfWeek());
+	}
+
+	private boolean match(final String field, final int value) {
+		if ("*".equals(field))
+			return true;
+		final String[] s = field.split(",");
+		for (int i = 0; i < s.length; i++) {
+			if (s[i].contains("/")) {
+				if (value % Integer.parseInt(s[i].split("/")[1]) == 0)
+					return true;
+			} else if (Integer.parseInt(s[i]) == value)
+				return true;
+		}
 	}
 
 	public static class SchedulerResult {
