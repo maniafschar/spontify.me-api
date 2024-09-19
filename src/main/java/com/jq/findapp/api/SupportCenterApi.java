@@ -493,10 +493,10 @@ public class SupportCenterApi {
 			return true;
 		final String[] s = cron.split(" ");
 		return match(s[0], now.getMinute())
-				&& match(s[0], now.getHour())
-				&& match(s[0], now.getDayOfMonth())
-				&& match(s[0], now.getMonth())
-				&& match(s[0], now.getDayOfWeek());
+				&& match(s[1], now.getHour())
+				&& match(s[2], now.getDayOfMonth())
+				&& match(s[3], now.getMonth())
+				&& match(s[4], now.getDayOfWeek());
 	}
 
 	private boolean match(final String field, final int value) {
