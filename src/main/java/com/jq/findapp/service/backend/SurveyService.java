@@ -723,7 +723,7 @@ public class SurveyService {
 		final QueryParams params = new QueryParams(Query.misc_listStorage);
 		params.setSearch("storage.label='" + label + "'");
 		final Result result = repository.list(params);
-		if ((fixture = needUpdate(result.size() == 0 ? null : result.get(0))) == null) {
+		if (result.size() == 0 || (fixture = needUpdate(result.get(0))) == null) {
 			if (System.currentTimeMillis() - pauseUntil < 0) {
 				String unit;
 				double i = (pauseUntil - System.currentTimeMillis()) / 1000;
@@ -768,8 +768,6 @@ public class SurveyService {
 	}
 
 	JsonNode needUpdate(final Map<String, Object> storage) {
-		if (storage == null)
-			return null;
 		JsonNode fixture = null;
 		if (!Strings.isEmpty(storage.get("storage.storage")))
 			fixture = Json.toNode(storage.get("storage.storage").toString());
