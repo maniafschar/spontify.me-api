@@ -131,7 +131,7 @@ public class SupportCenterApi {
 	private String schedulerSecret;
 
 	private static final Set<String> running = new HashSet<>();
-	private ZonedDateTime now;
+	ZonedDateTime now;
 
 	@DeleteMapping("user/{id}")
 	public void userDelete(@PathVariable final BigInteger id) throws Exception {
