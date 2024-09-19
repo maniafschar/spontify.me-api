@@ -14,9 +14,11 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
@@ -281,13 +283,27 @@ public class EventService {
 			final QueryParams params = new QueryParams(Query.event_listId);
 			params.setSearch("event.repetition='" + Repetition.Games.name()
 					+ "' and event.startDate is null and event.skills like '9.%'");
-			final Result events = repository.list(params);
+			Result events = repository.list(params);
 			for (int i = 0; i < events.size(); i++) {
 				final Event event = repository.one(Event.class, (BigInteger) events.get(i).get("event.id"));
 				event.setDescription(event.getDescription() + " ");
 				repository.save(event);
 			}
-			result.body = events.size() + " initialized";
+			result.body = events.size() + " initialized\n";
+			params.setSearch("event.repetition='" + Repetition.Games.name()
+					+ "' and event.startDate>current_time and event.skills like '9.%' and event.skills not like '%X%'");
+			events = repository.list(params);
+			final Set<String> processed = new HashSet<>();
+			for (int i = 0; i < events.size(); i++) {
+				final String key = events.get(i).get("event.contactId") + "-"
+						+ events.get(i).get("event.locationId") + "-"
+						+ events.get(i).get("event.skills");
+				if (!processed.contains(key)) {
+					processed.add(key);
+					updateSeries(repository.one(Event.class, (BigInteger) events.get(i).get("event.id")));
+				}
+			}
+			result.body += events.size() + " updated";
 		} catch (final Exception e) {
 			result.exception = e;
 		}
