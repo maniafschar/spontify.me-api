@@ -491,6 +491,8 @@ public class SupportCenterApi {
 	boolean cron(final String cron) {
 		if (cron == null)
 			return true;
+		if (Strings.isEmpty(cron))
+			return false;
 		final String[] s = (cron.trim() + " * * * *").split(" ");
 		return match(s[0], now.getMinute())
 				&& match(s[1], now.getHour())
