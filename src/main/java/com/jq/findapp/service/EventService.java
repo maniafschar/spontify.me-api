@@ -381,7 +381,7 @@ public class EventService {
 			int count = 0;
 			for (FutureEvent futureEvent : futureEvents) {
 				if (futureEvent.time > event.getSeriesId()
-						&& !importedIds.toString().contains('"' + get(event.getSkills() + '.' + futureEvent.time + '"')) {
+						&& !importedIds.toString().contains('"' + event.getSkills() + '.' + futureEvent.time + '"')) {
 					final Event e = new Event();
 					e.setContactId(event.getContactId());
 					e.setDescription(futureEvent.subject + description);
@@ -406,7 +406,7 @@ public class EventService {
 					+ "' where event.repetition is null and event.contactId=" + event.getContactId()
 					+ " and event.skills='" + event.getSkills()
 					+ "' and event.locationId=" + event.getLocationId());
-			if (!importedIds.toString().contains('"' + get(event.getSkills() + '.' + event.getSeriesId() + '"'))
+			if (!importedIds.toString().contains('"' + event.getSkills() + '.' + event.getSeriesId() + '"'))
 				importedIds.add(event.getSkills() + '.' + event.getSeriesId());
 			contact.setStorage(Json.toString(imported));
 			repository.save(contact);
