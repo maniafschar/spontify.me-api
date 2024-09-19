@@ -131,7 +131,6 @@ public class SupportCenterApi {
 	private String schedulerSecret;
 
 	private static final Set<String> running = new HashSet<>();
-	ZonedDateTime now;
 
 	@DeleteMapping("user/{id}")
 	public void userDelete(@PathVariable final BigInteger id) throws Exception {
@@ -380,49 +379,50 @@ public class SupportCenterApi {
 	@Async
 	private void run() {
 		CompletableFuture.supplyAsync(() -> {
-			now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
+			final ZonedDateTime now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
 			final List<CompletableFuture<Void>> list = new ArrayList<>();
-			run(importSportsBarService, null, list, "0 3");
-			run(chatService, null, list, null);
-			run(marketingLocationService, null, list, "* 6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21");
-			run(marketingLocationService, "Sent", list, "10 19");
-			run(marketingLocationService, "Unfinished", list, "30 17");
-			run(marketingLocationService, "Cooperation", list, "40 17");
-			run(dbService, null, list, null);
-			run(dbService, "CleanUp", list, "30 0");
-			run(engagementService, "Registration", list, "40 10");
-			run(eventService, "Match", list, null);
-			run(eventService, "MatchDays", list, "20 9");
-			run(eventService, "Import", list, new "40 5");
-			run(eventService, "Publish", list, null);
-			run(eventService, "Participation", list, null);
-			run(eventService, "Series", list, "40 23");
-			run(importLogService, null, list, null);
-			run(rssService, null, list, null);
-			run(surveyService, null, list, null);
-			run(importLocationsService, null, list, "50 0");
+			run(importSportsBarService, null, list, "0 3", now);
+			run(chatService, null, list, null, now);
+			run(marketingLocationService, null, list, "* 6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21", now);
+			run(marketingLocationService, "Sent", list, "10 19", now);
+			run(marketingLocationService, "Unfinished", list, "30 17", now);
+			run(marketingLocationService, "Cooperation", list, "40 17", now);
+			run(dbService, null, list, null, now);
+			run(dbService, "CleanUp", list, "30 0", now);
+			run(engagementService, "Registration", list, "40 10", now);
+			run(eventService, "Match", list, null, now);
+			run(eventService, "MatchDays", list, "20 9", now);
+			run(eventService, "Import", list, "40 5", now);
+			run(eventService, "Publish", list, null, now);
+			run(eventService, "Participation", list, null, now);
+			run(eventService, "Series", list, "40 23", now);
+			run(importLogService, null, list, null, now);
+			run(rssService, null, list, null, now);
+			run(surveyService, null, list, null, now);
+			run(importLocationsService, null, list, "50 0", now);
 			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 					.map(CompletableFuture::join).collect(Collectors.toList())).join();
 			list.clear();
-			run(marketingService, null, list, null);
-			run(marketingService, "Result", list, null);
+			run(marketingService, null, list, null, now);
+			run(marketingService, "Result", list, null, now);
 			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 					.map(CompletableFuture::join).collect(Collectors.toList())).join();
-			run(engagementService, "NearBy", null, null);
+			run(engagementService, "NearBy", null, null, now);
 			list.clear();
-			run(engagementService, null, list, null);
-			run(ipService, null, list, null);
-			run(sitemapService, null, list, "0 20");
+			run(engagementService, null, list, null, now);
+			run(ipService, null, list, null, now);
+			run(sitemapService, null, list, "0 20", now);
 			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 					.map(CompletableFuture::join).collect(Collectors.toList())).join();
-			run(dbService, "Backup", null, null);
+			run(dbService, "Backup", null, null, now);
 			return null;
 		});
 	}
 
 	@Async
-	private void run(final Object bean, final String method, final List<CompletableFuture<Void>> list, final String cron) {
-		if (!cron(cron))
+	private void run(final Object bean, final String method, final List<CompletableFuture<Void>> list,
+			final String cron, final ZonedDateTime now) {
+		if (!cron(cron, now))
 			return;
 		final CompletableFuture<Void> e = CompletableFuture.supplyAsync(() -> {
 			final Log log = new Log();
@@ -482,13 +482,13 @@ public class SupportCenterApi {
 	 * 1 2 3 4 5
 	 * ┬ ┬ ┬ ┬ ┬
 	 * │ │ │ │ │
-	 * │ │ │ │ └──── Weekday (0-7, Sunday is 0 or 7)
+	 * │ │ │ │ └──── Weekday (1-7, Sunday = 7)
 	 * │ │ │ └────── Month (1-12)
 	 * │ │ └──────── Day (1-31)
 	 * │ └────────── Hour (0-23)
 	 * └──────────── Minute (0-59)
 	 */
-	boolean cron(final String cron) {
+	boolean cron(final String cron, final ZonedDateTime now) {
 		if (cron == null)
 			return true;
 		if (Strings.isEmpty(cron))
@@ -497,8 +497,8 @@ public class SupportCenterApi {
 		return match(s[0], now.getMinute())
 				&& match(s[1], now.getHour())
 				&& match(s[2], now.getDayOfMonth())
-				&& match(s[3], now.getMonth())
-				&& match(s[4], now.getDayOfWeek());
+				&& match(s[3], now.getMonth().getValue())
+				&& match(s[4], now.getDayOfWeek().getValue());
 	}
 
 	private boolean match(final String field, final int value) {
