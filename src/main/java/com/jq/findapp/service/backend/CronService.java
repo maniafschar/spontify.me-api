@@ -1,42 +1,25 @@
 package com.jq.findapp.service.backend;
 
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.jq.findapp.entity.ClientMarketing;
-import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Log;
 import com.jq.findapp.entity.Log.LogStatus;
-import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.entity.Ticket.TicketType;
-import com.jq.findapp.repository.Query;
-import com.jq.findapp.repository.Query.Result;
-import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.ChatService;
 import com.jq.findapp.service.EventService;
 import com.jq.findapp.service.NotificationService;
@@ -45,6 +28,9 @@ import com.jq.findapp.util.Strings;
 
 @Service
 public class CronService {
+	@Autowired
+	private Repository repository;
+
 	@Autowired
 	private EngagementService engagementService;
 
@@ -64,7 +50,13 @@ public class CronService {
 	private DbService dbService;
 
 	@Autowired
+	private ImportLocationsService importLocationsService;
+
+	@Autowired
 	private ImportSportsBarService importSportsBarService;
+
+	@Autowired
+	private NotificationService notificationService;
 
 	@Autowired
 	private ChatService chatService;
@@ -80,6 +72,8 @@ public class CronService {
 
 	@Autowired
 	private MarketingLocationService marketingLocationService;
+
+	private static final Set<String> running = new HashSet<>();
 
 	public CronResult run(final String classname) throws Exception {
 		final String[] s = classname.split("\\.");

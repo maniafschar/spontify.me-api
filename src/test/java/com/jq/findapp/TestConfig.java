@@ -103,7 +103,7 @@ public class TestConfig {
 
 	@Service
 	@Primary
-	public class ExternalServiceTest extends ExternalService {
+	public class ExternalServiceMock extends ExternalService {
 		@Override
 		public String google(final String param) {
 			try {
