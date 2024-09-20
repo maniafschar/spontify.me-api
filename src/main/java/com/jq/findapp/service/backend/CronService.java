@@ -79,10 +79,10 @@ public class SupportCenterApi {
 	@Autowired
 	private MarketingLocationService marketingLocationService;
 
-	public SchedulerResult run(final String classname) throws Exception {
+	public CronResult run(final String classname) throws Exception {
 		final String[] s = classname.split("\\.");
 		final Object clazz = getClass().getDeclaredField(s[0]).get(this);
-		final SchedulerResult result = (SchedulerResult) clazz.getClass()
+		final CronResult result = (CronResult) clazz.getClass()
 				.getDeclaredMethod("run" + (s.length > 1 ? s[1] : ""))
 				.invoke(clazz);
 		LogFilter.body.set(result.toString());
@@ -145,20 +145,20 @@ public class SupportCenterApi {
 			String name = bean.getClass().getSimpleName();
 			if (name.contains("$"))
 				name = name.substring(0, name.indexOf('$'));
-			log.setUri("/support/scheduler/" + name + "/" + m);
+			log.setUri("/support/cron/" + name + "/" + m);
 			try {
 				if (running.contains(name + '.' + m))
 					log.setStatus(LogStatus.Running);
 				else {
 					running.add(name + '.' + m);
-					final SchedulerResult result = (SchedulerResult) bean.getClass().getMethod(m).invoke(bean);
+					final CronResult result = (CronResult) bean.getClass().getMethod(m).invoke(bean);
 					log.setStatus(Strings.isEmpty(result.exception) ? LogStatus.Ok : LogStatus.Error);
 					if (result.body != null)
 						log.setBody(result.body.trim());
 					if (result.exception != null) {
 						log.setBody((log.getBody() == null ? "" : log.getBody() + "\n")
 								+ result.exception.getClass().getName() + ": " + result.exception.getMessage());
-						notificationService.createTicket(TicketType.ERROR, "scheduler",
+						notificationService.createTicket(TicketType.ERROR, "cron",
 								(result.body == null ? "" : result.body + "\n")
 										+ Strings.stackTraceToString(result.exception),
 								null);
@@ -168,7 +168,7 @@ public class SupportCenterApi {
 				log.setStatus(LogStatus.Exception);
 				log.setBody("uncaught exception " + ex.getClass().getName() + ": " + ex.getMessage() +
 						(Strings.isEmpty(log.getBody()) ? "" : "\n" + log.getBody()));
-				notificationService.createTicket(TicketType.ERROR, "scheduler",
+				notificationService.createTicket(TicketType.ERROR, "cron",
 						"uncaught exception:\n" + Strings.stackTraceToString(ex)
 								+ (Strings.isEmpty(log.getBody()) ? "" : "\n\n" + log.getBody()),
 						null);
