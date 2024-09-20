@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientNews;
 import com.jq.findapp.entity.Contact;
@@ -34,6 +33,7 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.repository.listener.ClientNewsListener;
+import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 
@@ -54,8 +54,8 @@ public class DbService {
 	@Value("${spring.datasource.password}")
 	private String password;
 
-	public SchedulerResult run() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult run() {
+		final CronResult result = new CronResult();
 		try {
 			repository.executeUpdate(
 					"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and (select modifiedAt from Contact contact where contact.id=contactNotification.contactId)>contactNotification.createdAt and TIMESTAMPDIFF(MINUTE,contactNotification.createdAt,current_timestamp)>30");
@@ -94,8 +94,8 @@ public class DbService {
 		return result;
 	}
 
-	public SchedulerResult runCleanUp() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult runCleanUp() {
+		final CronResult result = new CronResult();
 		try {
 			result.body = repository.cleanUpAttachments();
 		} catch (final Exception e) {
@@ -104,8 +104,8 @@ public class DbService {
 		return result;
 	}
 
-	public SchedulerResult runBackup() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult runBackup() {
+		final CronResult result = new CronResult();
 		try {
 			new ProcessBuilder("./backup.sh", user, password).start().waitFor();
 		} catch (final Exception e) {
