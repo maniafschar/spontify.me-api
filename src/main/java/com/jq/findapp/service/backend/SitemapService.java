@@ -12,11 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.util.Json;
 
 @Service
@@ -24,8 +24,8 @@ public class SitemapService {
 	@Autowired
 	private Repository repository;
 
-	public SchedulerResult run() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult run() {
+		final CronResult result = new CronResult();
 		repository.list(new QueryParams(Query.misc_listClient)).forEach(e -> {
 			try {
 				final JsonNode json = Json.toNode(e.get("client.storage").toString()).get("sitemap");
