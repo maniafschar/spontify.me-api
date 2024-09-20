@@ -24,12 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Log;
 import com.jq.findapp.entity.Log.LogStatus;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.util.Strings;
 
 @Service
@@ -45,8 +45,8 @@ public class ImportLogService {
 
 	private static final Map<String, Integer> linesRead = new HashMap<>();
 
-	public SchedulerResult run() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult run() {
+		final CronResult result = new CronResult();
 		try {
 			if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) < 1
 					&& Calendar.getInstance().get(Calendar.MINUTE) < 1)
