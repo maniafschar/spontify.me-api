@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.api.model.InternalRegistration;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketing;
@@ -38,6 +37,7 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.AuthenticationService;
+import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
@@ -68,8 +68,8 @@ public class MarketingLocationService {
 		public String apply(X x, Y y, Z z);
 	}
 
-	public SchedulerResult run() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult run() {
+		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
 		params.setLimit(0);
 		try {
@@ -145,7 +145,7 @@ public class MarketingLocationService {
 		return result;
 	}
 
-	public SchedulerResult runUnfinished() {
+	public CronResult runUnfinished() {
 		return sendEmails("contactMarketing.finished=false and contactMarketing.createdAt>cast('"
 				+ Instant.now().minus(Duration.ofDays(14)).toString()
 				+ "' as timestamp) and contactMarketing.createdAt<cast('" +
@@ -156,7 +156,7 @@ public class MarketingLocationService {
 						+ location.getId() + "&h=" + location.getSecret().hashCode());
 	}
 
-	public SchedulerResult runSent() {
+	public CronResult runSent() {
 		return sendEmails(
 				"contactMarketing.createdAt<cast('" + Instant.parse("2024-09-04T05:00:00.00Z").toString()
 						+ "' as timestamp)",
@@ -176,7 +176,7 @@ public class MarketingLocationService {
 						: "/?i=" + location.getId() + "&h=" + location.getSecret().hashCode()));
 	}
 
-	public SchedulerResult runCooperation() {
+	public CronResult runCooperation() {
 		return sendEmails(
 				"1=1",
 				"Dauerhaft mehr Gäste durch Fanclub!", "Cooperation",
@@ -207,9 +207,9 @@ public class MarketingLocationService {
 				});
 	}
 
-	private SchedulerResult sendEmails(final String search, final String subject, final String postfixText,
+	private CronResult sendEmails(final String search, final String subject, final String postfixText,
 			final Decide<Location, Poll, JsonNode> decide, final Url<String, BigInteger, Location> url) {
-		final SchedulerResult result = new SchedulerResult();
+		final CronResult result = new CronResult();
 		final SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 		final Map<BigInteger, String> htmls = new HashMap<>();
 		final QueryParams params = new QueryParams(Query.contact_listMarketing);
