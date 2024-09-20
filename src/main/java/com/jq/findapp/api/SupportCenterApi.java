@@ -49,6 +49,7 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.backend.CronService;
+import com.jq.findapp.service.backend.CronService.CronResult;
 import com.jq.findapp.service.backend.ImportLocationsService;
 import com.jq.findapp.util.LogFilter;
 import com.jq.findapp.util.Strings;
@@ -190,7 +191,7 @@ public class SupportCenterApi {
 	}
 
 	@PostMapping("run/{classname}")
-	public SchedulerResult run(@PathVariable final String classname) throws Exception {
+	public CronResult run(@PathVariable final String classname) throws Exception {
 		return cronService.run(classname);
 	}
 
