@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactChat;
@@ -18,6 +17,7 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.backend.CronService.CronResult;
 import com.jq.findapp.util.Text;
 import com.jq.findapp.util.Text.TextId;
 
@@ -53,8 +53,8 @@ public class ChatService {
 								!list.get(0).get("contactLink.contactId").equals(contact.getId()));
 	}
 
-	public SchedulerResult run() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult run() {
+		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.contact_chat);
 		params.setSearch(
 				"contactChat.contactId<>(select adminId from Client client, Contact contact where client.id=contact.clientId and contact.id=contactChat.contactId) and cast(contactChat.textId as text)='"
