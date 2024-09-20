@@ -44,7 +44,7 @@ import com.jq.findapp.util.LogFilter;
 import com.jq.findapp.util.Strings;
 
 @Service
-public class SupportCenterApi {
+public class CronService {
 	@Autowired
 	private EngagementService engagementService;
 
