@@ -22,18 +22,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.Contact;
@@ -63,10 +52,6 @@ import com.jq.findapp.service.backend.SitemapService;
 import com.jq.findapp.service.backend.SurveyService;
 import com.jq.findapp.util.LogFilter;
 import com.jq.findapp.util.Strings;
-
-import jakarta.transaction.Transactional;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
 
 public class SupportCenterApi {
 	@Autowired
@@ -264,3 +249,4 @@ public class SupportCenterApi {
 					+ (exception == null ? "" : "\n" + Strings.stackTraceToString(exception)).trim();
 		}
 	}
+}
