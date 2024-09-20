@@ -21,9 +21,9 @@ import com.jq.findapp.TestConfig;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = { FindappApplication.class, TestConfig.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-public class SupportCenterApiTest {
+public class CronServiceTest {
 	@Autowired
-	private SupportCenterApi supportCenterApi;
+	private CronService cronService;
 
 	@Test
 	public void cron_minute() throws Exception {
@@ -31,7 +31,7 @@ public class SupportCenterApiTest {
 		final ZonedDateTime now = Instant.ofEpochSecond(60).atZone(ZoneId.of("Europe/Berlin"));
 
 		// when
-		final boolean value = supportCenterApi.cron("1", now);
+		final boolean value = cronService.cron("1", now);
 
 		// then
 		assertTrue(value);
@@ -43,7 +43,7 @@ public class SupportCenterApiTest {
 		final ZonedDateTime now = Instant.ofEpochSecond(1200).atZone(ZoneId.of("Europe/Berlin"));
 
 		// when
-		final boolean value = supportCenterApi.cron("*/10", now);
+		final boolean value = cronService.cron("*/10", now);
 
 		// then
 		assertTrue(value);
@@ -55,7 +55,7 @@ public class SupportCenterApiTest {
 		final ZonedDateTime now = Instant.ofEpochSecond(1100).atZone(ZoneId.of("Europe/Berlin"));
 
 		// when
-		final boolean value = supportCenterApi.cron("*/10", now);
+		final boolean value = cronService.cron("*/10", now);
 
 		// then
 		assertFalse(value);
@@ -67,7 +67,7 @@ public class SupportCenterApiTest {
 		final ZonedDateTime now = Instant.ofEpochSecond(54000).atZone(ZoneId.of("Europe/Berlin"));
 
 		// when
-		final boolean value = supportCenterApi.cron("0 15,16,17", now);
+		final boolean value = cronService.cron("0 15,16,17", now);
 
 		// then
 		assertTrue(value);
@@ -79,7 +79,7 @@ public class SupportCenterApiTest {
 		final ZonedDateTime now = Instant.ofEpochSecond(50400).atZone(ZoneId.of("Europe/Berlin"));
 
 		// when
-		final boolean value = supportCenterApi.cron("0 16,17", now);
+		final boolean value = cronService.cron("0 16,17", now);
 
 		// then
 		assertFalse(value);
