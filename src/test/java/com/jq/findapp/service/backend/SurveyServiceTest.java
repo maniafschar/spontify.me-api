@@ -28,11 +28,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
 import com.jq.findapp.TestConfig.SurveyServiceMock;
-import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.backend.CronService.CronResult;
 import com.jq.findapp.service.backend.SurveyService.PollSurvey;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Utils;
@@ -59,7 +59,7 @@ public class SurveyServiceTest {
 	public void update_twice() throws Exception {
 		// given
 		utils.createContact(BigInteger.valueOf(4));
-		SchedulerResult result = surveyService.run();
+		CronResult result = surveyService.run();
 		assertNull(result.exception);
 
 		// when
