@@ -84,8 +84,8 @@ public class SupportCenterApi {
 	@Value("${app.admin.buildScript}")
 	private String buildScript;
 
-	@Value("${app.scheduler.secret}")
-	private String schedulerSecret;
+	@Value("${app.cron.secret}")
+	private String cronSecret;
 
 	@DeleteMapping("user/{id}")
 	public void userDelete(@PathVariable final BigInteger id) throws Exception {
@@ -319,9 +319,9 @@ public class SupportCenterApi {
 		return result;
 	}
 
-	@PutMapping("scheduler")
-	public synchronized void scheduler(@RequestHeader final String secret) throws Exception {
-		if (schedulerSecret.equals(secret))
+	@PutMapping("cron")
+	public synchronized void cron(@RequestHeader final String secret) throws Exception {
+		if (cronSecret.equals(secret))
 			cronService.run();
 	}
 
