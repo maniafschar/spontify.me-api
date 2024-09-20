@@ -31,7 +31,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Event;
@@ -44,6 +43,7 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.repository.listener.EventListener;
+import com.jq.findapp.service.backend.CronService.CronResult;
 import com.jq.findapp.service.backend.SurveyService;
 import com.jq.findapp.service.backend.SurveyService.FutureEvent;
 import com.jq.findapp.service.backend.events.ImportMunich;
@@ -84,8 +84,8 @@ public class EventService {
 		return answers;
 	}
 
-	public SchedulerResult runMatch() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult runMatch() {
+		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setSearch(
@@ -142,8 +142,8 @@ public class EventService {
 		return result;
 	}
 
-	public SchedulerResult runParticipation() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult runParticipation() {
+		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.event_listParticipateRaw);
 			params.setSearch("eventParticipate.state=1 and eventParticipate.eventDate>cast('"
@@ -255,8 +255,8 @@ public class EventService {
 		return repository.list(params).size() >= event.getMaxParticipants().intValue();
 	}
 
-	public SchedulerResult runImport() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult runImport() {
+		final CronResult result = new CronResult();
 		try {
 			final BigInteger clientId = BigInteger.ONE;
 			result.body = "Munich: " + importMunich.run(this, clientId);
@@ -266,8 +266,8 @@ public class EventService {
 		return result;
 	}
 
-	public SchedulerResult runPublish() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult runPublish() {
+		final CronResult result = new CronResult();
 		try {
 			final BigInteger clientId = BigInteger.ONE;
 			result.body = publishClient(clientId) + "\n" + publishUser() + " user events published";
@@ -277,8 +277,8 @@ public class EventService {
 		return result;
 	}
 
-	public SchedulerResult runSeries() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult runSeries() {
+		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.event_listId);
 			params.setSearch("event.repetition='" + Repetition.Games.name()
@@ -310,8 +310,8 @@ public class EventService {
 		return result;
 	}
 
-	public SchedulerResult runMatchDays() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult runMatchDays() {
+		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.event_listId);
 			params.setSearch("event.repetition='Games' and length(event.skills)>0 and event.skills not like '%X%'");
