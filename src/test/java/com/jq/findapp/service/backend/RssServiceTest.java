@@ -28,8 +28,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
-import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.backend.CronService.CronResult;
 import com.jq.findapp.util.EntityUtil;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Utils;
@@ -209,7 +209,7 @@ public class RssServiceTest {
 		utils.createContact(BigInteger.ONE);
 
 		// when
-		final SchedulerResult result = rssService.run();
+		final CronResult result = rssService.run();
 
 		// then
 		assertTrue(!Strings.isEmpty(result), result.body);
