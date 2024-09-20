@@ -134,7 +134,6 @@ public class SupportCenterApi {
 		});
 	}
 
-	@Async
 	private void run(final Object bean, final String method, final List<CompletableFuture<Void>> list,
 			final String cron, final ZonedDateTime now) {
 		if (!cron(cron, now))
