@@ -46,7 +46,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 		if (event.getRepetition() == Repetition.Games && !Strings.isEmpty(event.getSkills())) {
 			final QueryParams params = new QueryParams(Query.event_listId);
 			params.setSearch("event.contactId=" + event.getContactId()
-					+ " event.skills='" + event.getSkills()
+					+ " and event.skills='" + event.getSkills()
 					+ "' and event.repetition='" + Repetition.Games.name()
 					+ "' and event.startDate>cast('" + Instant.now() + "' as timestamp)");
 			final Result events = repository.list(params);

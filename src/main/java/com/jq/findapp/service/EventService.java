@@ -419,8 +419,8 @@ public class EventService {
 				}
 			}
 			repository.executeUpdate("update Event event set event.repetition='" + Repetition.Games.name()
-					+ "' where event.repetition is null and event.contactId=" + event.getContactId()
-					+ " and event.skills='" + event.getSkills()
+					+ "' where event.repetition='" + Repetition.Once.name() + "' and event.contactId="
+					+ event.getContactId() + " and event.skills='" + event.getSkills()
 					+ "' and event.locationId=" + event.getLocationId());
 			if (!importedIds.toString().contains('"' + event.getSkills() + '.' + event.getSeriesId() + '"'))
 				importedIds.add(event.getSkills() + '.' + event.getSeriesId());
