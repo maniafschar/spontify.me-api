@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ClientMarketing.Poll;
@@ -26,6 +25,7 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Json;
@@ -47,8 +47,8 @@ public class MarketingService {
 	@Autowired
 	private Text text;
 
-	public SchedulerResult run() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult run() {
+		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
 		params.setUser(new Contact());
 		final String today = Instant.now().toString().substring(0, 19);
@@ -118,8 +118,8 @@ public class MarketingService {
 		return result;
 	}
 
-	public SchedulerResult runResult() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult runResult() {
+		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 			params.setSearch("clientMarketingResult.published=false and clientMarketing.endDate<=cast('" + Instant.now()
