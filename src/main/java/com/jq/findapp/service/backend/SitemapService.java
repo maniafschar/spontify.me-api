@@ -16,7 +16,7 @@ import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.CronService.CronResult;
+import com.jq.findapp.service.backend.CronService.CronResult;
 import com.jq.findapp.util.Json;
 
 @Service
