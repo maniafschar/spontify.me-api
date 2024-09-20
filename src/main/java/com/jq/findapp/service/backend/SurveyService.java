@@ -37,7 +37,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ClientMarketing.Answer;
@@ -52,6 +51,7 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.EntityUtil;
 import com.jq.findapp.util.Json;
@@ -666,8 +666,8 @@ public class SurveyService {
 		return now.getYear() - (now.getMonth().getValue() < 6 ? 1 : 0);
 	}
 
-	public SchedulerResult run() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult run() {
+		final CronResult result = new CronResult();
 		final Result list = repository.list(new QueryParams(Query.misc_listClient));
 		for (int i = 0; i < list.size(); i++) {
 			try {
