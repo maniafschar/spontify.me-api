@@ -33,7 +33,7 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.repository.listener.ClientNewsListener;
-import com.jq.findapp.service.CronService.CronResult;
+import com.jq.findapp.service.backend.CronService.CronResult;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 
