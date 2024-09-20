@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.Contact;
@@ -42,6 +43,7 @@ import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.LogFilter;
 import com.jq.findapp.util.Strings;
 
+@Service
 public class SupportCenterApi {
 	@Autowired
 	private EngagementService engagementService;
