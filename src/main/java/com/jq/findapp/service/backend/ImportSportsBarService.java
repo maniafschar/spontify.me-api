@@ -15,13 +15,13 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Storage;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
@@ -38,8 +38,8 @@ public class ImportSportsBarService {
 	private static final String URL2 = "https://api.sportsbarfinder.net/map?rq=";
 	// {"region":{"zoomLevel":15,"minLon":11.538975286077866,"minLat":48.13194161850865,"maxLon":11.59755473096312,"maxLat":48.1562533027202}}
 
-	public SchedulerResult run() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult run() {
+		final CronResult result = new CronResult();
 		final Results results = new Results();
 		try {
 			final String zipCodePrefix = "" + (LocalDateTime.now().getDayOfYear() % 10);
