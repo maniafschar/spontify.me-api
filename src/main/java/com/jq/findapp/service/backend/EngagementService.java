@@ -18,7 +18,6 @@ import java.util.TimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.OS;
@@ -29,6 +28,7 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
+import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Score;
@@ -259,8 +259,8 @@ public class EngagementService {
 		chatTemplates.add(new ChatTemplate(TextId.engagement_like, null, null));
 	}
 
-	public SchedulerResult runRegistration() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult runRegistration() {
+		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setSearch("contact.createdAt<cast('" + Instant.now().minus(Duration.ofHours(3))
@@ -301,8 +301,8 @@ public class EngagementService {
 		return false;
 	}
 
-	public SchedulerResult run() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult run() {
+		final CronResult result = new CronResult();
 		try {
 			resetChatInstallCurrentVersion();
 			final QueryParams params = new QueryParams(Query.contact_listId);
@@ -392,8 +392,8 @@ public class EngagementService {
 		}
 	}
 
-	public SchedulerResult runNearBy() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult runNearBy() {
+		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setSearch("contact.verified=true and contact.notification like '%" +
