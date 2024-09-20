@@ -51,8 +51,8 @@ public class LogFilter implements Filter {
 	@Value("${app.supportCenter.secret}")
 	private String supportCenterSecret;
 
-	@Value("${app.scheduler.secret}")
-	private String schedulerSecret;
+	@Value("${app.cron.secret}")
+	private String cronSecret;
 
 	@Override
 	public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
@@ -150,8 +150,8 @@ public class LogFilter implements Filter {
 					authenticationService.verify(
 							repository.one(Client.class, new BigInteger(req.getHeader("clientId"))).getAdminId(),
 							req.getHeader("password"), req.getHeader("salt"));
-				} else if (!schedulerSecret.equals(req.getHeader("secret")) ||
-						!req.getRequestURI().equals("/support/scheduler") &&
+				} else if (!cronSecret.equals(req.getHeader("secret")) ||
+						!req.getRequestURI().equals("/support/cron") &&
 								!req.getRequestURI().equals("/support/healthcheck"))
 					throw new AuthenticationException(AuthenticationExceptionType.ProtectetdArea);
 			}
