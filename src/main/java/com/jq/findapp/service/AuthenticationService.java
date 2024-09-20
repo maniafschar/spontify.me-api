@@ -99,7 +99,7 @@ public class AuthenticationService {
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
 	public static class AuthenticationException extends RuntimeException {
 		public enum AuthenticationExceptionType {
-			NoInputFromClient, WrongPassword, NoPasswordInDB, UsedSalt, WrongClient, ProtectetdArea, Unknown
+			NoInputFromClient, WrongPassword, NoPasswordInDB, UsedSalt, WrongClient, ProtectedArea, Unknown
 		}
 
 		private final AuthenticationExceptionType type;

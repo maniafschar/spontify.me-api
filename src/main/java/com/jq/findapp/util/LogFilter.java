@@ -153,7 +153,7 @@ public class LogFilter implements Filter {
 				} else if (!cronSecret.equals(req.getHeader("secret")) ||
 						!req.getRequestURI().equals("/support/cron") &&
 								!req.getRequestURI().equals("/support/healthcheck"))
-					throw new AuthenticationException(AuthenticationExceptionType.ProtectetdArea);
+					throw new AuthenticationException(AuthenticationExceptionType.ProtectedArea);
 			}
 		}
 	}
