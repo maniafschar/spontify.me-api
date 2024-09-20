@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.Ip;
 import com.jq.findapp.entity.Ticket;
 import com.jq.findapp.entity.Ticket.TicketType;
@@ -15,6 +14,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 
@@ -32,8 +32,8 @@ public class IpService {
 		return ip;
 	}
 
-	public SchedulerResult run() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult run() {
+		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.misc_listIp);
 		params.setSearch("ip.longitude=0 and ip.latitude=0");
 		final Result list = repository.list(params);
