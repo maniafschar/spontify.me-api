@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.ClientNews;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Ticket.TicketType;
@@ -32,6 +31,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.EntityUtil;
@@ -48,8 +48,8 @@ public class RssService {
 	@Autowired
 	private NotificationService notificationService;
 
-	public SchedulerResult run() {
-		final SchedulerResult result = new SchedulerResult();
+	public CronResult run() {
+		final CronResult result = new CronResult();
 		final Result list = this.repository.list(new QueryParams(Query.misc_listClient));
 		final List<CompletableFuture<ImportFeed>> futures = new ArrayList<>();
 		for (int i = 0; i < list.size(); i++) {
