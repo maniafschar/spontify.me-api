@@ -16,7 +16,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
-import com.jq.findapp.api.SupportCenterApi.SchedulerResult;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ClientMarketing.Answer;
 import com.jq.findapp.entity.ClientMarketing.Poll;
@@ -27,6 +26,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.backend.CronService.CronResult;
 import com.jq.findapp.util.Text.TextId;
 import com.jq.findapp.util.Utils;
 
@@ -76,7 +76,7 @@ public class MarketingServiceTest {
 		repository.save(contactMarketing);
 
 		// when
-		final SchedulerResult result = marketingService.runResult();
+		final CronResult result = marketingService.runResult();
 
 		// then
 		assertNull(result.exception);
