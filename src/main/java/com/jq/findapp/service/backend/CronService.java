@@ -32,37 +32,25 @@ public class CronService {
 	private Repository repository;
 
 	@Autowired
-	private EngagementService engagementService;
-
-	@Autowired
-	private ImportLogService importLogService;
-
-	@Autowired
-	private EventService eventService;
-
-	@Autowired
-	private RssService rssService;
-
-	@Autowired
-	private SurveyService surveyService;
+	private ChatService chatService;
 
 	@Autowired
 	private DbService dbService;
 
 	@Autowired
+	private EngagementService engagementService;
+
+	@Autowired
+	private EventService eventService;
+
+	@Autowired
 	private ImportLocationsService importLocationsService;
 
 	@Autowired
+	private ImportLogService importLogService;
+
+	@Autowired
 	private ImportSportsBarService importSportsBarService;
-
-	@Autowired
-	private NotificationService notificationService;
-
-	@Autowired
-	private ChatService chatService;
-
-	@Autowired
-	private SitemapService sitemapService;
 
 	@Autowired
 	private IpService ipService;
@@ -72,6 +60,18 @@ public class CronService {
 
 	@Autowired
 	private MarketingLocationService marketingLocationService;
+
+	@Autowired
+	private NotificationService notificationService;
+
+	@Autowired
+	private RssService rssService;
+
+	@Autowired
+	private SitemapService sitemapService;
+
+	@Autowired
+	private SurveyService surveyService;
 
 	private static final Set<String> running = new HashSet<>();
 
