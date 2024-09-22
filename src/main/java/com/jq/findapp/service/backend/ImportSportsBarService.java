@@ -143,7 +143,7 @@ public class ImportSportsBarService {
 						location.setSkills("x.1");
 						location.setAddress(
 								location.getStreet()
-										+ (Strings.isEmail(location.getNumber()) ? "" : " " + location.getNumber())
+										+ (Strings.isEmpty(location.getNumber()) ? "" : " " + location.getNumber())
 										+ "\n" + location.getZipCode() + " " + location.getTown() + "\nDeutschland");
 						try {
 							repository.save(location);
