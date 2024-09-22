@@ -141,6 +141,7 @@ public class ImportSportsBarService {
 						location.setTown(l.get("address").get("city").asText());
 						location.setCountry(l.get("address").get("countryCode").asText());
 						location.setSkills("x.1");
+						location.setContactId(BigInteger.ONE);
 						location.setAddress(
 								location.getStreet()
 										+ (Strings.isEmpty(location.getNumber()) ? "" : " " + location.getNumber())

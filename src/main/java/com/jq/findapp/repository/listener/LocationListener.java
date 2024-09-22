@@ -57,11 +57,13 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 
 	@Override
 	public void postPersist(final Location location) {
-		final LocationFavorite locationFavorite = new LocationFavorite();
-		locationFavorite.setContactId(location.getContactId());
-		locationFavorite.setLocationId(location.getId());
-		locationFavorite.setFavorite(true);
-		repository.save(locationFavorite);
+		if (location.getContactId() != null && location.getContactId().compareTo(BigInteger.ONE) > 0) {
+			final LocationFavorite locationFavorite = new LocationFavorite();
+			locationFavorite.setContactId(location.getContactId());
+			locationFavorite.setLocationId(location.getId());
+			locationFavorite.setFavorite(true);
+			repository.save(locationFavorite);
+		}
 	}
 
 	private void checkDuplicateLatLon(Location location) {
