@@ -66,13 +66,13 @@ public class ImportSportsBarService {
 				}
 			}
 			result.body = "prefix " + zipCodePrefix + "*" +
-					"\nprocessed " + results.processed +
-					"\nimported " + results.imported +
-					"\nupdated " + results.updated +
-					"\nunchanged " + results.unchanged +
-					"\nalreadyImported " + results.alreadyImported +
-					"\nerrors " + results.errors +
-					"\nerrorsScroll " + results.errorsScroll;
+					(results.processed > 0 ? "\nprocessed " + results.processed : "") +
+					(results.imported > 0 ? "\nimported " + results.imported : "") +
+					(results.updated > 0 ? "\nupdated " + results.updated : "") +
+					(results.unchanged > 0 ? "\nunchanged " + results.unchanged : "") +
+					(results.alreadyImported > 0 ? "\nalreadyImported " + results.alreadyImported : "") +
+					(results.errors > 0 ? "\nerrors " + results.errors : "") +
+					(results.errorsScroll > 0 ? "\nerrorsScroll " + results.errorsScroll : "");
 		} catch (final Exception e) {
 			result.exception = e;
 		}
@@ -87,9 +87,9 @@ public class ImportSportsBarService {
 		nf.setMinimumFractionDigits(2);
 		nf.setMaximumFractionDigits(2);
 		int count = 0;
-		for (double longitude = longitudeMin; longitude < longitudeMax; longitude += delta) {
-			for (double latitude = latitudeMin; latitude < latitudeMax; latitude += delta) {
-				try {
+		try {
+			for (double longitude = longitudeMin; longitude < longitudeMax; longitude += delta) {
+				for (double latitude = latitudeMin; latitude < latitudeMax; latitude += delta) {
 					if (!new File("dazn/" + nf.format(longitude) + "-" + nf.format(latitude) + ".json").exists()) {
 						final String s = IOUtils.toString(new URI(URL2 + URLEncoder.encode("{\"gd\":{},\"region\":{"
 								+ "\"zoomLevel\":15"
@@ -106,11 +106,11 @@ public class ImportSportsBarService {
 							count++;
 						}
 					}
-				} catch (Exception ex) {
-					if (!"Not enough variable values available to expand '\"region\"'".equals(ex.getMessage()))
-						result.exception = ex;
 				}
 			}
+		} catch (Exception ex) {
+			result.exception = ex;
+
 		}
 		result.body = count + " imports";
 		return result;
