@@ -90,19 +90,21 @@ public class ImportSportsBarService {
 		for (double longitude = longitudeMin; longitude < longitudeMax; longitude += delta) {
 			for (double latitude = latitudeMin; latitude < latitudeMax; latitude += delta) {
 				try {
-					final String s = IOUtils.toString(new URI(URL2 + URLEncoder.encode("{\"gd\":{},\"region\":{"
-							+ "\"zoomLevel\":15"
-							+ ",\"minLat\":" + longitude
-							+ ",\"minLon\":" + latitude
-							+ ",\"maxLat\":" + (longitude + delta)
-							+ ",\"maxLon\":" + (latitude + delta)
-							+ "},\"featureFilter\":[]}", StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
-					if (s.contains("\"value\":[{\"")) {
-						IOUtils.write(s,
-								new FileOutputStream(
-										"dazn/" + nf.format(longitude) + "-" + nf.format(latitude) + ".json"),
-								StandardCharsets.UTF_8);
-						count++;
+					if (!new File("dazn/" + nf.format(longitude) + "-" + nf.format(latitude) + ".json").exists()) {
+						final String s = IOUtils.toString(new URI(URL2 + URLEncoder.encode("{\"gd\":{},\"region\":{"
+								+ "\"zoomLevel\":15"
+								+ ",\"minLat\":" + longitude
+								+ ",\"minLon\":" + latitude
+								+ ",\"maxLat\":" + (longitude + delta)
+								+ ",\"maxLon\":" + (latitude + delta)
+								+ "},\"featureFilter\":[]}", StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
+						if (s.contains("\"value\":[{\"")) {
+							IOUtils.write(s,
+									new FileOutputStream(
+											"dazn/" + nf.format(longitude) + "-" + nf.format(latitude) + ".json"),
+									StandardCharsets.UTF_8);
+							count++;
+						}
 					}
 				} catch (Exception ex) {
 					if (!"Not enough variable values available to expand '\"region\"'".equals(ex.getMessage()))
