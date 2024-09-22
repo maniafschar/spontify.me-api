@@ -380,6 +380,18 @@ public class EventService {
 		if (event.getRepetition() == Repetition.Games && !Strings.isEmpty(event.getSkills())
 				&& event.getSkills().startsWith("9.") && event.getLocationId() != null
 				&& !event.getSkills().contains("X")) {
+			if (event.getSeriesId() == null) {
+				final List<FutureEvent> futureEvents = matchDayService
+						.futureEvents(Integer.valueOf(event.getSkills().substring(2)));
+				if (!futureEvents.isEmpty()) {
+					final FutureEvent futureEvent = futureEvents.get(0);
+					event.setStartDate(new Timestamp(futureEvent.time - EventListener.SERIES_TIMELAP));
+					event.setSeriesId(futureEvent.time);
+					event.setDescription(futureEvent.subject + "\n" + event.getDescription().trim());
+					repository.save(event);
+				} else
+					return 0;
+			}
 			final List<FutureEvent> futureEvents = matchDayService
 					.futureEvents(Integer.valueOf(event.getSkills().substring(2)));
 			final String description = event.getDescription().contains("\n")
