@@ -11,6 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -117,7 +119,9 @@ public class ImportSportsBarService {
 	public CronResult runImport() {
 		final CronResult result = new CronResult();
 		int count = 0;
-		for (String file : new File("dazn").list()) {
+		final List<String> files = Arrays.asList(new File("dazn").list());
+		files.sort((a, b) -> a.compareTo(b));
+		for (String file : files) {
 			if (file.endsWith(".json")) {
 				try {
 					final JsonNode n = Json.toNode(IOUtils.toString(new FileInputStream(new File("dazn/" + file)),
