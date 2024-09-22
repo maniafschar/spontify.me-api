@@ -62,7 +62,7 @@ public class ImportSportsBarServiceTest {
 		Files.copy(getClass().getResourceAsStream("/json/52.73-7.75.json"), Path.of("dazn/52.73-7.75.json"));
 
 		// when
-		final CronResult result = importSportsBarService.runDazn2();
+		final CronResult result = importSportsBarService.runImport();
 
 		// then
 		assertNull(result.exception);
