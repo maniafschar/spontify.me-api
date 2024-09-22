@@ -7,8 +7,6 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -142,17 +140,30 @@ public class ImportSportsBarService {
 						location.setZipCode(l.get("address").get("zip").asText());
 						location.setTown(l.get("address").get("city").asText());
 						location.setCountry(l.get("address").get("countryCode").asText());
+						location.setSkills("x.1");
 						location.setAddress(
-								location.getStreet() + " " + location.getNumber() + "\n" + location.getZipCode()
-										+ " " + location.getTown() + "\nDeutschland");
-						repository.save(location);
-						count++;
+								location.getStreet()
+										+ (Strings.isEmail(location.getNumber()) ? "" : " " + location.getNumber())
+										+ "\n" + location.getZipCode() + " " + location.getTown() + "\nDeutschland");
+						try {
+							repository.save(location);
+							count++;
+						} catch (IllegalArgumentException ex) {
+							if (ex.getMessage().startsWith("location exists: ")) {
+								final Location loc = repository.one(Location.class,
+										new BigInteger(ex.getMessage().substring(17)));
+								if (Strings.isEmpty(loc.getSkills()) || !loc.getSkills().contains("x.1")) {
+									loc.setSkills(Strings.isEmpty(loc.getSkills()) ? "x.1" : loc.getSkills() + "|x.1");
+									repository.save(loc);
+								}
+							}
+						}
 					}
-					Files.move(Path.of("dazn/" + file), Path.of("dazn/" + file + ".processed"));
+					new File("dazn/" + file).delete();
 				} catch (Exception ex) {
 					result.exception = ex;
 				}
-				if (count > 1)
+				if (result.exception != null || count > 1)
 					break;
 			}
 		}
