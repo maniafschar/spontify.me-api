@@ -101,6 +101,9 @@ public class MarketingLocationService {
 						final Contact contact = new Contact();
 						contact.setLanguage("DE");
 						contact.setClientId(clientMarketing.getClientId());
+						if (poll.locationPrefix == null)
+							throw new RuntimeException(
+									"locationPrefix not set for clientMarketing.id " + clientMarketing.getId());
 						final String subject = text.getText(contact,
 								TextId.valueOf("marketing_" + poll.locationPrefix + "SubjectPrefix"))
 								+ "möchtest Du mehr Gäste?";
