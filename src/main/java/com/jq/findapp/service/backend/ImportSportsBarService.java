@@ -1,10 +1,14 @@
 package com.jq.findapp.service.backend;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -75,7 +79,7 @@ public class ImportSportsBarService {
 		return result;
 	}
 
-	public CronResult runDazn() {
+	public CronResult runFetch() {
 		final CronResult result = new CronResult();
 		final double longitudeMin = 47.27, longitudeMax = 54.92,
 				latitudeMin = 5.87, latitudeMax = 15.03, delta = 0.02;
@@ -104,6 +108,48 @@ public class ImportSportsBarService {
 					if (!"Not enough variable values available to expand '\"region\"'".equals(ex.getMessage()))
 						result.exception = ex;
 				}
+			}
+		}
+		result.body = count + " imports";
+		return result;
+	}
+
+	public CronResult runImport() {
+		final CronResult result = new CronResult();
+		int count = 0;
+		for (String file : new File("dazn").list()) {
+			if (file.endsWith(".json")) {
+				try {
+					final JsonNode n = Json.toNode(IOUtils.toString(new FileInputStream(new File("dazn/" + file)),
+							StandardCharsets.UTF_8));
+					for (int i = 0; i < n.get("value").size(); i++) {
+						final JsonNode l = n.get("value").get(i);
+						final Location location = new Location();
+						location.setName(l.get("name").asText());
+						location.setLatitude((float) l.get("address").get("latitude").asDouble());
+						location.setLongitude((float) l.get("address").get("longitude").asDouble());
+						location.setStreet(l.get("address").get("street").asText());
+						if (location.getStreet().contains(" ")) {
+							location.setNumber(
+									location.getStreet().substring(location.getStreet().lastIndexOf(" ") + 1));
+							location.setStreet(
+									location.getStreet().substring(0, location.getStreet().lastIndexOf(" ")));
+						}
+						location.setZipCode(l.get("address").get("zip").asText());
+						location.setTown(l.get("address").get("city").asText());
+						location.setCountry(l.get("address").get("countryCode").asText());
+						location.setAddress(
+								location.getStreet() + " " + location.getNumber() + "\n" + location.getZipCode()
+										+ " " + location.getTown() + "\nDeutschland");
+						repository.save(location);
+						count++;
+					}
+					Files.move(Path.of("dazn/" + file), Path.of("dazn/" + file + ".processed"));
+				} catch (Exception ex) {
+					result.exception = ex;
+				}
+				if (count > 1)
+					break;
 			}
 		}
 		result.body = count + " imports";

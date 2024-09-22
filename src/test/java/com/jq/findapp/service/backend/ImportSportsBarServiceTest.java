@@ -1,9 +1,13 @@
 package com.jq.findapp.service.backend;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,11 +57,15 @@ public class ImportSportsBarServiceTest {
 	@Test
 	public void runDazn() throws Exception {
 		// given
+		new File("dazn/52.73-7.75.json").delete();
+		new File("dazn/52.73-7.75.json.processed").delete();
+		Files.copy(getClass().getResourceAsStream("/json/52.73-7.75.json"), Path.of("dazn/52.73-7.75.json"));
 
 		// when
-		final CronResult result = importSportsBarService.runDazn();
+		final CronResult result = importSportsBarService.runDazn2();
 
 		// then
 		assertNull(result.exception);
+		assertEquals("5 imports", result.body);
 	}
 }

@@ -1,0 +1,77 @@
+{
+	"value": [
+		{
+			"id": "j27cFWHhJ1US",
+			"name": "Die Schöne Kneipe",
+			"address": {
+				"latitude": 52.734799,
+				"longitude": 7.7605204,
+				"street": "Im Winkel 8",
+				"zip": "49624",
+				"city": "Löningen",
+				"countryCode": "DE"
+			},
+			"rating": 0.0,
+			"sports": "⚽"
+		},
+		{
+			"id": "IKqta8lHbckI",
+			"name": "Gaststätte Treffpunkt",
+			"address": {
+				"latitude": 52.7327145,
+				"longitude": 7.7619265,
+				"street": "Hasestr. 2",
+				"zip": "49624",
+				"city": "Löningen",
+				"countryCode": "DE"
+			},
+			"rating": 0.0,
+			"sports": "⚽"
+		},
+		{
+			"id": "Zpke6SzA0Nlz",
+			"name": "Cappuccino Löningen",
+			"address": {
+				"latitude": 52.7333272,
+				"longitude": 7.7593535,
+				"street": "Langenstraße 35",
+				"zip": "49624",
+				"city": "Löningen",
+				"countryCode": "DE"
+			},
+			"rating": 4.208333333333333,
+			"sports": "⚽"
+		},
+		{
+			"id": "V1XGyxxT8dFj",
+			"name": "Giuseppe Mio Eiscafe Colosseo",
+			"address": {
+				"latitude": 52.7332976,
+				"longitude": 7.7592689,
+				"street": "Langenstraße 33",
+				"zip": "49624",
+				"city": "Löningen",
+				"countryCode": "DE"
+			},
+			"rating": 4.791666666666667,
+			"sports": "⚽"
+		},
+		{
+			"id": "0gE5qquGKN6K",
+			"name": "VFL Löningen Clubhaus",
+			"address": {
+				"latitude": 52.7384419,
+				"longitude": 7.7620865,
+				"street": "Meerdorfer Str.",
+				"zip": "49624",
+				"city": "Löningen",
+				"countryCode": "DE"
+			},
+			"rating": 0.0,
+			"sports": "⚽"
+		}
+	],
+	"rd": {
+		"statusCode": 200
+	}
+}
