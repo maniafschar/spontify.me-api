@@ -237,6 +237,9 @@ public class MarketingLocationService {
 						final Contact contact = new Contact();
 						contact.setLanguage("DE");
 						contact.setClientId(clientMarketing.getClientId());
+						if (Strings.isEmpty(poll.locationPrefix))
+							throw new RuntimeException(
+									"no poll.locationPrefix for clientMarketing.id " + clientMarketing.getId());
 						final String subject2 = text.getText(contact,
 								TextId.valueOf("marketing_" + poll.locationPrefix + "SubjectPrefix")) + subject;
 						final ContactMarketing contactMarketing = repository.one(ContactMarketing.class,
