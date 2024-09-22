@@ -157,7 +157,9 @@ public class ImportSportsBarService {
 									loc.setSkills(Strings.isEmpty(loc.getSkills()) ? "x.1" : loc.getSkills() + "|x.1");
 									repository.save(loc);
 								}
-							}
+							} else
+								notificationService.createTicket(TicketType.ERROR, "importSportBar",
+										Strings.stackTraceToString(ex), BigInteger.ONE);
 						}
 					}
 					new File("dazn/" + file).delete();
