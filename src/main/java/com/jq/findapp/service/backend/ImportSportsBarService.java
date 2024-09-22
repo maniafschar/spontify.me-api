@@ -1,5 +1,6 @@
 package com.jq.findapp.service.backend;
 
+import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -36,7 +37,6 @@ public class ImportSportsBarService {
 
 	private static final String URL = "https://skyfinder.sky.de/sf/skyfinder.servlet?";
 	private static final String URL2 = "https://api.sportsbarfinder.net/map?rq=";
-	// {"region":{"zoomLevel":15,"minLon":11.538975286077866,"minLat":48.13194161850865,"maxLon":11.59755473096312,"maxLat":48.1562533027202}}
 
 	public CronResult run() {
 		final CronResult result = new CronResult();
@@ -66,9 +66,49 @@ public class ImportSportsBarService {
 					"\nalreadyImported " + results.alreadyImported +
 					"\nerrors " + results.errors +
 					"\nerrorsScroll " + results.errorsScroll;
+			final double longitudeMax = 54.92, latitudeMin = 5.88, longitudeMin = 47.27, latitudeMax = 15.03,
+					delta = 0.02;
+			for (double longitude = longitudeMin; longitude < longitudeMax; longitude += delta) {
+				for (double latitude = latitudeMin; latitude < latitudeMax; latitude += delta) {
+					final String s = WebClient
+							.create(URL2 + "{\"region\":{\"zoomLevel\":15,\"minLon\":" + longitude + ",\"minLat\":"
+									+ latitude + ",\"maxLon\":" + (longitude + delta) + ",\"maxLat\":"
+									+ (latitude + delta) + "}}")
+							.get().accept(MediaType.APPLICATION_JSON)
+							.retrieve().bodyToMono(String.class).block();
+					IOUtils.write(s, new FileOutputStream("dazn/" + longitude + "-" + latitude + ".json"),
+							StandardCharsets.UTF_8);
+				}
+			}
 		} catch (final Exception e) {
 			result.exception = e;
 		}
+		return result;
+	}
+
+	public CronResult runDazn() {
+		final CronResult result = new CronResult();
+		final double longitudeMax = 54.92, latitudeMin = 5.88, longitudeMin = 47.27, latitudeMax = 15.03,
+				delta = 0.02;
+		int count = 0;
+		for (double longitude = longitudeMin; longitude < longitudeMax; longitude += delta) {
+			for (double latitude = latitudeMin; latitude < latitudeMax; latitude += delta) {
+				try {
+					final String s = WebClient
+							.create(URL2 + "{\"region\":{\"zoomLevel\":15,\"minLon\":" + longitude + ",\"minLat\":"
+									+ latitude + ",\"maxLon\":" + (longitude + delta) + ",\"maxLat\":"
+									+ (latitude + delta) + "}}")
+							.get().accept(MediaType.APPLICATION_JSON)
+							.retrieve().bodyToMono(String.class).block();
+					IOUtils.write(s, new FileOutputStream("dazn/" + longitude + "-" + latitude + ".json"),
+							StandardCharsets.UTF_8);
+					count++;
+				} catch (Exception ex) {
+					result.exception = ex;
+				}
+			}
+		}
+		result.body = count + " imports";
 		return result;
 	}
 

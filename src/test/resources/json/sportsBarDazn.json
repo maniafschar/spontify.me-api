@@ -1,0 +1,608 @@
+{
+	"value": [
+		{
+			"id": "4VTlo7muqy6b",
+			"name": "La Cucaracha Gastronomie GmbH",
+			"address": {
+				"latitude": 48.1390143,
+				"longitude": 11.5563582,
+				"street": "Bayerstraße 49",
+				"zip": "80335",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 5.0,
+			"sports": "⚽🏒🏀🥊🏌🎾🏍️🤼"
+		},
+		{
+			"id": "DTWrQu4nR1s0",
+			"name": "Stadion an der Schleißheimerstraße",
+			"address": {
+				"latitude": 48.15391,
+				"longitude": 11.56121,
+				"street": "Schleißheimer Straße 82",
+				"zip": "80797",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.9,
+			"sports": "⚽"
+		},
+		{
+			"id": "0wmz3VHO6t7j",
+			"name": "Cafe Hajduk",
+			"address": {
+				"latitude": 48.1362781,
+				"longitude": 11.5541553,
+				"street": "Landwehrstraße 81",
+				"zip": "80336",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.857142857142857,
+			"sports": "⚽"
+		},
+		{
+			"id": "WO82C4RNMyLC",
+			"name": "Fan Arena, Der Rot-Weiße Fan Treff",
+			"address": {
+				"latitude": 48.1419227,
+				"longitude": 11.5581821,
+				"street": "Arnulfstraße 16",
+				"zip": "80335",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.85,
+			"sports": "⚽🏒🏀🏎️🥊🏌🎾🏍️🤼"
+		},
+		{
+			"id": "o7stYdtoleNx",
+			"name": "Landhaus",
+			"address": {
+				"latitude": 48.1366287,
+				"longitude": 11.5807999,
+				"street": "Marienstraße 2",
+				"zip": "80331",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.75,
+			"sports": "⚽"
+		},
+		{
+			"id": "h9y9nd0Pbrdl",
+			"name": "Klenze 17",
+			"address": {
+				"latitude": 48.1329228,
+				"longitude": 11.5783216,
+				"street": "Klenzestraße 17",
+				"zip": "80469",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.7,
+			"sports": ""
+		},
+		{
+			"id": "WB1a3AQaHggB",
+			"name": "Krua Thai Imbiss",
+			"address": {
+				"latitude": 48.1435311,
+				"longitude": 11.5601756,
+				"street": "Dachauer Straße 20",
+				"zip": "80335",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.685714285714286,
+			"sports": "⚽"
+		},
+		{
+			"id": "GsFl2PCAHxw7",
+			"name": "Zum Jagerhansl (bei Toni)",
+			"address": {
+				"latitude": 48.153516,
+				"longitude": 11.5657046,
+				"street": "Augustenstraße 107",
+				"zip": "80798",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.666666666666667,
+			"sports": "⚽"
+		},
+		{
+			"id": "eCTu1mG8LKl9",
+			"name": "Cafe Bar Shakespeare",
+			"address": {
+				"latitude": 48.142613,
+				"longitude": 11.556723,
+				"street": "Seidlstraße 2A",
+				"zip": "80335",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.65,
+			"sports": "⚽"
+		},
+		{
+			"id": "h7wSf29R6F5v",
+			"name": "Wirtshaus im Braunauer Hof",
+			"address": {
+				"latitude": 48.1344508,
+				"longitude": 11.581173,
+				"street": "Frauenstraße 42",
+				"zip": "80469",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.56,
+			"sports": "⚽"
+		},
+		{
+			"id": "cPgkkOnQZ32C",
+			"name": "Cafe Bar Jia Mas",
+			"address": {
+				"latitude": 48.1358202,
+				"longitude": 11.5415593,
+				"street": "Gollierstraße 30",
+				"zip": "80339",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.526315789473684,
+			"sports": "⚽"
+		},
+		{
+			"id": "UkiXso6N38n1",
+			"name": "Wirtshaus Maxvorstadt",
+			"address": {
+				"latitude": 48.1492663,
+				"longitude": 11.5627189,
+				"street": "Augustenstraße 53",
+				"zip": "80333",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.5227272727272725,
+			"sports": "⚽"
+		},
+		{
+			"id": "cHGgEf7Lu4YL",
+			"name": "Ned Kelly´s",
+			"address": {
+				"latitude": 48.1387203,
+				"longitude": 11.5747254,
+				"street": "Frauenplatz 11",
+				"zip": "80331",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.410256410256411,
+			"sports": "⚽🏈"
+		},
+		{
+			"id": "ggS1XN5sO6so",
+			"name": "Diogenis Taverne",
+			"address": {
+				"latitude": 48.137538,
+				"longitude": 11.56671,
+				"street": "Herzog-Wilhelm-Straße 7",
+				"zip": "80331",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.379310344827586,
+			"sports": "⚽"
+		},
+		{
+			"id": "NrzzKiQ4ghUE",
+			"name": "Riva Bar Pizzeria Tal",
+			"address": {
+				"latitude": 48.1353055,
+				"longitude": 11.581134,
+				"street": "Tal 44",
+				"zip": "80331",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.371428571428571,
+			"sports": "⚽"
+		},
+		{
+			"id": "vswSkBkUYxT3",
+			"name": "Kurfürstenstüberl",
+			"address": {
+				"latitude": 48.1543504,
+				"longitude": 11.5763974,
+				"street": "Kurfürstenstraße 8",
+				"zip": "80799",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.363636363636363,
+			"sports": "⚽🏒🏀🏎️🥊🏌🎾🏍️🤼"
+		},
+		{
+			"id": "SW4b72UzlVwz",
+			"name": "Buri's Bar",
+			"address": {
+				"latitude": 48.1416882,
+				"longitude": 11.5601879,
+				"street": "Arnulfstraße 2",
+				"zip": "80335",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.333333333333333,
+			"sports": "⚽"
+		},
+		{
+			"id": "niBLARTZYcFg",
+			"name": "Pasto",
+			"address": {
+				"latitude": 48.1419672,
+				"longitude": 11.5579728,
+				"street": "Arnulfstraße 18",
+				"zip": "80335",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.3125,
+			"sports": "⚽"
+		},
+		{
+			"id": "gDZXK9BCo3CR",
+			"name": "Café Philoma",
+			"address": {
+				"latitude": 48.148647,
+				"longitude": 11.5593924,
+				"street": "Schleißheimer Straße 12",
+				"zip": "80333",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.285714285714286,
+			"sports": "🎱 + ⚽"
+		},
+		{
+			"id": "P9OjR9qb3gjh",
+			"name": "Weiberwirtschaft",
+			"address": {
+				"latitude": 48.1354441,
+				"longitude": 11.5817643,
+				"street": "Tal 43",
+				"zip": "80331",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.2631578947368425,
+			"sports": "⚽🏒🏀🏎️🥊🏌🎾🏍️🤼"
+		},
+		{
+			"id": "K38QZO1a5OXX",
+			"name": "mœjo91münchen - Bar & LoungeClub",
+			"address": {
+				"latitude": 48.151879,
+				"longitude": 11.569519,
+				"street": "Schellingstraße 91",
+				"zip": "80799",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.260869565217392,
+			"sports": "⚽🏒🏀🏎️🥊🎾"
+		},
+		{
+			"id": "ivHH3ZanV7Me",
+			"name": "Atzinger",
+			"address": {
+				"latitude": 48.1495517,
+				"longitude": 11.5782029,
+				"street": "Schellingstraße 9",
+				"zip": "80799",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.23404255319149,
+			"sports": "⚽🏒"
+		},
+		{
+			"id": "4B0vYv9Dz2D6",
+			"name": "Hard Rock Cafe München",
+			"address": {
+				"latitude": 48.13771,
+				"longitude": 11.57958,
+				"street": "Platzl 1",
+				"zip": "80331",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.229166666666667,
+			"sports": "⚽🏒🏎️"
+		},
+		{
+			"id": "REqbHOno8yyn",
+			"name": "FORUM Essen. Trinken.",
+			"address": {
+				"latitude": 48.1327115,
+				"longitude": 11.5743469,
+				"street": "Corneliusstraße 2",
+				"zip": "80469",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.2,
+			"sports": "⚽"
+		},
+		{
+			"id": "VDe5GZ8sXXuk",
+			"name": "Türkenhof",
+			"address": {
+				"latitude": 48.1513621,
+				"longitude": 11.5768698,
+				"street": "Türkenstraße 78",
+				"zip": "80799",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.1875,
+			"sports": "🥅 + ⚽🏒🥊🏍️"
+		},
+		{
+			"id": "tL10eXddAnsV",
+			"name": "Lokal Kennedys Bar & Restaurant",
+			"address": {
+				"latitude": 48.13405,
+				"longitude": 11.56705,
+				"street": "Sendlinger-Tor-Platz 11",
+				"zip": "80336",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.15,
+			"sports": "⚽🥊🏉🏏"
+		},
+		{
+			"id": "U2izwWTzPdgb",
+			"name": "Ratskeller",
+			"address": {
+				"latitude": 48.137327,
+				"longitude": 11.576052,
+				"street": "Marienplatz 8",
+				"zip": "80331",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.136363636363637,
+			"sports": "⚽"
+		},
+		{
+			"id": "XkGVQPIDLz7e",
+			"name": "Cafe Bar Mellow",
+			"address": {
+				"latitude": 48.15452,
+				"longitude": 11.55275,
+				"street": "Dachauer Straße 159",
+				"zip": "80636",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.125,
+			"sports": "⚽"
+		},
+		{
+			"id": "48DnJfcifWDD",
+			"name": "TEGERNSEER TAL - Bräuhaus",
+			"address": {
+				"latitude": 48.13597,
+				"longitude": 11.57825,
+				"street": "Tal 8",
+				"zip": "80331",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.076923076923077,
+			"sports": "⚽"
+		},
+		{
+			"id": "0Lg7M5vClIWG",
+			"name": "Münchner Stubn",
+			"address": {
+				"latitude": 48.139,
+				"longitude": 11.55932,
+				"street": "Bayerstraße 35",
+				"zip": "80335",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.017543859649122,
+			"sports": "⚽"
+		},
+		{
+			"id": "t9AyoBdbGzGj",
+			"name": "Andechser am Dom",
+			"address": {
+				"latitude": 48.138408,
+				"longitude": 11.574582,
+				"street": "Weinstraße 7A",
+				"zip": "80333",
+				"city": "München",
+				"countryCode": "DE"
+			},
+			"rating": 4.0,
+			"sports": "⚽🏒🏀🏎️🥊🏌🎾🤼"
+		}
+	],
+	"exceededMaxResults": true,
+	"exceededResults": [
+		{
+			"lat": 48.1322,
+			"lng": 11.5688
+		},
+		{
+			"lat": 48.1382,
+			"lng": 11.5589
+		},
+		{
+			"lat": 48.1383,
+			"lng": 11.5657
+		},
+		{
+			"lat": 48.1474,
+			"lng": 11.5767
+		},
+		{
+			"lat": 48.1363,
+			"lng": 11.5797
+		},
+		{
+			"lat": 48.1365,
+			"lng": 11.5619
+		},
+		{
+			"lat": 48.1544,
+			"lng": 11.5617
+		},
+		{
+			"lat": 48.135,
+			"lng": 11.5393
+		},
+		{
+			"lat": 48.1357,
+			"lng": 11.5775
+		},
+		{
+			"lat": 48.1392,
+			"lng": 11.5638
+		},
+		{
+			"lat": 48.1382,
+			"lng": 11.574
+		},
+		{
+			"lat": 48.1495,
+			"lng": 11.5813
+		},
+		{
+			"lat": 48.1505,
+			"lng": 11.5756
+		},
+		{
+			"lat": 48.138,
+			"lng": 11.5646
+		},
+		{
+			"lat": 48.1328,
+			"lng": 11.576
+		},
+		{
+			"lat": 48.1341,
+			"lng": 11.5799
+		},
+		{
+			"lat": 48.138,
+			"lng": 11.5798
+		},
+		{
+			"lat": 48.1382,
+			"lng": 11.5802
+		},
+		{
+			"lat": 48.1487,
+			"lng": 11.5733
+		},
+		{
+			"lat": 48.1389,
+			"lng": 11.5613
+		},
+		{
+			"lat": 48.1375,
+			"lng": 11.5609
+		},
+		{
+			"lat": 48.1447,
+			"lng": 11.5629
+		},
+		{
+			"lat": 48.1408,
+			"lng": 11.5677
+		},
+		{
+			"lat": 48.141,
+			"lng": 11.5621
+		},
+		{
+			"lat": 48.1362,
+			"lng": 11.5478
+		},
+		{
+			"lat": 48.1442,
+			"lng": 11.5849
+		},
+		{
+			"lat": 48.1553,
+			"lng": 11.5841
+		},
+		{
+			"lat": 48.1556,
+			"lng": 11.5826
+		},
+		{
+			"lat": 48.1481,
+			"lng": 11.5756
+		},
+		{
+			"lat": 48.1384,
+			"lng": 11.5613
+		},
+		{
+			"lat": 48.1389,
+			"lng": 11.5778
+		},
+		{
+			"lat": 48.1413,
+			"lng": 11.5851
+		},
+		{
+			"lat": 48.1487,
+			"lng": 11.5594
+		},
+		{
+			"lat": 48.1324,
+			"lng": 11.5974
+		},
+		{
+			"lat": 48.1389,
+			"lng": 11.5505
+		},
+		{
+			"lat": 48.1539,
+			"lng": 11.5612
+		},
+		{
+			"lat": 48.1376,
+			"lng": 11.5641
+		},
+		{
+			"lat": 48.1393,
+			"lng": 11.547
+		},
+		{
+			"lat": 48.1384,
+			"lng": 11.5613
+		},
+		{
+			"lat": 48.1345,
+			"lng": 11.543
+		},
+		{
+			"lat": 48.1375,
+			"lng": 11.5632
+		}
+	],
+	"rd": {
+		"statusCode": 200
+	}
+}
