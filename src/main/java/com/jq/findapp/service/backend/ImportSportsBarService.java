@@ -66,20 +66,6 @@ public class ImportSportsBarService {
 					"\nalreadyImported " + results.alreadyImported +
 					"\nerrors " + results.errors +
 					"\nerrorsScroll " + results.errorsScroll;
-			final double longitudeMax = 54.92, latitudeMin = 5.88, longitudeMin = 47.27, latitudeMax = 15.03,
-					delta = 0.02;
-			for (double longitude = longitudeMin; longitude < longitudeMax; longitude += delta) {
-				for (double latitude = latitudeMin; latitude < latitudeMax; latitude += delta) {
-					final String s = WebClient
-							.create(URL2 + "{\"region\":{\"zoomLevel\":15,\"minLon\":" + longitude + ",\"minLat\":"
-									+ latitude + ",\"maxLon\":" + (longitude + delta) + ",\"maxLat\":"
-									+ (latitude + delta) + "}}")
-							.get().accept(MediaType.APPLICATION_JSON)
-							.retrieve().bodyToMono(String.class).block();
-					IOUtils.write(s, new FileOutputStream("dazn/" + longitude + "-" + latitude + ".json"),
-							StandardCharsets.UTF_8);
-				}
-			}
 		} catch (final Exception e) {
 			result.exception = e;
 		}
@@ -95,9 +81,8 @@ public class ImportSportsBarService {
 			for (double latitude = latitudeMin; latitude < latitudeMax; latitude += delta) {
 				try {
 					final String s = WebClient
-							.create(URL2 + "{\"region\":{\"zoomLevel\":15,\"minLon\":" + longitude + ",\"minLat\":"
-									+ latitude + ",\"maxLon\":" + (longitude + delta) + ",\"maxLat\":"
-									+ (latitude + delta) + "}}")
+							.create(URL2 + "%7B%22region%22%3A%7B%22zoomLevel%22%3A15%2C%22minLon%22%3A" + longitude
+									+ "%2C%22minLat%22%3A" + latitude + "%7D%7D")
 							.get().accept(MediaType.APPLICATION_JSON)
 							.retrieve().bodyToMono(String.class).block();
 					IOUtils.write(s, new FileOutputStream("dazn/" + longitude + "-" + latitude + ".json"),

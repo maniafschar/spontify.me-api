@@ -23,8 +23,8 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.service.EventService;
-import com.jq.findapp.service.backend.SurveyService;
-import com.jq.findapp.service.backend.SurveyService.FutureEvent;
+import com.jq.findapp.service.backend.MatchDayService;
+import com.jq.findapp.service.backend.MatchDayService.FutureEvent;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text.TextId;
 
@@ -36,7 +36,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	private EventService eventService;
 
 	@Autowired
-	private SurveyService surveyService;
+	private MatchDayService matchDayService;
 
 	@Override
 	public void prePersist(final Event event) {
@@ -61,7 +61,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 				}
 				throw new IllegalArgumentException("event series exists: " + id);
 			}
-			final List<FutureEvent> futureEvents = surveyService
+			final List<FutureEvent> futureEvents = matchDayService
 					.futureEvents(Integer.valueOf(event.getSkills().substring(2)));
 			if (!futureEvents.isEmpty()) {
 				final FutureEvent futureEvent = futureEvents.get(0);

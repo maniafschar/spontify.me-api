@@ -42,7 +42,7 @@ import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.EventService;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService.MailCreateor;
-import com.jq.findapp.service.backend.SurveyService;
+import com.jq.findapp.service.backend.MatchDayService;
 import com.jq.findapp.util.Json;
 
 @Profile("test")
@@ -140,7 +140,7 @@ public class TestConfig {
 
 	@Service
 	@Primary
-	public class SurveyServiceMock extends SurveyService {
+	public class MatchDayServiceMock extends MatchDayService {
 		public int offset = 0;
 
 		@Override
@@ -149,7 +149,8 @@ public class TestConfig {
 				final Instant now = Instant.now();
 				final String s = IOUtils.toString(
 						getClass().getResourceAsStream(
-								url.startsWith("id=") ? "/json/surveyLastMatch.json" : "/json/surveyMatchdays.json"),
+								url.startsWith("id=") ? "/json/matchDaysLastMatch.json"
+										: "/json/matchDays.json"),
 						StandardCharsets.UTF_8);
 				return Json.toNode(
 						s.replace("\"{date}\"",

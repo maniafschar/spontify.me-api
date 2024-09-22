@@ -27,22 +27,22 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
-import com.jq.findapp.TestConfig.SurveyServiceMock;
+import com.jq.findapp.TestConfig.MatchDayServiceMock;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.backend.CronService.CronResult;
-import com.jq.findapp.service.backend.SurveyService.PollSurvey;
+import com.jq.findapp.service.backend.MatchDayService.PollMatchDay;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = { FindappApplication.class, TestConfig.class })
 @ActiveProfiles("test")
-public class SurveyServiceTest {
+public class MatchDayServiceTest {
 	@Autowired
-	private SurveyService surveyService;
+	private MatchDayService matchDayService;
 
 	@Autowired
 	private Utils utils;
@@ -52,18 +52,18 @@ public class SurveyServiceTest {
 
 	@BeforeEach
 	public void before() {
-		((SurveyServiceMock) surveyService).offset = 0;
+		((MatchDayServiceMock) matchDayService).offset = 0;
 	}
 
 	@Test
 	public void update_twice() throws Exception {
 		// given
 		utils.createContact(BigInteger.valueOf(4));
-		CronResult result = surveyService.run();
+		CronResult result = matchDayService.run();
 		assertNull(result.exception);
 
 		// when
-		result = surveyService.run();
+		result = matchDayService.run();
 
 		// then
 		assertNull(result.exception);
@@ -74,8 +74,8 @@ public class SurveyServiceTest {
 	public void poll() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
-		((SurveyServiceMock) surveyService).offset = -2 * 60 * 60;
-		final BigInteger clientMarketingId = surveyService.synchronize.playerOfTheMatch(BigInteger.ONE, 0);
+		((MatchDayServiceMock) matchDayService).offset = -2 * 60 * 60;
+		final BigInteger clientMarketingId = matchDayService.synchronize.playerOfTheMatch(BigInteger.ONE, 0);
 
 		// when
 		final String result = result(clientMarketingId);
@@ -88,7 +88,7 @@ public class SurveyServiceTest {
 	public void prediction() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
-		final BigInteger clientMarketingId = surveyService.synchronize.prediction(BigInteger.ONE, 0);
+		final BigInteger clientMarketingId = matchDayService.synchronize.prediction(BigInteger.ONE, 0);
 
 		// when
 		final String result = result(clientMarketingId);
@@ -101,7 +101,7 @@ public class SurveyServiceTest {
 	public void prediction_withHistory() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
-		final BigInteger clientMarketingId = surveyService.synchronize.prediction(BigInteger.ONE, 0);
+		final BigInteger clientMarketingId = matchDayService.synchronize.prediction(BigInteger.ONE, 0);
 
 		// when
 		final String result = result(clientMarketingId);
@@ -144,12 +144,12 @@ public class SurveyServiceTest {
 		storage.put("storage.createdAt", new Timestamp(Instant.now().toEpochMilli()));
 		storage.put("storage.storage", IOUtils.toString(
 				getClass().getResourceAsStream(
-						"/json/surveyMatchdays.json"),
+						"/json/matchDays.json"),
 				StandardCharsets.UTF_8).replace("\"{dateTBD}\"",
 						"" + (long) (Instant.now().plus(Duration.ofDays(15)).getEpochSecond())));
 
 		// when
-		final JsonNode cache = surveyService.needUpdate(storage);
+		final JsonNode cache = matchDayService.needUpdate(storage);
 
 		// then
 		assertNotNull(cache);
@@ -163,12 +163,12 @@ public class SurveyServiceTest {
 		storage.put("storage.modifiedAt", new Timestamp(Instant.now().minus(Duration.ofHours(25)).toEpochMilli()));
 		storage.put("storage.storage", IOUtils.toString(
 				getClass().getResourceAsStream(
-						"/json/surveyMatchdays.json"),
+						"/json/matchDays.json"),
 				StandardCharsets.UTF_8).replace("\"{dateTBD}\"",
 						"" + (long) (Instant.now().plus(Duration.ofDays(14)).getEpochSecond())));
 
 		// when
-		final JsonNode cache = surveyService.needUpdate(storage);
+		final JsonNode cache = matchDayService.needUpdate(storage);
 
 		// then
 		assertNull(cache);
@@ -182,12 +182,12 @@ public class SurveyServiceTest {
 		storage.put("storage.modifiedAt", new Timestamp(Instant.now().minus(Duration.ofHours(1)).toEpochMilli()));
 		storage.put("storage.storage", IOUtils.toString(
 				getClass().getResourceAsStream(
-						"/json/surveyMatchdays.json"),
+						"/json/matchDays.json"),
 				StandardCharsets.UTF_8).replace("\"{dateTBD}\"",
 						"" + (long) (Instant.now().plus(Duration.ofDays(14)).getEpochSecond())));
 
 		// when
-		final JsonNode cache = surveyService.needUpdate(storage);
+		final JsonNode cache = matchDayService.needUpdate(storage);
 
 		// then
 		assertNotNull(cache);
@@ -200,7 +200,7 @@ public class SurveyServiceTest {
 				StandardCharsets.UTF_8);
 
 		// when
-		final PollSurvey result = Json.toObject(json, PollSurvey.class);
+		final PollMatchDay result = Json.toObject(json, PollMatchDay.class);
 
 		// then
 		assertEquals("Prediction", result.type);
@@ -234,8 +234,8 @@ public class SurveyServiceTest {
 
 	private String result(final BigInteger clientMarketingId) throws Exception {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
-		final PollSurvey poll = Json.toObject(Attachment.resolve(clientMarketing.getStorage()),
-				PollSurvey.class);
+		final PollMatchDay poll = Json.toObject(Attachment.resolve(clientMarketing.getStorage()),
+				PollMatchDay.class);
 		final int max = (int) (10 + Math.random() * 100);
 		for (int i = 0; i < max; i++) {
 			final ContactMarketing contactMarketing = new ContactMarketing();
@@ -248,6 +248,6 @@ public class SurveyServiceTest {
 		}
 		clientMarketing.setEndDate(new Timestamp(System.currentTimeMillis() - 1000));
 		repository.save(clientMarketing);
-		return surveyService.synchronize.result(clientMarketing.getClientId());
+		return matchDayService.synchronize.result(clientMarketing.getClientId());
 	}
 }

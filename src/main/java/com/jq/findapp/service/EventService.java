@@ -44,8 +44,8 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.repository.listener.EventListener;
 import com.jq.findapp.service.backend.CronService.CronResult;
-import com.jq.findapp.service.backend.SurveyService;
-import com.jq.findapp.service.backend.SurveyService.FutureEvent;
+import com.jq.findapp.service.backend.MatchDayService;
+import com.jq.findapp.service.backend.MatchDayService.FutureEvent;
 import com.jq.findapp.service.backend.events.ImportMunich;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Score;
@@ -71,7 +71,7 @@ public class EventService {
 	private ImportMunich importMunich;
 
 	@Autowired
-	private SurveyService surveyService;
+	private MatchDayService matchDayService;
 
 	public static List<String> getAnswers(JsonNode poll, long state) {
 		final List<String> answers = new ArrayList<>();
@@ -380,7 +380,7 @@ public class EventService {
 		if (event.getRepetition() == Repetition.Games && !Strings.isEmpty(event.getSkills())
 				&& event.getSkills().startsWith("9.") && event.getLocationId() != null
 				&& !event.getSkills().contains("X")) {
-			final List<FutureEvent> futureEvents = surveyService
+			final List<FutureEvent> futureEvents = matchDayService
 					.futureEvents(Integer.valueOf(event.getSkills().substring(2)));
 			final String description = event.getDescription().contains("\n")
 					? event.getDescription().substring(event.getDescription().indexOf("\n"))

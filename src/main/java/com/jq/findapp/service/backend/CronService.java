@@ -59,6 +59,9 @@ public class CronService {
 	private MarketingService marketingService;
 
 	@Autowired
+	private MatchDayService matchDayService;
+
+	@Autowired
 	private MarketingLocationService marketingLocationService;
 
 	@Autowired
@@ -69,9 +72,6 @@ public class CronService {
 
 	@Autowired
 	private SitemapService sitemapService;
-
-	@Autowired
-	private SurveyService surveyService;
 
 	private static final Set<String> running = new HashSet<>();
 
@@ -107,7 +107,7 @@ public class CronService {
 			run(eventService, "Series", list, "40 23", now);
 			run(importLogService, null, list, null, now);
 			run(rssService, null, list, null, now);
-			run(surveyService, null, list, null, now);
+			run(matchDayService, null, list, null, now);
 			run(importLocationsService, null, list, "50 0", now);
 			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 					.map(CompletableFuture::join).collect(Collectors.toList())).join();

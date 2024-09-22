@@ -59,7 +59,7 @@ import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text.TextId;
 
 @Service
-public class SurveyService {
+public class MatchDayService {
 	final Synchonize synchronize = new Synchonize();
 	private final Image image = new Image();
 
@@ -78,7 +78,7 @@ public class SurveyService {
 	private static volatile long pauseUntil = 0;
 	private static final String STORAGE_PREFIX = "api-sports-";
 
-	static class PollSurvey extends Poll {
+	static class PollMatchDay extends Poll {
 		public String type;
 		public String home;
 		public String away;
@@ -107,7 +107,7 @@ public class SurveyService {
 					final Instant date = Instant
 							.ofEpochSecond(json.get(i).get("fixture").get("timestamp").asLong());
 					if (date.getEpochSecond() >= now && date.minus(Duration.ofDays(1)).getEpochSecond() < now) {
-						final PollSurvey poll = new PollSurvey();
+						final PollMatchDay poll = new PollMatchDay();
 						poll.type = "Prediction";
 						poll.home = json.get(i).get("teams").get("home").get("logo").asText();
 						poll.away = json.get(i).get("teams").get("away").get("logo").asText();
@@ -154,7 +154,7 @@ public class SurveyService {
 			return null;
 		}
 
-		private void predictionAddStatistics(final BigInteger clientId, final PollSurvey poll) throws Exception {
+		private void predictionAddStatistics(final BigInteger clientId, final PollMatchDay poll) throws Exception {
 			final Question question = new Question();
 			question.question = "Erzielen wir eines der letzten Ergebnisse?";
 			question.textField = "text";
@@ -266,7 +266,7 @@ public class SurveyService {
 								JsonNode players = matchDay.findPath("players");
 								players = players.get(players.get(0).get("team").get("id").asInt() == teamId ? 0 : 1)
 										.get("players");
-								final PollSurvey poll = new PollSurvey();
+								final PollMatchDay poll = new PollMatchDay();
 								poll.type = "PlayerOfTheMatch";
 								poll.home = matchDay.findPath("home").get("logo").asText();
 								poll.away = matchDay.findPath("away").get("logo").asText();
@@ -373,10 +373,10 @@ public class SurveyService {
 			for (int i = 0; i < list.size(); i++) {
 				final ClientMarketingResult clientMarketingResult = marketingService.synchronizeResult(
 						(BigInteger) list.get(i).get("clientMarketing.id"));
-				final PollSurvey poll = Json.toObject(Attachment.resolve(
+				final PollMatchDay poll = Json.toObject(Attachment.resolve(
 						repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId())
 								.getStorage()),
-						PollSurvey.class);
+						PollMatchDay.class);
 				if (Json.toObject(Attachment.resolve(clientMarketingResult.getStorage()),
 						PollResult.class).answers.size() > 0) {
 					String prefix;
@@ -399,14 +399,16 @@ public class SurveyService {
 		private String updateMatchdays(final BigInteger clientId) throws Exception {
 			final JsonNode json = Json.toNode(Attachment.resolve(repository.one(Client.class, clientId).getStorage()));
 			String result = "";
-			if (json.has("survey")) {
-				for (int i2 = 0; i2 < json.get("survey").size(); i2++) {
-					final String label = "team=" + json.get("survey").get(i2).asInt() + "&season=" + currentSeason();
+			if (json.has("matchDays")) {
+				for (int i2 = 0; i2 < json.get("matchDays").size(); i2++) {
+					final String label = "team=" + json.get("matchDays").get(i2).asInt() + "&season=" + currentSeason();
 					final JsonNode matchDays = get(label);
 					if (matchDays != null) {
 						final QueryParams params = new QueryParams(Query.misc_listStorage);
 						for (int i = 0; i < matchDays.size(); i++) {
 							if ("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())
+									&& matchDays.get(i).get("fixture").get("timestamp")
+											.asLong() > System.currentTimeMillis() / 1000
 									&& Instant.ofEpochSecond(
 											matchDays.get(i).get("fixture").get("timestamp").asLong())
 											.plus(Duration.ofHours(6)).isBefore(Instant.now())) {
@@ -419,7 +421,7 @@ public class SurveyService {
 									repository.save(storage);
 									get(label);
 								}
-								result += "|" + json.get("survey").get(i2).asInt();
+								result += "|" + json.get("matchDays").get(i2).asInt();
 								break;
 							}
 						}
@@ -437,7 +439,7 @@ public class SurveyService {
 	private class Image {
 		private final int width = 600, height = 315, padding = 20;
 
-		private byte[] create(final PollSurvey poll, final String subtitlePrefix, final Client client,
+		private byte[] create(final PollMatchDay poll, final String subtitlePrefix, final Client client,
 				final ClientMarketingResult clientMarketingResult) throws Exception {
 			final JsonNode json = Json.toNode(Attachment.resolve(client.getStorage())).get("css");
 			final String[] color1 = json.get("bg1stop").asText().replace("rgb(", "").replace(")", "").split(",");
@@ -511,7 +513,7 @@ public class SurveyService {
 			}
 		}
 
-		private void prediction(final Graphics2D g2, final Font customFont, final PollSurvey poll,
+		private void prediction(final Graphics2D g2, final Font customFont, final PollMatchDay poll,
 				final Color colorText, final BigInteger clientId) throws Exception {
 			g2.setFont(customFont.deriveFont(12f));
 			final int h = g2.getFontMetrics().getHeight();
@@ -580,7 +582,7 @@ public class SurveyService {
 			}
 		}
 
-		private void result(final Graphics2D g2, final Font customFont, PollSurvey poll, PollResult result,
+		private void result(final Graphics2D g2, final Font customFont, PollMatchDay poll, PollResult result,
 				final Color colorText) throws Exception {
 			g2.setFont(customFont.deriveFont(16f));
 			final int h = g2.getFontMetrics().getHeight();
@@ -673,9 +675,9 @@ public class SurveyService {
 			try {
 				final BigInteger clientId = (BigInteger) list.get(i).get("client.id");
 				final JsonNode json = Json.toNode(list.get(i).get("client.storage").toString());
-				if (json.has("survey")) {
-					for (int i2 = 0; i2 < json.get("survey").size(); i2++) {
-						final int teamId = json.get("survey").get(i2).asInt();
+				if (json.has("matchDays")) {
+					for (int i2 = 0; i2 < json.get("matchDays").size(); i2++) {
+						final int teamId = json.get("matchDays").get(i2).asInt();
 						BigInteger id = synchronize.prediction(clientId, teamId);
 						if (id != null)
 							result.body += "\nprediction: " + id;
@@ -689,7 +691,7 @@ public class SurveyService {
 					}
 				}
 			} catch (final Exception e) {
-				notificationService.createTicket(TicketType.ERROR, "Survey", Strings.stackTraceToString(e),
+				notificationService.createTicket(TicketType.ERROR, "MatchDays", Strings.stackTraceToString(e),
 						(BigInteger) list.get(i).get("client.id"));
 				if (result.exception == null)
 					result.exception = e;
