@@ -154,7 +154,8 @@ public class MarketingLocationService {
 				+ "' as timestamp) and contactMarketing.createdAt<cast('" +
 				Instant.now().minus(Duration.ofHours(6)).toString() + "' as timestamp)",
 				"Vervollständigung Deiner Location Daten...", "Unfinished",
-				(location, poll, answer) -> !Strings.isEmpty(location.getSecret()),
+				(location, poll, answer) -> ("updateLocation".equals(poll.type) || "createEvents".equals(poll.type))
+						&& !Strings.isEmpty(location.getSecret()),
 				(url, clientMarketingId, location) -> url + "/?m=" + clientMarketingId + "&i="
 						+ location.getId() + "&h=" + location.getSecret().hashCode());
 	}
