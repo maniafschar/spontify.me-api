@@ -354,7 +354,7 @@ public class ImportLocationsService {
 						final Location location = repository.one(Location.class,
 								(BigInteger) list.get(i).get("location.id"));
 						location.setUrl(s.substring(s.indexOf('"')));
-						importImageFromUrl(location);
+						importEmailImage(location);
 						repository.save(location);
 						updated++;
 					}
@@ -368,10 +368,12 @@ public class ImportLocationsService {
 		return result;
 	}
 
-	private void importImageFromUrl(final Location location) throws Exception {
-		if (!Strings.isEmpty(location.getImage()))
-			return;
+	private void importEmailImage(final Location location) throws Exception {
 		String s = IOUtils.toString(location.getUrl());
+		if (Strings.isEmpty(location.getImage())) {
+		}
+		if (Strings.isEmpty(location.getEmail())) {
+		}
 	}
 
 	Location importLocation(final JsonNode json, final String category) throws Exception {
