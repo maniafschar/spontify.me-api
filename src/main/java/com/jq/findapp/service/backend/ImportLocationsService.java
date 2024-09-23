@@ -334,6 +334,46 @@ public class ImportLocationsService {
 		return false;
 	}
 
+	public CronResult runUrl() {
+		final CronResult result = new CronResult();
+		final QueryParams params = new QueryParams(Query.location_listId);
+		params.setSearch("location.url is null or length(location.url)=0");
+		params.setLimit(10);
+		final Result list = repository.list(params);
+		result.body = list.size() + " locations for update\n";
+		int updated = 0, exceptions = 0;
+		for (int i = 0; i < list.size(); i++) {
+			try {
+				String s = IOUtils.toString(new URI("https://www.google.com?q="
+						+ URLEncoder.encode(list.get(i).get("location.name") + ", "
+						+ list.get(i).get("location.address").replace('\n', ' '))));
+				if (s.contains("Website</")) {
+					s = s.substring(0, s.indexOf("Website</"));
+					if (s.contains("href=\"")) {
+						s = s.substring(s.lastIndexOf("href=\"") + 6);
+						final Location location = repository.one(Location.class,
+								(BigInteger) list.get(i).get("location.id"));
+						location.setUrl(s.substring(s.indexOf('"')));
+						importImageFromUrl(location);
+						repository.save(location);
+						updated++;
+					}
+				}
+			} catch (Exception ex) {
+				exceptions++;
+				result.exception = ex;
+			}
+		}
+		result.body += updated + " updated\n" + exceptions + " exceptions";
+		return result;
+	}
+
+	private void importImageFromUrl(final Location location) throws Exception {
+		if (!Strings.isEmpty(location.getImage()))
+			return;
+		String s = IOUtils.toString(location.getUrl());
+	}
+
 	Location importLocation(final JsonNode json, final String category) throws Exception {
 		final Location location = json2location(json);
 		if (category != null)
