@@ -387,8 +387,25 @@ public class ImportLocationsService {
 			int i = html.lastIndexOf("href=\"");
 			if (i > -1) {
 				i += 6;
-				html = IOUtils.toString(new URI(html.substring(i, html.indexOf('"', i))), StandardCharsets.UTF_8);
-
+				html = IOUtils.toString(new URI(html.substring(i, html.indexOf('"', i))), StandardCharsets.UTF_8)
+						.toLowerCase().replace("[at]", "@").replace("(*at*)", "@");
+				int pos = html.length();
+				final Pattern emailPattern = Pattern.compile(".*(\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,8}\\b).*",
+						Pattern.CASE_INSENSITIVE);
+				while ((pos = html.lastIndexOf('@', pos - 1)) > 0) {
+					final Matcher matcher = emailPattern.matcher(
+							html.substring(Math.max(0, pos - 200), Math.min(pos + 200, html.length())));
+					if (matcher.find()) {
+						final String email = matcher.group(1);
+						if (!email.endsWith(".png") && !email.endsWith(".jpg")
+								&& (email.endsWith("@web.de") || email.endsWith("@gmx.de") || email.endsWith("@t-online.de")
+										|| location.getUrl().contains(email.substring(matcher.group(1).indexOf("@") + 1)) ||
+										location.getUrl().contains(email.substring(0, matcher.group(1).indexOf("@"))))) {
+							location.setEmail(email);
+							break;
+						}
+					}
+				}
 			}
 		}
 	}
