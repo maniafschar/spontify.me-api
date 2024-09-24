@@ -109,7 +109,7 @@ public class CronService {
 			run(importLogService, null, list, null, now);
 			run(rssService, null, list, null, now);
 			run(matchDayService, null, list, null, now);
-			run(importLocationsService, null, list, "50 0", now);
+			run(importLocationsService, null, list, "50", now);
 			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 					.map(CompletableFuture::join).collect(Collectors.toList())).join();
 			list.clear();

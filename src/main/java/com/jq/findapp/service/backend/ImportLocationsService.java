@@ -1,12 +1,18 @@
 package com.jq.findapp.service.backend;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.imageio.ImageIO;
+
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -38,7 +44,7 @@ public class ImportLocationsService {
 	private NotificationService notificationService;
 
 	@Autowired
-	Repository repository;
+	private Repository repository;
 
 	private static final LocationType[] TYPES = {
 			new LocationType("accounting"),
@@ -286,7 +292,7 @@ public class ImportLocationsService {
 				result.exception = ex;
 			}
 		}
-		result.body += updated + " updated\n" + exceptions + " exceptions";
+		result.body += (updated > 0 ? updated + " updated\n" : "") + (exceptions > 0 ? exceptions + " exceptions" : "");
 		return result;
 	}
 
@@ -345,8 +351,9 @@ public class ImportLocationsService {
 		for (int i = 0; i < list.size(); i++) {
 			try {
 				String s = IOUtils.toString(new URI("https://www.google.com?q="
-						+ URLEncoder.encode(list.get(i).get("location.name") + ", "
-						+ list.get(i).get("location.address").replace('\n', ' '))));
+						+ URLEncoder.encode((list.get(i).get("location.name") + ", "
+								+ list.get(i).get("location.address")).replace('\n', ' '), StandardCharsets.UTF_8)),
+						StandardCharsets.UTF_8);
 				if (s.contains("Website</")) {
 					s = s.substring(0, s.indexOf("Website</"));
 					if (s.contains("href=\"")) {
@@ -364,15 +371,47 @@ public class ImportLocationsService {
 				result.exception = ex;
 			}
 		}
-		result.body += updated + " updated\n" + exceptions + " exceptions";
+		result.body += (updated > 0 ? updated + " updated\n" : "") + (exceptions > 0 ? exceptions + " exceptions" : "");
 		return result;
 	}
 
 	private void importEmailImage(final Location location) throws Exception {
-		String s = IOUtils.toString(location.getUrl());
+		String html = IOUtils.toString(new URI(location.getUrl()), StandardCharsets.UTF_8).toLowerCase();
 		if (Strings.isEmpty(location.getImage())) {
+			findImage(html, "src=\"([^\"]*)\"", location);
+			if (Strings.isEmpty(location.getImage()))
+				findImage(html, "url([^)]*)", location);
 		}
-		if (Strings.isEmpty(location.getEmail())) {
+		if (Strings.isEmpty(location.getEmail()) && html.contains("impressum")) {
+			html = html.substring(0, html.lastIndexOf("impressum"));
+			int i = html.lastIndexOf("href=\"");
+			if (i > -1) {
+				i += 6;
+				html = IOUtils.toString(new URI(html.substring(i, html.indexOf('"', i))), StandardCharsets.UTF_8);
+
+			}
+		}
+	}
+
+	private void findImage(String html, String pattern, Location location) throws Exception {
+		Matcher matcher = Pattern.compile(pattern).matcher(html);
+		int size = 0;
+		String urlImage = null;
+		while (matcher.find()) {
+			String m = matcher.group(1).toLowerCase();
+			if (m.endsWith(".jpg") || m.endsWith(".jpeg") || m.endsWith(".png")) {
+				final BufferedImage img = ImageIO
+						.read(new ByteArrayInputStream(
+								IOUtils.toByteArray(new URI(m.contains("://") ? m : location.getUrl() + "/" + m))));
+				if (size < img.getWidth() * img.getHeight()) {
+					urlImage = m;
+					size = img.getWidth() * img.getHeight();
+				}
+			}
+		}
+		if (urlImage != null && size > 150000) {
+			location.setImage(EntityUtil.getImage(urlImage, EntityUtil.IMAGE_SIZE, 0));
+			location.setImageList(EntityUtil.getImage(urlImage, EntityUtil.IMAGE_THUMB_SIZE, 0));
 		}
 	}
 
