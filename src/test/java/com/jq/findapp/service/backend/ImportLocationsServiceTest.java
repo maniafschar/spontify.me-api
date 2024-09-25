@@ -74,7 +74,7 @@ public class ImportLocationsServiceTest {
 	}
 
 	@Test
-	public void importLocationJSON() throws Exception {
+	public void importLocation_json() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
 		final String json = IOUtils.toString(getClass().getResourceAsStream("/json/googleNearByError.json"),
@@ -85,5 +85,21 @@ public class ImportLocationsServiceTest {
 
 		// then
 		assertNotNull(location);
+	}
+
+	@Test
+	public void runUrl() throws Exception {
+		// given
+		Location location = new Location();
+		location.setName("");
+		location.setAddress("");
+		repository.save(location);
+
+		// when
+		importLocationsService.runUrl();
+
+		// then
+		location = repository.one(Location.class, location.getId());
+		assertEquals("", location.getUrl());
 	}
 }
