@@ -1,0 +1,504 @@
+{
+	"kind": "customsearch#search",
+	"url": {
+		"type": "application/json",
+		"template": "https://www.googleapis.com/customsearch/v1?q={searchTerms}&num={count?}&start={startIndex?}&lr={language?}&safe={safe?}&cx={cx?}&sort={sort?}&filter={filter?}&gl={gl?}&cr={cr?}&googlehost={googleHost?}&c2coff={disableCnTwTranslation?}&hq={hq?}&hl={hl?}&siteSearch={siteSearch?}&siteSearchFilter={siteSearchFilter?}&exactTerms={exactTerms?}&excludeTerms={excludeTerms?}&linkSite={linkSite?}&orTerms={orTerms?}&dateRestrict={dateRestrict?}&lowRange={lowRange?}&highRange={highRange?}&searchType={searchType}&fileType={fileType?}&rights={rights?}&imgSize={imgSize?}&imgType={imgType?}&imgColorType={imgColorType?}&imgDominantColor={imgDominantColor?}&alt=json"
+	},
+	"queries": {
+		"request": [
+			{
+				"title": "Google Custom Search - Teatro Wilhwlm-Leibl-Str. 81479 München",
+				"totalResults": "721",
+				"searchTerms": "Teatro Wilhwlm-Leibl-Str. 81479 München",
+				"count": 10,
+				"startIndex": 1,
+				"inputEncoding": "utf8",
+				"outputEncoding": "utf8",
+				"safe": "off",
+				"cx": "30b268fe4eb204f65"
+			}
+		],
+		"nextPage": [
+			{
+				"title": "Google Custom Search - Teatro Wilhwlm-Leibl-Str. 81479 München",
+				"totalResults": "721",
+				"searchTerms": "Teatro Wilhwlm-Leibl-Str. 81479 München",
+				"count": 10,
+				"startIndex": 11,
+				"inputEncoding": "utf8",
+				"outputEncoding": "utf8",
+				"safe": "off",
+				"cx": "30b268fe4eb204f65"
+			}
+		]
+	},
+	"context": {
+		"title": "fanclub"
+	},
+	"searchInformation": {
+		"searchTime": 0.358026,
+		"formattedSearchTime": "0.36",
+		"totalResults": "721",
+		"formattedTotalResults": "721"
+	},
+	"spelling": {
+		"correctedQuery": "Teatro Wilhelm-Leibl-Str. 81479 München",
+		"htmlCorrectedQuery": "Teatro \u003cb\u003e\u003ci\u003eWilhelm\u003c/i\u003e\u003c/b\u003e-Leibl-Str. 81479 München"
+	},
+	"items": [
+		{
+			"kind": "customsearch#result",
+			"title": "IBERL'S GASTHAUS & BIERGARTEN, Munich - Restaurant ...",
+			"htmlTitle": "IBERL&#39;S GASTHAUS &amp; BIERGARTEN, \u003cb\u003eMunich\u003c/b\u003e - Restaurant ...",
+			"link": "https://www.tripadvisor.com/Restaurant_Review-g187309-d5773446-Reviews-Iberl_s_Gasthaus_Biergarten-Munich_Upper_Bavaria_Bavaria.html",
+			"displayLink": "www.tripadvisor.com",
+			"snippet": "#1,167 of 2,633 Restaurants in Munich$$ - $$$, German, Central European, Vegetarian Friendly. Wilhelm-Leibl-Str. 22 81479 München, 81479 Munich, Bavaria Germany.",
+			"htmlSnippet": "#1,167 of 2,633 Restaurants in \u003cb\u003eMunich\u003c/b\u003e$$ - $$$, German, Central European, Vegetarian Friendly. \u003cb\u003eWilhelm\u003c/b\u003e-\u003cb\u003eLeibl\u003c/b\u003e-\u003cb\u003eStr\u003c/b\u003e. 22 \u003cb\u003e81479 München\u003c/b\u003e, \u003cb\u003e81479 Munich\u003c/b\u003e, Bavaria Germany.",
+			"formattedUrl": "https://www.tripadvisor.com/Restaurant_Review-g187309-d5773446-Revie...",
+			"htmlFormattedUrl": "https://www.tripadvisor.com/Restaurant_Review-g187309-d5773446-Revie...",
+			"pagemap": {
+				"cse_thumbnail": [
+					{
+						"src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToX6oGGC50qO0yqY2geh3xeYKpkp-DpR4AXgdC48O7cNt4moz7zRq9eVw&s",
+						"width": "259",
+						"height": "194"
+					}
+				],
+				"metatags": [
+					{
+						"twitter:app:url:iphone": "tripadvisor://www.tripadvisor.com/Restaurant_Review-g187309-d5773446-Reviews-Iberl_s_Gasthaus_Biergarten-Munich_Upper_Bavaria_Bavaria.html?m=33762",
+						"apple-itunes-app": "app-id=284876795, app-argument=https://www.tripadvisor.com/Restaurant_Review-g187309-d5773446-Reviews-Iberl_s_Gasthaus_Biergarten-Munich_Upper_Bavaria_Bavaria.html",
+						"og:image": "https://media-cdn.tripadvisor.com/media/photo-s/11/e8/4a/d2/walserstuberl.jpg",
+						"theme-color": "#34e0a1",
+						"og:type": "website",
+						"og:image:width": "550",
+						"og:site_name": "Tripadvisor",
+						"al:ios:app_name": "TripAdvisor",
+						"twitter:app:url:ipad": "tripadvisor://www.tripadvisor.com/Restaurant_Review-g187309-d5773446-Reviews-Iberl_s_Gasthaus_Biergarten-Munich_Upper_Bavaria_Bavaria.html?m=33762",
+						"og:title": "IBERL'S GASTHAUS & BIERGARTEN, Munich - Restaurant Reviews, Photos & Phone Number - Tripadvisor",
+						"twitter:app:id:ipad": "284876795",
+						"og:image:height": "413",
+						"twitter:app:id:iphone": "284876795",
+						"al:ios:url": "tripadvisor://www.tripadvisor.com/Restaurant_Review-g187309-d5773446-Reviews-Iberl_s_Gasthaus_Biergarten-Munich_Upper_Bavaria_Bavaria.html?m=33762",
+						"fb:pages": "5863091683",
+						"og:description": "Iberl's Gasthaus & Biergarten, Munich: See 70 unbiased reviews of Iberl's Gasthaus & Biergarten, rated 4.0 of 5 on Tripadvisor and ranked #1,276 of 2,995 restaurants in Munich.",
+						"al:ios:app_store_id": "284876795",
+						"twitter:image": "https://media-cdn.tripadvisor.com/media/photo-s/11/e8/4a/d2/walserstuberl.jpg",
+						"viewport": "width=device-width, initial-scale=1.0, viewport-fit=cover",
+						"og:locale": "en-US",
+						"og:url": "https://www.tripadvisor.com/Restaurant_Review-g187309-d5773446-Reviews-Iberl_s_Gasthaus_Biergarten-Munich_Upper_Bavaria_Bavaria.html",
+						"format-detection": "telephone=no"
+					}
+				],
+				"cse_image": [
+					{
+						"src": "https://media-cdn.tripadvisor.com/media/photo-s/11/e8/4a/d2/walserstuberl.jpg"
+					}
+				]
+			}
+		},
+		{
+			"kind": "customsearch#result",
+			"title": "Teatro Solln · Apple Maps",
+			"htmlTitle": "\u003cb\u003eTeatro\u003c/b\u003e Solln · Apple Maps",
+			"link": "https://maps.apple.com/place?address=Wilhelm-Leibl-Stra%C3%9Fe%2022%2C%2081479%20M%C3%BCnchen%2C%20Deutschland&auid=9042291469583048903&ll=48.0708946%2C11.514826&q=Teatro%20Solln",
+			"displayLink": "maps.apple.com",
+			"snippet": "Website. teatro-solln.de · Phone. +49 89 41114360 · Address. Wilhelm-Leibl-Straße 22. 81479 Munich. Germany. More on Tripadvisor · Claim This Place · Privacy ...",
+			"htmlSnippet": "Website. \u003cb\u003eteatro\u003c/b\u003e-solln.de &middot; Phone. +49 89 41114360 &middot; Address. \u003cb\u003eWilhelm\u003c/b\u003e-\u003cb\u003eLeibl\u003c/b\u003e-\u003cb\u003eStraße\u003c/b\u003e 22. \u003cb\u003e81479 Munich\u003c/b\u003e. Germany. More on Tripadvisor &middot; Claim This Place &middot; Privacy&nbsp;...",
+			"formattedUrl": "https://maps.apple.com/place?...Straße%2022%2C%2081479%20München%...",
+			"htmlFormattedUrl": "https://maps.apple.com/place?...Straße%2022%2C%20\u003cb\u003e81479\u003c/b\u003e%20\u003cb\u003eMünchen\u003c/b\u003e%...",
+			"pagemap": {
+				"metatags": [
+					{
+						"place:location:longitude": "11.514826",
+						"og:image": "https://snapshot.apple-mapkit.com/api/v1/snapshot?center=48.0708946,11.514826&spn=0.008983199999995861,0.013443600000000444&annotations=%5B%7B%22point%22%3A%2248.0708946%2C11.514826%22%2C%22markerStyle%22%3A%22large%22%2C%22attrs%22%3A%22822279%3B4%3A129%2C6%3A20%2C10%3A0%2C82%3A1%2C85%3A15%2C89%3A2%2C164%3A1%2C193%3A1%22%7D%5D&size=450x300&scale=2&teamId=C5U892736Y&keyId=AAMMA356MB&signature=XVVsfCie7qfsSduCIQWGrQEjrjzZ-Rfz4Nggkq-MXSiFKsnxlQywuyWL8wjqefJTAg3O99ulKz3ds4E3LMYz_A",
+						"og:image:width": "450",
+						"twitter:card": "summary_large_image",
+						"place:location:latitude": "48.0708946",
+						"viewport": "width=device-width, initial-scale=1",
+						"og:title": "Teatro Solln",
+						"og:image:height": "300"
+					}
+				],
+				"cse_image": [
+					{
+						"src": "https://snapshot.apple-mapkit.com/api/v1/snapshot?center=48.0708946,11.514826&spn=0.008983199999995861,0.013443600000000444&annotations=%5B%7B%22point%22%3A%2248.0708946%2C11.514826%22%2C%22markerStyle%22%3A%22large%22%2C%22attrs%22%3A%22822279%3B4%3A129%2C6%3A20%2C10%3A0%2C82%3A1%2C85%3A15%2C89%3A2%2C164%3A1%2C193%3A1%22%7D%5D&size=450x300&scale=2&teamId=C5U892736Y&keyId=AAMMA356MB&signature=XVVsfCie7qfsSduCIQWGrQEjrjzZ-Rfz4Nggkq-MXSiFKsnxlQywuyWL8wjqefJTAg3O99ulKz3ds4E3LMYz_A"
+					}
+				]
+			}
+		},
+		{
+			"kind": "customsearch#result",
+			"title": "Location - Hotel VillaSolln",
+			"htmlTitle": "Location - Hotel VillaSolln",
+			"link": "https://www.villasolln.de/en/location.html",
+			"displayLink": "www.villasolln.de",
+			"snippet": "München Aktuell. Slider ... Restaurant Teatro · Chang Bistro Solln · Feinkost Käfer. Slider. Hotel Villa Solln. Wilhelm-Leibl-Straße 16. 81479 Munich",
+			"htmlSnippet": "\u003cb\u003eMünchen\u003c/b\u003e Aktuell. Slider ... Restaurant \u003cb\u003eTeatro\u003c/b\u003e &middot; Chang Bistro Solln &middot; Feinkost Käfer. Slider. Hotel Villa Solln. \u003cb\u003eWilhelm\u003c/b\u003e-\u003cb\u003eLeibl\u003c/b\u003e-\u003cb\u003eStraße\u003c/b\u003e 16. \u003cb\u003e81479 Munich\u003c/b\u003e",
+			"formattedUrl": "https://www.villasolln.de/en/location.html",
+			"htmlFormattedUrl": "https://www.villasolln.de/en/location.html",
+			"pagemap": {
+				"cse_thumbnail": [
+					{
+						"src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1IdS6Nn6VhA_wQawR_gWVLG5a9MEzDNc8nwOOadSPwcaCnPgzHainmbBe&s",
+						"width": "296",
+						"height": "170"
+					}
+				],
+				"metatags": [
+					{
+						"og:type": "article",
+						"viewport": "width=device-width, initial-scale=1",
+						"author": "Dana Boldt",
+						"og:title": "Location",
+						"og:url": "https://www.villasolln.de/en/location.html",
+						"og:description": "Location The Villa Solln is located in the beautiful south of Munich. Beautiful art nouveau villas, an old village pond, the village center with small stor..."
+					}
+				],
+				"cse_image": [
+					{
+						"src": "x-raw-image:///72cfaa8fa6eabf8677d276fa56d06e77fb397679fd3e5ad69a3b7510955dc3c9"
+					}
+				],
+				"article": [
+					{
+						"articlebody": "Location The Villa Solln is located in the beautiful south of Munich. Beautiful art nouveau villas, an old village pond, the village center with small stores and good gastronomy characterize...",
+						"inlanguage": "en-GB"
+					}
+				]
+			}
+		},
+		{
+			"kind": "customsearch#result",
+			"title": "Kontakt – Teatro Solln",
+			"htmlTitle": "Kontakt – \u003cb\u003eTeatro\u003c/b\u003e Solln",
+			"link": "https://teatro-solln.de/kontakt/",
+			"displayLink": "teatro-solln.de",
+			"snippet": "info@teatro-solln.de. Wilhelm-Leibl-Straße 22 – 81479 München. (Parkplatz im Hof). Restaurant täglich 11:30 – 23:00 Uhr. durchgehend warme Küche bis 22:30 Uhr ...",
+			"htmlSnippet": "info@\u003cb\u003eteatro\u003c/b\u003e-solln.de. \u003cb\u003eWilhelm\u003c/b\u003e-\u003cb\u003eLeibl\u003c/b\u003e-\u003cb\u003eStraße\u003c/b\u003e 22 – \u003cb\u003e81479 München\u003c/b\u003e. (Parkplatz im Hof). Restaurant täglich 11:30 – 23:00 Uhr. durchgehend warme Küche bis 22:30 Uhr&nbsp;...",
+			"formattedUrl": "https://teatro-solln.de/kontakt/",
+			"htmlFormattedUrl": "https://\u003cb\u003eteatro\u003c/b\u003e-solln.de/kontakt/",
+			"pagemap": {
+				"cse_thumbnail": [
+					{
+						"src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0wqI0E4fxNw8yFIReXC4gnKkdZnuJREpWre_t4MqNCElDiU1jHGcZm2U&s",
+						"width": "290",
+						"height": "174"
+					}
+				],
+				"metatags": [
+					{
+						"cdp-version": "1.4.8",
+						"viewport": "width=device-width,initial-scale=1,user-scalable=no",
+						"msapplication-tileimage": "https://teatro-solln.de/wp-content/uploads/2021/09/cropped-Favicon-Teatro-Solln-270x270.png"
+					}
+				],
+				"cse_image": [
+					{
+						"src": "https://teatro-solln.de/wp-content/uploads/2019/10/asdfasdfasd.jpg"
+					}
+				]
+			}
+		},
+		{
+			"kind": "customsearch#result",
+			"title": "Teatro Solln im Iberl",
+			"htmlTitle": "\u003cb\u003eTeatro\u003c/b\u003e Solln im Iberl",
+			"link": "https://www.dine-crime.de/de/tatorte_detail.php?id=250",
+			"displayLink": "www.dine-crime.de",
+			"snippet": "Teatro Solln im Iberl Iberl - Theatersaal 81479 München Wilhelm-Leibl-Straße 22. Die Geschichte des Teatro Solln im Iberl im Münchner Süden geht auf das ...",
+			"htmlSnippet": "\u003cb\u003eTeatro\u003c/b\u003e Solln im Iberl Iberl - Theatersaal \u003cb\u003e81479 München Wilhelm\u003c/b\u003e-\u003cb\u003eLeibl\u003c/b\u003e-\u003cb\u003eStraße\u003c/b\u003e 22. Die Geschichte des \u003cb\u003eTeatro\u003c/b\u003e Solln im Iberl im \u003cb\u003eMünchner\u003c/b\u003e Süden geht auf das&nbsp;...",
+			"formattedUrl": "https://www.dine-crime.de/de/tatorte_detail.php?id=250",
+			"htmlFormattedUrl": "https://www.dine-crime.de/de/tatorte_detail.php?id=250",
+			"pagemap": {
+				"cse_thumbnail": [
+					{
+						"src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSuVwgDqIsArnkL1P3lJkAYIDpRRExhCG4A78sNkRjdgRDimgcXPUgpk3s&s",
+						"width": "259",
+						"height": "194"
+					}
+				],
+				"cse_image": [
+					{
+						"src": "https://www.dine-crime.de/pic/locations/loc-250b.jpg"
+					}
+				]
+			}
+		},
+		{
+			"kind": "customsearch#result",
+			"title": "Teatro Solln – Vorhang auf für das Besondere!",
+			"htmlTitle": "\u003cb\u003eTeatro\u003c/b\u003e Solln – Vorhang auf für das Besondere!",
+			"link": "https://teatro-solln.de/",
+			"displayLink": "teatro-solln.de",
+			"snippet": "Teatro Solln in München. Das TEATRO Solln im Süden Münchens ist ein wunderbarer Ort des Genusses. Hier trifft Modernes auf Rustikales. · Restaurant in München ...",
+			"htmlSnippet": "\u003cb\u003eTeatro\u003c/b\u003e Solln in \u003cb\u003eMünchen\u003c/b\u003e. Das \u003cb\u003eTEATRO\u003c/b\u003e Solln im Süden Münchens ist ein wunderbarer Ort des Genusses. Hier trifft Modernes auf Rustikales. &middot; Restaurant in \u003cb\u003eMünchen\u003c/b\u003e&nbsp;...",
+			"formattedUrl": "https://teatro-solln.de/",
+			"htmlFormattedUrl": "https://\u003cb\u003eteatro\u003c/b\u003e-solln.de/",
+			"pagemap": {
+				"cse_thumbnail": [
+					{
+						"src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTy_L3jn6_60GuwDK5MRoiD_WmvCYsJOLja25OUKtf6Iuzayl_xaIRady6H&s",
+						"width": "276",
+						"height": "183"
+					}
+				],
+				"metatags": [
+					{
+						"cdp-version": "1.4.8",
+						"viewport": "width=device-width,initial-scale=1,user-scalable=no",
+						"msapplication-tileimage": "https://teatro-solln.de/wp-content/uploads/2021/09/cropped-Favicon-Teatro-Solln-270x270.png"
+					}
+				],
+				"cse_image": [
+					{
+						"src": "https://teatro-solln.de/wp-content/uploads/2022/08/Teatro-Solln-in-Muenchen.jpg"
+					}
+				]
+			}
+		},
+		{
+			"kind": "customsearch#result",
+			"title": "Teatro Solln Restaurant - München, BY | OpenTable",
+			"htmlTitle": "\u003cb\u003eTeatro\u003c/b\u003e Solln Restaurant - \u003cb\u003eMünchen\u003c/b\u003e, BY | OpenTable",
+			"link": "https://www.opentable.com/r/teatro-solln-munchen",
+			"displayLink": "www.opentable.com",
+			"snippet": "Book now at Teatro Solln in München, BY. Explore menu, see photos and read ... Wilhelm-Leibl-Straße 22, München, BY 81479. Neighborhood. Fürstenried-West.",
+			"htmlSnippet": "Book now at \u003cb\u003eTeatro\u003c/b\u003e Solln in \u003cb\u003eMünchen\u003c/b\u003e, BY. Explore menu, see photos and read ... \u003cb\u003eWilhelm\u003c/b\u003e-\u003cb\u003eLeibl\u003c/b\u003e-\u003cb\u003eStraße\u003c/b\u003e 22, \u003cb\u003eMünchen\u003c/b\u003e, BY \u003cb\u003e81479\u003c/b\u003e. Neighborhood. Fürstenried-West.",
+			"formattedUrl": "https://www.opentable.com/r/teatro-solln-munchen",
+			"htmlFormattedUrl": "https://www.opentable.com/r/\u003cb\u003eteatro\u003c/b\u003e-solln-munchen",
+			"pagemap": {
+				"cse_thumbnail": [
+					{
+						"src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSL2EgnLlTdjFasmiz5VgihQTiDzAXWvLfHEvj5MHmLeE55rhJj7x4pdEs&s",
+						"width": "225",
+						"height": "225"
+					}
+				],
+				"metatags": [
+					{
+						"place:location:longitude": "11.5146474",
+						"og:image": "https://images.otstatic.com/prod1/46722032/3/large.jpg",
+						"og:image:width": "640",
+						"twitter:card": "summary_large_image",
+						"og:site_name": "OpenTable",
+						"ot:seop": "-1142957031",
+						"business:contact_data:locality": "de-DE",
+						"place:location:latitude": "48.070899",
+						"al:ios:url": "reservetable-com.contextoptional.OpenTable-1://?rid=258102&dt=2024-09-20T22%3A54%3A00&ps=2",
+						"og:description": "Teatro Solln, Casual Dining Italian cuisine. Read reviews and book now.",
+						"twitter:creator": "@opentable",
+						"al:ios:app_store_id": "296581815",
+						"twitter:site": "@opentable",
+						"business:contact_data:postal_code": "81479",
+						"og:type": "website",
+						"twitter:title": "Teatro Solln - München, BY on OpenTable",
+						"business:contact_data:website": "https://teatro-solln.de/",
+						"al:ios:app_name": "OpenTable",
+						"business:contact_data:region": "Fürstenried-West",
+						"business:contact_data:phone_number": "089 41114360",
+						"og:title": "Teatro Solln - München, BY on OpenTable",
+						"og:image:height": "640",
+						"fb:pages": "123876194314735",
+						"ot:page_type": "restaurants,restaurant-profile,network",
+						"twitter:image:src": "https://images.otstatic.com/prod1/46722032/3/large.jpg",
+						"fb:app_id": "123876194314735",
+						"viewport": "width=device-width, initial-scale=1",
+						"twitter:description": "Teatro Solln, Casual Dining Italian cuisine. Read reviews and book now.",
+						"business:contact_data:country": "Deutschland",
+						"business:contact_data:street_address": "Wilhelm-Leibl-Straße 22",
+						"og:url": "https://www.opentable.com/r/teatro-solln-munchen"
+					}
+				],
+				"cse_image": [
+					{
+						"src": "https://images.otstatic.com/prod1/46722032/3/large.jpg"
+					}
+				]
+			}
+		},
+		{
+			"kind": "customsearch#result",
+			"title": "Hotel Villa Solln - Munich - Great prices at HOTEL INFO",
+			"htmlTitle": "Hotel Villa Solln - \u003cb\u003eMunich\u003c/b\u003e - Great prices at HOTEL INFO",
+			"link": "https://www.hotel.info/en/hotel/32773/",
+			"displayLink": "www.hotel.info",
+			"snippet": "Hotel Villa Solln (Munich). Wilhelm-Leibl-Str. 16, 81479 Munich - Solln ... Nördliche Münchner Str. 6. 82031 Grünwald, DEU. 7.8 / 10 (19 Evaluations of ).",
+			"htmlSnippet": "Hotel Villa Solln (\u003cb\u003eMunich\u003c/b\u003e). \u003cb\u003eWilhelm\u003c/b\u003e-\u003cb\u003eLeibl\u003c/b\u003e-\u003cb\u003eStr\u003c/b\u003e. 16, \u003cb\u003e81479 Munich\u003c/b\u003e - Solln ... Nördliche \u003cb\u003eMünchner\u003c/b\u003e Str. 6. 82031 Grünwald, DEU. 7.8 / 10 (19 Evaluations of ).",
+			"formattedUrl": "https://www.hotel.info/en/hotel/32773/",
+			"htmlFormattedUrl": "https://www.hotel.info/en/hotel/32773/",
+			"pagemap": {
+				"cse_thumbnail": [
+					{
+						"src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXZPX9lXtqk86ITSdrI1AxwWJZMv5hBuKJ0ECK25pbxLNtdHmaPyzqs5M&s",
+						"width": "275",
+						"height": "183"
+					}
+				],
+				"metatags": [
+					{
+						"application-name": "HDE",
+						"og:image": "https://www.hotel.de/de/media/image/7b/67/f5/Villa_Solln-Muenchen-Ecomomy_Zimmer_Doppel-6-32773_600x600.jpg",
+						"og:type": "website",
+						"theme-color": "#ff9033",
+						"og:site_name": "HDE",
+						"og:title": "Hotel Villa Solln (Munich)",
+						"geo.position": "48.07178;11.51474",
+						"og:description": "Book the Hotel Villa Solln (Munich) for as little as 97.68 EUR! 3 HOTEL INFO stars ✔ 30% discount with business rate ✔ Cancellation is free of charge ✔ Recommended by 100.0% of all hotel guests.",
+						"fb:app_id": "287071624680443",
+						"icbm": "48.07178, 11.51474",
+						"viewport": "width=device-width, user-scalable=yes, initial-scale=1, maximum-scale=5",
+						"hotel": "Hotel Villa Solln (Munich)",
+						"og:url": "https://www.hotel.info/en/hotel/32773/",
+						"geo.placename": "Munich"
+					}
+				],
+				"webpage": [
+					{
+						"copyrightholder": "HDE",
+						"image": "https://www.hotel.de/de/media/image/48/94/6f/hotel_infodYapDPlPRuIk9.png",
+						"isfamilyfriendly": "True",
+						"copyrightyear": "2014",
+						"name": "Hotel Villa Solln - Munich - Great prices at HOTEL INFO"
+					}
+				],
+				"cse_image": [
+					{
+						"src": "https://www.hotel.de/de/media/image/7b/67/f5/Villa_Solln-Muenchen-Ecomomy_Zimmer_Doppel-6-32773_600x600.jpg"
+					}
+				],
+				"sitenavigationelement": [
+					{
+						"name": "Log in",
+						"url": "Log in"
+					}
+				],
+				"listitem": [
+					{
+						"item": "HOTEL INFO",
+						"name": "HOTEL INFO",
+						"position": "0",
+						"url": "https://www.hotel.info/en/"
+					},
+					{
+						"item": "Europe",
+						"name": "Europe",
+						"position": "1",
+						"url": "https://www.hotel.info/en/continent/eu/"
+					},
+					{
+						"item": "Germany",
+						"name": "Germany",
+						"position": "2",
+						"url": "https://www.hotel.info/en/country/de/"
+					},
+					{
+						"item": "Munich",
+						"name": "Munich",
+						"position": "3",
+						"url": "https://www.hotel.info/en/destination/70801/"
+					},
+					{
+						"name": "Hotel Villa Solln (Munich)",
+						"position": "4"
+					}
+				]
+			}
+		},
+		{
+			"kind": "customsearch#result",
+			"title": "TEATRO Solln im Iberl TRATTORIA",
+			"htmlTitle": "\u003cb\u003eTEATRO\u003c/b\u003e Solln im Iberl TRATTORIA",
+			"link": "https://9gg.de/teatro-trattoria",
+			"displayLink": "9gg.de",
+			"snippet": "TEATRO Solln im Iberl TRATTORIA in Wilhelm-Leibl-Straße 22, 81479 München, Germany.",
+			"htmlSnippet": "\u003cb\u003eTEATRO\u003c/b\u003e Solln im Iberl TRATTORIA in \u003cb\u003eWilhelm\u003c/b\u003e-\u003cb\u003eLeibl\u003c/b\u003e-\u003cb\u003eStraße\u003c/b\u003e 22, \u003cb\u003e81479 München\u003c/b\u003e, Germany.",
+			"formattedUrl": "https://9gg.de/teatro-trattoria",
+			"htmlFormattedUrl": "https://9gg.de/\u003cb\u003eteatro\u003c/b\u003e-trattoria",
+			"pagemap": {
+				"cse_thumbnail": [
+					{
+						"src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR7wUvKG8nhVXPBDGCJU0-3_TavLk6-EfR1ewHrUtkPb4CWvnOZWvpHlzd&s",
+						"width": "259",
+						"height": "194"
+					}
+				],
+				"metatags": [
+					{
+						"og:image": "https://lh5.googleusercontent.com/p/AF1QipOwbVwZ4yOL332KK-GhoMSp3KJV77OYXJGyo5z6",
+						"og:type": "website",
+						"viewport": "width=device-width, initial-scale=1",
+						"og:title": "TEATRO Solln im Iberl TRATTORIA",
+						"og:url": "http://teatro-trattoria.9gg.de",
+						"og:description": "TEATRO Solln im Iberl TRATTORIA - Wilhelm-Leibl-Straße 22, 81479 München, Germany"
+					}
+				],
+				"cse_image": [
+					{
+						"src": "https://lh5.googleusercontent.com/p/AF1QipOwbVwZ4yOL332KK-GhoMSp3KJV77OYXJGyo5z6"
+					}
+				]
+			}
+		},
+		{
+			"kind": "customsearch#result",
+			"title": "Restaurante Teatro Solln - München, BY | OpenTable",
+			"htmlTitle": "Restaurante \u003cb\u003eTeatro\u003c/b\u003e Solln - \u003cb\u003eMünchen\u003c/b\u003e, BY | OpenTable",
+			"link": "https://www.opentable.com/r/teatro-solln-munchen?lang=es",
+			"displayLink": "www.opentable.com",
+			"snippet": "Ubicación. Wilhelm-Leibl-Straße 22, München, 81479 BY · Zona. Fürstenried-West · Detalles del área de estacionamiento. Estacionamiento privado · Adicional. Comida ...",
+			"htmlSnippet": "Ubicación. \u003cb\u003eWilhelm\u003c/b\u003e-\u003cb\u003eLeibl\u003c/b\u003e-\u003cb\u003eStraße\u003c/b\u003e 22, \u003cb\u003eMünchen\u003c/b\u003e, \u003cb\u003e81479\u003c/b\u003e BY &middot; Zona. Fürstenried-West &middot; Detalles del área de estacionamiento. Estacionamiento privado &middot; Adicional. Comida&nbsp;...",
+			"formattedUrl": "https://www.opentable.com/r/teatro-solln-munchen?lang=es",
+			"htmlFormattedUrl": "https://www.opentable.com/r/\u003cb\u003eteatro\u003c/b\u003e-solln-munchen?lang=es",
+			"pagemap": {
+				"cse_thumbnail": [
+					{
+						"src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSL2EgnLlTdjFasmiz5VgihQTiDzAXWvLfHEvj5MHmLeE55rhJj7x4pdEs&s",
+						"width": "225",
+						"height": "225"
+					}
+				],
+				"metatags": [
+					{
+						"place:location:longitude": "11.5146474",
+						"og:image": "https://images.otstatic.com/prod1/46722032/3/large.jpg",
+						"og:image:width": "640",
+						"twitter:card": "summary_large_image",
+						"og:site_name": "OpenTable",
+						"ot:seop": "1145155319",
+						"business:contact_data:locality": "de-DE",
+						"place:location:latitude": "48.070899",
+						"al:ios:url": "reservetable-com.contextoptional.OpenTable-1://?rid=258102&dt=2024-09-18T23%3A02%3A00&ps=2",
+						"og:description": "Teatro Solln, restaurante Informal de comida Italiana. Lee las reseñas y reserva ahora.",
+						"twitter:creator": "@opentable",
+						"al:ios:app_store_id": "296581815",
+						"twitter:site": "@opentable",
+						"business:contact_data:postal_code": "81479",
+						"og:type": "website",
+						"twitter:title": "Teatro Solln - München, BY en OpenTable",
+						"business:contact_data:website": "https://teatro-solln.de/",
+						"al:ios:app_name": "OpenTable",
+						"business:contact_data:region": "Fürstenried-West",
+						"business:contact_data:phone_number": "089 41114360",
+						"og:title": "Teatro Solln - München, BY en OpenTable",
+						"og:image:height": "640",
+						"fb:pages": "123876194314735",
+						"ot:page_type": "restaurants,restaurant-profile,network",
+						"twitter:image:src": "https://images.otstatic.com/prod1/46722032/3/large.jpg",
+						"fb:app_id": "123876194314735",
+						"viewport": "width=device-width, initial-scale=1",
+						"twitter:description": "Teatro Solln, restaurante Informal de comida Italiana. Lee las reseñas y reserva ahora.",
+						"business:contact_data:country": "Deutschland",
+						"business:contact_data:street_address": "Wilhelm-Leibl-Straße 22",
+						"og:url": "https://www.opentable.com/r/teatro-solln-munchen?lang=es"
+					}
+				],
+				"cse_image": [
+					{
+						"src": "https://images.otstatic.com/prod1/46722032/3/large.jpg"
+					}
+				]
+			}
+		}
+	]
+}
