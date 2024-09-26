@@ -343,29 +343,17 @@ public class ImportLocationsService {
 	public CronResult runUrl() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
-		params.setSearch("location.url is null or length(location.url)=0");
-		params.setLimit(10);
+		params.setSearch("length(location.url)>0 and (location.image is null or location.email is null)");
 		final Result list = repository.list(params);
 		result.body = list.size() + " locations for update\n";
 		int updated = 0, exceptions = 0;
 		for (int i = 0; i < list.size(); i++) {
 			try {
-				String s = IOUtils.toString(new URI("https://www.google.com?q="
-						+ URLEncoder.encode((list.get(i).get("location.name") + " "
-								+ list.get(i).get("location.address")).replace('\n', ' '), StandardCharsets.UTF_8)),
-						StandardCharsets.UTF_8);
-				if (s.contains("Website</")) {
-					s = s.substring(0, s.indexOf("Website</"));
-					if (s.contains("href=\"")) {
-						s = s.substring(s.lastIndexOf("href=\"") + 6);
-						final Location location = repository.one(Location.class,
-								(BigInteger) list.get(i).get("location.id"));
-						location.setUrl(s.substring(s.indexOf('"')));
-						importEmailImage(location);
-						repository.save(location);
-						updated++;
-					}
-				}
+				final Location location = repository.one(Location.class,
+						(BigInteger) list.get(i).get("location.id"));
+				importEmailImage(location);
+				repository.save(location);
+				updated++;
 			} catch (Exception ex) {
 				exceptions++;
 				result.exception = ex;
@@ -414,24 +402,28 @@ public class ImportLocationsService {
 		}
 	}
 
-	private void findImage(String html, String pattern, Location location) throws Exception {
-		Matcher matcher = Pattern.compile(pattern).matcher(html);
+	private void findImage(String html, String pattern, Location location) {
+		final Matcher matcher = Pattern.compile(pattern).matcher(html);
+		final int min = 350;
 		int size = 0;
 		String urlImage = null;
 		while (matcher.find()) {
 			String m = matcher.group(1).toLowerCase();
 			if (m.endsWith(".jpg") || m.endsWith(".jpeg") || m.endsWith(".png")) {
-				final BufferedImage img = ImageIO
-						.read(new ByteArrayInputStream(
-								IOUtils.toByteArray(new URI(m.contains("://") ? m : location.getUrl() + "/" + m))));
-				if (size < img.getWidth() * img.getHeight()) {
-					urlImage = m;
-					size = img.getWidth() * img.getHeight();
+				try {
+					final BufferedImage img = ImageIO
+							.read(new ByteArrayInputStream(
+									IOUtils.toByteArray(new URI(m.contains("://") ? m : location.getUrl() + "/" + m))));
+					if (size < img.getWidth() * img.getHeight() && img.getWidth() > min && img.getHeight() > min) {
+						urlImage = m;
+						size = img.getWidth() * img.getHeight();
+					}
+				} catch (Exception ex) {
 				}
 			}
 		}
 		if (urlImage != null && size > 150000) {
-			location.setImage(EntityUtil.getImage(urlImage, EntityUtil.IMAGE_SIZE, 0));
+			location.setImage(EntityUtil.getImage(urlImage, min, 0));
 			location.setImageList(EntityUtil.getImage(urlImage, EntityUtil.IMAGE_THUMB_SIZE, 0));
 		}
 	}

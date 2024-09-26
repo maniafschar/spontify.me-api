@@ -105,14 +105,15 @@ public class ImportLocationsServiceTest {
 		final Location location = new Location();
 		location.setName("Teatro");
 		location.setAddress(address);
+		location.setUrl("https://teatro-solln.de/");
 		repository.save(location);
 
 		// when
 		final CronResult result = importLocationsService.runUrl();
 
 		// then
-		assertEquals("", repository.one(Location.class, location.getId()).getUrl());
 		assertTrue(result.body.contains(" updated"));
 		assertNull(result.exception);
+		assertEquals("info@teatro-solln.de", repository.one(Location.class, location.getId()).getEmail());
 	}
 }
