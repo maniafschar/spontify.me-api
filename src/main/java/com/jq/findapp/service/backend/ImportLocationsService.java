@@ -351,7 +351,7 @@ public class ImportLocationsService {
 		for (int i = 0; i < list.size(); i++) {
 			try {
 				String s = IOUtils.toString(new URI("https://www.google.com?q="
-						+ URLEncoder.encode((list.get(i).get("location.name") + ", "
+						+ URLEncoder.encode((list.get(i).get("location.name") + " "
 								+ list.get(i).get("location.address")).replace('\n', ' '), StandardCharsets.UTF_8)),
 						StandardCharsets.UTF_8);
 				if (s.contains("Website</")) {
@@ -398,9 +398,13 @@ public class ImportLocationsService {
 					if (matcher.find()) {
 						final String email = matcher.group(1);
 						if (!email.endsWith(".png") && !email.endsWith(".jpg")
-								&& (email.endsWith("@web.de") || email.endsWith("@gmx.de") || email.endsWith("@t-online.de")
-										|| location.getUrl().contains(email.substring(matcher.group(1).indexOf("@") + 1)) ||
-										location.getUrl().contains(email.substring(0, matcher.group(1).indexOf("@"))))) {
+								&& (email.endsWith("@web.de") || email.endsWith("@gmx.de")
+										|| email.endsWith("@t-online.de")
+										|| location.getUrl()
+												.contains(email.substring(matcher.group(1).indexOf("@") + 1))
+										||
+										location.getUrl()
+												.contains(email.substring(0, matcher.group(1).indexOf("@"))))) {
 							location.setEmail(email);
 							break;
 						}

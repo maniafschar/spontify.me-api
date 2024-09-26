@@ -1,6 +1,8 @@
 package com.jq.findapp.service.backend;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
@@ -18,12 +20,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
 import com.jq.findapp.entity.Location;
+import com.jq.findapp.entity.Storage;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.backend.CronService.CronResult;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Utils;
 
@@ -90,16 +94,25 @@ public class ImportLocationsServiceTest {
 	@Test
 	public void runUrl() throws Exception {
 		// given
-		Location location = new Location();
-		location.setName("");
-		location.setAddress("");
+		final String address = "Wilhelm-Leibl-Straße 22\n81479 München";
+		final Storage storage = new Storage();
+		storage.setLabel("google-address-" + ("geocode/json?address=" + address.replaceAll("\n", ", ")).hashCode());
+		storage.setStorage(
+				IOUtils.toString(getClass().getResourceAsStream("/json/googleResponse.json"), StandardCharsets.UTF_8)
+						.replace("Melchiorstraße", "Wilhelm-Leibl-Straße")
+						.replace("\"6\"", "\"22\""));
+		repository.save(storage);
+		final Location location = new Location();
+		location.setName("Teatro");
+		location.setAddress(address);
 		repository.save(location);
 
 		// when
-		importLocationsService.runUrl();
+		final CronResult result = importLocationsService.runUrl();
 
 		// then
-		location = repository.one(Location.class, location.getId());
-		assertEquals("", location.getUrl());
+		assertEquals("", repository.one(Location.class, location.getId()).getUrl());
+		assertTrue(result.body.contains(" updated"));
+		assertNull(result.exception);
 	}
 }

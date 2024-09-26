@@ -1,5 +1,6 @@
 select
 	location.id,
+	location.address,
 	location.name,
 	location.latitude,
 	location.longitude,

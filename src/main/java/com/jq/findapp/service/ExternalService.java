@@ -36,6 +36,7 @@ import com.jq.findapp.util.Strings;
 @Service
 public class ExternalService {
 	private static String STORAGE_PREFIX = "google-address-";
+
 	@Autowired
 	private Repository repository;
 

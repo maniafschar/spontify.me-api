@@ -37,6 +37,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jq.findapp.entity.BaseEntity;
+import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.Query.Result;
+import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.EventService;
@@ -80,8 +83,11 @@ public class TestConfig {
 			doAnswer(f -> {
 				imageHtmlEmail.buildMimeMessage();
 				new File("target/email/").mkdir();
-				new FileOutputStream("target/email/" + System.currentTimeMillis() + Math.random())
-						.write(IOUtils.toByteArray(imageHtmlEmail.getMimeMessage().getInputStream()));
+				try (
+						final FileOutputStream out = new FileOutputStream(
+								"target/email/" + System.currentTimeMillis() + Math.random())) {
+					out.write(IOUtils.toByteArray(imageHtmlEmail.getMimeMessage().getInputStream()));
+				}
 				return "";
 			}).when(imageHtmlEmail).send();
 			return imageHtmlEmail;
@@ -104,9 +110,17 @@ public class TestConfig {
 	@Service
 	@Primary
 	public class ExternalServiceMock extends ExternalService {
+		@Autowired
+		private Repository repository;
+
 		@Override
 		public String google(final String param) {
 			try {
+				final QueryParams params = new QueryParams(Query.misc_listStorage);
+				params.setSearch("storage.label='google-address-" + param.hashCode() + "'");
+				final Result result = repository.list(params);
+				if (result.size() > 0)
+					return (String) result.get(0).get("storage.storage");
 				return IOUtils.toString(
 						getClass().getResourceAsStream(
 								param.startsWith("place/nearbysearch/json?") ? "/json/googleNearBy.json"
