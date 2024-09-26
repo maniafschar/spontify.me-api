@@ -68,13 +68,13 @@ public class Location {
 					driver.get(url + "?q=" + s[0]);
 					final String urlLocation = (String) js.executeScript(
 							"return document.getElementsByClassName('bkaPDb')[0]?.querySelector('a')?.getAttribute('href')");
-					if (!Strings.isEmpty(urlLocation)) {
-						if (blocked.stream().anyMatch(e -> urlLocation.toLowerCase().contains(e)))
-							write(out, "-- blocked " + urlLocation + "\n");
-						else
-							write(out, "update location set url='" + urlLocation + "', modified_at=now() where id=" + id + "\n;");
-					}
-					write(out, "\n");
+					if (Strings.isEmpty(urlLocation))
+						write(out, "-- not found");
+					else if (blocked.stream().anyMatch(e -> urlLocation.toLowerCase().contains(e)))
+						write(out, "-- blocked: " + urlLocation);
+					else
+						write(out, "update location set url='" + urlLocation + "', modified_at=now() where id=" + id + ";");
+					write(out, "\n\n");
 				} catch (Exception ex) {
 					if (ex.getMessage().contains("Could not start a new session. Response code 500.")) {
 						write(out, Strings.stackTraceToString(ex));
