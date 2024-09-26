@@ -52,36 +52,28 @@ public class Location {
 				new InputStreamReader(getClass().getResourceAsStream("/sample.txt")));
 				final FileOutputStream out = new FileOutputStream(file);) {
 			String line;
+			driver = AppTest.createWebDriver(800, 700, false);
+			js = (JavascriptExecutor) driver;
+			driver.manage().timeouts().implicitlyWait(Duration.ofMillis(50));
+			driver.manage().window().setSize(new Dimension(1200, 900));
 			while ((line = reader.readLine()) != null) {
 				final String s[] = line.split("\\|");
 				if (Integer.parseInt(s[1]) <= startId)
 					continue;
-				System.out.println(s[1]);
 				address = Arrays
 						.asList(s[0].toLowerCase().replace(".", "").replace("-", ",").replace(" ", ",")
 								.split(","));
 				write(out, "-- " + s[1] + " | " + s[0] + "\n");
 				try {
-					driver = AppTest.createWebDriver(800, 700, false);
-					js = (JavascriptExecutor) driver;
-					driver.manage().timeouts().implicitlyWait(Duration.ofMillis(50));
-					driver.manage().window().setSize(new Dimension(1200, 900));
 					driver.get(url + "?q=" + s[0]);
 					final String urlLocation = (String) js.executeScript(
 							"return document.getElementsByClassName('bkaPDb')[0]?.querySelector('a')?.getAttribute('href')");
 					if (!Strings.isEmpty(urlLocation)) {
-						if (blocked.stream().anyMatch(e -> urlLocation.toLowerCase().contains(e))) {
+						if (blocked.stream().anyMatch(e -> urlLocation.toLowerCase().contains(e)))
 							write(out, "-- blocked " + urlLocation + "\n");
-							lookupSearchResults(out, s[1]);
-						} else {
-							driver.get(urlLocation);
-							if (!analysePage(out, s[1],
-									((String) js.executeScript("return document.body.innerHTML")),
-									urlLocation.toLowerCase(), true))
-								lookupSearchResults(out, s[1]);
-						}
-					} else
-						lookupSearchResults(out, s[1]);
+						else
+							write(out, "update location set url='" + urlLocation + "', modified_at=now() where id=" + id + "\n;");
+					}
 					write(out, "\n");
 				} catch (Exception ex) {
 					if (ex.getMessage().contains("Could not start a new session. Response code 500.")) {
@@ -89,16 +81,16 @@ public class Location {
 						return;
 					}
 					write(out, "-- " + ex.getClass().getName() + ": " + ex.getMessage().replace('\n', ',') + "\n\n");
-				} finally {
-					if (driver != null)
-						try {
-							driver.close();
-						} catch (Exception ex) {
-						}
 				}
 			}
 		} catch (final Exception ex) {
 			ex.printStackTrace();
+		} finally {
+			if (driver != null)
+				try {
+					driver.close();
+				} catch (Exception ex) {
+				}
 		}
 	}
 
