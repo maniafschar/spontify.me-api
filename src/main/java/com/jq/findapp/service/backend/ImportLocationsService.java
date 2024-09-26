@@ -376,7 +376,10 @@ public class ImportLocationsService {
 			int i = html.lastIndexOf("href=\"");
 			if (i > -1) {
 				i += 6;
-				html = IOUtils.toString(new URI(html.substring(i, html.indexOf('"', i))), StandardCharsets.UTF_8)
+				html = html.substring(i, html.indexOf('"', i));
+				if (!html.startsWith("http"))
+					html = location.getUrl() + (location.getUrl().endsWith("/") ? "" : "/") + html;
+				html = IOUtils.toString(new URI(html), StandardCharsets.UTF_8)
 						.toLowerCase().replace("[at]", "@").replace("(*at*)", "@");
 				int pos = html.length();
 				final Pattern emailPattern = Pattern.compile(".*(\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,8}\\b).*",
