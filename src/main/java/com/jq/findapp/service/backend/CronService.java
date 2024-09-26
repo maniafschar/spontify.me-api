@@ -91,7 +91,7 @@ public class CronService {
 			final ZonedDateTime now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
 			final List<CompletableFuture<Void>> list = new ArrayList<>();
 			run(importSportsBarService, null, list, "0 3", now);
-			// run(importSportsBarService, "Import", list, null, now);
+			run(importSportsBarService, "Import", list, null, now);
 			run(chatService, null, list, null, now);
 			run(marketingLocationService, null, list, "* 6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21", now);
 			run(marketingLocationService, "Sent", list, "10 19", now);
