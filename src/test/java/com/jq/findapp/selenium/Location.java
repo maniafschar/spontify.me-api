@@ -63,19 +63,19 @@ public class Location {
 						write(out, "update location set skills='X', modified_at=now() where id=" + s[1] + ";\n");
 					else {
 						final String urlLocation = (String) js.executeScript(
-								"return document.getElementsByClassName('bkaPDb')[0]?.querySelector('a')?.getAttribute('href')");
-						if (urlLocation.contains("?")
+								"return document.getElementsByClassName('bkaPDb')[0]?.querySelector('a')?.getAttribute('href')||document.getElementsByClassName('ab_button')[0]?.getAttribute('href')");
+						if (urlLocation != null && urlLocation.contains("?")
 								&& blocked.stream().anyMatch(e -> urlLocation.toLowerCase().contains(e)))
 							write(out,
 									"-- blocked: update location set url='" + urlLocation
 											+ "', modified_at=now() where id=" + s[1]
 											+ ";\n");
-						else if (!Strings.isEmpty(urlLocation))
+						else if (urlLocation != null && urlLocation.startsWith("http"))
 							write(out,
 									"update location set url='" + urlLocation + "', modified_at=now() where id=" + s[1]
 											+ ";\n");
 					}
-					Thread.sleep((long) (1000 + 7000 * Math.random()));
+					Thread.sleep((long) (1000 + 4000 * Math.random()));
 				} catch (Exception ex) {
 					if (ex.getMessage().contains("Could not start a new session. Response code 500.")) {
 						write(out, Strings.stackTraceToString(ex));

@@ -344,7 +344,7 @@ public class ImportLocationsService {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setSearch(
-				"length(location.url)>0 and (location.image is null or location.email is null) and location.skills<>'X'");
+				"length(location.url)>0 and (location.image is null or location.email is null) and (location.skills is null or location.skills<>'X')");
 		final Result list = repository.list(params);
 		result.body = list.size() + " locations for update\n";
 		int updated = 0, exceptions = 0;
