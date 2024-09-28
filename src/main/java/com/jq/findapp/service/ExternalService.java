@@ -4,11 +4,13 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +66,9 @@ public class ExternalService {
 				return json;
 		}
 		if (System.currentTimeMillis() - pauseUntil > 0)
-			return "{}";
+			return "{\"error_message\":\"pause until "
+					+ new SimpleDateFormat("yyyy-MM-ss HH:mm:ss").format(new Date(pauseUntil))
+					+ "\",\"status\":\"OVER_QUERY_LIMIT\"}";
 		final String value = WebClient.create("https://maps.googleapis.com/maps/api/" + param
 				+ (param.contains("?") ? "&" : "?") + "key=" + googleKey).get().retrieve().toEntity(String.class)
 				.block().getBody();
