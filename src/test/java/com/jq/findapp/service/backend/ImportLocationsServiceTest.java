@@ -92,7 +92,7 @@ public class ImportLocationsServiceTest {
 	}
 
 	@Test
-	public void runUrl() throws Exception {
+	public void run() throws Exception {
 		// given
 		final String address = "Wilhelm-Leibl-Straße 22\n81479 München";
 		final Storage storage = new Storage();
@@ -109,7 +109,7 @@ public class ImportLocationsServiceTest {
 		repository.save(location);
 
 		// when
-		final CronResult result = importLocationsService.runUrl();
+		final CronResult result = importLocationsService.run();
 
 		// then
 		assertTrue(result.body.contains(" updated"));
