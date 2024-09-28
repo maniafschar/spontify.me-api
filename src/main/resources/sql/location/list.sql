@@ -21,6 +21,7 @@ select
 FROM
 	Location location left join LocationFavorite locationFavorite on locationFavorite.locationId=location.id and locationFavorite.contactId={USERID}
 WHERE
+	(location.skills is null or location.skills<>'X') and location.category like '%2%' and
 	{search}
 GROUP BY
 	location.id,
