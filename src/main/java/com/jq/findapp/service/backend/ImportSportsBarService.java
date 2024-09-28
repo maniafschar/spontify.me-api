@@ -132,6 +132,7 @@ public class ImportSportsBarService {
 						location.setName(l.get("name").asText());
 						location.setLatitude((float) l.get("address").get("latitude").asDouble());
 						location.setLongitude((float) l.get("address").get("longitude").asDouble());
+						location.setCategory("2");
 						location.setStreet(l.get("address").get("street").asText());
 						if (location.getStreet().contains(" ")) {
 							location.setNumber(
@@ -226,6 +227,7 @@ public class ImportSportsBarService {
 						final String street = data.get("description").get("street").asText();
 						Location location = new Location();
 						location.setName(data.get("name").asText());
+						location.setCategory("2");
 						if (street.contains(" ") && street.substring(street.lastIndexOf(' ')).trim().matches("\\d.*")) {
 							location.setStreet(street.substring(0, street.lastIndexOf(' ')));
 							location.setNumber(street.substring(street.lastIndexOf(' ')).trim());

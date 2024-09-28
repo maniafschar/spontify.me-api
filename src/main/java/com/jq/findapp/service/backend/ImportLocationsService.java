@@ -46,6 +46,14 @@ public class ImportLocationsService {
 	@Autowired
 	private Repository repository;
 
+	/*
+	 * 0 shopping
+	 * 1 culture
+	 * 2 eat/drink
+	 * 3 sightseeing
+	 * 4 nightlife
+	 * 5 sport
+	 */
 	private static final LocationType[] TYPES = {
 			new LocationType("accounting"),
 			new LocationType("airport", 3, 13),
