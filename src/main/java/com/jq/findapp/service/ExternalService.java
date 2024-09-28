@@ -4,6 +4,8 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -49,6 +51,8 @@ public class ExternalService {
 	@Value("${app.chatGPT.key}")
 	private String chatGpt;
 
+	private static volatile long pauseUntil = 0;
+
 	public synchronized String google(final String param) {
 		final String label = STORAGE_PREFIX + param.hashCode();
 		final QueryParams params = new QueryParams(Query.misc_listStorage);
@@ -59,6 +63,8 @@ public class ExternalService {
 			if (!json.contains("OVER_QUERY_LIMIT") && !json.contains("not authorized to use this API key"))
 				return json;
 		}
+		if (System.currentTimeMillis() - pauseUntil > 0)
+			return "{}";
 		final String value = WebClient.create("https://maps.googleapis.com/maps/api/" + param
 				+ (param.contains("?") ? "&" : "?") + "key=" + googleKey).get().retrieve().toEntity(String.class)
 				.block().getBody();
@@ -68,6 +74,8 @@ public class ExternalService {
 			storage.setLabel(label);
 			storage.setStorage(value);
 			repository.save(storage);
+			if (value.contains("OVER_QUERY_LIMIT"))
+				pauseUntil = Instant.now().plus(Duration.ofHours(4)).toEpochMilli();
 		}
 		return value;
 	}

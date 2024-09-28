@@ -86,10 +86,8 @@ public class EngagementService {
 		CONTACT_CURRENT_TOWN((contact, location, externalService, repository) -> {
 			try {
 				return externalService.getAddress(contact.getLatitude(), contact.getLongitude(), false).getTown();
-			} catch (
-
-		final Exception e) {
-				throw new RuntimeException(e);
+			} catch (final Exception e) {
+				throw new IllegalArgumentException("no town", e);
 			}
 		}),
 
@@ -501,20 +499,20 @@ public class EngagementService {
 				+ " and cast(contactChat.textId as text)='" + textId.name() + '\'');
 		if (repository.list(params).size() == 0) {
 			String s = text.getText(contact, textId);
-			for (final REPLACMENT rep : REPLACMENT.values())
-				s = rep.replace(s, contact, location, externalService, repository);
-			final ContactChat contactChat = new ContactChat();
-			contactChat.setContactId(adminId);
-			contactChat.setContactId2(contact.getId());
-			contactChat.setSeen(false);
-			contactChat.setAction(action);
-			contactChat.setTextId(textId);
-			contactChat.setNote(s);
 			try {
+				for (final REPLACMENT rep : REPLACMENT.values())
+					s = rep.replace(s, contact, location, externalService, repository);
+				final ContactChat contactChat = new ContactChat();
+				contactChat.setContactId(adminId);
+				contactChat.setContactId2(contact.getId());
+				contactChat.setSeen(false);
+				contactChat.setAction(action);
+				contactChat.setTextId(textId);
+				contactChat.setNote(s);
 				repository.save(contactChat);
 				return true;
 			} catch (final IllegalArgumentException ex) {
-				if (!"duplicate chat".equals(ex.getMessage()))
+				if (!"duplicate chat".equals(ex.getMessage()) && !"no town".equals(ex.getMessage()))
 					throw new RuntimeException(ex);
 			}
 		}
