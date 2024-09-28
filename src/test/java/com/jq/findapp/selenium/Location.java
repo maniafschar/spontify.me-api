@@ -30,7 +30,7 @@ public class Location {
 			final String old = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
 			if (old.contains("\n\n-- ")) {
 				int p = old.lastIndexOf("\n\n-- ");
-				startId = Integer.parseInt(old.substring(p + 5, old.indexOf('|', p)).trim());
+				startId = Integer.parseInt(old.substring(p + 5, old.lastIndexOf('|', p)).trim());
 			}
 		}
 		file.delete();
@@ -49,7 +49,8 @@ public class Location {
 			driver.manage().timeouts().implicitlyWait(Duration.ofMillis(50));
 			driver.manage().window().setSize(new Dimension(1200, 900));
 			while ((line = reader.readLine()) != null) {
-				final String s[] = line.split("\\|");
+				final String s[] = new String[] { line.substring(0, line.lastIndexOf('|')),
+						line.substring(line.lastIndexOf('|') + 1) };
 				if (Integer.parseInt(s[1]) <= startId)
 					continue;
 				try {
