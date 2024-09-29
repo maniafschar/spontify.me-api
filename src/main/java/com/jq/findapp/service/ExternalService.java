@@ -65,7 +65,7 @@ public class ExternalService {
 			if (!json.contains("OVER_QUERY_LIMIT") && !json.contains("not authorized to use this API key"))
 				return json;
 		}
-		if (System.currentTimeMillis() - pauseUntil > 0)
+		if (System.currentTimeMillis() - pauseUntil < 0)
 			return "{\"error_message\":\"pause until "
 					+ new SimpleDateFormat("yyyy-MM-ss HH:mm:ss").format(new Date(pauseUntil))
 					+ "\",\"status\":\"OVER_QUERY_LIMIT\"}";
