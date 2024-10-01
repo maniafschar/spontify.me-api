@@ -68,6 +68,24 @@ public class DBApi {
 		}
 	}
 
+	@PatchMapping("one/{id}")
+	public void save(@PathVariable final BigInteger id, @RequestBody final WriteEntity entity,
+			@RequestHeader final BigInteger user) throws Exception {
+		if (entity.getValues().containsKey("contactId"))
+			return;
+		final BaseEntity e = repository.one(entity.getClazz(), id);
+		if (checkWriteAuthorisation(e, user) && checkClient(user, e)) {
+			if (entity.getValues().containsKey("password")) {
+				final String pw = Encryption.decryptBrowser((String) entity.getValues().get("password"));
+				entity.getValues().put("password", Encryption.encryptDB(pw));
+				entity.getValues().put("passwordReset", BigInteger.valueOf(System.currentTimeMillis()));
+			}
+			EntityUtil.addImageList(entity);
+			e.populate(entity.getValues());
+			repository.save(e);
+		}
+	}
+
 	@PostMapping("one")
 	public BigInteger create(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger user,
 			@RequestHeader final BigInteger clientId) throws Exception {
