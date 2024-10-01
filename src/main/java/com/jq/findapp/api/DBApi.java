@@ -40,7 +40,7 @@ public class DBApi {
 	private NotificationService notificationService;
 
 	@GetMapping("one")
-	public Map<String, Object> one(final QueryParams params, @RequestHeader final BigInteger user) throws Exception {
+	public Map<String, Object> get(final QueryParams params, @RequestHeader final BigInteger user) throws Exception {
 		params.setUser(repository.one(Contact.class, user));
 		return repository.one(params);
 	}
@@ -51,8 +51,9 @@ public class DBApi {
 		return repository.list(params).getList();
 	}
 
+	// TODO rm
 	@PutMapping("one")
-	public void save(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger user) throws Exception {
+	public void put(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger user) throws Exception {
 		if (entity.getValues().containsKey("contactId"))
 			return;
 		final BaseEntity e = repository.one(entity.getClazz(), entity.getId());
@@ -69,7 +70,7 @@ public class DBApi {
 	}
 
 	@PatchMapping("one/{id}")
-	public void save(@PathVariable final BigInteger id, @RequestBody final WriteEntity entity,
+	public void patch(@PathVariable final BigInteger id, @RequestBody final WriteEntity entity,
 			@RequestHeader final BigInteger user) throws Exception {
 		if (entity.getValues().containsKey("contactId"))
 			return;
@@ -87,7 +88,7 @@ public class DBApi {
 	}
 
 	@PostMapping("one")
-	public BigInteger create(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger user,
+	public BigInteger post(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger user,
 			@RequestHeader final BigInteger clientId) throws Exception {
 		final Contact contact = repository.one(Contact.class, user);
 		if (clientId.equals(contact.getClientId())) {
@@ -98,9 +99,21 @@ public class DBApi {
 		throw new IllegalAccessError("clientId mismatch, should be " + contact.getClientId() + " but was " + clientId);
 	}
 
+	// TODO rm
 	@DeleteMapping("one")
 	public void delete(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger user) throws Exception {
 		final BaseEntity e = repository.one(entity.getClazz(), entity.getId());
+		if (e instanceof Contact)
+			notificationService.createTicket(TicketType.ERROR, "Contact Deletion",
+					"tried to delete contact " + e.getId(), user);
+		else if (checkWriteAuthorisation(e, user) && checkClient(user, e))
+			repository.delete(e);
+	}
+
+	@DeleteMapping("one/{id}")
+	public void delete(@PathVariable final BigInteger id, @RequestBody final WriteEntity entity,
+			@RequestHeader final BigInteger user) throws Exception {
+		final BaseEntity e = repository.one(entity.getClazz(), id);
 		if (e instanceof Contact)
 			notificationService.createTicket(TicketType.ERROR, "Contact Deletion",
 					"tried to delete contact " + e.getId(), user);
