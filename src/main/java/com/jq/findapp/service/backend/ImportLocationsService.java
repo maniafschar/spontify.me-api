@@ -385,8 +385,14 @@ public class ImportLocationsService {
 			if (i > -1) {
 				i += 6;
 				html = html.substring(i, html.indexOf('"', i));
-				if (!html.startsWith("http"))
-					html = location.getUrl() + (location.getUrl().endsWith("/") ? "" : "/") + html;
+				if (!html.startsWith("http")) {
+					String baseUrl = location.getUrl();
+					if (!location.getUrl().endsWith("/"))
+						baseUrl += "/";
+					if (html.startsWith("/"))
+						baseUrl = baseUrl.substring(0, baseUrl.indexOf('/', 10));
+					html = baseUrl + html;
+				}
 				html = IOUtils.toString(new URI(html), StandardCharsets.UTF_8)
 						.toLowerCase().replace("[at]", "@").replace("(*at*)", "@");
 				int pos = html.length();
