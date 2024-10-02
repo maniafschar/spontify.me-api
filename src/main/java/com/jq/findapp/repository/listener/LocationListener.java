@@ -85,8 +85,16 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 	}
 
 	private void lookupAddress(final Location location) {
-		if (location.getLatitude() != null)
+		if (location.getLatitude() != null) {
 			checkDuplicateLatLon(location);
+			if (!Strings.isEmpty(location.getAddress())
+					&& !Strings.isEmpty(location.getCountry())
+					&& !Strings.isEmpty(location.getTown())
+					&& !Strings.isEmpty(location.getZipCode())
+					&& !Strings.isEmpty(location.getStreet())
+					&& !Strings.isEmpty(location.getNumber()))
+				return;
+		}
 		final JsonNode address = Json.toNode(
 				externalService.google("geocode/json?address="
 						+ location.getAddress().replaceAll("\n", ", ")));
