@@ -56,7 +56,7 @@ public class FindappConfiguration implements AsyncConfigurer, WebSocketMessageBr
 			public void addCorsMappings(final CorsRegistry registry) {
 				registry.addMapping("/**").allowedOriginPatterns(allowedOrigins)
 						.allowedHeaders("clientid", "content-type", "password", "salt", "secret", "user", "webcall")
-						.allowedMethods("GET", "PUT", "POST", "OPTIONS", "DELETE");
+						.allowedMethods("GET", "PUT", "POST", "PATCH", "OPTIONS", "DELETE");
 			}
 		};
 	}
