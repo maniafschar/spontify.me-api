@@ -358,11 +358,9 @@ public class ImportLocationsService {
 		int updated = 0, exceptions = 0;
 		for (int i = 0; i < list.size(); i++) {
 			try {
-				final Location location = repository.one(Location.class,
-						(BigInteger) list.get(i).get("location.id"));
-				importEmailImage(location);
-				repository.save(location);
-				updated++;
+				if (importEmailImage(repository.one(Location.class,
+						(BigInteger) list.get(i).get("location.id"))))
+					updated++;
 			} catch (Exception ex) {
 				exceptions++;
 				result.exception = ex;
@@ -372,7 +370,8 @@ public class ImportLocationsService {
 		return result;
 	}
 
-	private void importEmailImage(final Location location) throws Exception {
+	private boolean importEmailImage(final Location location) throws Exception {
+		location.historize();
 		String html = IOUtils.toString(new URI(location.getUrl()), StandardCharsets.UTF_8).toLowerCase();
 		if (Strings.isEmpty(location.getImage())) {
 			findImage(html, "src=\"([^\"]*)\"", location);
@@ -418,6 +417,11 @@ public class ImportLocationsService {
 				}
 			}
 		}
+		if (location.modified()) {
+			repository.save(location);
+			return true;
+		}
+		return false;
 	}
 
 	private void findImage(String html, String pattern, Location location) {
