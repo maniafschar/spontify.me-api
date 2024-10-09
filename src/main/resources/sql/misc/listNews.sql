@@ -4,7 +4,7 @@ SELECT
 	clientNews.publish,
 	clientNews.image,
 	clientNews.url,
-	clientNews.category,
+	clientNews.skills,
 	clientNews.source,
 	clientNews.createdAt,
 	clientNews.modifiedAt,
