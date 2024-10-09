@@ -58,7 +58,6 @@ FROM
 	or
 		contactLink.contactId2={USERID} and contactLink.contactId=contact.id
 WHERE
-	event.startDate is not null and
 	event.contactId=contact.id and
 	contact.clientId={CLIENTID} and
 	{search}
