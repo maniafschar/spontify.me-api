@@ -133,22 +133,33 @@ public class ImportSportsBarService {
 						location.setLatitude((float) l.get("address").get("latitude").asDouble());
 						location.setLongitude((float) l.get("address").get("longitude").asDouble());
 						location.setCategory("2");
-						location.setStreet(l.get("address").get("street").asText());
-						if (location.getStreet().contains(" ")) {
-							location.setNumber(
-									location.getStreet().substring(location.getStreet().lastIndexOf(" ") + 1));
-							location.setStreet(
-									location.getStreet().substring(0, location.getStreet().lastIndexOf(" ")));
+						if (l.get("address").has("street")) {
+							location.setStreet(l.get("address").get("street").asText());
+							if (location.getStreet().contains(" ")) {
+								location.setNumber(
+										location.getStreet().substring(location.getStreet().lastIndexOf(" ") + 1));
+								location.setStreet(
+										location.getStreet().substring(0, location.getStreet().lastIndexOf(" ")));
+							}
 						}
-						location.setZipCode(l.get("address").get("zip").asText());
+						if (l.get("address").has("zip"))
+							location.setZipCode(l.get("address").get("zip").asText());
 						location.setTown(l.get("address").get("city").asText());
-						location.setCountry(l.get("address").get("countryCode").asText());
+						if (l.get("address").has("countryCode"))
+							location.setCountry(l.get("address").get("countryCode").asText());
+						else
+							location.setCountry("DE");
 						location.setSkills("x.1");
 						location.setContactId(BigInteger.ONE);
 						location.setAddress(
-								location.getStreet()
-										+ (Strings.isEmpty(location.getNumber()) ? "" : " " + location.getNumber())
-										+ "\n" + location.getZipCode() + " " + location.getTown() + "\nDeutschland");
+								(Strings.isEmpty(location.getStreet()) ? ""
+										: location.getStreet()
+												+ (Strings.isEmpty(location.getNumber()) ? ""
+														: " " + location.getNumber()))
+										+ "\n" + (Strings.isEmpty(location.getZipCode()) ? ""
+												: location.getZipCode() + " ")
+										+ location.getTown() + "\n"
+										+ ("DE".equals(location.getCountry()) ? "Deutschland" : location.getCountry()));
 						try {
 							repository.save(location);
 							count++;
