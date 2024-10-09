@@ -101,7 +101,6 @@ public class CronService {
 			run(dbService, "CleanUp", list, "30 0", now);
 			run(engagementService, "Registration", list, "40 10", now);
 			run(eventService, "Match", list, null, now);
-			run(eventService, "MatchDays", list, "20 9", now);
 			run(eventService, "Import", list, "40 5", now);
 			run(eventService, "Publish", list, null, now);
 			run(eventService, "Participation", list, null, now);

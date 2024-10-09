@@ -13,14 +13,11 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -283,48 +280,29 @@ public class EventService {
 			final QueryParams params = new QueryParams(Query.event_listId);
 			params.setSearch("event.repetition='" + Repetition.Games.name()
 					+ "' and event.startDate is null and event.skills like '9.%'");
-			Result events = repository.list(params);
-			for (int i = 0; i < events.size(); i++) {
-				final Event event = repository.one(Event.class, (BigInteger) events.get(i).get("event.id"));
+			final Result events = repository.list(params);
+			events.forEach(e -> {
+				final Event event = repository.one(Event.class, (BigInteger) e.get("event.id"));
 				event.setDescription(event.getDescription() + " ");
 				repository.save(event);
-			}
+			});
 			result.body = events.size() + " initialized\n";
-			params.setSearch("event.repetition='" + Repetition.Games.name()
-					+ "' and event.startDate>current_time and event.skills like '9.%' and event.skills not like '%X%'");
-			events = repository.list(params);
 			final Set<String> processed = new HashSet<>();
-			for (int i = 0; i < events.size(); i++) {
+			params.setSearch("event.repetition='" + Repetition.Games.name()
+					+ "' and event.skills like '9.%' and event.skills not like '%X%'");
+			final AtomicInteger updated = new AtomicInteger();
+			repository.list(params).forEach(e -> {
 				final String key = events.get(i).get("event.contactId") + "-"
 						+ events.get(i).get("event.locationId") + "-"
 						+ events.get(i).get("event.skills");
 				if (!processed.contains(key)) {
 					processed.add(key);
-					updateSeries(repository.one(Event.class, (BigInteger) events.get(i).get("event.id")));
+					if (updateSeries(repository.one(Event.class, (BigInteger) events.get(i).get("event.id"))) > 0)
+						updated.incrementAndGet();
 				}
-			}
-			result.body += events.size() + " updated";
-		} catch (final Exception e) {
-			result.exception = e;
-		}
-		return result;
-	}
-
-	public CronResult runMatchDays() {
-		final CronResult result = new CronResult();
-		try {
-			final QueryParams params = new QueryParams(Query.event_listId);
-			params.setSearch("event.repetition='Games' and length(event.skills)>0 and event.skills not like '%X%'");
-			final Map<String, Integer> processed = new HashMap<>();
-			repository.list(params).forEach(e -> {
-				final Event event = repository.one(Event.class, (BigInteger) e.get("event.id"));
-				final String key = event.getContactId() + "." + event.getSkills();
-				if (!processed.containsKey(key))
-					processed.put(key, updateSeries(event));
 			});
-			result.body = "" + processed.entrySet().stream()
-					.filter(e -> e.getValue() > 0)
-					.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+			if (updated.get() > 0)
+				result.body += updated.get() + " updated";
 		} catch (final Exception e) {
 			result.exception = e;
 		}
