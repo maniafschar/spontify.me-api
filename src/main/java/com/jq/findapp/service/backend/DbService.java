@@ -32,7 +32,6 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
-import com.jq.findapp.repository.listener.ClientNewsListener;
 import com.jq.findapp.service.backend.CronService.CronResult;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
@@ -40,7 +39,7 @@ import com.jq.findapp.util.Strings;
 @Service
 public class DbService {
 	@Autowired
-	private ClientNewsListener clientNewsListener;
+	private ClientNewsService clientNewsService;
 
 	@Autowired
 	private Repository repository;
@@ -81,7 +80,7 @@ public class DbService {
 				params.getUser().setClientId(client.getId());
 				final Result news = repository.list(params);
 				for (int i2 = 0; i2 < news.size(); i2++)
-					clientNewsListener.execute(
+					clientNewsService.notify(
 							repository.one(ClientNews.class, (BigInteger) news.get(i2).get("clientNews.id")));
 			}
 			if (clientUpdates.length() > 0)
@@ -128,8 +127,8 @@ public class DbService {
 		final List<String> langs = Arrays.asList("DE", "EN");
 		for (final String lang : langs) {
 			final JsonNode json = Json.toNode(IOUtils.toString(
-							new FileInputStream(webDir + client.getId() + "/js/lang/" + lang + ".json"),
-							StandardCharsets.UTF_8));
+					new FileInputStream(webDir + client.getId() + "/js/lang/" + lang + ".json"),
+					StandardCharsets.UTF_8));
 			if (!node.get("lang").has(lang))
 				((ObjectNode) node.get("lang")).set(lang, Json.createObject());
 			if (!node.get("lang").get(lang).has("buddy") ||
