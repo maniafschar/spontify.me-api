@@ -292,12 +292,12 @@ public class EventService {
 					+ "' and event.skills like '9.%' and event.skills not like '%X%'");
 			final AtomicInteger updated = new AtomicInteger();
 			repository.list(params).forEach(e -> {
-				final String key = events.get(i).get("event.contactId") + "-"
-						+ events.get(i).get("event.locationId") + "-"
-						+ events.get(i).get("event.skills");
+				final String key = e.get("event.contactId") + "-"
+						+ e.get("event.locationId") + "-"
+						+ e.get("event.skills");
 				if (!processed.contains(key)) {
 					processed.add(key);
-					if (updateSeries(repository.one(Event.class, (BigInteger) events.get(i).get("event.id"))) > 0)
+					if (updateSeries(repository.one(Event.class, (BigInteger) e.get("event.id"))) > 0)
 						updated.incrementAndGet();
 				}
 			});
