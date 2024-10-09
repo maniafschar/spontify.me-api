@@ -124,11 +124,11 @@ public class RssService {
 					Timestamp first = new Timestamp(System.currentTimeMillis());
 					final boolean addDescription = json.has("description") && json.get("description").asBoolean();
 					final String source = json.has("source") ? json.get("source").asText() : null;
-					final String category = json.has("category") ? json.get("category").asText() : null;
+					final String skills = json.has("skills") ? json.get("skills").asText() : null;
 					for (int i = 0; i < rss.size(); i++) {
 						try {
 							final ClientNews clientNews = this.createNews(params, rss.get(i), addDescription, clientId,
-									url, source, category);
+									url, source, skills);
 							if (clientNews != null && clientNews.getImage() != null) {
 								if (clientNews.getPublish().getTime() > lastPubDate)
 									chonological = false;
@@ -194,7 +194,7 @@ public class RssService {
 		}
 
 		private ClientNews createNews(final QueryParams params, final JsonNode rss, final boolean addDescription,
-				final BigInteger clientId, final String url, final String source, final String category)
+				final BigInteger clientId, final String url, final String source, final String skills)
 				throws Exception {
 			String uid = null;
 			if (rss.has("link"))
@@ -226,7 +226,7 @@ public class RssService {
 			clientNews.setSource(source);
 			clientNews.setClientId(clientId);
 			clientNews.setDescription(description);
-			clientNews.setCategory(category);
+			clientNews.setSkills(skills);
 			clientNews.setUrl(uid);
 			if (rss.has("pubDate"))
 				clientNews.setPublish(new Timestamp(this.dateParserPub.parse(rss.get("pubDate").asText()).getTime()));

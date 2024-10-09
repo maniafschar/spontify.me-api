@@ -17,12 +17,12 @@ import com.jq.findapp.util.Text.TextId;
 public class ClientNewsListener extends AbstractRepositoryListener<ClientNews> {
 	@Override
 	public void postPersist(final ClientNews clientNews) {
-		this.execute(clientNews);
+		execute(clientNews);
 	}
 
 	@Override
 	public void postUpdate(final ClientNews clientNews) {
-		this.execute(clientNews);
+		execute(clientNews);
 	}
 
 	@Async
@@ -34,17 +34,17 @@ public class ClientNewsListener extends AbstractRepositoryListener<ClientNews> {
 				final ClientNews clientNews2 = repository.one(ClientNews.class, clientNews.getId());
 				if (clientNews2 != null) {
 					clientNews2.setNotified(true);
-					this.repository.save(clientNews2);
-					if (clientNews2.getCategory() != null) {
+					repository.save(clientNews2);
+					if (clientNews2.getSkills() != null) {
 						final QueryParams params = new QueryParams(Query.contact_listId);
 						params.setSearch(
 								"contact.clientId=" + clientNews2.getClientId() + " and contact.verified=true");
-						final String cat = "|" + clientNews2.getCategory() + "|";
+						final String cat = "|" + clientNews2.getSkills() + "|";
 						repository.list(params).forEach(e -> {
-							final Contact contact = this.repository.one(Contact.class,
+							final Contact contact = repository.one(Contact.class,
 									(BigInteger) e.get("contact.id"));
 							if (("|" + contact.getSkills() + "|").contains(cat))
-								this.notificationService.sendNotificationSync(null,
+								notificationService.sendNotificationSync(null,
 										contact,
 										TextId.notification_clientNews, "news=" + clientNews2.getId(),
 										clientNews2.getSource() + ": " + clientNews2.getDescription());
@@ -54,7 +54,7 @@ public class ClientNewsListener extends AbstractRepositoryListener<ClientNews> {
 			} catch (final Exception e) {
 				try {
 					clientNews.setNotified(false);
-					this.repository.save(clientNews);
+					repository.save(clientNews);
 				} catch (final Exception e1) {
 				}
 				throw new RuntimeException(e);

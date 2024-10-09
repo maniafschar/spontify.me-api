@@ -14,7 +14,7 @@ public class ClientNews extends BaseEntity {
 	private BigInteger clientId;
 	private Float latitude;
 	private Float longitude;
-	private String category;
+	private String skills;
 	private String description;
 	private String image;
 	private String publishId;
@@ -103,12 +103,12 @@ public class ClientNews extends BaseEntity {
 		this.source = source;
 	}
 
-	public String getCategory() {
-		return this.category;
+	public String getSkills() {
+		return this.skills;
 	}
 
-	public void setCategory(final String category) {
-		this.category = category;
+	public void setSkills(final String skills) {
+		this.skills = skills;
 	}
 
 	@Transient
