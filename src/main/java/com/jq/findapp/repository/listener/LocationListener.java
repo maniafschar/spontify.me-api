@@ -27,7 +27,13 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 	public void prePersist(final Location location) {
 		location.setName(sanitizeName(location.getName()));
 		location.setUrl(sanitizeUrl(location.getUrl()));
-		lookupAddress(location);
+		if (location.getLatitude() == null
+				|| Strings.isEmpty(location.getAddress())
+				|| Strings.isEmpty(location.getCountry())
+				|| Strings.isEmpty(location.getTown())
+				|| Strings.isEmpty(location.getZipCode())
+				|| Strings.isEmpty(location.getStreet()))
+			lookupAddress(location);
 		final QueryParams params = new QueryParams(Query.location_list);
 		params.setUser(new Contact());
 		params.getUser().setId(BigInteger.ZERO);
@@ -85,16 +91,8 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 	}
 
 	private void lookupAddress(final Location location) {
-		if (location.getLatitude() != null) {
+		if (location.getLongitude() != null)
 			checkDuplicateLatLon(location);
-			if (!Strings.isEmpty(location.getAddress())
-					&& !Strings.isEmpty(location.getCountry())
-					&& !Strings.isEmpty(location.getTown())
-					&& !Strings.isEmpty(location.getZipCode())
-					&& !Strings.isEmpty(location.getStreet())
-					&& !Strings.isEmpty(location.getNumber()))
-				return;
-		}
 		final JsonNode address = Json.toNode(
 				externalService.google("geocode/json?address="
 						+ location.getAddress().replaceAll("\n", ", ")));

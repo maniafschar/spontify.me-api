@@ -371,7 +371,6 @@ public class ImportLocationsService {
 	}
 
 	private boolean importEmailImage(final Location location) throws Exception {
-		location.historize();
 		String html = IOUtils.toString(new URI(location.getUrl()), StandardCharsets.UTF_8).toLowerCase();
 		if (Strings.isEmpty(location.getImage())) {
 			findImage(html, "src=\"([^\"]*)\"", location);
