@@ -100,10 +100,10 @@ public class CronService {
 			run(dbService, null, list, null, now);
 			run(dbService, "CleanUp", list, "30 0", now);
 			run(engagementService, "Registration", list, "40 10", now);
+			run(eventService, null, list, null, now);
 			run(eventService, "Match", list, null, now);
 			run(eventService, "Import", list, "40 5", now);
 			run(eventService, "Publish", list, null, now);
-			run(eventService, "Participation", list, null, now);
 			run(eventService, "Series", list, "40 23", now);
 			run(importLogService, null, list, null, now);
 			run(rssService, null, list, null, now);
@@ -154,10 +154,7 @@ public class CronService {
 					if (result.exception != null) {
 						log.setBody((log.getBody() == null ? "" : log.getBody() + "\n")
 								+ result.exception.getClass().getName() + ": " + result.exception.getMessage());
-						notificationService.createTicket(TicketType.ERROR, "cron",
-								(result.body == null ? "" : result.body + "\n")
-										+ Strings.stackTraceToString(result.exception),
-								null);
+						notificationService.createTicket(TicketType.ERROR, "cron", result.toString(), null);
 					}
 				}
 			} catch (final Throwable ex) {

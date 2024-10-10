@@ -139,7 +139,7 @@ public class EventService {
 		return result;
 	}
 
-	public CronResult runParticipation() {
+	public CronResult run() {
 		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.event_listParticipateRaw);
