@@ -361,7 +361,13 @@ public class MarketingLocationService {
 				event.setSkills(poll.questions.get(0).answers.get(
 						answers.get("q0").get("a").get(i).asInt()).key);
 				event.setType(EventType.Location);
-				repository.save(event);
+				try {
+					repository.save(event);
+				} catch (IllegalArgumentException ex) {
+					if (!ex.getMessage().startsWith("event series exists: "))
+						notificationService.createTicket(TicketType.ERROR, "MarketingLocation",
+								Strings.stackTraceToString(ex), clientMarketing.getClientId());
+				}
 			}
 			return (s == null ? "Deine Events wurden angelegt." : s)
 					+ "\n\nÜbrigens, Du musst nichts mehr einstellen, auch zukünftige Spiele werden als Event automatisch für Dich angelegt.";
