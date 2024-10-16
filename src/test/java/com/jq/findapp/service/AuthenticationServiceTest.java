@@ -308,7 +308,7 @@ public class AuthenticationServiceTest {
 		// given
 		final Contact contact = this.utils.createContact(BigInteger.ONE);
 		contact.setPushToken(
-				"c2ga0x4YQkuAippnfsqIHQ:APA91bFc9UetIbp2mwHlasUxW3uvxKPmDYtxS68kDcJagDDs6P0-v0rUEqJ-YGa6bq0OFdASk--SQQ93MjwtEww2Xne_YjFqMJILYKnkmws5-AC72EAzYo6GS4HYxQblDrWdFqxNcw3R");
+				"ffYAqQb7RtWNNbECnb7-AU:APA91bFdialtf4-nnmLubNr5lFbg2vSAfnAscCpp_snHzxiYZTzlbuC43gRwtseWr92pbd3ViHU5X4VgCA4INRBJyGiAEcFxFXFIAhOWDQVsO2cC402onC3KmPJrafNcPEZ9J7Rjr_u4");
 
 		// when
 		this.android.send(contact.getPseudonym(), contact, "text", "action", "");
