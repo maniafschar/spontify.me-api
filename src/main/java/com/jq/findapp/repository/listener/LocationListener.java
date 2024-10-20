@@ -43,9 +43,10 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 				"location.zipCode='" + location.getZipCode() + "' and LOWER(location.street)='"
 						+ (location.getStreet() == null ? ""
 								: location.getStreet().replace("'", "''").toLowerCase().replace("traße", "tr."))
+								.replace("'", "_")
 						+ "' and LOWER(location.number)='"
 						+ (location.getNumber() == null ? ""
-								: location.getNumber().toLowerCase())
+								: location.getNumber().toLowerCase()).replace("'", "_")
 						+ "'");
 		final Result list = repository.list(params);
 		for (int i = 0; i < list.size(); i++) {
