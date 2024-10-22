@@ -70,19 +70,18 @@ public class MarketingService {
 							(BigInteger) contacts.get(i2).get("contact.id"));
 					if (Strings.isEmpty(contact.getVersion()) || "0.6.7".compareTo(contact.getVersion()) > 0)
 						run = false;
-					if (!Strings.isEmpty(clientMarketing.getLanguage())
+					else if (!Strings.isEmpty(clientMarketing.getLanguage())
 							&& !clientMarketing.getLanguage().contains(contact.getLanguage()))
 						run = false;
-					if (!Strings.isEmpty(clientMarketing.getGender())
+					else if (!Strings.isEmpty(clientMarketing.getGender())
 							&& !clientMarketing.getGender().contains("" + contact.getGender()))
 						run = false;
-					if (!Strings.isEmpty(clientMarketing.getAge())
+					else if (!Strings.isEmpty(clientMarketing.getAge())
 							&& (contact.getAge() == null
 									|| Integer.valueOf(clientMarketing.getAge().split(",")[0]) > contact.getAge()
 									|| Integer.valueOf(clientMarketing.getAge().split(",")[1]) < contact.getAge()))
 						run = false;
-
-					if (!Strings.isEmpty(clientMarketing.getRegion())) {
+					else if (!Strings.isEmpty(clientMarketing.getRegion())) {
 						final QueryParams params2 = new QueryParams(Query.contact_listGeoLocationHistory);
 						params2.setSearch("contactGeoLocationHistory.contactId=" + contact.getId());
 						final Result result2 = repository.list(params2);
