@@ -79,7 +79,6 @@ public class MatchDayService {
 	private static final String STORAGE_PREFIX = "api-sports-";
 
 	static class PollMatchDay extends Poll {
-		public String type;
 		public String home;
 		public String away;
 		public String homeName;
