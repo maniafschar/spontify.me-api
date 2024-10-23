@@ -444,7 +444,7 @@ public class ImportLocationsService {
 			}
 		}
 		if (urlImage != null && size > 150000) {
-			location.setImage(EntityUtil.getImage(urlImage, min, 0));
+			location.setImage(EntityUtil.getImage(urlImage, EntityUtil.IMAGE_SIZE, min));
 			location.setImageList(EntityUtil.getImage(urlImage, EntityUtil.IMAGE_THUMB_SIZE, 0));
 		}
 	}
