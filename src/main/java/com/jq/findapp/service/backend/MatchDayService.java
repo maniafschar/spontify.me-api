@@ -779,13 +779,13 @@ public class MatchDayService {
 				.plus(Duration.ofHours(23)).isBefore(Instant.now())
 				&& (storage.get("storage.modifiedAt") == null
 						|| Instant.ofEpochMilli(((Timestamp) storage.get("storage.modifiedAt")).getTime())
-								.plus(Duration.ofHours(23)).isBefore(Instant.now()))) {
+								.plus(Duration.ofDays(1)).isBefore(Instant.now()))) {
 			final JsonNode responses = fixture.get("response");
 			for (int i = 0; i < responses.size(); i++) {
 				final JsonNode f = responses.get(i).has("fixture") ? responses.get(i).get("fixture") : null;
 				if (f != null && f.has("timestamp") && "TBD".equals(f.get("status").get("short").asText())) {
-					if (Instant.ofEpochSecond(f.get("timestamp").asLong())
-							.minus(Duration.ofDays(14)).isBefore(Instant.now()))
+					final Instant time = Instant.ofEpochSecond(f.get("timestamp").asLong());
+					if (time.isAfter(Instant.now()) && time.minus(Duration.ofDays(14)).isBefore(Instant.now()))
 						return null;
 					break;
 				}
