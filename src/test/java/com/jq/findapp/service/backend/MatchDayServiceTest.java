@@ -149,7 +149,8 @@ public class MatchDayServiceTest {
 						"" + (long) (Instant.now().plus(Duration.ofDays(15)).getEpochSecond())));
 
 		// when
-		final JsonNode cache = matchDayService.needUpdate(storage);
+		final JsonNode cache = matchDayService.needUpdate(storage,
+				"team=786&season=" + matchDayService.currentSeason());
 
 		// then
 		assertNotNull(cache);
@@ -168,7 +169,8 @@ public class MatchDayServiceTest {
 						"" + (long) (Instant.now().plus(Duration.ofDays(14)).getEpochSecond())));
 
 		// when
-		final JsonNode cache = matchDayService.needUpdate(storage);
+		final JsonNode cache = matchDayService.needUpdate(storage,
+				"team=786&season=" + matchDayService.currentSeason());
 
 		// then
 		assertNull(cache);
@@ -187,10 +189,23 @@ public class MatchDayServiceTest {
 						"" + (long) (Instant.now().plus(Duration.ofDays(14)).getEpochSecond())));
 
 		// when
-		final JsonNode cache = matchDayService.needUpdate(storage);
+		final JsonNode cache = matchDayService.needUpdate(storage,
+				"team=786&season=" + matchDayService.currentSeason());
 
 		// then
 		assertNotNull(cache);
+	}
+
+	@Test
+	public void needUpdate_noSeason() throws Exception {
+		// given
+		final Map<String, Object> storage = new HashMap<>();
+
+		// when
+		final JsonNode cache = matchDayService.needUpdate(storage, "id=1234");
+
+		// then
+		assertNull(cache);
 	}
 
 	@Test

@@ -662,7 +662,7 @@ public class MatchDayService {
 		}
 	}
 
-	private int currentSeason() {
+	int currentSeason() {
 		final LocalDateTime now = LocalDateTime.now();
 		return now.getYear() - (now.getMonth().getValue() < 6 ? 1 : 0);
 	}
