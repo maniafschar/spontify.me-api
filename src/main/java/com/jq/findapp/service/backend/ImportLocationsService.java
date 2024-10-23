@@ -369,7 +369,8 @@ public class ImportLocationsService {
 			}
 			if (location.modified()) {
 				repository.save(location);
-				updated++;
+				if (!Strings.isEmpty(location.getImage()) || !Strings.isEmpty(location.getEmail()))
+					updated++;
 			}
 		}
 		result.body += (updated > 0 ? updated + " updated\n" : "") + (exceptions > 0 ? exceptions + " exceptions" : "");
