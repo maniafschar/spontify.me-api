@@ -671,11 +671,11 @@ public class MatchDayService {
 		final CronResult result = new CronResult();
 		final Result list = repository.list(new QueryParams(Query.misc_listClient));
 		for (int i = 0; i < list.size(); i++) {
-			try {
-				final BigInteger clientId = (BigInteger) list.get(i).get("client.id");
-				final JsonNode json = Json.toNode(list.get(i).get("client.storage").toString());
-				if (json.has("matchDays")) {
-					for (int i2 = 0; i2 < json.get("matchDays").size(); i2++) {
+			final BigInteger clientId = (BigInteger) list.get(i).get("client.id");
+			final JsonNode json = Json.toNode(list.get(i).get("client.storage").toString());
+			if (json.has("matchDays")) {
+				for (int i2 = 0; i2 < json.get("matchDays").size(); i2++) {
+					try {
 						final int teamId = json.get("matchDays").get(i2).asInt();
 						BigInteger id = synchronize.prediction(clientId, teamId);
 						if (id != null)
@@ -687,13 +687,11 @@ public class MatchDayService {
 						if (s.length() > 0)
 							result.body += "\nresultAndNotify: " + s;
 						result.body += synchronize.updateMatchdays(clientId);
+					} catch (final Exception e) {
+						if (result.exception == null)
+							result.exception = e;
 					}
 				}
-			} catch (final Exception e) {
-				notificationService.createTicket(TicketType.ERROR, "MatchDays", Strings.stackTraceToString(e),
-						(BigInteger) list.get(i).get("client.id"));
-				if (result.exception == null)
-					result.exception = e;
 			}
 		}
 		return result;
