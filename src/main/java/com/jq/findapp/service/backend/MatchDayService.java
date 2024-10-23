@@ -44,6 +44,7 @@ import com.jq.findapp.entity.ClientMarketing.Poll;
 import com.jq.findapp.entity.ClientMarketing.Question;
 import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.ClientMarketingResult.PollResult;
+import com.jq.findapp.entity.Event.FutureEvent;
 import com.jq.findapp.entity.Storage;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
@@ -710,8 +711,7 @@ public class MatchDayService {
 			if ("NS".equals(json.get(i).get("fixture").get("status").get("short").asText()))
 				events.add(new FutureEvent(json.get(i).get("fixture").get("timestamp").asLong() * 1000,
 						json.get(i).get("teams").get("home").get("name").asText() + " : "
-								+ json.get(i).get("teams").get("away").get("name").asText(),
-						json.get(i).get("teams").get("home").get("id").asInt() == teamId));
+								+ json.get(i).get("teams").get("away").get("name").asText()));
 		}
 		return events;
 	}
@@ -791,17 +791,5 @@ public class MatchDayService {
 			}
 		}
 		return fixture;
-	}
-
-	public static class FutureEvent {
-		public final long time;
-		public final boolean home;
-		public final String subject;
-
-		private FutureEvent(final long time, final String subject, final boolean home) {
-			this.time = time;
-			this.subject = subject;
-			this.home = home;
-		}
 	}
 }
