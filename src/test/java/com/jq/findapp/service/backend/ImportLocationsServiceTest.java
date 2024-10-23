@@ -103,7 +103,7 @@ public class ImportLocationsServiceTest {
 						.replace("Melchiorstraße", "Wilhelm-Leibl-Straße")
 						.replace("\"6\"", "\"22\""));
 		repository.save(storage);
-		final Location location = new Location();
+		Location location = new Location();
 		location.setName("Teatro");
 		location.setAddress(address);
 		location.setUrl("https://teatro-solln.de/");
@@ -115,6 +115,8 @@ public class ImportLocationsServiceTest {
 		// then
 		assertTrue(result.body.contains(" updated"));
 		assertNull(result.exception);
-		assertEquals("info@teatro-solln.de", repository.one(Location.class, location.getId()).getEmail());
+		location = repository.one(Location.class, location.getId())
+		assertEquals("info@teatro-solln.de", location.getEmail());
+		assertNotNull(location.getImage());
 	}
 }
