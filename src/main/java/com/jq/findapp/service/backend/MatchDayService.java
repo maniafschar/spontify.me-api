@@ -724,7 +724,7 @@ public class MatchDayService {
 		final QueryParams params = new QueryParams(Query.misc_listStorage);
 		params.setSearch("storage.label='" + label + "'");
 		final Result result = repository.list(params);
-		if (result.size() == 0 || (fixture = needUpdate(result.get(0))) == null) {
+		if (result.size() == 0 || (fixture = needUpdate(result.get(0)),url) == null) {
 			if (System.currentTimeMillis() - pauseUntil < 0) {
 				String unit;
 				double i = (pauseUntil - System.currentTimeMillis()) / 1000;
@@ -768,15 +768,16 @@ public class MatchDayService {
 		return fixture.get("response");
 	}
 
-	JsonNode needUpdate(final Map<String, Object> storage) {
+	JsonNode needUpdate(final Map<String, Object> storage, final String url) {
 		JsonNode fixture = null;
 		if (!Strings.isEmpty(storage.get("storage.storage")))
 			fixture = Json.toNode(storage.get("storage.storage").toString());
 		if (fixture == null || fixture.has("errors")
 				&& (fixture.get("errors").has("rateLimit") || fixture.get("errors").has("requests")))
 			return null;
-		if (Instant.ofEpochMilli(((Timestamp) storage.get("storage.createdAt")).getTime())
-				.plus(Duration.ofHours(23)).isBefore(Instant.now())
+		if (url.contains("season=" + currentSeason()) && url.contains("team=") &&
+				Instant.ofEpochMilli(((Timestamp) storage.get("storage.createdAt")).getTime())
+						.plus(Duration.ofDays(1)).isBefore(Instant.now())
 				&& (storage.get("storage.modifiedAt") == null
 						|| Instant.ofEpochMilli(((Timestamp) storage.get("storage.modifiedAt")).getTime())
 								.plus(Duration.ofDays(1)).isBefore(Instant.now()))) {
