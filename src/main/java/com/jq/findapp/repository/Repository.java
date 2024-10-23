@@ -423,7 +423,7 @@ public class Repository {
 				s = new String[] { "", value };
 			if (publicDir && s[1].length() > 20) {
 				final byte[] data = Base64.getDecoder().decode(s[1]);
-				if (old != null) {
+				if (!Strings.isEmpty(old)) {
 					final Path path = Paths.get(PATH + PUBLIC + getFilename(old));
 					if (Files.exists(path)) {
 						if (Arrays.equals(IOUtils.toByteArray(new FileInputStream(path.toFile())), data))
