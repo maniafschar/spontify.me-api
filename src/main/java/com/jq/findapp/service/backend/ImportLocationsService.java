@@ -367,15 +367,17 @@ public class ImportLocationsService {
 				if (result.exception == null)
 					result.exception = ex;
 			}
-			if (location.modified()) {
-				repository.save(location);
-				if (!Strings.isEmpty(location.getImage()) && !Strings.isEmpty(location.getEmail()))
-					updatedBoth++;
-				else if (!Strings.isEmpty(location.getImage()))
-					updatedImage++;
-				else if (!Strings.isEmpty(location.getEmail()))
-					updatedEmail++;
-			}
+			if (location.getEmail() == null)
+				location.setEmail("");
+			if (location.getUrl() == null)
+				location.setUrl("");
+			repository.save(location);
+			if (!Strings.isEmpty(location.getImage()) && !Strings.isEmpty(location.getEmail()))
+				updatedBoth++;
+			else if (!Strings.isEmpty(location.getImage()))
+				updatedImage++;
+			else if (!Strings.isEmpty(location.getEmail()))
+				updatedEmail++;
 		}
 		result.body += (updatedBoth > 0 ? updatedBoth + " updated image&email\n" : "")
 				+ (updatedImage > 0 ? updatedImage + " updated image\n" : "")
@@ -390,8 +392,6 @@ public class ImportLocationsService {
 			findImage(html, "src=\"([^\"]*)\"", location);
 			if (Strings.isEmpty(location.getImage()))
 				findImage(html, "url([^)]*)", location);
-			if (location.getImage() == null)
-				location.setImage("");
 		}
 		if (Strings.isEmpty(location.getEmail()) && html.contains("impressum")) {
 			html = html.substring(0, html.lastIndexOf("impressum"));
@@ -431,8 +431,6 @@ public class ImportLocationsService {
 				}
 			}
 		}
-		if (location.getEmail() == null)
-			location.setEmail("");
 	}
 
 	private void findImage(String html, String pattern, Location location) {
