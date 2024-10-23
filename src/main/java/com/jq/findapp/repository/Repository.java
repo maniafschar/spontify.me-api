@@ -412,7 +412,15 @@ public class Repository {
 			final String id;
 			// value = ".jpg" + SEPARATOR + "base64data";
 			// value = "some text";
-			final String[] s = publicDir ? value.split(SEPARATOR) : new String[] { "", value };
+			final String[] s;
+			if (publicDir) {
+				if (value.contains(SEPARATOR))
+					s = value.split(SEPARATOR);
+				else
+					throw new IllegalArgumentException("IMAGE_FORMAT_EXCEPTION missing separeator: "
+							+ value.substring(0, Math.min(50, value.length())));
+			} else
+				s = new String[] { "", value };
 			if (publicDir && s[1].length() > 20) {
 				final byte[] data = Base64.getDecoder().decode(s[1]);
 				if (old != null) {
