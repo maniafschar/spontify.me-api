@@ -115,8 +115,9 @@ public class ImportLocationsServiceTest {
 		// then
 		assertTrue(result.body.contains(" updated"));
 		assertNull(result.exception);
-		location = repository.one(Location.class, location.getId())
-		assertEquals("info@teatro-solln.de", location.getEmail());
+		location = repository.one(Location.class, location.getId());
+		assertNotNull(location.getModifiedAt());
 		assertNotNull(location.getImage());
+		assertEquals("info@teatro-solln.de", location.getEmail());
 	}
 }
