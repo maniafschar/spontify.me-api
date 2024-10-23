@@ -357,7 +357,7 @@ public class ImportLocationsService {
 				"length(location.url)>0 and (location.image is null or location.email is null) and (location.skills is null or location.skills<>'X')");
 		final Result list = repository.list(params);
 		result.body = list.size() + " locations for update\n";
-		int updated = 0, exceptions = 0;
+		int updatedEmail = 0, updatedImage = 0, updatedBoth = 0, exceptions = 0;
 		for (int i = 0; i < list.size(); i++) {
 			final Location location = repository.one(Location.class, (BigInteger) list.get(i).get("location.id"));
 			try {
@@ -369,11 +369,18 @@ public class ImportLocationsService {
 			}
 			if (location.modified()) {
 				repository.save(location);
-				if (!Strings.isEmpty(location.getImage()) || !Strings.isEmpty(location.getEmail()))
-					updated++;
+				if (!Strings.isEmpty(location.getImage()) && !Strings.isEmpty(location.getEmail()))
+					updatedBoth++;
+				else if (!Strings.isEmpty(location.getImage()))
+					updatedImage++;
+				else if (!Strings.isEmpty(location.getEmail()))
+					updatedEmail++;
 			}
 		}
-		result.body += (updated > 0 ? updated + " updated\n" : "") + (exceptions > 0 ? exceptions + " exceptions" : "");
+		result.body += (updatedBoth > 0 ? updatedBoth + " updated image&email\n" : "")
+				+ (updatedImage > 0 ? updatedImage + " updated image\n" : "")
+				+ (updatedEmail > 0 ? updatedEmail + " updated email\n" : "")
+				+ (exceptions > 0 ? exceptions + " exceptions" : "");
 		return result;
 	}
 
