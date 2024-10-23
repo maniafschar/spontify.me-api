@@ -46,6 +46,8 @@ public class ImportLocationsService {
 	@Autowired
 	private Repository repository;
 
+	private final int minImageSize = 350;
+	
 	/*
 	 * 0 shopping
 	 * 1 culture
@@ -325,7 +327,7 @@ public class ImportLocationsService {
 							if (matcher.find()) {
 								final String image = matcher.group(1);
 								try {
-									location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, 0));
+									location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, minImageSize));
 									location.setImageList(
 											EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
 									repository.save(location);
@@ -425,7 +427,6 @@ public class ImportLocationsService {
 
 	private void findImage(String html, String pattern, Location location) {
 		final Matcher matcher = Pattern.compile(pattern).matcher(html);
-		final int min = 350;
 		int size = 0;
 		String urlImage = null;
 		while (matcher.find()) {
@@ -435,7 +436,7 @@ public class ImportLocationsService {
 					final BufferedImage img = ImageIO
 							.read(new ByteArrayInputStream(
 									IOUtils.toByteArray(new URI(m.contains("://") ? m : location.getUrl() + "/" + m))));
-					if (size < img.getWidth() * img.getHeight() && img.getWidth() > min && img.getHeight() > min) {
+					if (size < img.getWidth() * img.getHeight() && img.getWidth() > minImageSize && img.getHeight() > minImageSize) {
 						urlImage = m;
 						size = img.getWidth() * img.getHeight();
 					}
@@ -444,7 +445,7 @@ public class ImportLocationsService {
 			}
 		}
 		if (urlImage != null && size > 150000) {
-			location.setImage(EntityUtil.getImage(urlImage, EntityUtil.IMAGE_SIZE, min));
+			location.setImage(EntityUtil.getImage(urlImage, EntityUtil.IMAGE_SIZE, minImageSize));
 			location.setImageList(EntityUtil.getImage(urlImage, EntityUtil.IMAGE_THUMB_SIZE, 0));
 		}
 	}
@@ -469,7 +470,7 @@ public class ImportLocationsService {
 			if (!matcher.find())
 				throw new IllegalArgumentException("no image in html: " + html);
 			image = matcher.group(1);
-			location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, 0));
+			location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, minImageSize));
 			if (location.getImage() != null)
 				location.setImageList(EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
 			repository.save(location);
