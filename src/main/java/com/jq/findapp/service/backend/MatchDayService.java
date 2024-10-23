@@ -724,7 +724,7 @@ public class MatchDayService {
 		final QueryParams params = new QueryParams(Query.misc_listStorage);
 		params.setSearch("storage.label='" + label + "'");
 		final Result result = repository.list(params);
-		if (result.size() == 0 || (fixture = needUpdate(result.get(0)),url) == null) {
+		if (result.size() == 0 || (fixture = needUpdate(result.get(0), url)) == null) {
 			if (System.currentTimeMillis() - pauseUntil < 0) {
 				String unit;
 				double i = (pauseUntil - System.currentTimeMillis()) / 1000;
