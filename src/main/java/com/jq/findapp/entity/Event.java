@@ -40,6 +40,16 @@ public class Event extends BaseEntity {
 		Location, Online, Inquiry, Poll
 	}
 
+	public static class FutureEvent {
+		public final long time;
+		public final String subject;
+
+		public FutureEvent(final long time, final String subject) {
+			this.time = time;
+			this.subject = subject;
+		}
+	}
+
 	public enum Repetition {
 		Once, Week, TwoWeeks, Month, Year, Games
 	}
