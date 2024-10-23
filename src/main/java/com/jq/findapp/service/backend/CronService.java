@@ -227,8 +227,8 @@ public class CronService {
 
 		@Override
 		public String toString() {
-			return (body == null ? "" : body)
-					+ (exception == null ? "" : "\n" + Strings.stackTraceToString(exception)).trim();
+			return ((body == null ? "" : body)
+					+ (exception == null ? "" : "\n" + Strings.stackTraceToString(exception))).trim();
 		}
 	}
 }
