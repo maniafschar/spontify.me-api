@@ -359,20 +359,24 @@ public class ImportLocationsService {
 		result.body = list.size() + " locations for update\n";
 		int updated = 0, exceptions = 0;
 		for (int i = 0; i < list.size(); i++) {
+			final Location location = repository.one(Location.class, (BigInteger) list.get(i).get("location.id"));
 			try {
-				if (importEmailImage(repository.one(Location.class,
-						(BigInteger) list.get(i).get("location.id"))))
-					updated++;
+				importEmailImage(location);
 			} catch (Exception ex) {
 				exceptions++;
-				result.exception = ex;
+				if (result.exception == null)
+					result.exception = ex;
+			}
+			if (location.modified()) {
+				repository.save(location);
+				updated++;
 			}
 		}
 		result.body += (updated > 0 ? updated + " updated\n" : "") + (exceptions > 0 ? exceptions + " exceptions" : "");
 		return result;
 	}
 
-	private boolean importEmailImage(final Location location) throws Exception {
+	private void importEmailImage(final Location location) throws Exception {
 		String html = IOUtils.toString(new URI(location.getUrl()), StandardCharsets.UTF_8).toLowerCase();
 		if (Strings.isEmpty(location.getImage())) {
 			findImage(html, "src=\"([^\"]*)\"", location);
@@ -408,8 +412,7 @@ public class ImportLocationsService {
 										|| email.endsWith("@t-online.de")
 										|| location.getUrl()
 												.contains(email.substring(matcher.group(1).indexOf("@") + 1))
-										||
-										location.getUrl()
+										|| location.getUrl()
 												.contains(email.substring(0, matcher.group(1).indexOf("@"))))) {
 							location.setEmail(email);
 							break;
@@ -418,11 +421,6 @@ public class ImportLocationsService {
 				}
 			}
 		}
-		if (location.modified()) {
-			repository.save(location);
-			return true;
-		}
-		return false;
 	}
 
 	private void findImage(String html, String pattern, Location location) {
