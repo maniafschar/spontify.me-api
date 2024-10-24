@@ -87,46 +87,43 @@ public class CronService {
 
 	@Async
 	public void run() {
-		CompletableFuture.supplyAsync(() -> {
-			final ZonedDateTime now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
-			final List<CompletableFuture<Void>> list = new ArrayList<>();
-			run(importSportsBarService, null, list, "0 3", now);
-			run(importSportsBarService, "Import", list, null, now);
-			run(chatService, null, list, null, now);
-			run(marketingLocationService, null, list, "* 6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21", now);
-			run(marketingLocationService, "Sent", list, "10 19", now);
-			run(marketingLocationService, "Unfinished", list, "30 17", now);
-			run(marketingLocationService, "Cooperation", list, "40 17", now);
-			run(dbService, null, list, null, now);
-			run(dbService, "CleanUp", list, "30 0", now);
-			run(engagementService, "Registration", list, "40 10", now);
-			run(eventService, null, list, null, now);
-			run(eventService, "Match", list, null, now);
-			run(eventService, "Import", list, "40 5", now);
-			run(eventService, "Publish", list, null, now);
-			run(eventService, "Series", list, "40 23", now);
-			run(importLogService, null, list, null, now);
-			run(rssService, null, list, null, now);
-			run(matchDayService, null, list, null, now);
-			run(importLocationsService, null, list, null, now);
-			run(importLocationsService, "Image", list, "30 2", now);
-			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
-					.map(CompletableFuture::join).collect(Collectors.toList())).join();
-			list.clear();
-			run(marketingService, null, list, null, now);
-			run(marketingService, "Result", list, null, now);
-			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
-					.map(CompletableFuture::join).collect(Collectors.toList())).join();
-			run(engagementService, "NearBy", null, null, now);
-			list.clear();
-			run(engagementService, null, list, null, now);
-			run(ipService, null, list, null, now);
-			run(sitemapService, null, list, "0 20", now);
-			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
-					.map(CompletableFuture::join).collect(Collectors.toList())).join();
-			run(dbService, "Backup", null, null, now);
-			return null;
-		});
+		final ZonedDateTime now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
+		final List<CompletableFuture<Void>> list = new ArrayList<>();
+		run(importSportsBarService, null, list, "0 3", now);
+		run(importSportsBarService, "Import", list, null, now);
+		run(chatService, null, list, null, now);
+		run(marketingLocationService, null, list, "* 6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21", now);
+		run(marketingLocationService, "Sent", list, "10 19", now);
+		run(marketingLocationService, "Unfinished", list, "30 17", now);
+		run(marketingLocationService, "Cooperation", list, "40 17", now);
+		run(dbService, null, list, null, now);
+		run(dbService, "CleanUp", list, "30 0", now);
+		run(engagementService, "Registration", list, "40 10", now);
+		run(eventService, null, list, null, now);
+		run(eventService, "Match", list, null, now);
+		run(eventService, "Import", list, "40 5", now);
+		run(eventService, "Publish", list, null, now);
+		run(eventService, "Series", list, "40 23", now);
+		run(importLogService, null, list, null, now);
+		run(rssService, null, list, null, now);
+		run(matchDayService, null, list, null, now);
+		run(importLocationsService, null, list, null, now);
+		run(importLocationsService, "Image", list, "30 2", now);
+		CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
+				.map(CompletableFuture::join).collect(Collectors.toList())).join();
+		list.clear();
+		run(marketingService, null, list, null, now);
+		run(marketingService, "Result", list, null, now);
+		CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
+				.map(CompletableFuture::join).collect(Collectors.toList())).join();
+		run(engagementService, "NearBy", null, null, now);
+		list.clear();
+		run(engagementService, null, list, null, now);
+		run(ipService, null, list, null, now);
+		run(sitemapService, null, list, "0 20", now);
+		CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
+				.map(CompletableFuture::join).collect(Collectors.toList())).join();
+		run(dbService, "Backup", null, null, now);
 	}
 
 	private void run(final Object bean, final String method, final List<CompletableFuture<Void>> list,
