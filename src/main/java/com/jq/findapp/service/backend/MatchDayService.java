@@ -138,6 +138,7 @@ public class MatchDayService {
 							final ClientMarketing clientMarketing = new ClientMarketing();
 							clientMarketing.setCreateResult(true);
 							clientMarketing.setClientId(clientId);
+							clientMarketing.setSkills("9." + teamId);
 							clientMarketing.setStartDate(new Timestamp(end
 									.minus(Duration.ofDays(1)).toEpochMilli()));
 							clientMarketing.setEndDate(new Timestamp(end.toEpochMilli()));
@@ -299,6 +300,7 @@ public class MatchDayService {
 								playerOfTheMatchAddAnswers(question.answers, players);
 								poll.questions.add(question);
 								final ClientMarketing clientMarketing = new ClientMarketing();
+								clientMarketing.setSkills("9." + teamId);
 								clientMarketing.setCreateResult(true);
 								clientMarketing.setStartDate(new Timestamp(startDate.toEpochMilli()));
 								clientMarketing
