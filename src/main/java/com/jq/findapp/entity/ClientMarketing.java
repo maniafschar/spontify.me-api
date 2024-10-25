@@ -22,6 +22,7 @@ public class ClientMarketing extends BaseEntity {
 	private String language;
 	private String publishId;
 	private String region;
+	private String skills;
 	private String storage;
 	private String image;
 	private Timestamp endDate;
@@ -117,6 +118,14 @@ public class ClientMarketing extends BaseEntity {
 
 	public void setLanguage(final String language) {
 		this.language = language;
+	}
+
+	public String getSkills() {
+		return skills;
+	}
+
+	public void setSkills(final String skills) {
+		this.skills = skills;
 	}
 
 	public String getRegion() {
