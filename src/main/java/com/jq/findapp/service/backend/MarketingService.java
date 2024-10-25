@@ -51,6 +51,7 @@ public class MarketingService {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
 		params.setUser(new Contact());
+		params.setLimit(0);
 		final String today = Instant.now().toString().substring(0, 19);
 		params.setSearch("clientMarketing.share=true and clientMarketing.startDate<=cast('" + today
 				+ "' as timestamp) and clientMarketing.endDate>=cast('" + today + "' as timestamp)");
@@ -75,6 +76,10 @@ public class MarketingService {
 						run = false;
 					else if (!Strings.isEmpty(clientMarketing.getGender())
 							&& !clientMarketing.getGender().contains("" + contact.getGender()))
+						run = false;
+					else if (!Strings.isEmpty(clientMarketing.getSkills())
+							&& (contact.getSkills() == null || 
+									!('|' + contact.getSkills() + '|').contains('|' + clientMarketing.getSkills() + '|')))
 						run = false;
 					else if (!Strings.isEmpty(clientMarketing.getAge())
 							&& (contact.getAge() == null
