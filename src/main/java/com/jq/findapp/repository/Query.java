@@ -25,7 +25,7 @@ public enum Query {
 	contact_listId,
 	contact_listMarketing,
 	contact_listNotification(true),
-	contact_listNotificationId(),
+	contact_listNotificationId,
 	contact_listReferer,
 	contact_listSupportCenter,
 	contact_listTeaser(true),
@@ -41,7 +41,7 @@ public enum Query {
 	contact_token,
 
 	event_list(true),
-	event_listId(),
+	event_listId,
 	event_listBlocked,
 	event_listMatching(true),
 	event_listParticipate(true),
