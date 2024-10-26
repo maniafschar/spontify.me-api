@@ -361,7 +361,6 @@ public class ImportLocationsService {
 		for (int i = 0; i < list.size(); i++) {
 			final Location location = repository.one(Location.class, (BigInteger) list.get(i).get("location.id"));
 			try {
-				notificationService.createTicket(TicketType.ERROR, "location image", location.getUrl(), null);
 				importEmailImage(location);
 			} catch (Exception ex) {
 				exceptions++;
@@ -389,6 +388,7 @@ public class ImportLocationsService {
 
 	private void importEmailImage(final Location location) throws Exception {
 		String html = IOUtils.toString(new URI(location.getUrl()), StandardCharsets.UTF_8).toLowerCase();
+		notificationService.createTicket(TicketType.ERROR, "location image", html, null);
 		if (Strings.isEmpty(location.getImage())) {
 			findImage(html, "src=\"([^\"]*)\"", location);
 			if (Strings.isEmpty(location.getImage()))
@@ -396,6 +396,7 @@ public class ImportLocationsService {
 		}
 		if (Strings.isEmpty(location.getEmail()) && html.contains("impressum")) {
 			html = html.substring(0, html.lastIndexOf("impressum"));
+			notificationService.createTicket(TicketType.ERROR, "location image impressum", html, null);
 			int i = html.lastIndexOf("href=\"");
 			if (i > -1) {
 				i += 6;
@@ -426,6 +427,7 @@ public class ImportLocationsService {
 										|| location.getUrl()
 												.contains(email.substring(0, matcher.group(1).indexOf("@"))))) {
 							location.setEmail(email);
+							notificationService.createTicket(TicketType.ERROR, "location image", email, null);
 							break;
 						}
 					}
@@ -455,6 +457,7 @@ public class ImportLocationsService {
 			}
 		}
 		if (urlImage != null && size > 150000) {
+			notificationService.createTicket(TicketType.ERROR, "location image", "image: " + urlImage, null);
 			location.setImage(EntityUtil.getImage(urlImage, EntityUtil.IMAGE_SIZE, minImageSize));
 			location.setImageList(EntityUtil.getImage(urlImage, EntityUtil.IMAGE_THUMB_SIZE, 0));
 		}
