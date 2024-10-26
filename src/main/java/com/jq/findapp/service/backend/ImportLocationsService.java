@@ -367,8 +367,6 @@ public class ImportLocationsService {
 					errors.append(location.getId() + " " + location.getUrl() + ": no image");
 			} catch (Exception ex) {
 				exceptions++;
-				if (result.exception == null)
-					result.exception = ex;
 				errors.append(
 						location.getId() + " " + location.getUrl() + "\n" + Strings.stackTraceToString(ex) + "\n\n");
 			}
