@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -386,7 +385,7 @@ public class ImportLocationsService {
 	}
 
 	private void importEmailImage(final Location location) throws Exception {
-		String html = IOUtils.toString(new URI(location.getUrl()), StandardCharsets.UTF_8).toLowerCase();
+		String html = Strings.url2string(location.getUrl()).toLowerCase();
 		if (Strings.isEmpty(location.getImage())) {
 			findImage(html, "src=\"([^\"]*)\"", location);
 			if (Strings.isEmpty(location.getImage()))
@@ -406,8 +405,7 @@ public class ImportLocationsService {
 						baseUrl = baseUrl.substring(0, baseUrl.indexOf('/', 10));
 					html = baseUrl + html;
 				}
-				html = IOUtils.toString(new URI(html), StandardCharsets.UTF_8)
-						.toLowerCase().replace("[at]", "@").replace("(*at*)", "@");
+				html = Strings.url2string(html).toLowerCase().replace("[at]", "@").replace("(*at*)", "@");
 				int pos = html.length();
 				final Pattern emailPattern = Pattern.compile(".*(\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,8}\\b).*",
 						Pattern.CASE_INSENSITIVE);

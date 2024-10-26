@@ -2,7 +2,12 @@ package com.jq.findapp.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.Date;
@@ -96,5 +101,21 @@ public class Strings {
 				s.append(c);
 		}
 		return s.toString();
+	}
+
+	public static String url2string(String url) {
+		try {
+			return (String) HttpClient.newHttpClient().send(HttpRequest.newBuilder()
+					.uri(URI.create(url))
+					.timeout(Duration.ofMinutes(1))
+					.header("Content-Type", "application/json")
+					.header("accept",
+							"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
+					.header("accept-language", "de-DE,de;q=0.9,en;q=0.8,en-US;q=0.7")
+					.GET()
+					.build(), BodyHandlers.ofString()).body();
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 }
