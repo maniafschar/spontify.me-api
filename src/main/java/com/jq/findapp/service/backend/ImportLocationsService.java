@@ -1,7 +1,6 @@
 package com.jq.findapp.service.backend;
 
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -388,7 +387,6 @@ public class ImportLocationsService {
 
 	private void importEmailImage(final Location location) throws Exception {
 		String html = IOUtils.toString(new URI(location.getUrl()), StandardCharsets.UTF_8).toLowerCase();
-		notificationService.createTicket(TicketType.ERROR, "location image", html, null);
 		if (Strings.isEmpty(location.getImage())) {
 			findImage(html, "src=\"([^\"]*)\"", location);
 			if (Strings.isEmpty(location.getImage()))
@@ -396,7 +394,6 @@ public class ImportLocationsService {
 		}
 		if (Strings.isEmpty(location.getEmail()) && html.contains("impressum")) {
 			html = html.substring(0, html.lastIndexOf("impressum"));
-			notificationService.createTicket(TicketType.ERROR, "location image impressum", html, null);
 			int i = html.lastIndexOf("href=\"");
 			if (i > -1) {
 				i += 6;
@@ -427,7 +424,6 @@ public class ImportLocationsService {
 										|| location.getUrl()
 												.contains(email.substring(0, matcher.group(1).indexOf("@"))))) {
 							location.setEmail(email);
-							notificationService.createTicket(TicketType.ERROR, "location image", email, null);
 							break;
 						}
 					}
@@ -438,15 +434,15 @@ public class ImportLocationsService {
 
 	private void findImage(String html, String pattern, Location location) {
 		final Matcher matcher = Pattern.compile(pattern).matcher(html);
-		int size = 0;
+		int size = 0, last = 0;
 		String urlImage = null;
-		while (matcher.find()) {
-			String m = matcher.group(1).toLowerCase();
+		while (matcher.find() && matcher.start() > last) {
+			last = matcher.start();
+			final String m = matcher.group(1).toLowerCase();
 			if (m.endsWith(".jpg") || m.endsWith(".jpeg") || m.endsWith(".png")) {
 				try {
 					final BufferedImage img = ImageIO
-							.read(new ByteArrayInputStream(
-									IOUtils.toByteArray(new URI(m.contains("://") ? m : location.getUrl() + "/" + m))));
+							.read(new URI(m.contains("://") ? m : location.getUrl() + "/" + m).toURL().openStream());
 					if (size < img.getWidth() * img.getHeight() && img.getWidth() > minImageSize
 							&& img.getHeight() > minImageSize) {
 						urlImage = m;
@@ -457,7 +453,6 @@ public class ImportLocationsService {
 			}
 		}
 		if (urlImage != null && size > 150000) {
-			notificationService.createTicket(TicketType.ERROR, "location image", "image: " + urlImage, null);
 			location.setImage(EntityUtil.getImage(urlImage, EntityUtil.IMAGE_SIZE, minImageSize));
 			location.setImageList(EntityUtil.getImage(urlImage, EntityUtil.IMAGE_THUMB_SIZE, 0));
 		}
