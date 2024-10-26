@@ -361,15 +361,18 @@ public class ImportLocationsService {
 			final Location location = repository.one(Location.class, (BigInteger) list.get(i).get("location.id"));
 			try {
 				importEmailImage(location);
-				if (Strings.isEmpty(location.getEmail()))
+				if (Strings.isEmpty(location.getImage()) && Strings.isEmpty(location.getEmail()))
+					errors.append(location.getId() + " " + location.getUrl() + ": no image & email");
+				else if (Strings.isEmpty(location.getEmail()))
 					errors.append(location.getId() + " " + location.getUrl() + ": no email");
-				if (Strings.isEmpty(location.getImage()))
+				else if (Strings.isEmpty(location.getImage()))
 					errors.append(location.getId() + " " + location.getUrl() + ": no image");
 			} catch (Exception ex) {
 				exceptions++;
 				errors.append(
-						location.getId() + " " + location.getUrl() + "\n" + Strings.stackTraceToString(ex) + "\n\n");
+						location.getId() + " " + location.getUrl() + "\n" + Strings.stackTraceToString(ex));
 			}
+			errors.append("\n\n");
 			if (location.getEmail() == null)
 				location.setEmail("");
 			if (location.getUrl() == null)
