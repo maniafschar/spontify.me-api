@@ -361,7 +361,7 @@ public class ImportLocationsService {
 		for (int i = 0; i < list.size(); i++) {
 			final Location location = repository.one(Location.class, (BigInteger) list.get(i).get("location.id"));
 			try {
-				result.body = location.getUrl();
+				notificationService.createTicket(TicketType.ERROR, "location image", location.getUrl(), null);
 				importEmailImage(location);
 			} catch (Exception ex) {
 				exceptions++;
