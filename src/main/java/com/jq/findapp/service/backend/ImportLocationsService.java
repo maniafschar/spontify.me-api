@@ -362,17 +362,16 @@ public class ImportLocationsService {
 			try {
 				importEmailImage(location);
 				if (Strings.isEmpty(location.getImage()) && Strings.isEmpty(location.getEmail()))
-					errors.append(location.getId() + " " + location.getUrl() + ": no image & email");
+					errors.append(location.getId() + " " + location.getUrl() + ": no image & email\n\n");
 				else if (Strings.isEmpty(location.getEmail()))
-					errors.append(location.getId() + " " + location.getUrl() + ": no email");
+					errors.append(location.getId() + " " + location.getUrl() + ": no email\n\n");
 				else if (Strings.isEmpty(location.getImage()))
-					errors.append(location.getId() + " " + location.getUrl() + ": no image");
+					errors.append(location.getId() + " " + location.getUrl() + ": no image\n\n");
 			} catch (Exception ex) {
 				exceptions++;
 				errors.append(
-						location.getId() + " " + location.getUrl() + "\n" + Strings.stackTraceToString(ex));
+						location.getId() + " " + location.getUrl() + "\n" + Strings.stackTraceToString(ex) + "\n\n");
 			}
-			errors.append("\n\n");
 			if (location.getEmail() == null)
 				location.setEmail("");
 			if (location.getUrl() == null)
