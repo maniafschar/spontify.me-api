@@ -355,15 +355,22 @@ public class ImportLocationsService {
 				"length(location.url)>0 and (location.image is null or location.email is null) and (location.skills is null or location.skills<>'X')");
 		final Result list = repository.list(params);
 		result.body = list.size() + " locations for update\n";
+		final StringBuilder errors = new StringBuilder();
 		int updatedEmail = 0, updatedImage = 0, updatedBoth = 0, exceptions = 0;
 		for (int i = 0; i < list.size(); i++) {
 			final Location location = repository.one(Location.class, (BigInteger) list.get(i).get("location.id"));
 			try {
 				importEmailImage(location);
+				if (Strings.isEmpty(location.getEmail()))
+					errors.append(location.getId() + " " + location.getUrl() + ": no email");
+				if (Strings.isEmpty(location.getImage()))
+					errors.append(location.getId() + " " + location.getUrl() + ": no image");
 			} catch (Exception ex) {
 				exceptions++;
 				if (result.exception == null)
 					result.exception = ex;
+				errors.append(
+						location.getId() + " " + location.getUrl() + "\n" + Strings.stackTraceToString(ex) + "\n\n");
 			}
 			if (location.getEmail() == null)
 				location.setEmail("");
@@ -381,6 +388,8 @@ public class ImportLocationsService {
 				+ (updatedImage > 0 ? updatedImage + " updated image\n" : "")
 				+ (updatedEmail > 0 ? updatedEmail + " updated email\n" : "")
 				+ (exceptions > 0 ? exceptions + " exceptions" : "");
+		if (errors.length() > 0)
+			notificationService.createTicket(TicketType.ERROR, "location image", errors.toString().trim(), null);
 		return result;
 	}
 
