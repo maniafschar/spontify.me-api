@@ -47,7 +47,7 @@ public class ImportLocationsService {
 	private Repository repository;
 
 	private final int minImageSize = 350;
-	
+
 	/*
 	 * 0 shopping
 	 * 1 culture
@@ -361,6 +361,7 @@ public class ImportLocationsService {
 		for (int i = 0; i < list.size(); i++) {
 			final Location location = repository.one(Location.class, (BigInteger) list.get(i).get("location.id"));
 			try {
+				result.body = location.getUrl();
 				importEmailImage(location);
 			} catch (Exception ex) {
 				exceptions++;
@@ -444,7 +445,8 @@ public class ImportLocationsService {
 					final BufferedImage img = ImageIO
 							.read(new ByteArrayInputStream(
 									IOUtils.toByteArray(new URI(m.contains("://") ? m : location.getUrl() + "/" + m))));
-					if (size < img.getWidth() * img.getHeight() && img.getWidth() > minImageSize && img.getHeight() > minImageSize) {
+					if (size < img.getWidth() * img.getHeight() && img.getWidth() > minImageSize
+							&& img.getHeight() > minImageSize) {
 						urlImage = m;
 						size = img.getWidth() * img.getHeight();
 					}
