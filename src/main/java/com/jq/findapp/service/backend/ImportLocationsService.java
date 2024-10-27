@@ -377,11 +377,11 @@ public class ImportLocationsService {
 			if (location.getUrl() == null)
 				location.setUrl("");
 			repository.save(location);
-			if (!Strings.isEmpty(location.getImage()) && !Strings.isEmpty(location.getEmail()))
+			if (location.old("image") != null && location.old("email") != null)
 				updatedBoth++;
-			else if (!Strings.isEmpty(location.getImage()))
+			else if (location.old("image") != null)
 				updatedImage++;
-			else if (!Strings.isEmpty(location.getEmail()))
+			else if (location.old("email") != null)
 				updatedEmail++;
 		}
 		result.body += (updatedBoth > 0 ? updatedBoth + " updated image&email\n" : "")
