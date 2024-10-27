@@ -445,11 +445,12 @@ public class ImportLocationsService {
 		String urlImage = null;
 		while (matcher.find() && matcher.start() > last) {
 			last = matcher.start();
-			final String m = matcher.group(1).toLowerCase();
+			String m = matcher.group(1).toLowerCase();
 			if (m.endsWith(".jpg") || m.endsWith(".jpeg") || m.endsWith(".png")) {
 				try {
-					final BufferedImage img = ImageIO
-							.read(new URI(m.contains("://") ? m : location.getUrl() + "/" + m).toURL().openStream());
+					if (!m.contains("://"))
+						m = location.getUrl() + (location.getUrl().endsWith("/") || m.startsWith("/") ? "" : "/") + m;
+					final BufferedImage img = ImageIO.read(new URI(m).toURL().openStream());
 					if (size < img.getWidth() * img.getHeight() && img.getWidth() > minImageSize
 							&& img.getHeight() > minImageSize) {
 						urlImage = m;
