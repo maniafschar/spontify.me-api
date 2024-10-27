@@ -382,8 +382,8 @@ public class ImportLocationsService {
 				updatedEmail++;
 			if (location.getEmail() == null)
 				location.setEmail("");
-			if (location.getUrl() == null)
-				location.setUrl("");
+			if (location.getImage() == null)
+				location.setImage("");
 			repository.save(location);
 		}
 		result.body += (updatedBoth > 0 ? updatedBoth + " updated image&email\n" : "")
