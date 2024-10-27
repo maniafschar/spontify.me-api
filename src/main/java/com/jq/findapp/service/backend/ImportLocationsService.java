@@ -372,17 +372,19 @@ public class ImportLocationsService {
 				errors.append(
 						location.getId() + " " + location.getUrl() + "\n" + Strings.stackTraceToString(ex) + "\n\n");
 			}
+			final boolean email = !Strings.isEmpty(location.getEmail()) && location.old("email") == null;
+			final boolean image = !Strings.isEmpty(location.getImage()) && location.old("image") == null;
+			if (image && email)
+				updatedBoth++;
+			else if (image)
+				updatedImage++;
+			else if (email)
+				updatedEmail++;
 			if (location.getEmail() == null)
 				location.setEmail("");
 			if (location.getUrl() == null)
 				location.setUrl("");
 			repository.save(location);
-			if (location.old("image") != null && location.old("email") != null)
-				updatedBoth++;
-			else if (location.old("image") != null)
-				updatedImage++;
-			else if (location.old("email") != null)
-				updatedEmail++;
 		}
 		result.body += (updatedBoth > 0 ? updatedBoth + " updated image&email\n" : "")
 				+ (updatedImage > 0 ? updatedImage + " updated image\n" : "")
