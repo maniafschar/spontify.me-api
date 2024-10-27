@@ -1,9 +1,6 @@
 package com.jq.findapp.service;
 
-import java.io.InputStream;
 import java.math.BigInteger;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -19,7 +16,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -342,16 +338,12 @@ public class EventService {
 	}
 
 	public String get(final String url) {
-		try (final InputStream in = new URI(url).toURL().openStream()) {
-			return IOUtils.toString(in, StandardCharsets.UTF_8)
-					.replace('\n', ' ')
-					.replace('\r', ' ')
-					.replace('\u0013', ' ')
-					.replace('\u001c', ' ')
-					.replace('\u001e', ' ');
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
-		}
+		return Strings.url2string(url)
+				.replace('\n', ' ')
+				.replace('\r', ' ')
+				.replace('\u0013', ' ')
+				.replace('\u001c', ' ')
+				.replace('\u001e', ' ');
 	}
 
 	public int updateSeries(final Event event) {

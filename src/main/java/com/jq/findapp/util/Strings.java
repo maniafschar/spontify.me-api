@@ -2,11 +2,15 @@ package com.jq.findapp.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.net.Socket;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
@@ -14,12 +18,60 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509ExtendedTrustManager;
+
 import org.springframework.web.util.HtmlUtils;
 
 public class Strings {
 	public static final Pattern EMAIL = Pattern.compile("([A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6})",
 			Pattern.CASE_INSENSITIVE);
 	public static final String TIME_OFFSET = "Europe/Berlin";
+	private static final SSLContext sslContext;
+	static {
+		try {
+			sslContext = SSLContext.getInstance("SSL");
+			sslContext.init(null, new TrustManager[] { new X509ExtendedTrustManager() {
+				@Override
+				public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+					return new java.security.cert.X509Certificate[0];
+				}
+
+				@Override
+				public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType)
+						throws CertificateException {
+				}
+
+				@Override
+				public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+				}
+
+				@Override
+				public void checkClientTrusted(X509Certificate[] chain, String authType, Socket socket)
+						throws CertificateException {
+				}
+
+				@Override
+				public void checkServerTrusted(X509Certificate[] chain, String authType, Socket socket)
+						throws CertificateException {
+				}
+
+				@Override
+				public void checkClientTrusted(X509Certificate[] chain, String authType, SSLEngine engine)
+						throws CertificateException {
+				}
+
+				@Override
+				public void checkServerTrusted(X509Certificate[] chain, String authType, SSLEngine engine)
+						throws CertificateException {
+				}
+			} }, new SecureRandom());
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
 
 	public static String encodeParam(final String param) {
 		int x = 0;
@@ -105,15 +157,17 @@ public class Strings {
 
 	public static String url2string(String url) {
 		try {
-			return (String) HttpClient.newHttpClient().send(HttpRequest.newBuilder()
-					.uri(URI.create(url))
-					.timeout(Duration.ofMinutes(1))
-					.header("Content-Type", "application/json")
-					.header("accept",
-							"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
-					.header("accept-language", "de-DE,de;q=0.9,en;q=0.8,en-US;q=0.7")
-					.GET()
-					.build(), BodyHandlers.ofString()).body();
+			return (String) HttpClient.newBuilder().sslContext(sslContext).build()
+					.send(HttpRequest.newBuilder()
+							.uri(URI.create(url))
+							.timeout(Duration.ofMinutes(1))
+							.header("Content-Type", "application/json")
+							.header("accept",
+									"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
+							.header("accept-language", "de-DE,de;q=0.9,en;q=0.8,en-US;q=0.7")
+							.GET()
+							.build(), BodyHandlers.ofString())
+					.body();
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
