@@ -414,7 +414,15 @@ public class ImportLocationsService {
 						baseUrl = baseUrl.substring(0, baseUrl.indexOf('/', 10));
 					html = baseUrl + html;
 				}
-				html = Strings.url2string(html).toLowerCase().replace("[at]", "@").replace("(*at*)", "@");
+				html = Strings.url2string(html).toLowerCase();
+				final String[] replacement = new String[] { "@", "at", "*at*", "ät" };
+				for (String s : replacement) {
+					html = html
+							.replace('[' + s + ']', "@")
+							.replace('{' + s + '}', "@")
+							.replace('(' + s + ')', "@")
+							.replace("<span>" + s + "</span>", "@");
+				}
 				int pos = html.length();
 				final Pattern emailPattern = Pattern.compile(".*(\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,8}\\b).*",
 						Pattern.CASE_INSENSITIVE);
