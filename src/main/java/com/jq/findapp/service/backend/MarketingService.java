@@ -176,7 +176,7 @@ public class MarketingService {
 			contact.setClientId(clientMarketing.getClientId());
 			String s = text
 					.getText(contact, poll.textId == null ? TextId.notification_clientMarketingPoll : poll.textId)
-					.replace("{0}", poll.subject)
+					.replace("<jq:EXTRA_1 />", poll.subject)
 					+ (Strings.isEmpty(poll.publishingPostfix) ? "" : poll.publishingPostfix)
 					+ (clientJson.has("publishingPostfix")
 							? "\n\n" + clientJson.get("publishingPostfix").asText()
