@@ -167,7 +167,6 @@ public class NotificationService {
 				s.delete(s.lastIndexOf(" "), s.length());
 			s.append("...");
 		}
-		System.out.println(serverWebSocket + "refresh/" + contactTo.getId() + "\n" + getPingValues(contactTo));
 		WebClient.create(serverWebSocket + "refresh/" + contactTo.getId()).post()
 				.header("Content-Type", "application/json")
 				.bodyValue(getPingValues(contactTo)).retrieve().toBodilessEntity().block();
