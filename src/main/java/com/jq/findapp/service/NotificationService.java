@@ -167,8 +167,8 @@ public class NotificationService {
 				s.delete(s.lastIndexOf(" "), s.length());
 			s.append("...");
 		}
-		WebClient.create(serverWebSocket + "refresh/" + contactTo.getId()).post()
-				.bodyValue(getPingValues(contactTo)).retrieve().toBodilessEntity();
+		System.out.println(WebClient.create(serverWebSocket + "refresh/" + contactTo.getId()).post()
+				.bodyValue(getPingValues(contactTo)).retrieve().toEntity(String.class));
 		ContactNotification notification = null;
 		if (textId != TextId.notification_chatNew
 				&& textId != TextId.notification_contactVideoCall
