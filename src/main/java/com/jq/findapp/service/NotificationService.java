@@ -170,7 +170,7 @@ public class NotificationService {
 		System.out.println(serverWebSocket + "refresh/" + contactTo.getId() + "\n" + getPingValues(contactTo));
 		WebClient.create(serverWebSocket + "refresh/" + contactTo.getId()).post()
 				.header("Content-Type", "application/json")
-				.bodyValue(getPingValues(contactTo)).retrieve().toBodilessEntity();
+				.bodyValue(getPingValues(contactTo)).retrieve().toBodilessEntity().block();
 		ContactNotification notification = null;
 		if (textId != TextId.notification_chatNew
 				&& textId != TextId.notification_contactVideoCall
