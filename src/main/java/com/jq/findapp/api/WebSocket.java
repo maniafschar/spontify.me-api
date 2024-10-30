@@ -104,6 +104,7 @@ public class WebSocket {
 
 	@PostMapping("refresh/{id}")
 	public boolean refresh(@RequestBody final Object payload, @PathVariable final BigInteger id) throws Exception {
+		System.out.println("ws:" + id + "\n" + payload);
 		if (USERS.containsKey(id)) {
 			messagingTemplate.convertAndSendToUser("" + id, "/refresh", payload);
 			return true;
