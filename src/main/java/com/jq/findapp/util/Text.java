@@ -51,8 +51,6 @@ public class Text {
 		mail_contactWelcomeEmail,
 		mail_title,
 		mail_titleFrom,
-		marketing_playerOfTheMatch,
-		marketing_prediction,
 		marketing_skySportCooperation,
 		marketing_skySportPostfix,
 		marketing_skySportSent,
