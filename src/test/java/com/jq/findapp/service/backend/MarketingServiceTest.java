@@ -59,7 +59,7 @@ public class MarketingServiceTest {
 		poll.epilog = "epilog";
 		poll.prolog = "prolog";
 		poll.subject = "subject";
-		poll.textId = TextId.marketing_prediction;
+		poll.textId = TextId.notification_clientMarketingPollPrediction;
 		poll.questions.add(question);
 		final ClientMarketing clientMarketing = new ClientMarketing();
 		clientMarketing.setCreateResult(true);
