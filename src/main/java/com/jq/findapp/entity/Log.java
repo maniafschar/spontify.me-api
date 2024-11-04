@@ -23,10 +23,11 @@ public class Log extends BaseEntity {
 	private int time;
 
 	public enum LogStatus {
-		ErrorClient, ErrorRuntime, ErrorServer, Ok, ServiceAlreadyRunning, UserOffline, UserUnauthorized;
+		ErrorClient, ErrorRedirection, ErrorRuntime, ErrorServer, ErrorServiceRunning, Ok, UserOffline,
+		UserUnauthorized;
 
 		public static LogStatus get(int httpCode) {
-			return httpCode < 300 ? Ok : httpCode < 400 ? ErrorClient : httpCode < 500 ? ErrorRuntime : ErrorServer;
+			return httpCode < 300 ? Ok : httpCode < 400 ? ErrorRedirection : httpCode < 500 ? ErrorClient : ErrorServer;
 		}
 	}
 
