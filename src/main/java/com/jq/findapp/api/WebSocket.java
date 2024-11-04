@@ -77,11 +77,11 @@ public class WebSocket {
 				final VideoMessage answer = new VideoMessage();
 				answer.setAnswer(Collections.singletonMap("userState", "offline"));
 				answer.setId(message.getUser());
-				log.setStatus(LogStatus.Offline);
+				log.setStatus(LogStatus.UserOffline);
 				messagingTemplate.convertAndSendToUser("" + message.getUser(), "/video", answer);
 			}
 		} else
-			log.setStatus(LogStatus.Error);
+			log.setStatus(LogStatus.ServerError);
 		log.setTime((int) (System.currentTimeMillis() - time));
 		log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
 		final QueryParams params = new QueryParams(Query.misc_listLog);

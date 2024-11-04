@@ -141,11 +141,11 @@ public class CronService {
 			log.setUri("/support/cron/" + name + "/" + m);
 			try {
 				if (running.contains(name + '.' + m))
-					log.setStatus(LogStatus.Running);
+					log.setStatus(LogStatus.AlreadyRunning);
 				else {
 					running.add(name + '.' + m);
 					final CronResult result = (CronResult) bean.getClass().getMethod(m).invoke(bean);
-					log.setStatus(Strings.isEmpty(result.exception) ? LogStatus.Ok : LogStatus.Error);
+					log.setStatus(Strings.isEmpty(result.exception) ? LogStatus.Ok : LogStatus.ServerError);
 					if (result.body != null)
 						log.setBody(result.body.trim());
 					if (result.exception != null) {
@@ -155,7 +155,7 @@ public class CronService {
 					}
 				}
 			} catch (final Throwable ex) {
-				log.setStatus(LogStatus.Exception);
+				log.setStatus(LogStatus.RuntimeError);
 				log.setBody("uncaught exception " + ex.getClass().getName() + ": " + ex.getMessage() +
 						(Strings.isEmpty(log.getBody()) ? "" : "\n" + log.getBody()));
 				notificationService.createTicket(TicketType.ERROR, "cron",
