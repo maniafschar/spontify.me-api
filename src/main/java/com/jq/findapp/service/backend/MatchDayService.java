@@ -670,6 +670,10 @@ public class MatchDayService {
 		return now.getYear() - (now.getMonth().getValue() < 6 ? 1 : 0);
 	}
 
+	public String retrieveMatchDays(final int teamId, final int pastMatches, final int futureMatches) {
+		return "";
+	}
+
 	public CronResult run() {
 		final CronResult result = new CronResult();
 		final Result list = repository.list(new QueryParams(Query.misc_listClient));
