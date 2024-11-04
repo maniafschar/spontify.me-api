@@ -670,7 +670,7 @@ public class MatchDayService {
 		return now.getYear() - (now.getMonth().getValue() < 6 ? 1 : 0);
 	}
 
-	public String retrieveMatchDays(final int pastMatches, final int futureMatches, final int... teamIds) {
+	public String retrieveMatchDays(final int pastMatches, final int futureMatches, final List<Integer> teamIds) {
 		return "";
 	}
 
