@@ -141,7 +141,7 @@ public class CronService {
 			log.setUri("/support/cron/" + name + "/" + m);
 			try {
 				if (running.contains(name + '.' + m))
-					log.setStatus(LogStatus.ServiceAlreadyRunning);
+					log.setStatus(LogStatus.ErrorServiceRunning);
 				else {
 					running.add(name + '.' + m);
 					final CronResult result = (CronResult) bean.getClass().getMethod(m).invoke(bean);
