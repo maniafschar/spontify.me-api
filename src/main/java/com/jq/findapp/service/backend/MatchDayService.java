@@ -671,7 +671,14 @@ public class MatchDayService {
 	}
 
 	public String retrieveMatchDays(final int pastMatches, final int futureMatches, final List<Integer> teamIds) {
-		return "";
+		final Map<Long, String> matches = new HashMap<>();
+		for (int teamId : teamIds) {
+			final JsonNode matchDays = get("team=" + teamId + "&season=" + currentSeason());
+			if (matchDays != null) {
+			}
+		}
+		Collections.sort(sortedKeys);
+		return matches.;
 	}
 
 	public CronResult run() {
