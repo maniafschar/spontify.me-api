@@ -98,6 +98,9 @@ public class ActionApi {
 	private ExternalService externalService;
 
 	@Autowired
+	private MatchDayService matchDayService;
+
+	@Autowired
 	private Text text;
 
 	@Value("${app.google.key}")
@@ -259,11 +262,11 @@ public class ActionApi {
 	public List<Object[]> news(@RequestHeader final BigInteger clientId,
 			@RequestParam(required = false) final BigInteger id,
 			@RequestParam(required = false) final Float latitude,
-			@RequestParam(required = false) final Float longitude) throws Exception {
+			@RequestParam(required = false) final Float longitude,
+			@RequestHeader(required = false) final BigInteger user) throws Exception {
 		final QueryParams params = new QueryParams(Query.misc_listNews);
-		final Contact contact = new Contact();
-		contact.setClientId(clientId);
-		params.setUser(contact);
+		params.setUser(new Contact());
+		params.getUser().setClientId(clientId);
 		if (id == null) {
 			if (latitude != null) {
 				params.setLatitude(latitude);
@@ -274,7 +277,26 @@ public class ActionApi {
 			params.setSearch("clientNews.publish<=cast('" + Instant.now().toString() + "' as timestamp)");
 		} else
 			params.setSearch("clientNews.id=" + id);
-		return repository.list(params).getList();
+		final List<Object[]> list = repository.list(params).getList();
+		if (user != null && clientId.intValue() == 4) {
+			final Contact contact = repository.one(Contact.class, user);
+			String s = "";
+			for (String skill : contact.getSkills().split("|")) {
+				if (skill.startsWith("9."))
+					s += matchDayService.retrieveMatchDays(Integer.valueOf(skill.substring(2)), 2, 4);
+			}
+			if (!Strings.isEmpty(s)) {
+				final Object[] o = new Object[list.get(0).length];
+				for (int i = 0; i < o.length; i++) {
+					if ("clientNews.description".equals(list.get(0)[i]))
+						o[i] = s;
+					else if ("clientNews.publish".equals(list.get(0)[i]))
+						o[i] = new Timestamp(System.currentTimeMillis());
+				}
+				list.add(1, o);
+			}
+		}
+		return list;
 	}
 
 	@GetMapping("teaser/meta")
