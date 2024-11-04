@@ -62,26 +62,29 @@ public class WebSocket {
 		log.setUri(destination);
 		log.setMethod("WS");
 		log.setContactId(message.getUser());
-		log.setBody(message.answer != null ? "answer:" + message.answer
-				: message.candidate != null ? "candidate:" + message.candidate
-						: message.offer != null ? "offer:" + message.offer : null);
-		if (log.getBody() != null && log.getBody().length() > 255)
-			log.setBody(log.getBody().substring(0, 255));
-		if (message.answer != null || chatService.isVideoCallAllowed(contact, message.getId())) {
+		if (message.answer == null) {
+			log.setStatus(LogStatus.ErrorClient);
+			log.setBody(Json.toString(message));
+		} else if (chatService.isVideoCallAllowed(contact, message.getId())) {
 			if (USERS.containsKey(message.getId())) {
 				message.setPassword(null);
 				message.setSalt(null);
 				log.setStatus(LogStatus.Ok);
 				messagingTemplate.convertAndSendToUser("" + message.getId(), "/video", message);
+				log.setBody(message.answer != null ? "answer:" + message.answer
+						: message.candidate != null ? "candidate:" + message.candidate : "offer:" + message.offer);
 			} else {
 				final VideoMessage answer = new VideoMessage();
 				answer.setAnswer(Collections.singletonMap("userState", "offline"));
 				answer.setId(message.getUser());
 				log.setStatus(LogStatus.UserOffline);
+				log.setBody("contact:" + message.getId());
 				messagingTemplate.convertAndSendToUser("" + message.getUser(), "/video", answer);
 			}
-		} else
-			log.setStatus(LogStatus.ErrorServer);
+		} else {
+			log.setStatus(LogStatus.UserUnauthorized);
+			log.setBody("contact:" + message.getId());
+		}
 		log.setTime((int) (System.currentTimeMillis() - time));
 		log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
 		final QueryParams params = new QueryParams(Query.misc_listLog);
