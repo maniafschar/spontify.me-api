@@ -81,7 +81,7 @@ public class WebSocket {
 				messagingTemplate.convertAndSendToUser("" + message.getUser(), "/video", answer);
 			}
 		} else
-			log.setStatus(LogStatus.ServerError);
+			log.setStatus(LogStatus.ErrorServer);
 		log.setTime((int) (System.currentTimeMillis() - time));
 		log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
 		final QueryParams params = new QueryParams(Query.misc_listLog);

@@ -102,7 +102,7 @@ public class LogFilter implements Filter {
 			else if (req.getRequestURI().startsWith("/support/"))
 				log.setContactId(BigInteger.ZERO);
 		} catch (final AuthenticationException ex) {
-			log.setStatus(LogStatus.Unauthorized);
+			log.setStatus(LogStatus.UserUnauthorized);
 			log.setBody(ex.getType().name());
 		} finally {
 			if (loggable && (!"/support/healthcheck".equals(log.getUri()) || res.getStatus() >= 400)) {
