@@ -269,8 +269,8 @@ public class ActionApi {
 				params.setLatitude(latitude);
 				params.setLongitude(longitude);
 				params.setDistance(200);
-				params.setLimit(50);
 			}
+			params.setLimit(50);
 			params.setSearch("clientNews.publish<=cast('" + Instant.now().toString() + "' as timestamp)");
 		} else
 			params.setSearch("clientNews.id=" + id);
