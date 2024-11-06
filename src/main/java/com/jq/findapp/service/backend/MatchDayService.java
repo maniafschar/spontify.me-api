@@ -675,10 +675,28 @@ public class MatchDayService {
 		for (int teamId : teamIds) {
 			final JsonNode matchDays = get("team=" + teamId + "&season=" + currentSeason());
 			if (matchDays != null) {
+				for (int i = 0; i < matchDays.size(); i++) {
+					final long timestamp = matchDays.get(i).get("fixture").get("timestamp").asLong() * 1000;
+					final Instant startDate = Instant.ofEpochMilli(timestamp);
+					final String homeName = json.get(i).get("teams").get("home").get("name").asText()
+							.replace("Munich", "München");
+					final String awayName = json.get(i).get("teams").get("away").get("name").asText()
+							.replace("Munich", "München");
+					final String homeGoals = json.get(i).get("goals").get("home").asText();
+					final String awayGoals = json.get(i).get("goals").get("away").asText();
+					final String leagueName = json.get(i).get("league").get("name").asText();
+					final String venue = json.get(i).get("fixture").get("venue").get("name").asText();
+					final String city = json.get(i).findPath("fixture").get("venue").get("city").asText();
+					matches.put(time + teamId, "<div><header>" + leagueName + " · " + venue + " · " + city + " · " + formatDate(timestamp, null) + "</header>"
+							+ homeName + homeGoals + " : " + awayGoals + awayName + "</div>");
+				}
 			}
 		}
-		Collections.sort(sortedKeys);
-		return matches.;
+		final List<Long> sortedKeys = Collections.sort(new ArrayList(matches.keySet()));
+		final StringBuilder s = new StringBuilder();
+		for (int i : sortedKeys)
+			s.append(matches.get(i));
+		return s.toString();
 	}
 
 	public CronResult run() {
