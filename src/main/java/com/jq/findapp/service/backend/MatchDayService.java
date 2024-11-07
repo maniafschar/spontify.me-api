@@ -682,8 +682,8 @@ public class MatchDayService {
 							.replace("Munich", "München");
 					final String awayName = matchDays.get(i).get("teams").get("away").get("name").asText()
 							.replace("Munich", "München");
-					final String homeGoals = matchDays.get(i).get("goals").get("home").isNull() ? "" : matchDays.get(i).get("goals").get("home").asText();
-					final String awayGoals = matchDays.get(i).get("goals").get("away").isNull() ? "" : matchDays.get(i).get("goals").get("away").asText();
+					final String homeGoals = matchDays.get(i).get("goals").get("home").isNull() ? "&nbsp;" : matchDays.get(i).get("goals").get("home").asText();
+					final String awayGoals = matchDays.get(i).get("goals").get("away").isNull() ? "&nbsp;" : matchDays.get(i).get("goals").get("away").asText();
 					final String leagueName = matchDays.get(i).get("league").get("name").asText();
 					final String venue = matchDays.get(i).get("fixture").get("venue").get("name").asText();
 					final String city = matchDays.get(i).findPath("fixture").get("venue").get("city").asText();
