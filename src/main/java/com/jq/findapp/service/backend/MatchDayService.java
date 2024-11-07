@@ -694,10 +694,11 @@ public class MatchDayService {
 		}
 		final List<String> sortedKeys = new ArrayList(matches.keySet());
 		Collections.sort(sortedKeys);
-		final StringBuilder s = new StringBuilder("<style>header{font-size:0.7em;}span{padding-bottom:1em;display:block;}home::after{content:':';}home{width:50%;display:inline-block;text-align:right;}away{width:50%;display:inline-block;text-align:left;}goals{width:2em;display:inline-block;text-align:center;}</style><div style=\"text-align:center;\">");
+		final StringBuilder s = new StringBuilder();
 		for (String key : sortedKeys)
 			s.insert(0, matches.get(key));
-		s.append("</div>");
+		s.insert(0, "<style>header{font-size:0.7em;}span{padding-bottom:1em;display:block;}home::after{content:':';}home{width:50%;display:inline-block;text-align:right;}away{width:50%;display:inline-block;text-align:left;}goals{width:2em;display:inline-block;text-align:center;}</style><matchDays style=\"text-align:center;\">");
+		s.append("</matchDays>");
 		return s.toString();
 	}
 
