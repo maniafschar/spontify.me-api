@@ -682,8 +682,8 @@ public class MatchDayService {
 							.replace("Munich", "München");
 					final String awayName = matchDays.get(i).get("teams").get("away").get("name").asText()
 							.replace("Munich", "München");
-					final String homeGoals = matchDays.get(i).get("goals").get("home").asText();
-					final String awayGoals = matchDays.get(i).get("goals").get("away").asText();
+					final String homeGoals = matchDays.get(i).get("goals").get("home").isNull() ? "" : matchDays.get(i).get("goals").get("home").asText();
+					final String awayGoals = matchDays.get(i).get("goals").get("away").isNull() ? "" : matchDays.get(i).get("goals").get("away").asText();
 					final String leagueName = matchDays.get(i).get("league").get("name").asText();
 					final String venue = matchDays.get(i).get("fixture").get("venue").get("name").asText();
 					final String city = matchDays.get(i).findPath("fixture").get("venue").get("city").asText();
@@ -694,7 +694,7 @@ public class MatchDayService {
 		}
 		final List<String> sortedKeys = new ArrayList(matches.keySet());
 		Collections.sort(sortedKeys);
-		final StringBuilder s = new StringBuilder("<style>header{font-size:0.7em;}home{width:50%;display:inline-block;text-align:right;padding-right:0.5em;}away{width:50%;display:inline-block;text-align:left;padding-left:0.5em;}goals{width:1.5em;}</style><div style=\"text-align:center;\">");
+		final StringBuilder s = new StringBuilder("<style>header{font-size:0.7em;}home::after{content:':';}home{width:50%;display:inline-block;text-align:right;padding-right:0.5em;}away{width:50%;display:inline-block;text-align:left;padding-left:0.5em;}goals{width:1.5em;display:inline-block;}</style><div style=\"text-align:center;\">");
 		for (String key : sortedKeys)
 			s.append(matches.get(key));
 		s.append("</div>");
