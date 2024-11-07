@@ -688,7 +688,7 @@ public class MatchDayService {
 					final String venue = matchDays.get(i).get("fixture").get("venue").get("name").asText();
 					final String city = matchDays.get(i).findPath("fixture").get("venue").get("city").asText();
 					matches.put(timestamp + "." + teamId, "<span><header>" + leagueName + " · " + venue + " · " + city + " · " + formatDate(timestamp, null) + "</header>"
-							+ "<home>" + homeName + "<goals>" + homeGoals + "</goals></home><away><goals>" + awayGoals + "</goals>" + awayName + "</away></span>");
+							+ "<home>" + homeName + "</home><goals>" + homeGoals + "</goals><goals>" + awayGoals + "</goals><away>" + awayName + "</away></span>");
 				}
 			}
 		}
@@ -697,7 +697,7 @@ public class MatchDayService {
 		final StringBuilder s = new StringBuilder();
 		for (String key : sortedKeys)
 			s.insert(0, matches.get(key));
-		s.insert(0, "<style>header{font-size:0.7em;}span{padding-bottom:1em;display:block;}home::after{content:':';}home{width:50%;display:inline-block;text-align:right;}away{width:50%;display:inline-block;text-align:left;}goals{width:2em;display:inline-block;text-align:center;}</style><matchDays style=\"text-align:center;\">");
+		s.insert(0, "<style>header{font-size:0.7em;}span{padding-bottom:1em;display:block;}away::before{content:':';}home, away{width:40%;display:inline-block;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}home{text-align:right;}away{text-align:left;}goals{width:10%;display:inline-block;text-align:center;}</style><matchDays style=\"text-align:center;\">");
 		s.append("</matchDays>");
 		return s.toString();
 	}
