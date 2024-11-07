@@ -687,8 +687,8 @@ public class MatchDayService {
 					final String leagueName = matchDays.get(i).get("league").get("name").asText();
 					final String venue = matchDays.get(i).get("fixture").get("venue").get("name").asText();
 					final String city = matchDays.get(i).findPath("fixture").get("venue").get("city").asText();
-					matches.put(timestamp + "." + teamId, "<span><header>" + leagueName + " · " + venue + " · " + city + " · " + formatDate(timestamp, null) + "</header>"
-							+ "<home>" + homeName + "</home><goals>" + homeGoals + "</goals><sep>:</sep><goals>" + awayGoals + "</goals><away>" + awayName + "</away></span>");
+					matches.put(timestamp + "." + teamId, "<match><header>" + leagueName + " · " + venue + " · " + city + " · " + formatDate(timestamp, null) + "</header>"
+							+ "<home>" + homeName + "</home><goals>" + homeGoals + "</goals><sep>:</sep><goals>" + awayGoals + "</goals><away>" + awayName + "</away></match>");
 				}
 			}
 		}
@@ -697,7 +697,7 @@ public class MatchDayService {
 		final StringBuilder s = new StringBuilder();
 		for (String key : sortedKeys)
 			s.insert(0, matches.get(key));
-		s.insert(0, "<style>header{font-size:0.7em;}span{padding-top:1em;display:inline-block;width:100%;}home,away{width:42%;display:inline-block;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}home{text-align:right;}away{text-align:left;}goals{width:8%;display:inline-block;text-align:center;overflow:hidden;}sep{position:absolute;margin-left:-0.1em;}</style><matchDays style=\"text-align:center;display:inline-block;\">");
+		s.insert(0, "<style>header{font-size:0.7em;}match{padding-top:1em;display:inline-block;width:100%;}home,away{width:42%;display:inline-block;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}home{text-align:right;}away{text-align:left;}goals{width:8%;display:inline-block;text-align:center;overflow:hidden;}sep{position:absolute;margin-left:-0.1em;}</style><matchDays style=\"text-align:center;display:inline-block;\">");
 		s.append("</matchDays>");
 		return s.toString();
 	}
