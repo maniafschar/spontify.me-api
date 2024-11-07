@@ -694,7 +694,7 @@ public class MatchDayService {
 		}
 		final List<String> sortedKeys = new ArrayList(matches.keySet());
 		Collections.sort(sortedKeys);
-		final StringBuilder s = new StringBuilder("<style>header{font-size:0.7em;}home::after{content:':';}home{width:50%;display:inline-block;text-align:right;padding-right:0.5em;}away{width:50%;display:inline-block;text-align:left;padding-left:0.5em;}goals{width:1.5em;display:inline-block;}</style><div style=\"text-align:center;\">");
+		final StringBuilder s = new StringBuilder("<style>header{font-size:0.7em;}span{padding-bottom:1em;display:block;}home::after{content:':';}home{width:50%;display:inline-block;text-align:right;}away{width:50%;display:inline-block;text-align:left;}goals{width:2em;display:inline-block;text-align:center;}</style><div style=\"text-align:center;\">");
 		for (String key : sortedKeys)
 			s.append(matches.get(key));
 		s.append("</div>");
