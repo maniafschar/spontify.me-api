@@ -687,16 +687,17 @@ public class MatchDayService {
 					final String leagueName = matchDays.get(i).get("league").get("name").asText();
 					final String venue = matchDays.get(i).get("fixture").get("venue").get("name").asText();
 					final String city = matchDays.get(i).findPath("fixture").get("venue").get("city").asText();
-					matches.put(timestamp + "." + teamId, "<div><header>" + leagueName + " · " + venue + " · " + city + " · " + formatDate(timestamp, null) + "</header>"
-							+ homeName + homeGoals + " : " + awayGoals + awayName + "</div>");
+					matches.put(timestamp + "." + teamId, "<span><header>" + leagueName + " · " + venue + " · " + city + " · " + formatDate(timestamp, null) + "</header>"
+							+ "<home>" + homeName + "<goals>" + homeGoals + "</goals></home><away><goals>" + awayGoals + "</goals>" + awayName + "</away></span>");
 				}
 			}
 		}
 		final List<String> sortedKeys = new ArrayList(matches.keySet());
 		Collections.sort(sortedKeys);
-		final StringBuilder s = new StringBuilder();
+		final StringBuilder s = new StringBuilder("<style>header{font-size:0.7em;}home{width:50%;display:inline-block;text-align:right;padding-right:0.5em;}away{width:50%;display:inline-block;text-align:left;padding-left:0.5em;}goals{width:1.5em;}</style><div style=\"text-align:center;\">");
 		for (String key : sortedKeys)
 			s.append(matches.get(key));
+		s.append("</div>");
 		return s.toString();
 	}
 
