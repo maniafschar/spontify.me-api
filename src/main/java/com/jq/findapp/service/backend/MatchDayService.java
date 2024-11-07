@@ -688,7 +688,9 @@ public class MatchDayService {
 					final String venue = matchDays.get(i).get("fixture").get("venue").get("name").asText();
 					final String city = matchDays.get(i).findPath("fixture").get("venue").get("city").asText();
 					matches.put(timestamp + "." + teamId, "<match><header>" + leagueName + " · " + venue + " · " + city + " · " + formatDate(timestamp, null) + "</header>"
-							+ "<home>" + homeName + "</home><goals>" + homeGoals + "</goals><sep>:</sep><goals>" + awayGoals + "</goals><away>" + awayName + "</away></match>");
+							+ "<home" + (matchDays.get(i).get("teams").get("home").get("id").asInt() == teamId ? " class=\"highlight\"" : "") + ">"
+							+ homeName + "</home><goals>" + homeGoals + "</goals><sep>:</sep><goals>"
+							+ awayGoals + "</goals><away" + (matchDays.get(i).get("teams").get("away").get("id").asInt() == teamId ? " class=\"highlight\"" : "") + ">" + awayName + "</away></match>");
 				}
 			}
 		}
@@ -697,7 +699,7 @@ public class MatchDayService {
 		final StringBuilder s = new StringBuilder();
 		for (String key : sortedKeys)
 			s.insert(0, matches.get(key));
-		s.insert(0, "<style>header{font-size:0.7em;}match{padding-top:1em;display:inline-block;width:100%;}home,away{width:42%;display:inline-block;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}home{text-align:right;}away{text-align:left;}goals{width:8%;display:inline-block;text-align:center;overflow:hidden;}sep{position:absolute;margin-left:-0.1em;}</style><matchDays style=\"text-align:center;display:inline-block;\">");
+		s.insert(0, "<style>header{font-size:0.7em;}match{padding-top:1em;display:inline-block;width:100%;}home,away{width:42%;display:inline-block;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}home{text-align:right;}away{text-align:left;}goals{width:8%;display:inline-block;text-align:center;overflow:hidden;}sep{position:absolute;margin-left:-0.1em;}.highlight{font-weight:bold;}</style><matchDays style=\"text-align:center;display:inline-block;\">");
 		s.append("</matchDays>");
 		return s.toString();
 	}
@@ -735,7 +737,7 @@ public class MatchDayService {
 	private String formatDate(final long seconds, final String format) {
 		return LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds),
 				TimeZone.getTimeZone(Strings.TIME_OFFSET).toZoneId())
-				.format(DateTimeFormatter.ofPattern(format == null ? "d.M.yyyy' um 'H:mm' Uhr'" : format));
+				.format(DateTimeFormatter.ofPattern(format == null ? "d.M.yyyy H:mm" : format));
 	}
 
 	public List<FutureEvent> futureEvents(final int teamId) {
