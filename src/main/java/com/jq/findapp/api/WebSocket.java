@@ -32,6 +32,7 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.ChatService;
+import com.jq.findapp.util.Json;
 
 @RestController
 @RequestMapping("ws")
