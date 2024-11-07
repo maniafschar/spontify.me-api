@@ -671,31 +671,32 @@ public class MatchDayService {
 	}
 
 	public String retrieveMatchDays(final int pastMatches, final int futureMatches, final List<Integer> teamIds) {
-		final Map<Long, String> matches = new HashMap<>();
+		final Map<String, String> matches = new HashMap<>();
 		for (int teamId : teamIds) {
 			final JsonNode matchDays = get("team=" + teamId + "&season=" + currentSeason());
 			if (matchDays != null) {
 				for (int i = 0; i < matchDays.size(); i++) {
-					final long timestamp = matchDays.get(i).get("fixture").get("timestamp").asLong() * 1000;
-					final Instant startDate = Instant.ofEpochMilli(timestamp);
-					final String homeName = json.get(i).get("teams").get("home").get("name").asText()
+					final long timestamp = matchDays.get(i).get("fixture").get("timestamp").asLong();
+					final Instant startDate = Instant.ofEpochMilli(timestamp * 1000);
+					final String homeName = matchDays.get(i).get("teams").get("home").get("name").asText()
 							.replace("Munich", "München");
-					final String awayName = json.get(i).get("teams").get("away").get("name").asText()
+					final String awayName = matchDays.get(i).get("teams").get("away").get("name").asText()
 							.replace("Munich", "München");
-					final String homeGoals = json.get(i).get("goals").get("home").asText();
-					final String awayGoals = json.get(i).get("goals").get("away").asText();
-					final String leagueName = json.get(i).get("league").get("name").asText();
-					final String venue = json.get(i).get("fixture").get("venue").get("name").asText();
-					final String city = json.get(i).findPath("fixture").get("venue").get("city").asText();
-					matches.put(time + teamId, "<div><header>" + leagueName + " · " + venue + " · " + city + " · " + formatDate(timestamp, null) + "</header>"
+					final String homeGoals = matchDays.get(i).get("goals").get("home").asText();
+					final String awayGoals = matchDays.get(i).get("goals").get("away").asText();
+					final String leagueName = matchDays.get(i).get("league").get("name").asText();
+					final String venue = matchDays.get(i).get("fixture").get("venue").get("name").asText();
+					final String city = matchDays.get(i).findPath("fixture").get("venue").get("city").asText();
+					matches.put(timestamp + "." + teamId, "<div><header>" + leagueName + " · " + venue + " · " + city + " · " + formatDate(timestamp, null) + "</header>"
 							+ homeName + homeGoals + " : " + awayGoals + awayName + "</div>");
 				}
 			}
 		}
-		final List<Long> sortedKeys = Collections.sort(new ArrayList(matches.keySet()));
+		final List<String> sortedKeys = new ArrayList(matches.keySet());
+		Collections.sort(sortedKeys);
 		final StringBuilder s = new StringBuilder();
-		for (int i : sortedKeys)
-			s.append(matches.get(i));
+		for (String key : sortedKeys)
+			s.append(matches.get(key));
 		return s.toString();
 	}
 
