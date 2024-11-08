@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
@@ -44,6 +45,7 @@ import com.jq.findapp.entity.ClientMarketing.Poll;
 import com.jq.findapp.entity.ClientMarketing.Question;
 import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.ClientMarketingResult.PollResult;
+import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Event.FutureEvent;
 import com.jq.findapp.entity.Storage;
 import com.jq.findapp.entity.Ticket.TicketType;
@@ -668,7 +670,9 @@ public class MatchDayService {
 		return now.getYear() - (now.getMonth().getValue() < 6 ? 1 : 0);
 	}
 
-	public String retrieveMatchDays(final int pastMatches, final int futureMatches, final List<Integer> teamIds) {
+	public String retrieveMatchDays(final int pastMatches, final int futureMatches, final Contact contact) {
+		final List<Integer> teamIds = Arrays.asList(contact.getSkills().split("\\|"))
+				.stream().filter(e -> e.startsWith("9.")).map(e -> Integer.valueOf(e.substring(2))).collect(Collectors.toList());
 		final Map<String, String> matches = new HashMap<>();
 		for (int teamId : teamIds) {
 			final JsonNode matchDays = get("team=" + teamId + "&season=" + currentSeason());
