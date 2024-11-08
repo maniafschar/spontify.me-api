@@ -142,7 +142,7 @@ public class Text {
 						.get(label.substring(label.indexOf('_') + 1)).asText();
 			else
 				s = languages.get(contact.getLanguage()).get(label).asText();
-			if (s.contains("{budd") || s.sontains("APP_TITLE")) {
+			if (s.contains("{budd") || s.contains("APP_TITLE")) {
 				final Client client = repository.one(Client.class, contact.getClientId());
 				final JsonNode node = Json.toNode(Attachment.resolve(client.getStorage()));
 				s = s.replaceAll("APP_TITLE", client.getName());
