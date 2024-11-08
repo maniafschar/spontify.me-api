@@ -694,10 +694,10 @@ public class MatchDayService {
 								+ "<home" + (matchDays.get(i).get("teams").get("home").get("id").asInt() == teamId ? " class=\"highlight\"" : "") + ">"
 								+ homeName + "</home><goals>" + homeGoals + "</goals><sep>:</sep><goals>"
 								+ awayGoals + "</goals><away" + (matchDays.get(i).get("teams").get("away").get("id").asInt() == teamId ? " class=\"highlight\"" : "") + ">" + awayName + "</away></match>";
-						("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText()) ? matchesFutureList : matchesPastList).add(new String[] { timestamp + "." + teamId, match });
+						(timestamp > System.currentTimeMillis() ? matchesFutureList : matchesPastList).add(new String[] { timestamp + "." + teamId, match });
 					}
 				}
-				for (int i = matchesPastList.size() - 1; matchesPastList.size() - pastMatches > 0 && i >= 0; i--)
+				for (int i = matchesPastList.size() - 1; matchesPastList.size() - i < pastMatches && i >= 0; i--)
 					matches.put(matchesPastList.get(i)[0], matchesPastList.get(i)[1]);
 				for (int i = 0; i < futureMatches && i < matchesFutureList.size(); i++)
 					matches.put(matchesFutureList.get(i)[0], matchesFutureList.get(i)[1]);
