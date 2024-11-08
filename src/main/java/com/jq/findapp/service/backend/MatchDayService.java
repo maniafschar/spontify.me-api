@@ -679,38 +679,42 @@ public class MatchDayService {
 				.stream().filter(e -> e.startsWith("9.")).map(e -> Integer.valueOf(e.substring(2))).collect(Collectors.toList());
 		final Map<String, String> matches = new HashMap<>();
 		for (int teamId : teamIds) {
-			final JsonNode matchDays = get("team=" + teamId + "&season=" + currentSeason());
-			if (matchDays != null) {
-				final Map<String, String> matchesFutureList = new HashMap<>();
-				final Map<String, String> matchesPastList = new HashMap<>();
-				for (int i = 0; i < matchDays.size(); i++) {
-					if (!"TBD".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())) {
-						final long timestamp = matchDays.get(i).get("fixture").get("timestamp").asLong();
-						final Instant startDate = Instant.ofEpochMilli(timestamp * 1000);
-						final String homeName = matchDays.get(i).get("teams").get("home").get("name").asText()
-								.replace("Munich", "München");
-						final String awayName = matchDays.get(i).get("teams").get("away").get("name").asText()
-								.replace("Munich", "München");
-						final String homeGoals = matchDays.get(i).get("goals").get("home").isNull() ? "&nbsp;" : matchDays.get(i).get("goals").get("home").asText();
-						final String awayGoals = matchDays.get(i).get("goals").get("away").isNull() ? "&nbsp;" : matchDays.get(i).get("goals").get("away").asText();
-						final String leagueName = matchDays.get(i).get("league").get("name").asText();
-						final String venue = matchDays.get(i).get("fixture").get("venue").get("name").asText();
-						final String city = matchDays.get(i).findPath("fixture").get("venue").get("city").asText();
-						("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText()) ? matchesFutureList : matchesPastList).put(timestamp + "." + teamId,
-								"<match><header>" + leagueName + " · " + venue + " · " + city + " · " + formatDate(timestamp, contact.getLanguage()) + "</header>"
-								+ "<home" + (matchDays.get(i).get("teams").get("home").get("id").asInt() == teamId ? " class=\"highlight\"" : "") + ">"
-								+ homeName + "</home><goals>" + homeGoals + "</goals><sep>:</sep><goals>"
-								+ awayGoals + "</goals><away" + (matchDays.get(i).get("teams").get("away").get("id").asInt() == teamId ? " class=\"highlight\"" : "") + ">" + awayName + "</away></match>");
+			try {
+				final JsonNode matchDays = get("team=" + teamId + "&season=" + currentSeason());
+				if (matchDays != null) {
+					final Map<String, String> matchesFutureList = new HashMap<>();
+					final Map<String, String> matchesPastList = new HashMap<>();
+					for (int i = 0; i < matchDays.size(); i++) {
+						if (!"TBD".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())) {
+							final long timestamp = matchDays.get(i).get("fixture").get("timestamp").asLong();
+							final Instant startDate = Instant.ofEpochMilli(timestamp * 1000);
+							final String homeName = matchDays.get(i).get("teams").get("home").get("name").asText()
+									.replace("Munich", "München");
+							final String awayName = matchDays.get(i).get("teams").get("away").get("name").asText()
+									.replace("Munich", "München");
+							final String homeGoals = matchDays.get(i).get("goals").get("home").isNull() ? "&nbsp;" : matchDays.get(i).get("goals").get("home").asText();
+							final String awayGoals = matchDays.get(i).get("goals").get("away").isNull() ? "&nbsp;" : matchDays.get(i).get("goals").get("away").asText();
+							final String leagueName = matchDays.get(i).get("league").get("name").asText();
+							final String venue = matchDays.get(i).get("fixture").get("venue").get("name").asText();
+							final String city = matchDays.get(i).findPath("fixture").get("venue").get("city").asText();
+							("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText()) ? matchesFutureList : matchesPastList).put(timestamp + "." + teamId,
+									"<match><header>" + leagueName + " · " + venue + " · " + city + " · " + formatDate(timestamp, contact.getLanguage()) + "</header>"
+									+ "<home" + (matchDays.get(i).get("teams").get("home").get("id").asInt() == teamId ? " class=\"highlight\"" : "") + ">"
+									+ homeName + "</home><goals>" + homeGoals + "</goals><sep>:</sep><goals>"
+									+ awayGoals + "</goals><away" + (matchDays.get(i).get("teams").get("away").get("id").asInt() == teamId ? " class=\"highlight\"" : "") + ">" + awayName + "</away></match>");
+						}
 					}
+					List<String> sortedKeys = new ArrayList(matchesPastList.keySet());
+					Collections.sort(sortedKeys);
+					for (int i = sortedKeys.size() - 1; sortedKeys.size() - i <= pastMatches && i >= 0; i--)
+						matches.put(sortedKeys.get(i), matchesPastList.get(sortedKeys.get(i)));
+					sortedKeys = new ArrayList(matchesFutureList.keySet());
+					Collections.sort(sortedKeys);
+					for (int i = 0; i < futureMatches && i < sortedKeys.size(); i++)
+						matches.put(sortedKeys.get(i), matchesFutureList.get(sortedKeys.get(i)));
 				}
-				List<String> sortedKeys = new ArrayList(matchesPastList.keySet());
-				Collections.sort(sortedKeys);
-				for (int i = sortedKeys.size() - 1; sortedKeys.size() - i <= pastMatches && i >= 0; i--)
-					matches.put(sortedKeys.get(i), matchesPastList.get(sortedKeys.get(i)));
-				sortedKeys = new ArrayList(matchesFutureList.keySet());
-				Collections.sort(sortedKeys);
-				for (int i = 0; i < futureMatches && i < sortedKeys.size(); i++)
-					matches.put(sortedKeys.get(i), matchesFutureList.get(sortedKeys.get(i)));
+			} catch (RuntimeException ex) {
+				// matchDays not up to date, ignore
 			}
 		}
 		final List<String> sortedKeys = new ArrayList(matches.keySet());
