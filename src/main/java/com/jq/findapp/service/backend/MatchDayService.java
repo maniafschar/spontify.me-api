@@ -131,7 +131,7 @@ public class MatchDayService {
 						poll.location = json.get(i).get("teams").get("home").get("id").asInt() == teamId ? "home"
 								: "away";
 						poll.subject = poll.homeName + " : " + poll.awayName + " (" + poll.city + " · " + poll.venue
-								+ " · " + formatDate(poll.timestamp, "DE") + ")";
+								+ " · " + formatDate(poll.timestamp, null) + ")";
 						poll.textId = TextId.notification_clientMarketingPollPrediction;
 						final Instant end = Instant.ofEpochSecond(poll.timestamp)
 								.minus(Duration.ofMinutes(15));
@@ -216,7 +216,7 @@ public class MatchDayService {
 				}
 				if (i < 8)
 					poll.matches.add(s + "|"
-							+ formatDate((Long) matches.get(i).get("timestamp"), "DE"));
+							+ formatDate((Long) matches.get(i).get("timestamp"), null));
 			}
 			final List<Map<String, Object>> statistics = new ArrayList<>();
 			for (int i = 0; i < labels.size(); i++) {
@@ -247,7 +247,7 @@ public class MatchDayService {
 					+ " - "
 					+ poll.awayName
 					+ "</div>vom <b>"
-					+ formatDate(poll.timestamp, "DE")
+					+ formatDate(poll.timestamp, null)
 					+ "</b>. Möchtest Du teilnehmen?";
 			poll.epilog = "Lieben Dank für die Teilnahme!\nDas Ergebnis wird kurz vor dem Spiel hier bekanntgegeben.\n\nLust auf mehr <b>Fan Feeling</b>? In unserer neuen App bauen wir eine neue <b>Fußball Fan Community</b> auf.\n\nMit ein paar wenigen Klicks kannst auch Du dabei sein.";
 		}
@@ -296,10 +296,10 @@ public class MatchDayService {
 										" Spiel<div style=\"padding:1em 0;font-weight:bold;\">"
 										+ poll.homeName + " - " + poll.awayName
 										+ "</div>vom <b>"
-										+ formatDate(matchDay.findPath("fixture").get("timestamp").asLong(), "DE")
+										+ formatDate(matchDay.findPath("fixture").get("timestamp").asLong(), null)
 										+ "</b>. Möchtest Du teilnehmen?";
 								poll.subject = poll.homeName + " : " + poll.awayName + " (" + poll.city + " · "
-										+ poll.venue + " · " + formatDate(poll.timestamp, "DE") + ")";
+										+ poll.venue + " · " + formatDate(poll.timestamp, null) + ")";
 								final Question question = new Question();
 								question.question = "Wer war für Dich Spieler des Spiels?";
 								playerOfTheMatchAddAnswers(question.answers, players);
@@ -310,7 +310,7 @@ public class MatchDayService {
 								clientMarketing.setStartDate(new Timestamp(startDate.toEpochMilli()));
 								clientMarketing
 										.setEndDate(new Timestamp(startDate.plus(Duration.ofHours(18)).toEpochMilli()));
-								final String endDate = formatDate(clientMarketing.getEndDate().getTime() / 1000 + 10 * 60, "DE");
+								final String endDate = formatDate(clientMarketing.getEndDate().getTime() / 1000 + 10 * 60, null);
 								clientMarketing.setClientId(clientId);
 								clientMarketing.setImage(Attachment.createImage(".png",
 										image.create(poll, "Spieler", repository.one(Client.class, clientId), null)));
@@ -492,7 +492,7 @@ public class MatchDayService {
 					s += "ergebnis";
 				g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 14.5f);
 				g2.setFont(customFont.deriveFont(24f));
-				s = subtitlePrefix + " des Spiels vom " + formatDate(poll.timestamp, "DE");
+				s = subtitlePrefix + " des Spiels vom " + formatDate(poll.timestamp, null);
 				g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 17.5f);
 				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP));
 				g2.setFont(customFont.deriveFont(12f));
@@ -698,7 +698,7 @@ public class MatchDayService {
 							final String venue = matchDays.get(i).get("fixture").get("venue").get("name").asText();
 							final String city = matchDays.get(i).findPath("fixture").get("venue").get("city").asText();
 							("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText()) ? matchesFutureList : matchesPastList).put(timestamp + "." + teamId,
-									"<match><header>" + leagueName + " · " + venue + " · " + city + " · " + formatDate(timestamp, contact.getLanguage()) + "</header>"
+									"<match><header>" + leagueName + " · " + venue + " · " + city + " · " + formatDate(timestamp, contact) + "</header>"
 									+ "<home" + (matchDays.get(i).get("teams").get("home").get("id").asInt() == teamId ? " class=\"highlight\"" : "") + ">"
 									+ homeName + "</home><goals>" + homeGoals + "</goals><sep>:</sep><goals>"
 									+ awayGoals + "</goals><away" + (matchDays.get(i).get("teams").get("away").get("id").asInt() == teamId ? " class=\"highlight\"" : "") + ">" + awayName + "</away></match>");
@@ -757,9 +757,13 @@ public class MatchDayService {
 		return result;
 	}
 
-	private String formatDate(final long seconds, final Contact contact) {
+	private String formatDate(final long seconds, Contact contact) {
 		final LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds),
 				TimeZone.getTimeZone(Strings.TIME_OFFSET).toZoneId());
+		if (contact == null) {
+			contact = new Contact();
+			contact.setLanguage("DE");
+		}
 		return text.getText(contact, TextId.valueOf("date_weekday" + (time.getDayOfWeek().getValue() % 7)))
 				+ time.format(DateTimeFormatter.ofPattern("d.M.yyyy H:mm"));
 	}
