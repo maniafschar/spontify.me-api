@@ -212,9 +212,12 @@ public class MatchDayServiceTest {
 	@Test
 	public void retrieveMatchDays() {
 		// given
+		final Contact contact = new Contact();
+		contact.setSkills("9.157");
+		contact.setLanguage("DE");
 
 		// when
-		final String matches = matchDayService.retrieveMatchDays(2, 4, Arrays.asList(157), null);
+		final String matches = matchDayService.retrieveMatchDays(2, 4, contact);
 
 		// then
 		assertNull(matches);
