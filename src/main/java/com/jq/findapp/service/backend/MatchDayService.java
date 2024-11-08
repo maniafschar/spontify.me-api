@@ -766,7 +766,7 @@ public class MatchDayService {
 			contact.setLanguage("DE");
 		}
 		return text.getText(contact, TextId.valueOf("date_weekday" + (time.getDayOfWeek().getValue() % 7)))
-				+ time.format(DateTimeFormatter.ofPattern("d.M.yyyy H:mm"));
+				+ " " + time.format(DateTimeFormatter.ofPattern("d.M.yyyy H:mm"));
 	}
 
 	public List<FutureEvent> futureEvents(final int teamId) {
