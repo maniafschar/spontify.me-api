@@ -699,7 +699,7 @@ public class MatchDayService {
 				}
 				for (int i = matchesPastList.size() - 1; matchesPastList.size() - pastMatches > 0 && i >= 0; i--)
 					matches.put(matchesPastList.get(i)[0], matchesPastList.get(i)[1]);
-				for (int i = 0; i < futureMatches && i < futureMatches.size(); i++)
+				for (int i = 0; i < futureMatches && i < matchesFutureList.size(); i++)
 					matches.put(matchesFutureList.get(i)[0], matchesFutureList.get(i)[1]);
 			}
 		}
