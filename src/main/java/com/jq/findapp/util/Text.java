@@ -142,11 +142,13 @@ public class Text {
 						.get(label.substring(label.indexOf('_') + 1)).asText();
 			else
 				s = languages.get(contact.getLanguage()).get(label).asText();
-			final Client client = repository.one(Client.class, contact.getClientId());
-			final JsonNode node = Json.toNode(Attachment.resolve(client.getStorage()));
-			s = s.replaceAll("APP_TITLE", client.getName());
-			s = s.replaceAll(" \\$\\{buddy}", node.get("lang").get(contact.getLanguage()).get("buddy").asText());
-			s = s.replaceAll(" \\$\\{buddies}", node.get("lang").get(contact.getLanguage()).get("buddies").asText());
+			if (s.contains("{buddy") || s.sontains("APP_TITLE")) {
+				final Client client = repository.one(Client.class, contact.getClientId());
+				final JsonNode node = Json.toNode(Attachment.resolve(client.getStorage()));
+				s = s.replaceAll("APP_TITLE", client.getName());
+				s = s.replaceAll(" \\$\\{buddy}", node.get("lang").get(contact.getLanguage()).get("buddy").asText());
+				s = s.replaceAll(" \\$\\{buddies}", node.get("lang").get(contact.getLanguage()).get("buddies").asText());
+			}
 			return s;
 		} catch (final NullPointerException ex) {
 			throw new RuntimeException("Missing label " + contact.getLanguage() + ": " + textId);
