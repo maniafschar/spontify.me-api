@@ -690,7 +690,7 @@ public class MatchDayService {
 						final String leagueName = matchDays.get(i).get("league").get("name").asText();
 						final String venue = matchDays.get(i).get("fixture").get("venue").get("name").asText();
 						final String city = matchDays.get(i).findPath("fixture").get("venue").get("city").asText();
-						(timestamp > System.currentTimeMillis() ? matchesFutureList : matchesPastList).put(timestamp + "." + teamId,
+						("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText()) ? matchesFutureList : matchesPastList).put(timestamp + "." + teamId,
 								"<match><header>" + leagueName + " · " + venue + " · " + city + " · " + formatDate(timestamp, null) + "</header>"
 								+ "<home" + (matchDays.get(i).get("teams").get("home").get("id").asInt() == teamId ? " class=\"highlight\"" : "") + ">"
 								+ homeName + "</home><goals>" + homeGoals + "</goals><sep>:</sep><goals>"
