@@ -675,8 +675,8 @@ public class MatchDayService {
 		for (int teamId : teamIds) {
 			final JsonNode matchDays = get("team=" + teamId + "&season=" + currentSeason());
 			if (matchDays != null) {
-				final List<String[]> matchesFuture = new ArrayList<>();
-				final List<String[]> matchesPast = new ArrayList<>();
+				final List<String[]> matchesFutureList = new ArrayList<>();
+				final List<String[]> matchesPastList = new ArrayList<>();
 				for (int i = 0; i < matchDays.size(); i++) {
 					if (!"TBD".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())) {
 						final long timestamp = matchDays.get(i).get("fixture").get("timestamp").asLong();
@@ -694,13 +694,13 @@ public class MatchDayService {
 								+ "<home" + (matchDays.get(i).get("teams").get("home").get("id").asInt() == teamId ? " class=\"highlight\"" : "") + ">"
 								+ homeName + "</home><goals>" + homeGoals + "</goals><sep>:</sep><goals>"
 								+ awayGoals + "</goals><away" + (matchDays.get(i).get("teams").get("away").get("id").asInt() == teamId ? " class=\"highlight\"" : "") + ">" + awayName + "</away></match>";
-						("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText()) ? matchesFuture : matchesPast).add(new String[] { timestamp + "." + teamId, match });
+						("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText()) ? matchesFutureList : matchesPastList).add(new String[] { timestamp + "." + teamId, match });
 					}
 				}
-				for (int i = matchesPast.size() - 1; matchesPast.size() - pastMatches > 0 && i >= 0; i--)
-					matches.put(matchesPast.get(i)[0], matchesPast.get(i)[1]);
+				for (int i = matchesPastList.size() - 1; matchesPastList.size() - pastMatches > 0 && i >= 0; i--)
+					matches.put(matchesPastList.get(i)[0], matchesPastList.get(i)[1]);
 				for (int i = 0; i < futureMatches && i < futureMatches.size(); i++)
-					matches.put(matchesFuture.get(i)[0], matchesFuture.get(i)[1]);
+					matches.put(matchesFutureList.get(i)[0], matchesFutureList.get(i)[1]);
 			}
 		}
 		final List<String> sortedKeys = new ArrayList(matches.keySet());
