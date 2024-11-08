@@ -699,12 +699,13 @@ public class MatchDayService {
 				}
 				List<String> sortedKeys = new ArrayList(matchesPastList.keySet());
 				Collections.sort(sortedKeys);
-				for (int i = sortedKeys.size() - 1; sortedKeys.size() - i < pastMatches && i >= 0; i--)
+				for (int i = sortedKeys.size() - 1; sortedKeys.size() - i <= pastMatches && i >= 0; i--)
 					matches.put(sortedKeys.get(i), matchesPastList.get(sortedKeys.get(i)));
 				sortedKeys = new ArrayList(matchesFutureList.keySet());
 				Collections.sort(sortedKeys);
 				for (int i = 0; i < futureMatches && i < sortedKeys.size(); i++)
 					matches.put(sortedKeys.get(i), matchesFutureList.get(sortedKeys.get(i)));
+				matches.put("00000000", teamId + ": " + matchesFutureList.size() + " - " + matchesPastList.size());
 			}
 		}
 		final List<String> sortedKeys = new ArrayList(matches.keySet());
