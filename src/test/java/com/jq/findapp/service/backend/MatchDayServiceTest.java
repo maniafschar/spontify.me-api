@@ -30,6 +30,7 @@ import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
 import com.jq.findapp.TestConfig.MatchDayServiceMock;
 import com.jq.findapp.entity.ClientMarketing;
+import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
