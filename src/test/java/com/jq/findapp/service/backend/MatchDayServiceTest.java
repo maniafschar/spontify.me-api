@@ -214,7 +214,7 @@ public class MatchDayServiceTest {
 		// given
 
 		// when
-		final String matches = matchDayService.retrieveMatchDays(2, 4, Arrays.asList(157));
+		final String matches = matchDayService.retrieveMatchDays(2, 4, Arrays.asList(157), null);
 
 		// then
 		assertNull(matches);
