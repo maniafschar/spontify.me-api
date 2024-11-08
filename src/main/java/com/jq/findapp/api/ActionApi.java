@@ -284,8 +284,7 @@ public class ActionApi {
 		final List<Object[]> list = repository.list(params).getList();
 		if (id == null && user != null && clientId.intValue() == 4) {
 			final Contact contact = repository.one(Contact.class, user);
-			final String s = matchDayService.retrieveMatchDays(2, 4, Arrays.asList(contact.getSkills().split("\\|"))
-					.stream().filter(e -> e.startsWith("9.")).map(e -> Integer.valueOf(e.substring(2))).collect(Collectors.toList()));
+			final String s = matchDayService.retrieveMatchDays(2, 4, contact);
 			if (!Strings.isEmpty(s)) {
 				final Object[] o = new Object[list.get(0).length];
 				for (int i = 0; i < o.length; i++) {
