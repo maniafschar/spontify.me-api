@@ -705,7 +705,6 @@ public class MatchDayService {
 				Collections.sort(sortedKeys);
 				for (int i = 0; i < futureMatches && i < sortedKeys.size(); i++)
 					matches.put(sortedKeys.get(i), matchesFutureList.get(sortedKeys.get(i)));
-				matches.put("00000000", teamId + ": " + matchesFutureList.size() + " - " + matchesPastList.size());
 			}
 		}
 		final List<String> sortedKeys = new ArrayList(matches.keySet());
