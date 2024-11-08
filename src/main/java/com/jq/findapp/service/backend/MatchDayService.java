@@ -18,8 +18,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
@@ -59,6 +59,7 @@ import com.jq.findapp.service.backend.CronService.CronResult;
 import com.jq.findapp.util.EntityUtil;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
+import com.jq.findapp.util.Text;
 import com.jq.findapp.util.Text.TextId;
 
 @Service
@@ -77,6 +78,9 @@ public class MatchDayService {
 
 	@Value("${app.sports.api.token}")
 	private String token;
+
+	@Autowired
+	private Text text;
 
 	private static volatile long pauseUntil = 0;
 	private static final String STORAGE_PREFIX = "api-sports-";
@@ -693,7 +697,7 @@ public class MatchDayService {
 						final String venue = matchDays.get(i).get("fixture").get("venue").get("name").asText();
 						final String city = matchDays.get(i).findPath("fixture").get("venue").get("city").asText();
 						("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText()) ? matchesFutureList : matchesPastList).put(timestamp + "." + teamId,
-								"<match><header>" + leagueName + " · " + venue + " · " + city + " · " + formatDate(timestamp, "DE") + "</header>"
+								"<match><header>" + leagueName + " · " + venue + " · " + city + " · " + formatDate(timestamp, contact.getLanguage()) + "</header>"
 								+ "<home" + (matchDays.get(i).get("teams").get("home").get("id").asInt() == teamId ? " class=\"highlight\"" : "") + ">"
 								+ homeName + "</home><goals>" + homeGoals + "</goals><sep>:</sep><goals>"
 								+ awayGoals + "</goals><away" + (matchDays.get(i).get("teams").get("away").get("id").asInt() == teamId ? " class=\"highlight\"" : "") + ">" + awayName + "</away></match>");
@@ -749,10 +753,11 @@ public class MatchDayService {
 		return result;
 	}
 
-	private String formatDate(final long seconds, final String language) {
-		return LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds),
-				TimeZone.getTimeZone(Strings.TIME_OFFSET).toZoneId())
-				.format(DateTimeFormatter.ofPattern("d.M.yyyy H:mm"));
+	private String formatDate(final long seconds, final Contact contact) {
+		final LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds),
+				TimeZone.getTimeZone(Strings.TIME_OFFSET).toZoneId());
+		return text.getText(contact, TextId.valueOf("date_weekday" + (time.getDayOfWeek().getValue() % 7)))
+				+ time.format(DateTimeFormatter.ofPattern("d.M.yyyy H:mm"));
 	}
 
 	public List<FutureEvent> futureEvents(final int teamId) {
