@@ -675,23 +675,32 @@ public class MatchDayService {
 		for (int teamId : teamIds) {
 			final JsonNode matchDays = get("team=" + teamId + "&season=" + currentSeason());
 			if (matchDays != null) {
+				final List<String[]> matchesFuture = new ArrayList<>();
+				final List<String[]> matchesPast = new ArrayList<>();
 				for (int i = 0; i < matchDays.size(); i++) {
-					final long timestamp = matchDays.get(i).get("fixture").get("timestamp").asLong();
-					final Instant startDate = Instant.ofEpochMilli(timestamp * 1000);
-					final String homeName = matchDays.get(i).get("teams").get("home").get("name").asText()
-							.replace("Munich", "München");
-					final String awayName = matchDays.get(i).get("teams").get("away").get("name").asText()
-							.replace("Munich", "München");
-					final String homeGoals = matchDays.get(i).get("goals").get("home").isNull() ? "&nbsp;" : matchDays.get(i).get("goals").get("home").asText();
-					final String awayGoals = matchDays.get(i).get("goals").get("away").isNull() ? "&nbsp;" : matchDays.get(i).get("goals").get("away").asText();
-					final String leagueName = matchDays.get(i).get("league").get("name").asText();
-					final String venue = matchDays.get(i).get("fixture").get("venue").get("name").asText();
-					final String city = matchDays.get(i).findPath("fixture").get("venue").get("city").asText();
-					matches.put(timestamp + "." + teamId, "<match><header>" + leagueName + " · " + venue + " · " + city + " · " + formatDate(timestamp, null) + "</header>"
-							+ "<home" + (matchDays.get(i).get("teams").get("home").get("id").asInt() == teamId ? " class=\"highlight\"" : "") + ">"
-							+ homeName + "</home><goals>" + homeGoals + "</goals><sep>:</sep><goals>"
-							+ awayGoals + "</goals><away" + (matchDays.get(i).get("teams").get("away").get("id").asInt() == teamId ? " class=\"highlight\"" : "") + ">" + awayName + "</away></match>");
+					if (!"TBD".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())) {
+						final long timestamp = matchDays.get(i).get("fixture").get("timestamp").asLong();
+						final Instant startDate = Instant.ofEpochMilli(timestamp * 1000);
+						final String homeName = matchDays.get(i).get("teams").get("home").get("name").asText()
+								.replace("Munich", "München");
+						final String awayName = matchDays.get(i).get("teams").get("away").get("name").asText()
+								.replace("Munich", "München");
+						final String homeGoals = matchDays.get(i).get("goals").get("home").isNull() ? "&nbsp;" : matchDays.get(i).get("goals").get("home").asText();
+						final String awayGoals = matchDays.get(i).get("goals").get("away").isNull() ? "&nbsp;" : matchDays.get(i).get("goals").get("away").asText();
+						final String leagueName = matchDays.get(i).get("league").get("name").asText();
+						final String venue = matchDays.get(i).get("fixture").get("venue").get("name").asText();
+						final String city = matchDays.get(i).findPath("fixture").get("venue").get("city").asText();
+						final String match = "<match><header>" + leagueName + " · " + venue + " · " + city + " · " + formatDate(timestamp, null) + "</header>"
+								+ "<home" + (matchDays.get(i).get("teams").get("home").get("id").asInt() == teamId ? " class=\"highlight\"" : "") + ">"
+								+ homeName + "</home><goals>" + homeGoals + "</goals><sep>:</sep><goals>"
+								+ awayGoals + "</goals><away" + (matchDays.get(i).get("teams").get("away").get("id").asInt() == teamId ? " class=\"highlight\"" : "") + ">" + awayName + "</away></match>";
+						("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText()) ? matchesFuture : matchesPast).add(new String[] { timestamp + "." + teamId, match });
+					}
 				}
+				for (int i = matchesPast.size() - 1; matchesPast.size() - pastMatches > 0 && i >= 0; i--)
+					matches.put(matchesPast.get(i)[0], matchesPast.get(i)[1]);
+				for (int i = 0; i < matchesFuture && i < matchesFuture.size(); i++)
+					matches.put(matchesFuture.get(i)[0], matchesFuture.get(i)[1]);
 			}
 		}
 		final List<String> sortedKeys = new ArrayList(matches.keySet());
