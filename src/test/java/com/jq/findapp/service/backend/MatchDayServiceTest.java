@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -206,6 +207,17 @@ public class MatchDayServiceTest {
 
 		// then
 		assertNull(cache);
+	}
+
+	@Test
+	public void retrieveMatchDays() {
+		// given
+
+		// when
+		final String matches = matchDayService.retrieveMatchDays(2, 4, Arrays.asList(157));
+
+		// then
+		assertNull(matches);
 	}
 
 	@Test
