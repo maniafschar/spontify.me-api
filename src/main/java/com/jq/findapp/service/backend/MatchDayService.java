@@ -835,7 +835,6 @@ public class MatchDayService {
 					final Instant time = Instant.ofEpochSecond(f.get("timestamp").asLong());
 					if (time.isAfter(Instant.now()) && time.minus(Duration.ofDays(14)).isBefore(Instant.now()))
 						return null;
-					break;
 				}
 			}
 		}
