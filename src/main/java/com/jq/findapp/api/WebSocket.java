@@ -56,7 +56,6 @@ public class WebSocket {
 	@MessageMapping("video")
 	public void video(final VideoMessage message, @Header(name = "destination") final String destination)
 			throws Exception {
-		System.out.println(Json.toPrettyString(message));
 		final Contact contact = authenticationService.verify(message.user, message.password,
 				message.salt);
 		final Log log = new Log();
@@ -143,5 +142,69 @@ public class WebSocket {
 		public String name;
 		public String password;
 		public String salt;
+
+		public BigInteger getId() {
+			return id;
+		}
+
+		public void setId(BigInteger id) {
+			this.id = id;
+		}
+
+		public BigInteger getUser() {
+			return user;
+		}
+
+		public void setUser(BigInteger user) {
+			this.user = user;
+		}
+
+		public Map<String, Object> getAnswer() {
+			return answer;
+		}
+
+		public void setAnswer(Map<String, Object> answer) {
+			this.answer = answer;
+		}
+
+		public Map<String, Object> getCandidate() {
+			return candidate;
+		}
+
+		public void setCandidate(Map<String, Object> candidate) {
+			this.candidate = candidate;
+		}
+
+		public Map<String, Object> getOffer() {
+			return offer;
+		}
+
+		public void setOffer(Map<String, Object> offer) {
+			this.offer = offer;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public String getPassword() {
+			return password;
+		}
+
+		public void setPassword(String password) {
+			this.password = password;
+		}
+
+		public String getSalt() {
+			return salt;
+		}
+
+		public void setSalt(String salt) {
+			this.salt = salt;
+		}
 	}
 }
