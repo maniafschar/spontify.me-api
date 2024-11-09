@@ -19,9 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.NotificationService.Environment;
 import com.jq.findapp.util.Strings;
 
@@ -29,8 +27,6 @@ import jakarta.ws.rs.NotFoundException;
 
 @Component
 public class Ios {
-	@Autowired
-	private Repository repository;
 
 	@Autowired
 	private JwtGenerator jwtGenerator;

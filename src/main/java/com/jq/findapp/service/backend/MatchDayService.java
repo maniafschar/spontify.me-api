@@ -311,7 +311,8 @@ public class MatchDayService {
 								clientMarketing.setStartDate(new Timestamp(startDate.toEpochMilli()));
 								clientMarketing
 										.setEndDate(new Timestamp(startDate.plus(Duration.ofHours(18)).toEpochMilli()));
-								final String endDate = formatDate(clientMarketing.getEndDate().getTime() / 1000 + 10 * 60, null);
+								final String endDate = formatDate(
+										clientMarketing.getEndDate().getTime() / 1000 + 10 * 60, null);
 								clientMarketing.setClientId(clientId);
 								clientMarketing.setImage(Attachment.createImage(".png",
 										image.create(poll, "Spieler", repository.one(Client.class, clientId), null)));
@@ -505,7 +506,7 @@ public class MatchDayService {
 							colorText);
 				else if ("Prediction".equals(poll.type))
 					prediction(g2, customFont, poll, colorText, client.getId());
-				// TODO final BufferedImageTranscoder imageTranscoder = new
+				// final BufferedImageTranscoder imageTranscoder = new
 				// BufferedImageTranscoder();
 				// imageTranscoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, width);
 				// imageTranscoder.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, height);
@@ -677,7 +678,8 @@ public class MatchDayService {
 
 	public String retrieveMatchDays(final int pastMatches, final int futureMatches, final Contact contact) {
 		final List<Integer> teamIds = Arrays.asList(contact.getSkills().split("\\|"))
-				.stream().filter(e -> e.startsWith("9.")).map(e -> Integer.valueOf(e.substring(2))).collect(Collectors.toList());
+				.stream().filter(e -> e.startsWith("9.")).map(e -> Integer.valueOf(e.substring(2)))
+				.collect(Collectors.toList());
 		final Map<String, String> matches = new HashMap<>();
 		for (int teamId : teamIds) {
 			try {
@@ -688,28 +690,39 @@ public class MatchDayService {
 					for (int i = 0; i < matchDays.size(); i++) {
 						if (!"TBD".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())) {
 							final long timestamp = matchDays.get(i).get("fixture").get("timestamp").asLong();
-							final Instant startDate = Instant.ofEpochMilli(timestamp * 1000);
 							final String homeName = matchDays.get(i).get("teams").get("home").get("name").asText()
 									.replace("Munich", "München");
 							final String awayName = matchDays.get(i).get("teams").get("away").get("name").asText()
 									.replace("Munich", "München");
-							final String homeGoals = matchDays.get(i).get("goals").get("home").isNull() ? "&nbsp;" : matchDays.get(i).get("goals").get("home").asText();
-							final String awayGoals = matchDays.get(i).get("goals").get("away").isNull() ? "&nbsp;" : matchDays.get(i).get("goals").get("away").asText();
+							final String homeGoals = matchDays.get(i).get("goals").get("home").isNull() ? "&nbsp;"
+									: matchDays.get(i).get("goals").get("home").asText();
+							final String awayGoals = matchDays.get(i).get("goals").get("away").isNull() ? "&nbsp;"
+									: matchDays.get(i).get("goals").get("away").asText();
 							final String leagueName = matchDays.get(i).get("league").get("name").asText();
 							final String venue = matchDays.get(i).get("fixture").get("venue").get("name").asText();
 							final String city = matchDays.get(i).findPath("fixture").get("venue").get("city").asText();
-							("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText()) ? matchesFutureList : matchesPastList).put(timestamp + "." + teamId,
-									"<match><header>" + leagueName + " · " + venue + " · " + city + " · " + formatDate(timestamp, contact) + "</header>"
-									+ "<home" + (matchDays.get(i).get("teams").get("home").get("id").asInt() == teamId ? " class=\"highlight\"" : "") + ">"
-									+ homeName + "</home><goals>" + homeGoals + "</goals><sep>:</sep><goals>"
-									+ awayGoals + "</goals><away" + (matchDays.get(i).get("teams").get("away").get("id").asInt() == teamId ? " class=\"highlight\"" : "") + ">" + awayName + "</away></match>");
+							("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())
+									? matchesFutureList
+									: matchesPastList).put(timestamp + "." + teamId,
+											"<match><header>" + leagueName + " · " + venue + " · " + city + " · "
+													+ formatDate(timestamp, contact) + "</header>"
+													+ "<home"
+													+ (matchDays.get(i).get("teams").get("home").get("id")
+															.asInt() == teamId ? " class=\"highlight\"" : "")
+													+ ">"
+													+ homeName + "</home><goals>" + homeGoals
+													+ "</goals><sep>:</sep><goals>"
+													+ awayGoals + "</goals><away"
+													+ (matchDays.get(i).get("teams").get("away").get("id")
+															.asInt() == teamId ? " class=\"highlight\"" : "")
+													+ ">" + awayName + "</away></match>");
 						}
 					}
-					List<String> sortedKeys = new ArrayList(matchesPastList.keySet());
+					List<String> sortedKeys = new ArrayList<>(matchesPastList.keySet());
 					Collections.sort(sortedKeys);
 					for (int i = sortedKeys.size() - 1; sortedKeys.size() - i <= pastMatches && i >= 0; i--)
 						matches.put(sortedKeys.get(i), matchesPastList.get(sortedKeys.get(i)));
-					sortedKeys = new ArrayList(matchesFutureList.keySet());
+					sortedKeys = new ArrayList<>(matchesFutureList.keySet());
 					Collections.sort(sortedKeys);
 					for (int i = 0; i < futureMatches && i < sortedKeys.size(); i++)
 						matches.put(sortedKeys.get(i), matchesFutureList.get(sortedKeys.get(i)));
@@ -718,12 +731,13 @@ public class MatchDayService {
 				// matchDays not up to date, ignore
 			}
 		}
-		final List<String> sortedKeys = new ArrayList(matches.keySet());
+		final List<String> sortedKeys = new ArrayList<>(matches.keySet());
 		Collections.sort(sortedKeys);
 		final StringBuilder s = new StringBuilder();
 		for (String key : sortedKeys)
 			s.insert(0, matches.get(key));
-		s.insert(0, "<style>header{font-size:0.7em;}match{padding-top:1em;display:inline-block;width:100%;}home,away{width:42%;display:inline-block;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}home{text-align:right;}away{text-align:left;}goals{width:8%;display:inline-block;text-align:center;overflow:hidden;}sep{position:absolute;margin-left:-0.1em;}.highlight{font-weight:bold;}</style><matchDays style=\"text-align:center;display:inline-block;\">");
+		s.insert(0,
+				"<style>header{font-size:0.7em;}match{padding-top:1em;display:inline-block;width:100%;}home,away{width:42%;display:inline-block;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}home{text-align:right;}away{text-align:left;}goals{width:8%;display:inline-block;text-align:center;overflow:hidden;}sep{position:absolute;margin-left:-0.1em;}.highlight{font-weight:bold;}</style><matchDays style=\"text-align:center;display:inline-block;\">");
 		s.append("</matchDays>");
 		return s.toString();
 	}

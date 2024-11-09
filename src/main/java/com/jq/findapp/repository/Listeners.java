@@ -51,6 +51,7 @@ class Listeners {
 	private static final AbstractRepositoryListener<?> LISTENER = new AbstractRepositoryListener<>() {
 	};
 
+	@SuppressWarnings("unchecked")
 	private <T extends BaseEntity> AbstractRepositoryListener<T> entity2listener(final T entity) {
 		if (entity instanceof Block)
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(BlockListener.class);

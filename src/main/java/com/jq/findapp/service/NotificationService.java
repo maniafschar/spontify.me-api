@@ -1,13 +1,5 @@
 package com.jq.findapp.service;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -22,8 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import javax.imageio.ImageIO;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.mail.DefaultAuthenticator;
@@ -518,24 +508,6 @@ public class NotificationService {
 		} catch (final Exception ex) {
 			ex.printStackTrace();
 		}
-	}
-
-	private byte[] imageRound(final byte[] img) throws IOException {
-		final BufferedImage image = ImageIO.read(new ByteArrayInputStream(img));
-		final int w = image.getWidth();
-		final int h = image.getHeight();
-		final BufferedImage output = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-		final Graphics2D g2 = output.createGraphics();
-		g2.setComposite(AlphaComposite.Src);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2.setColor(Color.WHITE);
-		g2.fill(new RoundRectangle2D.Float(0, 0, w, h, w, h));
-		g2.setComposite(AlphaComposite.SrcAtop);
-		g2.drawImage(image, 0, 0, null);
-		g2.dispose();
-		final ByteArrayOutputStream out = new ByteArrayOutputStream();
-		ImageIO.write(output, "png", out);
-		return out.toByteArray();
 	}
 
 	public static class Ping {

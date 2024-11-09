@@ -106,7 +106,7 @@ public class EntityUtil {
 	}
 
 	public static BaseEntity createEntity(final WriteEntity entity, final Contact contact) throws Exception {
-		final BaseEntity e = entity.getClazz().newInstance();
+		final BaseEntity e = entity.getClazz().getConstructor().newInstance();
 		try {
 			if (e.getClass().getDeclaredMethod("getContactId") != null)
 				entity.getValues().put("contactId", contact.getId());

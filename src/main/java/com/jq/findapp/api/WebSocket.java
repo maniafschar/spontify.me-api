@@ -56,35 +56,36 @@ public class WebSocket {
 	@MessageMapping("video")
 	public void video(final VideoMessage message, @Header(name = "destination") final String destination)
 			throws Exception {
-		final Contact contact = authenticationService.verify(message.getUser(), message.getPassword(),
-				message.getSalt());
+		final Contact contact = authenticationService.verify(message.user, message.password,
+				message.salt);
 		final Log log = new Log();
 		final long time = System.currentTimeMillis();
 		log.setUri(destination);
 		log.setMethod("WS");
-		log.setContactId(message.getUser());
+		log.setContactId(message.user);
 		if (message.answer == null) {
 			log.setStatus(LogStatus.ErrorClient);
 			log.setBody(Json.toString(message));
-		} else if (chatService.isVideoCallAllowed(contact, message.getId())) {
-			if (USERS.containsKey(message.getId())) {
-				message.setPassword(null);
-				message.setSalt(null);
+		} else if (chatService.isVideoCallAllowed(contact, message.id)) {
+			if (USERS.containsKey(message.id)) {
+				message.password = null;
+				message.salt = null;
 				log.setStatus(LogStatus.Ok);
-				messagingTemplate.convertAndSendToUser("" + message.getId(), "/video", message);
+				messagingTemplate.convertAndSendToUser("" + message.id, "/video", message);
 				log.setBody(message.answer != null ? "answer:" + message.answer
-						: message.candidate != null ? "candidate:" + message.candidate : "offer:" + message.offer);
+						: message.candidate != null ? "candidate:" + message.candidate
+								: "offer:" + message.offer);
 			} else {
 				final VideoMessage answer = new VideoMessage();
-				answer.setAnswer(Collections.singletonMap("userState", "offline"));
-				answer.setId(message.getUser());
+				answer.answer = Collections.singletonMap("userState", "offline");
+				answer.id = message.user;
 				log.setStatus(LogStatus.UserOffline);
-				log.setBody("contact:" + message.getId());
-				messagingTemplate.convertAndSendToUser("" + message.getUser(), "/video", answer);
+				log.setBody("contact:" + message.id);
+				messagingTemplate.convertAndSendToUser("" + message.user, "/video", answer);
 			}
 		} else {
 			log.setStatus(LogStatus.UserUnauthorized);
-			log.setBody("contact:" + message.getId());
+			log.setBody("contact:" + message.id);
 		}
 		log.setTime((int) (System.currentTimeMillis() - time));
 		log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
@@ -132,78 +133,14 @@ public class WebSocket {
 		return USERS.containsKey(user);
 	}
 
-	private static class VideoMessage {
-		BigInteger id;
-		BigInteger user;
-		Map<String, Object> answer;
-		Map<String, Object> candidate;
-		Map<String, Object> offer;
-		String name;
-		String password;
-		String salt;
-
-		public String getName() {
-			return name;
-		}
-
-		public void setName(final String name) {
-			this.name = name;
-		}
-
-		public BigInteger getId() {
-			return id;
-		}
-
-		public void setId(final BigInteger id) {
-			this.id = id;
-		}
-
-		public BigInteger getUser() {
-			return user;
-		}
-
-		public void setUser(final BigInteger user) {
-			this.user = user;
-		}
-
-		public Map<String, Object> getCandidate() {
-			return candidate;
-		}
-
-		public void setCandidate(final Map<String, Object> candidate) {
-			this.candidate = candidate;
-		}
-
-		public Map<String, Object> getOffer() {
-			return offer;
-		}
-
-		public void setOffer(final Map<String, Object> offer) {
-			this.offer = offer;
-		}
-
-		public Map<String, Object> getAnswer() {
-			return answer;
-		}
-
-		public void setAnswer(final Map<String, Object> answer) {
-			this.answer = answer;
-		}
-
-		public String getPassword() {
-			return password;
-		}
-
-		public void setPassword(final String password) {
-			this.password = password;
-		}
-
-		public String getSalt() {
-			return salt;
-		}
-
-		public void setSalt(final String salt) {
-			this.salt = salt;
-		}
+	public static class VideoMessage {
+		public BigInteger id;
+		public BigInteger user;
+		public Map<String, Object> answer;
+		public Map<String, Object> candidate;
+		public Map<String, Object> offer;
+		public String name;
+		public String password;
+		public String salt;
 	}
 }

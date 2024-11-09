@@ -18,6 +18,7 @@ public class WriteEntity {
 		this.id = id;
 	}
 
+	@SuppressWarnings("unchecked")
 	public Class<BaseEntity> getClazz() {
 		try {
 			return (Class<BaseEntity>) Class.forName(BaseEntity.class.getPackage().getName() + "." + classname);

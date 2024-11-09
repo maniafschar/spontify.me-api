@@ -52,6 +52,7 @@ public class FindappConfiguration implements AsyncConfigurer, WebSocketMessageBr
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
 		return new WebMvcConfigurer() {
+			@SuppressWarnings("null")
 			@Override
 			public void addCorsMappings(final CorsRegistry registry) {
 				registry.addMapping("/**").allowedOriginPatterns(allowedOrigins)
@@ -64,6 +65,7 @@ public class FindappConfiguration implements AsyncConfigurer, WebSocketMessageBr
 	@Override
 	public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
 		return new AsyncUncaughtExceptionHandler() {
+			@SuppressWarnings("null")
 			@Override
 			public void handleUncaughtException(final Throwable ex, final Method method, final Object... params) {
 				String msg = method.getName() + "\n\n" + Strings.stackTraceToString(ex);
@@ -88,6 +90,7 @@ public class FindappConfiguration implements AsyncConfigurer, WebSocketMessageBr
 		};
 	}
 
+	@SuppressWarnings("null")
 	@Override
 	public void configureMessageBroker(final MessageBrokerRegistry config) {
 		config.enableSimpleBroker("/user");
@@ -95,6 +98,7 @@ public class FindappConfiguration implements AsyncConfigurer, WebSocketMessageBr
 		config.setUserDestinationPrefix("/user");
 	}
 
+	@SuppressWarnings("null")
 	@Override
 	public void registerStompEndpoints(final StompEndpointRegistry registry) {
 		registry.addEndpoint("/ws/init").setAllowedOriginPatterns(allowedOrigins).withSockJS();

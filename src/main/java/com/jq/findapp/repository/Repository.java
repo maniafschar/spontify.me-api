@@ -52,6 +52,7 @@ public class Repository {
 	@Autowired
 	private Listeners listeners;
 
+	@SuppressWarnings("unchecked")
 	public Result list(final QueryParams params) {
 		final GeoLocationProcessor geo = new GeoLocationProcessor(params);
 		final Result result = params.getQuery().createResult();
@@ -156,6 +157,7 @@ public class Repository {
 		return params.getSearch();
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<BaseEntity> list(final String hql) {
 		try {
 			return (List<BaseEntity>) em.createQuery(hql,
