@@ -32,7 +32,6 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.ChatService;
-import com.jq.findapp.util.Json;
 
 @RestController
 @RequestMapping("ws")
@@ -63,10 +62,7 @@ public class WebSocket {
 		log.setUri(destination);
 		log.setMethod("WS");
 		log.setContactId(message.user);
-		if (message.answer == null) {
-			log.setStatus(LogStatus.ErrorClient);
-			log.setBody(Json.toString(message));
-		} else if (chatService.isVideoCallAllowed(contact, message.id)) {
+		if (message.answer != null || chatService.isVideoCallAllowed(contact, message.id)) {
 			if (USERS.containsKey(message.id)) {
 				message.password = null;
 				message.salt = null;
