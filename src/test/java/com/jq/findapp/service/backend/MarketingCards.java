@@ -118,7 +118,6 @@ public class MarketingCards {
 			createPage();
 			int y = 0;
 			addText(usAddress, 26, 45, 1.8f);
-			System.out.println(address.get("name").asText());
 			addText(address.get("name").asText(), 26, 39, 3.5f);
 			for (String s : address.get("address").asText().split("\n"))
 				addText(s, 26, 34 - (y++ * 5), 3.5f);
