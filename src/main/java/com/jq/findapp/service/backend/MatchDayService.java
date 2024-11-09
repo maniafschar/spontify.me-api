@@ -864,7 +864,7 @@ public class MatchDayService {
 				final JsonNode f = responses.get(i).has("fixture") ? responses.get(i).get("fixture") : null;
 				if (f != null && f.has("timestamp") && "TBD".equals(f.get("status").get("short").asText())) {
 					final Instant time = Instant.ofEpochSecond(f.get("timestamp").asLong());
-					if (time.isAfter(Instant.now()) && time.minus(Duration.ofDays(21)).isBefore(Instant.now()))
+					if (time.isAfter(Instant.now()) && time.minus(Duration.ofDays(14)).isBefore(Instant.now()))
 						return null;
 				}
 			}
