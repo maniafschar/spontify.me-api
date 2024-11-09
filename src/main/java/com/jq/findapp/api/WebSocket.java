@@ -56,6 +56,7 @@ public class WebSocket {
 	@MessageMapping("video")
 	public void video(final VideoMessage message, @Header(name = "destination") final String destination)
 			throws Exception {
+		System.out.println(Json.toPrettyString(message));
 		final Contact contact = authenticationService.verify(message.user, message.password,
 				message.salt);
 		final Log log = new Log();
