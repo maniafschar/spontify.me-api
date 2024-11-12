@@ -862,9 +862,11 @@ public class MatchDayService {
 			final JsonNode responses = fixture.get("response");
 			for (int i = 0; i < responses.size(); i++) {
 				final JsonNode f = responses.get(i).has("fixture") ? responses.get(i).get("fixture") : null;
-				if (f != null && f.has("timestamp") && "TBD".equals(f.get("status").get("short").asText())) {
+				if (f != null && f.has("timestamp") && ("TBD".equals(f.get("status").get("short").asText())
+						|| "NS".equals(f.get("status").get("short").asText()))) {
 					final Instant time = Instant.ofEpochSecond(f.get("timestamp").asLong());
-					if (time.isAfter(Instant.now()) && time.minus(Duration.ofDays(14)).isBefore(Instant.now()))
+					if (time.isAfter(Instant.now()) && time.minus(Duration.ofDays(14)).isBefore(Instant.now())
+							 && (!"NS".equals(f.get("status").get("short").asText()) || time.minus(Duration.ofMinutes(110)).isBefore(Instant.now())))
 						return null;
 				}
 			}
