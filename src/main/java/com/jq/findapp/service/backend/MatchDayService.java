@@ -866,7 +866,7 @@ public class MatchDayService {
 						|| "NS".equals(f.get("status").get("short").asText()))) {
 					final Instant time = Instant.ofEpochSecond(f.get("timestamp").asLong());
 					if ("NS".equals(f.get("status").get("short").asText())) {
-						if (time.plus(Duration.ofHours(2)).isBefore(Instant.now())))
+						if (time.plus(Duration.ofHours(2)).isBefore(Instant.now()))
 							return null;
 					} else if (time.isAfter(Instant.now()) && time.minus(Duration.ofDays(14)).isBefore(Instant.now()))
 						return null;
