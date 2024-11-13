@@ -704,7 +704,7 @@ public class MatchDayService {
 							("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())
 									? matchesFutureList
 									: matchesPastList).put(timestamp + "." + teamId,
-											"<match><header>" + leagueName + " · " + venue + " · " + city + " · "
+											"<match skills=\"9." + teamId + "\"><header>" + leagueName + " · " + venue + " · " + city + " · "
 													+ formatDate(timestamp, contact) + "</header>"
 													+ "<home"
 													+ (matchDays.get(i).get("teams").get("home").get("id")
