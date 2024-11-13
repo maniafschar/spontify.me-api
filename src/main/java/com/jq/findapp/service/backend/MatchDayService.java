@@ -737,7 +737,7 @@ public class MatchDayService {
 		for (String key : sortedKeys)
 			s.insert(0, matches.get(key));
 		s.insert(0,
-				"<style>header{font-size:0.7em;}match{padding-top:1em;display:inline-block;width:100%;font-size:0.8em;}home,away{width:42%;display:inline-block;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}home{text-align:right;}away{text-align:left;}goals{width:8%;display:inline-block;text-align:center;overflow:hidden;}sep{position:absolute;margin-left:-0.1em;}.highlight{font-weight:bold;}</style><matchDays style=\"text-align:center;display:inline-block;\">");
+				"<style>header{font-size:0.7em;}match{padding-top:1em;display:inline-block;float:left;width:100%;font-size:0.8em;}home,away{width:42%;display:inline-block;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}home{text-align:right;}away{text-align:left;}goals{width:8%;display:inline-block;text-align:center;overflow:hidden;}sep{position:absolute;margin-left:-0.1em;}.highlight{font-weight:bold;}</style><matchDays style=\"text-align:center;display:inline-block;\">");
 		s.append("</matchDays>");
 		return s.toString();
 	}
