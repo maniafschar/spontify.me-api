@@ -38,6 +38,7 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.repository.listener.EventListener;
 import com.jq.findapp.service.backend.CronService.CronResult;
+import com.jq.findapp.service.backend.CronService.Job;
 import com.jq.findapp.service.backend.MatchDayService;
 import com.jq.findapp.service.backend.events.ImportMunich;
 import com.jq.findapp.util.Json;
@@ -77,6 +78,7 @@ public class EventService {
 		return answers;
 	}
 
+	@Job
 	public CronResult runMatch() {
 		final CronResult result = new CronResult();
 		try {
@@ -135,6 +137,7 @@ public class EventService {
 		return result;
 	}
 
+	@Job
 	public CronResult run() {
 		final CronResult result = new CronResult();
 		try {
@@ -248,6 +251,7 @@ public class EventService {
 		return repository.list(params).size() >= event.getMaxParticipants().intValue();
 	}
 
+	@Job(cron = "40 5")
 	public CronResult runImport() {
 		final CronResult result = new CronResult();
 		try {
@@ -259,6 +263,7 @@ public class EventService {
 		return result;
 	}
 
+	@Job
 	public CronResult runPublish() {
 		final CronResult result = new CronResult();
 		try {
@@ -270,6 +275,7 @@ public class EventService {
 		return result;
 	}
 
+	@Job(cron = "40 23")
 	public CronResult runSeries() {
 		final CronResult result = new CronResult();
 		try {
