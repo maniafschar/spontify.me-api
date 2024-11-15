@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
@@ -157,9 +158,9 @@ public class NotificationService {
 				s.delete(s.lastIndexOf(" "), s.length());
 			s.append("...");
 		}
-		WebClient.create(serverWebSocket + "refresh/" + contactTo.getId()).post()
+		CompletableFuture.supplyAsync(() -> WebClient.create(serverWebSocket + "refresh/" + contactTo.getId()).post()
 				.header("Content-Type", "application/json")
-				.bodyValue(getPingValues(contactTo)).retrieve().toBodilessEntity().block();
+				.bodyValue(getPingValues(contactTo)).retrieve().toBodilessEntity().block());
 		ContactNotification notification = null;
 		if (textId != TextId.notification_chatNew
 				&& textId != TextId.notification_contactVideoCall

@@ -2,14 +2,18 @@ package com.jq.findapp.service.backend;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -80,14 +84,18 @@ public class CronService {
 	@Retention(RetentionPolicy.RUNTIME)
 	public static @interface Job {
 		Group group() default Group.One;
-		String cron();
+
+		String cron() default "";
 	}
 
-	public static enum Group { One, Two, Three, Four, Five }
+	public static enum Group {
+		One, Two, Three, Four, Five
+	}
 
-	private static class JobExecuter {
+	private class JobExecuter {
 		private final Method method;
 		private final Object service;
+
 		private JobExecuter(final Object service, final Method method) {
 			this.method = method;
 			this.service = service;
@@ -107,7 +115,7 @@ public class CronService {
 						log.setStatus(LogStatus.ErrorServiceRunning);
 					else {
 						running.add(name + '.' + method.getName());
-						final CronResult result = (CronResult) mrthod.invoke(service);
+						final CronResult result = (CronResult) method.invoke(service);
 						log.setStatus(Strings.isEmpty(result.exception) ? LogStatus.Ok : LogStatus.ErrorServer);
 						if (result.body != null)
 							log.setBody(result.body.trim());
@@ -139,22 +147,32 @@ public class CronService {
 		}
 	}
 
-	private Map<Integer, List<Method>> list(Object service, final Map<Integer, List<JobExecuter>> map, final ZonedDateTime now) {
+	private void list(Object service, final Map<Group, List<JobExecuter>> map, final ZonedDateTime now) {
 		for (final Method m : service.getClass().getMethods()) {
 			if (m.isAnnotationPresent(Job.class)) {
 				final Job job = m.getAnnotation(Job.class);
-				if (cron(job.getCron(), now)) {
-					if (!map.containsKey(job.getGroup()))
-						map.put(job.getGroup(), new ArrayList<>());
-					map.get(job.getGroup()).add(new JobExecuter(service, m));
+				if (cron(job.cron(), now)) {
+					if (!map.containsKey(job.group()))
+						map.put(job.group(), new ArrayList<>());
+					map.get(job.group()).add(new JobExecuter(service, m));
 				}
 			}
 		}
 	}
 
+	public CronResult run(final String classname) throws Exception {
+		final String[] s = classname.split("\\.");
+		final Object clazz = getClass().getDeclaredField(s[0]).get(this);
+		final CronResult result = (CronResult) clazz.getClass()
+				.getDeclaredMethod("run" + (s.length > 1 ? s[1] : ""))
+				.invoke(clazz);
+		LogFilter.body.set(result.toString());
+		return result;
+	}
+
 	@Async
 	public void run() {
-		final Map<Integer, List<JobExecuter>> map = new HashMap<>();
+		final Map<Group, List<JobExecuter>> map = new HashMap<>();
 		final ZonedDateTime now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
 		list(chatService, map, now);
 		list(dbService, map, now);
@@ -174,8 +192,8 @@ public class CronService {
 			map.get(e).forEach(e2 -> {
 				list.add(e2.execute());
 			});
-			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
-				.map(CompletableFuture::join).collect(Collectors.toList())).join();
+			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e2 -> list.stream()
+					.map(CompletableFuture::join).collect(Collectors.toList())).join();
 		});
 	}
 
