@@ -34,6 +34,7 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.backend.CronService.CronResult;
+import com.jq.findapp.service.backend.CronService.Job;
 import com.jq.findapp.util.EntityUtil;
 import com.jq.findapp.util.Strings;
 
@@ -48,6 +49,7 @@ public class RssService {
 	@Autowired
 	private NotificationService notificationService;
 
+	@Job
 	public CronResult run() {
 		final CronResult result = new CronResult();
 		final Result list = this.repository.list(new QueryParams(Query.misc_listClient));
