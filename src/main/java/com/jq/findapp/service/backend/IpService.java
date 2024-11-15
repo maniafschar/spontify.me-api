@@ -15,6 +15,7 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.backend.CronService.CronResult;
+import com.jq.findapp.service.backend.CronService.Job;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 
@@ -32,6 +33,7 @@ public class IpService {
 		return ip;
 	}
 
+	@Job
 	public CronResult run() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.misc_listIp);
