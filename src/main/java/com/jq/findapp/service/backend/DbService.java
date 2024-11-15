@@ -33,6 +33,8 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.backend.CronService.CronResult;
+import com.jq.findapp.service.backend.CronService.Group;
+import com.jq.findapp.service.backend.CronService.Job;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 
@@ -53,6 +55,7 @@ public class DbService {
 	@Value("${spring.datasource.password}")
 	private String password;
 
+	@Job
 	public CronResult run() {
 		final CronResult result = new CronResult();
 		try {
@@ -93,6 +96,7 @@ public class DbService {
 		return result;
 	}
 
+	@Job(cron = "30 0")
 	public CronResult runCleanUp() {
 		final CronResult result = new CronResult();
 		try {
@@ -103,6 +107,7 @@ public class DbService {
 		return result;
 	}
 
+	@Job(group = Group.Five)
 	public CronResult runBackup() {
 		final CronResult result = new CronResult();
 		try {
