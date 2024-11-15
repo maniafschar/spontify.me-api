@@ -79,114 +79,104 @@ public class CronService {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	public static @interface Job {
-		int group();	
+		Group group() default Group.One;
 		String cron();
 	}
 
-	public CronResult run(final String classname) throws Exception {
-		final String[] s = classname.split("\\.");
-		final Object clazz = getClass().getDeclaredField(s[0]).get(this);
-		final CronResult result = (CronResult) clazz.getClass()
-				.getDeclaredMethod("run" + (s.length > 1 ? s[1] : ""))
-				.invoke(clazz);
-		LogFilter.body.set(result.toString());
-		return result;
+	public static enum Group { One, Two, Three, Four, Five }
+
+	private static class JobExecuter {
+		private final Method method;
+		private final Object service;
+		private JobExecuter(final Object service, final Method method) {
+			this.method = method;
+			this.service = service;
+		}
+
+		private CompletableFuture<Void> execute() {
+			return CompletableFuture.supplyAsync(() -> {
+				final Log log = new Log();
+				log.setContactId(BigInteger.ZERO);
+				log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
+				String name = service.getClass().getSimpleName();
+				if (name.contains("$"))
+					name = name.substring(0, name.indexOf('$'));
+				log.setUri("/support/cron/" + name + "/" + method.getName());
+				try {
+					if (running.contains(name + '.' + method.getName()))
+						log.setStatus(LogStatus.ErrorServiceRunning);
+					else {
+						running.add(name + '.' + method.getName());
+						final CronResult result = (CronResult) mrthod.invoke(service);
+						log.setStatus(Strings.isEmpty(result.exception) ? LogStatus.Ok : LogStatus.ErrorServer);
+						if (result.body != null)
+							log.setBody(result.body.trim());
+						if (result.exception != null) {
+							log.setBody((log.getBody() == null ? "" : log.getBody() + "\n")
+									+ result.exception.getClass().getName() + ": " + result.exception.getMessage());
+							notificationService.createTicket(TicketType.ERROR, "cron", result.toString(), null);
+						}
+					}
+				} catch (final Throwable ex) {
+					log.setStatus(LogStatus.ErrorRuntime);
+					log.setBody("uncaught exception " + ex.getClass().getName() + ": " + ex.getMessage() +
+							(Strings.isEmpty(log.getBody()) ? "" : "\n" + log.getBody()));
+					notificationService.createTicket(TicketType.ERROR, "cron",
+							"uncaught exception:\n" + Strings.stackTraceToString(ex)
+									+ (Strings.isEmpty(log.getBody()) ? "" : "\n\n" + log.getBody()),
+							null);
+				} finally {
+					running.remove(name + '.' + method.getName());
+					log.setTime((int) (System.currentTimeMillis() - log.getCreatedAt().getTime()));
+					try {
+						repository.save(log);
+					} catch (final Exception e2) {
+						throw new RuntimeException(e2);
+					}
+				}
+				return null;
+			});
+		}
+	}
+
+	private Map<Integer, List<Method>> list(Object service, final Map<Integer, List<JobExecuter>> map, final ZonedDateTime now) {
+		for (final Method m : service.getClass().getMethods()) {
+			if (m.isAnnotationPresent(Job.class)) {
+				final Job job = m.getAnnotation(Job.class);
+				if (cron(job.getCron(), now)) {
+					if (!map.containsKey(job.getGroup()))
+						map.put(job.getGroup(), new ArrayList<>());
+					map.get(job.getGroup()).add(new JobExecuter(service, m));
+				}
+			}
+		}
 	}
 
 	@Async
 	public void run() {
+		final Map<Integer, List<JobExecuter>> map = new HashMap<>();
 		final ZonedDateTime now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
-		final List<CompletableFuture<Void>> list = new ArrayList<>();
-		run(importSportsBarService, null, list, "0 3", now);
-		run(importSportsBarService, "Import", list, null, now);
-		run(chatService, null, list, null, now);
-		run(marketingLocationService, null, list, "* 6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21", now);
-		run(marketingLocationService, "Sent", list, "10 19", now);
-		run(marketingLocationService, "Unfinished", list, "30 17", now);
-		run(marketingLocationService, "Cooperation", list, "40 17", now);
-		run(dbService, null, list, null, now);
-		run(dbService, "CleanUp", list, "30 0", now);
-		run(engagementService, "Registration", list, "40 10", now);
-		run(eventService, null, list, null, now);
-		run(eventService, "Match", list, null, now);
-		run(eventService, "Import", list, "40 5", now);
-		run(eventService, "Publish", list, null, now);
-		run(eventService, "Series", list, "40 23", now);
-		run(importLogService, null, list, null, now);
-		run(rssService, null, list, null, now);
-		run(matchDayService, null, list, null, now);
-		run(importLocationsService, null, list, null, now);
-		// run(importLocationsService, "Image", list, "30 2", now);
-		CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
+		list(chatService, map, now);
+		list(dbService, map, now);
+		list(engagementService, map, now);
+		list(eventService, map, now);
+		list(importLocationsService, map, now);
+		list(importLogService, map, now);
+		list(importSportsBarService, map, now);
+		list(ipService, map, now);
+		list(marketingLocationService, map, now);
+		list(marketingService, map, now);
+		list(matchDayService, map, now);
+		list(rssService, map, now);
+		list(sitemapService, map, now);
+		Arrays.asList(Group.values()).forEach(e -> {
+			final List<CompletableFuture<Void>> list = new ArrayList<>();
+			map.get(e).forEach(e2 -> {
+				list.add(e2.execute());
+			});
+			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
 				.map(CompletableFuture::join).collect(Collectors.toList())).join();
-		list.clear();
-		run(marketingService, null, list, null, now);
-		run(marketingService, "Result", list, null, now);
-		CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
-				.map(CompletableFuture::join).collect(Collectors.toList())).join();
-		run(engagementService, "NearBy", null, null, now);
-		list.clear();
-		run(engagementService, null, list, null, now);
-		run(ipService, null, list, null, now);
-		run(sitemapService, null, list, "0 20", now);
-		CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e -> list.stream()
-				.map(CompletableFuture::join).collect(Collectors.toList())).join();
-		run(dbService, "Backup", null, null, now);
-	}
-
-	private void run(final Object bean, final String method, final List<CompletableFuture<Void>> list,
-			final String cron, final ZonedDateTime now) {
-		if (!cron(cron, now))
-			return;
-		final CompletableFuture<Void> e = CompletableFuture.supplyAsync(() -> {
-			final Log log = new Log();
-			log.setContactId(BigInteger.ZERO);
-			log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
-			final String m = "run" + (method == null ? "" : method);
-			String name = bean.getClass().getSimpleName();
-			if (name.contains("$"))
-				name = name.substring(0, name.indexOf('$'));
-			log.setUri("/support/cron/" + name + "/" + m);
-			try {
-				if (running.contains(name + '.' + m))
-					log.setStatus(LogStatus.ErrorServiceRunning);
-				else {
-					running.add(name + '.' + m);
-					final CronResult result = (CronResult) bean.getClass().getMethod(m).invoke(bean);
-					log.setStatus(Strings.isEmpty(result.exception) ? LogStatus.Ok : LogStatus.ErrorServer);
-					if (result.body != null)
-						log.setBody(result.body.trim());
-					if (result.exception != null) {
-						log.setBody((log.getBody() == null ? "" : log.getBody() + "\n")
-								+ result.exception.getClass().getName() + ": " + result.exception.getMessage());
-						notificationService.createTicket(TicketType.ERROR, "cron", result.toString(), null);
-					}
-				}
-			} catch (final Throwable ex) {
-				log.setStatus(LogStatus.ErrorRuntime);
-				log.setBody("uncaught exception " + ex.getClass().getName() + ": " + ex.getMessage() +
-						(Strings.isEmpty(log.getBody()) ? "" : "\n" + log.getBody()));
-				notificationService.createTicket(TicketType.ERROR, "cron",
-						"uncaught exception:\n" + Strings.stackTraceToString(ex)
-								+ (Strings.isEmpty(log.getBody()) ? "" : "\n\n" + log.getBody()),
-						null);
-			} finally {
-				running.remove(name + '.' + m);
-				log.setTime((int) (System.currentTimeMillis() - log.getCreatedAt().getTime()));
-				if (log.getBody() != null && log.getBody().length() > 255)
-					log.setBody(log.getBody().substring(0, 252) + "...");
-				try {
-					repository.save(log);
-				} catch (final Exception e2) {
-					throw new RuntimeException(e2);
-				}
-			}
-			return null;
 		});
-		if (list == null)
-			e.join();
-		else
-			list.add(e);
 	}
 
 	/**
