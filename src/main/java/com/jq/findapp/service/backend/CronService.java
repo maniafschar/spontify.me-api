@@ -150,14 +150,15 @@ public class CronService {
 		}
 	}
 
-	private void list(Object service, final Map<Group, List<JobExecuter>> map, final ZonedDateTime now) {
-		for (final Method m : service.getClass().getMethods()) {
-			if (m.isAnnotationPresent(Job.class)) {
-				final Job job = m.getAnnotation(Job.class);
+	private void list(Object service, final Map<Group, List<JobExecuter>> map) {
+		final ZonedDateTime now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
+		for (final Method method : service.getClass().getMethods()) {
+			if (method.isAnnotationPresent(Job.class)) {
+				final Job job = method.getAnnotation(Job.class);
 				if (cron(job.cron(), now)) {
 					if (!map.containsKey(job.group()))
 						map.put(job.group(), new ArrayList<>());
-					map.get(job.group()).add(new JobExecuter(service, m));
+					map.get(job.group()).add(new JobExecuter(service, method));
 				}
 			}
 		}
@@ -177,20 +178,19 @@ public class CronService {
 	@Async
 	public void run() {
 		final Map<Group, List<JobExecuter>> map = new HashMap<>();
-		final ZonedDateTime now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
-		list(chatService, map, now);
-		list(dbService, map, now);
-		list(engagementService, map, now);
-		list(eventService, map, now);
-		list(importLocationsService, map, now);
-		list(importLogService, map, now);
-		list(importSportsBarService, map, now);
-		list(ipService, map, now);
-		list(marketingLocationService, map, now);
-		list(marketingService, map, now);
-		list(matchDayService, map, now);
-		list(rssService, map, now);
-		list(sitemapService, map, now);
+		list(chatService, map);
+		list(dbService, map);
+		list(engagementService, map);
+		list(eventService, map);
+		list(importLocationsService, map);
+		list(importLogService, map);
+		list(importSportsBarService, map);
+		list(ipService, map);
+		list(marketingLocationService, map);
+		list(marketingService, map);
+		list(matchDayService, map);
+		list(rssService, map);
+		list(sitemapService, map);
 		Arrays.asList(Group.values()).forEach(e -> {
 			if (map.containsKey(e)) {
 				final List<CompletableFuture<Void>> list = new ArrayList<>();
