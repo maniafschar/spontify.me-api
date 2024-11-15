@@ -1,5 +1,7 @@
 package com.jq.findapp.service.backend;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -74,6 +76,12 @@ public class CronService {
 	private SitemapService sitemapService;
 
 	private static final Set<String> running = new HashSet<>();
+
+	@Retention(RetentionPolicy.RUNTIME)
+	public static @interface Job {
+		int group();	
+		String cron();
+	}
 
 	public CronResult run(final String classname) throws Exception {
 		final String[] s = classname.split("\\.");
