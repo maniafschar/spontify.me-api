@@ -118,6 +118,7 @@ public class ImportSportsBarService {
 		return result;
 	}
 
+	@Job
 	public CronResult runImport() {
 		final CronResult result = new CronResult();
 		int count = 0;
