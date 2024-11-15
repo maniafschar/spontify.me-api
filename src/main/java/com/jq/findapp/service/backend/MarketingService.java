@@ -28,6 +28,7 @@ import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.backend.CronService.CronResult;
+import com.jq.findapp.service.backend.CronService.Group;
 import com.jq.findapp.service.backend.CronService.Job;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
@@ -48,7 +49,7 @@ public class MarketingService {
 	@Autowired
 	private Text text;
 
-	@Job
+	@Job(group = Group.Two)
 	public CronResult run() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
@@ -124,7 +125,7 @@ public class MarketingService {
 		return result;
 	}
 
-	@Job
+	@Job(group = Group.Two)
 	public CronResult runResult() {
 		final CronResult result = new CronResult();
 		try {
