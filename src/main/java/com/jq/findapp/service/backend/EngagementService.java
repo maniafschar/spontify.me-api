@@ -31,6 +31,8 @@ import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.backend.CronService.CronResult;
+import com.jq.findapp.service.backend.CronService.Group;
+import com.jq.findapp.service.backend.CronService.Job;
 import com.jq.findapp.util.Score;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
@@ -257,6 +259,7 @@ public class EngagementService {
 		chatTemplates.add(new ChatTemplate(TextId.engagement_like, null, null));
 	}
 
+	@Job(cron = "40 10")
 	public CronResult runRegistration() {
 		final CronResult result = new CronResult();
 		try {
@@ -299,6 +302,7 @@ public class EngagementService {
 		return false;
 	}
 
+	@Job(group = Group.Four)
 	public CronResult run() {
 		final CronResult result = new CronResult();
 		try {
@@ -390,6 +394,7 @@ public class EngagementService {
 		}
 	}
 
+	@Job(group = Group.Three)
 	public CronResult runNearBy() {
 		final CronResult result = new CronResult();
 		try {
