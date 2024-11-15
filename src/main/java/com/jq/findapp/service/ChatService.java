@@ -18,6 +18,7 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.backend.CronService.CronResult;
+import com.jq.findapp.service.backend.CronService.Job;
 import com.jq.findapp.util.Text;
 import com.jq.findapp.util.Text.TextId;
 
@@ -53,6 +54,7 @@ public class ChatService {
 								!list.get(0).get("contactLink.contactId").equals(contact.getId()));
 	}
 
+	@Job
 	public CronResult run() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.contact_chat);
