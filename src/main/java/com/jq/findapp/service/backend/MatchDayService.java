@@ -705,7 +705,8 @@ public class MatchDayService {
 							("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())
 									? matchesFutureList
 									: matchesPastList).put(timestamp + "." + teamId,
-											"<match skills=\"9." + teamId + "\"><header>" + leagueName + " · " + venue + " · " + city + " · "
+											"<match skills=\"9." + teamId + "\"><header>" + leagueName + " · " + venue
+													+ " · " + city + " · "
 													+ formatDate(timestamp, contact) + "</header>"
 													+ "<home"
 													+ (matchDays.get(i).get("teams").get("home").get("id")
@@ -738,7 +739,7 @@ public class MatchDayService {
 		for (String key : sortedKeys)
 			s.insert(0, matches.get(key));
 		s.insert(0,
-				"<style>header{font-size:0.7em;padding-top:1em;}match{display:inline-block;float:left;width:100%;font-size:0.7em;}home,away{width:42%;display:inline-block;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}home{text-align:right;}away{text-align:left;}goals{width:8%;display:inline-block;text-align:center;overflow:hidden;}sep{position:absolute;margin-left:-0.1em;}.highlight{font-weight:bold;}</style><matchDays style=\"text-align:center;display:inline-block;\">");
+				"<style>header{font-size:0.7em;padding-top:1em;}match{display:inline-block;float:left;width:100%;font-size:0.7em;}home,away{width:42%;display:inline-block;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}home{text-align:right;}away{text-align:left;}goals{width:8%;display:inline-block;text-align:center;overflow:hidden;}sep{position:absolute;margin-left:-0.1em;}.highlight{font-weight:bold;}matchdays{text-align:center;display:inline-block;float:left;}</style><matchDays>");
 		s.append("</matchDays>");
 		return s.toString();
 	}
