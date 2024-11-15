@@ -166,9 +166,10 @@ public class CronService {
 	public CronResult run(final String classname) throws Exception {
 		final String[] s = classname.split("\\.");
 		final Object clazz = getClass().getDeclaredField(s[0]).get(this);
-		final CronResult result = (CronResult) clazz.getClass()
-				.getDeclaredMethod("run" + (s.length > 1 ? s[1] : ""))
-				.invoke(clazz);
+		final Method method = clazz.getClass().getDeclaredMethod(s[1]);
+		if (!CronResult.class.equals(method.getReturnType()))
+			return null;
+		final CronResult result = (CronResult) method.invoke(clazz);
 		LogFilter.body.set(result.toString());
 		return result;
 	}
