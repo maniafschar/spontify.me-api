@@ -1,7 +1,9 @@
 package com.jq.findapp.service.backend;
 
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.sql.Timestamp;
@@ -82,6 +84,7 @@ public class CronService {
 	private static final Set<String> running = new HashSet<>();
 
 	@Retention(RetentionPolicy.RUNTIME)
+	@Target(value = ElementType.METHOD)
 	public static @interface Job {
 		Group group() default Group.One;
 
@@ -210,10 +213,8 @@ public class CronService {
 	 * └──────────── Minute (0-59)
 	 */
 	boolean cron(final String cron, final ZonedDateTime now) {
-		if (cron == null)
-			return true;
 		if (Strings.isEmpty(cron))
-			return false;
+			return true;
 		final String[] s = (cron.trim() + " * * * *").split(" ");
 		return match(s[0], now.getMinute())
 				&& match(s[1], now.getHour())
