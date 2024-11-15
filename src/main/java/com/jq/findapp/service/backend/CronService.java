@@ -188,12 +188,14 @@ public class CronService {
 		list(rssService, map, now);
 		list(sitemapService, map, now);
 		Arrays.asList(Group.values()).forEach(e -> {
-			final List<CompletableFuture<Void>> list = new ArrayList<>();
-			map.get(e).forEach(e2 -> {
-				list.add(e2.execute());
-			});
-			CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e2 -> list.stream()
-					.map(CompletableFuture::join).collect(Collectors.toList())).join();
+			if (map.containsKey(e)) {
+				final List<CompletableFuture<Void>> list = new ArrayList<>();
+				map.get(e).forEach(e2 -> {
+					list.add(e2.execute());
+				});
+				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e2 -> list.stream()
+						.map(CompletableFuture::join).collect(Collectors.toList())).join();
+			}
 		});
 	}
 
