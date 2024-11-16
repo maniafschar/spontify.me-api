@@ -83,6 +83,10 @@ public class CronService {
 
 	private static final Set<String> running = new HashSet<>();
 
+	public static enum Group {
+		One, Two, Three, Four, Five
+	}
+
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(value = ElementType.METHOD)
 	public static @interface Job {
@@ -91,8 +95,15 @@ public class CronService {
 		String cron() default "";
 	}
 
-	public static enum Group {
-		One, Two, Three, Four, Five
+	public static class CronResult {
+		public String body = "";
+		public Exception exception;
+
+		@Override
+		public String toString() {
+			return ((body == null ? "" : body)
+					+ (exception == null ? "" : "\n" + Strings.stackTraceToString(exception))).trim();
+		}
 	}
 
 	private class JobExecuter {
@@ -150,15 +161,21 @@ public class CronService {
 		}
 	}
 
-	private void list(Object service, final Map<Group, List<JobExecuter>> map) {
+	private void list(final Object service, final Map<Group, List<JobExecuter>> map) {
 		final ZonedDateTime now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
 		for (final Method method : service.getClass().getMethods()) {
 			if (method.isAnnotationPresent(Job.class)) {
 				final Job job = method.getAnnotation(Job.class);
 				if (cron(job.cron(), now)) {
-					if (!map.containsKey(job.group()))
-						map.put(job.group(), new ArrayList<>());
-					map.get(job.group()).add(new JobExecuter(service, method));
+					if (CronResult.class.equals(method.getReturnType())) {
+						if (!map.containsKey(job.group()))
+							map.put(job.group(), new ArrayList<>());
+						map.get(job.group()).add(new JobExecuter(service, method));
+					} else
+						notificationService.createTicket(TicketType.ERROR, "CronDeclaration",
+								"Method " + method.getName() + " does not return " + CronResult.class.getName()
+										+ ", but " + method.getReturnType(),
+								null);
 				}
 			}
 		}
@@ -191,6 +208,7 @@ public class CronService {
 		list(matchDayService, map);
 		list(rssService, map);
 		list(sitemapService, map);
+		System.out.println(map);
 		Arrays.asList(Group.values()).forEach(e -> {
 			if (map.containsKey(e)) {
 				final List<CompletableFuture<Void>> list = new ArrayList<>();
@@ -236,16 +254,5 @@ public class CronService {
 				return true;
 		}
 		return false;
-	}
-
-	public static class CronResult {
-		public String body = "";
-		public Exception exception;
-
-		@Override
-		public String toString() {
-			return ((body == null ? "" : body)
-					+ (exception == null ? "" : "\n" + Strings.stackTraceToString(exception))).trim();
-		}
 	}
 }
