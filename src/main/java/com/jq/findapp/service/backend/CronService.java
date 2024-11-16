@@ -171,6 +171,7 @@ public class CronService {
 						if (!map.containsKey(job.group()))
 							map.put(job.group(), new ArrayList<>());
 						map.get(job.group()).add(new JobExecuter(service, method));
+						System.out.println(service.getClass().getName() + '.' + method.getName());
 					} else
 						notificationService.createTicket(TicketType.ERROR, "CronDeclaration",
 								"Method " + method.getName() + " does not return " + CronResult.class.getName()
@@ -208,7 +209,6 @@ public class CronService {
 		list(matchDayService, map);
 		list(rssService, map);
 		list(sitemapService, map);
-		System.out.println(map);
 		Arrays.asList(Group.values()).forEach(e -> {
 			if (map.containsKey(e)) {
 				final List<CompletableFuture<Void>> list = new ArrayList<>();
