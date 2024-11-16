@@ -165,26 +165,12 @@ public class CronService {
 		final ZonedDateTime now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
 		for (final Method method : service.getClass().getDeclaredMethods()) {
 			if (method.isAnnotationPresent(Job.class)) {
-				System.out.println("check: " + service.getClass().getName() + '.' + method.getName());
 				final Job job = method.getAnnotation(Job.class);
 				if (cron(job.cron(), now)) {
 					if (CronResult.class.equals(method.getReturnType())) {
 						if (!map.containsKey(job.group()))
 							map.put(job.group(), new ArrayList<>());
 						map.get(job.group()).add(new JobExecuter(service, method));
-						System.out.println(service.getClass().getName() + '.' + method.getName());
-						// com.jq.findapp.service.backend.DbService.run
-						// com.jq.findapp.service.backend.DbService.runBackup
-						// com.jq.findapp.service.backend.EngagementService.run
-						// com.jq.findapp.service.backend.EngagementService.runNearBy
-						// com.jq.findapp.service.backend.ImportLogService.run
-						// com.jq.findapp.service.backend.ImportSportsBarService.runImport
-						// com.jq.findapp.service.backend.IpService.run
-						// com.jq.findapp.service.backend.MarketingLocationService.run
-						// com.jq.findapp.service.backend.MarketingService.run
-						// com.jq.findapp.service.backend.MarketingService.runResult
-						// com.jq.findapp.service.backend.MatchDayService.run
-						// com.jq.findapp.service.backend.RssService.run
 					} else
 						notificationService.createTicket(TicketType.ERROR, "CronDeclaration",
 								"Method " + method.getName() + " does not return " + CronResult.class.getName()
