@@ -820,7 +820,6 @@ public class MatchDayService {
 				throw new RuntimeException(
 						"Too many requests!\nURL: " + url + "\nRemaining pause " + ((int) (i + 0.5)) + unit);
 			}
-			System.out.println(url);
 			fixture = WebClient
 					.create("https://v3.football.api-sports.io/fixtures?" + url)
 					.get()
