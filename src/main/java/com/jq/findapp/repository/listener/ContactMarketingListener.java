@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.repository.Repository.Attachment;
-import com.jq.findapp.service.backend.MarketingService;
+import com.jq.findapp.service.MarketingService;
 import com.jq.findapp.util.Json;
 
 @Component

@@ -1,4 +1,4 @@
-package com.jq.findapp.service.backend;
+package com.jq.findapp.service;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -28,9 +28,6 @@ import com.jq.findapp.entity.Log;
 import com.jq.findapp.entity.Log.LogStatus;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.ChatService;
-import com.jq.findapp.service.EventService;
-import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.LogFilter;
 import com.jq.findapp.util.Strings;
 

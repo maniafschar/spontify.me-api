@@ -44,9 +44,9 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.AuthenticationService;
+import com.jq.findapp.service.IpService;
+import com.jq.findapp.service.MarketingLocationService;
 import com.jq.findapp.service.NotificationService;
-import com.jq.findapp.service.backend.IpService;
-import com.jq.findapp.service.backend.MarketingLocationService;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 

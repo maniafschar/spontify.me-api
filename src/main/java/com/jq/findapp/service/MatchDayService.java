@@ -1,4 +1,4 @@
-package com.jq.findapp.service.backend;
+package com.jq.findapp.service;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -55,9 +55,8 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
-import com.jq.findapp.service.NotificationService;
-import com.jq.findapp.service.backend.CronService.CronResult;
-import com.jq.findapp.service.backend.CronService.Job;
+import com.jq.findapp.service.CronService.CronResult;
+import com.jq.findapp.service.CronService.Job;
 import com.jq.findapp.util.EntityUtil;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;

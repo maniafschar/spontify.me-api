@@ -39,10 +39,10 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService;
+import com.jq.findapp.service.CronService;
+import com.jq.findapp.service.CronService.CronResult;
+import com.jq.findapp.service.ImportLocationsService;
 import com.jq.findapp.service.NotificationService;
-import com.jq.findapp.service.backend.CronService;
-import com.jq.findapp.service.backend.CronService.CronResult;
-import com.jq.findapp.service.backend.ImportLocationsService;
 
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Produces;

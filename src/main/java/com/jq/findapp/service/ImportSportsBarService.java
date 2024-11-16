@@ -1,4 +1,4 @@
-package com.jq.findapp.service.backend;
+package com.jq.findapp.service;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,9 +29,8 @@ import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.NotificationService;
-import com.jq.findapp.service.backend.CronService.CronResult;
-import com.jq.findapp.service.backend.CronService.Job;
+import com.jq.findapp.service.CronService.CronResult;
+import com.jq.findapp.service.CronService.Job;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 

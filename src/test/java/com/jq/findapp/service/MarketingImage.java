@@ -1,4 +1,4 @@
-package com.jq.findapp.service.backend;
+package com.jq.findapp.service;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;

@@ -29,7 +29,7 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationExternalService;
 import com.jq.findapp.service.AuthenticationService;
-import com.jq.findapp.service.backend.IpService;
+import com.jq.findapp.service.IpService;
 import com.jq.findapp.util.Encryption;
 
 import jakarta.transaction.Transactional;

@@ -24,7 +24,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.service.EventService;
-import com.jq.findapp.service.backend.MatchDayService;
+import com.jq.findapp.service.MatchDayService;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text.TextId;
 

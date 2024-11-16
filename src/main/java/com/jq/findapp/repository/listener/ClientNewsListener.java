@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.jq.findapp.entity.ClientNews;
-import com.jq.findapp.service.backend.ClientNewsService;
+import com.jq.findapp.service.ClientNewsService;
 
 @Component
 public class ClientNewsListener extends AbstractRepositoryListener<ClientNews> {

@@ -1,4 +1,4 @@
-package com.jq.findapp.service.backend;
+package com.jq.findapp.service;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
@@ -14,7 +14,6 @@ import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Text.TextId;
 
 @Service

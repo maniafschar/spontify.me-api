@@ -1,4 +1,4 @@
-package com.jq.findapp.service.backend;
+package com.jq.findapp.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -29,7 +29,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
 import com.jq.findapp.repository.Repository.Attachment;
-import com.jq.findapp.service.backend.CronService.CronResult;
+import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.util.EntityUtil;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Utils;

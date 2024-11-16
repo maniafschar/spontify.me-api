@@ -1,4 +1,4 @@
-package com.jq.findapp.service.backend;
+package com.jq.findapp.service;
 
 import java.math.BigInteger;
 import java.time.Instant;
@@ -25,11 +25,9 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
-import com.jq.findapp.service.ExternalService;
-import com.jq.findapp.service.NotificationService;
-import com.jq.findapp.service.backend.CronService.CronResult;
-import com.jq.findapp.service.backend.CronService.Group;
-import com.jq.findapp.service.backend.CronService.Job;
+import com.jq.findapp.service.CronService.CronResult;
+import com.jq.findapp.service.CronService.Group;
+import com.jq.findapp.service.CronService.Job;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
@@ -81,8 +79,9 @@ public class MarketingService {
 							&& !clientMarketing.getGender().contains("" + contact.getGender()))
 						run = false;
 					else if (!Strings.isEmpty(clientMarketing.getSkills())
-							&& (contact.getSkills() == null || 
-									!('|' + contact.getSkills() + '|').contains('|' + clientMarketing.getSkills() + '|')))
+							&& (contact.getSkills() == null ||
+									!('|' + contact.getSkills() + '|')
+											.contains('|' + clientMarketing.getSkills() + '|')))
 						run = false;
 					else if (!Strings.isEmpty(clientMarketing.getAge())
 							&& (contact.getAge() == null

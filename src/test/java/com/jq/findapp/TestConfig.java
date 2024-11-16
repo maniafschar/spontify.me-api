@@ -44,8 +44,8 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.EventService;
 import com.jq.findapp.service.ExternalService;
+import com.jq.findapp.service.MatchDayService;
 import com.jq.findapp.service.NotificationService.MailCreateor;
-import com.jq.findapp.service.backend.MatchDayService;
 import com.jq.findapp.util.Json;
 
 @Profile("test")

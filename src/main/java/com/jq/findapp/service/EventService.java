@@ -17,7 +17,6 @@ import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -37,10 +36,9 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.repository.listener.EventListener;
-import com.jq.findapp.service.backend.CronService.CronResult;
-import com.jq.findapp.service.backend.CronService.Job;
-import com.jq.findapp.service.backend.MatchDayService;
-import com.jq.findapp.service.backend.events.ImportMunich;
+import com.jq.findapp.service.CronService.CronResult;
+import com.jq.findapp.service.CronService.Job;
+import com.jq.findapp.service.events.ImportMunich;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Score;
 import com.jq.findapp.util.Strings;
@@ -189,8 +187,7 @@ public class EventService {
 		return result;
 	}
 
-	@Async
-	public void publish(final BigInteger id) {
+	private void publish(final BigInteger id) {
 		final Event event = repository.one(Event.class, id);
 		if (!Strings.isEmpty(event.getPublishId()))
 			return;

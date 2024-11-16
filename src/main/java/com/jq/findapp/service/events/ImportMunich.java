@@ -1,4 +1,4 @@
-package com.jq.findapp.service.backend.events;
+package com.jq.findapp.service.events;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;

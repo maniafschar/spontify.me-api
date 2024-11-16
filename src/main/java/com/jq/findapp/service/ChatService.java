@@ -5,7 +5,6 @@ import java.time.Duration;
 import java.time.Instant;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.jq.findapp.entity.Client;
@@ -17,8 +16,9 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
-import com.jq.findapp.service.backend.CronService.CronResult;
-import com.jq.findapp.service.backend.CronService.Job;
+import com.jq.findapp.service.CronService.CronResult;
+import com.jq.findapp.service.CronService.Group;
+import com.jq.findapp.service.CronService.Job;
 import com.jq.findapp.util.Text;
 import com.jq.findapp.util.Text.TextId;
 
@@ -36,7 +36,6 @@ public class ChatService {
 	@Autowired
 	private Text text;
 
-	@Async
 	public void createGptAnswer(final ContactChat contactChat) {
 		createGptAnswerIntern(contactChat);
 	}
@@ -54,7 +53,7 @@ public class ChatService {
 								!list.get(0).get("contactLink.contactId").equals(contact.getId()));
 	}
 
-	@Job
+	@Job(group = Group.Four)
 	public CronResult run() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.contact_chat);
@@ -129,5 +128,4 @@ public class ChatService {
 		notificationService.sendNotification(contactFrom, contactTo, TextId.notification_chatNew,
 				"chat=" + contactFrom.getId(), s);
 	}
-
 }
