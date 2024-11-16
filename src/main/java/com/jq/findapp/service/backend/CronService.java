@@ -163,7 +163,7 @@ public class CronService {
 
 	private void list(final Object service, final Map<Group, List<JobExecuter>> map) {
 		final ZonedDateTime now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
-		for (final Method method : service.getClass().getMethods()) {
+		for (final Method method : service.getClass().getDeclaredMethods()) {
 			if (method.isAnnotationPresent(Job.class)) {
 				System.out.println("check: " + service.getClass().getName() + '.' + method.getName());
 				final Job job = method.getAnnotation(Job.class);
@@ -199,7 +199,7 @@ public class CronService {
 		final String[] s = classname.split("\\.");
 		final Object clazz = getClass().getDeclaredField(s[0]).get(this);
 		final Method method = clazz.getClass().getDeclaredMethod(s[1]);
-		if (!CronResult.class.equals(method.getReturnType()))
+		if (!CronResult.class.equals(method.getReturnType()) || !method.isAnnotationPresent(Job.class))
 			return null;
 		final CronResult result = (CronResult) method.invoke(clazz);
 		LogFilter.body.set(result.toString());
