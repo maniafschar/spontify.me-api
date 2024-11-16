@@ -28,7 +28,7 @@ import com.jq.findapp.TestConfig;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.backend.events.ImportMunich;
+import com.jq.findapp.service.events.ImportMunich;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith(SpringExtension.class)
