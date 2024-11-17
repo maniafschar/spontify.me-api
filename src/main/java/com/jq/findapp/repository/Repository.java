@@ -158,7 +158,7 @@ public class Repository {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<BaseEntity> list(final String hql) {
+	public List<? extends BaseEntity> list(final String hql) {
 		try {
 			return (List<BaseEntity>) em.createQuery(hql,
 					Class.forName(BaseEntity.class.getPackage().getName() + "." + hql.split(" ")[1])).getResultList();

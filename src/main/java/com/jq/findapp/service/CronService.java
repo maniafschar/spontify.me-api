@@ -13,11 +13,11 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +78,7 @@ public class CronService {
 	@Autowired
 	private SitemapService sitemapService;
 
-	private static final Set<String> running = new HashSet<>();
+	private static final Set<String> running = ConcurrentHashMap.newKeySet();
 
 	public static enum Group {
 		One, Two, Three, Four, Five
@@ -164,14 +164,13 @@ public class CronService {
 			if (method.isAnnotationPresent(Job.class)) {
 				final Job job = method.getAnnotation(Job.class);
 				if (cron(job.cron(), now)) {
-					if (CronResult.class.equals(method.getReturnType())) {
+					if (CronResult.class.equals(method.getReturnType()) && method.getParameterCount() == 0) {
 						if (!map.containsKey(job.group()))
 							map.put(job.group(), new ArrayList<>());
 						map.get(job.group()).add(new JobExecuter(service, method));
 					} else
 						notificationService.createTicket(TicketType.ERROR, "CronDeclaration",
-								"Method " + method.getName() + " does not return " + CronResult.class.getName()
-										+ ", but " + method.getReturnType(),
+								service.getClass().getName() + "." + method + " not eligable for @Job annotation!",
 								null);
 				}
 			}
@@ -208,9 +207,7 @@ public class CronService {
 		Arrays.asList(Group.values()).forEach(e -> {
 			if (map.containsKey(e)) {
 				final List<CompletableFuture<Void>> list = new ArrayList<>();
-				map.get(e).forEach(e2 -> {
-					list.add(e2.execute());
-				});
+				map.get(e).forEach(e2 -> list.add(e2.execute()));
 				CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()])).thenApply(e2 -> list.stream()
 						.map(CompletableFuture::join).collect(Collectors.toList())).join();
 			}

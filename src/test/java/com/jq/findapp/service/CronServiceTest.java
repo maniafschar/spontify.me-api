@@ -17,9 +17,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
+import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.CronService.Job;
-
-import jakarta.inject.Inject;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = { FindappApplication.class, TestConfig.class })
@@ -28,8 +27,11 @@ public class CronServiceTest {
 	@Autowired
 	private CronService cronService;
 
-	@Inject
+	@Autowired
 	private ChatService chatService;
+
+	@Autowired
+	private Repository repository;
 
 	@Test
 	public void cron_minute() throws Exception {
@@ -100,5 +102,20 @@ public class CronServiceTest {
 
 		// then
 		assertTrue(method.isAnnotationPresent(Job.class));
+	}
+
+	@Test
+	public void run_fourTimes() throws Exception {
+		// given
+		cronService.run();
+		cronService.run();
+		cronService.run();
+
+		// when
+		cronService.run();
+
+		// then
+		Thread.sleep(1000);
+		assertTrue(repository.list("from Log where uri like '/support/cron/MarketingLocationService/run'").size() == 4);
 	}
 }
