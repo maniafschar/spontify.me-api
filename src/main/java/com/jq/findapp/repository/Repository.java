@@ -234,7 +234,7 @@ public class Repository {
 		final List<String> ids = new ArrayList<>();
 		final Map<String, List<String>> attachmentEntities = Attachment.getAttachmentEntities();
 		for (final String entity : attachmentEntities.keySet()) {
-			final List<BaseEntity> list = list("from " + entity + attachmentEntities.get(entity).stream()
+			final List<? extends BaseEntity> list = list("from " + entity + attachmentEntities.get(entity).stream()
 					.collect(Collectors.joining(" like '%" + Attachment.SEPARATOR + "%' or ", " where ",
 							" like '%" + Attachment.SEPARATOR + "%'")));
 			list.stream().forEach(e -> {
