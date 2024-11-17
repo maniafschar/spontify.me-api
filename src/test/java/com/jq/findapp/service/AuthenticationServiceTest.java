@@ -170,7 +170,7 @@ public class AuthenticationServiceTest {
 		registration.setTime(5000);
 		registration.setReferer(BigInteger.ONE);
 		authenticationService.register(registration);
-		final List<BaseEntity> list = repository.list("from Contact");
+		final List<? extends BaseEntity> list = repository.list("from Contact");
 		final Contact register = (Contact) list.get(list.size() - 1);
 		final QueryParams params = new QueryParams(Query.contact_listFriends);
 		params.setId(contact.getId());

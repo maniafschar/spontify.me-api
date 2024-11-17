@@ -102,7 +102,7 @@ public class TestConfig {
 		private Repository repository;
 
 		@GetMapping("db/{hql}")
-		public List<BaseEntity> db(@PathVariable final String hql) throws ClassNotFoundException {
+		public List<? extends BaseEntity> db(@PathVariable final String hql) throws ClassNotFoundException {
 			return repository.list(hql);
 		}
 	}
