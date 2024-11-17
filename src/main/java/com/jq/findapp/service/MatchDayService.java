@@ -866,11 +866,13 @@ public class MatchDayService {
 				if (f != null && f.has("timestamp") && ("TBD".equals(f.get("status").get("short").asText())
 						|| "NS".equals(f.get("status").get("short").asText()))) {
 					final Instant time = Instant.ofEpochSecond(f.get("timestamp").asLong());
-					if ("NS".equals(f.get("status").get("short").asText())) {
-						if (time.plus(Duration.ofHours(2)).isBefore(Instant.now()))
+					if (time.isAfter(Instant.now())) {
+						if ("NS".equals(f.get("status").get("short").asText())) {
+							if (time.plus(Duration.ofHours(2)).isBefore(Instant.now()))
+								return null;
+						} else if (time.minus(Duration.ofDays(14)).isBefore(Instant.now()))
 							return null;
-					} else if (time.isAfter(Instant.now()) && time.minus(Duration.ofDays(14)).isBefore(Instant.now()))
-						return null;
+					}
 				}
 			}
 		}
