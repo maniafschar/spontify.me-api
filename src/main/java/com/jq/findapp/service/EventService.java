@@ -198,14 +198,19 @@ public class EventService {
 		try {
 			final JsonNode json = new ObjectMapper()
 					.readTree(Attachment.resolve(repository.one(Client.class, contact.getClientId()).getStorage()));
+			final String description;
+			if (event.getType() == EventType.Poll)
+				description = text.getText(contact, TextId.event_fbPoll)
+						.replace("{pseudonym}", contact.getPseudonym()).replace("{date}", date)
+						.replace("{question}", Json.toNode(event.getDescription()).get("q").asText());
+			else if (location == null)
+				description = text.getText(contact, TextId.event_fbWithoutLocation)
+						.replace("{pseudonym}", contact.getPseudonym()).replace("{date}", date)
+						.replace("{description}", event.getDescription());
+			else
+				description = date + "\n" + event.getDescription() + "\n\n" + location.getName() + "\n" + location.getAddress();
 			final String fbId = externalService.publishOnFacebook(contact.getClientId(),
-					(location == null
-							? text.getText(contact, TextId.event_fbWithoutLocation)
-									.replace("{pseudonym}", contact.getPseudonym()).replace("{date}", date)
-									.replace("{description}", event.getDescription())
-							: date + "\n" + event.getDescription() + "\n\n" + location.getName() + "\n"
-									+ location.getAddress())
-							+ (json.has("publishingPostfix") ? "\n\n" + json.get("publishingPostfix").asText() : ""),
+					description + (json.has("publishingPostfix") ? "\n\n" + json.get("publishingPostfix").asText() : ""),
 					"/rest/marketing/event/" + id);
 			if (fbId != null) {
 				event.setPublishId(fbId);
@@ -334,9 +339,7 @@ public class EventService {
 				+ " and (event.modifiedAt is null or event.modifiedAt<cast('"
 				+ Instant.now().minus(Duration.ofMinutes(15)) + "' as timestamp))");
 		final Result result = repository.list(params);
-		result.forEach(e -> {
-			publish((BigInteger) e.get("event.id"));
-		});
+		result.forEach(e -> publish((BigInteger) e.get("event.id")));
 		return result.size();
 	}
 
