@@ -192,10 +192,13 @@ public class EventService {
 		final Event event = repository.one(Event.class, id);
 		if (!Strings.isEmpty(event.getPublishId()))
 			return;
+		final LocalDateTime startDate = getRealDate(event);
+		if (startDate.isBefore(LocalDateTime.now()) || startDate.plus(Duration.ofDays(1)).isAfter(LocalDateTime.now()))
+			return;
 		final Contact contact = repository.one(Contact.class, event.getContactId());
 		final Location location = event.getLocationId() == null ? null
 				: repository.one(Location.class, event.getLocationId());
-		final String date = new SimpleDateFormat("d.M.yyyy H:mm").format(event.getStartDate());
+		final String date = new SimpleDateFormat("d.M.yyyy H:mm").format(startDate);
 		try {
 			final JsonNode json = new ObjectMapper()
 					.readTree(Attachment.resolve(repository.one(Client.class, contact.getClientId()).getStorage()));
@@ -209,9 +212,11 @@ public class EventService {
 						.replace("{pseudonym}", contact.getPseudonym()).replace("{date}", date)
 						.replace("{description}", event.getDescription());
 			else
-				description = date + "\n" + event.getDescription() + "\n\n" + location.getName() + "\n" + location.getAddress();
+				description = date + "\n" + event.getDescription() + "\n\n" + location.getName() + "\n"
+						+ location.getAddress();
 			final String fbId = externalService.publishOnFacebook(contact.getClientId(),
-					description + (json.has("publishingPostfix") ? "\n\n" + json.get("publishingPostfix").asText() : ""),
+					description
+							+ (json.has("publishingPostfix") ? "\n\n" + json.get("publishingPostfix").asText() : ""),
 					"/rest/marketing/event/" + id);
 			if (fbId != null) {
 				event.setPublishId(fbId);
@@ -325,16 +330,13 @@ public class EventService {
 				+ " and event.maxParticipants is null"
 				+ " and event.publishId is null");
 		final Result result = repository.list(params);
-		result.forEach(e -> {
-			publish((BigInteger) e.get("event.id"));
-		});
+		result.forEach(e -> publish((BigInteger) e.get("event.id")));
 		return result.size() + " published";
 	}
 
 	private int publishUser() throws Exception {
 		final QueryParams params = new QueryParams(Query.event_listId);
-		params.setSearch("(event.type='Poll' or event.startDate>cast('"
-				+ Instant.now().plus(Duration.ofMinutes(10)) + "' as timestamp))"
+		params.setSearch("event.startDate>cast('" + Instant.now().plus(Duration.ofMinutes(10)) + "' as timestamp)"
 				+ " and event.publish=true"
 				+ " and event.publishId is null"
 				+ " and (event.modifiedAt is null or event.modifiedAt<cast('"

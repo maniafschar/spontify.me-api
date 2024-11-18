@@ -232,7 +232,7 @@ public class ExternalService {
 			body.put("link", Strings.removeSubdomain(client.getUrl()) + link);
 			body.put("access_token", client.getFbPageAccessToken());
 			final String response = WebClient
-					.create("https://graph.facebook.com/v19.0/" + client.getFbPageId() + "/feed")
+					.create("https://graph.facebook.com/v21.0/" + client.getFbPageId() + "/feed")
 					.post().bodyValue(body).retrieve()
 					.toEntity(String.class).block().getBody();
 			if (response == null || !response.contains("\"id\":"))

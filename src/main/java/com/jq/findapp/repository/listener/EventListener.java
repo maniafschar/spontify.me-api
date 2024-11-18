@@ -177,5 +177,4 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 			repository.delete(eventParticipate);
 		}
 	}
-
 }
