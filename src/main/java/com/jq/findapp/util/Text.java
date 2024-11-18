@@ -52,6 +52,7 @@ public class Text {
 		engagement_uploadProfileAttributes,
 		engagement_uploadProfileImage,
 		engagement_welcome,
+		event_fbPoll,
 		event_fbWithoutLocation,
 		mail_contactPasswordReset,
 		mail_contactRegistrationReminder,
