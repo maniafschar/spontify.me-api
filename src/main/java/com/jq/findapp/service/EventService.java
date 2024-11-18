@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Event;
+import com.jq.findapp.entity.Event.EventType;
 import com.jq.findapp.entity.Event.FutureEvent;
 import com.jq.findapp.entity.Event.Repetition;
 import com.jq.findapp.entity.EventParticipate;
