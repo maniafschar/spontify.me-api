@@ -198,7 +198,8 @@ public class EventService {
 		final Contact contact = repository.one(Contact.class, event.getContactId());
 		final Location location = event.getLocationId() == null ? null
 				: repository.one(Location.class, event.getLocationId());
-		final String date = new SimpleDateFormat("d.M.yyyy H:mm").format(startDate);
+		final String date = new SimpleDateFormat("d.M.yyyy H:mm")
+				.format(startDate.toInstant(ZoneOffset.of(contact.getTimezone())));
 		try {
 			final JsonNode json = new ObjectMapper()
 					.readTree(Attachment.resolve(repository.one(Client.class, contact.getClientId()).getStorage()));
