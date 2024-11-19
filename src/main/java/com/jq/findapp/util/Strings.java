@@ -122,7 +122,7 @@ public class Strings {
 	}
 
 	public static String formatDate(final String format, final Date date, final String zone) {
-		return date.toInstant().atZone(TimeZone.getTimeZone(zone).toZoneId())
+		return date.toInstant().atZone(TimeZone.getTimeZone(isEmpty(zone) ? TIME_OFFSET : zone).toZoneId())
 				.format(DateTimeFormatter.ofPattern(format == null ? "dd.MM.yyyy HH:mm" : format));
 	}
 
