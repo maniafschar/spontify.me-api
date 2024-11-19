@@ -2,13 +2,13 @@ package com.jq.findapp.service;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -198,8 +198,7 @@ public class EventService {
 		final Contact contact = repository.one(Contact.class, event.getContactId());
 		final Location location = event.getLocationId() == null ? null
 				: repository.one(Location.class, event.getLocationId());
-		final String date = new SimpleDateFormat("d.M.yyyy H:mm")
-				.format(startDate.toInstant(ZoneOffset.of(contact.getTimezone())));
+		final String date = startDate.format(DateTimeFormatter.ofPattern("d.M.yyyy H:mm"));
 		try {
 			final JsonNode json = new ObjectMapper()
 					.readTree(Attachment.resolve(repository.one(Client.class, contact.getClientId()).getStorage()));
