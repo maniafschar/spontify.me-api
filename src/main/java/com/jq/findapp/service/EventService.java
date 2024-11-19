@@ -113,14 +113,13 @@ public class EventService {
 							if (event.getLocationId() == null)
 								notificationService.sendNotification(contactEvent,
 										params.getUser(), TextId.notification_eventNotifyWithoutLocation,
-										Strings.encodeParam("e=" + event.getId() + "_" + realDate.toLocalDate()),
-										time,
-										event.getDescription());
+										Strings.encodeParam("e=" + event.getId() + "_" + realDate.toString().substring(0, 10)),
+										time, event.getDescription());
 							else
 								notificationService.sendNotification(contactEvent,
 										params.getUser(), TextId.notification_eventNotify,
-										Strings.encodeParam("e=" + event.getId() + "_" + realDate.toLocalDate()),
-										(realDate.getDayOfYear() == now.getDayOfYear()
+										Strings.encodeParam("e=" + event.getId() + "_" + realDate.toString().substring(0, 10)),
+										(realDate.atOffset(ZoneOffset.ofHours(0)).getDayOfYear() == now.atOffset(ZoneOffset.ofHours(0)).getDayOfYear()
 												? text.getText(params.getUser(), TextId.today)
 												: text.getText(params.getUser(), TextId.tomorrow)) + " " + time,
 										(String) events.get(i2).get("location.name"));
@@ -193,8 +192,8 @@ public class EventService {
 		final Event event = repository.one(Event.class, id);
 		if (!Strings.isEmpty(event.getPublishId()))
 			return;
-		final LocalDateTime startDate = getRealDate(event);
-		if (startDate.isBefore(LocalDateTime.now()) || startDate.minus(Duration.ofDays(1)).isAfter(LocalDateTime.now()))
+		final Instant startDate = getRealDate(event);
+		if (startDate.isBefore(Instant.now()) || startDate.minus(Duration.ofDays(1)).isAfter(Instant.now()))
 			return;
 		final Contact contact = repository.one(Contact.class, event.getContactId());
 		final Location location = event.getLocationId() == null ? null
