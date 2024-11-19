@@ -5,6 +5,8 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -90,7 +92,6 @@ public class EventService {
 			params.setQuery(Query.event_listMatching);
 			params.setDistance(50);
 			params.setSearch("event.endDate>current_timestamp");
-			final LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
 			int count = 0;
 			for (int i = 0; i < ids.size(); i++) {
 				params.setUser(repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id")));
@@ -100,10 +101,10 @@ public class EventService {
 				for (int i2 = 0; i2 < events.size(); i2++) {
 					final Event event = repository.one(Event.class, (BigInteger) events.get(i2).get("event.id"));
 					if (!params.getUser().getId().equals(event.getContactId())) {
-						final LocalDateTime realDate = getRealDate(event, now);
+						final LocalDateTime realDate = getRealDate(event);
 						final Contact contactEvent = repository.one(Contact.class, event.getContactId());
-						if (realDate.isAfter(now)
-								&& realDate.minusDays(1).isBefore(now)
+						if (realDate.isAfter(Instant.now())
+								&& realDate.minus(Duration.ofDays(1)).isBefore(Instant.now())
 								&& !isMaxParticipants(event, realDate, params.getUser())
 								&& Score.getContact(contactEvent, params.getUser()) > 0.4) {
 							final ZonedDateTime t = realDate
@@ -227,23 +228,19 @@ public class EventService {
 		}
 	}
 
-	public LocalDateTime getRealDate(final Event event) {
-		return getRealDate(event, LocalDateTime.now(ZoneId.systemDefault()));
-	}
-
-	private LocalDateTime getRealDate(final Event event, final LocalDateTime now) {
-		LocalDateTime realDate = Instant.ofEpochMilli(event.getStartDate().getTime())
-				.atZone(ZoneId.systemDefault()).toLocalDateTime();
+	private Instant getRealDate(final Event event) {
+		Instant realDate = Instant.ofEpochMilli(event.getStartDate().getTime());
 		if (event.getRepetition() != Repetition.Once && event.getRepetition() != Repetition.Games) {
-			while (realDate.isBefore(now)) {
+			while (realDate.isBefore(Instant.now())) {
 				if (event.getRepetition() == Repetition.Week)
-					realDate = realDate.plusWeeks(1);
+					realDate = realDate.plus(Duration.ofDays(7));
 				else if (event.getRepetition() == Repetition.TwoWeeks)
-					realDate = realDate.plusWeeks(2);
-				else if (event.getRepetition() == Repetition.Month)
-					realDate = realDate.plusMonths(1);
-				else
-					realDate = realDate.plusYears(1);
+					realDate = realDate.plus(Duration.ofDays(14));
+				else {
+					final OffsetDateTime d = realDate.atOffset(java.time.ZoneOffset.ofHours(0));
+					final YearMonth yearMonth = YearMonth.of(d.getYear(), d.getMonthValue());
+					realDate = realDate.plus(Duration.ofDays(event.getRepetition() == Repetition.Month ? yearMonth.lengthOfMonth() : yearMonth.lengthOfYear()));
+				}
 			}
 		}
 		return realDate;
