@@ -10,8 +10,8 @@ import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -119,7 +119,7 @@ public class EventService {
 								notificationService.sendNotification(contactEvent,
 										params.getUser(), TextId.notification_eventNotify,
 										Strings.encodeParam("e=" + event.getId() + "_" + realDate.toString().substring(0, 10)),
-										(realDate.atOffset(ZoneOffset.ofHours(0)).getDayOfYear() == now.atOffset(ZoneOffset.ofHours(0)).getDayOfYear()
+										(realDate.atOffset(ZoneOffset.ofHours(0)).getDayOfYear() == Instant.now().atOffset(ZoneOffset.ofHours(0)).getDayOfYear()
 												? text.getText(params.getUser(), TextId.today)
 												: text.getText(params.getUser(), TextId.tomorrow)) + " " + time,
 										(String) events.get(i2).get("location.name"));
@@ -198,7 +198,7 @@ public class EventService {
 		final Contact contact = repository.one(Contact.class, event.getContactId());
 		final Location location = event.getLocationId() == null ? null
 				: repository.one(Location.class, event.getLocationId());
-		final String date = startDate.format(DateTimeFormatter.ofPattern("d.M.yyyy H:mm"));
+		final String date = new SimpleDateFormat("d.M.yyyy H:mm").format(new Date(startDate.toEpochMilli()));
 		try {
 			final JsonNode json = new ObjectMapper()
 					.readTree(Attachment.resolve(repository.one(Client.class, contact.getClientId()).getStorage()));
@@ -215,8 +215,8 @@ public class EventService {
 				description = date + "\n" + event.getDescription() + "\n\n" + location.getName() + "\n"
 						+ location.getAddress();
 			final String fbId = externalService.publishOnFacebook(contact.getClientId(),
-					description
-							+ (json.has("publishingPostfix") ? "\n\n" + json.get("publishingPostfix").asText() : ""),
+					description + (json.has("publishingPostfix") ? "\n\n" +
+					json.get("publishingPostfix").asText() : ""),
 					"/rest/marketing/event/" + id);
 			if (fbId != null) {
 				event.setPublishId(fbId);
