@@ -101,7 +101,7 @@ public class EventService {
 				for (int i2 = 0; i2 < events.size(); i2++) {
 					final Event event = repository.one(Event.class, (BigInteger) events.get(i2).get("event.id"));
 					if (!params.getUser().getId().equals(event.getContactId())) {
-						final LocalDateTime realDate = getRealDate(event);
+						final Instant realDate = getRealDate(event);
 						final Contact contactEvent = repository.one(Contact.class, event.getContactId());
 						if (realDate.isAfter(Instant.now())
 								&& realDate.minus(Duration.ofDays(1)).isBefore(Instant.now())
@@ -228,7 +228,7 @@ public class EventService {
 		}
 	}
 
-	private Instant getRealDate(final Event event) {
+	public Instant getRealDate(final Event event) {
 		Instant realDate = Instant.ofEpochMilli(event.getStartDate().getTime());
 		if (event.getRepetition() != Repetition.Once && event.getRepetition() != Repetition.Games) {
 			while (realDate.isBefore(Instant.now())) {
@@ -246,13 +246,13 @@ public class EventService {
 		return realDate;
 	}
 
-	private boolean isMaxParticipants(final Event event, final LocalDateTime date, final Contact contact) {
+	private boolean isMaxParticipants(final Event event, final Instant date, final Contact contact) {
 		if (event.getMaxParticipants() == null)
 			return false;
 		final QueryParams params = new QueryParams(Query.event_listParticipateRaw);
 		params.setUser(contact);
 		params.setSearch("eventParticipate.eventId=" + event.getId() + " and eventParticipate.eventDate=cast('"
-				+ date.toLocalDate() + "' as timestamp) and eventParticipate.state=1");
+				+ date + "' as date) and eventParticipate.state=1");
 		return repository.list(params).size() >= event.getMaxParticipants().intValue();
 	}
 
