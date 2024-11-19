@@ -118,7 +118,7 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 					else
 						eventParticipate
 								.setEventDate(new java.sql.Date(
-										eventService.getRealDate(event).toInstant(ZoneOffset.UTC).toEpochMilli()));
+										eventService.getRealDate(event).toEpochMilli()));
 					repository.save(eventParticipate);
 				}
 				if (eventParticipate.getState() == 1 && !eventParticipate.getContactId().equals(event.getContactId())) {
