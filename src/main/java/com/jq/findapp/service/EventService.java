@@ -193,7 +193,7 @@ public class EventService {
 		if (!Strings.isEmpty(event.getPublishId()))
 			return;
 		final LocalDateTime startDate = getRealDate(event);
-		if (startDate.isBefore(LocalDateTime.now()) || startDate.plus(Duration.ofDays(1)).isAfter(LocalDateTime.now()))
+		if (startDate.isBefore(LocalDateTime.now()) || startDate.minus(Duration.ofDays(1)).isAfter(LocalDateTime.now()))
 			return;
 		final Contact contact = repository.one(Contact.class, event.getContactId());
 		final Location location = event.getLocationId() == null ? null
