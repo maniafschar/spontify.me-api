@@ -5,10 +5,8 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.YearMonth;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -114,15 +112,19 @@ public class EventService {
 							if (event.getLocationId() == null)
 								notificationService.sendNotification(contactEvent,
 										params.getUser(), TextId.notification_eventNotifyWithoutLocation,
-										Strings.encodeParam("e=" + event.getId() + "_" + realDate.toString().substring(0, 10)),
+										Strings.encodeParam(
+												"e=" + event.getId() + "_" + realDate.toString().substring(0, 10)),
 										time, event.getDescription());
 							else
 								notificationService.sendNotification(contactEvent,
 										params.getUser(), TextId.notification_eventNotify,
-										Strings.encodeParam("e=" + event.getId() + "_" + realDate.toString().substring(0, 10)),
-										(realDate.atOffset(ZoneOffset.ofHours(0)).getDayOfYear() == Instant.now().atOffset(ZoneOffset.ofHours(0)).getDayOfYear()
-												? text.getText(params.getUser(), TextId.today)
-												: text.getText(params.getUser(), TextId.tomorrow)) + " " + time,
+										Strings.encodeParam(
+												"e=" + event.getId() + "_" + realDate.toString().substring(0, 10)),
+										(realDate.atOffset(ZoneOffset.ofHours(0)).getDayOfYear() == Instant.now()
+												.atOffset(ZoneOffset.ofHours(0)).getDayOfYear()
+														? text.getText(params.getUser(), TextId.today)
+														: text.getText(params.getUser(), TextId.tomorrow))
+												+ " " + time,
 										(String) events.get(i2).get("location.name"));
 							count++;
 							break;
@@ -217,7 +219,7 @@ public class EventService {
 						+ location.getAddress();
 			final String fbId = externalService.publishOnFacebook(contact.getClientId(),
 					description + (json.has("publishingPostfix") ? "\n\n" +
-					json.get("publishingPostfix").asText() : ""),
+							json.get("publishingPostfix").asText() : ""),
 					"/rest/marketing/event/" + id);
 			if (fbId != null) {
 				event.setPublishId(fbId);
@@ -239,7 +241,9 @@ public class EventService {
 				else {
 					final OffsetDateTime d = realDate.atOffset(java.time.ZoneOffset.ofHours(0));
 					final YearMonth yearMonth = YearMonth.of(d.getYear(), d.getMonthValue());
-					realDate = realDate.plus(Duration.ofDays(event.getRepetition() == Repetition.Month ? yearMonth.lengthOfMonth() : yearMonth.lengthOfYear()));
+					realDate = realDate
+							.plus(Duration.ofDays(event.getRepetition() == Repetition.Month ? yearMonth.lengthOfMonth()
+									: yearMonth.lengthOfYear()));
 				}
 			}
 		}

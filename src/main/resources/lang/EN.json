@@ -39,7 +39,7 @@
 		"welcome": "Hello CONTACT_PSEUDONYM,\n\nit's nice to have you here. Take a look around and contact me if you have any questions.\n\nHave fun\nYour APP_TITLE team"
 	},
 	"event": {
-		"fbPoll": "{pseudonym} has this question: {quetion}\nLog in to answer the question.",
+		"fbPoll": "{pseudonym} has this question: {question}\nLog in to answer the question.",
 		"fbWithoutLocation": "{pseudonym} would like to do the following on {date}:\n{description}\nLog in and you can get in touch."
 	},
 	"mail": {

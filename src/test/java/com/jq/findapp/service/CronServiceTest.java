@@ -1,5 +1,6 @@
 package com.jq.findapp.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -7,6 +8,7 @@ import java.lang.reflect.Method;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -116,6 +118,7 @@ public class CronServiceTest {
 
 		// then
 		Thread.sleep(1000);
-		assertTrue(repository.list("from Log where uri like '/support/cron/MarketingLocationService/run'").size() == 4);
+		final List<?> list = repository.list("from Log where uri like '/support/cron/MarketingLocationService/run'");
+		assertEquals(4, list.size());
 	}
 }
