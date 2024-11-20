@@ -84,6 +84,18 @@ public class CronService {
 		One, Two, Three, Four, Five
 	}
 
+	/**
+	 * 1 2 3 4 5
+	 * ┬ ┬ ┬ ┬ ┬
+	 * │ │ │ │ │
+	 * │ │ │ │ └──── Weekday (1-7, Sunday = 7)
+	 * │ │ │ └────── Month (1-12)
+	 * │ │ └──────── Day (1-31)
+	 * │ └────────── Hour (0-23)
+	 * └──────────── Minute (0-59)
+	 * 
+	 * e.g.: 10,40 0 1,15
+	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(value = ElementType.METHOD)
 	public static @interface Job {
@@ -214,16 +226,6 @@ public class CronService {
 		});
 	}
 
-	/**
-	 * 1 2 3 4 5
-	 * ┬ ┬ ┬ ┬ ┬
-	 * │ │ │ │ │
-	 * │ │ │ │ └──── Weekday (1-7, Sunday = 7)
-	 * │ │ │ └────── Month (1-12)
-	 * │ │ └──────── Day (1-31)
-	 * │ └────────── Hour (0-23)
-	 * └──────────── Minute (0-59)
-	 */
 	boolean cron(final String cron, final ZonedDateTime now) {
 		if (Strings.isEmpty(cron))
 			return true;

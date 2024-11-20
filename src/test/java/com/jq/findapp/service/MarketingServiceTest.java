@@ -1,10 +1,13 @@
 package com.jq.findapp.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -91,5 +94,21 @@ public class MarketingServiceTest {
 		assertEquals(true,
 				repository.one(ClientMarketingResult.class, (BigInteger) list.get(0).get("clientMarketingResult.id"))
 						.getPublished());
+	}
+
+	@Test
+	public void time() {
+		// given
+		final LocalDate date = LocalDate.now();
+		final String s = date.getYear() + "-" + date.getMonthValue()
+				+ "-" + date.getDayOfMonth() + "T" + (int) (16 + Math.random() * 5) + (":"
+						+ ((int) (Math.random() * 4) % 4) * 15).replace(":0", ":00")
+				+ ":00.00Z";
+
+		// when
+		final Instant datetime = Instant.parse(s);
+
+		// then
+		assertNotNull(datetime);
 	}
 }
