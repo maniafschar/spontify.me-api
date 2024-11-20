@@ -65,7 +65,9 @@ public class MarketingService {
 				for (int i2 = 0; i2 < node.get("marketing").size(); i2++) {
 					if (Math.random() > 0.8) {
 						final long contactId = node.get("marketing").get(i2).get("user").asLong();
-						params.setSearch("event.contactId=" + contactId + " and event.startDate>=now()");
+						params.setSearch(
+								"event.contactId=" + contactId
+										+ " and event.startDate>=now() and event.type='Inquiry'");
 						if (repository.list(params).size() == 0) {
 							final JsonNode text = node.get("marketing").get(i2).get("text");
 							final LocalDate date = LocalDate.now();
@@ -84,8 +86,8 @@ public class MarketingService {
 						}
 					}
 				}
-				if (count > 0)
-					result.body += client.getId() + ": " + count + "\n";
+				// if (count > 0)
+				result.body += client.getId() + ":" + count + "\n";
 			}
 		}
 		return result;
