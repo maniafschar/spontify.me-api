@@ -86,8 +86,8 @@ public class MarketingService {
 						}
 					}
 				}
-				// if (count > 0)
-				result.body += client.getId() + ":" + count + "\n";
+				if (count > 0)
+					result.body += client.getId() + ":" + count + "\n";
 			}
 		}
 		return result;

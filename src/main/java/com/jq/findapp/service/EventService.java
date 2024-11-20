@@ -191,13 +191,13 @@ public class EventService {
 		return result;
 	}
 
-	private void publish(final BigInteger id) {
+	private boolean publish(final BigInteger id) {
 		final Event event = repository.one(Event.class, id);
 		if (!Strings.isEmpty(event.getPublishId()))
-			return;
+			return false;
 		final Instant startDate = getRealDate(event);
 		if (startDate.isBefore(Instant.now()) || startDate.minus(Duration.ofDays(1)).isAfter(Instant.now()))
-			return;
+			return false;
 		final Contact contact = repository.one(Contact.class, event.getContactId());
 		final Location location = event.getLocationId() == null ? null
 				: repository.one(Location.class, event.getLocationId());
@@ -225,6 +225,7 @@ public class EventService {
 				event.setPublishId(fbId);
 				repository.save(event);
 			}
+			return true;
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
@@ -277,7 +278,7 @@ public class EventService {
 		final CronResult result = new CronResult();
 		try {
 			final BigInteger clientId = BigInteger.ONE;
-			result.body = publishClient(clientId) + "\n" + publishUser() + " user events published";
+			result.body = publishClient(clientId) + " client\n" + publishUser() + " user";
 		} catch (final Exception e) {
 			result.exception = e;
 		}
@@ -320,7 +321,7 @@ public class EventService {
 		return result;
 	}
 
-	private String publishClient(final BigInteger clientId) throws Exception {
+	private int publishClient(final BigInteger clientId) throws Exception {
 		final QueryParams params = new QueryParams(Query.event_listId);
 		params.setSearch("event.startDate>cast('" + Instant.now().plus(Duration.ofHours(2))
 				+ "' as timestamp) and event.startDate<cast('" + Instant.now().plus(Duration.ofHours(10))
@@ -331,8 +332,12 @@ public class EventService {
 				+ " and event.maxParticipants is null"
 				+ " and event.publishId is null");
 		final Result result = repository.list(params);
-		result.forEach(e -> publish((BigInteger) e.get("event.id")));
-		return result.size() + " published";
+		final StringBuffer s = new StringBuffer();
+		result.forEach(e -> {
+			if (publish((BigInteger) e.get("event.id")))
+				s.append("x");
+		});
+		return s.length();
 	}
 
 	private int publishUser() throws Exception {
@@ -343,8 +348,12 @@ public class EventService {
 				+ " and (event.modifiedAt is null or event.modifiedAt<cast('"
 				+ Instant.now().minus(Duration.ofMinutes(15)) + "' as timestamp))");
 		final Result result = repository.list(params);
-		result.forEach(e -> publish((BigInteger) e.get("event.id")));
-		return result.size();
+		final StringBuffer s = new StringBuffer();
+		result.forEach(e -> {
+			if (publish((BigInteger) e.get("event.id")))
+				s.append("x");
+		});
+		return s.length();
 	}
 
 	public String get(final String url) {
