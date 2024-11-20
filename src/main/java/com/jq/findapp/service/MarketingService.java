@@ -67,7 +67,7 @@ public class MarketingService {
 						final long contactId = node.get("marketing").get(i2).get("user").asLong();
 						params.setSearch(
 								"event.contactId=" + contactId
-										+ " and event.startDate>=now() and event.type='Inquiry'");
+										+ " and event.startDate>=cast('" + Instant.now().minus(Duration.ofDays(2)).toString().substring(0, 19) + "' as timestamp) and event.type='Inquiry'");
 						if (repository.list(params).size() == 0) {
 							final JsonNode text = node.get("marketing").get(i2).get("text");
 							final LocalDate date = LocalDate.now();
