@@ -61,6 +61,7 @@ public class MarketingService {
 			final Client client = repository.one(Client.class, (BigInteger) list.get(i).get("client.id"));
 			final JsonNode node = Json.toNode(Attachment.resolve(client.getStorage()));
 			if (node.has("marketing")) {
+				int count = 0;
 				for (int i2 = 0; i2 < node.get("marketing").size(); i2++) {
 					if (Math.random() > 0.8) {
 						final long contactId = node.get("marketing").get(i2).get("user").asLong();
@@ -79,9 +80,12 @@ public class MarketingService {
 							event.setPublish(true);
 							event.setType(EventType.Inquiry);
 							repository.save(event);
+							count++;
 						}
 					}
 				}
+				if (count > 0)
+					result.body += client.getId() + ": " + count + "\n";
 			}
 		}
 		return result;
