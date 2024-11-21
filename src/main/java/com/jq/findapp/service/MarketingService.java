@@ -67,8 +67,10 @@ public class MarketingService {
 					if (Math.random() > 0.8) {
 						final long contactId = node.get("marketing").get(i2).get("user").asLong();
 						params.setSearch(
-								"event.contactId=" + contactId
-										+ " and event.startDate>=cast('" + Instant.now().minus(Duration.ofDays(2)).toString().substring(0, 19) + "' as timestamp) and event.type='Inquiry'");
+								"event.contactId=" + contactId + " and event.type='Inquiry' and event.startDate>=cast('"
+										+ Instant.now().minus(Duration.ofDays(2 + (int) (Math.random() * 7))).toString()
+												.substring(0, 19)
+										+ "' as timestamp)");
 						if (repository.list(params).size() == 0) {
 							final JsonNode text = node.get("marketing").get(i2).get("text");
 							final LocalDate date = LocalDate.now();
