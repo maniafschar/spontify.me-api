@@ -68,7 +68,7 @@ public class MarketingService {
 						final long contactId = node.get("marketing").get(i2).get("user").asLong();
 						params.setSearch(
 								"event.contactId=" + contactId + " and event.type='Inquiry' and event.startDate>=cast('"
-										+ Instant.now().minus(Duration.ofHours(2 + (int) (Math.random() * 5))).toString()
+										+ Instant.now().minus(Duration.ofHours(1)).toString()
 												.substring(0, 19)
 										+ "' as timestamp)");
 						if (repository.list(params).size() == 0) {
