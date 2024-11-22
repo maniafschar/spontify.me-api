@@ -52,7 +52,7 @@ public class MarketingService {
 	@Autowired
 	private Text text;
 
-	@Job(cron = "* 9,10,11,12,13,14,15,16")
+	@Job(cron = "* 9,10,11,12,13,14,15,16,17,18")
 	public CronResult runEvent() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.misc_listClient);
