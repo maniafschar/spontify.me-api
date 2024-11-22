@@ -323,7 +323,7 @@ public class EventService {
 	}
 
 	@Job(cron = "* 9,10,11,12,13,14,15,16,17,18")
-	public CronResult runEvent() {
+	public CronResult runMarketing() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.misc_listClient);
 		final Result list = repository.list(params);
