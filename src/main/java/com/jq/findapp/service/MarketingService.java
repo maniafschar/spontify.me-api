@@ -1,11 +1,7 @@
 package com.jq.findapp.service;
 
 import java.math.BigInteger;
-import java.sql.Timestamp;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,8 +19,6 @@ import com.jq.findapp.entity.ClientMarketing.Question;
 import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.ClientMarketingResult.PollResult;
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.Event;
-import com.jq.findapp.entity.Event.EventType;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
@@ -48,64 +42,10 @@ public class MarketingService {
 	private ExternalService externalService;
 
 	@Autowired
-	private EventService eventService;
-
-	@Autowired
 	private NotificationService notificationService;
 
 	@Autowired
 	private Text text;
-
-	@Job(cron = "* 9,10,11,12,13,14,15,16,17,18")
-	public CronResult runEvent() {
-		final CronResult result = new CronResult();
-		final QueryParams params = new QueryParams(Query.misc_listClient);
-		final Result list = repository.list(params);
-		params.setQuery(Query.event_listId);
-		for (int i = 0; i < list.size(); i++) {
-			final Client client = repository.one(Client.class, (BigInteger) list.get(i).get("client.id"));
-			final JsonNode node = Json.toNode(Attachment.resolve(client.getStorage()));
-			if (node.has("marketing")) {
-				for (int i2 = 0; i2 < node.get("marketing").size(); i2++) {
-					if (Math.random() > 0.5) {
-						final long contactId = node.get("marketing").get(i2).get("user").asLong();
-						params.setSearch(
-								"event.contactId=" + contactId + " and event.type='Inquiry' and event.startDate>=cast('"
-										+ Instant.now().minus(Duration.ofHours(LocalDateTime.now().getHour()))
-												.toString()
-												.substring(0, 19)
-										+ "' as timestamp)");
-						final Result events = repository.list(params);
-						if (events.size() == 0) {
-							final JsonNode text = node.get("marketing").get(i2).get("text");
-							final LocalDate date = LocalDate.now();
-							final Event event = new Event();
-							event.setContactId(BigInteger.valueOf(contactId));
-							event.setDescription(text.get((int) (Math.random() * text.size() % text.size())).asText());
-							event.setStartDate(new Timestamp(Instant.parse(date.getYear() + "-" + date.getMonthValue()
-									+ "-" + date.getDayOfMonth() + "T" + (int) (16 + Math.random() * 5) + (":"
-											+ ((int) (Math.random() * 4) % 4) * 15).replace(":0", ":00")
-									+ ":00.00Z")
-									.toEpochMilli()));
-							event.setPublish(true);
-							event.setType(EventType.Inquiry);
-							repository.save(event);
-							result.body += client.getId() + "\n";
-							break;
-						} else {
-							final Event event = repository.one(Event.class, (BigInteger) events.get(0).get("event.id"));
-							event.setPublishId(null);
-							if (eventService.publish(event)) {
-								result.body += client.getId() + "\n";
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
-		return result;
-	}
 
 	@Job(group = Group.Two)
 	public CronResult run() {
