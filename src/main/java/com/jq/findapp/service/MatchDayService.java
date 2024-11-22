@@ -493,7 +493,7 @@ public class MatchDayService {
 				if (clientMarketingResult != null)
 					s += "ergebnis";
 				g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 14.5f);
-				g2.setFont(customFont.deriveFont(24f));
+				g2.setFont(customFont.deriveFont(20f));
 				s = subtitlePrefix + " des Spiels vom " + formatDate(poll.timestamp, null);
 				g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 17.5f);
 				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP));
