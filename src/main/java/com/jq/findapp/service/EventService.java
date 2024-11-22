@@ -219,7 +219,7 @@ public class EventService {
 			final String fbId = externalService.publishOnFacebook(contact.getClientId(),
 					description + (json.has("publishingPostfix") ? "\n\n" +
 							json.get("publishingPostfix").asText() : ""),
-					"/rest/marketing/event/" + id);
+					"/rest/marketing/event/" + event.getId());
 			if (fbId != null) {
 				event.setPublishId(fbId);
 				repository.save(event);
