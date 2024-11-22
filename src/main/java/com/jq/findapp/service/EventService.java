@@ -191,8 +191,7 @@ public class EventService {
 		return result;
 	}
 
-	private boolean publish(final BigInteger id) {
-		final Event event = repository.one(Event.class, id);
+	public boolean publish(final Event event) {
 		if (!Strings.isEmpty(event.getPublishId()))
 			return false;
 		final Instant startDate = getRealDate(event);
@@ -334,7 +333,7 @@ public class EventService {
 		final Result result = repository.list(params);
 		final StringBuffer s = new StringBuffer();
 		result.forEach(e -> {
-			if (publish((BigInteger) e.get("event.id")))
+			if (publish(repository.one(Event.class, (BigInteger) e.get("event.id"))))
 				s.append("x");
 		});
 		return s.length();
@@ -350,7 +349,7 @@ public class EventService {
 		final Result result = repository.list(params);
 		final StringBuffer s = new StringBuffer();
 		result.forEach(e -> {
-			if (publish((BigInteger) e.get("event.id")))
+			if (publish(repository.one(Event.class, (BigInteger) e.get("event.id"))))
 				s.append("x");
 		});
 		return s.length();

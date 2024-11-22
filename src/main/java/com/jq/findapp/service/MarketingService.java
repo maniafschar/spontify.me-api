@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -47,6 +48,9 @@ public class MarketingService {
 	private ExternalService externalService;
 
 	@Autowired
+	private EventService eventService;
+
+	@Autowired
 	private NotificationService notificationService;
 
 	@Autowired
@@ -67,10 +71,12 @@ public class MarketingService {
 						final long contactId = node.get("marketing").get(i2).get("user").asLong();
 						params.setSearch(
 								"event.contactId=" + contactId + " and event.type='Inquiry' and event.startDate>=cast('"
-										+ Instant.now().minus(Duration.ofHours(1)).toString()
+										+ Instant.now().minus(Duration.ofHours(LocalDateTime.now().getHour()))
+												.toString()
 												.substring(0, 19)
 										+ "' as timestamp)");
-						if (repository.list(params).size() == 0) {
+						final Result events = repository.list(params);
+						if (events.size() == 0) {
 							final JsonNode text = node.get("marketing").get(i2).get("text");
 							final LocalDate date = LocalDate.now();
 							final Event event = new Event();
@@ -86,6 +92,13 @@ public class MarketingService {
 							repository.save(event);
 							result.body += client.getId() + "\n";
 							break;
+						} else {
+							final Event event = repository.one(Event.class, (BigInteger) events.get(0).get("event.id"));
+							event.setPublishId(null);
+							if (eventService.publish(event)) {
+								result.body += client.getId() + "\n";
+								break;
+							}
 						}
 					}
 				}
