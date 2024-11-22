@@ -529,7 +529,7 @@ public class MatchDayService {
 			final double w = width * 0.3, delta = 1.6;
 			for (int i = 0; i < poll.matches.size(); i++) {
 				final String[] s = poll.matches.get(poll.matches.size() - i - 1).split("\\|");
-				g2.drawString(s[0], width - padding - 120 - g2.getFontMetrics().stringWidth(s[0]) / 2, y + h);
+				g2.drawString(s[0], width - padding - 150 - g2.getFontMetrics().stringWidth(s[0]) / 2, y + h);
 				g2.drawString(s[1], width - padding - g2.getFontMetrics().stringWidth(s[1]), y + h);
 				y += delta * padding;
 			}
