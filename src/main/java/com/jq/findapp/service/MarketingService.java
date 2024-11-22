@@ -64,29 +64,21 @@ public class MarketingService {
 			if (node.has("marketing")) {
 				int count = 0;
 				for (int i2 = 0; i2 < node.get("marketing").size(); i2++) {
-					if (Math.random() > 0.9) {
-						final long contactId = node.get("marketing").get(i2).get("user").asLong();
-						params.setSearch(
-								"event.contactId=" + contactId + " and event.type='Inquiry' and event.startDate>=cast('"
-										+ Instant.now().minus(Duration.ofDays(2 + (int) (Math.random() * 7))).toString()
-												.substring(0, 19)
-										+ "' as timestamp)");
-						if (repository.list(params).size() == 0) {
-							final JsonNode text = node.get("marketing").get(i2).get("text");
-							final LocalDate date = LocalDate.now();
-							final Event event = new Event();
-							event.setContactId(BigInteger.valueOf(contactId));
-							event.setDescription(text.get((int) (Math.random() * text.size() % text.size())).asText());
-							event.setStartDate(new Timestamp(Instant.parse(date.getYear() + "-" + date.getMonthValue()
-									+ "-" + date.getDayOfMonth() + "T" + (int) (16 + Math.random() * 5) + (":"
-											+ ((int) (Math.random() * 4) % 4) * 15).replace(":0", ":00")
-									+ ":00.00Z")
-									.toEpochMilli()));
-							event.setPublish(true);
-							event.setType(EventType.Inquiry);
-							repository.save(event);
-							count++;
-						}
+					if (Math.random() > 0.5) {
+						final JsonNode text = node.get("marketing").get(i2).get("text");
+						final LocalDate date = LocalDate.now();
+						final Event event = new Event();
+						event.setContactId(BigInteger.valueOf(node.get("marketing").get(i2).get("user").asLong()));
+						event.setDescription(text.get((int) (Math.random() * text.size() % text.size())).asText());
+						event.setStartDate(new Timestamp(Instant.parse(date.getYear() + "-" + date.getMonthValue()
+								+ "-" + date.getDayOfMonth() + "T" + (int) (16 + Math.random() * 5) + (":"
+										+ ((int) (Math.random() * 4) % 4) * 15).replace(":0", ":00")
+								+ ":00.00Z")
+								.toEpochMilli()));
+						event.setPublish(true);
+						event.setType(EventType.Inquiry);
+						repository.save(event);
+						count++;
 					}
 				}
 				if (count > 0)
