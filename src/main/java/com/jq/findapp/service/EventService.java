@@ -322,7 +322,7 @@ public class EventService {
 		return result;
 	}
 
-	@Job(cron = "* 8,9,10,11,12,13,14,15,16,17,18")
+	@Job(cron = "* 10,11,12,13,14,15,16,17,18")
 	public CronResult runMarketing() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.misc_listClient);
