@@ -261,7 +261,7 @@ public class MatchDayService {
 						final Instant startDate = Instant
 								.ofEpochSecond(matchDays.get(i).get("fixture").get("timestamp").asLong());
 						if (startDate.plus(Duration.ofHours(8)).isAfter(Instant.now())
-								&& startDate.plus(Duration.ofHours(2)).isBefore(Instant.now())) {
+								&& startDate.plus(Duration.ofHours(10)).isBefore(Instant.now())) {
 							final QueryParams params = new QueryParams(Query.misc_listMarketing);
 							params.setSearch(
 									"clientMarketing.startDate=cast('" + startDate
