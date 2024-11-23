@@ -322,7 +322,7 @@ public class EventService {
 		return result;
 	}
 
-	@Job(cron = "* 10,11,12,13,14,15,16,17,18")
+	@Job(cron = "* 8,9,10,11,12,13,14,15,16,17,18")
 	public CronResult runMarketing() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.misc_listClient);
@@ -360,10 +360,13 @@ public class EventService {
 							break;
 						} else {
 							final Event event = repository.one(Event.class, (BigInteger) events.get(0).get("event.id"));
-							event.setPublishId(null);
-							if (publish(event)) {
-								result.body += client.getId() + "\n";
-								break;
+							if (Instant.ofEpochMilli(event.getModifiedAt().getTime()).plus(Duration.ofHours(4))
+									.isBefore(Instant.now())) {
+								event.setPublishId(null);
+								if (publish(event)) {
+									result.body += client.getId() + "\n";
+									break;
+								}
 							}
 						}
 					}
