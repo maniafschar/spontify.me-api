@@ -322,7 +322,7 @@ public class EventService {
 		return result;
 	}
 
-	@Job(cron = "* 8,9,10,11,12,13,14,15,16,17,18")
+	@Job(cron = "* 8,9,10,11,12,13,14,15,16,17,18,19,20")
 	public CronResult runMarketing() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.misc_listClient);
@@ -349,7 +349,7 @@ public class EventService {
 							event.setContactId(BigInteger.valueOf(contactId));
 							event.setDescription(text.get((int) (Math.random() * text.size() % text.size())).asText());
 							event.setStartDate(new Timestamp(Instant.parse(date.getYear() + "-" + date.getMonthValue()
-									+ "-" + date.getDayOfMonth() + "T" + (int) (16 + Math.random() * 5) + (":"
+									+ "-" + date.getDayOfMonth() + "T" + (int) (19 + Math.random() * 2) + (":"
 											+ ((int) (Math.random() * 4) % 4) * 15).replace(":0", ":00")
 									+ ":00.00Z")
 									.toEpochMilli()));
