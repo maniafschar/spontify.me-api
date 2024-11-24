@@ -360,7 +360,10 @@ public class EventService {
 							break;
 						} else {
 							final Event event = repository.one(Event.class, (BigInteger) events.get(0).get("event.id"));
-							if (Instant.ofEpochMilli(event.getModifiedAt().getTime()).plus(Duration.ofHours(4))
+							if (Instant
+									.ofEpochMilli((event.getModifiedAt() == null ? event.getCreatedAt()
+											: event.getModifiedAt()).getTime())
+									.plus(Duration.ofHours(4))
 									.isBefore(Instant.now())) {
 								event.setPublishId(null);
 								if (publish(event)) {
