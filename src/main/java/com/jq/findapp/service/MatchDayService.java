@@ -311,7 +311,7 @@ public class MatchDayService {
 								clientMarketing.setCreateResult(true);
 								clientMarketing.setStartDate(new Timestamp(startDate.toEpochMilli()));
 								clientMarketing
-										.setEndDate(new Timestamp(startDate.plus(Duration.ofHours(18)).toEpochMilli()));
+										.setEndDate(new Timestamp(startDate.plus(Duration.ofDays(1)).toEpochMilli()));
 								final String endDate = formatDate(
 										clientMarketing.getEndDate().getTime() / 1000 + 10 * 60, null);
 								clientMarketing.setClientId(clientId);
@@ -403,41 +403,6 @@ public class MatchDayService {
 					repository.save(clientMarketingResult);
 			}
 			return result.trim();
-		}
-
-		private String updateMatchdays(final BigInteger clientId) throws Exception {
-			final JsonNode json = Json.toNode(Attachment.resolve(repository.one(Client.class, clientId).getStorage()));
-			String result = "";
-			if (json.has("matchDays")) {
-				for (int i2 = 0; i2 < json.get("matchDays").size(); i2++) {
-					final String label = "team=" + json.get("matchDays").get(i2).asInt() + "&season=" + currentSeason();
-					final JsonNode matchDays = get(label);
-					if (matchDays != null) {
-						final QueryParams params = new QueryParams(Query.misc_listStorage);
-						for (int i = 0; i < matchDays.size(); i++) {
-							if ("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())
-									&& matchDays.get(i).get("fixture").get("timestamp")
-											.asLong() > System.currentTimeMillis() / 1000
-									&& Instant.ofEpochSecond(
-											matchDays.get(i).get("fixture").get("timestamp").asLong())
-											.plus(Duration.ofHours(6)).isBefore(Instant.now())) {
-								params.setSearch("storage.label='" + STORAGE_PREFIX + label + "'");
-								final Result list = repository.list(params);
-								if (list.size() > 0) {
-									final Storage storage = repository.one(Storage.class,
-											(BigInteger) list.get(0).get("storage.id"));
-									storage.setStorage("");
-									repository.save(storage);
-									get(label);
-								}
-								result += "|" + json.get("matchDays").get(i2).asInt();
-								break;
-							}
-						}
-					}
-				}
-			}
-			return result.length() > 0 ? "\nmatchdays: " + result.substring(1) : result;
 		}
 
 		private String getLine(final int x, final String singular, final String plural) {
@@ -760,11 +725,10 @@ public class MatchDayService {
 							result.body += "\nprediction: " + id;
 						id = synchronize.playerOfTheMatch(clientId, teamId);
 						if (id != null)
-							result.body += "\npoll: " + id;
+							result.body += "\nplayerOfTheMatch: " + id;
 						final String s = synchronize.result(clientId);
 						if (s.length() > 0)
-							result.body += "\nresultAndNotify: " + s;
-						result.body += synchronize.updateMatchdays(clientId);
+							result.body += "\nresult: " + s;
 					} catch (final Exception e) {
 						if (result.exception == null)
 							result.exception = e;
