@@ -75,7 +75,7 @@ public class MatchDayServiceTest {
 	public void poll() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
-		((MatchDayServiceMock) matchDayService).offset = -2 * 60 * 60;
+		((MatchDayServiceMock) matchDayService).offset = -9 * 60 * 60;
 		final BigInteger clientMarketingId = matchDayService.synchronize.playerOfTheMatch(BigInteger.ONE, 0);
 
 		// when

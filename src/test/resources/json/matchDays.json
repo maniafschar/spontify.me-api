@@ -1037,7 +1037,7 @@
 				"referee": "Deniz Aytekin, Germany",
 				"timezone": "UTC",
 				"date": "2023-11-04T17:30:00+00:00",
-				"timestamp": 1699119000,
+				"timestamp": "{date}",
 				"periods": {
 					"first": 1699119000,
 					"second": 1699122600

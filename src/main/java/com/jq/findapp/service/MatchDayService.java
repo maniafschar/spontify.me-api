@@ -334,6 +334,7 @@ public class MatchDayService {
 		private boolean anyPlayerWith90Minutes(JsonNode players) {
 			if (players.get(0) == null)
 				return false;
+			players = players.get(0).get("players");
 			for (int i = 0; i < players.size(); i++) {
 				final JsonNode statistics = players.get(i).get("statistics").get(0);
 				if (!statistics.get("games").get("minutes").isNull()
