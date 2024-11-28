@@ -258,10 +258,10 @@ public class MatchDayService {
 			if (matchDays != null) {
 				for (int i = 0; i < matchDays.size(); i++) {
 					if ("FT".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())) {
-						final Instant startDate = Instant
-								.ofEpochSecond(matchDays.get(i).get("fixture").get("timestamp").asLong());
-						if (startDate.plus(Duration.ofHours(12)).isAfter(Instant.now())
-								&& startDate.plus(Duration.ofDays(5)).isBefore(Instant.now())) {
+						final Instant startDate = Instant.ofEpochSecond(matchDays.get(i)
+								.get("fixture").get("timestamp").asLong()).plus(Duration.ofHours(12));
+						if (startDate.isAfter(Instant.now())
+								&& startDate.plus(Duration.ofDays(4)).isBefore(Instant.now())) {
 							final QueryParams params = new QueryParams(Query.misc_listMarketing);
 							params.setSearch(
 									"clientMarketing.startDate=cast('" + startDate
