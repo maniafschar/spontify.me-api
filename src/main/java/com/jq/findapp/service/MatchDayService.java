@@ -259,7 +259,7 @@ public class MatchDayService {
 				for (int i = 0; i < matchDays.size(); i++) {
 					if ("FT".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())) {
 						final Instant startDate = Instant.ofEpochSecond(matchDays.get(i)
-								.get("fixture").get("timestamp").asLong()).plus(Duration.ofHours(12));
+								.get("fixture").get("timestamp").asLong()).plus(Duration.ofHours(8));
 						if (startDate.isBefore(Instant.now())
 								&& startDate.plus(Duration.ofDays(4)).isAfter(Instant.now())) {
 							final QueryParams params = new QueryParams(Query.misc_listMarketing);
@@ -271,7 +271,7 @@ public class MatchDayService {
 								break;
 							final JsonNode matchDay = get("id=" + matchDays.get(i).get("fixture").get("id").asText())
 									.get(0);
-							if (matchDay != null && matchDay.findPath("players").get(0) != null) {
+							if (matchDay != null && anyPlayerWith90Minutes(matchDay.findPath("players"))) {
 								JsonNode players = matchDay.findPath("players");
 								players = players.get(players.get(0).get("team").get("id").asInt() == teamId ? 0 : 1)
 										.get("players");
@@ -309,9 +309,10 @@ public class MatchDayService {
 								final ClientMarketing clientMarketing = new ClientMarketing();
 								clientMarketing.setSkills("9." + teamId);
 								clientMarketing.setCreateResult(true);
-								clientMarketing.setStartDate(new Timestamp(startDate.toEpochMilli()));
+								clientMarketing.setStartDate(new Timestamp(System.currentTimeMillis()));
 								clientMarketing
-										.setEndDate(new Timestamp(startDate.plus(Duration.ofDays(1)).toEpochMilli()));
+										.setEndDate(
+												new Timestamp(Instant.now().plus(Duration.ofDays(1)).toEpochMilli()));
 								final String endDate = formatDate(
 										clientMarketing.getEndDate().getTime() / 1000 + 10 * 60, null);
 								clientMarketing.setClientId(clientId);
@@ -328,6 +329,18 @@ public class MatchDayService {
 				}
 			}
 			return null;
+		}
+
+		private boolean anyPlayerWith90Minutes(JsonNode players) {
+			if (players.get(0) == null)
+				return false;
+			for (int i = 0; i < players.size(); i++) {
+				final JsonNode statistics = players.get(i).get("statistics").get(0);
+				if (!statistics.get("games").get("minutes").isNull()
+						&& statistics.get("games").get("minutes").asInt() >= 90)
+					return true;
+			}
+			return false;
 		}
 
 		private void playerOfTheMatchAddAnswers(final List<Answer> answers, final JsonNode players) {
