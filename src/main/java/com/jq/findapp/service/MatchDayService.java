@@ -264,7 +264,7 @@ public class MatchDayService {
 								&& startDate.plus(Duration.ofDays(4)).isAfter(Instant.now())) {
 							final QueryParams params = new QueryParams(Query.misc_listMarketing);
 							params.setSearch(
-									"clientMarketing.startDate=cast('" + startDate
+									"clientMarketing.startDate>=cast('" + startDate
 											+ "' as timestamp) and clientMarketing.clientId=" + clientId
 											+ " and clientMarketing.skills='9." + teamId + "'");
 							if (repository.list(params).size() > 0)
