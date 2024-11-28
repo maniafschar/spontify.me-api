@@ -19,6 +19,7 @@ import com.jq.findapp.entity.ClientMarketing.Question;
 import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.ClientMarketingResult.PollResult;
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.ContactMarketing;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
@@ -198,7 +199,6 @@ public class MarketingService {
 
 	public synchronized ClientMarketingResult synchronizeResult(final BigInteger clientMarketingId) {
 		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
-		final Poll poll = Json.toObject(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
 		if (!clientMarketing.getCreateResult())
 			return null;
 		final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
@@ -215,6 +215,22 @@ public class MarketingService {
 		params.setQuery(Query.contact_listMarketing);
 		params.setSearch("contactMarketing.clientMarketingId=" + clientMarketingId);
 		result = repository.list(params);
+		final Poll poll = Json.toObject(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
+		if (result.size() == 0) {
+			final QueryParams params2 = new QueryParams(Query.contact_listId);
+			params2.setSearch("contact.clientId=" + clientMarketing.getClientId() + " and contact.id<100");
+			final Result contacts = repository.list(params2);
+			for (int i = 0; i < 5 && i < contacts.size(); i++) {
+				final ContactMarketing contactMarketing = new ContactMarketing();
+				contactMarketing.setClientMarketingId(clientMarketingId);
+				contactMarketing.setContactId((BigInteger) contacts.get(i).get("contact.id"));
+				contactMarketing.setFinished(true);
+				contactMarketing.setStorage(
+						"{\"q0\":{\"a\":[" + (int) (Math.random() * poll.questions.get(0).answers.size()) + "]}}");
+				repository.save(contactMarketing);
+			}
+			result = repository.list(params);
+		}
 		final PollResult pollResult = new PollResult();
 		pollResult.participants = result.size();
 		pollResult.finished = 0;
