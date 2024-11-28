@@ -257,11 +257,11 @@ public class MatchDayService {
 			final JsonNode matchDays = get("team=" + teamId + "&season=" + currentSeason());
 			if (matchDays != null) {
 				for (int i = 0; i < matchDays.size(); i++) {
-					if ("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())) {
+					if ("FT".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())) {
 						final Instant startDate = Instant
 								.ofEpochSecond(matchDays.get(i).get("fixture").get("timestamp").asLong());
-						if (startDate.plus(Duration.ofHours(8)).isAfter(Instant.now())
-								&& startDate.plus(Duration.ofHours(12)).isBefore(Instant.now())) {
+						if (startDate.plus(Duration.ofHours(12)).isAfter(Instant.now())
+								&& startDate.plus(Duration.ofDays(5)).isBefore(Instant.now())) {
 							final QueryParams params = new QueryParams(Query.misc_listMarketing);
 							params.setSearch(
 									"clientMarketing.startDate=cast('" + startDate
