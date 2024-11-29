@@ -59,7 +59,7 @@ public class DbService {
 			long time = System.currentTimeMillis();
 			repository.executeUpdate(
 					"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and contactNotification.createdAt>cast('"
-							+ Instant.now().minus(Duration.ofMinutes(30))
+							+ Instant.now().minus(Duration.ofMinutes(30)).toString().substring(0, 19)
 							+ "' as timestamp) and (select modifiedAt from Contact contact where contact.id=contactNotification.contactId)>contactNotification.createdAt");
 			result.body += (System.currentTimeMillis() - time) + " ";
 			time = System.currentTimeMillis();
@@ -71,7 +71,7 @@ public class DbService {
 					"update Contact set timezone='" + Strings.TIME_OFFSET + "' where timezone is null");
 			result.body += (System.currentTimeMillis() - time) + " ";
 			time = System.currentTimeMillis();
-			final Instant d = Instant.now().minus(Duration.ofDays(183));
+			final String d = Instant.now().minus(Duration.ofDays(183)).toString().substring(0, 19);
 			repository.executeUpdate(
 					"update ContactToken set token='' where modifiedAt is not null and modifiedAt<cast('" + d
 							+ "' as timestamp) or modifiedAt is null and createdAt<cast('" + d + "' as timestamp)");
