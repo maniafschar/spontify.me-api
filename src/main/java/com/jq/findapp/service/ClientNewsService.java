@@ -7,7 +7,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.jq.findapp.entity.ClientNews;
@@ -48,7 +47,6 @@ public class ClientNewsService {
 							TextId.notification_clientNews, "news=" + clientNews.getId(),
 							clientNews.getSource() + ": " + clientNews.getDescription());
 				});
-				return null;
 			});
 		}
 	}
