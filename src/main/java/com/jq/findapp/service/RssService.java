@@ -48,7 +48,7 @@ public class RssService {
 	private NotificationService notificationService;
 
 	@Job
-	public CronResult run() {
+	public CronResult job() {
 		final CronResult result = new CronResult();
 		final Result list = this.repository.list(new QueryParams(Query.misc_listClient));
 		final List<CompletableFuture<ImportFeed>> futures = new ArrayList<>();

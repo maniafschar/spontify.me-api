@@ -46,7 +46,7 @@ public class ImportSportsBarService {
 	private static final String URL2 = "https://api.sportsbarfinder.net/map?rq=";
 
 	@Job(cron = "0 3")
-	public CronResult run() {
+	public CronResult job() {
 		final CronResult result = new CronResult();
 		final Results results = new Results();
 		try {
@@ -80,7 +80,7 @@ public class ImportSportsBarService {
 		return result;
 	}
 
-	public CronResult runFetch() {
+	public CronResult jobFetch() {
 		final CronResult result = new CronResult();
 		final double longitudeMin = 47.27, longitudeMax = 54.92,
 				latitudeMin = 5.87, latitudeMax = 15.03, delta = 0.02;
@@ -118,7 +118,7 @@ public class ImportSportsBarService {
 	}
 
 	@Job
-	public CronResult runImport() {
+	public CronResult jobImport() {
 		final CronResult result = new CronResult();
 		int count = 0;
 		final List<String> files = Arrays.asList(new File("dazn").list());

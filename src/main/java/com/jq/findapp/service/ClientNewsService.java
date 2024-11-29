@@ -31,7 +31,7 @@ public class ClientNewsService {
 		if (clientNews.getPublish() != null
 				&& (clientNews.getNotified() == null || !clientNews.getNotified())
 				&& !Strings.isEmpty(clientNews.getSkills())
-		    		&& !clientNews.getPublish().after(new Timestamp(Instant.now().toEpochMilli()))) {
+				&& !clientNews.getPublish().after(new Timestamp(Instant.now().toEpochMilli()))) {
 			clientNews.setNotified(true);
 			repository.save(clientNews);
 			CompletableFuture.runAsync(() -> {
@@ -52,7 +52,7 @@ public class ClientNewsService {
 	}
 
 	@Job
-	public CronResult run() {
+	public CronResult job() {
 		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.misc_listClient);

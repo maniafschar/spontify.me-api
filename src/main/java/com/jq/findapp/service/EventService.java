@@ -81,7 +81,7 @@ public class EventService {
 	}
 
 	@Job
-	public CronResult runMatch() {
+	public CronResult jobMatch() {
 		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.contact_listId);
@@ -142,7 +142,7 @@ public class EventService {
 	}
 
 	@Job
-	public CronResult run() {
+	public CronResult job() {
 		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.event_listParticipateRaw);
@@ -263,7 +263,7 @@ public class EventService {
 	}
 
 	@Job(cron = "40 5")
-	public CronResult runImport() {
+	public CronResult jobImport() {
 		final CronResult result = new CronResult();
 		try {
 			final BigInteger clientId = BigInteger.ONE;
@@ -275,7 +275,7 @@ public class EventService {
 	}
 
 	@Job
-	public CronResult runPublish() {
+	public CronResult jobPublish() {
 		final CronResult result = new CronResult();
 		try {
 			final BigInteger clientId = BigInteger.ONE;
@@ -287,7 +287,7 @@ public class EventService {
 	}
 
 	@Job(cron = "40 23")
-	public CronResult runSeries() {
+	public CronResult jobSeries() {
 		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.event_listId);
@@ -323,7 +323,7 @@ public class EventService {
 	}
 
 	@Job(cron = "* 8,9,10,11,12,13,14,15,16,17,18,19,20")
-	public CronResult runMarketing() {
+	public CronResult jobMarketing() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.misc_listClient);
 		final Result list = repository.list(params);

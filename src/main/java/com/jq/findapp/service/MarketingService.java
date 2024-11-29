@@ -49,7 +49,7 @@ public class MarketingService {
 	private Text text;
 
 	@Job(group = Group.Two)
-	public CronResult run() {
+	public CronResult job() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
 		params.setUser(new Contact());
@@ -126,7 +126,7 @@ public class MarketingService {
 	}
 
 	@Job(group = Group.Two)
-	public CronResult runResult() {
+	public CronResult jobResult() {
 		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);

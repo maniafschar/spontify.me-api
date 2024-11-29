@@ -47,7 +47,7 @@ public class ImportLogService {
 	private static final Map<String, Integer> linesRead = new HashMap<>();
 
 	@Job
-	public CronResult run() {
+	public CronResult job() {
 		final CronResult result = new CronResult();
 		try {
 			if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) < 1

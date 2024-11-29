@@ -54,7 +54,7 @@ public class ChatService {
 	}
 
 	@Job(group = Group.Four)
-	public CronResult run() {
+	public CronResult job() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.contact_chat);
 		params.setSearch(

@@ -68,7 +68,7 @@ public class MarketingLocationService {
 	}
 
 	@Job(cron = "* 6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21")
-	public CronResult run() {
+	public CronResult job() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
 		params.setLimit(0);
@@ -149,7 +149,7 @@ public class MarketingLocationService {
 	}
 
 	@Job(cron = "30 17")
-	public CronResult runUnfinished() {
+	public CronResult jobUnfinished() {
 		return sendEmails("contactMarketing.finished=false and contactMarketing.createdAt>cast('"
 				+ Instant.now().minus(Duration.ofDays(14)).toString()
 				+ "' as timestamp) and contactMarketing.createdAt<cast('" +
@@ -162,7 +162,7 @@ public class MarketingLocationService {
 	}
 
 	@Job(cron = "10 19")
-	public CronResult runSent() {
+	public CronResult jobSent() {
 		return sendEmails(
 				"contactMarketing.createdAt<cast('" + Instant.parse("2024-09-04T05:00:00.00Z").toString()
 						+ "' as timestamp)",
@@ -183,7 +183,7 @@ public class MarketingLocationService {
 	}
 
 	@Job(cron = "40 17")
-	public CronResult runCooperation() {
+	public CronResult jobCooperation() {
 		return sendEmails(
 				"1=1",
 				"Dauerhaft mehr Gäste durch Fanclub!", "Cooperation",

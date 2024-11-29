@@ -193,7 +193,7 @@ public class CronService {
 		}
 	}
 
-	public CronResult run(final String classname) throws Exception {
+	public CronResult job(final String classname) throws Exception {
 		final String[] s = classname.split("\\.");
 		final Object clazz = getClass().getDeclaredField(s[0]).get(this);
 		final Method method = clazz.getClass().getDeclaredMethod(s[1]);

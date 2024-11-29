@@ -27,7 +27,7 @@ public class SitemapService {
 	private Repository repository;
 
 	@Job(cron = "0 20", group = Group.Four)
-	public CronResult run() {
+	public CronResult job() {
 		final CronResult result = new CronResult();
 		repository.list(new QueryParams(Query.misc_listClient)).forEach(e -> {
 			try {

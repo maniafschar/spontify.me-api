@@ -35,7 +35,7 @@ public class IpService {
 	}
 
 	@Job(group = Group.Four)
-	public CronResult run() {
+	public CronResult job() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.misc_listIp);
 		params.setSearch("ip.longitude=0 and ip.latitude=0");

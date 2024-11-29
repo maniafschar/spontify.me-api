@@ -280,7 +280,7 @@ public class ImportLocationsService {
 		return null;
 	}
 
-	public CronResult runImage() {
+	public CronResult jobImage() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setSearch("location.image is null");
@@ -346,7 +346,7 @@ public class ImportLocationsService {
 	}
 
 	@Job
-	public CronResult run() {
+	public CronResult job() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setSearch(

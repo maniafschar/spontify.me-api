@@ -257,7 +257,7 @@ public class EngagementService {
 	}
 
 	@Job(cron = "40 10")
-	public CronResult runRegistration() {
+	public CronResult jobRegistration() {
 		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.contact_listId);
@@ -300,7 +300,7 @@ public class EngagementService {
 	}
 
 	@Job(group = Group.Four)
-	public CronResult run() {
+	public CronResult job() {
 		final CronResult result = new CronResult();
 		try {
 			resetChatInstallCurrentVersion();
@@ -392,7 +392,7 @@ public class EngagementService {
 	}
 
 	@Job(group = Group.Three)
-	public CronResult runNearBy() {
+	public CronResult jobNearBy() {
 		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.contact_listId);
