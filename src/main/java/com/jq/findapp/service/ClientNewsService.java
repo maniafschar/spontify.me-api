@@ -35,7 +35,7 @@ public class ClientNewsService {
 		    		&& !clientNews.getPublish().after(new Timestamp(Instant.now().toEpochMilli()))) {
 			clientNews.setNotified(true);
 			repository.save(clientNews);
-			CompletableFuture.supplyAsync(() -> {
+			CompletableFuture.runAsync(() -> {
 				final QueryParams params = new QueryParams(Query.contact_listId);
 				params.setSearch(
 						"contact.clientId=" + clientNews.getClientId()
@@ -48,6 +48,7 @@ public class ClientNewsService {
 							TextId.notification_clientNews, "news=" + clientNews.getId(),
 							clientNews.getSource() + ": " + clientNews.getDescription());
 				});
+				return null;
 			});
 		}
 	}
