@@ -176,7 +176,7 @@ public class MarketingService {
 			params.setSearch("contact.clientId=" + clientMarketing.getClientId() + " and contact.id<100");
 			final Result contacts = repository.list(params);
 			final Poll poll = Json.toObject(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
-			for (int i2 = 0; i2 < 5 && i2 < contacts.size(); i2++) {
+			for (int i = 0; i < 5 && i < contacts.size(); i++) {
 				final ContactMarketing contactMarketing = new ContactMarketing();
 				contactMarketing.setClientMarketingId(clientMarketing.getClientId());
 				contactMarketing.setContactId((BigInteger) contacts.get(i).get("contact.id"));
