@@ -7,8 +7,6 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -60,7 +58,9 @@ public class DbService {
 		try {
 			long time = System.currentTimeMillis();
 			repository.executeUpdate(
-					"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and TIMESTAMPDIFF(MINUTE,contactNotification.createdAt,current_timestamp)>30 and (select modifiedAt from Contact contact where contact.id=contactNotification.contactId)>contactNotification.createdAt");
+					"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and contactNotification.createdAt>cast('"
+							+ Instant.now().minus(Duration.ofMinutes(30))
+							+ "' as timestamp) and (select modifiedAt from Contact contact where contact.id=contactNotification.contactId)>contactNotification.createdAt");
 			result.body += (System.currentTimeMillis() - time) + " ";
 			time = System.currentTimeMillis();
 			repository.executeUpdate(
@@ -71,7 +71,7 @@ public class DbService {
 					"update Contact set timezone='" + Strings.TIME_OFFSET + "' where timezone is null");
 			result.body += (System.currentTimeMillis() - time) + " ";
 			time = System.currentTimeMillis();
-			final LocalDate d = LocalDate.ofInstant(Instant.now().minus(Duration.ofDays(183)), ZoneId.systemDefault());
+			final Instant d = Instant.now().minus(Duration.ofDays(183));
 			repository.executeUpdate(
 					"update ContactToken set token='' where modifiedAt is not null and modifiedAt<cast('" + d
 							+ "' as timestamp) or modifiedAt is null and createdAt<cast('" + d + "' as timestamp)");
