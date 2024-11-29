@@ -94,6 +94,7 @@ public class CronService {
 		Group group() default Group.One;
 
 		/**
+		 * <pre>
 		 * 1 2 3 4 5
 		 * ┬ ┬ ┬ ┬ ┬
 		 * │ │ │ │ │
@@ -102,6 +103,7 @@ public class CronService {
 		 * │ │ └──────── Day (1-31)
 		 * │ └────────── Hour (0-23)
 		 * └──────────── Minute (0-59)
+		 * </pre>
 		 * 
 		 * e.g.: 10,40 0 1,15
 		 */
