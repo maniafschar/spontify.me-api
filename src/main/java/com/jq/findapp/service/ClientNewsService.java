@@ -12,8 +12,11 @@ import org.springframework.stereotype.Service;
 import com.jq.findapp.entity.ClientNews;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.CronService.CronResult;
+import com.jq.findapp.service.CronService.Job;
 import com.jq.findapp.util.Text.TextId;
 
 @Service
@@ -56,4 +59,25 @@ public class ClientNewsService {
 		}
 	}
 
+	@Job
+	public CronResult run() {
+		final CronResult result = new CronResult();
+		try {
+			final QueryParams params = new QueryParams(Query.misc_listClient);
+			final Result clients = repository.list(params);
+			params.setUser(new Contact());
+			params.setQuery(Query.misc_listNews);
+			params.setSearch(
+					"clientNews.notified=false and clientNews.publish<=cast('" + Instant.now() + "' as timestamp)");
+			for (int i = 0; i < clients.size(); i++) {
+				params.getUser().setClientId((BigInteger) clients.get(i).get("client.id"));
+				final Result news = repository.list(params);
+				for (int i2 = 0; i2 < news.size(); i2++)
+					notify(repository.one(ClientNews.class, (BigInteger) news.get(i2).get("clientNews.id")));
+			}
+		} catch (final Exception e) {
+			result.exception = e;
+		}
+		return result;
+	}
 }

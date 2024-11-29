@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.entity.Client;
-import com.jq.findapp.entity.ClientNews;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
@@ -71,20 +70,11 @@ public class DbService {
 							+ "' as timestamp) or modifiedAt is null and createdAt<cast('" + d + "' as timestamp)");
 			final QueryParams params = new QueryParams(Query.misc_listClient);
 			final Result list = repository.list(params);
-			params.setUser(new Contact());
-			params.setQuery(Query.misc_listNews);
-			params.setSearch(
-					"clientNews.notified=false and clientNews.publish<=cast('" + Instant.now() + "' as timestamp)");
 			String clientUpdates = "";
 			for (int i = 0; i < list.size(); i++) {
 				final Client client = repository.one(Client.class, (BigInteger) list.get(i).get("client.id"));
 				if (updateClient(client))
 					clientUpdates += "|" + client.getId();
-				params.getUser().setClientId(client.getId());
-				final Result news = repository.list(params);
-				for (int i2 = 0; i2 < news.size(); i2++)
-					clientNewsService.notify(
-							repository.one(ClientNews.class, (BigInteger) news.get(i2).get("clientNews.id")));
 			}
 			if (clientUpdates.length() > 0)
 				result.body += (result.body.length() > 0 ? "\n" : "") + "ClientUpdate:"

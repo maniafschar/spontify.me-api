@@ -41,9 +41,12 @@ public class CronService {
 	@Autowired
 	private Repository repository;
 
-	// 13 executable jobs
+	// 14 executable jobs
 	@Autowired
 	private ChatService chatService;
+
+	@Autowired
+	private ClientNewsService clientNewsService;
 
 	@Autowired
 	private DbService dbService;
@@ -205,6 +208,7 @@ public class CronService {
 	public void run() {
 		final Map<Group, List<JobExecuter>> map = new HashMap<>();
 		list(chatService, map);
+		list(clientNewsService, map);
 		list(dbService, map);
 		list(engagementService, map);
 		list(eventService, map);
