@@ -134,11 +134,11 @@ public class MarketingService {
 					+ "' as timestamp)");
 			params.setLimit(0);
 			final Result clientMarketings = repository.list(params);
+			params.setQuery(Query.contact_listMarketing);
 			for (int i = 0; i < clientMarketings.size(); i++) {
 				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 						(BigInteger) clientMarketings.get(i).get("clientMarketing.id"));
 				sync(clientMarketing);
-				params.setQuery(Query.contact_listMarketing);
 				params.setSearch(
 						"contactMarketing.finished=true and contactMarketing.contactId is not null and contactMarketing.clientMarketingId="
 								+ clientMarketing.getId());
