@@ -110,7 +110,7 @@ public class ImportLocationsServiceTest {
 		repository.save(location);
 
 		// when
-		final CronResult result = importLocationsService.run();
+		final CronResult result = importLocationsService.cron();
 
 		// then
 		assertTrue(result.body.contains(" updated"));

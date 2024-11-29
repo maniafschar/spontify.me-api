@@ -60,11 +60,11 @@ public class MatchDayServiceTest {
 	public void update_twice() throws Exception {
 		// given
 		utils.createContact(BigInteger.valueOf(4));
-		CronResult result = matchDayService.run();
+		CronResult result = matchDayService.cron();
 		assertNull(result.exception);
 
 		// when
-		result = matchDayService.run();
+		result = matchDayService.cron();
 
 		// then
 		assertNull(result.exception);

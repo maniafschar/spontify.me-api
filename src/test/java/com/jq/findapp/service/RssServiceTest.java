@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
-import java.net.URL;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -50,7 +50,7 @@ public class RssServiceTest {
 		final String url = "https://fcbayerntotal.com/feed/";
 
 		// when
-		final JsonNode node = new XmlMapper().readTree(new URL(url)).get("channel").get("item");
+		final JsonNode node = new XmlMapper().readTree(new URI(url).toURL()).get("channel").get("item");
 
 		// then
 		assertTrue(node instanceof ArrayNode);
@@ -164,7 +164,7 @@ public class RssServiceTest {
 	@Test
 	public void image() throws Exception {
 		// given
-		IOUtils.toByteArray(new URL("https://feed.rundschau-online.de/feed/rss/region/index.rss"));
+		IOUtils.toByteArray(new URI("https://feed.rundschau-online.de/feed/rss/region/index.rss").toURL());
 		final String url = "https://fan-club.online/images/icon512.png";
 
 		// when
@@ -209,7 +209,7 @@ public class RssServiceTest {
 		utils.createContact(BigInteger.ONE);
 
 		// when
-		final CronResult result = rssService.run();
+		final CronResult result = rssService.cron();
 
 		// then
 		assertTrue(!Strings.isEmpty(result), result.body);

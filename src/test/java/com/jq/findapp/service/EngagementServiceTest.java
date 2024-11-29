@@ -34,10 +34,10 @@ public class EngagementServiceTest {
 	@Test
 	public void sendChats() throws Exception {
 		// given
-		this.utils.createContact(BigInteger.ONE);
+		utils.createContact(BigInteger.ONE);
 
 		// when
-		this.engagementService.run();
+		engagementService.cron();
 
 		// then no exception
 	}

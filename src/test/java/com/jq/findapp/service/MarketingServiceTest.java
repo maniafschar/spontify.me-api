@@ -79,7 +79,7 @@ public class MarketingServiceTest {
 		repository.save(contactMarketing);
 
 		// when
-		final CronResult result = marketingService.runResult();
+		final CronResult result = marketingService.cronResult();
 
 		// then
 		assertNull(result.exception);
