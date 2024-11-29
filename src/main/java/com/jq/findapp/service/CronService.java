@@ -88,25 +88,25 @@ public class CronService {
 		One, Two, Three, Four, Five
 	}
 
+	/**
+	 * <pre>
+	 * 1 2 3 4 5
+	 * ┬ ┬ ┬ ┬ ┬
+	 * │ │ │ │ │
+	 * │ │ │ │ └──── Weekday (1-7, Sunday = 7)
+	 * │ │ │ └────── Month (1-12)
+	 * │ │ └──────── Day (1-31)
+	 * │ └────────── Hour (0-23)
+	 * └──────────── Minute (0-59)
+	 * </pre>
+	 * 
+	 * e.g.: 10,40 0 1,15
+	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(value = ElementType.METHOD)
 	public static @interface Cron {
 		Group group() default Group.One;
 
-		/**
-		 * <pre>
-		 * 1 2 3 4 5
-		 * ┬ ┬ ┬ ┬ ┬
-		 * │ │ │ │ │
-		 * │ │ │ │ └──── Weekday (1-7, Sunday = 7)
-		 * │ │ │ └────── Month (1-12)
-		 * │ │ └──────── Day (1-31)
-		 * │ └────────── Hour (0-23)
-		 * └──────────── Minute (0-59)
-		 * </pre>
-		 * 
-		 * e.g.: 10,40 0 1,15
-		 */
 		String value() default "";
 	}
 
