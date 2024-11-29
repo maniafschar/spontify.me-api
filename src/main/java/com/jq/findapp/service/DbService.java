@@ -57,8 +57,8 @@ public class DbService {
 		final CronResult result = new CronResult();
 		try {
 			repository.executeUpdate(
-					"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and contactNotification.createdAt>cast('"
-							+ Instant.now().minus(Duration.ofMinutes(30)).toString().substring(0, 19)
+					"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and contactNotification.createdAt<cast('"
+							+ Instant.now().minus(Duration.ofHours(12)).toString().substring(0, 19)
 							+ "' as timestamp) and (select modifiedAt from Contact contact where contact.id=contactNotification.contactId)>contactNotification.createdAt");
 			repository.executeUpdate(
 					"update Contact set age=cast((YEAR(current_timestamp) - YEAR(birthday) - case when MONTH(current_timestamp) < MONTH(birthday) or MONTH(current_timestamp) = MONTH(birthday) and DAY(current_timestamp) < DAY(birthday) then 1 else 0 end) as short) where birthday is not null");
