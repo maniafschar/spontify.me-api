@@ -58,16 +58,25 @@ public class DbService {
 	public CronResult run() {
 		final CronResult result = new CronResult();
 		try {
+			long time = System.currentTimeMillis();
 			repository.executeUpdate(
 					"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and (select modifiedAt from Contact contact where contact.id=contactNotification.contactId)>contactNotification.createdAt and TIMESTAMPDIFF(MINUTE,contactNotification.createdAt,current_timestamp)>30");
+			result.body += (System.currentTimeMillis() - time) + " ";
+			time = System.currentTimeMillis();
 			repository.executeUpdate(
 					"update Contact set age=cast((YEAR(current_timestamp) - YEAR(birthday) - case when MONTH(current_timestamp) < MONTH(birthday) or MONTH(current_timestamp) = MONTH(birthday) and DAY(current_timestamp) < DAY(birthday) then 1 else 0 end) as short) where birthday is not null");
+			result.body += (System.currentTimeMillis() - time) + " ";
+			time = System.currentTimeMillis();
 			repository.executeUpdate(
 					"update Contact set timezone='" + Strings.TIME_OFFSET + "' where timezone is null");
+			result.body += (System.currentTimeMillis() - time) + " ";
+			time = System.currentTimeMillis();
 			final LocalDate d = LocalDate.ofInstant(Instant.now().minus(Duration.ofDays(183)), ZoneId.systemDefault());
 			repository.executeUpdate(
 					"update ContactToken set token='' where modifiedAt is not null and modifiedAt<cast('" + d
 							+ "' as timestamp) or modifiedAt is null and createdAt<cast('" + d + "' as timestamp)");
+			result.body += (System.currentTimeMillis() - time) + " ";
+			time = System.currentTimeMillis();
 			final QueryParams params = new QueryParams(Query.misc_listClient);
 			final Result list = repository.list(params);
 			String clientUpdates = "";
@@ -76,10 +85,13 @@ public class DbService {
 				if (updateClient(client))
 					clientUpdates += "|" + client.getId();
 			}
+			result.body += (System.currentTimeMillis() - time) + " ";
+			time = System.currentTimeMillis();
+			statistics(BigInteger.valueOf(4l));
+			result.body += (System.currentTimeMillis() - time);
 			if (clientUpdates.length() > 0)
 				result.body += (result.body.length() > 0 ? "\n" : "") + "ClientUpdate:"
 						+ clientUpdates.substring(1);
-			statistics(BigInteger.valueOf(4l));
 		} catch (final Exception e) {
 			result.exception = e;
 		}
