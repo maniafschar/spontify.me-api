@@ -137,13 +137,30 @@ public class MarketingService {
 			for (int i = 0; i < clientMarketings.size(); i++) {
 				final ClientMarketing clientMarketing = repository.one(ClientMarketing.class,
 						(BigInteger) clientMarketings.get(i).get("clientMarketing.id"));
+				final Poll poll = Json.toObject(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
+				params.setQuery(Query.contact_listMarketing);
+				params.setSearch("contactMarketing.clientMarketingId=" + clientMarketing.getId());
+				if (repository.list(params).size() == 0) {
+					params.setQuery(Query.contact_listId);
+					params.setSearch("contact.clientId=" + clientMarketing.getClientId() + " and contact.id<100");
+					final Result contacts = repository.list(params);
+					for (int i2 = 0; i2 < 5 && i2 < contacts.size(); i2++) {
+						final ContactMarketing contactMarketing = new ContactMarketing();
+						contactMarketing.setClientMarketingId(clientMarketing.getClientId());
+						contactMarketing.setContactId((BigInteger) contacts.get(i).get("contact.id"));
+						contactMarketing.setFinished(true);
+						contactMarketing.setStorage(
+								"{\"q0\":{\"a\":[" + (int) (Math.random() * poll.questions.get(0).answers.size())
+										+ "]}}");
+						repository.save(contactMarketing);
+					}
+				}
 				synchronizeResult(clientMarketing.getId());
 				params.setQuery(Query.contact_listMarketing);
 				params.setSearch(
 						"contactMarketing.finished=true and contactMarketing.contactId is not null and contactMarketing.clientMarketingId="
 								+ clientMarketing.getId());
 				final Result users = repository.list(params);
-				final Poll poll = Json.toObject(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
 				final List<Object> sent = new ArrayList<>();
 				final String field = "contactMarketing.contactId";
 				for (int i2 = 0; i2 < users.size(); i2++) {
@@ -216,21 +233,6 @@ public class MarketingService {
 		params.setSearch("contactMarketing.clientMarketingId=" + clientMarketingId);
 		result = repository.list(params);
 		final Poll poll = Json.toObject(Attachment.resolve(clientMarketing.getStorage()), Poll.class);
-		if (result.size() == 0) {
-			final QueryParams params2 = new QueryParams(Query.contact_listId);
-			params2.setSearch("contact.clientId=" + clientMarketing.getClientId() + " and contact.id<100");
-			final Result contacts = repository.list(params2);
-			for (int i = 0; i < 5 && i < contacts.size(); i++) {
-				final ContactMarketing contactMarketing = new ContactMarketing();
-				contactMarketing.setClientMarketingId(clientMarketingId);
-				contactMarketing.setContactId((BigInteger) contacts.get(i).get("contact.id"));
-				contactMarketing.setFinished(true);
-				contactMarketing.setStorage(
-						"{\"q0\":{\"a\":[" + (int) (Math.random() * poll.questions.get(0).answers.size()) + "]}}");
-				repository.save(contactMarketing);
-			}
-			result = repository.list(params);
-		}
 		final PollResult pollResult = new PollResult();
 		pollResult.participants = result.size();
 		pollResult.finished = 0;
