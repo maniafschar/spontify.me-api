@@ -36,8 +36,8 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
-import com.jq.findapp.service.CronService.Job;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
@@ -67,8 +67,8 @@ public class MarketingLocationService {
 		public String apply(X x, Y y, Z z);
 	}
 
-	@Job(cron = "* 6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21")
-	public CronResult job() {
+	@Cron("* 6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21")
+	public CronResult cron() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
 		params.setLimit(0);
@@ -148,8 +148,8 @@ public class MarketingLocationService {
 		return result;
 	}
 
-	@Job(cron = "30 17")
-	public CronResult jobUnfinished() {
+	@Cron("30 17")
+	public CronResult cronUnfinished() {
 		return sendEmails("contactMarketing.finished=false and contactMarketing.createdAt>cast('"
 				+ Instant.now().minus(Duration.ofDays(14)).toString()
 				+ "' as timestamp) and contactMarketing.createdAt<cast('" +
@@ -161,8 +161,8 @@ public class MarketingLocationService {
 						+ location.getId() + "&h=" + location.getSecret().hashCode());
 	}
 
-	@Job(cron = "10 19")
-	public CronResult jobSent() {
+	@Cron("10 19")
+	public CronResult cronSent() {
 		return sendEmails(
 				"contactMarketing.createdAt<cast('" + Instant.parse("2024-09-04T05:00:00.00Z").toString()
 						+ "' as timestamp)",
@@ -182,8 +182,8 @@ public class MarketingLocationService {
 						: "/?i=" + location.getId() + "&h=" + location.getSecret().hashCode()));
 	}
 
-	@Job(cron = "40 17")
-	public CronResult jobCooperation() {
+	@Cron("40 17")
+	public CronResult cronCooperation() {
 		return sendEmails(
 				"1=1",
 				"Dauerhaft mehr Gäste durch Fanclub!", "Cooperation",

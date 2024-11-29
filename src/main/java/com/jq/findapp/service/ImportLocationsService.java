@@ -23,8 +23,8 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
-import com.jq.findapp.service.CronService.Job;
 import com.jq.findapp.util.EntityUtil;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
@@ -280,7 +280,7 @@ public class ImportLocationsService {
 		return null;
 	}
 
-	public CronResult jobImage() {
+	public CronResult cronImage() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setSearch("location.image is null");
@@ -345,8 +345,8 @@ public class ImportLocationsService {
 		return false;
 	}
 
-	@Job
-	public CronResult job() {
+	@Cron
+	public CronResult cron() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setSearch(

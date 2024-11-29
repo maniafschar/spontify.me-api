@@ -20,7 +20,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.CronService.Job;
+import com.jq.findapp.service.CronService.Cron;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = { FindappApplication.class, TestConfig.class })
@@ -103,7 +103,7 @@ public class CronServiceTest {
 		final Method method = chatService.getClass().getMethod("run");
 
 		// then
-		assertTrue(method.isAnnotationPresent(Job.class));
+		assertTrue(method.isAnnotationPresent(Cron.class));
 	}
 
 	@Test

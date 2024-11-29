@@ -29,8 +29,8 @@ import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
-import com.jq.findapp.service.CronService.Job;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 
@@ -45,8 +45,8 @@ public class ImportSportsBarService {
 	private static final String URL = "https://skyfinder.sky.de/sf/skyfinder.servlet?";
 	private static final String URL2 = "https://api.sportsbarfinder.net/map?rq=";
 
-	@Job(cron = "0 3")
-	public CronResult job() {
+	@Cron("0 3")
+	public CronResult cron() {
 		final CronResult result = new CronResult();
 		final Results results = new Results();
 		try {
@@ -80,7 +80,7 @@ public class ImportSportsBarService {
 		return result;
 	}
 
-	public CronResult jobFetch() {
+	public CronResult cronFetch() {
 		final CronResult result = new CronResult();
 		final double longitudeMin = 47.27, longitudeMax = 54.92,
 				latitudeMin = 5.87, latitudeMax = 15.03, delta = 0.02;
@@ -117,8 +117,8 @@ public class ImportSportsBarService {
 		return result;
 	}
 
-	@Job
-	public CronResult jobImport() {
+	@Cron
+	public CronResult cronImport() {
 		final CronResult result = new CronResult();
 		int count = 0;
 		final List<String> files = Arrays.asList(new File("dazn").list());

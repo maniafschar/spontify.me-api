@@ -27,9 +27,9 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.service.CronService.Group;
-import com.jq.findapp.service.CronService.Job;
 import com.jq.findapp.util.Score;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
@@ -256,8 +256,8 @@ public class EngagementService {
 		chatTemplates.add(new ChatTemplate(TextId.engagement_like, null, null));
 	}
 
-	@Job(cron = "40 10")
-	public CronResult jobRegistration() {
+	@Cron("40 10")
+	public CronResult cronRegistration() {
 		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.contact_listId);
@@ -299,8 +299,8 @@ public class EngagementService {
 		return false;
 	}
 
-	@Job(group = Group.Four)
-	public CronResult job() {
+	@Cron(group = Group.Four)
+	public CronResult cron() {
 		final CronResult result = new CronResult();
 		try {
 			resetChatInstallCurrentVersion();
@@ -391,8 +391,8 @@ public class EngagementService {
 		}
 	}
 
-	@Job(group = Group.Three)
-	public CronResult jobNearBy() {
+	@Cron(group = Group.Three)
+	public CronResult cronNearBy() {
 		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.contact_listId);

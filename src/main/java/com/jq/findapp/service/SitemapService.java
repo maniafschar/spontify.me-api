@@ -16,9 +16,9 @@ import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.service.CronService.Group;
-import com.jq.findapp.service.CronService.Job;
 import com.jq.findapp.util.Json;
 
 @Service
@@ -26,8 +26,8 @@ public class SitemapService {
 	@Autowired
 	private Repository repository;
 
-	@Job(cron = "0 20", group = Group.Four)
-	public CronResult job() {
+	@Cron(value = "0 20", group = Group.Four)
+	public CronResult cron() {
 		final CronResult result = new CronResult();
 		repository.list(new QueryParams(Query.misc_listClient)).forEach(e -> {
 			try {

@@ -40,8 +40,8 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.repository.listener.EventListener;
+import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
-import com.jq.findapp.service.CronService.Job;
 import com.jq.findapp.service.events.ImportMunich;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Score;
@@ -80,8 +80,8 @@ public class EventService {
 		return answers;
 	}
 
-	@Job
-	public CronResult jobMatch() {
+	@Cron
+	public CronResult cronMatch() {
 		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.contact_listId);
@@ -141,8 +141,8 @@ public class EventService {
 		return result;
 	}
 
-	@Job
-	public CronResult job() {
+	@Cron
+	public CronResult cron() {
 		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.event_listParticipateRaw);
@@ -262,8 +262,8 @@ public class EventService {
 		return repository.list(params).size() >= event.getMaxParticipants().intValue();
 	}
 
-	@Job(cron = "40 5")
-	public CronResult jobImport() {
+	@Cron("40 5")
+	public CronResult cronImport() {
 		final CronResult result = new CronResult();
 		try {
 			final BigInteger clientId = BigInteger.ONE;
@@ -274,8 +274,8 @@ public class EventService {
 		return result;
 	}
 
-	@Job
-	public CronResult jobPublish() {
+	@Cron
+	public CronResult cronPublish() {
 		final CronResult result = new CronResult();
 		try {
 			final BigInteger clientId = BigInteger.ONE;
@@ -286,8 +286,8 @@ public class EventService {
 		return result;
 	}
 
-	@Job(cron = "40 23")
-	public CronResult jobSeries() {
+	@Cron("40 23")
+	public CronResult cronSeries() {
 		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.event_listId);
@@ -322,8 +322,8 @@ public class EventService {
 		return result;
 	}
 
-	@Job(cron = "* 8,9,10,11,12,13,14,15,16,17,18,19,20")
-	public CronResult jobMarketing() {
+	@Cron("* 8,9,10,11,12,13,14,15,16,17,18,19,20")
+	public CronResult cronMarketing() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.misc_listClient);
 		final Result list = repository.list(params);

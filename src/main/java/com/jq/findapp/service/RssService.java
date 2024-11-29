@@ -31,8 +31,8 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
-import com.jq.findapp.service.CronService.Job;
 import com.jq.findapp.util.EntityUtil;
 import com.jq.findapp.util.Strings;
 
@@ -47,8 +47,8 @@ public class RssService {
 	@Autowired
 	private NotificationService notificationService;
 
-	@Job
-	public CronResult job() {
+	@Cron
+	public CronResult cron() {
 		final CronResult result = new CronResult();
 		final Result list = this.repository.list(new QueryParams(Query.misc_listClient));
 		final List<CompletableFuture<ImportFeed>> futures = new ArrayList<>();

@@ -26,9 +26,9 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.service.CronService.Group;
-import com.jq.findapp.service.CronService.Job;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
@@ -48,8 +48,8 @@ public class MarketingService {
 	@Autowired
 	private Text text;
 
-	@Job(group = Group.Two)
-	public CronResult job() {
+	@Cron(group = Group.Two)
+	public CronResult cron() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.misc_listMarketing);
 		params.setUser(new Contact());
@@ -125,8 +125,8 @@ public class MarketingService {
 		return result;
 	}
 
-	@Job(group = Group.Two)
-	public CronResult jobResult() {
+	@Cron(group = Group.Two)
+	public CronResult cronResult() {
 		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);

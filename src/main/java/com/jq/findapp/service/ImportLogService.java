@@ -29,8 +29,8 @@ import com.jq.findapp.entity.Log.LogStatus;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
-import com.jq.findapp.service.CronService.Job;
 import com.jq.findapp.util.Strings;
 
 @Service
@@ -46,8 +46,8 @@ public class ImportLogService {
 
 	private static final Map<String, Integer> linesRead = new HashMap<>();
 
-	@Job
-	public CronResult job() {
+	@Cron
+	public CronResult cron() {
 		final CronResult result = new CronResult();
 		try {
 			if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) < 1

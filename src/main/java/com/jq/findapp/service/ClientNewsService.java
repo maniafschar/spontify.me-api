@@ -15,8 +15,8 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
-import com.jq.findapp.service.CronService.Job;
 import com.jq.findapp.util.Text.TextId;
 
 @Service
@@ -51,8 +51,8 @@ public class ClientNewsService {
 		}
 	}
 
-	@Job
-	public CronResult job() {
+	@Cron
+	public CronResult cron() {
 		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.misc_listClient);

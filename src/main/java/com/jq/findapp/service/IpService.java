@@ -14,9 +14,9 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.service.CronService.Group;
-import com.jq.findapp.service.CronService.Job;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 
@@ -34,8 +34,8 @@ public class IpService {
 		return ip;
 	}
 
-	@Job(group = Group.Four)
-	public CronResult job() {
+	@Cron(group = Group.Four)
+	public CronResult cron() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.misc_listIp);
 		params.setSearch("ip.longitude=0 and ip.latitude=0");

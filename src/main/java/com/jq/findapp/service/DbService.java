@@ -29,9 +29,9 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.service.CronService.Group;
-import com.jq.findapp.service.CronService.Job;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 
@@ -52,8 +52,8 @@ public class DbService {
 	@Value("${spring.datasource.password}")
 	private String password;
 
-	@Job
-	public CronResult job() {
+	@Cron
+	public CronResult cron() {
 		final CronResult result = new CronResult();
 		try {
 			repository.executeUpdate(
@@ -85,8 +85,8 @@ public class DbService {
 		return result;
 	}
 
-	@Job(cron = "30 0")
-	public CronResult jobCleanUp() {
+	@Cron("30 0")
+	public CronResult cronCleanUp() {
 		final CronResult result = new CronResult();
 		try {
 			result.body = repository.cleanUpAttachments();
@@ -96,8 +96,8 @@ public class DbService {
 		return result;
 	}
 
-	@Job(group = Group.Five)
-	public CronResult jobBackup() {
+	@Cron(group = Group.Five)
+	public CronResult cronBackup() {
 		final CronResult result = new CronResult();
 		try {
 			new ProcessBuilder("./backup.sh", user, password).start().waitFor();
@@ -160,8 +160,8 @@ public class DbService {
 			set.accept(matcher.group(1));
 	}
 
-	@Job(cron = "30 4")
-	public CronResult jobStatistics() throws Exception {
+	@Cron("30 4")
+	public CronResult cronStatistics() throws Exception {
 		final CronResult result = new CronResult();
 		final BigInteger clientId = BigInteger.valueOf(4l);
 		final Map<String, Object> data = new HashMap<>();

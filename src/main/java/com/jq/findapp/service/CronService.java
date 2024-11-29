@@ -90,7 +90,7 @@ public class CronService {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(value = ElementType.METHOD)
-	public static @interface Job {
+	public static @interface Cron {
 		Group group() default Group.One;
 
 		/**
@@ -105,7 +105,7 @@ public class CronService {
 		 * 
 		 * e.g.: 10,40 0 1,15
 		 */
-		String cron() default "";
+		String value() default "";
 	}
 
 	public static class CronResult {
@@ -177,8 +177,8 @@ public class CronService {
 	private void list(final Object service, final Map<Group, List<JobExecuter>> map) {
 		final ZonedDateTime now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
 		for (final Method method : service.getClass().getDeclaredMethods()) {
-			if (method.isAnnotationPresent(Job.class)) {
-				final Job job = method.getAnnotation(Job.class);
+			if (method.isAnnotationPresent(Cron.class)) {
+				final Cron job = method.getAnnotation(Cron.class);
 				if (cron(job.cron(), now)) {
 					if (CronResult.class.equals(method.getReturnType()) && method.getParameterCount() == 0) {
 						if (!map.containsKey(job.group()))
@@ -193,11 +193,11 @@ public class CronService {
 		}
 	}
 
-	public CronResult job(final String classname) throws Exception {
+	public CronResult cron(final String classname) throws Exception {
 		final String[] s = classname.split("\\.");
 		final Object clazz = getClass().getDeclaredField(s[0]).get(this);
 		final Method method = clazz.getClass().getDeclaredMethod(s[1]);
-		if (!CronResult.class.equals(method.getReturnType()) || !method.isAnnotationPresent(Job.class))
+		if (!CronResult.class.equals(method.getReturnType()) || !method.isAnnotationPresent(Cron.class))
 			return null;
 		final CronResult result = (CronResult) method.invoke(clazz);
 		LogFilter.body.set(result.toString());
