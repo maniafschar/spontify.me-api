@@ -33,9 +33,15 @@ import com.jq.findapp.util.Strings;
 
 @Service
 public class CronService {
+	private static final Set<String> running = ConcurrentHashMap.newKeySet();
+
+	@Autowired
+	private NotificationService notificationService;
+
 	@Autowired
 	private Repository repository;
 
+	// 13 executable jobs
 	@Autowired
 	private ChatService chatService;
 
@@ -70,37 +76,32 @@ public class CronService {
 	private MarketingLocationService marketingLocationService;
 
 	@Autowired
-	private NotificationService notificationService;
-
-	@Autowired
 	private RssService rssService;
 
 	@Autowired
 	private SitemapService sitemapService;
 
-	private static final Set<String> running = ConcurrentHashMap.newKeySet();
-
 	public static enum Group {
 		One, Two, Three, Four, Five
 	}
 
-	/**
-	 * 1 2 3 4 5
-	 * ┬ ┬ ┬ ┬ ┬
-	 * │ │ │ │ │
-	 * │ │ │ │ └──── Weekday (1-7, Sunday = 7)
-	 * │ │ │ └────── Month (1-12)
-	 * │ │ └──────── Day (1-31)
-	 * │ └────────── Hour (0-23)
-	 * └──────────── Minute (0-59)
-	 * 
-	 * e.g.: 10,40 0 1,15
-	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(value = ElementType.METHOD)
 	public static @interface Job {
 		Group group() default Group.One;
 
+		/**
+		 * 1 2 3 4 5
+		 * ┬ ┬ ┬ ┬ ┬
+		 * │ │ │ │ │
+		 * │ │ │ │ └──── Weekday (1-7, Sunday = 7)
+		 * │ │ │ └────── Month (1-12)
+		 * │ │ └──────── Day (1-31)
+		 * │ └────────── Hour (0-23)
+		 * └──────────── Minute (0-59)
+		 * 
+		 * e.g.: 10,40 0 1,15
+		 */
 		String cron() default "";
 	}
 
