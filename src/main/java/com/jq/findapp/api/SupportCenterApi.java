@@ -181,7 +181,7 @@ public class SupportCenterApi {
 	}
 
 	@PostMapping("run/{classname}")
-	public CronResult cron(@PathVariable final String classname) throws Exception {
+	public CronResult run(@PathVariable final String classname) throws Exception {
 		return cronService.run(classname);
 	}
 

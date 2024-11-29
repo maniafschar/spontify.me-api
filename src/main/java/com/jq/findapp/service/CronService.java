@@ -178,12 +178,12 @@ public class CronService {
 		final ZonedDateTime now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
 		for (final Method method : service.getClass().getDeclaredMethods()) {
 			if (method.isAnnotationPresent(Cron.class)) {
-				final Cron job = method.getAnnotation(Cron.class);
-				if (cron(job.cron(), now)) {
+				final Cron cron = method.getAnnotation(Cron.class);
+				if (cron(cron.value(), now)) {
 					if (CronResult.class.equals(method.getReturnType()) && method.getParameterCount() == 0) {
-						if (!map.containsKey(job.group()))
-							map.put(job.group(), new ArrayList<>());
-						map.get(job.group()).add(new JobExecuter(service, method));
+						if (!map.containsKey(cron.group()))
+							map.put(cron.group(), new ArrayList<>());
+						map.get(cron.group()).add(new JobExecuter(service, method));
 					} else
 						notificationService.createTicket(TicketType.ERROR, "CronDeclaration",
 								service.getClass().getName() + "." + method + " not eligable for @Job annotation!",
@@ -193,7 +193,7 @@ public class CronService {
 		}
 	}
 
-	public CronResult cron(final String classname) throws Exception {
+	public CronResult run(final String classname) throws Exception {
 		final String[] s = classname.split("\\.");
 		final Object clazz = getClass().getDeclaredField(s[0]).get(this);
 		final Method method = clazz.getClass().getDeclaredMethod(s[1]);
