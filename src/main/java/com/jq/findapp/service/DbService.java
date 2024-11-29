@@ -60,7 +60,7 @@ public class DbService {
 		try {
 			long time = System.currentTimeMillis();
 			repository.executeUpdate(
-					"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and (select modifiedAt from Contact contact where contact.id=contactNotification.contactId)>contactNotification.createdAt and TIMESTAMPDIFF(MINUTE,contactNotification.createdAt,current_timestamp)>30");
+					"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and TIMESTAMPDIFF(MINUTE,contactNotification.createdAt,current_timestamp)>30 and (select modifiedAt from Contact contact where contact.id=contactNotification.contactId)>contactNotification.createdAt");
 			result.body += (System.currentTimeMillis() - time) + " ";
 			time = System.currentTimeMillis();
 			repository.executeUpdate(
@@ -86,9 +86,6 @@ public class DbService {
 					clientUpdates += "|" + client.getId();
 			}
 			result.body += (System.currentTimeMillis() - time) + " ";
-			time = System.currentTimeMillis();
-			statistics(BigInteger.valueOf(4l));
-			result.body += (System.currentTimeMillis() - time);
 			if (clientUpdates.length() > 0)
 				result.body += (result.body.length() > 0 ? "\n" : "") + "ClientUpdate:"
 						+ clientUpdates.substring(1);
@@ -173,7 +170,10 @@ public class DbService {
 			set.accept(matcher.group(1));
 	}
 
-	private void statistics(final BigInteger clientId) throws Exception {
+	@Job(cron = "30 4")
+	public CronResult runStatistics() throws Exception {
+		final CronResult result = new CronResult();
+		final BigInteger clientId = BigInteger.valueOf(4l);
 		final Map<String, Object> data = new HashMap<>();
 		final QueryParams params = new QueryParams(Query.misc_statsUser);
 		params.setUser(new Contact());
@@ -190,5 +190,6 @@ public class DbService {
 		data.put("update", Instant.now().toString());
 		IOUtils.write(Json.toString(data),
 				new FileOutputStream("statistics" + clientId + ".json"), StandardCharsets.UTF_8);
+		return result;
 	}
 }
