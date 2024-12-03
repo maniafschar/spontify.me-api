@@ -348,10 +348,13 @@ public class EventService {
 							final Event event = new Event();
 							event.setContactId(BigInteger.valueOf(contactId));
 							event.setDescription(text.get((int) (Math.random() * text.size() % text.size())).asText());
-							event.setStartDate(new Timestamp(Instant.parse(date.getYear() + "-" + date.getMonthValue()
-									+ "-" + date.getDayOfMonth() + "T" + (int) (19 + Math.random() * 2) + (":"
-											+ ((int) (Math.random() * 4) % 4) * 15).replace(":0", ":00")
-									+ ":00.00Z")
+							event.setStartDate(new Timestamp(Instant
+									.parse(date.getYear() + "-" + (date.getMonthValue() < 10 ? "0" : "")
+											+ date.getMonthValue()
+											+ "-" + (date.getDayOfMonth() < 10 ? "0" : "") + date.getDayOfMonth() + "T"
+											+ (int) (19 + Math.random() * 2) + (":"
+													+ ((int) (Math.random() * 4) % 4) * 15).replace(":0", ":00")
+											+ ":00.00Z")
 									.toEpochMilli()));
 							event.setPublish(true);
 							event.setType(EventType.Inquiry);
