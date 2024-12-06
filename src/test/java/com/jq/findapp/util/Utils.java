@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.ContactType;
-import com.jq.findapp.entity.Setting;
+import com.jq.findapp.entity.Storage;
 import com.jq.findapp.repository.Repository;
 
 @Component
@@ -73,9 +73,9 @@ public class Utils {
 		String v = "";
 		for (int i = 1; i < 20; i++)
 			v += "," + i;
-		final Setting setting = new Setting();
+		final Storage setting = new Storage();
 		setting.setLabel("paypal.sandbox");
-		setting.setData(v.substring(1));
+		setting.setStorage(v.substring(1));
 		repository.save(setting);
 	}
 }

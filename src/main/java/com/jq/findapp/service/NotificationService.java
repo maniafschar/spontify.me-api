@@ -272,13 +272,13 @@ public class NotificationService {
 			repository.save(contactTo);
 			return false;
 		} catch (final Exception ex) {
-			final QueryParams params = new QueryParams(Query.misc_setting);
-			params.setSearch("setting.label like 'push.gen.%'");
-			final Result settings = repository.list(params);
+			final QueryParams params = new QueryParams(Query.misc_listStorage);
+			params.setSearch("storage.label like 'push.gen.%'");
+			final Result list = repository.list(params);
 			String setting = "\n\n";
 			try {
-				for (int i = 0; i < settings.size(); i++)
-					setting += Json.toPrettyString(settings.get(i)) + "\n\n";
+				for (int i = 0; i < list.size(); i++)
+					setting += Json.toPrettyString(list.get(i)) + "\n\n";
 				createTicket(TicketType.ERROR, "Push Notification",
 						contactTo.getId() + "\n\n"
 								+ IOUtils.toString(getClass().getResourceAsStream("/template/push.android"),

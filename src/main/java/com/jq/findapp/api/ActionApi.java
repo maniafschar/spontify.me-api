@@ -523,10 +523,10 @@ public class ActionApi {
 	}
 
 	private boolean isPaypalSandbox(final BigInteger user) {
-		final QueryParams params = new QueryParams(Query.misc_setting);
-		params.setSearch("setting.label='paypal.sandbox'");
-		final Map<String, Object> settings = repository.one(params);
-		return settings != null && ("," + settings.get("setting.data") + ",").contains("," + user + ",");
+		final QueryParams params = new QueryParams(Query.misc_listStorage);
+		params.setSearch("storage.label='paypal.sandbox'");
+		final Map<String, Object> storage = repository.one(params);
+		return storage != null && ("," + storage.get("storage.storage") + ",").contains("," + user + ",");
 	}
 
 	private String getPaypalKey(final BigInteger user) {

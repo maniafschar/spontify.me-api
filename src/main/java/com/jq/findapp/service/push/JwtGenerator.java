@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.jq.findapp.entity.Setting;
+import com.jq.findapp.entity.Storage;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
@@ -38,21 +38,21 @@ public class JwtGenerator {
 	protected int getLastGeneration(final String keyId, final boolean reset) throws Exception {
 		final String label = "push.gen." + keyId;
 		long lastGeneration = 0;
-		final QueryParams params = new QueryParams(Query.misc_setting);
-		params.setSearch("setting.label='" + label + "'");
-		final Map<String, Object> settingMap = repository.one(params);
-		final Setting setting;
-		if (settingMap == null) {
-			setting = new Setting();
-			setting.setLabel(label);
+		final QueryParams params = new QueryParams(Query.misc_listStorage);
+		params.setSearch("storage.label='" + label + "'");
+		final Map<String, Object> storageMap = repository.one(params);
+		final Storage storage;
+		if (storageMap == null) {
+			storage = new Storage();
+			storage.setLabel(label);
 		} else {
-			setting = repository.one(Setting.class, (BigInteger) settingMap.get("setting.id"));
-			lastGeneration = Long.valueOf(setting.getData().toString());
+			storage = repository.one(Storage.class, (BigInteger) storageMap.get("storage.id"));
+			lastGeneration = Long.valueOf(storage.getStorage());
 		}
 		if (reset || System.currentTimeMillis() - lastGeneration > TIMEOUT) {
 			lastGeneration = System.currentTimeMillis();
-			setting.setData("" + lastGeneration);
-			repository.save(setting);
+			storage.setStorage("" + lastGeneration);
+			repository.save(storage);
 			token.remove(keyId);
 		}
 		return (int) (lastGeneration / 1000);
