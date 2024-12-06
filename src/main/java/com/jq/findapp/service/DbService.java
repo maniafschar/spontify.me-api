@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -100,7 +101,10 @@ public class DbService {
 	public CronResult cronBackup() {
 		final CronResult result = new CronResult();
 		try {
-			new ProcessBuilder("./backup.sh", user, password).start().waitFor();
+			String tables = "block chat client client_marketing client_marketing_result client_news contact contact_bluetooth contact_chat contact_geo_location_history contact_group contact_group_link contact_link contact_marketing contact_notification contact_referer contact_token contact_video_call contact_visit event event_participate event_rating geo_location ip location location_favorite location_visit storage ticket";
+			if (LocalDateTime.now().getHour() == 23 && LocalDateTime.now().getMinute() > 50)
+				tables += " log ticket";
+			new ProcessBuilder("./backup.sh", user, password, tables).start().waitFor();
 		} catch (final Exception e) {
 			result.exception = e;
 		}
