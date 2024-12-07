@@ -100,7 +100,7 @@ public class CronServiceTest {
 		// given
 
 		// when
-		final Method method = chatService.getClass().getMethod("run");
+		final Method method = chatService.getClass().getMethod("cron");
 
 		// then
 		assertTrue(method.isAnnotationPresent(Cron.class));

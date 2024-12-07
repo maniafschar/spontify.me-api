@@ -100,8 +100,10 @@ public class MarketingServiceTest {
 	public void time() {
 		// given
 		final LocalDate date = LocalDate.now();
-		final String s = date.getYear() + "-" + date.getMonthValue()
-				+ "-" + date.getDayOfMonth() + "T" + (int) (16 + Math.random() * 5) + (":"
+		final String s = date.getYear() + "-" + (date.getMonthValue() < 10 ? "0" : "")
+				+ date.getMonthValue()
+				+ "-" + (date.getDayOfMonth() < 10 ? "0" : "") + date.getDayOfMonth() + "T"
+				+ (int) (19 + Math.random() * 2) + (":"
 						+ ((int) (Math.random() * 4) % 4) * 15).replace(":0", ":00")
 				+ ":00.00Z";
 
