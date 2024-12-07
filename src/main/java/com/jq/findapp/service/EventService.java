@@ -357,6 +357,8 @@ public class EventService {
 											+ ":00.00Z")
 									.toEpochMilli()));
 							event.setPublish(true);
+							event.setLatitude(48.1330090f);
+							event.setLongitude(11.56684f);
 							event.setType(EventType.Inquiry);
 							repository.save(event);
 							result.body += client.getId() + "\n";
