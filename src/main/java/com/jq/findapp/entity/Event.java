@@ -19,6 +19,8 @@ public class Event extends BaseEntity {
 	private BigInteger contactId;
 	private BigInteger locationId;
 	private Boolean publish;
+	private Float latitude;
+	private Float longitude;
 	private Date endDate;
 	private Double price;
 	private Short maxParticipants;
@@ -196,6 +198,22 @@ public class Event extends BaseEntity {
 
 	public void setSeriesId(Long seriesId) {
 		this.seriesId = seriesId;
+	}
+
+	public Float getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(Float latitude) {
+		this.latitude = latitude;
+	}
+
+	public Float getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(Float longitude) {
+		this.longitude = longitude;
 	}
 
 	@Transient
