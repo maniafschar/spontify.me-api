@@ -5,6 +5,8 @@ SELECT
 	event.image,
 	event.imageList,
 	event.locationId,
+	event.latitude,
+	event.longitude,
 	event.maxParticipants,
 	event.price,
 	event.rating,
