@@ -250,7 +250,7 @@ public class MatchDayService {
 					+ "</div>vom <b>"
 					+ formatDate(poll.timestamp, null)
 					+ "</b>. Möchtest Du teilnehmen?";
-			poll.epilog = "Lieben Dank für die Teilnahme!\nDas Ergebnis wird kurz vor dem Spiel hier bekanntgegeben.\n\nLust auf mehr <b>Fan Feeling</b>? In unserer neuen App bauen wir eine neue <b>Fußball Fan Community</b> auf.\n\nMit ein paar wenigen Klicks kannst auch Du dabei sein.";
+			poll.epilog = "Lieben Dank für Deine Teilnahme!\nDas Ergebnis wird kurz vor dem Spiel hier bekanntgegeben.";
 		}
 
 		BigInteger playerOfTheMatch(final BigInteger clientId, final int teamId) throws Exception {
@@ -318,8 +318,8 @@ public class MatchDayService {
 								clientMarketing.setClientId(clientId);
 								clientMarketing.setImage(Attachment.createImage(".png",
 										image.create(poll, "Spieler", repository.one(Client.class, clientId), null)));
-								poll.epilog = "Lieben Dank für die Teilnahme!\nDas Ergebnis wird am " + endDate
-										+ " hier bekanntgegeben.\n\nLust auf mehr <b>Fan Feeling</b>? In unserer neuen App bauen wir eine neue <b>Fußball Fan Community</b> auf.\n\nMit ein paar wenigen Klicks kannst auch Du dabei sein.";
+								poll.epilog = "Lieben Dank für Deine Teilnahme!\nDas Ergebnis wird am " + endDate
+										+ " hier bekanntgegeben.";
 								clientMarketing.setStorage(Json.toString(poll));
 								repository.save(clientMarketing);
 								return clientMarketing.getId();

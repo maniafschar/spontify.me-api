@@ -257,7 +257,7 @@ public class ActionApi {
 
 	@GetMapping("script/{version}")
 	public String script(@PathVariable final String version) throws Exception {
-		return "initialisation.customElementsCss+='input-date {overflow-x:auto;max-width:100%;}';setInterval(function(){var e=ui.q('chatList');if(parseInt(e.style.height)==0&&parseInt(e.getAttribute('toggle'))<new Date().getTime()-500){var e2=document.createElement('chatList');e2.style.display='none';e.parentElement.replaceChild(e2,e);communication.ping()}},1000)";
+		return "communication.afterLogin();";
 	}
 
 	@GetMapping("news")

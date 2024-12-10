@@ -37,9 +37,6 @@ import com.jq.findapp.entity.ContactToken;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.NotificationService.Environment;
-import com.jq.findapp.service.push.Android;
-import com.jq.findapp.service.push.Ios;
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.EncryptionTest;
 import com.jq.findapp.util.Utils;
@@ -53,12 +50,6 @@ public class AuthenticationServiceTest {
 
 	@Autowired
 	private Repository repository;
-
-	@Autowired
-	private Ios ios;
-
-	@Autowired
-	private Android android;
 
 	@Autowired
 	private Utils utils;
@@ -287,33 +278,6 @@ public class AuthenticationServiceTest {
 
 		// then
 		assertTrue(result);
-	}
-
-	public void ios() throws Exception {
-		// given
-		final Contact contact = this.utils.createContact(BigInteger.ONE);
-		contact.setPushToken("722fb09cd97250a33d0046fbd0612045a06e463de8d098158fbe4c80321cfcf9");
-		contact.setClientId(new BigInteger("4"));
-		// System.setProperty("javax.net.debug", "all");
-
-		// when
-		final Environment environmet = this.ios.send(contact.getPseudonym(), contact, "uzgku", "news=823", 12, "1");
-
-		// then
-		assertEquals(Environment.Development, environmet);
-	}
-
-	@Test
-	public void android() throws Exception {
-		// given
-		final Contact contact = this.utils.createContact(BigInteger.ONE);
-		contact.setPushToken(
-				"ffYAqQb7RtWNNbECnb7-AU:APA91bFdialtf4-nnmLubNr5lFbg2vSAfnAscCpp_snHzxiYZTzlbuC43gRwtseWr92pbd3ViHU5X4VgCA4INRBJyGiAEcFxFXFIAhOWDQVsO2cC402onC3KmPJrafNcPEZ9J7Rjr_u4");
-
-		// when
-		this.android.send(contact.getPseudonym(), contact, "text", "action", "");
-
-		// then no exception
 	}
 
 	@Test

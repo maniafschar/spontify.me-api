@@ -260,7 +260,7 @@ public class MatchDayServiceTest {
 				"<b>Ergebnistipps</b> zum Bundesliga Spiel<div style=\"padding:1em 0;font-weight:bold;\">1899 Hoffenheim - Bayern München</div>vom <b>18.5.2024 um 15:30 Uhr</b>. Möchtest Du teilnehmen?",
 				result.prolog);
 		assertEquals(
-				"Lieben Dank für die Teilnahme!\nDas Ergebnis wird kurz vor dem Spiel hier bekanntgegeben.\n\nLust auf mehr <b>Fan Feeling</b>? In unserer neuen App bauen wir eine neue <b>Fußball Fan Community</b> auf.\n\nMit ein paar wenigen Klicks kannst auch Du dabei sein.",
+				"Lieben Dank für die Teilnahme!\nDas Ergebnis wird kurz vor dem Spiel hier bekanntgegeben.",
 				result.epilog);
 	}
 
