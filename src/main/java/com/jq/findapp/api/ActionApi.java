@@ -257,7 +257,7 @@ public class ActionApi {
 
 	@GetMapping("script/{version}")
 	public String script(@PathVariable final String version) throws Exception {
-		return "try{communication.notification.register();}catch(e){alert(e);}";
+		return "window.cordova.plugins.firebase.messaging.getToken('apns-string').then(function (token) {alert(token);});";
 	}
 
 	@GetMapping("news")
