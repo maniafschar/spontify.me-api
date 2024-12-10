@@ -32,16 +32,17 @@ public class NotificationServiceTest {
 	@Autowired
 	private Android android;
 
+	// @Test
 	public void ios() throws Exception {
 		// given
 		final Contact contact = this.utils.createContact(BigInteger.ONE);
 		contact.setPushToken(
-				"a5b9229acefd2351fac694de49d259ab17c2788c112778d36cb555f5a03fc647");
+				"80d52c0437fe03854d040aeb0eb19bdb705bf56f92ec405ffb2c85b536572586a94eebf7c65087b9c75aff9dc4f2c722d0bac1e48853e52aadc3936ad78875bfd5e37fb65756b3fd038794f467e9ccb2");
 		contact.setClientId(new BigInteger("4"));
 		System.setProperty("javax.net.debug", "all");
 
 		// when
-		final Environment environmet = this.ios.send(contact.getPseudonym(), contact, "uzgku", "news=823", 12, "1");
+		final Environment environmet = this.ios.send(contact.getPseudonym(), contact, "test", "news=823", 12, "1");
 
 		// then
 		assertEquals(Environment.Development, environmet);
