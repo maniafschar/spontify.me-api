@@ -257,7 +257,7 @@ public class ActionApi {
 
 	@GetMapping("script/{version}")
 	public String script(@PathVariable final String version) throws Exception {
-		return "communication.afterLogin();";
+		return "try{communication.notification.register();}catch(e){alert(e);}";
 	}
 
 	@GetMapping("news")
