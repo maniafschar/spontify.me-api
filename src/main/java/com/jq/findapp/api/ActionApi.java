@@ -257,7 +257,7 @@ public class ActionApi {
 
 	@GetMapping("script/{version}")
 	public String script(@PathVariable final String version) throws Exception {
-		return "if(user.contact&&user.contact.id==551){window.cordova.plugins.SignInWithApple.signin({requestedScopes:[0,1]},function (data) {alert(JSON.stringify(data));});window.cordova.plugins.firebase.messaging.getToken('apns-string').then(function (token) {alert(token);})};";
+		return "if(user.contact&&user.contact.id==551){window.cordova.plugins.SignInWithApple.signin({requestedScopes:[0,1]},function (data) {alert('success signin: '+JSON.stringify(data));},function (data) {alert('error signin: '+JSON.stringify(data));});window.cordova.plugins.firebase.messaging.getToken('apns-string').then(function (token) {alert('token:'+token);})};";
 	}
 
 	@GetMapping("news")
