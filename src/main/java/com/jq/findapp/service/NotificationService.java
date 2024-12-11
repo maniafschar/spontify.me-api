@@ -422,6 +422,9 @@ public class NotificationService {
 
 	public void sendEmail(final Client client, final String name, final String to, final String subject,
 			final String text, final String html) {
+		final String clientDomain = client.getEmail().substring(client.getEmail().indexOf('@'));
+		if (to.endsWith(".apple" + clientDomain) || to.endsWith(".facebook" + clientDomain))
+			return;
 		if (sendingEmailPaused) {
 			sendEmailAsync(client, name, to, subject, text, html);
 			return;
