@@ -65,8 +65,10 @@ public class Screenshots {
 		login();
 		Util.sleep(1000);
 		js.executeScript("pageHome.openNews()");
-		screenshot(name + "-news");
 		Util.sleep(1000);
+		js.executeScript("ui.q('dialog-hint input-checkbox[value=\"9.157\"]').click()");
+		Util.sleep(1000);
+		screenshot(name + "-news");
 		js.executeScript("ui.navigation.goTo('search')");
 		Util.sleep(1000);
 		Util.click("search tabHeader tab[i=\"contacts\"]");
