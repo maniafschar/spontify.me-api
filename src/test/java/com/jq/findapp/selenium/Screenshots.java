@@ -56,17 +56,16 @@ public class Screenshots {
 	private void screenshots(final String name) throws Exception {
 		Util.driver.get("https://fan-club.online/");
 		Util.sleep(3000);
-		js.executeScript(
-				"ui.navigation.closeHint()");
+		js.executeScript("ui.navigation.closeHint()");
 		js.executeScript(
 				"var p={},e=ui.qa('card img');for(var i=0;i<e.length;i++)if(p[e[i].src])ui.parents(e[i],'card').outerHTML='';else p[e[i].src]=true;");
 		js.executeScript(
 				"var e=ui.qa('card[onclick*=\"(223,\"],card[onclick*=\"(244,\"],card[onclick*=\"(245,\"],card[onclick*=\"(324,\"],card[onclick*=\"(435,\"],card[onclick*=\"(445,\"],card[onclick*=\"(459,\"],card[onclick*=\"(645,\"],card[onclick*=\"(723,\"],card[onclick*=\"(385,\"],card[onclick*=\"(276,\"],card[onclick*=\"(607,\"],card[onclick*=\"(793,\"]');for(var i=0;i<e.length;i++)e[i].outerHTML='';");
 		screenshot(name);
+		login();
+		Util.sleep(1000);
 		js.executeScript("pageHome.openNews()");
 		screenshot(name + "-news");
-		Util.sleep(1000);
-		login();
 		Util.sleep(1000);
 		js.executeScript("ui.navigation.goTo('search')");
 		Util.sleep(1000);
