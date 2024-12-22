@@ -223,7 +223,7 @@ public class ImportMunich {
 		}
 		throw new RuntimeException(
 				"Name: " + location.getName() + " | URL: " + location.getUrl() + " | Address: " + location.getAddress()
-						+ " | Page: " + page);
+						+ " | Page: " + externalUrl);
 	}
 
 	private String getField(final Pattern pattern, final String text, final int group) {
