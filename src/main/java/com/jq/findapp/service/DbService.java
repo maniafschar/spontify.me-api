@@ -53,14 +53,10 @@ public class DbService {
 	@Value("${spring.datasource.password}")
 	private String password;
 
-	@Cron
+	@Cron("0 4")
 	public CronResult cron() {
 		final CronResult result = new CronResult();
 		try {
-			repository.executeUpdate(
-					"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and contactNotification.createdAt<cast('"
-							+ Instant.now().minus(Duration.ofHours(12)).toString().substring(0, 19)
-							+ "' as timestamp) and (select modifiedAt from Contact contact where contact.id=contactNotification.contactId)>contactNotification.createdAt");
 			repository.executeUpdate(
 					"update Contact set age=cast((YEAR(current_timestamp) - YEAR(birthday) - case when MONTH(current_timestamp) < MONTH(birthday) or MONTH(current_timestamp) = MONTH(birthday) and DAY(current_timestamp) < DAY(birthday) then 1 else 0 end) as short) where birthday is not null");
 			repository.executeUpdate(
@@ -80,6 +76,20 @@ public class DbService {
 			if (clientUpdates.length() > 0)
 				result.body += (result.body.length() > 0 ? "\n" : "") + "ClientUpdate:"
 						+ clientUpdates.substring(1);
+		} catch (final Exception e) {
+			result.exception = e;
+		}
+		return result;
+	}
+
+	@Cron("40")
+	public CronResult cronUpdateNotification() {
+		final CronResult result = new CronResult();
+		try {
+			repository.executeUpdate(
+					"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and contactNotification.createdAt<cast('"
+							+ Instant.now().minus(Duration.ofHours(12)).toString().substring(0, 19)
+							+ "' as timestamp) and (select modifiedAt from Contact contact where contact.id=contactNotification.contactId)>contactNotification.createdAt");
 		} catch (final Exception e) {
 			result.exception = e;
 		}
