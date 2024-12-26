@@ -65,6 +65,12 @@ public class DbService {
 			repository.executeUpdate(
 					"update ContactToken set token='' where modifiedAt is not null and modifiedAt<cast('" + d
 							+ "' as timestamp) or modifiedAt is null and createdAt<cast('" + d + "' as timestamp)");
+			repository.executeUpdate(
+					"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and contactNotification.createdAt<cast('"
+							+ Instant.now().minus(Duration.ofHours(12)).toString().substring(0, 19)
+							+ "' as timestamp) and contactNotification.createdAt>cast('"
+							+ Instant.now().minus(Duration.ofDays(7)).toString().substring(0, 19)
+							+ "' as timestamp) and (select modifiedAt from Contact contact where contact.id=contactNotification.contactId)>contactNotification.createdAt");
 			final QueryParams params = new QueryParams(Query.misc_listClient);
 			final Result list = repository.list(params);
 			String clientUpdates = "";
@@ -76,20 +82,6 @@ public class DbService {
 			if (clientUpdates.length() > 0)
 				result.body += (result.body.length() > 0 ? "\n" : "") + "ClientUpdate:"
 						+ clientUpdates.substring(1);
-		} catch (final Exception e) {
-			result.exception = e;
-		}
-		return result;
-	}
-
-	@Cron("40")
-	public CronResult cronUpdateNotification() {
-		final CronResult result = new CronResult();
-		try {
-			repository.executeUpdate(
-					"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and contactNotification.createdAt<cast('"
-							+ Instant.now().minus(Duration.ofHours(12)).toString().substring(0, 19)
-							+ "' as timestamp) and (select modifiedAt from Contact contact where contact.id=contactNotification.contactId)>contactNotification.createdAt");
 		} catch (final Exception e) {
 			result.exception = e;
 		}
