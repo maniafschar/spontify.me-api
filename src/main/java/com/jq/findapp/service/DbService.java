@@ -65,12 +65,6 @@ public class DbService {
 			repository.executeUpdate(
 					"update ContactToken set token='' where modifiedAt is not null and modifiedAt<cast('" + d
 							+ "' as timestamp) or modifiedAt is null and createdAt<cast('" + d + "' as timestamp)");
-			repository.executeUpdate(
-					"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.seen=false and contactNotification.createdAt<cast('"
-							+ Instant.now().minus(Duration.ofHours(12)).toString().substring(0, 19)
-							+ "' as timestamp) and contactNotification.createdAt>cast('"
-							+ Instant.now().minus(Duration.ofDays(7)).toString().substring(0, 19)
-							+ "' as timestamp) and (select modifiedAt from Contact contact where contact.id=contactNotification.contactId)>contactNotification.createdAt");
 			final QueryParams params = new QueryParams(Query.misc_listClient);
 			final Result list = repository.list(params);
 			String clientUpdates = "";

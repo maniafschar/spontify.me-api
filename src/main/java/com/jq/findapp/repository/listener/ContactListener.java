@@ -2,6 +2,7 @@ package com.jq.findapp.repository.listener;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -84,6 +85,11 @@ public class ContactListener extends AbstractRepositoryListener<Contact> {
 	public void postUpdate(final Contact contact) {
 		if (contact.old("email") != null)
 			authenticationService.recoverSendEmail(contact.getEmail(), contact.getClientId());
+		repository.executeUpdate(
+				"update ContactNotification contactNotification set contactNotification.seen=true where contactNotification.contactId="
+						+ contact.getId() + " and contactNotification.createdAt<cast('"
+						+ Instant.now().minus(Duration.ofHours(12)).toString().substring(0, 19)
+						+ "' as timestamp)");
 	}
 
 	@Override
