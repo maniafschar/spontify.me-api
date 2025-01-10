@@ -101,19 +101,7 @@ public class RssService {
 		private ImportFeed(final JsonNode json, final BigInteger clientId, final String publishingPostfix) {
 			try {
 				final String url = json.get("url").asText();
-				ArrayNode rss = null;
-				for (int i = 0; i < 5 && rss == null; i++) {
-					try {
-						rss = (ArrayNode) new XmlMapper().readTree(URI.create(url).toURL()).findValues("item")
-								.get(0);
-						if (i > 0)
-							success = "[" + i + "] ";
-					} catch (JsonParseException ex) {
-						if (!ex.getMessage().contains("EOF"))
-							throw ex;
-						Thread.sleep(5000);
-					}
-				}
+				final ArrayNode rss = (ArrayNode) new XmlMapper().readTree(URI.create(url).toURL()).findValues("item").get(0);
 				if (rss != null && rss.size() > 0) {
 					final QueryParams params = new QueryParams(Query.misc_listNews);
 					params.setUser(new Contact());
@@ -218,11 +206,9 @@ public class RssService {
 						+ "' and clientNews.clientId=" + clientId);
 				result = RssService.this.repository.list(params);
 			}
-			if (result.size() == 0)
-				clientNews = new ClientNews();
-			else
-				clientNews = RssService.this.repository.one(ClientNews.class,
-						(BigInteger) result.get(0).get("clientNews.id"));
+			if (result.size() > 0)
+				return null;
+			clientNews = new ClientNews();
 			clientNews.setSource(source);
 			clientNews.setClientId(clientId);
 			clientNews.setDescription(description);
@@ -232,7 +218,6 @@ public class RssService {
 				clientNews.setPublish(new Timestamp(this.dateParserPub.parse(rss.get("pubDate").asText()).getTime()));
 			else
 				clientNews.setPublish(new Timestamp(this.dateParser.parse(rss.get("date").asText()).getTime()));
-			clientNews.setImage(null);
 			if (rss.has("media:content") && rss.get("media:content").has("url"))
 				clientNews.setImage(EntityUtil.getImage(rss.get("media:content").get("url").asText(),
 						EntityUtil.IMAGE_SIZE, 200));
