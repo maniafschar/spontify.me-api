@@ -33,7 +33,7 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
-import com.jq.findapp.util.EntityUtil;
+import com.jq.findapp.util.Entity;
 import com.jq.findapp.util.Strings;
 
 @Service
@@ -219,8 +219,8 @@ public class RssService {
 			else
 				clientNews.setPublish(new Timestamp(this.dateParser.parse(rss.get("date").asText()).getTime()));
 			if (rss.has("media:content") && rss.get("media:content").has("url"))
-				clientNews.setImage(EntityUtil.getImage(rss.get("media:content").get("url").asText(),
-						EntityUtil.IMAGE_SIZE, 200));
+				clientNews.setImage(Entity.getImage(rss.get("media:content").get("url").asText(),
+						Entity.IMAGE_SIZE, 200));
 			else {
 				final String html = IOUtils.toString(new URI(uid), StandardCharsets.UTF_8)
 						.replace('\r', ' ').replace('\n', ' ');
@@ -235,7 +235,7 @@ public class RssService {
 				if (s != null) {
 					if (s.startsWith("/"))
 						s = url.substring(0, url.indexOf("/", 10)) + s;
-					clientNews.setImage(EntityUtil.getImage(s, EntityUtil.IMAGE_SIZE, 200));
+					clientNews.setImage(Entity.getImage(s, Entity.IMAGE_SIZE, 200));
 				}
 			}
 			return clientNews;
