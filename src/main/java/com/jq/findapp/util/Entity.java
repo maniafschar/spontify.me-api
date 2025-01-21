@@ -18,7 +18,7 @@ import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 
-public class EntityUtil {
+public class Entity {
 	public static final int IMAGE_SIZE = 800;
 	public static final int IMAGE_THUMB_SIZE = 100;
 
