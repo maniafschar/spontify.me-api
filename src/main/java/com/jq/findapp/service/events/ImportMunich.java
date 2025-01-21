@@ -27,7 +27,7 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.EventService;
 import com.jq.findapp.service.NotificationService;
-import com.jq.findapp.util.EntityUtil;
+import com.jq.findapp.util.Entity;
 import com.jq.findapp.util.Strings;
 
 @Component
@@ -138,10 +138,10 @@ public class ImportMunich {
 					} else {
 						final String image = getField(regexImage, page, 2);
 						if (image.length() > 0) {
-							event.setImage(EntityUtil.getImage(url + image, EntityUtil.IMAGE_SIZE, 300));
+							event.setImage(Entity.getImage(url + image, Entity.IMAGE_SIZE, 300));
 							if (event.getImage() != null)
 								event.setImageList(
-										EntityUtil.getImage(url + image, EntityUtil.IMAGE_THUMB_SIZE, 0));
+										Entity.getImage(url + image, Entity.IMAGE_THUMB_SIZE, 0));
 						}
 					}
 					event.setDescription(getField(regexDesc, page, 1));
@@ -205,10 +205,10 @@ public class ImportMunich {
 				if (image.length() > 0) {
 					if (!image.startsWith("http"))
 						image = (externalPage ? externalUrl.substring(0, externalUrl.indexOf("/", 10)) : url) + image;
-					location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, 250));
+					location.setImage(Entity.getImage(image, Entity.IMAGE_SIZE, 250));
 					if (location.getImage() != null) {
 						location.setImageList(
-								EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
+								Entity.getImage(image, Entity.IMAGE_THUMB_SIZE, 0));
 						repository.save(location);
 					}
 				}
