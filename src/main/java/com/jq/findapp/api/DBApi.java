@@ -27,7 +27,7 @@ import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Encryption;
-import com.jq.findapp.util.EntityUtil;
+import com.jq.findapp.util.Entity;
 
 import jakarta.transaction.Transactional;
 
@@ -65,7 +65,7 @@ public class DBApi {
 				entity.getValues().put("password", Encryption.encryptDB(pw));
 				entity.getValues().put("passwordReset", BigInteger.valueOf(System.currentTimeMillis()));
 			}
-			EntityUtil.addImageList(entity);
+			Entity.addImageList(entity);
 			e.populate(entity.getValues());
 			repository.save(e);
 		}
@@ -83,7 +83,7 @@ public class DBApi {
 				entity.getValues().put("password", Encryption.encryptDB(pw));
 				entity.getValues().put("passwordReset", BigInteger.valueOf(System.currentTimeMillis()));
 			}
-			EntityUtil.addImageList(entity);
+			Entity.addImageList(entity);
 			e.populate(entity.getValues());
 			repository.save(e);
 		}
@@ -94,7 +94,7 @@ public class DBApi {
 			@RequestHeader final BigInteger clientId) throws Exception {
 		final Contact contact = repository.one(Contact.class, user);
 		if (clientId.equals(contact.getClientId())) {
-			final BaseEntity e = EntityUtil.createEntity(entity, contact);
+			final BaseEntity e = Entity.createEntity(entity, contact);
 			repository.save(e);
 			return e.getId();
 		}
