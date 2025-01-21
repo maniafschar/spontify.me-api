@@ -25,7 +25,7 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
-import com.jq.findapp.util.EntityUtil;
+import com.jq.findapp.util.Entity;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 
@@ -322,9 +322,9 @@ public class ImportLocationsService {
 							if (matcher.find()) {
 								final String image = matcher.group(1);
 								try {
-									location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, minImageSize));
+									location.setImage(Entity.getImage(image, Entity.IMAGE_SIZE, minImageSize));
 									location.setImageList(
-											EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
+											Entity.getImage(image, Entity.IMAGE_THUMB_SIZE, 0));
 									repository.save(location);
 									return true;
 								} catch (IllegalArgumentException ex) {
@@ -469,8 +469,8 @@ public class ImportLocationsService {
 			}
 		}
 		if (urlImage != null && size > 150000) {
-			location.setImage(EntityUtil.getImage(urlImage, EntityUtil.IMAGE_SIZE, minImageSize));
-			location.setImageList(EntityUtil.getImage(urlImage, EntityUtil.IMAGE_THUMB_SIZE, 0));
+			location.setImage(Entity.getImage(urlImage, Entity.IMAGE_SIZE, minImageSize));
+			location.setImageList(Entity.getImage(urlImage, Entity.IMAGE_THUMB_SIZE, 0));
 		}
 	}
 
@@ -494,9 +494,9 @@ public class ImportLocationsService {
 			if (!matcher.find())
 				throw new IllegalArgumentException("no image in html: " + html);
 			image = matcher.group(1);
-			location.setImage(EntityUtil.getImage(image, EntityUtil.IMAGE_SIZE, minImageSize));
+			location.setImage(Entity.getImage(image, Entity.IMAGE_SIZE, minImageSize));
 			if (location.getImage() != null)
-				location.setImageList(EntityUtil.getImage(image, EntityUtil.IMAGE_THUMB_SIZE, 0));
+				location.setImageList(Entity.getImage(image, Entity.IMAGE_THUMB_SIZE, 0));
 			repository.save(location);
 		} catch (IllegalArgumentException ex) {
 			if (ex.getMessage().startsWith("location exists: ")) {
