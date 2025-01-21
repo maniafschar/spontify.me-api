@@ -30,7 +30,7 @@ import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.CronService.CronResult;
-import com.jq.findapp.util.EntityUtil;
+import com.jq.findapp.util.Entity;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Utils;
 
@@ -168,7 +168,7 @@ public class RssServiceTest {
 		final String url = "https://fan-club.online/images/icon512.png";
 
 		// when
-		final String tag = EntityUtil.getImage(url, EntityUtil.IMAGE_SIZE, 200);
+		final String tag = Entity.getImage(url, Entity.IMAGE_SIZE, 200);
 
 		// then
 		assertNotNull(tag);
@@ -180,9 +180,9 @@ public class RssServiceTest {
 		// given
 
 		// when
-		final String tag = EntityUtil.getImage(
+		final String tag = Entity.getImage(
 				"https://www.rbb24.de/content/dam/rbb/rbb/rbb24/2024/2024_01/rbb-reporter/Abendschau-Nebenkostenabrechnung.png.png/size=708x398.png",
-				EntityUtil.IMAGE_SIZE, 200);
+				Entity.IMAGE_SIZE, 200);
 
 		// then
 		assertNotNull(tag);
@@ -194,9 +194,9 @@ public class RssServiceTest {
 		// given
 
 		// when
-		final String tag = EntityUtil.getImage(
+		final String tag = Entity.getImage(
 				"https://www.muenchen.de/sites/default/files/styles/3_2_w1202/public/2023-07/staatliche_antikensammlungen_und_glyptothek_foto_markus_loex.jpg.webp",
-				EntityUtil.IMAGE_SIZE, 200);
+				Entity.IMAGE_SIZE, 200);
 
 		// then
 		assertNotNull(tag);
