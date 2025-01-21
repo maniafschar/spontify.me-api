@@ -57,7 +57,7 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
-import com.jq.findapp.util.EntityUtil;
+import com.jq.findapp.util.Entity;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
@@ -637,7 +637,7 @@ public class MatchDayService {
 			else {
 				final Storage storage = new Storage();
 				storage.setLabel(label);
-				storage.setStorage(EntityUtil.getImage(url, 0, 0));
+				storage.setStorage(Entity.getImage(url, 0, 0));
 				repository.save(storage);
 				data = Attachment.resolve(storage.getStorage());
 			}
