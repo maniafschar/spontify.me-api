@@ -15,7 +15,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.util.Encryption;
-import com.jq.findapp.util.EntityUtil;
+import com.jq.findapp.util.Entity;
 
 @Service
 public class AuthenticationExternalService {
@@ -103,10 +103,10 @@ public class AuthenticationExternalService {
 		if (contact.getImage() == null && facebookData.containsKey("picture")
 				&& facebookData.get("picture") != null && facebookData.get("picture").startsWith("http")) {
 			try {
-				contact.setImage(EntityUtil.getImage(facebookData.get("picture"), EntityUtil.IMAGE_SIZE, 0));
+				contact.setImage(Entity.getImage(facebookData.get("picture"), Entity.IMAGE_SIZE, 0));
 				if (contact.getImage() != null)
 					contact.setImageList(
-							EntityUtil.getImage(facebookData.get("picture"), EntityUtil.IMAGE_THUMB_SIZE, 0));
+							Entity.getImage(facebookData.get("picture"), Entity.IMAGE_THUMB_SIZE, 0));
 			} catch (final Exception ex) {
 				// no pic for now, continue registration/login
 			}
