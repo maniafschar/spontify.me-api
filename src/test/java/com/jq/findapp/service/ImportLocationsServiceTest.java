@@ -92,7 +92,7 @@ public class ImportLocationsServiceTest {
 	}
 
 	@Test
-	public void run() throws Exception {
+	public void cron() throws Exception {
 		// given
 		repository.executeUpdate("update Location set url=null");
 		final String address = "Wilhelm-Leibl-Straße 22\n81479 München";

@@ -32,7 +32,7 @@ public class EngagementServiceTest {
 	private Utils utils;
 
 	@Test
-	public void sendChats() throws Exception {
+	public void cron() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
 

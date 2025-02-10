@@ -38,7 +38,7 @@ public class ImportSportsBarServiceTest {
 	private Utils utils;
 
 	@Test
-	public void run() throws Exception {
+	public void zipCode() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
 		final Storage storage = new Storage();
@@ -55,7 +55,7 @@ public class ImportSportsBarServiceTest {
 	}
 
 	@Test
-	public void runDazn() throws Exception {
+	public void cronImport() throws Exception {
 		// given
 		new File("dazn/52.73-7.75.json").delete();
 		new File("dazn/52.73-7.75.json.processed").delete();

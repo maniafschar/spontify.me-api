@@ -164,7 +164,7 @@ public class TestConfig {
 				final String s = IOUtils.toString(
 						getClass().getResourceAsStream(
 								url.startsWith("id=") ? "/json/matchDaysLastMatch.json"
-										: "/json/matchDays.json"),
+										: url.contains("786") ? "/json/matchDays1860.json" : "/json/matchDays.json"),
 						StandardCharsets.UTF_8);
 				return Json.toNode(
 						s.replace("\"{date}\"",

@@ -118,7 +118,7 @@ public class CronServiceTest {
 
 		// then
 		Thread.sleep(1000);
-		final List<?> list = repository.list("from Log where uri like '/support/cron/MarketingLocationService/run'");
+		final List<?> list = repository.list("from Log where uri like '/support/cron/MarketingLocationService/cron'");
 		assertEquals(4, list.size());
 	}
 }

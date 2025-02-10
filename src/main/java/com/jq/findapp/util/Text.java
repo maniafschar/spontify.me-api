@@ -68,6 +68,11 @@ public class Text {
 		notification_authenticate,
 		notification_chatNew,
 		notification_chatSeen,
+		notification_chatSentEntries,
+		notification_chatSentEntry,
+		notification_chatSentImg,
+		notification_chatSentPos1,
+		notification_chatSentPos2,
 		notification_clientMarketing,
 		notification_clientMarketingPoll,
 		notification_clientMarketingPollPlayerOfTheMath,
@@ -94,11 +99,6 @@ public class Text {
 		notification_eventRated,
 		notification_feedback,
 		notification_locationMarketing,
-		notification_sentImg,
-		notification_sentPos1,
-		notification_sentPos2,
-		notification_sentEntries,
-		notification_sentEntry,
 		or,
 		today,
 		tomorrow
@@ -148,7 +148,8 @@ public class Text {
 				final JsonNode node = Json.toNode(Attachment.resolve(client.getStorage()));
 				s = s.replaceAll("APP_TITLE", client.getName());
 				s = s.replaceAll(" \\$\\{buddy}", node.get("lang").get(contact.getLanguage()).get("buddy").asText());
-				s = s.replaceAll(" \\$\\{buddies}", node.get("lang").get(contact.getLanguage()).get("buddies").asText());
+				s = s.replaceAll(" \\$\\{buddies}",
+						node.get("lang").get(contact.getLanguage()).get("buddies").asText());
 			}
 			return s;
 		} catch (final NullPointerException ex) {

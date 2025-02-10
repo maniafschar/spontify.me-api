@@ -48,7 +48,7 @@ public class EventServiceTest {
 	private Utils utils;
 
 	@Test
-	public void importEvents() throws Exception {
+	public void importMunich() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
 		final QueryParams params = new QueryParams(Query.event_listId);

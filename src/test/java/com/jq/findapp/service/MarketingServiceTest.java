@@ -47,7 +47,7 @@ public class MarketingServiceTest {
 	private Utils utils;
 
 	@Test
-	public void runResult() throws Exception {
+	public void cronResult() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
 		final Question question = new Question();

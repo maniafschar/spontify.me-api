@@ -204,7 +204,7 @@ public class RssServiceTest {
 	}
 
 	@Test
-	public void run() throws Exception {
+	public void cron() throws Exception {
 		// given
 		utils.createContact(BigInteger.ONE);
 

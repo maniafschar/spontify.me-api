@@ -114,16 +114,17 @@ public class ChatService {
 		final Contact contactTo = repository.one(Contact.class, contactChat.getContactId2());
 		String s = null;
 		if (contactChat.getNote() == null)
-			s = text.getText(contactTo, TextId.notification_sentImg);
+			s = text.getText(contactTo, TextId.notification_chatSentImg);
 		else {
 			s = Attachment.resolve(contactChat.getNote());
 			if (s.indexOf(" :openPos(") == 0)
 				s = text.getText(contactTo,
-						contactFrom.getGender() == null || contactFrom.getGender() == 2 ? TextId.notification_sentPos2
-								: TextId.notification_sentPos1);
+						contactFrom.getGender() == null || contactFrom.getGender() == 2
+								? TextId.notification_chatSentPos2
+								: TextId.notification_chatSentPos1);
 			else if (s.indexOf(" :open(") == 0)
-				s = text.getText(contactTo, s.lastIndexOf(" :open(") == 0 ? TextId.notification_sentEntry
-						: TextId.notification_sentEntries);
+				s = text.getText(contactTo, s.lastIndexOf(" :open(") == 0 ? TextId.notification_chatSentEntry
+						: TextId.notification_chatSentEntries);
 		}
 		notificationService.sendNotification(contactFrom, contactTo, TextId.notification_chatNew,
 				"chat=" + contactFrom.getId(), s);
