@@ -19,7 +19,6 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -101,7 +100,8 @@ public class RssService {
 		private ImportFeed(final JsonNode json, final BigInteger clientId, final String publishingPostfix) {
 			try {
 				final String url = json.get("url").asText();
-				final ArrayNode rss = (ArrayNode) new XmlMapper().readTree(URI.create(url).toURL()).findValues("item").get(0);
+				final ArrayNode rss = (ArrayNode) new XmlMapper().readTree(URI.create(url).toURL()).findValues("item")
+						.get(0);
 				if (rss != null && rss.size() > 0) {
 					final QueryParams params = new QueryParams(Query.misc_listNews);
 					params.setUser(new Contact());
@@ -148,28 +148,8 @@ public class RssService {
 							this.addFailure(ex, url);
 						}
 					}
-					int deleted = 0;
-					if (chonological) {
-						params.setSearch(
-								"clientNews.publish>cast('" + first + "' as timestamp) and clientNews.clientId="
-										+ clientId);
-						final Result result = RssService.this.repository.list(params);
-						for (int i = 0; i < result.size(); i++) {
-							if (!this.urls.contains(result.get(i).get("clientNews.url"))) {
-								RssService.this.repository.delete(RssService.this.repository.one(ClientNews.class,
-										(BigInteger) result.get(i).get("clientNews.id")));
-								RssService.this.notificationService.createTicket(TicketType.ERROR, "RSS Deletion",
-										result.get(i).get("clientNews.id") + "\n"
-												+ result.get(i).get("clientNews.description")
-												+ "\n" + result.get(i).get("clientNews.url"),
-										clientId);
-								deleted++;
-							}
-						}
-					}
-					if (count != 0 || deleted != 0)
-						success += count + " on " + clientId + " " + url
-								+ (deleted > 0 ? ", " + deleted + " deleted" : "");
+					if (count != 0)
+						success += count + " on " + clientId + " " + url;
 				}
 			} catch (final Exception ex) {
 				addFailure(ex, success + json.get("url").asText());
