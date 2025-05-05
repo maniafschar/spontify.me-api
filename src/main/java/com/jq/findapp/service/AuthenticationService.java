@@ -364,6 +364,7 @@ public class AuthenticationService {
 			repository.save(t);
 			return Encryption.encrypt(c.getEmail() + "\u0015" + getPassword(c), publicKey);
 		} catch (final Exception ex) {
+			notificationService.createTicket(TicketType.ERROR, null, Strings.stackTraceToString(ex), null);
 			return null;
 		}
 	}
