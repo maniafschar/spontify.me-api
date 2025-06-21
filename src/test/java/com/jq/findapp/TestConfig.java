@@ -192,6 +192,5 @@ public class TestConfig {
 
 	public static String substringIndex(final Connection connection, final String s, final String s2, final int i) {
 		return s;
-
 	}
 }

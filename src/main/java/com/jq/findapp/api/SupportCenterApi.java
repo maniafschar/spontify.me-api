@@ -50,7 +50,7 @@ import jakarta.ws.rs.core.MediaType;
 
 @RestController
 @Transactional
-@CrossOrigin(origins = { "https://sc.skills.community" })
+@CrossOrigin(origins = { "https://sc.fan-club.online" })
 @RequestMapping("support")
 public class SupportCenterApi {
 	@Autowired
@@ -79,14 +79,14 @@ public class SupportCenterApi {
 
 	@DeleteMapping("user/{id}")
 	public void userDelete(@PathVariable final BigInteger id) throws Exception {
-		authenticationService.deleteAccount(repository.one(Contact.class, id));
+		this.authenticationService.deleteAccount(this.repository.one(Contact.class, id));
 	}
 
 	@GetMapping("user")
 	public List<Object[]> user() {
 		final QueryParams params = new QueryParams(Query.contact_listSupportCenter);
 		params.setLimit(0);
-		return repository.list(params).getList();
+		return this.repository.list(params).getList();
 	}
 
 	@GetMapping("ticket")
@@ -94,12 +94,12 @@ public class SupportCenterApi {
 		final QueryParams params = new QueryParams(Query.misc_listTicket);
 		params.setSearch(search);
 		params.setLimit(0);
-		return repository.list(params).getList();
+		return this.repository.list(params).getList();
 	}
 
 	@DeleteMapping("ticket/{id}")
 	public void ticketDelete(@PathVariable final BigInteger id) throws Exception {
-		repository.delete(repository.one(Ticket.class, id));
+		this.repository.delete(this.repository.one(Ticket.class, id));
 	}
 
 	@GetMapping("log")
@@ -107,7 +107,7 @@ public class SupportCenterApi {
 		final QueryParams params = new QueryParams(Query.misc_listLog);
 		params.setSearch(search);
 		params.setLimit(0);
-		return repository.list(params).getList();
+		return this.repository.list(params).getList();
 	}
 
 	@GetMapping("marketing/{id}")
@@ -116,16 +116,16 @@ public class SupportCenterApi {
 		final QueryParams params = new QueryParams(Query.contact_listMarketing);
 		params.setSearch("contactMarketing.clientMarketingId=" + id);
 		params.setLimit(0);
-		final Result contactMarketing = repository.list(params);
+		final Result contactMarketing = this.repository.list(params);
 		result.put("contactMarketing", contactMarketing.getList());
 		params.setQuery(Query.misc_listMarketing);
 		params.setSearch("clientMarketing.id=" + id);
-		result.put("clientMarketing", repository.list(params).getList());
+		result.put("clientMarketing", this.repository.list(params).getList());
 		params.setQuery(Query.misc_listLog);
 		params.setSearch("log.uri='/marketing' and log.query like 'm=" + id + "&%' and log.createdAt>=cast('"
-				+ Instant.ofEpochMilli(repository.one(ClientMarketing.class, id).getStartDate().getTime())
+				+ Instant.ofEpochMilli(this.repository.one(ClientMarketing.class, id).getStartDate().getTime())
 				+ "' as timestamp)");
-		final Result log = repository.list(params);
+		final Result log = this.repository.list(params);
 		final Pattern locationIdPattern = Pattern.compile("\"locationId\":.?\"(\\d+)\"", Pattern.MULTILINE);
 		final List<String> processed = new ArrayList<>();
 		for (int i = 0; i < contactMarketing.size(); i++) {
@@ -144,7 +144,7 @@ public class SupportCenterApi {
 			final String locationId = ((String) log.get(i).get("log.query")).split("&")[1].substring(2);
 			if (!processed.contains(locationId)) {
 				final Object[] row = Arrays.copyOf(log.getList().get(i + 1), length + 2);
-				final Location location = repository.one(Location.class, new BigInteger(locationId));
+				final Location location = this.repository.one(Location.class, new BigInteger(locationId));
 				row[length] = location.getName();
 				row[length + 1] = location.getAddress();
 				logs.add(row);
@@ -158,31 +158,31 @@ public class SupportCenterApi {
 	@PostMapping("email")
 	@Produces(MediaType.TEXT_PLAIN)
 	public void email(final BigInteger id, final String text, final String action) throws Exception {
-		notificationService.sendNotificationEmail(null, repository.one(Contact.class, id), text, action);
+		this.notificationService.sendNotificationEmail(null, this.repository.one(Contact.class, id), text, action);
 	}
 
 	@PutMapping("resend/{id}")
 	public void resend(@PathVariable final BigInteger id) throws Exception {
-		authenticationService.recoverSendEmailReminder(repository.one(Contact.class, id));
+		this.authenticationService.recoverSendEmailReminder(this.repository.one(Contact.class, id));
 	}
 
 	@PostMapping("location/import/{id}/{category}")
 	public String importLocation(@PathVariable final BigInteger id, @PathVariable final String category)
 			throws Exception {
-		return importLocationsService.importLocation(id, category);
+		return this.importLocationsService.importLocation(id, category);
 	}
 
 	@PostMapping("authenticate/{id}")
 	public void authenticate(@PathVariable final BigInteger id, final String image) throws Exception {
-		final Contact contact = repository.one(Contact.class, id);
+		final Contact contact = this.repository.one(Contact.class, id);
 		contact.setImageAuthenticate(image);
 		contact.setAuthenticate(Boolean.TRUE);
-		repository.save(contact);
+		this.repository.save(contact);
 	}
 
 	@PostMapping("run/{classname}")
 	public CronResult run(@PathVariable final String classname) throws Exception {
-		return cronService.run(classname);
+		return this.cronService.run(classname);
 	}
 
 	@GetMapping("report/{days}")
@@ -194,7 +194,7 @@ public class SupportCenterApi {
 		params.setSearch(
 				"log.clientId>0 and (log.uri='/action/teaser/contacts' or log.uri not like '/%') and LOWER(ip.org) not like '%google%' and LOWER(ip.org) not like '%facebook%' and LOWER(ip.org) not like '%amazon%' and log.createdAt>cast('"
 						+ Instant.now().minus(Duration.ofDays(days)) + "' as timestamp)");
-		final Result list = repository.list(params);
+		final Result list = this.repository.list(params);
 		final Set<String> users = new HashSet<>();
 		for (int i = 0; i < list.size(); i++) {
 			final Map<String, Object> log = list.get(i);
@@ -209,7 +209,7 @@ public class SupportCenterApi {
 					&& !BigInteger.ZERO.equals(log.get("log.contactId"))) {
 				final String day = new SimpleDateFormat("-yyyy-MM-dd").format(log.get("log.createdAt"));
 				if (!users.contains(log.get("log.contactId") + day)) {
-					addLogEntry(result.get(clientId), login, log);
+					this.addLogEntry(result.get(clientId), login, log);
 					users.add(log.get("log.contactId") + day);
 				}
 			}
@@ -218,12 +218,12 @@ public class SupportCenterApi {
 			final Map<String, Object> log = list.get(i);
 			if (((String) log.get("log.uri")).startsWith("/")
 					&& (log.get("log.contactId") == null || BigInteger.ZERO.equals(log.get("log.contactId"))))
-				addLogEntry(result.get(log.get("log.clientId").toString()), anonym, log, login);
+				this.addLogEntry(result.get(log.get("log.clientId").toString()), anonym, log, login);
 		}
 		for (int i = 0; i < list.size(); i++) {
 			final Map<String, Object> log = list.get(i);
 			if (!((String) log.get("log.uri")).startsWith("/"))
-				addLogEntry(result.get(log.get("log.clientId").toString()), teaser, log, login, anonym);
+				this.addLogEntry(result.get(log.get("log.clientId").toString()), teaser, log, login, anonym);
 		}
 		return result;
 	}
@@ -237,7 +237,7 @@ public class SupportCenterApi {
 		params.setSearch(
 				"log.clientId>0 and log.uri like '/%' and log.uri not like '/support/%' and log.uri not like '/marketing/%' and log.uri not like '/ws/%' and log.createdAt>cast('"
 						+ Instant.now().minus(Duration.ofDays(days)) + "' as timestamp)");
-		final Result list = repository.list(params);
+		final Result list = this.repository.list(params);
 		for (int i = 0; i < list.size(); i++) {
 			final Map<String, Object> log = list.get(i);
 			final String id = log.get("log.uri") + "|" + log.get("log.webCall");
@@ -259,14 +259,14 @@ public class SupportCenterApi {
 	@PostMapping("build/{type}")
 	public Object build(@PathVariable final String type) throws Exception {
 		if ("state".equals(type))
-			return metrics();
+			return this.metrics();
 		if ("status".equals(type)) {
 			final ProcessBuilder pb = new ProcessBuilder("/usr/bin/bash", "-c", "ps aux|grep java");
 			pb.redirectErrorStream(true);
 			return IOUtils.toString(pb.start().getInputStream(), StandardCharsets.UTF_8);
 		}
 		if ("server".equals(type) || "sc".equals(type)) {
-			final ProcessBuilder pb = new ProcessBuilder(buildScript.replace("{type}", type).split(" "));
+			final ProcessBuilder pb = new ProcessBuilder(this.buildScript.replace("{type}", type).split(" "));
 			pb.redirectErrorStream(true);
 			return IOUtils.toString(pb.start().getInputStream(), StandardCharsets.UTF_8);
 		}
@@ -274,7 +274,7 @@ public class SupportCenterApi {
 			String result = "";
 			for (final String client : type.substring(7).split(",")) {
 				final ProcessBuilder pb = new ProcessBuilder(
-						(buildScript.replace("{type}", "client") + " " + client).split(" "));
+						(this.buildScript.replace("{type}", "client") + " " + client).split(" "));
 				pb.redirectErrorStream(true);
 				result += IOUtils.toString(pb.start().getInputStream(), StandardCharsets.UTF_8) + "\n\n";
 			}
@@ -284,7 +284,7 @@ public class SupportCenterApi {
 	}
 
 	private boolean addLogEntry(final Map<String, Map<String, Set<String>>> map, final String type,
-			final Map<String, Object> log, String... check) {
+			final Map<String, Object> log, final String... check) {
 		final String key = Instant.ofEpochMilli(((Timestamp) log.get("log.createdAt")).getTime()).toString()
 				.substring(0, 10);
 		final String value = log.get("log.ip").toString();
@@ -302,21 +302,21 @@ public class SupportCenterApi {
 	@GetMapping("metrics")
 	public Map<String, Object> metrics() throws Exception {
 		final Map<String, Object> result = new HashMap<>();
-		final Set<String> names = metricsEndpoint.listNames().getNames();
+		final Set<String> names = this.metricsEndpoint.listNames().getNames();
 		names.forEach(e -> {
-			result.put(e, metricsEndpoint.metric(e, null));
+			result.put(e, this.metricsEndpoint.metric(e, null));
 		});
 		return result;
 	}
 
 	@PutMapping("cron")
 	public synchronized void cron(@RequestHeader final String secret) throws Exception {
-		if (cronSecret.equals(secret))
-			cronService.run();
+		if (this.cronSecret.equals(secret))
+			this.cronService.run();
 	}
 
 	@GetMapping("healthcheck")
 	public void healthcheck(@RequestHeader final String secret) throws Exception {
-		repository.one(Contact.class, BigInteger.ONE);
+		this.repository.one(Contact.class, BigInteger.ONE);
 	}
 }
