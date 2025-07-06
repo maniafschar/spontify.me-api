@@ -356,8 +356,10 @@ public class AuthenticationService {
 			final QueryParams params = new QueryParams(Query.contact_token);
 			params.setSearch("contactToken.token='" + token + "'");
 			final Map<String, Object> u = repository.one(params);
-			if (u == null)
+			if (u == null) {
+				notificationService.createTicket(TicketType.ERROR, null, "Token not found\n" + token. null);
 				return null;
+			}
 			final ContactToken t = repository.one(ContactToken.class, (BigInteger) u.get("contactToken.id"));
 			final Contact c = repository.one(Contact.class, t.getContactId());
 			t.setToken("");
