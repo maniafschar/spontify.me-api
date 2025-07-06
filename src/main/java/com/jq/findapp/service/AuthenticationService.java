@@ -357,7 +357,7 @@ public class AuthenticationService {
 			params.setSearch("contactToken.token='" + token + "'");
 			final Map<String, Object> u = repository.one(params);
 			if (u == null) {
-				notificationService.createTicket(TicketType.ERROR, null, "Token not found\n" + token. null);
+				notificationService.createTicket(TicketType.ERROR, null, "Token not found\n" + token, null);
 				return null;
 			}
 			final ContactToken t = repository.one(ContactToken.class, (BigInteger) u.get("contactToken.id"));
