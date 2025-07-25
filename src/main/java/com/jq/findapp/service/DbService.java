@@ -57,14 +57,18 @@ public class DbService {
 	public CronResult cron() {
 		final CronResult result = new CronResult();
 		try {
-			repository.executeUpdate(
+			int i = repository.executeUpdate(
 					"update Contact set age=cast((YEAR(current_timestamp) - YEAR(birthday) - case when MONTH(current_timestamp) < MONTH(birthday) or MONTH(current_timestamp) = MONTH(birthday) and DAY(current_timestamp) < DAY(birthday) then 1 else 0 end) as short) where birthday is not null");
+			if (i > 0)
+				result.body += "Birthday: " + i + "\n";
 			repository.executeUpdate(
 					"update Contact set timezone='" + Strings.TIME_OFFSET + "' where timezone is null");
 			final String d = Instant.now().minus(Duration.ofDays(183)).toString().substring(0, 19);
-			repository.executeUpdate(
+			i = repository.executeUpdate(
 					"update ContactToken set token='' where modifiedAt is not null and modifiedAt<cast('" + d
 							+ "' as timestamp) or modifiedAt is null and createdAt<cast('" + d + "' as timestamp)");
+			if (i > 0)
+				result.body += "Token reset: " + i + "\n";
 			final QueryParams params = new QueryParams(Query.misc_listClient);
 			final Result list = repository.list(params);
 			String clientUpdates = "";
