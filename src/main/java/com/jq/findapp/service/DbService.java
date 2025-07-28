@@ -72,7 +72,7 @@ public class DbService {
 			final QueryParams params = new QueryParams(Query.misc_listClient);
 			final Result list = repository.list(params);
 			String clientUpdates = "";
-			for (int i = 0; i < list.size(); i++) {
+			for (i = 0; i < list.size(); i++) {
 				final Client client = repository.one(Client.class, (BigInteger) list.get(i).get("client.id"));
 				if (updateClient(client))
 					clientUpdates += "|" + client.getId();
