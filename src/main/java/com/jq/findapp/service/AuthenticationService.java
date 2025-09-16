@@ -357,16 +357,17 @@ public class AuthenticationService {
 			params.setSearch("contactToken.token='" + token + "'");
 			final Map<String, Object> u = repository.one(params);
 			if (u == null) {
-				notificationService.createTicket(TicketType.ERROR, null, "Token not found\n" + token, null);
+				notificationService.createTicket(TicketType.ERROR, "Token", "not found\n" + token, null);
 				return null;
 			}
+			notificationService.createTicket(TicketType.ERROR, "Token", "reseted\n" + token, null);
 			final ContactToken t = repository.one(ContactToken.class, (BigInteger) u.get("contactToken.id"));
 			final Contact c = repository.one(Contact.class, t.getContactId());
 			t.setToken("");
 			repository.save(t);
 			return Encryption.encrypt(c.getEmail() + "\u0015" + getPassword(c), publicKey);
 		} catch (final Exception ex) {
-			notificationService.createTicket(TicketType.ERROR, null, Strings.stackTraceToString(ex), null);
+			notificationService.createTicket(TicketType.ERROR, "Token", Strings.stackTraceToString(ex), null);
 			return null;
 		}
 	}
