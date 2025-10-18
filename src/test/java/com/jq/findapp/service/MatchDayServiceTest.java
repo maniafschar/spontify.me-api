@@ -31,10 +31,12 @@ import com.jq.findapp.TestConfig.MatchDayServiceMock;
 import com.jq.findapp.entity.ClientMarketing;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.ContactMarketing;
+import com.jq.findapp.entity.Storage;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.service.MatchDayService.PollMatchDay;
+import com.jq.findapp.util.Entity;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Utils;
 
@@ -53,18 +55,30 @@ public class MatchDayServiceTest {
 
 	@BeforeEach
 	public void before() {
-		((MatchDayServiceMock) matchDayService).offset = 0;
+		((MatchDayServiceMock) this.matchDayService).offset = 0;
+		final String image = Entity.getImage("https://sc.fan-club.online/images/test.png", 0, 0);
+		this.saveStorage("leagues/78", image);
+		this.saveStorage("teams/157", image);
+		this.saveStorage("teams/165", image);
+		this.saveStorage("teams/180", image);
+	}
+
+	private void saveStorage(final String label, final String image) {
+		final Storage storage = new Storage();
+		storage.setLabel("api-sports-/" + label + ".png");
+		storage.setStorage(image);
+		this.repository.save(storage);
 	}
 
 	@Test
 	public void update_twice() throws Exception {
 		// given
-		utils.createContact(BigInteger.valueOf(4));
-		CronResult result = matchDayService.cron();
+		this.utils.createContact(BigInteger.valueOf(4));
+		CronResult result = this.matchDayService.cron();
 		assertNull(result.exception);
 
 		// when
-		result = matchDayService.cron();
+		result = this.matchDayService.cron();
 
 		// then
 		assertNull(result.exception);
@@ -74,12 +88,12 @@ public class MatchDayServiceTest {
 	@Test
 	public void poll() throws Exception {
 		// given
-		utils.createContact(BigInteger.ONE);
-		((MatchDayServiceMock) matchDayService).offset = -9 * 60 * 60;
-		final BigInteger clientMarketingId = matchDayService.synchronize.playerOfTheMatch(BigInteger.ONE, 0);
+		this.utils.createContact(BigInteger.ONE);
+		((MatchDayServiceMock) this.matchDayService).offset = -9 * 60 * 60;
+		final BigInteger clientMarketingId = this.matchDayService.synchronize.playerOfTheMatch(BigInteger.ONE, 0);
 
 		// when
-		final String result = result(clientMarketingId);
+		final String result = this.result(clientMarketingId);
 
 		// then
 		assertTrue(Integer.valueOf(result.split(" ")[0]) > 0);
@@ -88,11 +102,11 @@ public class MatchDayServiceTest {
 	@Test
 	public void prediction() throws Exception {
 		// given
-		utils.createContact(BigInteger.ONE);
-		final BigInteger clientMarketingId = matchDayService.synchronize.prediction(BigInteger.ONE, 0);
+		this.utils.createContact(BigInteger.ONE);
+		final BigInteger clientMarketingId = this.matchDayService.synchronize.prediction(BigInteger.ONE, 0);
 
 		// when
-		final String result = result(clientMarketingId);
+		final String result = this.result(clientMarketingId);
 
 		// then
 		assertTrue(Integer.valueOf(result.split(" ")[0]) > 0);
@@ -101,11 +115,11 @@ public class MatchDayServiceTest {
 	@Test
 	public void prediction_withHistory() throws Exception {
 		// given
-		utils.createContact(BigInteger.ONE);
-		final BigInteger clientMarketingId = matchDayService.synchronize.prediction(BigInteger.ONE, 0);
+		this.utils.createContact(BigInteger.ONE);
+		final BigInteger clientMarketingId = this.matchDayService.synchronize.prediction(BigInteger.ONE, 0);
 
 		// when
-		final String result = result(clientMarketingId);
+		final String result = this.result(clientMarketingId);
 
 		// then
 		assertTrue(Integer.valueOf(result.split(" ")[0]) > 0);
@@ -144,14 +158,14 @@ public class MatchDayServiceTest {
 		final Map<String, Object> storage = new HashMap<>();
 		storage.put("storage.createdAt", new Timestamp(Instant.now().toEpochMilli()));
 		storage.put("storage.storage", IOUtils.toString(
-				getClass().getResourceAsStream(
+				this.getClass().getResourceAsStream(
 						"/json/matchDays.json"),
 				StandardCharsets.UTF_8).replace("\"{dateTBD}\"",
 						"" + (long) (Instant.now().plus(Duration.ofDays(15)).getEpochSecond())));
 
 		// when
-		final JsonNode cache = matchDayService.needUpdate(storage,
-				"team=786&season=" + matchDayService.currentSeason());
+		final JsonNode cache = this.matchDayService.needUpdate(storage,
+				"team=786&season=" + this.matchDayService.currentSeason());
 
 		// then
 		assertNotNull(cache);
@@ -164,14 +178,14 @@ public class MatchDayServiceTest {
 		storage.put("storage.createdAt", new Timestamp(Instant.now().minus(Duration.ofHours(26)).toEpochMilli()));
 		storage.put("storage.modifiedAt", new Timestamp(Instant.now().minus(Duration.ofHours(25)).toEpochMilli()));
 		storage.put("storage.storage", IOUtils.toString(
-				getClass().getResourceAsStream(
+				this.getClass().getResourceAsStream(
 						"/json/matchDays.json"),
 				StandardCharsets.UTF_8).replace("\"{dateTBD}\"",
 						"" + (long) (Instant.now().plus(Duration.ofDays(14)).getEpochSecond())));
 
 		// when
-		final JsonNode cache = matchDayService.needUpdate(storage,
-				"team=786&season=" + matchDayService.currentSeason());
+		final JsonNode cache = this.matchDayService.needUpdate(storage,
+				"team=786&season=" + this.matchDayService.currentSeason());
 
 		// then
 		assertNull(cache);
@@ -184,14 +198,14 @@ public class MatchDayServiceTest {
 		storage.put("storage.createdAt", new Timestamp(Instant.now().minus(Duration.ofHours(2)).toEpochMilli()));
 		storage.put("storage.modifiedAt", new Timestamp(Instant.now().minus(Duration.ofHours(1)).toEpochMilli()));
 		storage.put("storage.storage", IOUtils.toString(
-				getClass().getResourceAsStream(
+				this.getClass().getResourceAsStream(
 						"/json/matchDays.json"),
 				StandardCharsets.UTF_8).replace("\"{dateTBD}\"",
 						"" + (long) (Instant.now().plus(Duration.ofDays(14)).getEpochSecond())));
 
 		// when
-		final JsonNode cache = matchDayService.needUpdate(storage,
-				"team=786&season=" + matchDayService.currentSeason());
+		final JsonNode cache = this.matchDayService.needUpdate(storage,
+				"team=786&season=" + this.matchDayService.currentSeason());
 
 		// then
 		assertNotNull(cache);
@@ -203,7 +217,7 @@ public class MatchDayServiceTest {
 		final Map<String, Object> storage = new HashMap<>();
 
 		// when
-		final JsonNode cache = matchDayService.needUpdate(storage, "id=1234");
+		final JsonNode cache = this.matchDayService.needUpdate(storage, "id=1234");
 
 		// then
 		assertNull(cache);
@@ -217,7 +231,7 @@ public class MatchDayServiceTest {
 		contact.setLanguage("DE");
 
 		// when
-		final String matches = matchDayService.retrieveMatchDays(2, 4, contact);
+		final String matches = this.matchDayService.retrieveMatchDays(2, 4, contact);
 
 		// then
 		assertEquals(
@@ -228,7 +242,7 @@ public class MatchDayServiceTest {
 	@Test
 	public void map() throws Exception {
 		// given
-		final String json = IOUtils.toString(getClass().getResourceAsStream("/json/pollPrediction.json"),
+		final String json = IOUtils.toString(this.getClass().getResourceAsStream("/json/pollPrediction.json"),
 				StandardCharsets.UTF_8);
 
 		// when
@@ -265,7 +279,7 @@ public class MatchDayServiceTest {
 	}
 
 	private String result(final BigInteger clientMarketingId) throws Exception {
-		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
+		final ClientMarketing clientMarketing = this.repository.one(ClientMarketing.class, clientMarketingId);
 		final PollMatchDay poll = Json.toObject(Attachment.resolve(clientMarketing.getStorage()),
 				PollMatchDay.class);
 		final int max = (int) (10 + Math.random() * 100);
@@ -276,10 +290,10 @@ public class MatchDayServiceTest {
 			contactMarketing.setFinished(Boolean.TRUE);
 			contactMarketing.setStorage("{\"q0\":{\"a\":["
 					+ (int) (Math.random() * poll.questions.get(0).answers.size()) + "]}}");
-			repository.save(contactMarketing);
+			this.repository.save(contactMarketing);
 		}
 		clientMarketing.setEndDate(new Timestamp(System.currentTimeMillis() - 1000));
-		repository.save(clientMarketing);
-		return matchDayService.synchronize.result(clientMarketing.getClientId());
+		this.repository.save(clientMarketing);
+		return this.matchDayService.synchronize.result(clientMarketing.getClientId());
 	}
 }

@@ -37,17 +37,16 @@ public class ImportSportsBarServiceTest {
 	@Autowired
 	private Utils utils;
 
-	@Test
 	public void zipCode() throws Exception {
 		// given
-		utils.createContact(BigInteger.ONE);
+		this.utils.createContact(BigInteger.ONE);
 		final Storage storage = new Storage();
 		storage.setLabel("importSportBars");
 		storage.setStorage("[]");
-		repository.save(storage);
+		this.repository.save(storage);
 
 		// when
-		final Results result = importSportsBarService.zipCode("80331");
+		final Results result = this.importSportsBarService.zipCode("80331");
 
 		// then
 		assertTrue(result.processed > 10, "" + result.processed);
@@ -59,10 +58,10 @@ public class ImportSportsBarServiceTest {
 		// given
 		new File("dazn/52.73-7.75.json").delete();
 		new File("dazn/52.73-7.75.json.processed").delete();
-		Files.copy(getClass().getResourceAsStream("/json/52.73-7.75.json"), Path.of("dazn/52.73-7.75.json"));
+		Files.copy(this.getClass().getResourceAsStream("/json/52.73-7.75.json"), Path.of("dazn/52.73-7.75.json"));
 
 		// when
-		final CronResult result = importSportsBarService.cronImport();
+		final CronResult result = this.importSportsBarService.cronImport();
 
 		// then
 		assertNull(result.exception);
