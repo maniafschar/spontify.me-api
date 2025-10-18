@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.jq.findapp.entity.ClientNews;
@@ -33,6 +32,7 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.util.Entity;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 
 @Service
@@ -54,7 +54,7 @@ public class RssService {
 		for (int i = 0; i < list.size(); i++) {
 			final BigInteger clientId = (BigInteger) list.get(i).get("client.id");
 			try {
-				final JsonNode json = new ObjectMapper().readTree(list.get(i).get("client.storage").toString());
+				final JsonNode json = Json.toNode(list.get(i).get("client.storage").toString());
 				if (json.has("rss")) {
 					for (final JsonNode rss : json.get("rss"))
 						futures.add(CompletableFuture.supplyAsync(() -> new ImportFeed(rss, clientId,
@@ -140,7 +140,7 @@ public class RssService {
 											"/rest/marketing/news/" + clientNews.getId());
 									if (fbId != null) {
 										clientNews.setPublishId(fbId);
-										repository.save(clientNews);
+										RssService.this.repository.save(clientNews);
 									}
 								}
 							}
@@ -149,15 +149,15 @@ public class RssService {
 						}
 					}
 					if (count != 0)
-						success += count + " on " + clientId + " " + url;
+						this.success += count + " on " + clientId + " " + url;
 				}
 			} catch (final Exception ex) {
-				addFailure(ex, success + json.get("url").asText());
+				this.addFailure(ex, this.success + json.get("url").asText());
 			}
 		}
 
 		private void addFailure(final Exception ex, final String url) {
-			failed.add((ex.getMessage().startsWith("IMAGE_") ? "" : ex.getClass().getName() + ": ")
+			this.failed.add((ex.getMessage().startsWith("IMAGE_") ? "" : ex.getClass().getName() + ": ")
 					+ ex.getMessage().replace("\n", "\n  ") + "\n  " + url);
 		}
 
@@ -205,7 +205,7 @@ public class RssService {
 				final String html = IOUtils.toString(new URI(uid), StandardCharsets.UTF_8)
 						.replace('\r', ' ').replace('\n', ' ');
 				String s = null;
-				for (Pattern pattern : imageRegex) {
+				for (final Pattern pattern : this.imageRegex) {
 					final Matcher matcher = pattern.matcher(html);
 					if (matcher.find()) {
 						s = matcher.group(1);

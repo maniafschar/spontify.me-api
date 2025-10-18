@@ -16,7 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
 import com.jq.findapp.entity.ClientMarketing;
@@ -30,6 +29,7 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.CronService.CronResult;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Text.TextId;
 import com.jq.findapp.util.Utils;
 
@@ -49,7 +49,7 @@ public class MarketingServiceTest {
 	@Test
 	public void cronResult() throws Exception {
 		// given
-		utils.createContact(BigInteger.ONE);
+		this.utils.createContact(BigInteger.ONE);
 		final Question question = new Question();
 		question.question = "abc?";
 		question.textField = "input";
@@ -69,30 +69,31 @@ public class MarketingServiceTest {
 		clientMarketing.setClientId(BigInteger.ONE);
 		clientMarketing.setStartDate(new Timestamp(System.currentTimeMillis() - 1000));
 		clientMarketing.setEndDate(new Timestamp(System.currentTimeMillis() - 1));
-		clientMarketing.setStorage(new ObjectMapper().writeValueAsString(poll));
-		repository.save(clientMarketing);
+		clientMarketing.setStorage(Json.toString(poll));
+		this.repository.save(clientMarketing);
 		final ContactMarketing contactMarketing = new ContactMarketing();
 		contactMarketing.setClientMarketingId(clientMarketing.getId());
 		contactMarketing.setContactId(BigInteger.ONE);
 		contactMarketing.setFinished(true);
 		contactMarketing.setStorage("{\"q0\":{\"a\":[1],\"t\":\"25:0\"}}");
-		repository.save(contactMarketing);
+		this.repository.save(contactMarketing);
 
 		// when
-		final CronResult result = marketingService.cronResult();
+		final CronResult result = this.marketingService.cronResult();
 
 		// then
 		assertNull(result.exception);
 		assertEquals("sent 1 for " + clientMarketing.getId(), result.body.trim());
 		final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 		params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketing.getId());
-		final Result list = repository.list(params);
+		final Result list = this.repository.list(params);
 		assertEquals(1, list.size());
 		assertEquals(
 				"{\"participants\":1,\"finished\":1,\"answers\":{\"q0\":{\"a\":[0,1],\"t\":\"<div>25:0</div>\"}}}",
 				list.get(0).get("clientMarketingResult.storage"));
 		assertEquals(true,
-				repository.one(ClientMarketingResult.class, (BigInteger) list.get(0).get("clientMarketingResult.id"))
+				this.repository
+						.one(ClientMarketingResult.class, (BigInteger) list.get(0).get("clientMarketingResult.id"))
 						.getPublished());
 	}
 

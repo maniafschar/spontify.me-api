@@ -8,9 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.util.Json;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,7 +31,7 @@ public abstract class BaseEntity {
 	private Map<String, Object> old = null;
 
 	public BigInteger getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(final BigInteger id) {
@@ -39,7 +39,7 @@ public abstract class BaseEntity {
 	}
 
 	public Timestamp getCreatedAt() {
-		return createdAt;
+		return this.createdAt;
 	}
 
 	public void setCreatedAt(final Timestamp createdAt) {
@@ -47,7 +47,7 @@ public abstract class BaseEntity {
 	}
 
 	public Timestamp getModifiedAt() {
-		return modifiedAt;
+		return this.modifiedAt;
 	}
 
 	public void setModifiedAt(final Timestamp modifiedAt) {
@@ -56,14 +56,14 @@ public abstract class BaseEntity {
 
 	@Transient
 	public boolean modified() {
-		if (old == null)
+		if (this.old == null)
 			return true;
-		for (final Field field : getClass().getDeclaredFields()) {
+		for (final Field field : this.getClass().getDeclaredFields()) {
 			try {
-				if (old(field.getName()) != null)
+				if (this.old(field.getName()) != null)
 					return true;
-				if (old.get(field.getName()) == null) {
-					final Field fieldActual = getClass().getDeclaredField(field.getName());
+				if (this.old.get(field.getName()) == null) {
+					final Field fieldActual = this.getClass().getDeclaredField(field.getName());
 					fieldActual.setAccessible(true);
 					if (fieldActual.get(this) != null)
 						return true;
@@ -77,15 +77,15 @@ public abstract class BaseEntity {
 
 	@Transient
 	public void historize() {
-		if (id == null)
+		if (this.id == null)
 			return;
-		if (old == null)
-			old = new HashMap<>();
-		for (final Field field : getClass().getDeclaredFields()) {
+		if (this.old == null)
+			this.old = new HashMap<>();
+		for (final Field field : this.getClass().getDeclaredFields()) {
 			try {
 				field.setAccessible(true);
-				if (!old.containsKey(field.getName()))
-					old.put(field.getName(), field.get(this));
+				if (!this.old.containsKey(field.getName()))
+					this.old.put(field.getName(), field.get(this));
 			} catch (final Exception e) {
 				throw new RuntimeException("Failed to historize on " + field.getName(), e);
 			}
@@ -94,19 +94,19 @@ public abstract class BaseEntity {
 
 	@Transient
 	public void populate(final Map<String, Object> values) {
-		final BaseEntity ref = new ObjectMapper().convertValue(values, this.getClass());
+		final BaseEntity ref = Json.toObject(values, this.getClass());
 		values.forEach((name, value) -> {
 			if (!"id".equals(name) && !"createdAt".equals(name) && !"modifiedAt".equals(name)) {
 				try {
-					final Method m = getClass()
+					final Method m = this.getClass()
 							.getDeclaredMethod("get" + name.substring(0, 1).toUpperCase() + name.substring(1));
 					final Object valueOld = m.invoke(this), valueNew = m.invoke(ref);
 					if (!Objects.equals(valueOld, valueNew)) {
-						if (old != null)
-							old.put(name, valueOld);
+						if (this.old != null)
+							this.old.put(name, valueOld);
 						if (value instanceof String && ((String) value).contains("<"))
 							value = ((String) value).replace("<", "&lt;");
-						getClass()
+						this.getClass()
 								.getDeclaredMethod("set" + name.substring(0, 1).toUpperCase() + name.substring(1),
 										m.getReturnType())
 								.invoke(this, valueNew);
@@ -120,13 +120,13 @@ public abstract class BaseEntity {
 
 	@Transient
 	public Object old(final String name) {
-		if (old == null)
+		if (this.old == null)
 			return null;
-		final Object value = old.get(name);
+		final Object value = this.old.get(name);
 		if (value == null)
 			return null;
 		try {
-			final Field field = getClass().getDeclaredField(name);
+			final Field field = this.getClass().getDeclaredField(name);
 			field.setAccessible(true);
 			final Object compare = field.get(this);
 			return value.equals(compare)

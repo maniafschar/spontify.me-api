@@ -14,7 +14,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
 import com.jq.findapp.entity.Contact;
@@ -33,11 +32,11 @@ public class TextTest {
 	@Test
 	public void ids() throws Exception {
 		// given
-		final Contact contact = utils.createContact(BigInteger.ONE);
+		final Contact contact = this.utils.createContact(BigInteger.ONE);
 
 		// when
 		for (final TextId id : TextId.values())
-			text.getText(contact, id);
+			this.text.getText(contact, id);
 
 		// then no exceptions
 	}
@@ -45,14 +44,14 @@ public class TextTest {
 	@Test
 	public void json() throws Exception {
 		// given
-		final JsonNode de = new ObjectMapper().readTree(
-				IOUtils.toString(Text.class.getResourceAsStream("/lang/DE.json"), StandardCharsets.UTF_8));
-		final JsonNode en = new ObjectMapper().readTree(
-				IOUtils.toString(Text.class.getResourceAsStream("/lang/EN.json"), StandardCharsets.UTF_8));
+		final JsonNode de = Json
+				.toNode(IOUtils.toString(Text.class.getResourceAsStream("/lang/DE.json"), StandardCharsets.UTF_8));
+		final JsonNode en = Json
+				.toNode(IOUtils.toString(Text.class.getResourceAsStream("/lang/EN.json"), StandardCharsets.UTF_8));
 
 		// when
-		iterate(de.fields(), en);
-		iterate(en.fields(), de);
+		this.iterate(de.fields(), en);
+		this.iterate(en.fields(), de);
 
 		// then no exceptions
 	}
@@ -63,7 +62,7 @@ public class TextTest {
 			if (compare.get(entry.getKey()) == null)
 				throw new IllegalArgumentException("missing key " + entry.getKey() + " in en");
 			if (entry.getValue().isObject())
-				iterate(entry.getValue().fields(), compare.get(entry.getKey()));
+				this.iterate(entry.getValue().fields(), compare.get(entry.getKey()));
 		}
 	}
 }

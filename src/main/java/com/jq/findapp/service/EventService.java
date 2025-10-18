@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jq.findapp.entity.Client;
@@ -69,7 +68,7 @@ public class EventService {
 	@Autowired
 	private MatchDayService matchDayService;
 
-	public static List<String> getAnswers(JsonNode poll, long state) {
+	public static List<String> getAnswers(final JsonNode poll, long state) {
 		final List<String> answers = new ArrayList<>();
 		if (state < 0)
 			state += 2 * Integer.MAX_VALUE - 2;
@@ -89,43 +88,43 @@ public class EventService {
 					"contact.verified=true and contact.version is not null and contact.longitude is not null and (" +
 							"(length(contact.skills)>0 or length(contact.skillsText)>0))");
 			params.setLimit(0);
-			final Result ids = repository.list(params);
+			final Result ids = this.repository.list(params);
 			params.setQuery(Query.event_listMatching);
 			params.setDistance(50);
 			params.setSearch("event.endDate>current_timestamp");
 			int count = 0;
 			for (int i = 0; i < ids.size(); i++) {
-				params.setUser(repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id")));
+				params.setUser(this.repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id")));
 				params.setLatitude(params.getUser().getLatitude());
 				params.setLongitude(params.getUser().getLongitude());
-				final Result events = repository.list(params);
+				final Result events = this.repository.list(params);
 				for (int i2 = 0; i2 < events.size(); i2++) {
-					final Event event = repository.one(Event.class, (BigInteger) events.get(i2).get("event.id"));
+					final Event event = this.repository.one(Event.class, (BigInteger) events.get(i2).get("event.id"));
 					if (!params.getUser().getId().equals(event.getContactId())) {
-						final Instant realDate = getRealDate(event);
-						final Contact contactEvent = repository.one(Contact.class, event.getContactId());
+						final Instant realDate = this.getRealDate(event);
+						final Contact contactEvent = this.repository.one(Contact.class, event.getContactId());
 						if (realDate.isAfter(Instant.now())
 								&& realDate.minus(Duration.ofDays(1)).isBefore(Instant.now())
-								&& !isMaxParticipants(event, realDate, params.getUser())
+								&& !this.isMaxParticipants(event, realDate, params.getUser())
 								&& Score.getContact(contactEvent, params.getUser()) > 0.4) {
 							final ZonedDateTime t = realDate
 									.atZone(TimeZone.getTimeZone(params.getUser().getTimezone()).toZoneId());
 							final String time = t.getHour() + ":" + (t.getMinute() < 10 ? "0" : "") + t.getMinute();
 							if (event.getLocationId() == null)
-								notificationService.sendNotification(contactEvent,
+								this.notificationService.sendNotification(contactEvent,
 										params.getUser(), TextId.notification_eventNotifyWithoutLocation,
 										Strings.encodeParam(
 												"e=" + event.getId() + "_" + realDate.toString().substring(0, 10)),
 										time, event.getDescription());
 							else
-								notificationService.sendNotification(contactEvent,
+								this.notificationService.sendNotification(contactEvent,
 										params.getUser(), TextId.notification_eventNotify,
 										Strings.encodeParam(
 												"e=" + event.getId() + "_" + realDate.toString().substring(0, 10)),
 										(realDate.atOffset(ZoneOffset.ofHours(0)).getDayOfYear() == Instant.now()
 												.atOffset(ZoneOffset.ofHours(0)).getDayOfYear()
-														? text.getText(params.getUser(), TextId.today)
-														: text.getText(params.getUser(), TextId.tomorrow))
+														? this.text.getText(params.getUser(), TextId.today)
+														: this.text.getText(params.getUser(), TextId.tomorrow))
 												+ " " + time,
 										(String) events.get(i2).get("location.name"));
 							count++;
@@ -151,15 +150,15 @@ public class EventService {
 					+ "' as timestamp) and eventParticipate.eventDate<cast('"
 					+ Instant.now().plus(Duration.ofDays(1)) + "' as timestamp)");
 			params.setLimit(0);
-			final Result ids = repository.list(params);
+			final Result ids = this.repository.list(params);
 			final ZonedDateTime now = Instant.now().atZone(ZoneOffset.UTC);
 			int count = 0;
 			for (int i = 0; i < ids.size(); i++) {
-				final EventParticipate eventParticipate = repository.one(EventParticipate.class,
+				final EventParticipate eventParticipate = this.repository.one(EventParticipate.class,
 						(BigInteger) ids.get(i).get("eventParticipate.id"));
-				final Event event = repository.one(Event.class, eventParticipate.getEventId());
+				final Event event = this.repository.one(Event.class, eventParticipate.getEventId());
 				if (event == null)
-					repository.delete(eventParticipate);
+					this.repository.delete(eventParticipate);
 				else {
 					final ZonedDateTime time = Instant.ofEpochMilli(event.getStartDate().getTime())
 							.atZone(ZoneOffset.UTC);
@@ -167,18 +166,19 @@ public class EventService {
 							(time.getHour() == 0
 									|| time.getHour() > now.getHour() && time.getHour() < now.getHour() + 3)) {
 						if (event.getLocationId() != null && event.getLocationId().compareTo(BigInteger.ZERO) > 0) {
-							if (repository.one(Location.class, event.getLocationId()) == null)
-								repository.delete(event);
+							if (this.repository.one(Location.class, event.getLocationId()) == null)
+								this.repository.delete(event);
 							else {
-								final Contact contact = repository.one(Contact.class, eventParticipate.getContactId());
+								final Contact contact = this.repository.one(Contact.class,
+										eventParticipate.getContactId());
 								final ZonedDateTime t = event.getStartDate().toInstant()
 										.atZone(TimeZone.getTimeZone(contact.getTimezone()).toZoneId());
-								notificationService.sendNotification(
-										repository.one(Contact.class, event.getContactId()),
+								this.notificationService.sendNotification(
+										this.repository.one(Contact.class, event.getContactId()),
 										contact, TextId.notification_eventNotification,
 										Strings.encodeParam(
 												"e=" + event.getId() + "_" + eventParticipate.getEventDate()),
-										repository.one(Location.class, event.getLocationId()).getName(),
+										this.repository.one(Location.class, event.getLocationId()).getName(),
 										t.getHour() + ":" + (t.getMinute() < 10 ? "0" : "") + t.getMinute());
 								count++;
 							}
@@ -196,38 +196,38 @@ public class EventService {
 	private boolean publish(final Event event) {
 		if (!Strings.isEmpty(event.getPublishId()))
 			return false;
-		final Instant startDate = getRealDate(event);
+		final Instant startDate = this.getRealDate(event);
 		if (startDate.isBefore(Instant.now()) || startDate.minus(Duration.ofDays(1)).isAfter(Instant.now()))
 			return false;
-		final Contact contact = repository.one(Contact.class, event.getContactId());
+		final Contact contact = this.repository.one(Contact.class, event.getContactId());
 		final Location location = event.getLocationId() == null ? null
-				: repository.one(Location.class, event.getLocationId());
+				: this.repository.one(Location.class, event.getLocationId());
 		final String date = new SimpleDateFormat("d.M.yyyy H:mm").format(new Date(startDate.toEpochMilli()));
 		try {
-			final JsonNode json = new ObjectMapper()
-					.readTree(Attachment.resolve(repository.one(Client.class, contact.getClientId()).getStorage()));
+			final JsonNode json = Json
+					.toNode(Attachment.resolve(this.repository.one(Client.class, contact.getClientId()).getStorage()));
 			final String description;
 			if (event.getType() == EventType.Poll)
-				description = text.getText(contact, TextId.event_fbPoll)
+				description = this.text.getText(contact, TextId.event_fbPoll)
 						.replace("{pseudonym}", contact.getPseudonym()).replace("{date}", date)
 						.replace("{question}", Json.toNode(event.getDescription()).get("q").asText());
 			else if (location == null)
-				description = text.getText(contact, TextId.event_fbWithoutLocation)
+				description = this.text.getText(contact, TextId.event_fbWithoutLocation)
 						.replace("{pseudonym}", contact.getPseudonym()).replace("{date}", date)
 						.replace("{description}", event.getDescription());
 			else
 				description = date + "\n" + event.getDescription() + "\n\n" + location.getName() + "\n"
 						+ location.getAddress();
-			final String fbId = externalService.publishOnFacebook(contact.getClientId(),
+			final String fbId = this.externalService.publishOnFacebook(contact.getClientId(),
 					description + (json.has("publishingPostfix") ? "\n\n" +
 							json.get("publishingPostfix").asText() : ""),
 					"/rest/marketing/event/" + event.getId());
 			if (fbId != null) {
 				event.setPublishId(fbId);
-				repository.save(event);
+				this.repository.save(event);
 			}
 			return true;
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw new RuntimeException(ex);
 		}
 	}
@@ -259,7 +259,7 @@ public class EventService {
 		params.setUser(contact);
 		params.setSearch("eventParticipate.eventId=" + event.getId() + " and eventParticipate.eventDate=cast('"
 				+ date + "' as date) and eventParticipate.state=1");
-		return repository.list(params).size() >= event.getMaxParticipants().intValue();
+		return this.repository.list(params).size() >= event.getMaxParticipants().intValue();
 	}
 
 	@Cron("40 5")
@@ -267,7 +267,7 @@ public class EventService {
 		final CronResult result = new CronResult();
 		try {
 			final BigInteger clientId = BigInteger.ONE;
-			result.body = "Munich: " + importMunich.run(this, clientId);
+			result.body = "Munich: " + this.importMunich.run(this, clientId);
 		} catch (final Exception e) {
 			result.exception = e;
 		}
@@ -279,7 +279,7 @@ public class EventService {
 		final CronResult result = new CronResult();
 		try {
 			final BigInteger clientId = BigInteger.ONE;
-			result.body = publishClient(clientId) + " client\n" + publishUser() + " user";
+			result.body = this.publishClient(clientId) + " client\n" + this.publishUser() + " user";
 		} catch (final Exception e) {
 			result.exception = e;
 		}
@@ -293,24 +293,24 @@ public class EventService {
 			final QueryParams params = new QueryParams(Query.event_listId);
 			params.setSearch("event.repetition='" + Repetition.Games.name()
 					+ "' and event.startDate is null and event.skills like '9.%'");
-			final Result events = repository.list(params);
+			final Result events = this.repository.list(params);
 			events.forEach(e -> {
-				final Event event = repository.one(Event.class, (BigInteger) e.get("event.id"));
+				final Event event = this.repository.one(Event.class, (BigInteger) e.get("event.id"));
 				event.setDescription(event.getDescription() + " ");
-				repository.save(event);
+				this.repository.save(event);
 			});
 			result.body = events.size() + " initialized\n";
 			final Set<String> processed = new HashSet<>();
 			params.setSearch("event.repetition='" + Repetition.Games.name()
 					+ "' and event.skills like '9.%' and event.skills not like '%X%'");
 			final AtomicInteger updated = new AtomicInteger();
-			repository.list(params).forEach(e -> {
+			this.repository.list(params).forEach(e -> {
 				final String key = e.get("event.contactId") + "-"
 						+ e.get("event.locationId") + "-"
 						+ e.get("event.skills");
 				if (!processed.contains(key)) {
 					processed.add(key);
-					if (updateSeries(repository.one(Event.class, (BigInteger) e.get("event.id"))) > 0)
+					if (this.updateSeries(this.repository.one(Event.class, (BigInteger) e.get("event.id"))) > 0)
 						updated.incrementAndGet();
 				}
 			});
@@ -326,10 +326,10 @@ public class EventService {
 	public CronResult cronMarketing() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.misc_listClient);
-		final Result list = repository.list(params);
+		final Result list = this.repository.list(params);
 		params.setQuery(Query.event_listId);
 		for (int i = 0; i < list.size(); i++) {
-			final Client client = repository.one(Client.class, (BigInteger) list.get(i).get("client.id"));
+			final Client client = this.repository.one(Client.class, (BigInteger) list.get(i).get("client.id"));
 			final JsonNode node = Json.toNode(Attachment.resolve(client.getStorage()));
 			if (node.has("marketing")) {
 				for (int i2 = 0; i2 < node.get("marketing").size(); i2++) {
@@ -341,7 +341,7 @@ public class EventService {
 												.toString()
 												.substring(0, 19)
 										+ "' as timestamp)");
-						final Result events = repository.list(params);
+						final Result events = this.repository.list(params);
 						if (events.size() == 0) {
 							final JsonNode text = node.get("marketing").get(i2).get("text");
 							final LocalDate date = LocalDate.now();
@@ -360,18 +360,19 @@ public class EventService {
 							event.setLatitude(48.1330090f);
 							event.setLongitude(11.56684f);
 							event.setType(EventType.Inquiry);
-							repository.save(event);
+							this.repository.save(event);
 							result.body += client.getId() + "\n";
 							break;
 						} else {
-							final Event event = repository.one(Event.class, (BigInteger) events.get(0).get("event.id"));
+							final Event event = this.repository.one(Event.class,
+									(BigInteger) events.get(0).get("event.id"));
 							if (Instant
 									.ofEpochMilli((event.getModifiedAt() == null ? event.getCreatedAt()
 											: event.getModifiedAt()).getTime())
 									.plus(Duration.ofHours(4))
 									.isBefore(Instant.now())) {
 								event.setPublishId(null);
-								if (publish(event)) {
+								if (this.publish(event)) {
 									result.body += client.getId() + "\n";
 									break;
 								}
@@ -394,10 +395,10 @@ public class EventService {
 				+ " and event.repetition='Once'"
 				+ " and event.maxParticipants is null"
 				+ " and event.publishId is null");
-		final Result result = repository.list(params);
+		final Result result = this.repository.list(params);
 		final StringBuffer s = new StringBuffer();
 		result.forEach(e -> {
-			if (publish(repository.one(Event.class, (BigInteger) e.get("event.id"))))
+			if (this.publish(this.repository.one(Event.class, (BigInteger) e.get("event.id"))))
 				s.append("x");
 		});
 		return s.length();
@@ -410,10 +411,10 @@ public class EventService {
 				+ " and event.publishId is null"
 				+ " and (event.modifiedAt is null or event.modifiedAt<cast('"
 				+ Instant.now().minus(Duration.ofMinutes(15)) + "' as timestamp))");
-		final Result result = repository.list(params);
+		final Result result = this.repository.list(params);
 		final StringBuffer s = new StringBuffer();
 		result.forEach(e -> {
-			if (publish(repository.one(Event.class, (BigInteger) e.get("event.id"))))
+			if (this.publish(this.repository.one(Event.class, (BigInteger) e.get("event.id"))))
 				s.append("x");
 		});
 		return s.length();
@@ -433,23 +434,23 @@ public class EventService {
 				&& event.getSkills().startsWith("9.") && event.getLocationId() != null
 				&& !event.getSkills().contains("X")) {
 			if (event.getSeriesId() == null) {
-				final List<FutureEvent> futureEvents = matchDayService
+				final List<FutureEvent> futureEvents = this.matchDayService
 						.futureEvents(Integer.valueOf(event.getSkills().substring(2)));
 				if (!futureEvents.isEmpty()) {
 					final FutureEvent futureEvent = futureEvents.get(0);
 					event.setStartDate(new Timestamp(futureEvent.time - EventListener.SERIES_TIMELAP));
 					event.setSeriesId(futureEvent.time);
 					event.setDescription(futureEvent.subject + "\n" + event.getDescription().trim());
-					repository.save(event);
+					this.repository.save(event);
 				} else
 					return 0;
 			}
-			final List<FutureEvent> futureEvents = matchDayService
+			final List<FutureEvent> futureEvents = this.matchDayService
 					.futureEvents(Integer.valueOf(event.getSkills().substring(2)));
 			final String description = event.getDescription().contains("\n")
 					? event.getDescription().substring(event.getDescription().indexOf("\n"))
 					: "\n" + event.getDescription();
-			final Contact contact = repository.one(Contact.class, event.getContactId());
+			final Contact contact = this.repository.one(Contact.class, event.getContactId());
 			final String storage = contact.getStorage();
 			final ObjectNode imported = Strings.isEmpty(storage) ? Json.createObject()
 					: (ObjectNode) Json.toNode(Attachment.resolve(storage));
@@ -459,7 +460,7 @@ public class EventService {
 			else
 				importedIds = imported.putArray("eventSeries");
 			int count = 0;
-			for (FutureEvent futureEvent : futureEvents) {
+			for (final FutureEvent futureEvent : futureEvents) {
 				if (futureEvent.time > event.getSeriesId()
 						&& !importedIds.toString().contains('"' + event.getSkills() + '.' + futureEvent.time + '"')) {
 					final Event e = new Event();
@@ -477,19 +478,19 @@ public class EventService {
 					e.setStartDate(new Timestamp(futureEvent.time - EventListener.SERIES_TIMELAP));
 					e.setType(event.getType());
 					e.setUrl(event.getUrl());
-					repository.save(e);
+					this.repository.save(e);
 					count++;
 					importedIds.add(event.getSkills() + '.' + futureEvent.time);
 				}
 			}
-			repository.executeUpdate("update Event event set event.repetition='" + Repetition.Games.name()
+			this.repository.executeUpdate("update Event event set event.repetition='" + Repetition.Games.name()
 					+ "' where event.repetition='" + Repetition.Once.name() + "' and event.contactId="
 					+ event.getContactId() + " and event.skills='" + event.getSkills()
 					+ "' and event.locationId=" + event.getLocationId());
 			if (!importedIds.toString().contains('"' + event.getSkills() + '.' + event.getSeriesId() + '"'))
 				importedIds.add(event.getSkills() + '.' + event.getSeriesId());
 			contact.setStorage(Json.toString(imported));
-			repository.save(contact);
+			this.repository.save(contact);
 			return count;
 		}
 		return 0;

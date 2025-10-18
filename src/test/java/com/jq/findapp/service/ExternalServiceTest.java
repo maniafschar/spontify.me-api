@@ -11,9 +11,8 @@ import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.entity.Ip;
+import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 
 public class ExternalServiceTest {
@@ -62,8 +61,7 @@ public class ExternalServiceTest {
 		loc.find();
 
 		// when
-		final Ip ip = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-				.readValue(response, Ip.class);
+		final Ip ip = Json.toObject(response, Ip.class);
 		ip.setLatitude(Float.parseFloat(loc.group(1).split(",")[1]));
 
 		// then

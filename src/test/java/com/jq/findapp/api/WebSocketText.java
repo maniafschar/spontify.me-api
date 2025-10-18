@@ -8,8 +8,8 @@ import java.util.HashMap;
 
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.findapp.api.WebSocket.VideoMessage;
+import com.jq.findapp.util.Json;
 
 public class WebSocketText {
 
@@ -24,7 +24,7 @@ public class WebSocketText {
 		videoMessage.name = "name";
 
 		// when
-		final String s = new ObjectMapper().writeValueAsString(videoMessage);
+		final String s = Json.toString(videoMessage);
 
 		// then
 		assertNotNull(s);
