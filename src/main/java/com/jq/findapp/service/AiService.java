@@ -26,6 +26,28 @@ public class AiService {
 	@Value("${app.google.gemini.apiKey}")
 	private String geminiKey;
 
+	public String text(final String question) {
+		final List<Content> contents = ImmutableList.of(Content.builder().role("user")
+				.parts(ImmutableList.of(Part.fromText(question)))
+				.build());
+		final GenerateContentConfig config = GenerateContentConfig.builder()
+				.thinkingConfig(ThinkingConfig.builder().thinkingBudget(0).build())
+				.build();
+		try (final ResponseStream<GenerateContentResponse> responseStream = Client.builder().apiKey(this.geminiKey)
+				.build().models.generateContentStream("gemini-2.5-flash-lite", contents, config)) {
+			final StringBuffer s = new StringBuffer();
+			for (final GenerateContentResponse res : responseStream) {
+				if (res.candidates().isEmpty() || res.candidates().get().get(0).content().isEmpty()
+						|| res.candidates().get().get(0).content().get().parts().isEmpty())
+					continue;
+				final List<Part> parts = res.candidates().get().get(0).content().get().parts().get();
+				for (final Part part : parts)
+					s.append(part.text().orElse(""));
+			}
+			return s.toString();
+		}
+	}
+
 	public List<Location> locations(final String question) {
 		final List<Content> contents = ImmutableList.of(Content.builder().role("user")
 				.parts(ImmutableList.of(Part.fromText(question)))

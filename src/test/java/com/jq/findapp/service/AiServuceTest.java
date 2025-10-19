@@ -24,15 +24,28 @@ public class AiServuceTest {
 	private AiService aiService;
 
 	@Test
-	public void ask() {
+	public void locations() {
 		// given
 
 		// when
 		final List<Location> locations = this.aiService.locations(
-				"I'm currenty in Munich, Germany, 80333 and I like Whisky and Beer. Plaese recommend me some locations for tonight.");
+				"I'm currenty in Munich, Germany, 80333 and I like Whisky and Beer. Plaese recommend me some locations.");
 
 		// then
 		assertNotNull(locations);
 		assertTrue(locations.size() > 0);
+	}
+
+	@Test
+	public void text() {
+		// given
+
+		// when
+		final String text = this.aiService.text(
+				"Tell me some special moments of the matches between FC Bayern München and 1. FC Nürnberg of the past 80 years.");
+
+		// then
+		assertNotNull(text);
+		assertTrue(text.length() > 20);
 	}
 }
