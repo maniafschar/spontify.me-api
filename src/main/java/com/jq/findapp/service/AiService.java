@@ -1,10 +1,12 @@
 package com.jq.findapp.service;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +20,10 @@ import com.google.genai.types.Part;
 import com.google.genai.types.Schema;
 import com.google.genai.types.ThinkingConfig;
 import com.google.genai.types.Type;
+import com.jq.findapp.entity.Ai;
+import com.jq.findapp.entity.Ai.AiType;
 import com.jq.findapp.entity.Location;
+import com.jq.findapp.repository.Repository;
 import com.jq.findapp.util.Json;
 
 @Service
@@ -26,15 +31,48 @@ public class AiService {
 	@Value("${app.google.gemini.apiKey}")
 	private String geminiKey;
 
+	@Autowired
+	private Repository repository;
+
 	public String text(final String question) {
+		final String answer = this.call(question, null);
+		final Ai ai = new Ai();
+		ai.setQuestion(question);
+		ai.setAnswer(answer);
+		ai.setType(AiType.Text);
+		this.repository.save(ai);
+		return answer;
+	}
+
+	public List<Location> locations(final String question) {
+		final String answer = this.call(question, this.createLocationSchema());
+		final List<Location> locations = Arrays.asList(Json.toObject(answer, Location[].class));
+		for (Location location : locations) {
+			try {
+				this.repository.save(location);
+			} catch (final IllegalArgumentException ex) {
+				if (ex.getMessage().startsWith("location exists: "))
+					location = this.repository.one(Location.class, new BigInteger(ex.getMessage().substring(17)));
+			}
+			final Ai ai = new Ai();
+			ai.setQuestion(question);
+			ai.setAnswer(location.getId().toString());
+			ai.setType(AiType.Location);
+			this.repository.save(ai);
+		}
+		return locations;
+	}
+
+	private String call(final String question, final Schema schema) {
+		final GenerateContentConfig.Builder config = GenerateContentConfig.builder()
+				.thinkingConfig(ThinkingConfig.builder().thinkingBudget(0).build());
+		if (schema != null)
+			config.responseMimeType("application/json").responseSchema(schema);
 		final List<Content> contents = ImmutableList.of(Content.builder().role("user")
 				.parts(ImmutableList.of(Part.fromText(question)))
 				.build());
-		final GenerateContentConfig config = GenerateContentConfig.builder()
-				.thinkingConfig(ThinkingConfig.builder().thinkingBudget(0).build())
-				.build();
 		try (final ResponseStream<GenerateContentResponse> responseStream = Client.builder().apiKey(this.geminiKey)
-				.build().models.generateContentStream("gemini-2.5-flash-lite", contents, config)) {
+				.build().models.generateContentStream("gemini-2.5-flash-lite", contents, config.build())) {
 			final StringBuffer s = new StringBuffer();
 			for (final GenerateContentResponse res : responseStream) {
 				if (res.candidates().isEmpty() || res.candidates().get().get(0).content().isEmpty()
@@ -45,30 +83,6 @@ public class AiService {
 					s.append(part.text().orElse(""));
 			}
 			return s.toString();
-		}
-	}
-
-	public List<Location> locations(final String question) {
-		final List<Content> contents = ImmutableList.of(Content.builder().role("user")
-				.parts(ImmutableList.of(Part.fromText(question)))
-				.build());
-		final GenerateContentConfig config = GenerateContentConfig.builder()
-				.thinkingConfig(ThinkingConfig.builder().thinkingBudget(0).build())
-				.responseMimeType("application/json")
-				.responseSchema(this.createLocationSchema())
-				.build();
-		try (final ResponseStream<GenerateContentResponse> responseStream = Client.builder().apiKey(this.geminiKey)
-				.build().models.generateContentStream("gemini-2.5-flash-lite", contents, config)) {
-			final StringBuffer s = new StringBuffer();
-			for (final GenerateContentResponse res : responseStream) {
-				if (res.candidates().isEmpty() || res.candidates().get().get(0).content().isEmpty()
-						|| res.candidates().get().get(0).content().get().parts().isEmpty())
-					continue;
-				final List<Part> parts = res.candidates().get().get(0).content().get().parts().get();
-				for (final Part part : parts)
-					s.append(part.text().orElse(""));
-			}
-			return Arrays.asList(Json.toObject(s.toString(), Location[].class));
 		}
 	}
 
