@@ -56,6 +56,7 @@ public enum Query {
 	location_listId,
 	location_listVisit,
 
+	misc_ai,
 	misc_block,
 	misc_geoLocation,
 	misc_listClient,
