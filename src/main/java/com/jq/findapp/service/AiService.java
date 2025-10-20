@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.ImmutableList;
 import com.google.genai.Client;
 import com.google.genai.ResponseStream;
@@ -45,20 +47,42 @@ public class AiService {
 	}
 
 	public List<Location> locations(final String question) {
-		final String answer = this.call(question, this.createLocationSchema());
-		final List<Location> locations = Arrays.asList(Json.toObject(answer, Location[].class));
+		final List<Location> locations = Arrays.asList(Json.toObject(
+				this.call(question, this.createSchema(false)), Location[].class));
 		for (Location location : locations) {
+			final Ai ai = new Ai();
 			try {
 				this.repository.save(location);
+				ai.setAnswer(location.getId().toString());
 			} catch (final IllegalArgumentException ex) {
 				if (ex.getMessage().startsWith("location exists: "))
-					location = this.repository.one(Location.class, new BigInteger(ex.getMessage().substring(17)));
+					ai.setAnswer(new BigInteger(ex.getMessage().substring(17)).toString());
 			}
+			if (!Strings.isEmpty(ai.getAnswer())) {
+				ai.setQuestion(question);
+				ai.setType(AiType.Location);
+				this.repository.save(ai);
+			}
+		}
+		return locations;
+	}
+
+	public List<Event> events(final String question) {
+		final ArrayNode events = (ArrayNode) Json.toNode(this.call(question, this.createSchema(true)));
+		for (Node event : events) {
 			final Ai ai = new Ai();
-			ai.setQuestion(question);
-			ai.setAnswer(location.getId().toString());
-			ai.setType(AiType.Location);
-			this.repository.save(ai);
+			try {
+				this.repository.save(location);
+				ai.setAnswer(location.getId().toString());
+			} catch (final IllegalArgumentException ex) {
+				if (ex.getMessage().startsWith("location exists: "))
+					ai.setAnswer(new BigInteger(ex.getMessage().substring(17)).toString());
+			}
+			if (!Strings.isEmpty(ai.getAnswer())) {
+				ai.setQuestion(question);
+				ai.setType(AiType.Location);
+				this.repository.save(ai);
+			}
 		}
 		return locations;
 	}
@@ -86,18 +110,22 @@ public class AiService {
 		}
 	}
 
-	private Schema createLocationSchema() {
+	private Schema createSchema(boolean event) {
 		final Map<String, Schema> location = new HashMap<>();
 		location.put("country", Schema.builder().type(Type.Known.STRING).description("ISO 3166 Alpha 2 code").build());
 		location.put("description", Schema.builder().type(Type.Known.STRING).build());
 		location.put("email", Schema.builder().type(Type.Known.STRING).build());
-		location.put("name", Schema.builder().type(Type.Known.STRING).build());
 		location.put("number", Schema.builder().type(Type.Known.STRING).build());
 		location.put("street", Schema.builder().type(Type.Known.STRING).build());
 		location.put("telephone", Schema.builder().type(Type.Known.STRING).build());
 		location.put("town", Schema.builder().type(Type.Known.STRING).build());
 		location.put("url", Schema.builder().type(Type.Known.STRING).build());
 		location.put("zipCode", Schema.builder().type(Type.Known.STRING).build());
+		if (event) {
+			location.put("date", Schema.builder().type(Type.Known.STRING).format("date-time").build());
+			location.put("location_name", Schema.builder().type(Type.Known.STRING).build());
+		} else
+			location.put("name", Schema.builder().type(Type.Known.STRING).build());
 
 		return Schema.builder()
 				.type(Type.Known.ARRAY)
