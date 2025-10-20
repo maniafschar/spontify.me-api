@@ -47,6 +47,7 @@ import com.jq.findapp.entity.ClientMarketing.Question;
 import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.ClientMarketingResult.PollResult;
 import com.jq.findapp.entity.Contact;
+import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.Event.FutureEvent;
 import com.jq.findapp.entity.Storage;
 import com.jq.findapp.entity.Ticket.TicketType;
@@ -57,6 +58,8 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
+import com.jq.findapp.service.model.Match;
+import com.jq.findapp.service.model.Response;
 import com.jq.findapp.util.Entity;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
@@ -108,7 +111,8 @@ public class MatchDayService {
 
 		BigInteger prediction(final BigInteger clientId, final int teamId) throws Exception {
 			final long now = Instant.now().getEpochSecond();
-			final JsonNode json = get("team=" + teamId + "&season=" + currentSeason());
+			final JsonNode json = MatchDayService.this
+					.get("team=" + teamId + "&season=" + MatchDayService.this.currentSeason());
 			for (int i = 0; i < json.size(); i++) {
 				if ("NS".equals(json.get(i).get("fixture").get("status").get("short").asText())) {
 					final Instant date = Instant
@@ -132,7 +136,7 @@ public class MatchDayService {
 						poll.location = json.get(i).get("teams").get("home").get("id").asInt() == teamId ? "home"
 								: "away";
 						poll.subject = poll.homeName + " : " + poll.awayName + " (" + poll.city + " · " + poll.venue
-								+ " · " + formatDate(poll.timestamp, null) + ")";
+								+ " · " + MatchDayService.this.formatDate(poll.timestamp, null) + ")";
 						poll.textId = TextId.notification_clientMarketingPollPrediction;
 						final Instant end = Instant.ofEpochSecond(poll.timestamp)
 								.minus(Duration.ofMinutes(15));
@@ -140,8 +144,8 @@ public class MatchDayService {
 						params.setSearch(
 								"clientMarketing.endDate=cast('" + end + "' as timestamp) and clientMarketing.clientId="
 										+ clientId);
-						if (repository.list(params).size() == 0) {
-							predictionAddStatistics(clientId, poll);
+						if (MatchDayService.this.repository.list(params).size() == 0) {
+							this.predictionAddStatistics(clientId, poll);
 							final ClientMarketing clientMarketing = new ClientMarketing();
 							clientMarketing.setCreateResult(true);
 							clientMarketing.setClientId(clientId);
@@ -151,9 +155,9 @@ public class MatchDayService {
 							clientMarketing.setEndDate(new Timestamp(end.toEpochMilli()));
 							clientMarketing.setStorage(Json.toString(poll));
 							clientMarketing.setImage(Attachment.createImage(".png",
-									image.create(poll, "Ergebnistipps",
-											repository.one(Client.class, clientId), null)));
-							repository.save(clientMarketing);
+									MatchDayService.this.image.create(poll, "Ergebnistipps",
+											MatchDayService.this.repository.one(Client.class, clientId), null)));
+							MatchDayService.this.repository.save(clientMarketing);
 							return clientMarketing.getId();
 						}
 					}
@@ -169,13 +173,14 @@ public class MatchDayService {
 			poll.questions.add(question);
 			final int teamId = poll.location == "away" ? poll.awayId : poll.homeId;
 			final List<Map<String, Object>> matches = new ArrayList<>();
-			for (int i = FIRST_YEAR; i <= currentSeason(); i++) {
-				final JsonNode json = get("team=" + teamId + "&season=" + i);
+			for (int i = FIRST_YEAR; i <= MatchDayService.this.currentSeason(); i++) {
+				final JsonNode json = MatchDayService.this.get("team=" + teamId + "&season=" + i);
 				for (int i2 = 0; i2 < json.size(); i2++) {
 					if (json.get(i2).get("teams").get("home").get("id").asInt() == poll.homeId
 							&& json.get(i2).get("teams").get("away").get("id").asInt() == poll.awayId
 							&& "FT".equals(json.get(i2).get("fixture").get("status").get("short").asText())) {
-						final JsonNode fixture = get("id=" + json.get(i2).get("fixture").get("id").asInt()).get(0);
+						final JsonNode fixture = MatchDayService.this
+								.get("id=" + json.get(i2).get("fixture").get("id").asInt()).get(0);
 						if (fixture != null && fixture.has("statistics") && fixture.get("statistics").size() > 1
 								&& fixture.get("statistics").get(0).has("statistics")) {
 							final Map<String, Object> match = new HashMap<>();
@@ -217,7 +222,7 @@ public class MatchDayService {
 				}
 				if (i < 8)
 					poll.matches.add(s + "|"
-							+ formatDate((Long) matches.get(i).get("timestamp"), null));
+							+ MatchDayService.this.formatDate((Long) matches.get(i).get("timestamp"), null));
 			}
 			final List<Map<String, Object>> statistics = new ArrayList<>();
 			for (int i = 0; i < labels.size(); i++) {
@@ -248,13 +253,14 @@ public class MatchDayService {
 					+ " - "
 					+ poll.awayName
 					+ "</div>vom <b>"
-					+ formatDate(poll.timestamp, null)
+					+ MatchDayService.this.formatDate(poll.timestamp, null)
 					+ "</b>. Möchtest Du teilnehmen?";
 			poll.epilog = "Lieben Dank für Deine Teilnahme!\nDas Ergebnis wird kurz vor dem Spiel hier bekanntgegeben.";
 		}
 
 		BigInteger playerOfTheMatch(final BigInteger clientId, final int teamId) throws Exception {
-			final JsonNode matchDays = get("team=" + teamId + "&season=" + currentSeason());
+			final JsonNode matchDays = MatchDayService.this
+					.get("team=" + teamId + "&season=" + MatchDayService.this.currentSeason());
 			if (matchDays != null) {
 				for (int i = 0; i < matchDays.size(); i++) {
 					if ("FT".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())) {
@@ -267,11 +273,12 @@ public class MatchDayService {
 									"clientMarketing.startDate>=cast('" + startDate
 											+ "' as timestamp) and clientMarketing.clientId=" + clientId
 											+ " and clientMarketing.skills='9." + teamId + "'");
-							if (repository.list(params).size() > 0)
+							if (MatchDayService.this.repository.list(params).size() > 0)
 								break;
-							final JsonNode matchDay = get("id=" + matchDays.get(i).get("fixture").get("id").asText())
+							final JsonNode matchDay = MatchDayService.this
+									.get("id=" + matchDays.get(i).get("fixture").get("id").asText())
 									.get(0);
-							if (matchDay != null && anyPlayerWith90Minutes(matchDay.findPath("players"))) {
+							if (matchDay != null && this.anyPlayerWith90Minutes(matchDay.findPath("players"))) {
 								JsonNode players = matchDay.findPath("players");
 								players = players.get(players.get(0).get("team").get("id").asInt() == teamId ? 0 : 1)
 										.get("players");
@@ -298,13 +305,15 @@ public class MatchDayService {
 										" Spiel<div style=\"padding:1em 0;font-weight:bold;\">"
 										+ poll.homeName + " - " + poll.awayName
 										+ "</div>vom <b>"
-										+ formatDate(matchDay.findPath("fixture").get("timestamp").asLong(), null)
+										+ MatchDayService.this.formatDate(
+												matchDay.findPath("fixture").get("timestamp").asLong(), null)
 										+ "</b>. Möchtest Du teilnehmen?";
 								poll.subject = poll.homeName + " : " + poll.awayName + " (" + poll.city + " · "
-										+ poll.venue + " · " + formatDate(poll.timestamp, null) + ")";
+										+ poll.venue + " · " + MatchDayService.this.formatDate(poll.timestamp, null)
+										+ ")";
 								final Question question = new Question();
 								question.question = "Wer war für Dich Spieler des Spiels?";
-								playerOfTheMatchAddAnswers(question.answers, players);
+								this.playerOfTheMatchAddAnswers(question.answers, players);
 								poll.questions.add(question);
 								final ClientMarketing clientMarketing = new ClientMarketing();
 								clientMarketing.setSkills("9." + teamId);
@@ -313,15 +322,16 @@ public class MatchDayService {
 								clientMarketing
 										.setEndDate(
 												new Timestamp(Instant.now().plus(Duration.ofDays(1)).toEpochMilli()));
-								final String endDate = formatDate(
+								final String endDate = MatchDayService.this.formatDate(
 										clientMarketing.getEndDate().getTime() / 1000 + 10 * 60, null);
 								clientMarketing.setClientId(clientId);
 								clientMarketing.setImage(Attachment.createImage(".png",
-										image.create(poll, "Spieler", repository.one(Client.class, clientId), null)));
+										MatchDayService.this.image.create(poll, "Spieler",
+												MatchDayService.this.repository.one(Client.class, clientId), null)));
 								poll.epilog = "Lieben Dank für Deine Teilnahme!\nDas Ergebnis wird am " + endDate
 										+ " hier bekanntgegeben.";
 								clientMarketing.setStorage(Json.toString(poll));
-								repository.save(clientMarketing);
+								MatchDayService.this.repository.save(clientMarketing);
 								return clientMarketing.getId();
 							}
 						}
@@ -353,22 +363,22 @@ public class MatchDayService {
 							(statistics.get("games").get("minutes").asInt() > 1 ? " gespielte Minuten"
 									: " gespielte Minute");
 					if (!statistics.get("goals").get("total").isNull())
-						s += getLine(statistics.get("goals").get("total").asInt(), " Tor", " Tore");
+						s += this.getLine(statistics.get("goals").get("total").asInt(), " Tor", " Tore");
 					if (!statistics.get("shots").get("total").isNull())
-						s += getLine(statistics.get("shots").get("total").asInt(), " Torschuss, ",
+						s += this.getLine(statistics.get("shots").get("total").asInt(), " Torschuss, ",
 								" Torschüsse, ")
 								+ (statistics.get("shots").get("on").isNull() ? 0
 										: statistics.get("shots").get("on").asInt())
 								+ " aufs Tor";
 					if (!statistics.get("goals").get("assists").isNull())
-						s += getLine(statistics.get("goals").get("assists").asInt(), " Assist",
+						s += this.getLine(statistics.get("goals").get("assists").asInt(), " Assist",
 								" Assists");
 					if (!statistics.get("passes").get("total").isNull())
-						s += getLine(statistics.get("passes").get("total").asInt(), " Pass, ",
+						s += this.getLine(statistics.get("passes").get("total").asInt(), " Pass, ",
 								" Pässe, ")
 								+ statistics.get("passes").get("accuracy").asInt() + " angekommen";
 					if (!statistics.get("duels").get("total").isNull())
-						s += getLine(statistics.get("duels").get("total").asInt(), " Duell, ",
+						s += this.getLine(statistics.get("duels").get("total").asInt(), " Duell, ",
 								" Duelle, ")
 								+ statistics.get("duels").get("won").asInt() + " gewonnen";
 					if (statistics.get("cards").get("yellow").asInt() > 0
@@ -391,13 +401,15 @@ public class MatchDayService {
 			params.setSearch(
 					"clientMarketingResult.published=false and clientMarketing.endDate<=cast('" + Instant.now()
 							+ "' as timestamp) and clientMarketing.clientId=" + clientId);
-			final Result list = repository.list(params);
+			final Result list = MatchDayService.this.repository.list(params);
 			String result = "";
 			for (int i = 0; i < list.size(); i++) {
-				final ClientMarketingResult clientMarketingResult = marketingService.synchronizeResult(
-						(BigInteger) list.get(i).get("clientMarketing.id"));
+				final ClientMarketingResult clientMarketingResult = MatchDayService.this.marketingService
+						.synchronizeResult(
+								(BigInteger) list.get(i).get("clientMarketing.id"));
 				final PollMatchDay poll = Json.toObject(Attachment.resolve(
-						repository.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId())
+						MatchDayService.this.repository
+								.one(ClientMarketing.class, clientMarketingResult.getClientMarketingId())
 								.getStorage()),
 						PollMatchDay.class);
 				if (Json.toObject(Attachment.resolve(clientMarketingResult.getStorage()),
@@ -408,13 +420,15 @@ public class MatchDayService {
 					else
 						prefix = "Spieler";
 					clientMarketingResult.setImage(Attachment.createImage(".png",
-							image.create(poll, prefix, repository.one(Client.class, clientId), clientMarketingResult)));
-					repository.save(clientMarketingResult);
+							MatchDayService.this.image.create(poll, prefix,
+									MatchDayService.this.repository.one(Client.class, clientId),
+									clientMarketingResult)));
+					MatchDayService.this.repository.save(clientMarketingResult);
 					if ("PlayerOfTheMatch".equals(poll.type))
 						prefix = "Umfrage Spieler des Spiels";
 					result += clientMarketingResult.getId() + " ";
 				} else
-					repository.save(clientMarketingResult);
+					MatchDayService.this.repository.save(clientMarketingResult);
 			}
 			return result.trim();
 		}
@@ -437,15 +451,15 @@ public class MatchDayService {
 			final String urlHome = poll.home;
 			final String urlAway = poll.away;
 			final boolean homeMatch = "home".equals(poll.location);
-			final BufferedImage output = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+			final BufferedImage output = new BufferedImage(this.width, this.height, BufferedImage.TYPE_INT_ARGB);
 			final Color colorText = new Color(Integer.valueOf(color3[0].trim()), Integer.valueOf(color3[1].trim()),
 					Integer.valueOf(color3[2].trim()));
 			final Graphics2D g2 = output.createGraphics();
 			g2.setComposite(AlphaComposite.Src);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			final RadialGradientPaint gradient = new RadialGradientPaint(width / 2 - 2 * padding,
-					height / 2 - 2 * padding,
-					height,
+			final RadialGradientPaint gradient = new RadialGradientPaint(this.width / 2 - 2 * this.padding,
+					this.height / 2 - 2 * this.padding,
+					this.height,
 					new float[] { .3f, 1f },
 					new Color[] {
 							new Color(Integer.valueOf(color1[0].trim()), Integer.valueOf(color1[1].trim()),
@@ -454,17 +468,17 @@ public class MatchDayService {
 									Integer.valueOf(color2[2].trim()))
 					});
 			g2.setPaint(gradient);
-			g2.fill(new Rectangle2D.Float(0, 0, width, height));
+			g2.fill(new Rectangle2D.Float(0, 0, this.width, this.height));
 			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
 					clientMarketingResult == null && "PlayerOfTheMatch".equals(poll.type) ? 1 : 0.15f));
-			final int h = (int) (height * 0.4);
+			final int h = (int) (this.height * 0.4);
 			if (!homeMatch)
-				draw(urlHome, g2, width / 2, padding, h, -1);
-			draw(urlAway, g2, width / 2, padding, h, 1);
+				this.draw(urlHome, g2, this.width / 2, this.padding, h, -1);
+			this.draw(urlAway, g2, this.width / 2, this.padding, h, 1);
 			if (homeMatch)
-				draw(urlHome, g2, width / 2, padding, h, -1);
-			draw(urlLeague, g2, width - padding, padding, height / 4, 0);
-			try (final InputStream in = getClass().getResourceAsStream("/Comfortaa-Regular.ttf")) {
+				this.draw(urlHome, g2, this.width / 2, this.padding, h, -1);
+			this.draw(urlLeague, g2, this.width - this.padding, this.padding, this.height / 4, 0);
+			try (final InputStream in = this.getClass().getResourceAsStream("/Comfortaa-Regular.ttf")) {
 				final Font customFont = Font.createFont(Font.TRUETYPE_FONT, in).deriveFont(50f);
 				GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(customFont);
 				g2.setFont(customFont);
@@ -472,20 +486,21 @@ public class MatchDayService {
 				String s = "Umfrage";
 				if (clientMarketingResult != null)
 					s += "ergebnis";
-				g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 14.5f);
+				g2.drawString(s, (this.width - g2.getFontMetrics().stringWidth(s)) / 2, this.height / 20 * 14.5f);
 				g2.setFont(customFont.deriveFont(20f));
-				s = subtitlePrefix + " des Spiels vom " + formatDate(poll.timestamp, null);
-				g2.drawString(s, (width - g2.getFontMetrics().stringWidth(s)) / 2, height / 20 * 17.5f);
+				s = subtitlePrefix + " des Spiels vom " + MatchDayService.this.formatDate(poll.timestamp, null);
+				g2.drawString(s, (this.width - g2.getFontMetrics().stringWidth(s)) / 2, this.height / 20 * 17.5f);
 				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP));
 				g2.setFont(customFont.deriveFont(12f));
 				s = "© " + LocalDateTime.now().getYear() + " " + client.getName();
-				g2.drawString(s, width - g2.getFontMetrics().stringWidth(s) - padding, height - padding);
+				g2.drawString(s, this.width - g2.getFontMetrics().stringWidth(s) - this.padding,
+						this.height - this.padding);
 				if (clientMarketingResult != null)
-					result(g2, customFont, poll,
+					this.result(g2, customFont, poll,
 							Json.toObject(Attachment.resolve(clientMarketingResult.getStorage()), PollResult.class),
 							colorText);
 				else if ("Prediction".equals(poll.type))
-					prediction(g2, customFont, poll, colorText, client.getId());
+					this.prediction(g2, customFont, poll, colorText, client.getId());
 				// final BufferedImageTranscoder imageTranscoder = new
 				// BufferedImageTranscoder();
 				// imageTranscoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, width);
@@ -505,15 +520,15 @@ public class MatchDayService {
 				final Color colorText, final BigInteger clientId) throws Exception {
 			g2.setFont(customFont.deriveFont(12f));
 			final int h = g2.getFontMetrics().getHeight();
-			int y = padding;
-			final double w = width * 0.3, delta = 1.6;
+			int y = this.padding;
+			final double w = this.width * 0.3, delta = 1.6;
 			for (int i = 0; i < poll.matches.size(); i++) {
 				final String[] s = poll.matches.get(poll.matches.size() - i - 1).split("\\|");
-				g2.drawString(s[0], width - padding - 150 - g2.getFontMetrics().stringWidth(s[0]) / 2, y + h);
-				g2.drawString(s[1], width - padding - g2.getFontMetrics().stringWidth(s[1]), y + h);
-				y += delta * padding;
+				g2.drawString(s[0], this.width - this.padding - 150 - g2.getFontMetrics().stringWidth(s[0]) / 2, y + h);
+				g2.drawString(s[1], this.width - this.padding - g2.getFontMetrics().stringWidth(s[1]), y + h);
+				y += delta * this.padding;
 			}
-			y = padding;
+			y = this.padding;
 			if (poll.statistics.size() == 0) {
 				final String[] s = new String[4];
 				s[0] = "Das erste Spiel seit langem zwischen";
@@ -523,13 +538,13 @@ public class MatchDayService {
 				g2.setFont(customFont.deriveFont(24f));
 				final double pad = g2.getFontMetrics().getHeight() * 1.8;
 				y += pad;
-				g2.drawString(s[0], (width - g2.getFontMetrics().stringWidth(s[0])) / 2, y + h);
+				g2.drawString(s[0], (this.width - g2.getFontMetrics().stringWidth(s[0])) / 2, y + h);
 				y += pad;
-				g2.drawString(s[1], (width - g2.getFontMetrics().stringWidth(s[1])) / 2, y + h);
+				g2.drawString(s[1], (this.width - g2.getFontMetrics().stringWidth(s[1])) / 2, y + h);
 				y += pad;
-				g2.drawString(s[2], (width - g2.getFontMetrics().stringWidth(s[2])) / 2, y + h);
+				g2.drawString(s[2], (this.width - g2.getFontMetrics().stringWidth(s[2])) / 2, y + h);
 				y += pad;
-				g2.drawString(s[3], (width - g2.getFontMetrics().stringWidth(s[3])) / 2, y + h);
+				g2.drawString(s[3], (this.width - g2.getFontMetrics().stringWidth(s[3])) / 2, y + h);
 			} else {
 				double max = 0;
 				for (int i = 0; i < poll.statistics.size() && i < 9; i++) {
@@ -551,31 +566,32 @@ public class MatchDayService {
 				for (int i = 0; i < poll.statistics.size() && i < 9; i++) {
 					final double w2 = ((double) poll.statistics.get(i).get("home")) / max * w;
 					g2.setColor(new Color(255, 100, 0, 50));
-					g2.fillRect(padding + (int) (w - w2), y - 4, (int) w2, h * 2);
+					g2.fillRect(this.padding + (int) (w - w2), y - 4, (int) w2, h * 2);
 					g2.setColor(new Color(0, 100, 255, 50));
-					g2.fillRect(padding + (int) w, y - 4,
+					g2.fillRect(this.padding + (int) w, y - 4,
 							(int) (((double) poll.statistics.get(i).get("away")) / max * w),
 							h * 2);
 					g2.setColor(colorText);
 					String s = poll.statistics.get(i).get("label").toString();
 					if (labels.containsKey(s))
 						s = labels.get(s);
-					g2.drawString(s, padding + (int) w - g2.getFontMetrics().stringWidth(s) / 2, y + h);
+					g2.drawString(s, this.padding + (int) w - g2.getFontMetrics().stringWidth(s) / 2, y + h);
 					s = "" + (int) (((double) poll.statistics.get(i).get("home")) + 0.5);
-					g2.drawString(s, padding + (int) w * 0.4f - g2.getFontMetrics().stringWidth(s), y + h);
+					g2.drawString(s, this.padding + (int) w * 0.4f - g2.getFontMetrics().stringWidth(s), y + h);
 					s = "" + (int) (((double) poll.statistics.get(i).get("away")) + 0.5);
-					g2.drawString(s, padding + (int) w * 1.6f, y + h);
-					y += delta * padding;
+					g2.drawString(s, this.padding + (int) w * 1.6f, y + h);
+					y += delta * this.padding;
 				}
 			}
 		}
 
-		private void result(final Graphics2D g2, final Font customFont, PollMatchDay poll, PollResult result,
+		private void result(final Graphics2D g2, final Font customFont, final PollMatchDay poll,
+				final PollResult result,
 				final Color colorText) throws Exception {
 			g2.setFont(customFont.deriveFont(16f));
 			final int h = g2.getFontMetrics().getHeight();
 			final int total = result.participants;
-			int y = padding;
+			int y = this.padding;
 			final boolean prediction = "Prediction".equals(poll.type);
 			final String text = result.answers.get("q0").containsKey("t") ? result.answers.get("q0").get("t").toString()
 					: null;
@@ -615,13 +631,13 @@ public class MatchDayService {
 				if (percent < 1)
 					break;
 				g2.setColor(new Color(255, 100, 0, 50));
-				g2.fillRoundRect(padding, y, width - 2 * padding, h * 2, 10, 10);
+				g2.fillRoundRect(this.padding, y, this.width - 2 * this.padding, h * 2, 10, 10);
 				g2.setColor(new Color(255, 100, 0, 120));
-				g2.fillRoundRect(padding, y, (width - 2 * padding) * percent / 100, h * 2, 10, 10);
+				g2.fillRoundRect(this.padding, y, (this.width - 2 * this.padding) * percent / 100, h * 2, 10, 10);
 				g2.setColor(colorText);
-				g2.drawString(percent + "%", padding * 1.8f, y + h + 5);
-				g2.drawString(s[1], padding * 4.5f, y + h + 5);
-				y += 2.3 * padding;
+				g2.drawString(percent + "%", this.padding * 1.8f, y + h + 5);
+				g2.drawString(s[1], this.padding * 4.5f, y + h + 5);
+				y += 2.3 * this.padding;
 			}
 		}
 
@@ -630,7 +646,7 @@ public class MatchDayService {
 			final String label = STORAGE_PREFIX + url.substring(url.lastIndexOf('/', url.length() - 10));
 			final QueryParams params = new QueryParams(Query.misc_listStorage);
 			params.setSearch("storage.label='" + label + "'");
-			final Result result = repository.list(params);
+			final Result result = MatchDayService.this.repository.list(params);
 			final String data;
 			if (result.size() > 0)
 				data = (String) result.get(0).get("storage.storage");
@@ -638,7 +654,7 @@ public class MatchDayService {
 				final Storage storage = new Storage();
 				storage.setLabel(label);
 				storage.setStorage(Entity.getImage(url, 0, 0));
-				repository.save(storage);
+				MatchDayService.this.repository.save(storage);
 				data = Attachment.resolve(storage.getStorage());
 			}
 			final BufferedImage image = ImageIO.read(new ByteArrayInputStream(Base64.getDecoder()
@@ -661,41 +677,39 @@ public class MatchDayService {
 				.stream().filter(e -> e.startsWith("9.")).map(e -> Integer.valueOf(e.substring(2)))
 				.collect(Collectors.toList());
 		final Map<String, String> matches = new HashMap<>();
-		for (int teamId : teamIds) {
+		for (final int teamId : teamIds) {
 			try {
-				final JsonNode matchDays = get("team=" + teamId + "&season=" + currentSeason());
+				final List<Match> matchDays = this.get("team=" + teamId + "&season=" + this.currentSeason());
 				if (matchDays != null) {
 					final Map<String, String> matchesFutureList = new HashMap<>();
 					final Map<String, String> matchesPastList = new HashMap<>();
 					for (int i = 0; i < matchDays.size(); i++) {
-						if (!"TBD".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())) {
-							final long timestamp = matchDays.get(i).get("fixture").get("timestamp").asLong();
-							final String homeName = matchDays.get(i).get("teams").get("home").get("name").asText()
-									.replace("Munich", "München");
-							final String awayName = matchDays.get(i).get("teams").get("away").get("name").asText()
-									.replace("Munich", "München");
-							final String homeGoals = matchDays.get(i).get("goals").get("home").isNull() ? "&nbsp;"
-									: matchDays.get(i).get("goals").get("home").asText();
-							final String awayGoals = matchDays.get(i).get("goals").get("away").isNull() ? "&nbsp;"
-									: matchDays.get(i).get("goals").get("away").asText();
-							final String leagueName = matchDays.get(i).get("league").get("name").asText();
-							final String venue = matchDays.get(i).get("fixture").get("venue").get("name").asText();
-							final String city = matchDays.get(i).findPath("fixture").get("venue").get("city").asText();
-							("NS".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())
+						if (!"TBD".equals(matchDays.get(i).fixture.status.myshort)) {
+							final long timestamp = matchDays.get(i).fixture.timestamp;
+							final String homeName = matchDays.get(i).teams.home.name.replace("Munich", "München");
+							final String awayName = matchDays.get(i).teams.away.name.replace("Munich", "München");
+							final String homeGoals = matchDays.get(i).goals.home == null ? "&nbsp;"
+									: matchDays.get(i).goals.home.toString();
+							final String awayGoals = matchDays.get(i).goals.away == null ? "&nbsp;"
+									: matchDays.get(i).goals.away.toString();
+							final String leagueName = matchDays.get(i).league.name;
+							final String venue = matchDays.get(i).fixture.venue.name;
+							final String city = matchDays.get(i).fixture.venue.city;
+							("NS".equals(matchDays.get(i).fixture.status.myshort)
 									? matchesFutureList
 									: matchesPastList).put(timestamp + "." + teamId,
 											"<match skills=\"9." + teamId + "\"><header>" + leagueName + " · " + venue
 													+ " · " + city + " · "
-													+ formatDate(timestamp, contact) + "</header>"
+													+ this.formatDate(timestamp, contact) + "</header>"
 													+ "<home"
-													+ (matchDays.get(i).get("teams").get("home").get("id")
-															.asInt() == teamId ? " class=\"highlight\"" : "")
+													+ (matchDays.get(i).teams.home.id == teamId ? " class=\"highlight\""
+															: "")
 													+ ">"
 													+ homeName + "</home><goals>" + homeGoals
 													+ "</goals><sep>:</sep><goals>"
 													+ awayGoals + "</goals><away"
-													+ (matchDays.get(i).get("teams").get("away").get("id")
-															.asInt() == teamId ? " class=\"highlight\"" : "")
+													+ (matchDays.get(i).teams.away.id == teamId ? " class=\"highlight\""
+															: "")
 													+ ">" + awayName + "</away></match>");
 						}
 					}
@@ -708,14 +722,14 @@ public class MatchDayService {
 					for (int i = 0; i < futureMatches && i < sortedKeys.size(); i++)
 						matches.put(sortedKeys.get(i), matchesFutureList.get(sortedKeys.get(i)));
 				}
-			} catch (RuntimeException ex) {
+			} catch (final RuntimeException ex) {
 				// matchDays not up to date, ignore
 			}
 		}
 		final List<String> sortedKeys = new ArrayList<>(matches.keySet());
 		Collections.sort(sortedKeys);
 		final StringBuilder s = new StringBuilder();
-		for (String key : sortedKeys)
+		for (final String key : sortedKeys)
 			s.insert(0, matches.get(key));
 		s.insert(0,
 				"<style>header{font-size:0.7em;padding-top:1em;}match{display:inline-block;float:left;width:100%;font-size:0.7em;}home,away{width:42%;display:inline-block;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}home{text-align:right;}away{text-align:left;}goals{width:8%;display:inline-block;text-align:center;overflow:hidden;}sep{position:absolute;margin-left:-0.1em;}.highlight{font-weight:bold;}matchdays{text-align:center;display:inline-block;float:left;}</style><matchDays>");
@@ -726,7 +740,7 @@ public class MatchDayService {
 	@Cron
 	public CronResult cron() {
 		final CronResult result = new CronResult();
-		final Result list = repository.list(new QueryParams(Query.misc_listClient));
+		final Result list = this.repository.list(new QueryParams(Query.misc_listClient));
 		for (int i = 0; i < list.size(); i++) {
 			final BigInteger clientId = (BigInteger) list.get(i).get("client.id");
 			final JsonNode json = Json.toNode(list.get(i).get("client.storage").toString());
@@ -734,13 +748,13 @@ public class MatchDayService {
 				for (int i2 = 0; i2 < json.get("matchDays").size(); i2++) {
 					try {
 						final int teamId = json.get("matchDays").get(i2).asInt();
-						BigInteger id = synchronize.prediction(clientId, teamId);
+						BigInteger id = this.synchronize.prediction(clientId, teamId);
 						if (id != null)
 							result.body += "\nprediction: " + id;
-						id = synchronize.playerOfTheMatch(clientId, teamId);
+						id = this.synchronize.playerOfTheMatch(clientId, teamId);
 						if (id != null)
 							result.body += "\nplayerOfTheMatch: " + id;
-						final String s = synchronize.result(clientId);
+						final String s = this.synchronize.result(clientId);
 						if (s.length() > 0)
 							result.body += "\nresult: " + s;
 					} catch (final Exception e) {
@@ -760,29 +774,32 @@ public class MatchDayService {
 			contact = new Contact();
 			contact.setLanguage("DE");
 		}
-		return text.getText(contact, TextId.valueOf("date_weekday" + (time.getDayOfWeek().getValue() % 7)))
+		return this.text.getText(contact, TextId.valueOf("date_weekday" + (time.getDayOfWeek().getValue() % 7)))
 				+ " " + time.format(DateTimeFormatter.ofPattern("d.M.yyyy H:mm"));
 	}
 
 	public List<FutureEvent> futureEvents(final int teamId) {
 		final List<FutureEvent> events = new ArrayList<>();
-		final JsonNode json = get("team=" + teamId + "&season=" + currentSeason());
+		final List<Match> json = this.get("team=" + teamId + "&season=" + this.currentSeason());
 		for (int i = 0; i < json.size(); i++) {
-			if ("NS".equals(json.get(i).get("fixture").get("status").get("short").asText()))
-				events.add(new FutureEvent(json.get(i).get("fixture").get("timestamp").asLong() * 1000,
-						json.get(i).get("teams").get("home").get("name").asText() + " : "
-								+ json.get(i).get("teams").get("away").get("name").asText()));
+			if ("NS".equals(json.get(i).fixture.status.myshort))
+				events.add(new FutureEvent(json.get(i).fixture.timestamp * 1000,
+						json.get(i).teams.home.name + " : " + json.get(i).teams.away.name));
 		}
 		return events;
 	}
 
-	protected synchronized JsonNode get(final String url) {
-		JsonNode fixture = null;
+	public Event retrieveNextMatchDay(final int teamId) {
+		return null;
+	}
+
+	protected synchronized List<Match> get(final String url) {
+		Response fixture = null;
 		final String label = STORAGE_PREFIX + url;
 		final QueryParams params = new QueryParams(Query.misc_listStorage);
 		params.setSearch("storage.label='" + label + "'");
-		final Result result = repository.list(params);
-		if (result.size() == 0 || (fixture = needUpdate(result.get(0), url)) == null) {
+		final Result result = this.repository.list(params);
+		if (result.size() == 0 || (fixture = this.needUpdate(result.get(0), url)) == null) {
 			if (System.currentTimeMillis() - pauseUntil < 0) {
 				String unit;
 				double i = (pauseUntil - System.currentTimeMillis()) / 1000;
@@ -801,39 +818,39 @@ public class MatchDayService {
 			fixture = WebClient
 					.create("https://v3.football.api-sports.io/fixtures?" + url)
 					.get()
-					.header("x-rapidapi-key", token)
+					.header("x-rapidapi-key", this.token)
 					.header("x-rapidapi-host", "v3.football.api-sports.io")
 					.retrieve()
-					.toEntity(JsonNode.class).block().getBody();
-			if (fixture != null && fixture.has("response")) {
-				pauseUntil = fixture.get("errors").has("rateLimit")
+					.toEntity(Response.class).block().getBody();
+			if (fixture != null && fixture.response != null) {
+				pauseUntil = fixture.errors.rateLimit != null
 						? Instant.now().plus(Duration.ofMinutes(11)).toEpochMilli()
-						: fixture.get("errors").has("requests")
+						: fixture.errors.requests != null
 								? Instant.now().plus(Duration.ofDays(1)).truncatedTo(ChronoUnit.DAYS).toEpochMilli()
 								: 0;
 				if (pauseUntil == 0) {
 					final Storage storage = result.size() == 0 ? new Storage()
-							: repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
+							: this.repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
 					storage.setLabel(label);
 					storage.setStorage(Json.toString(fixture));
-					repository.save(storage);
+					this.repository.save(storage);
 				}
 			} else
-				notificationService.createTicket(TicketType.ERROR, "FIXTURE not FOUND", url, null);
+				this.notificationService.createTicket(TicketType.ERROR, "FIXTURE not FOUND", url, null);
 		}
 		if (fixture == null)
 			throw new RuntimeException(url + " not found");
-		return fixture.get("response");
+		return fixture.response;
 	}
 
-	JsonNode needUpdate(final Map<String, Object> storage, final String url) {
-		JsonNode fixture = null;
+	Response needUpdate(final Map<String, Object> storage, final String url) {
+		Response fixture = null;
 		if (!Strings.isEmpty(storage.get("storage.storage")))
-			fixture = Json.toNode(storage.get("storage.storage").toString());
-		if (fixture == null || fixture.has("errors")
-				&& (fixture.get("errors").has("rateLimit") || fixture.get("errors").has("requests")))
+			fixture = Json.toObject(storage.get("storage.storage").toString(), Response.class);
+		if (fixture == null || fixture.errors != null
+				&& (fixture.errors.rateLimit != null || fixture.errors.requests != null))
 			return null;
-		if (url.contains("season=" + currentSeason()) && url.contains("team=") &&
+		if (url.contains("season=" + this.currentSeason()) && url.contains("team=") &&
 				Instant.ofEpochMilli(((Timestamp) storage.get("storage.createdAt")).getTime())
 						.plus(Duration.ofDays(1)).isBefore(Instant.now())
 				&& (storage.get("storage.modifiedAt") == null

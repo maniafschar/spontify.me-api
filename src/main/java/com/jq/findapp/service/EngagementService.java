@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,13 @@ public class EngagementService {
 	private AuthenticationService authenticationService;
 
 	@Autowired
+	private AiService aiService;
+
+	@Autowired
 	private ExternalService externalService;
+
+	@Autowired
+	private MatchDayService matchDayService;
 
 	@Autowired
 	private Text text;
@@ -67,7 +74,7 @@ public class EngagementService {
 		}
 
 		boolean eligible(final Contact contact) {
-			return condition == null ? true : condition.isTrue(contact);
+			return this.condition == null ? true : this.condition.isTrue(contact);
 		}
 	}
 
@@ -154,51 +161,51 @@ public class EngagementService {
 		String replace(final String s, final Contact contact, final Location location,
 				final ExternalService externalService,
 				final Repository repository) {
-			return s.contains(name())
-					? s.replaceAll(name(), exec.replace(contact, location, externalService, repository))
+			return s.contains(this.name())
+					? s.replaceAll(this.name(), this.exec.replace(contact, location, externalService, repository))
 					: s;
 		}
 
 	}
 
 	public EngagementService() {
-		chatTemplates.add(new ChatTemplate(TextId.engagement_uploadProfileImage,
+		this.chatTemplates.add(new ChatTemplate(TextId.engagement_uploadProfileImage,
 				"ui.navigation.goTo(&quot;settings&quot;)",
 				contact -> contact.getImage() == null));
 
-		chatTemplates.add(new ChatTemplate(TextId.engagement_uploadProfileAttributes,
+		this.chatTemplates.add(new ChatTemplate(TextId.engagement_uploadProfileAttributes,
 				"ui.navigation.goTo(&quot;settings&quot;)",
 				contact -> (Strings.isEmpty(contact.getSkills()) && Strings.isEmpty(contact.getSkillsText()))
 						|| (Strings.isEmpty(contact.getAgeMale()) && Strings.isEmpty(contact.getAgeFemale())
 								&& Strings.isEmpty(contact.getAgeDivers()))
 						|| contact.getGender() == null || contact.getBirthday() == null));
 
-		chatTemplates.add(new ChatTemplate(TextId.engagement_newTown,
+		this.chatTemplates.add(new ChatTemplate(TextId.engagement_newTown,
 				"pageInfo.socialShare()",
 				contact -> contact.getLatitude() != null
 						&& contact.getModifiedAt() != null
 						&& contact.getModifiedAt()
 								.after(new Date(Instant.now().minus(Duration.ofDays(1)).toEpochMilli()))));
 
-		chatTemplates.add(new ChatTemplate(TextId.engagement_allowLocation,
+		this.chatTemplates.add(new ChatTemplate(TextId.engagement_allowLocation,
 				"",
 				contact -> contact.getLongitude() == null && contact.getOs() != OS.web));
 
-		chatTemplates.add(new ChatTemplate(TextId.engagement_addEvent,
+		this.chatTemplates.add(new ChatTemplate(TextId.engagement_addEvent,
 				"",
 				contact -> {
 					final QueryParams params = new QueryParams(Query.event_list);
 					params.setUser(contact);
 					params.setSearch("event.contactId=" + contact.getId());
-					if (repository.list(params).size() == 0) {
+					if (this.repository.list(params).size() == 0) {
 						params.setQuery(Query.location_listFavorite);
 						params.setSearch("locationFavorite.contactId=" + contact.getId());
-						return repository.list(params).size() > 0;
+						return this.repository.list(params).size() > 0;
 					}
 					return false;
 				}));
 
-		chatTemplates.add(new ChatTemplate(TextId.engagement_newLocations,
+		this.chatTemplates.add(new ChatTemplate(TextId.engagement_newLocations,
 				"",
 				contact -> {
 					if (contact.getLongitude() == null)
@@ -212,10 +219,10 @@ public class EngagementService {
 							"location.createdAt>=cast('"
 									+ Instant.ofEpochMilli(contact.getModifiedAt().getTime())
 									+ "' as timestamp)");
-					return repository.list(params).size() > 1;
+					return this.repository.list(params).size() > 1;
 				}));
 
-		chatTemplates.add(new ChatTemplate(TextId.engagement_newContacts,
+		this.chatTemplates.add(new ChatTemplate(TextId.engagement_newContacts,
 				"",
 				contact -> {
 					if (contact.getLongitude() == null)
@@ -228,20 +235,20 @@ public class EngagementService {
 					params.setSearch(
 							"contact.createdAt>=cast('"
 									+ Instant.ofEpochMilli(contact.getModifiedAt().getTime()) + "' as timestamp)");
-					return repository.list(params).size() > 9;
+					return this.repository.list(params).size() > 9;
 				}));
 
-		chatTemplates.add(new ChatTemplate(TextId.engagement_addFriends,
+		this.chatTemplates.add(new ChatTemplate(TextId.engagement_addFriends,
 				"pageInfo.socialShare()",
 				null));
 
-		chatTemplates.add(new ChatTemplate(TextId.engagement_installCurrentVersion,
+		this.chatTemplates.add(new ChatTemplate(TextId.engagement_installCurrentVersion,
 				"global.openStore()",
 				contact -> !Strings.isEmpty(contact.getVersion()) && contact.getOs() != OS.web
 						&& currentVersion.get(contact.getClientId()) != null
 						&& currentVersion.get(contact.getClientId()).compareTo(contact.getVersion()) > 0));
 
-		chatTemplates.add(new ChatTemplate(TextId.engagement_praise,
+		this.chatTemplates.add(new ChatTemplate(TextId.engagement_praise,
 				"",
 				contact -> contact.getLongitude() != null && contact.getImage() != null
 						&& contact.getBirthday() != null && !Strings.isEmpty(contact.getDescription())
@@ -249,11 +256,11 @@ public class EngagementService {
 						&& (!Strings.isEmpty(contact.getAgeDivers()) || !Strings.isEmpty(contact.getAgeFemale())
 								|| !Strings.isEmpty(contact.getAgeMale()))));
 
-		chatTemplates.add(new ChatTemplate(TextId.engagement_patience,
+		this.chatTemplates.add(new ChatTemplate(TextId.engagement_patience,
 				"pageInfo.socialShare()",
 				contact -> contact.getLongitude() != null));
 
-		chatTemplates.add(new ChatTemplate(TextId.engagement_like, null, null));
+		this.chatTemplates.add(new ChatTemplate(TextId.engagement_like, null, null));
 	}
 
 	@Cron("40 10")
@@ -264,16 +271,16 @@ public class EngagementService {
 			params.setSearch("contact.createdAt<cast('" + Instant.now().minus(Duration.ofHours(3))
 					+ "' as timestamp) and contact.verified=false");
 			params.setLimit(0);
-			final Result list = repository.list(params);
+			final Result list = this.repository.list(params);
 			int count = 0;
 			params.setQuery(Query.misc_listTicket);
 			for (int i = 0; i < list.size(); i++) {
-				final Contact to = repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
+				final Contact to = this.repository.one(Contact.class, (BigInteger) list.get(i).get("contact.id"));
 				params.setSearch("ticket.type='EMAIL' and ticket.subject='" + to.getEmail() + "'");
-				final Result emails = repository.list(params);
-				if (timeToSendNewRegistrationReminder(
+				final Result emails = this.repository.list(params);
+				if (this.timeToSendNewRegistrationReminder(
 						emails.size() == 0 ? null : (Timestamp) emails.get(0).get("ticket.createdAt"), to)) {
-					authenticationService.recoverSendEmailReminder(to);
+					this.authenticationService.recoverSendEmailReminder(to);
 					count++;
 				}
 			}
@@ -303,23 +310,23 @@ public class EngagementService {
 	public CronResult cron() {
 		final CronResult result = new CronResult();
 		try {
-			resetChatInstallCurrentVersion();
+			this.resetChatInstallCurrentVersion();
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setLimit(0);
 			params.setSearch("contact.verified=true and contact.version is not null");
-			final Result ids = repository.list(params);
+			final Result ids = this.repository.list(params);
 			params.setQuery(Query.contact_chat);
 			int count = 0;
 			long t = System.currentTimeMillis();
 			for (int i = 0; i < ids.size(); i++) {
 				final BigInteger contactId = (BigInteger) ids.get(i).get("contact.id");
-				final BigInteger adminId = repository
-						.one(Client.class, repository.one(Contact.class, contactId).getClientId())
+				final BigInteger adminId = this.repository
+						.one(Client.class, this.repository.one(Contact.class, contactId).getClientId())
 						.getAdminId();
 				params.setSearch("contactChat.contactId=" + adminId + " and contactChat.contactId2=" + contactId);
-				if (repository.list(params).size() == 0) {
-					sendChat(TextId.engagement_welcome,
-							repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id")), null, null);
+				if (this.repository.list(params).size() == 0) {
+					this.sendChat(TextId.engagement_welcome,
+							this.repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id")), null, null);
 					count++;
 				}
 			}
@@ -327,8 +334,8 @@ public class EngagementService {
 			count = 0;
 			t = System.currentTimeMillis();
 			for (int i = 0; i < ids.size(); i++) {
-				final Contact contact = repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id"));
-				if (timeForNewChat(contact, params, false) && sendChatTemplate(contact))
+				final Contact contact = this.repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id"));
+				if (this.timeForNewChat(contact, params, false) && this.sendChatTemplate(contact))
 					count++;
 			}
 			result.body += "\ntemplate: " + count + ", time: " + (System.currentTimeMillis() - t);
@@ -338,18 +345,41 @@ public class EngagementService {
 		return result;
 	}
 
+	@Cron(value = "0 8", group = Group.Four)
+	public CronResult cronAi() {
+		final CronResult result = new CronResult();
+		try {
+			final QueryParams params = new QueryParams(Query.contact_listId);
+			params.setSearch("contact.clientId=4");
+			final Result contacts = this.repository.list(params);
+			for (final int i = 0; i < contacts.size(); i++) {
+				final Contact contact = this.repository.one(Contact.class,
+						(BigInteger) contacts.get(i).get("contact.id"));
+				final List<Integer> teamIds = Arrays.asList(contact.getSkills().split("\\|"))
+						.stream().filter(e -> e.startsWith("9.")).map(e -> Integer.valueOf(e.substring(2)))
+						.collect(Collectors.toList());
+				for (int i2 = 0; i2 < teamIds.size(); i2++) {
+					this.matchDayService.retrieveNextMatchDay(teamIds.get(i2));
+				}
+			}
+		} catch (final Exception e) {
+			result.exception = e;
+		}
+		return result;
+	}
+
 	private boolean timeForNewChat(final Contact contact, final QueryParams params, final boolean nearBy) {
 		final int hour = Instant.now().atZone(TimeZone.getTimeZone(contact.getTimezone()).toZoneId()).getHour();
 		if (hour > 6 && hour < 22) {
-			final BigInteger adminId = repository.one(Client.class, contact.getClientId()).getAdminId();
+			final BigInteger adminId = this.repository.one(Client.class, contact.getClientId()).getAdminId();
 			params.setSearch("contactChat.contactId=" + adminId + " and contactChat.contactId2=" + contact.getId()
 					+ " and contactChat.createdAt>cast('"
 					+ Instant.now().minus(Duration.ofDays(32)).toString()
 					+ "' as timestamp)");
-			if (repository.list(params).size() == 0) {
+			if (this.repository.list(params).size() == 0) {
 				params.setSearch("contactChat.textId is not null and contactChat.contactId=" + adminId
 						+ " and contactChat.contactId2=" + contact.getId());
-				final Result lastChats = repository.list(params);
+				final Result lastChats = this.repository.list(params);
 				if (lastChats.size() == 0)
 					return true;
 				final boolean isLastChatNearBy = ((TextId) lastChats.get(0).get("contactChat.textId")).name()
@@ -369,7 +399,7 @@ public class EngagementService {
 		if (currentVersion.size() == 0) {
 			final QueryParams params = new QueryParams(Query.contact_maxAppVersion);
 			params.setSearch("contact.email not like '%@jq-consulting.de' and contact.id<>client.adminId");
-			final Result result = repository.list(params);
+			final Result result = this.repository.list(params);
 			for (int i = 0; i < result.size(); i++)
 				currentVersion.put((BigInteger) result.get(i).get("contact.clientId"),
 						(String) result.get(i).get("_c"));
@@ -381,12 +411,12 @@ public class EngagementService {
 			params.setLimit(0);
 			params.setSearch("cast(contactChat.textId as text)='" + TextId.engagement_installCurrentVersion.name() +
 					"' and contact.version='" + currentVersion.get(clientId) + "' and contact.clientId=" + clientId);
-			final Result ids = repository.list(params);
+			final Result ids = this.repository.list(params);
 			for (int i = 0; i < ids.size(); i++) {
-				final ContactChat contactChat = repository.one(ContactChat.class,
+				final ContactChat contactChat = this.repository.one(ContactChat.class,
 						(BigInteger) ids.get(i).get("contactChat.id"));
 				contactChat.setTextId(null);
-				repository.save(contactChat);
+				this.repository.save(contactChat);
 			}
 		}
 	}
@@ -401,15 +431,15 @@ public class EngagementService {
 					+ "contact.version is not null and contact.longitude is not null and "
 					+ "(length(contact.skills)>0 or length(contact.skillsText)>0)");
 			params.setLimit(0);
-			final Result ids = repository.list(params);
+			final Result ids = this.repository.list(params);
 			params.setQuery(Query.contact_chat);
 			int count = 0;
 			for (int i = 0; i < ids.size(); i++) {
-				final Contact contact = repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id"));
-				if (!contact.getId().equals(repository.one(Client.class, contact.getClientId()).getAdminId())
-						&& timeForNewChat(contact, params, true)) {
-					final String action = getLastNearByAction(params, (BigInteger) ids.get(i).get("contact.id"));
-					if (!action.startsWith("p=") && sendContact(contact))
+				final Contact contact = this.repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id"));
+				if (!contact.getId().equals(this.repository.one(Client.class, contact.getClientId()).getAdminId())
+						&& this.timeForNewChat(contact, params, true)) {
+					final String action = this.getLastNearByAction(params, (BigInteger) ids.get(i).get("contact.id"));
+					if (!action.startsWith("p=") && this.sendContact(contact))
 						count++;
 				}
 			}
@@ -425,9 +455,9 @@ public class EngagementService {
 				+ TextId.engagement_nearByLocation.name().substring(0,
 						TextId.engagement_nearByLocation.name().indexOf('L'))
 				+ "%' and contactChat.contactId="
-				+ repository.one(Client.class, repository.one(Contact.class, id).getClientId()).getAdminId()
+				+ this.repository.one(Client.class, this.repository.one(Contact.class, id).getClientId()).getAdminId()
 				+ " and contactChat.contactId2=" + id);
-		final Result chats = repository.list(params);
+		final Result chats = this.repository.list(params);
 		if (chats.size() == 0)
 			return "";
 		String action = (String) chats.get(0).get("contactChat.action");
@@ -441,9 +471,9 @@ public class EngagementService {
 	}
 
 	private boolean sendChatTemplate(final Contact contact) throws Exception {
-		for (final ChatTemplate chatTemplate : chatTemplates) {
+		for (final ChatTemplate chatTemplate : this.chatTemplates) {
 			if (chatTemplate.eligible(contact) &&
-					sendChat(chatTemplate.textId, contact, null, chatTemplate.action))
+					this.sendChat(chatTemplate.textId, contact, null, chatTemplate.action))
 				return true;
 		}
 		return false;
@@ -458,20 +488,20 @@ public class EngagementService {
 			params.setLatitude(contact.getLatitude());
 			params.setLongitude(contact.getLongitude());
 			params.setUser(contact);
-			final Result result = repository.list(params);
+			final Result result = this.repository.list(params);
 			params.setQuery(Query.contact_chat);
 			params.setLatitude(null);
 			double score = 0;
 			Contact contact2 = null;
 			for (int i = 0; i < result.size(); i++) {
-				final Contact c = repository.one(Contact.class, (BigInteger) result.get(i).get("contact.id"));
+				final Contact c = this.repository.one(Contact.class, (BigInteger) result.get(i).get("contact.id"));
 				params.setSearch(
-						"contactChat.contactId=" + repository.one(Client.class, contact.getClientId()).getAdminId()
+						"contactChat.contactId=" + this.repository.one(Client.class, contact.getClientId()).getAdminId()
 								+ " and contactChat.contactId2=" + contact.getId()
 								+ " and cast(contactChat.textId as text)='" + TextId.engagement_nearByContact.name()
 								+ "' and contactChat.action like '%"
 								+ Strings.encodeParam("p=" + c.getId()) + "%'");
-				if (repository.list(params).size() == 0) {
+				if (this.repository.list(params).size() == 0) {
 					final double s = Score.getContact(contact, c);
 					if (s > score) {
 						score = s;
@@ -482,7 +512,7 @@ public class EngagementService {
 			if (score > 0.5 && contact2 != null) {
 				final Location location = new Location();
 				location.setName(contact2.getPseudonym());
-				sendChat(TextId.engagement_nearByContact, contact, location,
+				this.sendChat(TextId.engagement_nearByContact, contact, location,
 						"ui.navigation.autoOpen(&quot;" + Strings.encodeParam("p=" + contact2.getId())
 								+ "&quot;,event)");
 				return true;
@@ -493,17 +523,17 @@ public class EngagementService {
 
 	public boolean sendChat(final TextId textId, final Contact contact, final Location location, final String action)
 			throws Exception {
-		final BigInteger adminId = repository.one(Client.class, contact.getClientId()).getAdminId();
+		final BigInteger adminId = this.repository.one(Client.class, contact.getClientId()).getAdminId();
 		if (contact.getId().equals(adminId))
 			return false;
 		final QueryParams params = new QueryParams(Query.contact_chat);
 		params.setSearch("contactChat.contactId=" + adminId + " and contactChat.contactId2=" + contact.getId()
 				+ " and cast(contactChat.textId as text)='" + textId.name() + '\'');
-		if (repository.list(params).size() == 0) {
-			String s = text.getText(contact, textId);
+		if (this.repository.list(params).size() == 0) {
+			String s = this.text.getText(contact, textId);
 			try {
 				for (final REPLACMENT rep : REPLACMENT.values())
-					s = rep.replace(s, contact, location, externalService, repository);
+					s = rep.replace(s, contact, location, this.externalService, this.repository);
 				final ContactChat contactChat = new ContactChat();
 				contactChat.setContactId(adminId);
 				contactChat.setContactId2(contact.getId());
@@ -511,7 +541,7 @@ public class EngagementService {
 				contactChat.setAction(action);
 				contactChat.setTextId(textId);
 				contactChat.setNote(s);
-				repository.save(contactChat);
+				this.repository.save(contactChat);
 				return true;
 			} catch (final IllegalArgumentException ex) {
 				if (!"duplicate chat".equals(ex.getMessage()) && !"no town".equals(ex.getMessage()))
