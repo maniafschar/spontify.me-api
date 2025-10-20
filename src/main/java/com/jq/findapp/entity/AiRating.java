@@ -8,7 +8,7 @@ import jakarta.persistence.Entity;
 public class AiRating extends BaseEntity {
 	private BigInteger aiId;
 	private BigInteger contactId;
-	private Boolean value;
+	private Short rating;
 
 	public BigInteger getAiId() {
 		return this.aiId;
@@ -26,11 +26,11 @@ public class AiRating extends BaseEntity {
 		this.contactId = contactId;
 	}
 
-	public Boolean getValue() {
-		return this.value;
+	public Short getValue() {
+		return this.rating;
 	}
 
-	public void setValue(final Boolean value) {
-		this.value = value;
+	public void setValue(final Short rating) {
+		this.rating = rating;
 	}
 }
