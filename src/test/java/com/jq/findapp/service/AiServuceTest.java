@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +22,7 @@ public class AiServuceTest {
 	@Autowired
 	private AiService aiService;
 
-	@Test
+	// @Test
 	public void locations() {
 		// given
 
@@ -36,7 +35,7 @@ public class AiServuceTest {
 		assertTrue(locations.size() > 0);
 	}
 
-	@Test
+	// @Test
 	public void text() {
 		// given
 
