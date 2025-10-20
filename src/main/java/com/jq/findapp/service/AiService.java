@@ -1,6 +1,10 @@
 package com.jq.findapp.service;
 
 import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +29,9 @@ import com.google.genai.types.Type;
 import com.jq.findapp.entity.Ai;
 import com.jq.findapp.entity.Ai.AiType;
 import com.jq.findapp.entity.Location;
+import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.Query.Result;
+import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.util.Json;
 
@@ -37,6 +44,9 @@ public class AiService {
 	private Repository repository;
 
 	public String text(final String question) {
+		final Result result = exists(question, AiType.Text, 365);
+		if (result.size() > 0)
+			return (String) result.get(0).get("ai.answer");
 		final String answer = this.call(question, null);
 		final Ai ai = new Ai();
 		ai.setQuestion(question);
@@ -47,6 +57,13 @@ public class AiService {
 	}
 
 	public List<Location> locations(final String question) {
+		final Result result = exists(question, AiType.Location, 183);
+		if (result.size() > 0) {
+			final List<Location> locations = new ArrayList<>();
+			for (int i = 0; i < result.size(); i++)
+				locations.add(repository.one(Location.class, new BigInteger(result.get(i).get("ai.answer"))));
+			return locations;
+		}
 		final List<Location> locations = Arrays.asList(Json.toObject(
 				this.call(question, this.createSchema(false)), Location[].class));
 		for (Location location : locations) {
@@ -68,6 +85,17 @@ public class AiService {
 	}
 
 	public List<Event> events(final String question) {
+		final Result result = exists(question, AiType.Event, 7);
+		if (result.size() > 0) {
+			final List<Location> events = new ArrayList<>();
+			for (int i = 0; i < result.size(); i++) {
+				final Event event = repository.one(Event.class, new BigInteger(result.get(i).get("ai.answer")));
+				if (event.getStartDate().after(new Timestamp()))
+					events.add(event);
+			}
+			if (event.size() > 0)
+				return events;
+		}
 		final ArrayNode events = (ArrayNode) Json.toNode(this.call(question, this.createSchema(true)));
 		for (Node event : events) {
 			final Ai ai = new Ai();
@@ -85,6 +113,13 @@ public class AiService {
 			}
 		}
 		return locations;
+	}
+
+	private Result exists(final String qustion, final AiType type, int daysBack) {
+		final QueryParams params = new QueryParams(Query.misc_ai);
+		params.setSearch("ai.question='" + qustion + "' and ai.type='" + type.name() +
+				"' and ai.createdAt>cast('" + Instant.now().minus((Duration.ofDays(daysBack)) + "' as timestamp"')");
+		return repository.list(params);
 	}
 
 	private String call(final String question, final Schema schema) {
