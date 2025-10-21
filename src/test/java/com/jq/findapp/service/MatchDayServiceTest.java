@@ -36,6 +36,7 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.service.MatchDayService.PollMatchDay;
+import com.jq.findapp.service.model.Response;
 import com.jq.findapp.util.Entity;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Utils;
@@ -68,6 +69,22 @@ public class MatchDayServiceTest {
 		storage.setLabel("api-sports-/" + label + ".png");
 		storage.setStorage(image);
 		this.repository.save(storage);
+	}
+
+	@Test
+	void convert() throws Exception {
+		// given
+
+		// when
+		final Response response = Json.toObject(IOUtils.toString(
+				this.getClass().getResourceAsStream("/json/matchDays.json"), StandardCharsets.UTF_8)
+				.replace("{date}", "0")
+				.replace("{date1}", "1")
+				.replace("{date2}", "2")
+				.replace("{dateTBD}", "3"), Response.class);
+
+		// then
+		assertNotNull(response);
 	}
 
 	@Test
@@ -164,7 +181,7 @@ public class MatchDayServiceTest {
 						"" + (long) (Instant.now().plus(Duration.ofDays(15)).getEpochSecond())));
 
 		// when
-		final JsonNode cache = this.matchDayService.needUpdate(storage,
+		final Response cache = this.matchDayService.needUpdate(storage,
 				"team=786&season=" + this.matchDayService.currentSeason());
 
 		// then
@@ -184,7 +201,7 @@ public class MatchDayServiceTest {
 						"" + (long) (Instant.now().plus(Duration.ofDays(14)).getEpochSecond())));
 
 		// when
-		final JsonNode cache = this.matchDayService.needUpdate(storage,
+		final Response cache = this.matchDayService.needUpdate(storage,
 				"team=786&season=" + this.matchDayService.currentSeason());
 
 		// then
@@ -204,7 +221,7 @@ public class MatchDayServiceTest {
 						"" + (long) (Instant.now().plus(Duration.ofDays(14)).getEpochSecond())));
 
 		// when
-		final JsonNode cache = this.matchDayService.needUpdate(storage,
+		final Response cache = this.matchDayService.needUpdate(storage,
 				"team=786&season=" + this.matchDayService.currentSeason());
 
 		// then
@@ -217,7 +234,7 @@ public class MatchDayServiceTest {
 		final Map<String, Object> storage = new HashMap<>();
 
 		// when
-		final JsonNode cache = this.matchDayService.needUpdate(storage, "id=1234");
+		final Response cache = this.matchDayService.needUpdate(storage, "id=1234");
 
 		// then
 		assertNull(cache);

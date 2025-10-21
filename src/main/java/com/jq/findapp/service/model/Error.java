@@ -1,6 +1,6 @@
 package com.jq.findapp.service.model;
 
-public class Errors {
+public class Error {
 	public String rateLimit;
 	public String requests;
 }

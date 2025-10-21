@@ -5,7 +5,7 @@ import java.util.List;
 public class Response {
 	public String get;
 	public Parameters parameters;
-	public Errors errors;
+	public List<Error> errors;
 	public int results;
 	public Paging paging;
 	public List<Match> response;

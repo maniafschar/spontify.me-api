@@ -59,7 +59,9 @@ import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.service.model.Match;
+import com.jq.findapp.service.model.Player;
 import com.jq.findapp.service.model.Response;
+import com.jq.findapp.service.model.Statistic;
 import com.jq.findapp.util.Entity;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
@@ -111,29 +113,28 @@ public class MatchDayService {
 
 		BigInteger prediction(final BigInteger clientId, final int teamId) throws Exception {
 			final long now = Instant.now().getEpochSecond();
-			final JsonNode json = MatchDayService.this
+			final List<Match> json = MatchDayService.this
 					.get("team=" + teamId + "&season=" + MatchDayService.this.currentSeason());
 			for (int i = 0; i < json.size(); i++) {
-				if ("NS".equals(json.get(i).get("fixture").get("status").get("short").asText())) {
-					final Instant date = Instant
-							.ofEpochSecond(json.get(i).get("fixture").get("timestamp").asLong());
+				if ("NS".equals(json.get(i).fixture.status.myshort)) {
+					final Instant date = Instant.ofEpochSecond(json.get(i).fixture.timestamp);
 					if (date.getEpochSecond() >= now && date.minus(Duration.ofDays(1)).getEpochSecond() < now) {
 						final PollMatchDay poll = new PollMatchDay();
 						poll.type = "Prediction";
-						poll.home = json.get(i).get("teams").get("home").get("logo").asText();
-						poll.away = json.get(i).get("teams").get("away").get("logo").asText();
-						poll.homeName = json.get(i).get("teams").get("home").get("name").asText()
+						poll.home = json.get(i).teams.home.logo;
+						poll.away = json.get(i).teams.away.logo;
+						poll.homeName = json.get(i).teams.home.name
 								.replace("Munich", "München");
-						poll.awayName = json.get(i).get("teams").get("away").get("name").asText()
+						poll.awayName = json.get(i).teams.away.name
 								.replace("Munich", "München");
-						poll.homeId = json.get(i).get("teams").get("home").get("id").asInt();
-						poll.awayId = json.get(i).get("teams").get("away").get("id").asInt();
-						poll.league = json.get(i).get("league").get("logo").asText();
-						poll.leagueName = json.get(i).get("league").get("name").asText();
-						poll.timestamp = json.get(i).get("fixture").get("timestamp").asLong();
-						poll.venue = json.get(i).get("fixture").get("venue").get("name").asText();
-						poll.city = json.get(i).findPath("fixture").get("venue").get("city").asText();
-						poll.location = json.get(i).get("teams").get("home").get("id").asInt() == teamId ? "home"
+						poll.homeId = json.get(i).teams.home.id;
+						poll.awayId = json.get(i).teams.away.id;
+						poll.league = json.get(i).league.logo;
+						poll.leagueName = json.get(i).league.name;
+						poll.timestamp = json.get(i).fixture.timestamp;
+						poll.venue = json.get(i).fixture.venue.name;
+						poll.city = json.get(i).fixture.venue.city;
+						poll.location = json.get(i).teams.home.id == teamId ? "home"
 								: "away";
 						poll.subject = poll.homeName + " : " + poll.awayName + " (" + poll.city + " · " + poll.venue
 								+ " · " + MatchDayService.this.formatDate(poll.timestamp, null) + ")";
@@ -172,48 +173,43 @@ public class MatchDayService {
 			question.textField = "text";
 			poll.questions.add(question);
 			final int teamId = poll.location == "away" ? poll.awayId : poll.homeId;
-			final List<Map<String, Object>> matches = new ArrayList<>();
+			final List<Match> matches = new ArrayList<>();
 			for (int i = FIRST_YEAR; i <= MatchDayService.this.currentSeason(); i++) {
-				final JsonNode json = MatchDayService.this.get("team=" + teamId + "&season=" + i);
+				final List<Match> json = MatchDayService.this.get("team=" + teamId + "&season=" + i);
 				for (int i2 = 0; i2 < json.size(); i2++) {
-					if (json.get(i2).get("teams").get("home").get("id").asInt() == poll.homeId
-							&& json.get(i2).get("teams").get("away").get("id").asInt() == poll.awayId
-							&& "FT".equals(json.get(i2).get("fixture").get("status").get("short").asText())) {
-						final JsonNode fixture = MatchDayService.this
-								.get("id=" + json.get(i2).get("fixture").get("id").asInt()).get(0);
-						if (fixture != null && fixture.has("statistics") && fixture.get("statistics").size() > 1
-								&& fixture.get("statistics").get(0).has("statistics")) {
-							final Map<String, Object> match = new HashMap<>();
-							match.put("timestamp", fixture.get("fixture").get("timestamp").asLong());
-							match.put("goals", fixture.get("goals"));
-							match.put("statistics", fixture.get("statistics"));
-							matches.add(match);
+					if (json.get(i2).teams.home.id == poll.homeId
+							&& json.get(i2).teams.away.id == poll.awayId
+							&& "FT".equals(json.get(i2).fixture.status.myshort)) {
+						final Match fixture = MatchDayService.this
+								.get("id=" + json.get(i2).fixture.id).get(0);
+						if (fixture != null && fixture.statistics != null && fixture.statistics.size() > 1
+								&& fixture.statistics.get(0).statistics != null) {
+							matches.add(fixture);
 							if (matches.size() > 7)
 								break;
 						}
 					}
 				}
 			}
+
 			final Map<String, Double> homeList = new HashMap<>();
 			final Map<String, Double> awayList = new HashMap<>();
 			final List<String> labels = new ArrayList<>();
 			String added = "|";
 			for (int i = 0; i < matches.size(); i++) {
-				final JsonNode json = (JsonNode) matches.get(i).get("statistics");
-				for (int i2 = 0; i2 < json.get(0).get("statistics").size(); i2++) {
-					final String label = json.get(0).get("statistics").get(i2).get("type").asText();
+				for (int i2 = 0; i2 < matches.get(i).statistics.get(0).statistics.size(); i2++) {
+					final String label = matches.get(i).statistics.get(0).statistics.get(i2).type;
 					if (!homeList.containsKey(label)) {
 						homeList.put(label, 0.0);
 						awayList.put(label, 0.0);
 						labels.add(label);
 					}
 					homeList.put(label,
-							homeList.get(label) + json.get(0).get("statistics").get(i2).get("value").asDouble());
+							homeList.get(label) + matches.get(i).statistics.get(0).statistics.get(i2).value);
 					awayList.put(label,
-							awayList.get(label) + json.get(1).get("statistics").get(i2).get("value").asDouble());
+							awayList.get(label) + matches.get(i).statistics.get(1).statistics.get(i2).value);
 				}
-				final String s = ((JsonNode) matches.get(i).get("goals")).get("home").intValue() + " : "
-						+ ((JsonNode) matches.get(i).get("goals")).get("away").intValue();
+				final String s = matches.get(i).goals.home + " : " + matches.get(i).goals.away;
 				if (!added.contains("|" + s + "|")) {
 					final Answer answer = new Answer();
 					answer.answer = s;
@@ -222,7 +218,7 @@ public class MatchDayService {
 				}
 				if (i < 8)
 					poll.matches.add(s + "|"
-							+ MatchDayService.this.formatDate((Long) matches.get(i).get("timestamp"), null));
+							+ MatchDayService.this.formatDate(matches.get(i).fixture.timestamp, null));
 			}
 			final List<Map<String, Object>> statistics = new ArrayList<>();
 			for (int i = 0; i < labels.size(); i++) {
@@ -246,26 +242,21 @@ public class MatchDayService {
 			final Answer answer = new Answer();
 			answer.answer = "Oder erzielen wir ein anderes Ergebnis?";
 			poll.questions.get(0).answers.add(answer);
-			poll.prolog = "<b>Ergebnistipps</b> zum "
-					+ poll.leagueName
-					+ " Spiel<div style=\"padding:1em 0;font-weight:bold;\">"
-					+ poll.homeName
-					+ " - "
-					+ poll.awayName
-					+ "</div>vom <b>"
-					+ MatchDayService.this.formatDate(poll.timestamp, null)
+			poll.prolog = "<b>Ergebnistipps</b> zum " + poll.leagueName
+					+ " Spiel<div style=\"padding:1em 0;font-weight:bold;\">" + poll.homeName + " - " + poll.awayName
+					+ "</div>vom <b>" + MatchDayService.this.formatDate(poll.timestamp, null)
 					+ "</b>. Möchtest Du teilnehmen?";
 			poll.epilog = "Lieben Dank für Deine Teilnahme!\nDas Ergebnis wird kurz vor dem Spiel hier bekanntgegeben.";
 		}
 
 		BigInteger playerOfTheMatch(final BigInteger clientId, final int teamId) throws Exception {
-			final JsonNode matchDays = MatchDayService.this
+			final List<Match> matchDays = MatchDayService.this
 					.get("team=" + teamId + "&season=" + MatchDayService.this.currentSeason());
 			if (matchDays != null) {
-				for (int i = 0; i < matchDays.size(); i++) {
-					if ("FT".equals(matchDays.get(i).get("fixture").get("status").get("short").asText())) {
-						final Instant startDate = Instant.ofEpochSecond(matchDays.get(i)
-								.get("fixture").get("timestamp").asLong()).plus(Duration.ofHours(8));
+				for (final int i = 0; i < matchDays.size(); i++) {
+					if ("FT".equals(matchDays.get(i).fixture.status.myshort)) {
+						final Instant startDate = Instant.ofEpochSecond(matchDays.get(i).fixture.timestamp)
+								.plus(Duration.ofHours(8));
 						if (startDate.isBefore(Instant.now())
 								&& startDate.plus(Duration.ofDays(4)).isAfter(Instant.now())) {
 							final QueryParams params = new QueryParams(Query.misc_listMarketing);
@@ -275,38 +266,30 @@ public class MatchDayService {
 											+ " and clientMarketing.skills='9." + teamId + "'");
 							if (MatchDayService.this.repository.list(params).size() > 0)
 								break;
-							final JsonNode matchDay = MatchDayService.this
-									.get("id=" + matchDays.get(i).get("fixture").get("id").asText())
-									.get(0);
-							if (matchDay != null && this.anyPlayerWith90Minutes(matchDay.findPath("players"))) {
-								JsonNode players = matchDay.findPath("players");
-								players = players.get(players.get(0).get("team").get("id").asInt() == teamId ? 0 : 1)
-										.get("players");
+							final Match matchDay = MatchDayService.this.get("id=" + matchDays.get(i).fixture.id).get(0);
+							if (matchDay != null && this.anyPlayerWith90Minutes(matchDay.players)) {
+								final List<Player> players = matchDay.players;
+								players = players.get(players.get(0).team.id == teamId ? 0 : 1).players;
 								final PollMatchDay poll = new PollMatchDay();
 								poll.type = "PlayerOfTheMatch";
-								poll.home = matchDay.findPath("home").get("logo").asText();
-								poll.away = matchDay.findPath("away").get("logo").asText();
-								poll.homeName = matchDay.findPath("home").get("name").asText().replace("Munich",
-										"München");
-								poll.awayName = matchDay.findPath("away").get("name").asText().replace("Munich",
-										"München");
-								poll.homeId = matchDay.findPath("home").get("id").asInt();
-								poll.awayId = matchDay.findPath("away").get("id").asInt();
-								poll.league = matchDay.findPath("league").get("logo").asText();
-								poll.timestamp = matchDay.findPath("fixture").get("timestamp").asLong();
-								poll.venue = matchDay.findPath("fixture").get("venue").get("name").asText();
-								poll.city = matchDay.findPath("fixture").get("venue").get("city").asText();
+								poll.home = matchDay.teams.home.logo;
+								poll.away = matchDay.teams.away.logo;
+								poll.homeName = matchDay.teams.home.name.replace("Munich", "München");
+								poll.awayName = matchDay.teams.away.name.replace("Munich", "München");
+								poll.homeId = matchDay.teams.home.id;
+								poll.awayId = matchDay.teams.away.id;
+								poll.league = matchDay.league.logo;
+								poll.timestamp = matchDay.fixture.timestamp;
+								poll.venue = matchDay.fixture.venue.name;
+								poll.city = matchDay.fixture.venue.city;
 								poll.textId = TextId.notification_clientMarketingPollPlayerOfTheMath;
-								poll.location = matchDay.findPath("teams").get("home").get("id").asInt() == teamId
-										? "home"
-										: "away";
+								poll.location = matchDay.teams.home.id == teamId ? "home" : "away";
 								poll.prolog = "Umfrage <b>Spieler des Spiels</b> zum "
-										+ matchDay.findPath("league").get("name").asText() +
+										+ matchDay.league.name +
 										" Spiel<div style=\"padding:1em 0;font-weight:bold;\">"
 										+ poll.homeName + " - " + poll.awayName
 										+ "</div>vom <b>"
-										+ MatchDayService.this.formatDate(
-												matchDay.findPath("fixture").get("timestamp").asLong(), null)
+										+ MatchDayService.this.formatDate(matchDay.fixture.timestamp, null)
 										+ "</b>. Möchtest Du teilnehmen?";
 								poll.subject = poll.homeName + " : " + poll.awayName + " (" + poll.city + " · "
 										+ poll.venue + " · " + MatchDayService.this.formatDate(poll.timestamp, null)
@@ -341,12 +324,11 @@ public class MatchDayService {
 			return null;
 		}
 
-		private boolean anyPlayerWith90Minutes(JsonNode players) {
-			if (players.get(0) == null)
+		private boolean anyPlayerWith90Minutes(final List<Player> players) {
+			if (players == null)
 				return false;
-			players = players.get(0).get("players");
 			for (int i = 0; i < players.size(); i++) {
-				final JsonNode statistics = players.get(i).get("statistics").get(0);
+				final Statistic statistics = players.get(i).statistics.get(0);
 				if (!statistics.get("games").get("minutes").isNull()
 						&& statistics.get("games").get("minutes").asInt() >= 90)
 					return true;
@@ -354,7 +336,7 @@ public class MatchDayService {
 			return false;
 		}
 
-		private void playerOfTheMatchAddAnswers(final List<Answer> answers, final JsonNode players) {
+		private void playerOfTheMatchAddAnswers(final List<Answer> answers, final List<Player> players) {
 			for (int i = 0; i < players.size(); i++) {
 				final JsonNode statistics = players.get(i).get("statistics").get(0);
 				if (!statistics.get("games").get("minutes").isNull()) {
@@ -665,6 +647,7 @@ public class MatchDayService {
 					x + (pos == 1 ? w : 0) + pos * paddingLogos,
 					height + y, 0, 0, image.getWidth(), image.getHeight(), null);
 		}
+
 	}
 
 	int currentSeason() {
