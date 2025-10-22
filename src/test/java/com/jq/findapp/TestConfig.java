@@ -35,7 +35,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
@@ -46,6 +45,8 @@ import com.jq.findapp.service.EventService;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.MatchDayService;
 import com.jq.findapp.service.NotificationService.MailCreateor;
+import com.jq.findapp.service.model.Match;
+import com.jq.findapp.service.model.Response;
 import com.jq.findapp.util.Json;
 
 @Profile("test")
@@ -58,15 +59,15 @@ public class TestConfig {
 		dataSource.setUrl("jdbc:h2:mem:db;DB_CLOSE_DELAY=-1");
 		dataSource.getConnection()
 				.prepareStatement(
-						"CREATE ALIAS IF NOT EXISTS WEEKDAY FOR \"" + getClass().getName() + ".weekday\";")
+						"CREATE ALIAS IF NOT EXISTS WEEKDAY FOR \"" + this.getClass().getName() + ".weekday\";")
 				.executeUpdate();
 		dataSource.getConnection()
 				.prepareStatement(
-						"CREATE ALIAS IF NOT EXISTS TO_DAYS FOR \"" + getClass().getName() + ".toDays\";")
+						"CREATE ALIAS IF NOT EXISTS TO_DAYS FOR \"" + this.getClass().getName() + ".toDays\";")
 				.executeUpdate();
 		dataSource.getConnection()
 				.prepareStatement(
-						"CREATE ALIAS IF NOT EXISTS SUBSTRING_INDEX FOR \"" + getClass().getName()
+						"CREATE ALIAS IF NOT EXISTS SUBSTRING_INDEX FOR \"" + this.getClass().getName()
 								+ ".substringIndex\";")
 				.executeUpdate();
 		Files.createDirectories(Paths.get(Attachment.PATH));
@@ -103,7 +104,7 @@ public class TestConfig {
 
 		@GetMapping("db/{hql}")
 		public List<? extends BaseEntity> db(@PathVariable final String hql) throws ClassNotFoundException {
-			return repository.list(hql);
+			return this.repository.list(hql);
 		}
 	}
 
@@ -118,11 +119,11 @@ public class TestConfig {
 			try {
 				final QueryParams params = new QueryParams(Query.misc_listStorage);
 				params.setSearch("storage.label='google-address-" + param.hashCode() + "'");
-				final Result result = repository.list(params);
+				final Result result = this.repository.list(params);
 				if (result.size() > 0)
 					return (String) result.get(0).get("storage.storage");
 				return IOUtils.toString(
-						getClass().getResourceAsStream(
+						this.getClass().getResourceAsStream(
 								param.startsWith("place/nearbysearch/json?") ? "/json/googleNearBy.json"
 										: param.startsWith("place/photo?") ? "/html/googlePhoto.html"
 												: "/json/googleResponse.json"),
@@ -142,7 +143,7 @@ public class TestConfig {
 				if (url.contains("search=1"))
 					return "";
 				return IOUtils.toString(
-						getClass().getResourceAsStream("/html/event" + (url.contains("/veranstaltungen/")
+						this.getClass().getResourceAsStream("/html/event" + (url.contains("/veranstaltungen/")
 								? (url.split("/").length == 5 ? "List" : "Detail")
 								: url.contains("muenchenticket.") ? "Ticket" : "Address") + ".html"),
 						StandardCharsets.UTF_8).replace('\n', ' ').replace('\r', ' ');
@@ -158,23 +159,25 @@ public class TestConfig {
 		public int offset = 0;
 
 		@Override
-		protected JsonNode get(final String url) {
+		protected List<Match> get(final String url) {
 			try {
 				final Instant now = Instant.now();
 				final String s = IOUtils.toString(
-						getClass().getResourceAsStream(
+						this.getClass().getResourceAsStream(
 								url.startsWith("id=") ? "/json/matchDaysLastMatch.json"
 										: url.contains("786") ? "/json/matchDays1860.json" : "/json/matchDays.json"),
 						StandardCharsets.UTF_8);
-				return Json.toNode(
+				return Json.toObject(
 						s.replace("\"{date}\"",
-								"" + (long) (now.getEpochSecond() + offset))
+								"" + (long) (now.getEpochSecond() + this.offset))
 								.replace("\"{date1}\"",
-										"" + (long) (now.plus(Duration.ofDays(7)).getEpochSecond() + offset))
+										"" + (long) (now.plus(Duration.ofDays(7)).getEpochSecond() + this.offset))
 								.replace("\"{date2}\"",
-										"" + (long) (now.plus(Duration.ofDays(14)).getEpochSecond() + offset)))
-						.get("response");
-			} catch (Exception ex) {
+										"" + (long) (now.plus(Duration.ofDays(14)).getEpochSecond() + this.offset))
+								.replace("\"{dateTBD}\"",
+										"" + (long) (now.plus(Duration.ofDays(30)).getEpochSecond() + this.offset)),
+						Response.class).response;
+			} catch (final Exception ex) {
 				throw new RuntimeException(ex);
 			}
 		}

@@ -6,7 +6,7 @@ public class Statistic {
 	public Team team;
 	public ArrayList<Statistic> statistics;
 	public String type;
-	public Double value;
+	public String value;
 	public Games games;
 	public int offsides;
 	public Shots shots;

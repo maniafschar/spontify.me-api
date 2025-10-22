@@ -1,7 +1,7 @@
 package com.jq.findapp.service.model;
 
 public class Venue {
-	public Object id;
+	public int id;
 	public String name;
 	public String city;
 }

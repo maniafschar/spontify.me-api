@@ -58,8 +58,10 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
+import com.jq.findapp.service.model.Fixture;
 import com.jq.findapp.service.model.Match;
-import com.jq.findapp.service.model.Player;
+import com.jq.findapp.service.model.Players;
+import com.jq.findapp.service.model.PlayersTeam;
 import com.jq.findapp.service.model.Response;
 import com.jq.findapp.service.model.Statistic;
 import com.jq.findapp.util.Entity;
@@ -173,7 +175,7 @@ public class MatchDayService {
 			question.textField = "text";
 			poll.questions.add(question);
 			final int teamId = poll.location == "away" ? poll.awayId : poll.homeId;
-			final List<Match> matches = new ArrayList<>();
+			final List<Match> result = new ArrayList<>();
 			for (int i = FIRST_YEAR; i <= MatchDayService.this.currentSeason(); i++) {
 				final List<Match> matches = MatchDayService.this.get("team=" + teamId + "&season=" + i);
 				for (int i2 = 0; i2 < matches.size(); i2++) {
@@ -184,8 +186,8 @@ public class MatchDayService {
 								.get("id=" + matches.get(i2).fixture.id).get(0);
 						if (fixture != null && fixture.statistics != null && fixture.statistics.size() > 1
 								&& fixture.statistics.get(0).statistics != null) {
-							matches.add(fixture);
-							if (matches.size() > 7)
+							result.add(fixture);
+							if (result.size() > 7)
 								break;
 						}
 					}
@@ -196,20 +198,22 @@ public class MatchDayService {
 			final Map<String, Double> awayList = new HashMap<>();
 			final List<String> labels = new ArrayList<>();
 			String added = "|";
-			for (int i = 0; i < matches.size(); i++) {
-				for (int i2 = 0; i2 < matches.get(i).statistics.get(0).statistics.size(); i2++) {
-					final String label = matches.get(i).statistics.get(0).statistics.get(i2).type;
+			for (int i = 0; i < result.size(); i++) {
+				for (int i2 = 0; i2 < result.get(i).statistics.get(0).statistics.size(); i2++) {
+					final String label = result.get(i).statistics.get(0).statistics.get(i2).type;
 					if (!homeList.containsKey(label)) {
 						homeList.put(label, 0.0);
 						awayList.put(label, 0.0);
 						labels.add(label);
 					}
 					homeList.put(label,
-							homeList.get(label) + matches.get(i).statistics.get(0).statistics.get(i2).value);
+							homeList.get(label)
+									+ Double.valueOf(result.get(i).statistics.get(0).statistics.get(i2).value));
 					awayList.put(label,
-							awayList.get(label) + matches.get(i).statistics.get(1).statistics.get(i2).value);
+							awayList.get(label)
+									+ Double.valueOf(result.get(i).statistics.get(1).statistics.get(i2).value));
 				}
-				final String s = matches.get(i).goals.home + " : " + matches.get(i).goals.away;
+				final String s = result.get(i).goals.home + " : " + result.get(i).goals.away;
 				if (!added.contains("|" + s + "|")) {
 					final Answer answer = new Answer();
 					answer.answer = s;
@@ -218,13 +222,13 @@ public class MatchDayService {
 				}
 				if (i < 8)
 					poll.matches.add(s + "|"
-							+ MatchDayService.this.formatDate(matches.get(i).fixture.timestamp, null));
+							+ MatchDayService.this.formatDate(result.get(i).fixture.timestamp, null));
 			}
 			final List<Map<String, Object>> statistics = new ArrayList<>();
 			for (int i = 0; i < labels.size(); i++) {
 				final Map<String, Object> row = new HashMap<>();
-				row.put("home", homeList.get(labels.get(i)) / matches.size());
-				row.put("away", awayList.get(labels.get(i)) / matches.size());
+				row.put("home", homeList.get(labels.get(i)) / result.size());
+				row.put("away", awayList.get(labels.get(i)) / result.size());
 				row.put("label", labels.get(i));
 				statistics.add(row);
 			}
@@ -253,7 +257,7 @@ public class MatchDayService {
 			final List<Match> matchDays = MatchDayService.this
 					.get("team=" + teamId + "&season=" + MatchDayService.this.currentSeason());
 			if (matchDays != null) {
-				for (final int i = 0; i < matchDays.size(); i++) {
+				for (int i = 0; i < matchDays.size(); i++) {
 					if ("FT".equals(matchDays.get(i).fixture.status.myshort)) {
 						final Instant startDate = Instant.ofEpochSecond(matchDays.get(i).fixture.timestamp)
 								.plus(Duration.ofHours(8));
@@ -268,8 +272,9 @@ public class MatchDayService {
 								break;
 							final Match matchDay = MatchDayService.this.get("id=" + matchDays.get(i).fixture.id).get(0);
 							if (matchDay != null && this.anyPlayerWith90Minutes(matchDay.players)) {
-								final List<Player> players = matchDay.players;
-								players = players.get(players.get(0).team.id == teamId ? 0 : 1).players;
+								final List<PlayersTeam> playersTeam = matchDay.players;
+								final List<Players> players = playersTeam
+										.get(playersTeam.get(0).team.id == teamId ? 0 : 1).players;
 								final PollMatchDay poll = new PollMatchDay();
 								poll.type = "PlayerOfTheMatch";
 								poll.home = matchDay.teams.home.logo;
@@ -324,39 +329,40 @@ public class MatchDayService {
 			return null;
 		}
 
-		private boolean anyPlayerWith90Minutes(final List<Player> players) {
+		private boolean anyPlayerWith90Minutes(final List<PlayersTeam> players) {
 			if (players == null)
 				return false;
 			for (int i = 0; i < players.size(); i++) {
-				final Statistic statistics = players.get(i).statistics.get(0);
-				if (!statistics.get("games").get("minutes").isNull()
-						&& statistics.get("games").get("minutes").asInt() >= 90)
-					return true;
+				for (int i2 = 0; i2 < players.get(i).players.size(); i2++) {
+					final Statistic statistics = players.get(i).players.get(i2).statistics.get(0);
+					if (statistics.games.minutes >= 90)
+						return true;
+				}
 			}
 			return false;
 		}
 
-		private void playerOfTheMatchAddAnswers(final List<Answer> answers, final List<Player> players) {
+		private void playerOfTheMatchAddAnswers(final List<Answer> answers, final List<Players> players) {
 			for (int i = 0; i < players.size(); i++) {
-				final Statistics statistics = players.get(i).statistics.get(0);
-				if (statistics.get("games").minutes == null) {
+				final Statistic statistics = players.get(i).statistics.get(0);
+				if (statistics.games.minutes > 0) {
 					String s = players.get(i).player.name +
 							"<explain>" + statistics.games.minutes +
 							(statistics.games.minutes > 1 ? " gespielte Minuten"
 									: " gespielte Minute");
-					if (statistics.goals.total != null)
+					if (statistics.goals.total > 0)
 						s += this.getLine(statistics.goals.total, " Tor", " Tore");
-					if (statistics.shots.total != null)
+					if (statistics.shots.total > 0)
 						s += this.getLine(statistics.shots.total, " Torschuss, ",
 								" Torschüsse, ")
-								+ (statistics.shots.on == null ? 0 : statistics.shots.on)
+								+ statistics.shots.on
 								+ " aufs Tor";
-					if (statistics.goals.assists != null)
+					if (statistics.goals.assists > 0)
 						s += this.getLine(statistics.goals.assists, " Assist", " Assists");
-					if (statistics.passes.total != null)
+					if (statistics.passes.total > 0)
 						s += this.getLine(statistics.passes.total, " Pass, ", " Pässe, ")
 								+ statistics.passes.accuracy + " angekommen";
-					if (!statistics.duels.total != null)
+					if (statistics.duels.total > 0)
 						s += this.getLine(statistics.duels.total, " Duell, ", " Duelle, ")
 								+ statistics.duels.won + " gewonnen";
 					if (statistics.cards.yellow > 0 && statistics.cards.red > 0)
@@ -666,10 +672,8 @@ public class MatchDayService {
 							final long timestamp = matchDays.get(i).fixture.timestamp;
 							final String homeName = matchDays.get(i).teams.home.name.replace("Munich", "München");
 							final String awayName = matchDays.get(i).teams.away.name.replace("Munich", "München");
-							final String homeGoals = matchDays.get(i).goals.home == null ? "&nbsp;"
-									: matchDays.get(i).goals.home.toString();
-							final String awayGoals = matchDays.get(i).goals.away == null ? "&nbsp;"
-									: matchDays.get(i).goals.away.toString();
+							final String homeGoals = "" + matchDays.get(i).goals.home;
+							final String awayGoals = "" + matchDays.get(i).goals.away;
 							final String leagueName = matchDays.get(i).league.name;
 							final String venue = matchDays.get(i).fixture.venue.name;
 							final String city = matchDays.get(i).fixture.venue.city;
@@ -801,9 +805,9 @@ public class MatchDayService {
 					.retrieve()
 					.toEntity(Response.class).block().getBody();
 			if (response != null && response.response != null) {
-				pauseUntil = response.errors.rateLimit != null
+				pauseUntil = response.errors.get(0).rateLimit != null
 						? Instant.now().plus(Duration.ofMinutes(11)).toEpochMilli()
-						: response.errors.requests != null
+						: response.errors.get(0).requests != null
 								? Instant.now().plus(Duration.ofDays(1)).truncatedTo(ChronoUnit.DAYS).toEpochMilli()
 								: 0;
 				if (pauseUntil == 0) {
@@ -825,8 +829,8 @@ public class MatchDayService {
 		Response response = null;
 		if (!Strings.isEmpty(storage.get("storage.storage")))
 			response = Json.toObject(storage.get("storage.storage").toString(), Response.class);
-		if (response == null || response.errors != null
-				&& (response.errors.rateLimit != null || response.errors.requests != null))
+		if (response == null || response.errors != null && response.errors.size() > 0
+				&& (response.errors.get(0).rateLimit != null || response.errors.get(0).requests != null))
 			return null;
 		if (url.contains("season=" + this.currentSeason()) && url.contains("team=") &&
 				Instant.ofEpochMilli(((Timestamp) storage.get("storage.createdAt")).getTime())
@@ -837,7 +841,7 @@ public class MatchDayService {
 			final List<Match> responses = response.response;
 			for (int i = 0; i < responses.size(); i++) {
 				final Fixture f = responses.get(i).fixture;
-				if (f != null && f.timestamp != null && ("TBD".equals(f.status.myshort)
+				if (f != null && f.timestamp > 0 && ("TBD".equals(f.status.myshort)
 						|| "NS".equals(f.status.myshort))) {
 					final Instant time = Instant.ofEpochSecond(f.timestamp);
 					if ("NS".equals(f.status.myshort)) {

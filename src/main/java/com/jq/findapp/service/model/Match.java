@@ -11,5 +11,5 @@ public class Match {
 	public ArrayList<Event> events;
 	public ArrayList<Lineup> lineups;
 	public ArrayList<Statistic> statistics;
-	public ArrayList<Player> players;
+	public ArrayList<PlayersTeam> players;
 }

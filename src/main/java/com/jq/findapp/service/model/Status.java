@@ -7,5 +7,5 @@ public class Status {
 	public String mylong;
 	@JsonProperty("short")
 	public String myshort;
-	public Integer elapsed;
+	public int elapsed;
 }

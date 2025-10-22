@@ -1,12 +1,12 @@
 package com.jq.findapp.service.model;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class Response {
 	public String get;
 	public Parameters parameters;
-	public List<Error> errors;
+	public ArrayList<Error> errors;
 	public int results;
 	public Paging paging;
-	public List<Match> response;
+	public ArrayList<Match> response;
 }

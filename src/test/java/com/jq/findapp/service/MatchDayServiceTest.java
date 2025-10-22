@@ -88,6 +88,19 @@ public class MatchDayServiceTest {
 	}
 
 	@Test
+	void convertLastMatch() throws Exception {
+		// given
+
+		// when
+		final Response response = Json.toObject(IOUtils.toString(
+				this.getClass().getResourceAsStream("/json/matchDaysLastMatch.json"), StandardCharsets.UTF_8),
+				Response.class);
+
+		// then
+		assertNotNull(response);
+	}
+
+	@Test
 	public void update_twice() throws Exception {
 		// given
 		this.utils.createContact(BigInteger.valueOf(4));
@@ -177,7 +190,11 @@ public class MatchDayServiceTest {
 		storage.put("storage.storage", IOUtils.toString(
 				this.getClass().getResourceAsStream(
 						"/json/matchDays.json"),
-				StandardCharsets.UTF_8).replace("\"{dateTBD}\"",
+				StandardCharsets.UTF_8)
+				.replace("\"{date}\"", "0")
+				.replace("\"{date1}\"", "1")
+				.replace("\"{date2}\"", "2")
+				.replace("\"{dateTBD}\"",
 						"" + (long) (Instant.now().plus(Duration.ofDays(15)).getEpochSecond())));
 
 		// when
@@ -195,9 +212,11 @@ public class MatchDayServiceTest {
 		storage.put("storage.createdAt", new Timestamp(Instant.now().minus(Duration.ofHours(26)).toEpochMilli()));
 		storage.put("storage.modifiedAt", new Timestamp(Instant.now().minus(Duration.ofHours(25)).toEpochMilli()));
 		storage.put("storage.storage", IOUtils.toString(
-				this.getClass().getResourceAsStream(
-						"/json/matchDays.json"),
-				StandardCharsets.UTF_8).replace("\"{dateTBD}\"",
+				this.getClass().getResourceAsStream("/json/matchDays.json"), StandardCharsets.UTF_8)
+				.replace("\"{date}\"", "0")
+				.replace("\"{date1}\"", "1")
+				.replace("\"{date2}\"", "2")
+				.replace("\"{dateTBD}\"",
 						"" + (long) (Instant.now().plus(Duration.ofDays(14)).getEpochSecond())));
 
 		// when
@@ -217,7 +236,11 @@ public class MatchDayServiceTest {
 		storage.put("storage.storage", IOUtils.toString(
 				this.getClass().getResourceAsStream(
 						"/json/matchDays.json"),
-				StandardCharsets.UTF_8).replace("\"{dateTBD}\"",
+				StandardCharsets.UTF_8)
+				.replace("\"{date}\"", "0")
+				.replace("\"{date1}\"", "1")
+				.replace("\"{date2}\"", "2")
+				.replace("\"{dateTBD}\"",
 						"" + (long) (Instant.now().plus(Duration.ofDays(14)).getEpochSecond())));
 
 		// when
@@ -252,7 +275,7 @@ public class MatchDayServiceTest {
 
 		// then
 		assertEquals(
-				"<style>header{font-size:0.7em;padding-top:1em;}match{display:inline-block;float:left;width:100%;font-size:0.7em;}home,away{width:42%;display:inline-block;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}home{text-align:right;}away{text-align:left;}goals{width:8%;display:inline-block;text-align:center;overflow:hidden;}sep{position:absolute;margin-left:-0.1em;}.highlight{font-weight:bold;}matchdays{text-align:center;display:inline-block;float:left;}</style><matchDays><match skills=\"9.786\"><header>3. Liga · Dietmar-Scholze-Stadion an der Lohmühle · Lübeck · Mi 24.1.2024 19:00</header><home>VfB Lubeck</home><goals>&nbsp;</goals><sep>:</sep><goals>&nbsp;</goals><away class=\"highlight\">TSV 1860 München</away></match><match skills=\"9.786\"><header>3. Liga · Städtisches Stadion an der Grünwalder Straße · München · Sa 20.1.2024 16:30</header><home class=\"highlight\">TSV 1860 München</home><goals>&nbsp;</goals><sep>:</sep><goals>&nbsp;</goals><away>MSV Duisburg</away></match><match skills=\"9.786\"><header>3. Liga · Carl-Benz-Stadion · Mannheim · Mi 20.12.2023 19:00</header><home>Waldhof Mannheim</home><goals>&nbsp;</goals><sep>:</sep><goals>&nbsp;</goals><away class=\"highlight\">TSV 1860 München</away></match><match skills=\"9.786\"><header>3. Liga · SchücoArena · Bielefeld · So 17.12.2023 16:30</header><home>Arminia Bielefeld</home><goals>&nbsp;</goals><sep>:</sep><goals>&nbsp;</goals><away class=\"highlight\">TSV 1860 München</away></match><match skills=\"9.786\"><header>3. Liga · Städtisches Stadion an der Grünwalder Straße · München · Sa 9.12.2023 14:00</header><home class=\"highlight\">TSV 1860 München</home><goals>&nbsp;</goals><sep>:</sep><goals>&nbsp;</goals><away>Rot-weiss Essen</away></match><match skills=\"9.786\"><header>3. Liga · Stadion Rote Erde · Dortmund · So 3.12.2023 19:30</header><home>Borussia Dortmund II</home><goals>3</goals><sep>:</sep><goals>0</goals><away class=\"highlight\">TSV 1860 München</away></match></matchDays>",
+				"<style>header{font-size:0.7em;padding-top:1em;}match{display:inline-block;float:left;width:100%;font-size:0.7em;}home,away{width:42%;display:inline-block;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}home{text-align:right;}away{text-align:left;}goals{width:8%;display:inline-block;text-align:center;overflow:hidden;}sep{position:absolute;margin-left:-0.1em;}.highlight{font-weight:bold;}matchdays{text-align:center;display:inline-block;float:left;}</style><matchDays><match skills=\"9.786\"><header>3. Liga · Dietmar-Scholze-Stadion an der Lohmühle · Lübeck · Mi 24.1.2024 19:00</header><home>VfB Lubeck</home><goals>0</goals><sep>:</sep><goals>0</goals><away class=\"highlight\">TSV 1860 München</away></match><match skills=\"9.786\"><header>3. Liga · Städtisches Stadion an der Grünwalder Straße · München · Sa 20.1.2024 16:30</header><home class=\"highlight\">TSV 1860 München</home><goals>0</goals><sep>:</sep><goals>0</goals><away>MSV Duisburg</away></match><match skills=\"9.786\"><header>3. Liga · Carl-Benz-Stadion · Mannheim · Mi 20.12.2023 19:00</header><home>Waldhof Mannheim</home><goals>0</goals><sep>:</sep><goals>0</goals><away class=\"highlight\">TSV 1860 München</away></match><match skills=\"9.786\"><header>3. Liga · SchücoArena · Bielefeld · So 17.12.2023 16:30</header><home>Arminia Bielefeld</home><goals>0</goals><sep>:</sep><goals>0</goals><away class=\"highlight\">TSV 1860 München</away></match><match skills=\"9.786\"><header>3. Liga · Städtisches Stadion an der Grünwalder Straße · München · Sa 9.12.2023 14:00</header><home class=\"highlight\">TSV 1860 München</home><goals>0</goals><sep>:</sep><goals>0</goals><away>Rot-weiss Essen</away></match><match skills=\"9.786\"><header>3. Liga · Stadion Rote Erde · Dortmund · So 3.12.2023 19:30</header><home>Borussia Dortmund II</home><goals>3</goals><sep>:</sep><goals>0</goals><away class=\"highlight\">TSV 1860 München</away></match></matchDays>",
 				matches);
 	}
 

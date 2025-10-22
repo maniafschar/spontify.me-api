@@ -1,8 +1,8 @@
 package com.jq.findapp.service.model;
 
 public class Penalty {
-	public Object home;
-	public Object away;
+	public int home;
+	public int away;
 	public int won;
 	public int commited;
 	public int scored;

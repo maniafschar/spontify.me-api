@@ -1,6 +1,6 @@
 package com.jq.findapp.service.model;
 
 public class Extratime {
-	public Object home;
-	public Object away;
+	public int home;
+	public int away;
 }
