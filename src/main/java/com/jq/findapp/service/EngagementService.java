@@ -352,7 +352,7 @@ public class EngagementService {
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setSearch("contact.clientId=4");
 			final Result contacts = this.repository.list(params);
-			for (final int i = 0; i < contacts.size(); i++) {
+			for (int i = 0; i < contacts.size(); i++) {
 				final Contact contact = this.repository.one(Contact.class,
 						(BigInteger) contacts.get(i).get("contact.id"));
 				final List<Integer> teamIds = Arrays.asList(contact.getSkills().split("\\|"))
