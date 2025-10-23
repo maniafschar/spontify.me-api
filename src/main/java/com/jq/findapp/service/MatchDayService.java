@@ -804,7 +804,7 @@ public class MatchDayService {
 					.header("x-rapidapi-host", "v3.football.api-sports.io")
 					.retrieve()
 					.toEntity(Response.class).block().getBody();
-			if (response != null && response.errors != null) {
+			if (response != null && response.errors != null && response.errors.size() > 0) {
 				pauseUntil = response.errors.get(0).rateLimit != null
 						? Instant.now().plus(Duration.ofMinutes(11)).toEpochMilli()
 						: response.errors.get(0).requests != null
