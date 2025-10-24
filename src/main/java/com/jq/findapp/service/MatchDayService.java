@@ -804,10 +804,10 @@ public class MatchDayService {
 					.header("x-rapidapi-host", "v3.football.api-sports.io")
 					.retrieve()
 					.toEntity(Response.class).block().getBody();
-			if (response != null && response.errors != null && response.errors.size() > 0) {
-				pauseUntil = response.errors.get(0).rateLimit != null
+			if (response != null && response.errors != null) {
+				pauseUntil = response.errors.rateLimit != null
 						? Instant.now().plus(Duration.ofMinutes(11)).toEpochMilli()
-						: response.errors.get(0).requests != null
+						: response.errors.requests != null
 								? Instant.now().plus(Duration.ofDays(1)).truncatedTo(ChronoUnit.DAYS).toEpochMilli()
 								: 0;
 				if (pauseUntil == 0) {
@@ -829,8 +829,8 @@ public class MatchDayService {
 		Response response = null;
 		if (!Strings.isEmpty(storage.get("storage.storage")))
 			response = Json.toObject(storage.get("storage.storage").toString(), Response.class);
-		if (response == null || response.errors != null && response.errors.size() > 0
-				&& (response.errors.get(0).rateLimit != null || response.errors.get(0).requests != null))
+		if (response == null || response.errors != null
+				&& (response.errors.rateLimit != null || response.errors.requests != null))
 			return null;
 		if (url.contains("season=" + this.currentSeason()) && url.contains("team=") &&
 				Instant.ofEpochMilli(((Timestamp) storage.get("storage.createdAt")).getTime())
