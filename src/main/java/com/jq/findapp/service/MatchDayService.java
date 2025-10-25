@@ -808,11 +808,13 @@ public class MatchDayService {
 			try {
 				response = Json.toObject(s, Response.class);
 				if (response.response != null) {
-					pauseUntil = response.errors.rateLimit != null
-							? Instant.now().plus(Duration.ofMinutes(11)).toEpochMilli()
-							: response.errors.requests != null
-									? Instant.now().plus(Duration.ofDays(1)).truncatedTo(ChronoUnit.DAYS).toEpochMilli()
-									: 0;
+					pauseUntil = response.errors == null ? 0
+							: response.errors.rateLimit != null
+									? Instant.now().plus(Duration.ofMinutes(11)).toEpochMilli()
+									: response.errors.requests != null
+											? Instant.now().plus(Duration.ofDays(1)).truncatedTo(ChronoUnit.DAYS)
+													.toEpochMilli()
+											: 0;
 					if (pauseUntil == 0) {
 						final Storage storage = result.size() == 0 ? new Storage()
 								: this.repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
