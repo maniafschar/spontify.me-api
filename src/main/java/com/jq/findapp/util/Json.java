@@ -12,6 +12,7 @@ public class Json {
 
 	static {
 		om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		om.configure(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true);
 	}
 
 	public static JsonNode toNode(final String json) {
