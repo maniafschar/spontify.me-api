@@ -187,8 +187,6 @@ public class MatchDayService {
 						if (fixture != null && fixture.statistics != null && fixture.statistics.size() > 1
 								&& fixture.statistics.get(0).statistics != null) {
 							result.add(fixture);
-							MatchDayService.this.notificationService.createTicket(TicketType.ERROR, "MDS",
-									Json.toPrettyString(fixture), clientId);
 							if (result.size() > 7)
 								break;
 						}
@@ -210,10 +208,12 @@ public class MatchDayService {
 					}
 					homeList.put(label,
 							homeList.get(label)
-									+ Double.valueOf(result.get(i).statistics.get(0).statistics.get(i2).value));
+									+ Double.valueOf(
+											result.get(i).statistics.get(0).statistics.get(i2).value.replace("%", "")));
 					awayList.put(label,
 							awayList.get(label)
-									+ Double.valueOf(result.get(i).statistics.get(1).statistics.get(i2).value));
+									+ Double.valueOf(
+											result.get(i).statistics.get(1).statistics.get(i2).value.replace("%", "")));
 				}
 				final String s = result.get(i).goals.home + " : " + result.get(i).goals.away;
 				if (!added.contains("|" + s + "|")) {
