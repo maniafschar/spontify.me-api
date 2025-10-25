@@ -797,13 +797,14 @@ public class MatchDayService {
 				throw new RuntimeException(
 						"Too many requests!\nURL: " + url + "\nRemaining pause " + ((int) (i + 0.5)) + unit);
 			}
-			response = WebClient
+			// need to be done this way to avoid "errors: []" exception
+			response = Json.toObject(WebClient
 					.create("https://v3.football.api-sports.io/fixtures?" + url)
 					.get()
 					.header("x-rapidapi-key", this.token)
 					.header("x-rapidapi-host", "v3.football.api-sports.io")
 					.retrieve()
-					.toEntity(Response.class).block().getBody();
+					.toEntity(String.class).block().getBody(), Response.class);
 			if (response != null && response.errors != null) {
 				pauseUntil = response.errors.rateLimit != null
 						? Instant.now().plus(Duration.ofMinutes(11)).toEpochMilli()
