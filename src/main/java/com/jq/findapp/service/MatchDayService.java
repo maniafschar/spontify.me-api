@@ -807,7 +807,7 @@ public class MatchDayService {
 					.toEntity(String.class).block().getBody();
 			try {
 				response = Json.toObject(s, Response.class);
-				if (response != null && response.errors != null) {
+				if (response.response != null) {
 					pauseUntil = response.errors.rateLimit != null
 							? Instant.now().plus(Duration.ofMinutes(11)).toEpochMilli()
 							: response.errors.requests != null
