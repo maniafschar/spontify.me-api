@@ -39,9 +39,6 @@ import com.jq.findapp.util.Strings;
 @Service
 public class DbService {
 	@Autowired
-	private ClientNewsService clientNewsService;
-
-	@Autowired
 	private Repository repository;
 
 	@Value("${app.server.webDir}")
