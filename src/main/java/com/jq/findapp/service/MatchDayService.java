@@ -206,6 +206,12 @@ public class MatchDayService {
 						awayList.put(label, 0.0);
 						labels.add(label);
 					}
+					if (result.get(i).statistics.get(0).statistics.get(i2).value == null)
+						MatchDayService.this.notificationService.createTicket(TicketType.ERROR, "MDS",
+								Json.toPrettyString(result.get(i).statistics.get(0).statistics.get(i2)), null);
+					if (result.get(i).statistics.get(1).statistics.get(i2).value == null)
+						MatchDayService.this.notificationService.createTicket(TicketType.ERROR, "MDS",
+								Json.toPrettyString(result.get(i).statistics.get(1).statistics.get(i2)), null);
 					homeList.put(label,
 							homeList.get(label)
 									+ Double.valueOf(
