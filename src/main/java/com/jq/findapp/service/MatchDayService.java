@@ -148,8 +148,6 @@ public class MatchDayService {
 								"clientMarketing.endDate=cast('" + end + "' as timestamp) and clientMarketing.clientId="
 										+ clientId);
 						if (MatchDayService.this.repository.list(params).size() == 0) {
-							MatchDayService.this.notificationService.createTicket(TicketType.ERROR, "MDS",
-									Json.toString(poll), clientId);
 							this.predictionAddStatistics(clientId, poll);
 							final ClientMarketing clientMarketing = new ClientMarketing();
 							clientMarketing.setCreateResult(true);
@@ -189,6 +187,8 @@ public class MatchDayService {
 						if (fixture != null && fixture.statistics != null && fixture.statistics.size() > 1
 								&& fixture.statistics.get(0).statistics != null) {
 							result.add(fixture);
+							MatchDayService.this.notificationService.createTicket(TicketType.ERROR, "MDS",
+									Json.toPrettyString(fixture), clientId);
 							if (result.size() > 7)
 								break;
 						}
