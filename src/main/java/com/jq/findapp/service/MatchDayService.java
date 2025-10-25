@@ -148,6 +148,8 @@ public class MatchDayService {
 								"clientMarketing.endDate=cast('" + end + "' as timestamp) and clientMarketing.clientId="
 										+ clientId);
 						if (MatchDayService.this.repository.list(params).size() == 0) {
+							MatchDayService.this.notificationService.createTicket(TicketType.ERROR, "MDS",
+									Json.toString(poll), clientId);
 							this.predictionAddStatistics(clientId, poll);
 							final ClientMarketing clientMarketing = new ClientMarketing();
 							clientMarketing.setCreateResult(true);
