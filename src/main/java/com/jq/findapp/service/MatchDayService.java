@@ -798,28 +798,33 @@ public class MatchDayService {
 						"Too many requests!\nURL: " + url + "\nRemaining pause " + ((int) (i + 0.5)) + unit);
 			}
 			// need to be done this way to avoid "errors: []" exception
-			response = Json.toObject(WebClient
+			final String s = WebClient
 					.create("https://v3.football.api-sports.io/fixtures?" + url)
 					.get()
 					.header("x-rapidapi-key", this.token)
 					.header("x-rapidapi-host", "v3.football.api-sports.io")
 					.retrieve()
-					.toEntity(String.class).block().getBody(), Response.class);
-			if (response != null && response.errors != null) {
-				pauseUntil = response.errors.rateLimit != null
-						? Instant.now().plus(Duration.ofMinutes(11)).toEpochMilli()
-						: response.errors.requests != null
-								? Instant.now().plus(Duration.ofDays(1)).truncatedTo(ChronoUnit.DAYS).toEpochMilli()
-								: 0;
-				if (pauseUntil == 0) {
-					final Storage storage = result.size() == 0 ? new Storage()
-							: this.repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
-					storage.setLabel(label);
-					storage.setStorage(Json.toString(response));
-					this.repository.save(storage);
+					.toEntity(String.class).block().getBody();
+			try {
+				response = Json.toObject(s, Response.class);
+				if (response != null && response.errors != null) {
+					pauseUntil = response.errors.rateLimit != null
+							? Instant.now().plus(Duration.ofMinutes(11)).toEpochMilli()
+							: response.errors.requests != null
+									? Instant.now().plus(Duration.ofDays(1)).truncatedTo(ChronoUnit.DAYS).toEpochMilli()
+									: 0;
+					if (pauseUntil == 0) {
+						final Storage storage = result.size() == 0 ? new Storage()
+								: this.repository.one(Storage.class, (BigInteger) result.get(0).get("storage.id"));
+						storage.setLabel(label);
+						storage.setStorage(Json.toString(response));
+						this.repository.save(storage);
+					}
 				}
-			} else
-				this.notificationService.createTicket(TicketType.ERROR, "FIXTURE not FOUND", url, null);
+			} catch (final Exception ex) {
+				this.notificationService.createTicket(TicketType.ERROR, "FIXTURE",
+						url + "\n" + s + "\n" + Strings.stackTraceToString(ex), null);
+			}
 		}
 		if (response == null)
 			throw new RuntimeException(url + " not found");
