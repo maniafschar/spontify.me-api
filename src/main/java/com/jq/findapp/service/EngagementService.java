@@ -366,7 +366,7 @@ public class EngagementService {
 			params.setSearch("contact.clientId=4 and contact.skills like '%9.%'");
 			final Result contacts = this.repository.list(params);
 			final Map<Integer, Ai> text = new HashMap<>();
-			for (final int i = 0; i < contacts.size(); i++) {
+			for (int i = 0; i < contacts.size(); i++) {
 				final Contact contact = this.repository.one(Contact.class,
 						(BigInteger) contacts.get(i).get("contact.id"));
 				final List<Integer> teamIds = Arrays.asList(contact.getSkills().split("\\|"))
