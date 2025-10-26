@@ -1,5 +1,6 @@
 package com.jq.findapp.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -7,6 +8,7 @@ import jakarta.persistence.Enumerated;
 @Entity
 public class Ai extends BaseEntity {
 	private String question;
+	@Column(columnDefinition = "TEXT")
 	private String answer;
 	@Enumerated(EnumType.STRING)
 	private AiType type;

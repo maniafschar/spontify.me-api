@@ -47,7 +47,6 @@ import com.jq.findapp.entity.ClientMarketing.Question;
 import com.jq.findapp.entity.ClientMarketingResult;
 import com.jq.findapp.entity.ClientMarketingResult.PollResult;
 import com.jq.findapp.entity.Contact;
-import com.jq.findapp.entity.Event;
 import com.jq.findapp.entity.Event.FutureEvent;
 import com.jq.findapp.entity.Storage;
 import com.jq.findapp.entity.Ticket.TicketType;
@@ -114,56 +113,49 @@ public class MatchDayService {
 		private final static int FIRST_YEAR = 2010;
 
 		BigInteger prediction(final BigInteger clientId, final int teamId) throws Exception {
-			final long now = Instant.now().getEpochSecond();
-			final List<Match> matches = MatchDayService.this
-					.get("team=" + teamId + "&season=" + MatchDayService.this.currentSeason());
-			for (int i = 0; i < matches.size(); i++) {
-				if ("NS".equals(matches.get(i).fixture.status.myshort)) {
-					final Instant date = Instant.ofEpochSecond(matches.get(i).fixture.timestamp);
-					if (date.getEpochSecond() >= now && date.minus(Duration.ofDays(1)).getEpochSecond() < now) {
-						final PollMatchDay poll = new PollMatchDay();
-						poll.type = "Prediction";
-						poll.home = matches.get(i).teams.home.logo;
-						poll.away = matches.get(i).teams.away.logo;
-						poll.homeName = matches.get(i).teams.home.name
-								.replace("Munich", "München");
-						poll.awayName = matches.get(i).teams.away.name
-								.replace("Munich", "München");
-						poll.homeId = matches.get(i).teams.home.id;
-						poll.awayId = matches.get(i).teams.away.id;
-						poll.league = matches.get(i).league.logo;
-						poll.leagueName = matches.get(i).league.name;
-						poll.timestamp = matches.get(i).fixture.timestamp;
-						poll.venue = matches.get(i).fixture.venue.name;
-						poll.city = matches.get(i).fixture.venue.city;
-						poll.location = matches.get(i).teams.home.id == teamId ? "home"
-								: "away";
-						poll.subject = poll.homeName + " : " + poll.awayName + " (" + poll.city + " · " + poll.venue
-								+ " · " + MatchDayService.this.formatDate(poll.timestamp, null) + ")";
-						poll.textId = TextId.notification_clientMarketingPollPrediction;
-						final Instant end = Instant.ofEpochSecond(poll.timestamp)
-								.minus(Duration.ofMinutes(15));
-						final QueryParams params = new QueryParams(Query.misc_listMarketing);
-						params.setSearch(
-								"clientMarketing.endDate=cast('" + end + "' as timestamp) and clientMarketing.clientId="
-										+ clientId);
-						if (MatchDayService.this.repository.list(params).size() == 0) {
-							this.predictionAddStatistics(clientId, poll);
-							final ClientMarketing clientMarketing = new ClientMarketing();
-							clientMarketing.setCreateResult(true);
-							clientMarketing.setClientId(clientId);
-							clientMarketing.setSkills("9." + teamId);
-							clientMarketing.setStartDate(new Timestamp(end
-									.minus(Duration.ofDays(1)).toEpochMilli()));
-							clientMarketing.setEndDate(new Timestamp(end.toEpochMilli()));
-							clientMarketing.setStorage(Json.toString(poll));
-							clientMarketing.setImage(Attachment.createImage(".png",
-									MatchDayService.this.image.create(poll, "Ergebnistipps",
-											MatchDayService.this.repository.one(Client.class, clientId), null)));
-							MatchDayService.this.repository.save(clientMarketing);
-							return clientMarketing.getId();
-						}
-					}
+			final Match match = MatchDayService.this.retrieveNextMatch(teamId);
+			if (match != null) {
+				final PollMatchDay poll = new PollMatchDay();
+				poll.type = "Prediction";
+				poll.home = match.teams.home.logo;
+				poll.away = match.teams.away.logo;
+				poll.homeName = match.teams.home.name
+						.replace("Munich", "München");
+				poll.awayName = match.teams.away.name
+						.replace("Munich", "München");
+				poll.homeId = match.teams.home.id;
+				poll.awayId = match.teams.away.id;
+				poll.league = match.league.logo;
+				poll.leagueName = match.league.name;
+				poll.timestamp = match.fixture.timestamp;
+				poll.venue = match.fixture.venue.name;
+				poll.city = match.fixture.venue.city;
+				poll.location = match.teams.home.id == teamId ? "home"
+						: "away";
+				poll.subject = poll.homeName + " : " + poll.awayName + " (" + poll.city + " · " + poll.venue
+						+ " · " + MatchDayService.this.formatDate(poll.timestamp, null) + ")";
+				poll.textId = TextId.notification_clientMarketingPollPrediction;
+				final Instant end = Instant.ofEpochSecond(poll.timestamp)
+						.minus(Duration.ofMinutes(15));
+				final QueryParams params = new QueryParams(Query.misc_listMarketing);
+				params.setSearch(
+						"clientMarketing.endDate=cast('" + end + "' as timestamp) and clientMarketing.clientId="
+								+ clientId);
+				if (MatchDayService.this.repository.list(params).size() == 0) {
+					this.predictionAddStatistics(clientId, poll);
+					final ClientMarketing clientMarketing = new ClientMarketing();
+					clientMarketing.setCreateResult(true);
+					clientMarketing.setClientId(clientId);
+					clientMarketing.setSkills("9." + teamId);
+					clientMarketing.setStartDate(new Timestamp(end
+							.minus(Duration.ofDays(1)).toEpochMilli()));
+					clientMarketing.setEndDate(new Timestamp(end.toEpochMilli()));
+					clientMarketing.setStorage(Json.toString(poll));
+					clientMarketing.setImage(Attachment.createImage(".png",
+							MatchDayService.this.image.create(poll, "Ergebnistipps",
+									MatchDayService.this.repository.one(Client.class, clientId), null)));
+					MatchDayService.this.repository.save(clientMarketing);
+					return clientMarketing.getId();
 				}
 			}
 			return null;
@@ -777,7 +769,17 @@ public class MatchDayService {
 		return events;
 	}
 
-	public Event retrieveNextMatchDay(final int teamId) {
+	public Match retrieveNextMatch(final int teamId) {
+		final long now = Instant.now().getEpochSecond();
+		final List<Match> matches = MatchDayService.this
+				.get("team=" + teamId + "&season=" + MatchDayService.this.currentSeason());
+		for (int i = 0; i < matches.size(); i++) {
+			if ("NS".equals(matches.get(i).fixture.status.myshort)) {
+				final Instant date = Instant.ofEpochSecond(matches.get(i).fixture.timestamp);
+				if (date.getEpochSecond() >= now && date.minus(Duration.ofDays(1)).getEpochSecond() < now)
+					return matches.get(i);
+			}
+		}
 		return null;
 	}
 

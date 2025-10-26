@@ -56,10 +56,10 @@ public class Repository {
 	public Result list(final QueryParams params) {
 		final GeoLocationProcessor geo = new GeoLocationProcessor(params);
 		final Result result = params.getQuery().createResult();
-		final String sql = prepareSql(params);
+		final String sql = this.prepareSql(params);
 		final List<Object> data;
 		try {
-			data = em.createQuery(sql).getResultList();
+			data = this.em.createQuery(sql).getResultList();
 		} catch (final Exception ex) {
 			throw new ParsingException(ex.getMessage() + "\n" + sql);
 		}
@@ -96,7 +96,7 @@ public class Repository {
 	}
 
 	private String prepareSql(final QueryParams params) {
-		String search = Strings.isEmpty(params.getSearch()) ? "1=1" : sanatizeSearchToken(params);
+		String search = Strings.isEmpty(params.getSearch()) ? "1=1" : this.sanatizeSearchToken(params);
 		if (params.getSearchGeoLocation() != null)
 			search += " and " + params.getSearchGeoLocation();
 		if (params.getQuery().addBlock && params.getUser() != null) {
@@ -113,7 +113,7 @@ public class Repository {
 		if (s.contains("{CLIENTID}"))
 			s = s.replaceAll("\\{CLIENTID}", "" + params.getUser().getClientId());
 		if (s.contains("{ADMINID}"))
-			s = s.replaceAll("\\{ADMINID}", "" + one(Client.class, params.getUser().getClientId()).getAdminId());
+			s = s.replaceAll("\\{ADMINID}", "" + this.one(Client.class, params.getUser().getClientId()).getAdminId());
 		if (s.contains("{USERAGE}"))
 			s = s.replaceAll("\\{USERAGE}",
 					"" + (params.getUser().getAge() == null ? 0 : params.getUser().getAge()));
@@ -160,22 +160,22 @@ public class Repository {
 	@SuppressWarnings("unchecked")
 	public List<? extends BaseEntity> list(final String hql) {
 		try {
-			return (List<BaseEntity>) em.createQuery(hql,
+			return (List<BaseEntity>) this.em.createQuery(hql,
 					Class.forName(BaseEntity.class.getPackage().getName() + "." + hql.split(" ")[1])).getResultList();
-		} catch (ClassNotFoundException ex) {
+		} catch (final ClassNotFoundException ex) {
 			throw new RuntimeException(ex);
 		}
 	}
 
 	public <T extends BaseEntity> T one(final Class<T> clazz, final BigInteger id) {
-		final T entity = em.find(clazz, id);
+		final T entity = this.em.find(clazz, id);
 		if (entity != null)
 			entity.historize();
 		return entity;
 	}
 
 	public Map<String, Object> one(final QueryParams params) {
-		final Result result = list(params);
+		final Result result = this.list(params);
 		if (result.size() < 1)
 			return null;
 		if (result.size() > 1)
@@ -191,18 +191,18 @@ public class Repository {
 				if (entity.getId() == null) {
 					if (entity.getCreatedAt() == null)
 						entity.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
-					listeners.prePersist(entity);
-					em.persist(entity);
-					listeners.postPersist(entity);
+					this.listeners.prePersist(entity);
+					this.em.persist(entity);
+					this.listeners.postPersist(entity);
 				} else {
 					entity.setModifiedAt(new Timestamp(Instant.now().toEpochMilli()));
-					listeners.preUpdate(entity);
-					em.merge(entity);
-					listeners.postUpdate(entity);
+					this.listeners.preUpdate(entity);
+					this.em.merge(entity);
+					this.listeners.postUpdate(entity);
 				}
-				em.flush();
+				this.em.flush();
 				return true;
-			} catch (PersistenceException ex) {
+			} catch (final PersistenceException ex) {
 				throw new RuntimeException(ex);
 			}
 		}
@@ -211,17 +211,17 @@ public class Repository {
 
 	public void delete(final BaseEntity entity) throws IllegalArgumentException {
 		try {
-			listeners.preRemove(entity);
-			em.remove(em.contains(entity) ? entity : em.merge(entity));
+			this.listeners.preRemove(entity);
+			this.em.remove(this.em.contains(entity) ? entity : this.em.merge(entity));
 			Attachment.delete(entity);
-			listeners.postRemove(entity);
-		} catch (PersistenceException ex) {
+			this.listeners.postRemove(entity);
+		} catch (final PersistenceException ex) {
 			throw new RuntimeException(ex);
 		}
 	}
 
 	public int executeUpdate(final String hql, final Object... params) {
-		final jakarta.persistence.Query query = em.createQuery(hql);
+		final jakarta.persistence.Query query = this.em.createQuery(hql);
 		if (params != null) {
 			for (int i = 0; i < params.length; i++)
 				query.setParameter(i + 1, params[i]);
@@ -234,7 +234,7 @@ public class Repository {
 		final List<String> ids = new ArrayList<>();
 		final Map<String, List<String>> attachmentEntities = Attachment.getAttachmentEntities();
 		for (final String entity : attachmentEntities.keySet()) {
-			final List<? extends BaseEntity> list = list("from " + entity + attachmentEntities.get(entity).stream()
+			final List<? extends BaseEntity> list = this.list("from " + entity + attachmentEntities.get(entity).stream()
 					.collect(Collectors.joining(" like '%" + Attachment.SEPARATOR + "%' or ", " where ",
 							" like '%" + Attachment.SEPARATOR + "%'")));
 			list.stream().forEach(e -> {
@@ -252,8 +252,8 @@ public class Repository {
 				});
 			});
 		}
-		return cleanUpAttachmentDir(Attachment.PATH, time, ids) +
-				cleanUpAttachmentDir(Attachment.PATH + Attachment.PUBLIC, time, ids);
+		return this.cleanUpAttachmentDir(Attachment.PATH, time, ids) +
+				this.cleanUpAttachmentDir(Attachment.PATH + Attachment.PUBLIC, time, ids);
 	}
 
 	private String cleanUpAttachmentDir(final String dir, final long time, final List<String> ids) throws Exception {
@@ -365,7 +365,7 @@ public class Repository {
 			try {
 				return IOUtils.toByteArray(new FileInputStream(PATH + (id.contains(".") ? PUBLIC : "")
 						+ (id.contains(SEPARATOR) ? getFilename(id) : id)));
-			} catch (IOException ex) {
+			} catch (final IOException ex) {
 				throw new RuntimeException(ex);
 			}
 		}
@@ -411,6 +411,9 @@ public class Repository {
 					new File(PATH + (old.contains(".") ? PUBLIC : "") + getFilename(old)).delete();
 				return value;
 			}
+			if (value.indexOf(SEPARATOR) > -1
+					&& new File(PATH + (value.contains(".") ? PUBLIC : "") + getFilename(value)).exists())
+				return value;
 			final String id;
 			// value = ".jpg" + SEPARATOR + "base64data";
 			// value = "some text";

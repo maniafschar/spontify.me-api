@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.jq.findapp.entity.Ai;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.OS;
@@ -31,6 +32,7 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.service.CronService.Group;
+import com.jq.findapp.service.model.Match;
 import com.jq.findapp.util.Score;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
@@ -55,6 +57,17 @@ public class EngagementService {
 
 	@Autowired
 	private Text text;
+
+	private static Map<Integer, String[]> QUESTIONS = new HashMap<>();
+	static {
+		QUESTIONS.put(4,
+				new String[] {
+						"Fasse in etwa 300 Wörtern die Highlights aus den Begegnungen des {teamHome} gegen {teamAway} zusammen.",
+						"Liste Top 10 Begegnungen der Kontrahenten {teamHome} gegen {teamAway} auf.",
+						"Welche besonderen Anekdoten gibt es zu den Spielen zwischen {teamHome} und {teamAway}?",
+						"Welche Spieler prägten die Partien zwischen {teamHome} und {teamAway}?"
+				});
+	}
 
 	private static Map<BigInteger, String> currentVersion = new HashMap<>();
 
@@ -350,16 +363,33 @@ public class EngagementService {
 		final CronResult result = new CronResult();
 		try {
 			final QueryParams params = new QueryParams(Query.contact_listId);
-			params.setSearch("contact.clientId=4");
+			params.setSearch("contact.clientId=4 and contact.skills like '%9.%'");
 			final Result contacts = this.repository.list(params);
-			for (int i = 0; i < contacts.size(); i++) {
+			final Map<Integer, Ai> text = new HashMap<>();
+			for (final int i = 0; i < contacts.size(); i++) {
 				final Contact contact = this.repository.one(Contact.class,
 						(BigInteger) contacts.get(i).get("contact.id"));
 				final List<Integer> teamIds = Arrays.asList(contact.getSkills().split("\\|"))
 						.stream().filter(e -> e.startsWith("9.")).map(e -> Integer.valueOf(e.substring(2)))
 						.collect(Collectors.toList());
 				for (int i2 = 0; i2 < teamIds.size(); i2++) {
-					this.matchDayService.retrieveNextMatchDay(teamIds.get(i2));
+					if (!text.containsKey(teamIds.get(i2))) {
+						final Match match = this.matchDayService.retrieveNextMatch(teamIds.get(i2));
+						text.put(teamIds.get(i2),
+								match == null ? null
+										: this.aiService
+												.text(QUESTIONS.get(4)[(int) (Math.random() * QUESTIONS.get(4).length)]
+														.replace("{teamHome}", match.teams.home.name)
+														.replace("{teamAway}", match.teams.away.name)));
+					}
+					if (text.get(teamIds.get(i2)) != null) {
+						final ContactChat chat = new ContactChat();
+						chat.setContactId(this.repository.one(Client.class, contact.getClientId()).getAdminId());
+						chat.setContactId2(contact.getId());
+						chat.setAction("ai:" + text.get(teamIds.get(i2)).getId());
+						chat.setNote(text.get(teamIds.get(i2)).getAnswer());
+						this.repository.save(chat);
+					}
 				}
 			}
 		} catch (final Exception e) {

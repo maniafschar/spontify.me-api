@@ -45,17 +45,17 @@ public class AiService {
 	@Autowired
 	private Repository repository;
 
-	public String text(final String question) {
+	public Ai text(final String question) {
 		final Result result = this.exists(question, AiType.Text, 365);
 		if (result.size() > 0)
-			return (String) result.get(0).get("ai.answer");
+			return this.repository.one(Ai.class, (BigInteger) result.get(0).get("ai.id"));
 		final String answer = this.call(question, null);
 		final Ai ai = new Ai();
 		ai.setQuestion(question);
 		ai.setAnswer(answer);
 		ai.setType(AiType.Text);
 		this.repository.save(ai);
-		return answer;
+		return ai;
 	}
 
 	public List<Location> locations(final String question) {
@@ -68,7 +68,7 @@ public class AiService {
 			return locations;
 		}
 		final List<Location> locations = Arrays.asList(Json.toObject(
-				this.call(question, this.createSchema(false)), Location[].class));
+				this.call(question, this.createSchemaLocation(false)), Location[].class));
 		for (final Location location : locations) {
 			final Ai ai = new Ai();
 			try {
@@ -100,7 +100,7 @@ public class AiService {
 			if (events.size() > 0)
 				return events;
 		}
-		final ArrayNode eventNodes = (ArrayNode) Json.toNode(this.call(question, this.createSchema(true)));
+		final ArrayNode eventNodes = (ArrayNode) Json.toNode(this.call(question, this.createSchemaLocation(true)));
 		final List<Event> events = new ArrayList<>();
 		for (final JsonNode eventNode : eventNodes) {
 			final Ai ai = new Ai();
@@ -150,7 +150,7 @@ public class AiService {
 		}
 	}
 
-	private Schema createSchema(final boolean event) {
+	private Schema createSchemaLocation(final boolean event) {
 		final Map<String, Schema> location = new HashMap<>();
 		location.put("country", Schema.builder().type(Type.Known.STRING).description("ISO 3166 Alpha 2 code").build());
 		location.put("description", Schema.builder().type(Type.Known.STRING).build());
@@ -166,7 +166,6 @@ public class AiService {
 			location.put("location_name", Schema.builder().type(Type.Known.STRING).build());
 		} else
 			location.put("name", Schema.builder().type(Type.Known.STRING).build());
-
 		return Schema.builder()
 				.type(Type.Known.ARRAY)
 				.items(Schema.builder()
