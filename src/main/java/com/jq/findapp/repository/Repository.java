@@ -395,8 +395,7 @@ public class Repository {
 					if (n.contains("."))
 						value = n;
 					else
-						value = new String(IOUtils.toByteArray(new FileInputStream(PATH + n)),
-								StandardCharsets.UTF_8);
+						value = new String(IOUtils.toByteArray(new FileInputStream(PATH + n)), StandardCharsets.UTF_8);
 				} catch (final Exception ex) {
 					throw new RuntimeException("Failed on " + value, ex);
 				}
@@ -411,7 +410,7 @@ public class Repository {
 					new File(PATH + (old.contains(".") ? PUBLIC : "") + getFilename(old)).delete();
 				return value;
 			}
-			if (value.indexOf(SEPARATOR) > -1
+			if (value.indexOf(SEPARATOR) > -1 && value.length() < 20
 					&& new File(PATH + (value.contains(".") ? PUBLIC : "") + getFilename(value)).exists())
 				return value;
 			final String id;

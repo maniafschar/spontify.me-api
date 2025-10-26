@@ -7,7 +7,7 @@ public class Fixture {
 	public String referee;
 	public String timezone;
 	public Date date;
-	public int timestamp;
+	public long timestamp;
 	public Periods periods;
 	public Venue venue;
 	public Status status;

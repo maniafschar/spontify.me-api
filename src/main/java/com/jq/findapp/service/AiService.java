@@ -72,6 +72,8 @@ public class AiService {
 		for (final Location location : locations) {
 			final Ai ai = new Ai();
 			try {
+				location.setAddress(location.getStreet() + " " + location.getNumber() + "\n" + location.getZipCode()
+						+ " " + location.getTown() + "\n" + location.getCountry());
 				this.repository.save(location);
 				ai.setAnswer(location.getId().toString());
 			} catch (final IllegalArgumentException ex) {
@@ -123,7 +125,7 @@ public class AiService {
 
 	private Result exists(final String qustion, final AiType type, final int daysBack) {
 		final QueryParams params = new QueryParams(Query.misc_ai);
-		params.setSearch("ai.question='" + qustion + "' and ai.type='" + type.name() +
+		params.setSearch("ai.question='" + qustion.replace("'", "''") + "' and ai.type='" + type.name() +
 				"' and ai.createdAt>cast('" + Instant.now().minus(Duration.ofDays(daysBack)) + "' as timestamp)");
 		return this.repository.list(params);
 	}

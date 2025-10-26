@@ -38,7 +38,6 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.util.Encryption;
-import com.jq.findapp.util.EncryptionTest;
 import com.jq.findapp.util.Utils;
 
 @ExtendWith(SpringExtension.class)
@@ -63,16 +62,15 @@ public class AuthenticationServiceTest {
 	}
 
 	@Test
-	public void getAutoLogin() throws Exception {
+	public void autoLogin() throws Exception {
 		// given
 		final Contact contact = this.utils.createContact(BigInteger.ONE);
 		final ContactToken token = this.createToken(contact);
-		final String t = EncryptionTest.encryptBrowser(token.getToken());
 		final String publicKey = IOUtils.toString(Encryption.class.getResourceAsStream("/keys/publicDB.key"),
 				StandardCharsets.UTF_8);
 
 		// when
-		final String s = this.authenticationService.getAutoLogin(publicKey, t);
+		final String s = this.authenticationService.autoLogin(publicKey, token.getToken());
 
 		// then
 		assertNotNull(s);
@@ -150,7 +148,7 @@ public class AuthenticationServiceTest {
 	@Test
 	public void register_referer() throws Exception {
 		// given
-		final Contact contact = utils.createContact(BigInteger.ONE);
+		final Contact contact = this.utils.createContact(BigInteger.ONE);
 		final InternalRegistration registration = new InternalRegistration();
 		registration.setAgb(true);
 		registration.setEmail("test_xyz@jq-consulting.de");
@@ -160,18 +158,18 @@ public class AuthenticationServiceTest {
 		registration.setTimezone("Europe/Berlin");
 		registration.setTime(5000);
 		registration.setReferer(BigInteger.ONE);
-		authenticationService.register(registration);
-		final List<? extends BaseEntity> list = repository.list("from Contact");
+		this.authenticationService.register(registration);
+		final List<? extends BaseEntity> list = this.repository.list("from Contact");
 		final Contact register = (Contact) list.get(list.size() - 1);
 		final QueryParams params = new QueryParams(Query.contact_listFriends);
 		params.setId(contact.getId());
 		params.setUser(register);
 
 		// when
-		authenticationService.recoverVerifyEmail(register.getLoginLink(), BigInteger.ONE);
+		this.authenticationService.recoverVerifyEmail(register.getLoginLink(), BigInteger.ONE);
 
 		// then
-		assertEquals(ContactLink.Status.Friends, repository.one(params).get("contactLink.status"));
+		assertEquals(ContactLink.Status.Friends, this.repository.one(params).get("contactLink.status"));
 	}
 
 	@Test

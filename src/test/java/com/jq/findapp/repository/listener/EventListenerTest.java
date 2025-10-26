@@ -43,10 +43,10 @@ public class EventListenerTest {
 	public void save_participation() throws Exception {
 		// given
 		final long millis = 1717711200000l;
-		utils.createContact(BigInteger.ONE);
-		final Contact contact = utils.createContact(new BigInteger("2"));
+		this.utils.createContact(BigInteger.ONE);
+		final Contact contact = this.utils.createContact(new BigInteger("2"));
 		contact.setClientId(BigInteger.ONE);
-		repository.save(contact);
+		this.repository.save(contact);
 		final Event event = new Event();
 		event.setContactId(contact.getId());
 		event.setDescription("abc");
@@ -55,13 +55,13 @@ public class EventListenerTest {
 		event.setType(EventType.Location);
 
 		// when
-		repository.save(event);
+		this.repository.save(event);
 
 		// then
 		assertEquals(millis, event.getStartDate().getTime());
 		final QueryParams params = new QueryParams(Query.event_listParticipateRaw);
 		params.setSearch("eventParticipate.eventId=" + event.getId());
-		final Result result = repository.list(params);
+		final Result result = this.repository.list(params);
 		assertEquals(1, result.size());
 		final Object eventDate = result.get(0).get("eventParticipate.eventDate");
 		assertEquals(event.getEndDate().toString(), eventDate.toString());
@@ -74,7 +74,7 @@ public class EventListenerTest {
 	public void save_series() throws Exception {
 		// given
 		final long now = System.currentTimeMillis();
-		final Contact contact = utils.createContact(new BigInteger("99"));
+		final Contact contact = this.utils.createContact(new BigInteger("99"));
 		final Event event = new Event();
 		event.setContactId(contact.getId());
 		event.setLocationId(BigInteger.ZERO);
@@ -84,16 +84,16 @@ public class EventListenerTest {
 		event.setType(EventType.Location);
 
 		// when
-		repository.save(event);
+		this.repository.save(event);
 
 		// then
 		assertNotNull(event.getStartDate());
 		assertNotNull(event.getSeriesId() >= now);
 		final QueryParams params = new QueryParams(Query.event_listId);
 		params.setSearch("event.contactId=" + contact.getId());
-		final Result result = repository.list(params);
+		final Result result = this.repository.list(params);
 		assertEquals(3, result.size());
-		final Event last = repository.one(Event.class, (BigInteger) result.get(result.size() - 1).get("event.id"));
+		final Event last = this.repository.one(Event.class, (BigInteger) result.get(result.size() - 1).get("event.id"));
 		assertEquals(contact.getId(), last.getContactId());
 		assertTrue(
 				last.getDescription().endsWith(event.getDescription().substring(event.getDescription().indexOf("\n"))));
@@ -104,27 +104,21 @@ public class EventListenerTest {
 	@Test
 	public void save_seriesTwice() throws Exception {
 		// given
-		Event event = new Event();
-		event.setContactId(utils.createContact(BigInteger.ONE).getId());
+		final Event event = new Event();
+		event.setContactId(this.utils.createContact(BigInteger.ONE).getId());
 		event.setLocationId(BigInteger.ZERO);
 		event.setDescription("abc");
 		event.setRepetition(Repetition.Games);
 		event.setSkills("9.157");
 		event.setType(EventType.Location);
-		repository.save(event);
-		event = new Event();
-		event.setContactId(BigInteger.ONE);
-		event.setLocationId(BigInteger.ZERO);
-		event.setDescription("abc");
-		event.setRepetition(Repetition.Games);
-		event.setSkills("9.157");
-		event.setType(EventType.Location);
+		this.repository.save(event);
+		event.setId(null);
 
 		// when
 		try {
-			repository.save(event);
+			this.repository.save(event);
 			throw new RuntimeException("IllegalArgumentException expected");
-		} catch (IllegalArgumentException ex) {
+		} catch (final IllegalArgumentException ex) {
 
 			// then exact exception
 			if (!ex.getMessage().startsWith("event series exists: "))
@@ -136,20 +130,20 @@ public class EventListenerTest {
 	public void save_seriesContactStorage() throws Exception {
 		// given
 		final Event event = new Event();
-		event.setContactId(utils.createContact(BigInteger.valueOf(98l)).getId());
+		event.setContactId(this.utils.createContact(BigInteger.valueOf(98l)).getId());
 		event.setLocationId(BigInteger.ZERO);
 		event.setDescription("abc");
 		event.setRepetition(Repetition.Games);
 		event.setSkills("9.157");
 		event.setType(EventType.Location);
-		repository.save(event);
+		this.repository.save(event);
 
 		// when
-		repository.save(event);
+		this.repository.save(event);
 
 		// then
 		final JsonNode storage = Json
-				.toNode(Attachment.resolve(repository.one(Contact.class, BigInteger.ONE).getStorage()));
+				.toNode(Attachment.resolve(this.repository.one(Contact.class, BigInteger.ONE).getStorage()));
 		assertTrue(storage.has("eventSeries"), storage.toPrettyString());
 		assertEquals(3, storage.get("eventSeries").size());
 	}

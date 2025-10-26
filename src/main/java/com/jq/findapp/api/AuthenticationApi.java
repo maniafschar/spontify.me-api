@@ -49,7 +49,7 @@ public class AuthenticationApi {
 
 	@GetMapping("logoff")
 	public void logoff(final String token, @RequestHeader final BigInteger user) throws Exception {
-		authenticationService.logoff(repository.one(Contact.class, user), token);
+		this.authenticationService.logoff(this.repository.one(Contact.class, user), token);
 	}
 
 	@PostMapping("register")
@@ -57,34 +57,34 @@ public class AuthenticationApi {
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
 		registration.setClientId(clientId);
 		registration.setIp(ip);
-		authenticationService.register(registration);
+		this.authenticationService.register(registration);
 	}
 
 	@GetMapping("login")
-	public Map<String, Object> login(final Contact contact, final String publicKey,
+	public Map<String, Object> login(final Contact contact, final String publicKey, final String token,
 			@RequestHeader final BigInteger clientId, @RequestHeader final String password,
 			@RequestHeader final String salt) throws Exception {
 		contact.setEmail(Encryption.decryptBrowser(contact.getEmail()));
 		contact.setClientId(clientId);
-		final Map<String, Object> user = authenticationService.login(contact, password, salt);
+		final Map<String, Object> user = this.authenticationService.login(contact, password, salt);
 		if (user != null) {
 			final QueryParams params = new QueryParams(Query.event_listId);
 			params.setSearch("event.contactId=" + user.get("contact.id"));
-			int i = repository.list(params).size();
+			int i = this.repository.list(params).size();
 			if (i < 5) {
 				params.setQuery(Query.location_listId);
 				params.setSearch("location.contactId=" + user.get("contact.id"));
-				i += repository.list(params).size();
+				i += this.repository.list(params).size();
 			}
 			user.put("authority", i > 4 ? "editLocation" : "editLocation[" + i + "]");
-			if (getVideoTimeSlot((BigInteger) user.get("contact.id")))
+			if (this.getVideoTimeSlot((BigInteger) user.get("contact.id")))
 				user.put("login_video_call", Boolean.TRUE);
 			params.setQuery(Query.contact_listGeoLocationHistory);
 			params.setSearch("contactGeoLocationHistory.contactId=" + user.get("contact.id"));
-			repository.list(params).forEach(e -> {
+			this.repository.list(params).forEach(e -> {
 				if (e.containsKey("contactGeoLocationHistory.manual")
 						&& ((Boolean) e.get("contactGeoLocationHistory.manual"))) {
-					final GeoLocation geoLocation = repository.one(GeoLocation.class,
+					final GeoLocation geoLocation = this.repository.one(GeoLocation.class,
 							(BigInteger) e.get("contactGeoLocationHistory.geoLocationId"));
 					user.put("geo_location", "{\"lat\":" + geoLocation.getLatitude() +
 							",\"lon\":" + geoLocation.getLongitude()
@@ -93,21 +93,21 @@ public class AuthenticationApi {
 				}
 			});
 			if (publicKey != null) {
-				final ContactToken t;
 				params.setQuery(Query.contact_token);
 				params.setSearch("contactToken.contactId=" + user.get("contact.id") + " and contactToken.token=''");
-				final Result u = repository.list(params);
+				final Result u = this.repository.list(params);
+				final ContactToken t;
 				if (u.size() < 1) {
 					t = new ContactToken();
 					t.setContactId((BigInteger) user.get("contact.id"));
 				} else {
-					t = repository.one(ContactToken.class, (BigInteger) u.get(0).get("contactToken.id"));
+					t = this.repository.one(ContactToken.class, (BigInteger) u.get(0).get("contactToken.id"));
 					for (i = 1; i < u.size(); i++)
-						repository.delete(
-								repository.one(ContactToken.class, (BigInteger) u.get(i).get("contactToken.id")));
+						this.repository.delete(
+								this.repository.one(ContactToken.class, (BigInteger) u.get(i).get("contactToken.id")));
 				}
 				t.setToken(UUID.randomUUID().toString());
-				repository.save(t);
+				this.repository.save(t);
 				user.put("auto_login_token", Encryption.encrypt(t.getToken(), publicKey));
 			}
 		}
@@ -115,12 +115,13 @@ public class AuthenticationApi {
 	}
 
 	private Boolean getVideoTimeSlot(final BigInteger id) {
-		if (repository.one(Client.class, repository.one(Contact.class, id).getClientId()).getAdminId().equals(id))
+		if (this.repository.one(Client.class, this.repository.one(Contact.class, id).getClientId()).getAdminId()
+				.equals(id))
 			return true;
 		final QueryParams params = new QueryParams(Query.contact_listVideoCalls);
-		params.setUser(repository.one(Contact.class, id));
+		params.setUser(this.repository.one(Contact.class, id));
 		params.setSearch("contactVideoCall.contactId=" + id);
-		final Result list = repository.list(params);
+		final Result list = this.repository.list(params);
 		if (list.size() == 0)
 			return false;
 		final Timestamp t = (Timestamp) list.get(0).get("contactVideoCall.time");
@@ -129,7 +130,7 @@ public class AuthenticationApi {
 
 	@DeleteMapping("one")
 	public void one(@RequestHeader final BigInteger user) throws Exception {
-		authenticationService.deleteAccount(repository.one(Contact.class, user));
+		this.authenticationService.deleteAccount(this.repository.one(Contact.class, user));
 	}
 
 	@PutMapping("loginExternal")
@@ -139,15 +140,20 @@ public class AuthenticationApi {
 		registration.setClientId(clientId);
 		registration.setIp(ip);
 		registration.getUser().put("id", Encryption.decryptBrowser(registration.getUser().get("id")));
-		final Contact contact = authenticationExternalService.register(registration);
+		final Contact contact = this.authenticationExternalService.register(registration);
 		return contact == null ? null
-				: Encryption.encrypt(contact.getEmail() + "\u0015" + authenticationService.getPassword(contact),
+				: Encryption.encrypt(contact.getEmail() + "\u0015" + this.authenticationService.getPassword(contact),
 						registration.getPublicKey());
 	}
 
 	@GetMapping("loginAuto")
 	public String autoLogin(final String publicKey, final String token) throws IllegalAccessException {
-		return authenticationService.getAutoLogin(publicKey, token);
+		return this.authenticationService.autoLogin(publicKey, Encryption.decryptBrowser(token));
+	}
+
+	@GetMapping("resetToken")
+	public void resetToken(final String token) throws IllegalAccessException {
+		this.authenticationService.resetToken(Encryption.decryptBrowser(token));
 	}
 
 	@GetMapping("recoverSendEmail")
@@ -158,17 +164,18 @@ public class AuthenticationApi {
 		params.setSearch("log.ip='" + IpService.sanatizeIp(ip)
 				+ "' and log.createdAt>cast('" + Instant.now().minus(Duration.ofDays(1)).toString()
 				+ "' as timestamp) and log.uri like '%recoverSendEmail'");
-		if (repository.list(params).size() > 10)
+		if (this.repository.list(params).size() > 10)
 			return "nok:Spam";
-		return authenticationService.recoverSendEmail(Encryption.decryptBrowser(email), clientId);
+		return this.authenticationService.recoverSendEmail(Encryption.decryptBrowser(email), clientId);
 	}
 
 	@GetMapping("recoverVerifyEmail")
 	public String recoverVerifyEmail(final String publicKey, final String token,
 			@RequestHeader final BigInteger clientId) throws Exception {
-		final Contact contact = authenticationService.recoverVerifyEmail(Encryption.decryptBrowser(token), clientId);
+		final Contact contact = this.authenticationService.recoverVerifyEmail(Encryption.decryptBrowser(token),
+				clientId);
 		return contact == null ? null
 				: Encryption.encrypt(
-						contact.getEmail() + "\u0015" + authenticationService.getPassword(contact), publicKey);
+						contact.getEmail() + "\u0015" + this.authenticationService.getPassword(contact), publicKey);
 	}
 }

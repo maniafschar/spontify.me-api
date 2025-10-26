@@ -109,12 +109,12 @@ public class AuthenticationService {
 		}
 
 		public AuthenticationExceptionType getType() {
-			return type;
+			return this.type;
 		}
 
 		@Override
 		public String getMessage() {
-			return type.name();
+			return this.type.name();
 		}
 	}
 
@@ -132,7 +132,7 @@ public class AuthenticationService {
 	public Contact verify(final BigInteger user, final String password, final String salt) {
 		if (user == null || user.compareTo(BigInteger.ONE) < 0)
 			throw new AuthenticationException(AuthenticationExceptionType.NoInputFromClient);
-		return verify(repository.one(Contact.class, user), password, salt, false);
+		return this.verify(this.repository.one(Contact.class, user), password, salt, false);
 	}
 
 	private Contact verify(final Contact contact, final String password, final String salt, final boolean login) {
@@ -156,7 +156,7 @@ public class AuthenticationService {
 				}
 			}
 		}
-		if (!getHash(getPassword(contact) + salt + (login ? 0 : contact.getId())).equals(password)) {
+		if (!this.getHash(this.getPassword(contact) + salt + (login ? 0 : contact.getId())).equals(password)) {
 			final FailedAttempts x;
 			synchronized (FAILED_AUTHS) {
 				final long SIX_HOURS_BEFORE = System.currentTimeMillis() - 3600000L * 6L;
@@ -190,19 +190,20 @@ public class AuthenticationService {
 			throw new IllegalArgumentException("time");
 		if (!Strings.isEmail(registration.getEmail()))
 			throw new IllegalArgumentException("email");
-		final Unique unique = unique(registration.getClientId(), registration.getEmail());
+		final Unique unique = this.unique(registration.getClientId(), registration.getEmail());
 		if (!unique.unique)
 			throw new IllegalArgumentException("email");
 		if (unique.blocked) {
-			notificationService.createTicket(TicketType.ERROR, "denied email blocked", registration.toString(), null);
+			this.notificationService.createTicket(TicketType.ERROR, "denied email blocked", registration.toString(),
+					null);
 			throw new IllegalArgumentException("domain");
 		}
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.email='" + registration.getEmail().toLowerCase().trim() + "' and contact.clientId="
 				+ registration.getClientId());
-		final Map<String, Object> user = repository.one(params);
+		final Map<String, Object> user = this.repository.one(params);
 		final Contact contact = user == null ? new Contact()
-				: repository.one(Contact.class, (BigInteger) user.get("contact.id"));
+				: this.repository.one(Contact.class, (BigInteger) user.get("contact.id"));
 		contact.setBirthday(registration.getBirthday());
 		contact.setGender(registration.getGender());
 		contact.setPseudonym(registration.getPseudonym());
@@ -211,12 +212,13 @@ public class AuthenticationService {
 		contact.setTimezone(registration.getTimezone());
 		contact.setClientId(registration.getClientId());
 		try {
-			notificationService.sendNotificationEmail(
-					repository.one(Contact.class,
-							repository.one(Client.class, registration.getClientId()).getAdminId()),
+			this.notificationService.sendNotificationEmail(
+					this.repository.one(Contact.class,
+							this.repository.one(Client.class, registration.getClientId()).getAdminId()),
 					contact,
-					text.getText(contact, TextId.mail_contactWelcomeEmail), "r=" + generateLoginParam(contact));
-			saveRegistration(contact, registration);
+					this.text.getText(contact, TextId.mail_contactWelcomeEmail),
+					"r=" + this.generateLoginParam(contact));
+			this.saveRegistration(contact, registration);
 			return contact;
 		} catch (final IllegalArgumentException ex) {
 			throw new IllegalArgumentException("email");
@@ -227,7 +229,7 @@ public class AuthenticationService {
 		email = email.toLowerCase();
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("LOWER(contact.email)='" + email + "' and contact.clientId=" + clientId);
-		return new Unique(email, repository.one(params) == null, AuthenticationService.BLOCKED_EMAIL_DOMAINS
+		return new Unique(email, this.repository.one(params) == null, AuthenticationService.BLOCKED_EMAIL_DOMAINS
 				.contains(email.substring(email.indexOf('@') + 1)));
 	}
 
@@ -249,13 +251,13 @@ public class AuthenticationService {
 			final QueryParams params = new QueryParams(Query.contact_listReferer);
 			params.setSearch("contactReferer.ip='" + registration.getIp() + "' and contactReferer.footprint='"
 					+ registration.getFootprint() + "'");
-			repository.list(params).forEach(e -> {
-				final ContactReferer contactReferer = repository.one(ContactReferer.class,
+			this.repository.list(params).forEach(e -> {
+				final ContactReferer contactReferer = this.repository.one(ContactReferer.class,
 						(BigInteger) e.get("contactReferer.id"));
 				contact.setReferer(contactReferer.getContactId());
 				if (contactReferer.getCreatedAt()
 						.after(new Date(Instant.now().minus(Duration.ofHours(12)).toEpochMilli())))
-					repository.delete(contactReferer);
+					this.repository.delete(contactReferer);
 			});
 		}
 		if (contact.getIdDisplay() == null) {
@@ -264,11 +266,11 @@ public class AuthenticationService {
 			int i = 0;
 			while (true) {
 				try {
-					contact.setIdDisplay(generateIdDisplay(name));
-					repository.save(contact);
+					contact.setIdDisplay(this.generateIdDisplay(name));
+					this.repository.save(contact);
 					break;
 				} catch (final Throwable ex) {
-					if (isDuplicateIdDisplay(ex)) {
+					if (this.isDuplicateIdDisplay(ex)) {
 						if (i++ > max)
 							throw new IllegalArgumentException(
 									"reg failed: " + i + " tries to find id_display | " + ex.getMessage());
@@ -277,8 +279,8 @@ public class AuthenticationService {
 				}
 			}
 		} else
-			repository.save(contact);
-		notificationService.createTicket(TicketType.REGISTRATION, contact.getEmail(), registration.toString(),
+			this.repository.save(contact);
+		this.notificationService.createTicket(TicketType.REGISTRATION, contact.getEmail(), registration.toString(),
 				contact.getId());
 	}
 
@@ -296,17 +298,17 @@ public class AuthenticationService {
 		params.setUser(new Contact());
 		params.getUser().setId(BigInteger.valueOf(0L));
 		params.getUser().setClientId(contact.getClientId());
-		final Map<String, Object> user = repository.one(params);
+		final Map<String, Object> user = this.repository.one(params);
 		if (user != null) {
-			final Contact c2 = repository.one(Contact.class, (BigInteger) user.get("contact.id"));
-			verify(c2, password, salt, true);
+			final Contact c2 = this.repository.one(Contact.class, (BigInteger) user.get("contact.id"));
+			this.verify(c2, password, salt, true);
 			c2.setLastLogin(new Timestamp(Instant.now().toEpochMilli()));
 			c2.setOs(contact.getOs());
 			c2.setDevice(contact.getDevice());
 			c2.setVersion(contact.getVersion());
 			if (contact.getTimezone() != null)
 				c2.setTimezone(contact.getTimezone());
-			repository.save(c2);
+			this.repository.save(c2);
 			if (ContactType.demo == c2.getType())
 				user.put("contact.type", ContactType.adminContent.name());
 		}
@@ -350,24 +352,32 @@ public class AuthenticationService {
 		return s;
 	}
 
-	public String getAutoLogin(final String publicKey, String token) {
+	public void resetToken(String token) {
+		token = Encryption.decryptBrowser(token);
+		final QueryParams params = new QueryParams(Query.contact_token);
+		params.setSearch("contactToken.token='" + token + "'");
+		final Map<String, Object> u = this.repository.one(params);
+		if (u != null) {
+			final ContactToken t = this.repository.one(ContactToken.class, (BigInteger) u.get("contactToken.id"));
+			t.setToken("");
+			this.repository.save(t);
+			this.notificationService.createTicket(TicketType.ERROR, "Token", "reseted\n" + token, null);
+		}
+	}
+
+	public String autoLogin(final String publicKey, final String token) {
 		try {
-			token = Encryption.decryptBrowser(token);
 			final QueryParams params = new QueryParams(Query.contact_token);
 			params.setSearch("contactToken.token='" + token + "'");
-			final Map<String, Object> u = repository.one(params);
+			final Map<String, Object> u = this.repository.one(params);
 			if (u == null) {
-				notificationService.createTicket(TicketType.ERROR, "Token", "not found\n" + token, null);
+				this.notificationService.createTicket(TicketType.ERROR, "Token", "not found\n" + token, null);
 				return null;
 			}
-			notificationService.createTicket(TicketType.ERROR, "Token", "reseted\n" + token, null);
-			final ContactToken t = repository.one(ContactToken.class, (BigInteger) u.get("contactToken.id"));
-			final Contact c = repository.one(Contact.class, t.getContactId());
-			t.setToken("");
-			repository.save(t);
-			return Encryption.encrypt(c.getEmail() + "\u0015" + getPassword(c), publicKey);
+			final Contact c = this.repository.one(Contact.class, (BigInteger) u.get("contactToken.contactId"));
+			return Encryption.encrypt(c.getEmail() + "\u0015" + this.getPassword(c), publicKey);
 		} catch (final Exception ex) {
-			notificationService.createTicket(TicketType.ERROR, "Token", Strings.stackTraceToString(ex), null);
+			this.notificationService.createTicket(TicketType.ERROR, "Token", Strings.stackTraceToString(ex), null);
 			return null;
 		}
 	}
@@ -376,48 +386,49 @@ public class AuthenticationService {
 		if (token != null) {
 			final QueryParams params = new QueryParams(Query.contact_token);
 			params.setSearch("contactToken.token='" + Encryption.decryptBrowser(token) + "'");
-			final Map<String, Object> u = repository.one(params);
+			final Map<String, Object> u = this.repository.one(params);
 			if (u != null)
-				repository.delete(repository.one(ContactToken.class, (BigInteger) u.get("contactToken.id")));
+				this.repository.delete(this.repository.one(ContactToken.class, (BigInteger) u.get("contactToken.id")));
 		}
 	}
 
 	public void recoverSendEmailReminder(final Contact contact) {
 		final String s;
 		if (Strings.isEmpty(contact.getLoginLink())) {
-			s = generateLoginParam(contact);
-			repository.save(contact);
+			s = this.generateLoginParam(contact);
+			this.repository.save(contact);
 		} else
 			s = contact.getLoginLink().substring(0, 10) + contact.getLoginLink().substring(20);
-		notificationService.sendNotificationEmail(
-				repository.one(Contact.class, repository.one(Client.class, contact.getClientId()).getAdminId()),
-				contact, text.getText(contact, TextId.mail_contactRegistrationReminder).replace("<jq:EXTRA_1 />",
+		this.notificationService.sendNotificationEmail(
+				this.repository.one(Contact.class,
+						this.repository.one(Client.class, contact.getClientId()).getAdminId()),
+				contact, this.text.getText(contact, TextId.mail_contactRegistrationReminder).replace("<jq:EXTRA_1 />",
 						Strings.formatDate(null, contact.getCreatedAt(), contact.getTimezone())),
 				"r=" + s);
 	}
 
-	public String recoverSendEmail(final String email, BigInteger clientId) {
+	public String recoverSendEmail(final String email, final BigInteger clientId) {
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.email='" + email + "' and contact.clientId=" + clientId);
-		final Map<String, Object> user = repository.one(params);
+		final Map<String, Object> user = this.repository.one(params);
 		if (user != null) {
-			final Contact contact = repository.one(Contact.class, (BigInteger) user.get("contact.id"));
-			final String s = generateLoginParam(contact);
-			repository.save(contact);
-			notificationService.sendNotificationEmail(contact, contact,
-					text.getText(contact, TextId.mail_contactPasswordReset), "r=" + s);
+			final Contact contact = this.repository.one(Contact.class, (BigInteger) user.get("contact.id"));
+			final String s = this.generateLoginParam(contact);
+			this.repository.save(contact);
+			this.notificationService.sendNotificationEmail(contact, contact,
+					this.text.getText(contact, TextId.mail_contactPasswordReset), "r=" + s);
 			return "ok";
 		}
 		return "nok:Email";
 	}
 
-	public Contact recoverVerifyEmail(final String token, BigInteger clientId) {
+	public Contact recoverVerifyEmail(final String token, final BigInteger clientId) {
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.loginLink like '%" + token + "%' and contact.clientId=" + clientId);
-		final Map<String, Object> user = repository.one(params);
+		final Map<String, Object> user = this.repository.one(params);
 		if (user == null)
 			return null;
-		final Contact contact = repository.one(Contact.class, new BigInteger(user.get("contact.id").toString()));
+		final Contact contact = this.repository.one(Contact.class, new BigInteger(user.get("contact.id").toString()));
 		if (contact.getVerified() == null || !contact.getVerified()) {
 			contact.setVerified(Boolean.TRUE);
 			if (contact.getReferer() != null) {
@@ -425,17 +436,17 @@ public class AuthenticationService {
 				params.setUser(contact);
 				params.setId(contact.getReferer());
 				params.setSearch(null);
-				if (repository.list(params).size() == 0) {
+				if (this.repository.list(params).size() == 0) {
 					final ContactLink contactLink = new ContactLink();
 					contactLink.setContactId(contact.getReferer());
 					contactLink.setContactId2(contact.getId());
 					contactLink.setStatus(Status.Friends);
-					repository.save(contactLink);
+					this.repository.save(contactLink);
 				}
 			}
 		}
 		contact.setEmailVerified(contact.getEmail());
-		repository.save(contact);
+		this.repository.save(contact);
 		return contact;
 	}
 
@@ -473,17 +484,17 @@ public class AuthenticationService {
 	}
 
 	public void deleteAccount(final Contact contact) {
-		if (contact.getId() == repository.one(Client.class, contact.getClientId()).getAdminId())
+		if (contact.getId() == this.repository.one(Client.class, contact.getClientId()).getAdminId())
 			return;
-		final String[] sqls = accountDeleteSql.split(";");
+		final String[] sqls = this.accountDeleteSql.split(";");
 		for (String sql : sqls) {
 			sql = sql.replaceAll("\\{ID}", "" + contact.getId()).trim();
 			if (sql.startsWith("from ")) {
-				final List<?> list = repository.list(sql);
+				final List<?> list = this.repository.list(sql);
 				for (final Object e : list)
-					repository.delete((BaseEntity) e);
+					this.repository.delete((BaseEntity) e);
 			} else
-				repository.executeUpdate(sql);
+				this.repository.executeUpdate(sql);
 		}
 	}
 }

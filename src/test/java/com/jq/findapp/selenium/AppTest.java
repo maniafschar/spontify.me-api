@@ -46,7 +46,7 @@ public class AppTest {
 	@Autowired
 	private Utils utils;
 
-	static WebDriver createWebDriver(int width, int height, boolean mobile) {
+	static WebDriver createWebDriver(final int width, final int height, final boolean mobile) {
 		final ChromeOptions options = new ChromeOptions();
 		final Map<String, Object> deviceMetrics = new HashMap<>();
 		deviceMetrics.put("pixelRatio", 1.0);
