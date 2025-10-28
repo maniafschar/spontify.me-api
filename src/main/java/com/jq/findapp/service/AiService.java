@@ -59,7 +59,29 @@ public class AiService {
 	}
 
 	public List<Location> locations(final String question) {
-		final Result result = this.exists(question, AiType.Location, 183);
+		Result result = this.exists(question, AiType.Location, 183);
+		if (result.size() == 0) {
+			final List<Location> locations = Arrays.asList(Json.toObject(
+					this.call(question, this.createSchemaLocation(false)), Location[].class));
+			for (final Location location : locations) {
+				final Ai ai = new Ai();
+				try {
+					location.setAddress(location.getStreet() + " " + location.getNumber() + "\n" + location.getZipCode()
+							+ " " + location.getTown() + "\n" + location.getCountry());
+					this.repository.save(location);
+					ai.setAnswer(location.getId().toString());
+				} catch (final IllegalArgumentException ex) {
+					if (ex.getMessage().startsWith("location exists: "))
+						ai.setAnswer(new BigInteger(ex.getMessage().substring(17)).toString());
+				}
+				if (!Strings.isEmpty(ai.getAnswer())) {
+					ai.setQuestion(question);
+					ai.setType(AiType.Location);
+					this.repository.save(ai);
+				}
+			}
+			result = this.exists(question, AiType.Location, 183);
+		}
 		if (result.size() > 0) {
 			final List<Location> locations = new ArrayList<>();
 			for (int i = 0; i < result.size(); i++)
@@ -67,58 +89,37 @@ public class AiService {
 						this.repository.one(Location.class, new BigInteger(result.get(i).get("ai.answer").toString())));
 			return locations;
 		}
-		final List<Location> locations = Arrays.asList(Json.toObject(
-				this.call(question, this.createSchemaLocation(false)), Location[].class));
-		for (final Location location : locations) {
-			final Ai ai = new Ai();
-			try {
-				location.setAddress(location.getStreet() + " " + location.getNumber() + "\n" + location.getZipCode()
-						+ " " + location.getTown() + "\n" + location.getCountry());
-				this.repository.save(location);
-				ai.setAnswer(location.getId().toString());
-			} catch (final IllegalArgumentException ex) {
-				if (ex.getMessage().startsWith("location exists: "))
-					ai.setAnswer(new BigInteger(ex.getMessage().substring(17)).toString());
-			}
-			if (!Strings.isEmpty(ai.getAnswer())) {
-				ai.setQuestion(question);
-				ai.setType(AiType.Location);
-				this.repository.save(ai);
-			}
-		}
 		return locations;
 	}
 
 	public List<Event> events(final String question) {
-		final Result result = this.exists(question, AiType.Event, 7);
-		if (result.size() > 0) {
-			final List<Event> events = new ArrayList<>();
-			for (int i = 0; i < result.size(); i++) {
-				final Event event = this.repository.one(Event.class,
-						new BigInteger(result.get(i).get("ai.answer").toString()));
-				if (event.getStartDate().after(new Timestamp(System.currentTimeMillis())))
-					events.add(event);
+		Result result = this.exists(question, AiType.Event, 7);
+		if (result.size() == 0) {
+			final ArrayNode eventNodes = (ArrayNode) Json.toNode(this.call(question, this.createSchemaLocation(true)));
+			for (final JsonNode eventNode : eventNodes) {
+				final Ai ai = new Ai();
+				try {
+					final Location location = new Location();
+					this.repository.save(location);
+					ai.setAnswer(location.getId().toString());
+				} catch (final IllegalArgumentException ex) {
+					if (ex.getMessage().startsWith("location exists: "))
+						ai.setAnswer(new BigInteger(ex.getMessage().substring(17)).toString());
+				}
+				if (!Strings.isEmpty(ai.getAnswer())) {
+					ai.setQuestion(question);
+					ai.setType(AiType.Location);
+					this.repository.save(ai);
+				}
 			}
-			if (events.size() > 0)
-				return events;
+			result = this.exists(question, AiType.Event, 7);
 		}
-		final ArrayNode eventNodes = (ArrayNode) Json.toNode(this.call(question, this.createSchemaLocation(true)));
 		final List<Event> events = new ArrayList<>();
-		for (final JsonNode eventNode : eventNodes) {
-			final Ai ai = new Ai();
-			try {
-				final Location location = new Location();
-				this.repository.save(location);
-				ai.setAnswer(location.getId().toString());
-			} catch (final IllegalArgumentException ex) {
-				if (ex.getMessage().startsWith("location exists: "))
-					ai.setAnswer(new BigInteger(ex.getMessage().substring(17)).toString());
-			}
-			if (!Strings.isEmpty(ai.getAnswer())) {
-				ai.setQuestion(question);
-				ai.setType(AiType.Location);
-				this.repository.save(ai);
-			}
+		for (int i = 0; i < result.size(); i++) {
+			final Event event = this.repository.one(Event.class,
+					new BigInteger(result.get(i).get("ai.answer").toString()));
+			if (event.getStartDate().after(new Timestamp(System.currentTimeMillis())))
+				events.add(event);
 		}
 		return events;
 	}
