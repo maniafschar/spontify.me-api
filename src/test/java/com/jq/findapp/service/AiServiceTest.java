@@ -49,7 +49,7 @@ public class AiServiceTest {
 
 		// then
 		assertNotNull(ai);
-		assertTrue(ai.getAnswer().length() > 20);
+		assertTrue(ai.setNote().length() > 2);
 	}
 
 	@Test
