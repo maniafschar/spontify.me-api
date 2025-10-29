@@ -174,11 +174,10 @@ public class MatchDayService {
 					if (matches.get(i2).teams.home.id == poll.homeId
 							&& matches.get(i2).teams.away.id == poll.awayId
 							&& "FT".equals(matches.get(i2).fixture.status.myshort)) {
-						final Match fixture = MatchDayService.this
-								.get("id=" + matches.get(i2).fixture.id).get(0);
-						if (fixture != null && fixture.statistics != null && fixture.statistics.size() > 1
-								&& fixture.statistics.get(0).statistics != null) {
-							result.add(fixture);
+						final List<Match> match = MatchDayService.this.get("id=" + matches.get(i2).fixture.id);
+						if (match.size() > 0 && match.get(0).statistics != null && match.get(0).statistics.size() > 1
+									&& match.get(0).statistics.get(0).statistics != null) {
+							result.add(match.get(0));
 							if (result.size() > 7)
 								break;
 						}
