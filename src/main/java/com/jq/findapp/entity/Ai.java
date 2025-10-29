@@ -9,7 +9,7 @@ import jakarta.persistence.Enumerated;
 public class Ai extends BaseEntity {
 	private String question;
 	@Column(columnDefinition = "TEXT")
-	private String answer;
+	private String note;
 	@Enumerated(EnumType.STRING)
 	private AiType type;
 
@@ -25,12 +25,12 @@ public class Ai extends BaseEntity {
 		this.question = question;
 	}
 
-	public String getAnswer() {
-		return this.answer;
+	public String getNote() {
+		return this.note;
 	}
 
-	public void setAnswer(final String answer) {
-		this.answer = answer;
+	public void setNote(final String note) {
+		this.note = note;
 	}
 
 	public AiType getType() {
