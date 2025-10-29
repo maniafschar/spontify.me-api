@@ -387,7 +387,7 @@ public class EngagementService {
 						chat.setContactId(this.repository.one(Client.class, contact.getClientId()).getAdminId());
 						chat.setContactId2(contact.getId());
 						chat.setAction("ai:" + text.get(teamIds.get(i2)).getId());
-						chat.setNote(text.get(teamIds.get(i2)).getAnswer());
+						chat.setNote(text.get(teamIds.get(i2)).getNote());
 						this.repository.save(chat);
 					}
 				}
