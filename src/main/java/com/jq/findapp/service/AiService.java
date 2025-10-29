@@ -52,7 +52,7 @@ public class AiService {
 		final String answer = this.call(question, null);
 		final Ai ai = new Ai();
 		ai.setQuestion(question);
-		ai.setAnswer(answer);
+		ai.setNote(answer);
 		ai.setType(AiType.Text);
 		this.repository.save(ai);
 		return ai;
@@ -69,10 +69,10 @@ public class AiService {
 					location.setAddress(location.getStreet() + " " + location.getNumber() + "\n" + location.getZipCode()
 							+ " " + location.getTown() + "\n" + location.getCountry());
 					this.repository.save(location);
-					ai.setAnswer(location.getId().toString());
+					ai.setNote(location.getId().toString());
 				} catch (final IllegalArgumentException ex) {
 					if (ex.getMessage().startsWith("location exists: "))
-						ai.setAnswer(new BigInteger(ex.getMessage().substring(17)).toString());
+						ai.setNote(new BigInteger(ex.getMessage().substring(17)).toString());
 				}
 				if (!Strings.isEmpty(ai.getNote())) {
 					ai.setQuestion(question);
@@ -101,10 +101,10 @@ public class AiService {
 				try {
 					final Location location = new Location();
 					this.repository.save(location);
-					ai.setAnswer(location.getId().toString());
+					ai.setNote(location.getId().toString());
 				} catch (final IllegalArgumentException ex) {
 					if (ex.getMessage().startsWith("location exists: "))
-						ai.setAnswer(new BigInteger(ex.getMessage().substring(17)).toString());
+						ai.setNote(new BigInteger(ex.getMessage().substring(17)).toString());
 				}
 				if (!Strings.isEmpty(ai.getNote())) {
 					ai.setQuestion(question);
