@@ -74,7 +74,7 @@ public class AiService {
 					if (ex.getMessage().startsWith("location exists: "))
 						ai.setAnswer(new BigInteger(ex.getMessage().substring(17)).toString());
 				}
-				if (!Strings.isEmpty(ai.getAnswer())) {
+				if (!Strings.isEmpty(ai.getNote())) {
 					ai.setQuestion(question);
 					ai.setType(AiType.Location);
 					this.repository.save(ai);
@@ -106,7 +106,7 @@ public class AiService {
 					if (ex.getMessage().startsWith("location exists: "))
 						ai.setAnswer(new BigInteger(ex.getMessage().substring(17)).toString());
 				}
-				if (!Strings.isEmpty(ai.getAnswer())) {
+				if (!Strings.isEmpty(ai.getNote())) {
 					ai.setQuestion(question);
 					ai.setType(AiType.Location);
 					this.repository.save(ai);
