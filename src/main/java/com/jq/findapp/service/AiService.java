@@ -82,8 +82,8 @@ public class AiService {
 			}
 			result = this.exists(question, AiType.Location, 183);
 		}
+		final List<Location> locations = new ArrayList<>();
 		if (result.size() > 0) {
-			final List<Location> locations = new ArrayList<>();
 			for (int i = 0; i < result.size(); i++)
 				locations.add(
 						this.repository.one(Location.class, new BigInteger(result.get(i).get("ai.answer").toString())));
