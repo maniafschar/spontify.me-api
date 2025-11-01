@@ -94,7 +94,7 @@ public class LogFilter implements Filter {
 			this.authenticate(req);
 			chain.doFilter(req, res);
 			if (req.getHeader("clientId") == null)
-				log.setClientId(resolveClientId(req.getHeader("X-Forwarded-Host")));
+				log.setClientId(this.resolveClientId(req.getHeader("X-Forwarded-Host")));
 			else
 				log.setClientId(new BigInteger(req.getHeader("clientId")));
 			if (req.getHeader("user") != null)
@@ -126,7 +126,7 @@ public class LogFilter implements Filter {
 		}
 	}
 
-	public static BigInteger resolveClientId(final String host) {
+	private BigInteger resolveClientId(final String host) {
 		if (host == null)
 			return null;
 		final Client client = clients.stream().filter(e -> e.getUrl().contains(host)).findFirst().orElse(null);
