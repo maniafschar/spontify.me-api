@@ -206,7 +206,7 @@ public class ActionApi {
 					&& params.getQuery() != Query.event_listTeaser)
 				throw new RuntimeException("unauthenticated request");
 			final Contact contact = new Contact();
-			contact.setClientId(clientId == null ? this.resolveClientId(uriInfo.getRequestUri()) : clientId);
+			contact.setClientId(clientId == null ? this.resolveClientId(uriInfo.getRequestUri().getHost()) : clientId);
 			contact.setId(BigInteger.ZERO);
 			params.setUser(contact);
 		} else
