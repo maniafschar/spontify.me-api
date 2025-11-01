@@ -62,8 +62,8 @@ public class EngagementService {
 	static {
 		QUESTIONS.put(4,
 				new String[] {
-						"Fasse in etwa 300 Wörtern die Highlights aus den Begegnungen des {teamHome} gegen {teamAway} zusammen.",
-						"Liste Top 10 Begegnungen der Kontrahenten {teamHome} gegen {teamAway} auf.",
+						"Fasse in etwa 300 Wörtern die schönsten Spiele der letzten 80 Jahre aus den Begegnungen {teamHome} gegen {teamAway} zusammen.",
+						"Liste die höchsten Ergebnisse samt Torschützen der Kontrahenten {teamHome} gegen {teamAway} auf.",
 						"Welche besonderen Anekdoten gibt es zu den Spielen zwischen {teamHome} und {teamAway}?",
 						"Welche Spieler prägten die Partien zwischen {teamHome} und {teamAway}?"
 				});
@@ -358,7 +358,7 @@ public class EngagementService {
 		return result;
 	}
 
-	@Cron(value = "20 8", group = Group.Four)
+	@Cron(value = "0 8", group = Group.Four)
 	public CronResult cronAi() {
 		final CronResult result = new CronResult();
 		try {

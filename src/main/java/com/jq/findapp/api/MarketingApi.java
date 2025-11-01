@@ -75,10 +75,10 @@ public class MarketingApi {
 			@RequestHeader(required = false) final BigInteger user) throws Exception {
 		final ContactMarketing contactMarketing = new ContactMarketing();
 		contactMarketing.populate(entity.getValues());
-		if (repository.one(ClientMarketing.class, contactMarketing.getClientMarketingId()).getClientId()
+		if (this.repository.one(ClientMarketing.class, contactMarketing.getClientMarketingId()).getClientId()
 				.equals(clientId)) {
 			contactMarketing.setContactId(user);
-			repository.save(contactMarketing);
+			this.repository.save(contactMarketing);
 			return contactMarketing.getId();
 		}
 		return null;
@@ -87,13 +87,13 @@ public class MarketingApi {
 	@PutMapping
 	public String pollAnswerSave(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger clientId)
 			throws Exception {
-		final ContactMarketing contactMarketing = repository.one(ContactMarketing.class, entity.getId());
+		final ContactMarketing contactMarketing = this.repository.one(ContactMarketing.class, entity.getId());
 		contactMarketing.populate(entity.getValues());
-		repository.save(contactMarketing);
+		this.repository.save(contactMarketing);
 		if (contactMarketing.getFinished()) {
 			final JsonNode questions = Json.toNode(
 					Attachment.resolve(
-							repository.one(ClientMarketing.class, contactMarketing.getClientMarketingId())
+							this.repository.one(ClientMarketing.class, contactMarketing.getClientMarketingId())
 									.getStorage()));
 			final JsonNode answers = Json.toNode(Attachment.resolve(contactMarketing.getStorage()));
 			final JsonNode email = answers.get("q" + (questions.get("questions").size() - 1)).get("t");
@@ -135,16 +135,16 @@ public class MarketingApi {
 					}
 				}
 				s.append(questions.get("epilog").asText().replaceAll("\n", "<br/>") + "</div>");
-				notificationService.sendNotificationEmail(null, to, s.toString(), null);
+				this.notificationService.sendNotificationEmail(null, to, s.toString(), null);
 			}
-			return marketingLocationService.pollFinished(contactMarketing);
+			return this.marketingLocationService.pollFinished(contactMarketing);
 		}
 		return null;
 	}
 
 	@GetMapping(path = "user/{locationId}/{hash}")
 	public String createLocationUserAllowed(@PathVariable final BigInteger locationId, @PathVariable final int hash) {
-		final Location location = repository.one(Location.class, locationId);
+		final Location location = this.repository.one(Location.class, locationId);
 		if (location.getSecret() != null && location.getSecret().hashCode() == hash
 				&& (location.getContactId() == null || location.getContactId().compareTo(BigInteger.ONE) <= 0))
 			return location.getName();
@@ -154,8 +154,8 @@ public class MarketingApi {
 	@PostMapping(path = "user/{locationId}/{hash}")
 	public boolean createLocationUser(@RequestHeader final BigInteger clientId,
 			@PathVariable final BigInteger locationId, @PathVariable final int hash) throws Exception {
-		if (createLocationUserAllowed(locationId, hash) != null) {
-			final Location location = repository.one(Location.class, locationId);
+		if (this.createLocationUserAllowed(locationId, hash) != null) {
+			final Location location = this.repository.one(Location.class, locationId);
 			final InternalRegistration registration = new InternalRegistration();
 			registration.setAgb(true);
 			registration.setClientId(clientId);
@@ -168,9 +168,9 @@ public class MarketingApi {
 			registration.setTime(6000);
 			registration.setTimezone("Europe/Berlin");
 			registration.setVersion("0.7.1");
-			location.setContactId(authenticationService.register(registration).getId());
+			location.setContactId(this.authenticationService.register(registration).getId());
 			location.setSecret(null);
-			repository.save(location);
+			this.repository.save(location);
 			return true;
 		}
 		return false;
@@ -183,26 +183,21 @@ public class MarketingApi {
 			@RequestParam(name = "i", required = false) final BigInteger locationId,
 			@RequestParam(name = "h", required = false) final Integer hash,
 			@RequestHeader(required = false, name = "X-Forwarded-For") final String ip) throws Exception {
-		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, clientMarketingId);
+		final ClientMarketing clientMarketing = this.repository.one(ClientMarketing.class, clientMarketingId);
 		if (clientMarketing != null && clientId.equals(clientMarketing.getClientId())) {
 			if (clientMarketing.getEndDate() != null
 					&& clientMarketing.getEndDate().getTime() < Instant.now().toEpochMilli()) {
 				final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 				params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketing.getId());
-				return repository.one(params);
+				return this.repository.one(params);
 			}
 			final QueryParams params = new QueryParams(Query.misc_listMarketing);
 			params.setSearch("clientMarketing.id=" + clientMarketingId);
-			final Map<String, Object> result = repository.one(params);
+			final Map<String, Object> result = this.repository.one(params);
 			if (locationId != null) {
-				final Location location = repository.one(Location.class, locationId);
+				final Location location = this.repository.one(Location.class, locationId);
 				if (location == null || location.getSecret() == null || location.getSecret().hashCode() != hash)
 					return null;
-				if (location.getUpdatedAt() != null) {
-					// TODO temporary fix unti end of Octobre 2024
-					params.setSearch("clientMarketing.id=181");
-					return repository.one(params);
-				}
 				result.put("_address", location.getAddress());
 				result.put("_description", location.getDescription());
 				result.put("_name", location.getName());
@@ -211,7 +206,7 @@ public class MarketingApi {
 				result.put("_url", location.getUrl());
 			}
 			if ((locationId == null || !((String) result.get("clientMarketing.storage")).contains("locationMarketing"))
-					&& !finished(result, clientId, user, clientMarketingId, ip, locationId))
+					&& !this.finished(result, clientId, user, clientMarketingId, ip, locationId))
 				return result;
 		}
 		return null;
@@ -225,7 +220,7 @@ public class MarketingApi {
 					+ "' and log.createdAt>cast('" + Instant.now().minus(Duration.ofHours(6)).toString()
 					+ "' as timestamp) and log.uri='/marketing' and log.status='Ok' and log.method='POST' and log.clientId="
 					+ clientId);
-			final Result list = repository.list(params);
+			final Result list = this.repository.list(params);
 			params.setQuery(Query.contact_listMarketing);
 			for (int i = 0; i < list.size(); i++) {
 				final Instant time = Instant.ofEpochMilli(((Timestamp) list.get(i).get("log.createdAt")).getTime());
@@ -236,14 +231,14 @@ public class MarketingApi {
 								+ time.plus(Duration.ofSeconds(30)).toString()
 								+ "' as timestamp) and contactMarketing.clientMarketingId="
 								+ clientMarketingId);
-				final Result list2 = repository.list(params);
+				final Result list2 = this.repository.list(params);
 				if (list2.size() > 0)
 					result.put("_answer", list2.get(0));
 			}
 			if (!result.containsKey("_answer") && locationId != null) {
 				params.setSearch(
 						"contactMarketing.finished=false and contactMarketing.clientMarketingId=" + clientMarketingId);
-				final Result list2 = repository.list(params);
+				final Result list2 = this.repository.list(params);
 				for (int i = 0; i < list2.size(); i++) {
 					if (((String) list2.get(i).get("contactMarketing.storage"))
 							.contains("\"locationId\":\"" + locationId + "\"")) {
@@ -256,7 +251,7 @@ public class MarketingApi {
 			final QueryParams params = new QueryParams(Query.contact_listMarketing);
 			params.setSearch("contactMarketing.contactId=" + user + " and contactMarketing.clientMarketingId="
 					+ clientMarketingId);
-			final Result list = repository.list(params);
+			final Result list = this.repository.list(params);
 			if (list.size() > 0)
 				result.put("_answer", list.get(0));
 		}
@@ -268,7 +263,7 @@ public class MarketingApi {
 
 	@GetMapping(path = { "{id}", "{id}/result" }, produces = MediaType.TEXT_HTML_VALUE)
 	public String poll(@PathVariable final BigInteger id) throws Exception {
-		final ClientMarketing clientMarketing = repository.one(ClientMarketing.class, id);
+		final ClientMarketing clientMarketing = this.repository.one(ClientMarketing.class, id);
 		if (clientMarketing == null)
 			return "";
 		final String image;
@@ -276,42 +271,42 @@ public class MarketingApi {
 				&& clientMarketing.getEndDate().before(new Timestamp(Instant.now().toEpochMilli()))) {
 			final QueryParams params = new QueryParams(Query.misc_listMarketingResult);
 			params.setSearch("clientMarketingResult.clientMarketingId=" + clientMarketing.getId());
-			final Result result = repository.list(params);
+			final Result result = this.repository.list(params);
 			if (result.size() == 0 || result.get(0).get("clientMarketingResult.image") == null)
-				return getHtml(repository.one(Client.class, clientMarketing.getClientId()), null, null, null);
+				return this.getHtml(this.repository.one(Client.class, clientMarketing.getClientId()), null, null, null);
 			image = result.get(0).get("clientMarketingResult.image").toString();
 		} else
 			image = Attachment.resolve(clientMarketing.getImage());
-		return getHtml(repository.one(Client.class, clientMarketing.getClientId()), "" + id, image, "");
+		return this.getHtml(this.repository.one(Client.class, clientMarketing.getClientId()), "" + id, image, "");
 	}
 
 	@GetMapping(path = "location/{id}", produces = MediaType.TEXT_HTML_VALUE)
 	public String location(@PathVariable final BigInteger id) throws Exception {
-		final Location location = repository.one(Location.class, id);
+		final Location location = this.repository.one(Location.class, id);
 		if (location == null)
 			return "";
-		return getHtml(repository.one(Client.class, BigInteger.ONE), "location/" + id,
+		return this.getHtml(this.repository.one(Client.class, BigInteger.ONE), "location/" + id,
 				Attachment.resolve(location.getImage()),
 				location.getName() + " " + location.getAddress() + " " + location.getDescription());
 	}
 
 	@GetMapping(path = "news/{id}", produces = MediaType.TEXT_HTML_VALUE)
 	public String news(@PathVariable final BigInteger id) throws Exception {
-		final ClientNews news = repository.one(ClientNews.class, id);
+		final ClientNews news = this.repository.one(ClientNews.class, id);
 		if (news == null)
 			return "";
-		return getHtml(repository.one(Client.class, news.getClientId()), "news/" + id,
+		return this.getHtml(this.repository.one(Client.class, news.getClientId()), "news/" + id,
 				Attachment.resolve(news.getImage()), news.getDescription());
 	}
 
 	@GetMapping(path = "event/{id}", produces = MediaType.TEXT_HTML_VALUE)
 	public String event(@PathVariable final BigInteger id) throws Exception {
-		final Event event = repository.one(Event.class, id);
+		final Event event = this.repository.one(Event.class, id);
 		if (event == null)
 			return "";
-		final Contact contact = repository.one(Contact.class, event.getContactId());
+		final Contact contact = this.repository.one(Contact.class, event.getContactId());
 		final Location location = event.getLocationId() == null ? null
-				: repository.one(Location.class, event.getLocationId());
+				: this.repository.one(Location.class, event.getLocationId());
 		String image = event.getImage();
 		if (image == null && location != null)
 			image = location.getImage();
@@ -319,7 +314,7 @@ public class MarketingApi {
 			image = contact.getImage();
 		if (image == null)
 			image = "/images/eventPublishDefault.png";
-		return getHtml(repository.one(Client.class, contact.getClientId()), "event/" + id,
+		return this.getHtml(this.repository.one(Client.class, contact.getClientId()), "event/" + id,
 				Attachment.resolve(image),
 				event.getDescription()
 						+ (location == null ? "" : " " + location.getAddress() + " " + location.getDescription()));
@@ -327,14 +322,14 @@ public class MarketingApi {
 
 	private void update() throws IOException {
 		if (INDEXES.size() == 0) {
-			final Result list = repository.list(new QueryParams(Query.misc_listClient));
+			final Result list = this.repository.list(new QueryParams(Query.misc_listClient));
 			final Pattern patternUrl = Pattern.compile("<meta property=\"og:url\" content=\"([^\"].*)\"");
 			final Pattern patternCanonical = Pattern.compile("<link rel=\"canonical\" href=\"([^\"].*)\"");
 			final Pattern patternImage = Pattern.compile("<meta property=\"og:image\" content=\"([^\"].*)\"");
 			final Pattern patternAlternate = Pattern.compile("(<link rel=\"alternate\" ([^>].*)>)");
 			final Pattern patternDescription = Pattern.compile("<meta name=\"description\" content=\"([^\"].*)\"");
 			for (int i = 0; i < list.size(); i++) {
-				final Client client = repository.one(Client.class, (BigInteger) list.get(i).get("client.id"));
+				final Client client = this.repository.one(Client.class, (BigInteger) list.get(i).get("client.id"));
 				final String url = Strings.removeSubdomain(client.getUrl());
 				try (final InputStream in = URI.create(client.getUrl()).toURL().openStream()) {
 					String s = IOUtils.toString(in, StandardCharsets.UTF_8);
@@ -371,7 +366,7 @@ public class MarketingApi {
 
 	private String getHtml(final Client client, final String path, final String image, String description)
 			throws IOException {
-		update();
+		this.update();
 		String s = INDEXES.get(client.getId());
 		s = s.replace("{{og:url}}", path == null ? "" : path);
 		s = s.replace("{{og:image}}", image == null ? "" : image);
