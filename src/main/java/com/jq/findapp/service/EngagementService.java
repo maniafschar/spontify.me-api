@@ -358,7 +358,7 @@ public class EngagementService {
 		return result;
 	}
 
-	@Cron(value = "0 8", group = Group.Four)
+	@Cron(value = "20 8", group = Group.Four)
 	public CronResult cronAi() {
 		final CronResult result = new CronResult();
 		try {

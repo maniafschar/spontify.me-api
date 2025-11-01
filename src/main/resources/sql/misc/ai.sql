@@ -1,7 +1,7 @@
 SELECT
 	ai.id,
 	ai.question,
-	ai.answer,
+	ai.note,
 	ai.type,
 	ai.modifiedAt,
 	ai.createdAt
