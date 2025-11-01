@@ -352,8 +352,7 @@ public class AuthenticationService {
 		return s;
 	}
 
-	public void resetToken(String token) {
-		token = Encryption.decryptBrowser(token);
+	public void resetToken(final String token) {
 		final QueryParams params = new QueryParams(Query.contact_token);
 		params.setSearch("contactToken.token='" + token + "'");
 		final Map<String, Object> u = this.repository.one(params);
@@ -385,7 +384,7 @@ public class AuthenticationService {
 	public void logoff(final Contact contact, final String token) {
 		if (token != null) {
 			final QueryParams params = new QueryParams(Query.contact_token);
-			params.setSearch("contactToken.token='" + Encryption.decryptBrowser(token) + "'");
+			params.setSearch("contactToken.token='" + token + "'");
 			final Map<String, Object> u = this.repository.one(params);
 			if (u != null)
 				this.repository.delete(this.repository.one(ContactToken.class, (BigInteger) u.get("contactToken.id")));

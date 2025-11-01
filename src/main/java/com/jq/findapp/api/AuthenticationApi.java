@@ -49,7 +49,8 @@ public class AuthenticationApi {
 
 	@GetMapping("logoff")
 	public void logoff(final String token, @RequestHeader final BigInteger user) throws Exception {
-		this.authenticationService.logoff(this.repository.one(Contact.class, user), token);
+		this.authenticationService.logoff(this.repository.one(Contact.class, user),
+				token == null ? null : Encryption.decryptBrowser(token));
 	}
 
 	@PostMapping("register")
