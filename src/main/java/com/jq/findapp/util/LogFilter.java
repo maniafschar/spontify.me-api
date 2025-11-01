@@ -58,9 +58,9 @@ public class LogFilter implements Filter {
 	public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
 			throws IOException, ServletException {
 		if (clients.size() == 0) {
-			final Result list = repository.list(new QueryParams(Query.misc_listClient));
+			final Result list = this.repository.list(new QueryParams(Query.misc_listClient));
 			for (int i = 0; i < list.size(); i++)
-				clients.add(repository.one(Client.class, (BigInteger) list.get(i).get("client.id")));
+				clients.add(this.repository.one(Client.class, (BigInteger) list.get(i).get("client.id")));
 		}
 		final ContentCachingRequestWrapper req = new ContentCachingRequestWrapper((HttpServletRequest) request);
 		final HttpServletResponse res = (HttpServletResponse) response;
@@ -91,7 +91,7 @@ public class LogFilter implements Filter {
 		}
 		final long time = System.currentTimeMillis();
 		try {
-			authenticate(req);
+			this.authenticate(req);
 			chain.doFilter(req, res);
 			if (req.getHeader("clientId") == null)
 				log.setClientId(resolveClientId(req.getHeader("X-Forwarded-Host")));
@@ -118,7 +118,7 @@ public class LogFilter implements Filter {
 					body.set(null);
 				}
 				try {
-					repository.save(log);
+					this.repository.save(log);
 				} catch (final Exception e) {
 					e.printStackTrace();
 				}
@@ -126,7 +126,7 @@ public class LogFilter implements Filter {
 		}
 	}
 
-	private BigInteger resolveClientId(final String host) {
+	public static BigInteger resolveClientId(final String host) {
 		if (host == null)
 			return null;
 		final Client client = clients.stream().filter(e -> e.getUrl().contains(host)).findFirst().orElse(null);
@@ -138,19 +138,19 @@ public class LogFilter implements Filter {
 			if (req.getHeader("user") != null) {
 				final BigInteger user = new BigInteger(req.getHeader("user"));
 				if (!BigInteger.ZERO.equals(user)) {
-					final Contact contact = authenticationService.verify(user,
+					final Contact contact = this.authenticationService.verify(user,
 							req.getHeader("password"), req.getHeader("salt"));
 					if (!contact.getClientId().equals(new BigInteger(req.getHeader("clientId"))))
 						throw new AuthenticationException(AuthenticationExceptionType.WrongClient);
 				}
 			} else if (req.getRequestURI().startsWith("/support/")) {
-				if (supportCenterSecret.equals(req.getHeader("secret"))) {
+				if (this.supportCenterSecret.equals(req.getHeader("secret"))) {
 					if (req.getHeader("clientId") == null)
 						throw new AuthenticationException(AuthenticationExceptionType.NoInputFromClient);
-					authenticationService.verify(
-							repository.one(Client.class, new BigInteger(req.getHeader("clientId"))).getAdminId(),
+					this.authenticationService.verify(
+							this.repository.one(Client.class, new BigInteger(req.getHeader("clientId"))).getAdminId(),
 							req.getHeader("password"), req.getHeader("salt"));
-				} else if (!cronSecret.equals(req.getHeader("secret")) ||
+				} else if (!this.cronSecret.equals(req.getHeader("secret")) ||
 						!req.getRequestURI().equals("/support/cron") &&
 								!req.getRequestURI().equals("/support/healthcheck"))
 					throw new AuthenticationException(AuthenticationExceptionType.ProtectedArea);

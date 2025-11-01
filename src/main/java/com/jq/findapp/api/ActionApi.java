@@ -58,13 +58,12 @@ import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.service.NotificationService.Ping;
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Json;
+import com.jq.findapp.util.LogFilter;
 import com.jq.findapp.util.Strings;
 import com.jq.findapp.util.Text;
 import com.jq.findapp.util.Text.TextId;
 
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.UriInfo;
 
 @RestController
 @Transactional
@@ -200,13 +199,14 @@ public class ActionApi {
 
 	@GetMapping("one")
 	public Map<String, Object> one(final QueryParams params, @RequestHeader(required = false) final BigInteger clientId,
-			@RequestHeader(required = false) final BigInteger user, @Context final UriInfo uriInfo) throws Exception {
+			@RequestHeader(required = false) final BigInteger user,
+			@RequestHeader(required = false, name = "X-Forwarded-Host") final String host) throws Exception {
 		if (user == null) {
 			if (params.getQuery() != Query.location_list && params.getQuery() != Query.contact_listTeaser
 					&& params.getQuery() != Query.event_listTeaser)
 				throw new RuntimeException("unauthenticated request");
 			final Contact contact = new Contact();
-			contact.setClientId(clientId == null ? this.resolveClientId(uriInfo.getRequestUri().getHost()) : clientId);
+			contact.setClientId(clientId == null ? LogFilter.resolveClientId(host) : clientId);
 			contact.setId(BigInteger.ZERO);
 			params.setUser(contact);
 		} else
