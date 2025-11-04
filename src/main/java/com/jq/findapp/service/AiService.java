@@ -205,19 +205,21 @@ public class AiService {
 		location.put("town", Schema.builder().type(Type.Known.STRING).build());
 		location.put("url", Schema.builder().type(Type.Known.STRING).build());
 		location.put("zipCode", Schema.builder().type(Type.Known.STRING).build());
+		String name;
 		if (event) {
 			location.put("date", Schema.builder().type(Type.Known.STRING).format("date-time").build());
-			location.put("location_name", Schema.builder().type(Type.Known.STRING).build());
+			name = "location_name";
 		} else
-			location.put("name", Schema.builder().type(Type.Known.STRING).build());
+			name = "name";
+		location.put(name, Schema.builder().type(Type.Known.STRING).build());
 		return Schema.builder()
 				.type(Type.Known.ARRAY)
 				.items(Schema.builder()
 						.type(Type.Known.OBJECT)
 						.properties(location)
-						.required(Arrays.asList("name", "description", "street", "number", "zipCode", "town",
+						.required(Arrays.asList(name, "description", "street", "number", "zipCode", "town",
 								"country", "url"))
-						.propertyOrdering(Arrays.asList("name", "description", "street", "number", "zipCode",
+						.propertyOrdering(Arrays.asList(name, "description", "street", "number", "zipCode",
 								"town", "country", "url", "email", "telephone", "url"))
 						.build())
 				.build();
