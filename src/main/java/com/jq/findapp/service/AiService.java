@@ -63,10 +63,10 @@ public class AiService {
 		final Result result = this.exists(question, AiType.Text, 365);
 		if (result.size() > 0)
 			return this.repository.one(Ai.class, (BigInteger) result.get(0).get("ai.id"));
-		final String answer = this.call(question, null);
+		final String note = this.call(question, null);
 		final Ai ai = new Ai();
 		ai.setQuestion(question);
-		ai.setNote(answer);
+		ai.setNote(note);
 		ai.setType(AiType.Text);
 		this.repository.save(ai);
 		return ai;
@@ -127,7 +127,7 @@ public class AiService {
 		if (result.size() > 0) {
 			for (int i = 0; i < result.size(); i++)
 				locations.add(
-						this.repository.one(Location.class, new BigInteger(result.get(i).get("ai.answer").toString())));
+						this.repository.one(Location.class, new BigInteger(result.get(i).get("ai.note").toString())));
 			return locations;
 		}
 		return locations;
@@ -158,7 +158,7 @@ public class AiService {
 		final List<Event> events = new ArrayList<>();
 		for (int i = 0; i < result.size(); i++) {
 			final Event event = this.repository.one(Event.class,
-					new BigInteger(result.get(i).get("ai.answer").toString()));
+					new BigInteger(result.get(i).get("ai.note").toString()));
 			if (event.getStartDate().after(new Timestamp(System.currentTimeMillis())))
 				events.add(event);
 		}
