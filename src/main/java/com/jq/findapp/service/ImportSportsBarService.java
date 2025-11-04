@@ -29,7 +29,6 @@ import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
@@ -45,18 +44,18 @@ public class ImportSportsBarService {
 	private static final String URL = "https://skyfinder.sky.de/sf/skyfinder.servlet?";
 	private static final String URL2 = "https://api.sportsbarfinder.net/map?rq=";
 
-	@Cron("0 3")
+	// @Cron("0 3")
 	public CronResult cron() {
 		final CronResult result = new CronResult();
 		final Results results = new Results();
 		try {
 			final String zipCodePrefix = "" + (LocalDateTime.now().getDayOfYear() % 10);
 			final JsonNode zip = Json
-					.toNode(IOUtils.toString(getClass().getResourceAsStream("/json/zip.json"), StandardCharsets.UTF_8));
+					.toNode(IOUtils.toString(this.getClass().getResourceAsStream("/json/zip.json"), StandardCharsets.UTF_8));
 			for (int i = 0; i < zip.size(); i++) {
 				final String s = zip.get(i).get("zip").asText();
 				if (s.startsWith("" + zipCodePrefix)) {
-					final Results r = zipCode(s);
+					final Results r = this.zipCode(s);
 					results.imported += r.imported;
 					results.updated += r.updated;
 					results.processed += r.processed;
@@ -109,7 +108,7 @@ public class ImportSportsBarService {
 					}
 				}
 			}
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			result.exception = ex;
 
 		}
@@ -117,13 +116,13 @@ public class ImportSportsBarService {
 		return result;
 	}
 
-	@Cron
+	// @Cron
 	public CronResult cronImport() {
 		final CronResult result = new CronResult();
 		int count = 0;
 		final List<String> files = Arrays.asList(new File("dazn").list());
 		files.sort((a, b) -> a.compareTo(b));
-		for (String file : files) {
+		for (final String file : files) {
 			if (file.endsWith(".json")) {
 				try {
 					final JsonNode n = Json.toNode(IOUtils.toString(new FileInputStream(new File("dazn/" + file)),
@@ -163,25 +162,25 @@ public class ImportSportsBarService {
 										+ location.getTown() + "\n"
 										+ ("DE".equals(location.getCountry()) ? "Deutschland" : location.getCountry()));
 						try {
-							repository.save(location);
+							this.repository.save(location);
 							count++;
-						} catch (IllegalArgumentException ex) {
+						} catch (final IllegalArgumentException ex) {
 							if (ex.getMessage().startsWith("location exists: ")) {
-								final Location loc = repository.one(Location.class,
+								final Location loc = this.repository.one(Location.class,
 										new BigInteger(ex.getMessage().substring(17)));
 								if (Strings.isEmpty(loc.getSkills()) || !loc.getSkills().contains("x.1")) {
 									loc.setSkills(Strings.isEmpty(loc.getSkills()) ? "x.1" : loc.getSkills() + "|x.1");
-									repository.save(loc);
+									this.repository.save(loc);
 								}
 							} else if (ex.getMessage().contains("OVER_QUERY_LIMIT"))
 								throw ex;
 							else
-								notificationService.createTicket(TicketType.ERROR, "importSportBar",
+								this.notificationService.createTicket(TicketType.ERROR, "importSportBar",
 										Strings.stackTraceToString(ex), BigInteger.ONE);
 						}
 					}
 					new File("dazn/" + file).delete();
-				} catch (Exception ex) {
+				} catch (final Exception ex) {
 					result.exception = ex;
 				}
 				if (result.exception != null || count > 1)
@@ -192,7 +191,7 @@ public class ImportSportsBarService {
 		return result;
 	}
 
-	Results zipCode(String zip) throws Exception {
+	Results zipCode(final String zip) throws Exception {
 		final Results result = new Results();
 		final MultiValueMap<String, String> cookies = new LinkedMultiValueMap<>();
 		JsonNode list = Json.toNode(WebClient
@@ -211,7 +210,7 @@ public class ImportSportsBarService {
 		if (list.get("currentPageIndexEnd").intValue() > 0) {
 			final QueryParams params = new QueryParams(Query.misc_listStorage);
 			params.setSearch("storage.label='importSportBars'");
-			final Map<String, Object> storage = repository.one(params);
+			final Map<String, Object> storage = this.repository.one(params);
 			@SuppressWarnings("unchecked")
 			final Set<String> imported = Json.toObject(storage.get("storage.storage").toString(), Set.class);
 			for (int i = 0; i < list.get("numberOfPages").asInt(); i++) {
@@ -223,9 +222,9 @@ public class ImportSportsBarService {
 								.retrieve()
 								.toEntity(String.class).block().getBody());
 
-					} catch (Exception ex) {
+					} catch (final Exception ex) {
 						result.errorsScroll++;
-						notificationService.createTicket(TicketType.ERROR, "ImportSportsBarService.scroll",
+						this.notificationService.createTicket(TicketType.ERROR, "ImportSportsBarService.scroll",
 								Strings.stackTraceToString(ex), null);
 						continue;
 					}
@@ -256,18 +255,18 @@ public class ImportSportsBarService {
 							location.setLatitude(data.get("mapdata").get("latitude").floatValue());
 							location.setLongitude(data.get("mapdata").get("longitude").floatValue());
 						}
-						updateFields(location, data);
+						this.updateFields(location, data);
 						location.setContactId(BigInteger.ONE);
 						try {
-							repository.save(location);
+							this.repository.save(location);
 							imported.add(data.get("number").asText());
 							result.imported++;
-						} catch (IllegalArgumentException ex) {
+						} catch (final IllegalArgumentException ex) {
 							if (ex.getMessage().startsWith("location exists: ")) {
-								location = repository.one(Location.class,
+								location = this.repository.one(Location.class,
 										new BigInteger(ex.getMessage().substring(17)));
-								if (updateFields(location, data)) {
-									repository.save(location);
+								if (this.updateFields(location, data)) {
+									this.repository.save(location);
 									result.updated++;
 								} else
 									result.unchanged++;
@@ -275,20 +274,20 @@ public class ImportSportsBarService {
 							} else {
 								result.errors++;
 								if (!ex.getMessage().contains("OVER_QUERY_LIMIT"))
-									notificationService.createTicket(TicketType.ERROR, "ImportSportsBar",
+									this.notificationService.createTicket(TicketType.ERROR, "ImportSportsBar",
 											Strings.stackTraceToString(ex), null);
 							}
-						} catch (Exception ex) {
+						} catch (final Exception ex) {
 							result.errors++;
-							notificationService.createTicket(TicketType.ERROR, "ImportSportsBar",
+							this.notificationService.createTicket(TicketType.ERROR, "ImportSportsBar",
 									Strings.stackTraceToString(ex), null);
 						}
 					}
 				}
 			}
-			final Storage s = repository.one(Storage.class, (BigInteger) storage.get("storage.id"));
+			final Storage s = this.repository.one(Storage.class, (BigInteger) storage.get("storage.id"));
 			s.setStorage(Json.toString(imported));
-			repository.save(s);
+			this.repository.save(s);
 		}
 		return result;
 	}
