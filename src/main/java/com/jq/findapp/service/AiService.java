@@ -134,6 +134,8 @@ public class AiService {
 	}
 
 	public List<Event> events(final String question) {
+		if (true)
+			return new ArrayList<>();
 		Result result = this.exists(question, AiType.Event, 7);
 		if (result.size() == 0) {
 			final ArrayNode eventNodes = (ArrayNode) Json.toNode(this.call(question, this.createSchemaLocation(true)));
