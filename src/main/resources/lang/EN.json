@@ -1,12 +1,4 @@
 {
-	"category": {
-		"verb0": "Knowledge",
-		"verb1": "Culture",
-		"verb2": "Culinary",
-		"verb3": "Character",
-		"verb4": "Sport",
-		"verb5": "Hobby"
-	},
 	"date": {
 		"weekday0": "Su",
 		"weekday1": "Mo",

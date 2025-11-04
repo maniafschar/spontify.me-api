@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -28,14 +29,18 @@ import com.google.genai.types.ThinkingConfig;
 import com.google.genai.types.Type;
 import com.jq.findapp.entity.Ai;
 import com.jq.findapp.entity.Ai.AiType;
+import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Event;
+import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Location;
+import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
+import com.jq.findapp.util.Text;
 
 @Service
 public class AiService {
@@ -44,6 +49,15 @@ public class AiService {
 
 	@Autowired
 	private Repository repository;
+
+	@Autowired
+	private ExternalService externalService;
+
+	@Autowired
+	private NotificationService notificationService;
+
+	@Autowired
+	private Text text;
 
 	public Ai text(final String question) {
 		final Result result = this.exists(question, AiType.Text, 365);
@@ -56,6 +70,33 @@ public class AiService {
 		ai.setType(AiType.Text);
 		this.repository.save(ai);
 		return ai;
+	}
+
+	@Async
+	public void lookup(final Contact contact) {
+		final GeoLocation geoLocation = this.externalService.getAddress(contact.getLatitude(), contact.getLongitude(),
+				false);
+		if (geoLocation == null) {
+			this.notificationService.createTicket(TicketType.ERROR, "AI",
+					"GeoLocation not found: " + contact.getLatitude() + " / " + contact.getLongitude(), null);
+			return;
+		}
+		if (Strings.isEmpty(contact.getSkills())) {
+			this.locations("Please suggest interesting restaurants and clubs in and arround "
+					+ geoLocation.getZipCode() + " " + geoLocation.getTown() + " " + geoLocation.getCountry());
+			this.events("Please suggest interesting events in and arround " + geoLocation.getTown() + " "
+					+ geoLocation.getCountry());
+		} else {
+			Arrays.asList(contact.getSkills().split("\\|"))
+					.stream().forEach(e -> {
+						final String[] cat = this.text.getCategory(e).split("\\.");
+						this.locations("Please suggest interesting locations for " + cat[0] + ", especially " + cat[1]
+								+ ", in and arround " + geoLocation.getZipCode() + " " + geoLocation.getTown() + " "
+								+ geoLocation.getCountry());
+						this.events("Please suggest interesting events for " + cat[0] + ", especially " + cat[1]
+								+ ", in and arround " + geoLocation.getTown() + " " + geoLocation.getCountry());
+					});
+		}
 	}
 
 	public List<Location> locations(final String question) {

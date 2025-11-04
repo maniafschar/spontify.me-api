@@ -48,6 +48,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.AiService;
 import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.AuthenticationService.Unique;
 import com.jq.findapp.service.ChatService;
@@ -101,6 +102,9 @@ public class ActionApi {
 
 	@Autowired
 	private MatchDayService matchDayService;
+
+	@Autowired
+	private AiService aiService;
 
 	@Autowired
 	private Text text;
@@ -413,9 +417,9 @@ public class ActionApi {
 				+ "' as timestamp) and contactGeoLocationHistory.contactId=" + contact.getId());
 		if (this.repository.list(params).size() == 0) {
 			final GeoLocation geoLocation = this.externalService.getAddress(position.getLatitude(),
-					position.getLongitude(),
-					false);
+					position.getLongitude(), false);
 			if (geoLocation != null) {
+				this.aiService.lookup(contact);
 				final Map<String, Object> result = new HashMap<>();
 				if (geoLocation.getStreet() != null && geoLocation.getNumber() != null)
 					result.put("street", geoLocation.getStreet() + ' ' + geoLocation.getNumber());

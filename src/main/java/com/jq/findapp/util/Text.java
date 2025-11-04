@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Repository;
@@ -21,12 +22,6 @@ import com.jq.findapp.repository.Repository.Attachment;
 @Component
 public class Text {
 	public enum TextId {
-		category_verb0,
-		category_verb1,
-		category_verb2,
-		category_verb3,
-		category_verb4,
-		category_verb5,
 		date_weekday0,
 		date_weekday1,
 		date_weekday2,
@@ -107,6 +102,8 @@ public class Text {
 	@Autowired
 	private Repository repository;
 
+	private static ArrayNode categories;
+
 	private static Map<String, JsonNode> languages = new HashMap<>();
 
 	static {
@@ -122,6 +119,8 @@ public class Text {
 							Json.toNode(IOUtils.toString(zip.getInputStream(entry), StandardCharsets.UTF_8)));
 				}
 			}
+			categories = (ArrayNode) Json.toNode(
+					IOUtils.toString(Text.class.getResourceAsStream("/json/categories.json"), StandardCharsets.UTF_8));
 		} catch (final Exception e) {
 			try (final InputStream in = Text.class.getResourceAsStream("/lang/DE.json")) {
 				// Test environment, only german is tested
@@ -133,18 +132,32 @@ public class Text {
 		}
 	}
 
+	public String getCategory(final String id) {
+		final String[] s = id.split("\\.");
+		for (int i = 0; i < categories.size(); i++) {
+			if (s[0].equals(categories.get(i).get("key").asText())) {
+				final ArrayNode values = (ArrayNode) categories.get(i).get("values");
+				for (int i2 = 0; i2 < values.size(); i2++) {
+					if (values.get(i2).asText().endsWith("|" + s[1]))
+						return categories.get(i).get("label") + "." +
+								values.get(i2).asText().replace("|" + s[1], "");
+				}
+			}
+		}
+		return id;
+	}
+
 	public String getText(final Contact contact, final TextId textId) {
 		final String label = textId.name();
 		String s;
 		try {
-
 			if (label.contains("_"))
 				s = languages.get(contact.getLanguage()).get(label.substring(0, label.indexOf('_')))
 						.get(label.substring(label.indexOf('_') + 1)).asText();
 			else
 				s = languages.get(contact.getLanguage()).get(label).asText();
 			if (s.contains("{budd") || s.contains("APP_TITLE")) {
-				final Client client = repository.one(Client.class, contact.getClientId());
+				final Client client = this.repository.one(Client.class, contact.getClientId());
 				final JsonNode node = Json.toNode(Attachment.resolve(client.getStorage()));
 				s = s.replaceAll("APP_TITLE", client.getName());
 				s = s.replaceAll(" \\$\\{buddy}", node.get("lang").get(contact.getLanguage()).get("buddy").asText());
