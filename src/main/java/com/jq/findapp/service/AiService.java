@@ -97,7 +97,8 @@ public class AiService {
 								+ ", in and arround " + geoLocation.getZipCode() + " " + geoLocation.getTown() + " "
 								+ geoLocation.getCountry());
 						this.events("Please suggest interesting events for " + cat[0] + ", especially " + cat[1]
-								+ ", in and arround " + geoLocation.getTown() + " " + geoLocation.getCountry());
+								+ ", in and arround " + geoLocation.getTown() + " " + geoLocation.getCountry(),
+								contact);
 					});
 		}
 	}
