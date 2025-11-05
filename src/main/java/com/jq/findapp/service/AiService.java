@@ -163,12 +163,12 @@ public class AiService {
 					final Event event = new Event();
 					event.setContactId(this.repository.one(com.jq.findapp.entity.Client.class, contact.getClientId())
 							.getAdminId());
-					event.setDescription(nodes.get("description").asText());
+					event.setDescription(nodes.get(i).get("description").asText());
 					event.setType(EventType.Location);
 					event.setRepetition(Repetition.Once);
 					event.setLocationId(locationIds.get(i));
 					try {
-						event.setStartDate(new Timestamp(df.parse(nodes.get("date").asText()).getTime()));
+						event.setStartDate(new Timestamp(df.parse(nodes.get(i).get("date").asText()).getTime()));
 						this.repository.save(event);
 					} catch (final ParseException ex) {
 						this.notificationService.createTicket(TicketType.ERROR, "AI event",
