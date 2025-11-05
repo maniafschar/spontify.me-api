@@ -102,7 +102,7 @@ public class AiService {
 		}
 	}
 
-	public List<Location> locations(final String question) {
+	List<Location> locations(final String question) {
 		Result result = this.exists(question, AiType.Location, 183);
 		if (result.size() == 0) {
 			this.importLocations(question, this.call(question, this.createSchemaLocation(false)));
@@ -118,7 +118,7 @@ public class AiService {
 		return locations;
 	}
 
-	public List<BigInteger> importLocations(final String question, final String answer) {
+	private List<BigInteger> importLocations(final String question, final String answer) {
 		final List<Location> locations = Arrays.asList(Json.toObject(answer, Location[].class));
 		final ArrayNode nodes = (ArrayNode) Json.toNode(answer);
 		final List<BigInteger> locationIds = new ArrayList<>();
@@ -150,7 +150,7 @@ public class AiService {
 		return locationIds;
 	}
 
-	public List<Event> events(final String question) {
+	private List<Event> events(final String question) {
 		final Result result = this.exists(question, AiType.Event, 7);
 		if (result.size() == 0) {
 			final String answer = this.call(question, this.createSchemaLocation(true));
