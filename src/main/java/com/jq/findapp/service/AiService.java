@@ -88,7 +88,7 @@ public class AiService {
 			this.locations("Please suggest interesting restaurants and clubs in and arround "
 					+ geoLocation.getZipCode() + " " + geoLocation.getTown() + " " + geoLocation.getCountry());
 			this.events("Please suggest interesting events in and arround " + geoLocation.getTown() + " "
-					+ geoLocation.getCountry());
+					+ geoLocation.getCountry(), contact);
 		} else {
 			Arrays.asList(contact.getSkills().split("\\|"))
 					.stream().forEach(e -> {
@@ -105,7 +105,7 @@ public class AiService {
 	List<Location> locations(final String question) {
 		Result result = this.exists(question, AiType.Location, 183);
 		if (result.size() == 0) {
-			this.importLocations(question, this.call(question, this.createSchemaLocation(false)));
+			this.importLocations(question, this.call(question, this.createSchema(false)));
 			result = this.exists(question, AiType.Location, 183);
 		}
 		final List<Location> locations = new ArrayList<>();
@@ -150,17 +150,18 @@ public class AiService {
 		return locationIds;
 	}
 
-	private List<Event> events(final String question) {
+	private List<Event> events(final String question, final Contact contact) {
 		final Result result = this.exists(question, AiType.Event, 7);
 		if (result.size() == 0) {
-			final String answer = this.call(question, this.createSchemaLocation(true));
+			final String answer = this.call(question, this.createSchema(true));
 			final List<BigInteger> locationIds = this.importLocations(question, answer);
 			final ArrayNode nodes = (ArrayNode) Json.toNode(answer);
 			final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			for (int i = 0; i < nodes.size(); i++) {
 				if (locationIds.get(i) != null) {
 					final Event event = new Event();
-					event.setContactId(null);
+					event.setContactId(this.repository.one(com.jq.findapp.entity.Client.class, contact.getClientId())
+							.getAdminId());
 					event.setDescription(nodes.get("description").asText());
 					event.setType(EventType.Location);
 					event.setRepetition(Repetition.Once);
@@ -216,7 +217,7 @@ public class AiService {
 		}
 	}
 
-	private Schema createSchemaLocation(final boolean event) {
+	private Schema createSchema(final boolean event) {
 		final Map<String, Schema> location = new HashMap<>();
 		location.put("country", Schema.builder().type(Type.Known.STRING).description("ISO 3166 Alpha 2 code").build());
 		location.put("description", Schema.builder().type(Type.Known.STRING).build());
@@ -242,7 +243,7 @@ public class AiService {
 						.required(Arrays.asList(name, "description", "street", "number", "zipCode", "town",
 								"country", "url"))
 						.propertyOrdering(Arrays.asList(name, "description", "street", "number", "zipCode",
-								"town", "country", "url", "email", "telephone", "url"))
+								"town", "country", "url", "email", "telephone"))
 						.build())
 				.build();
 	}
