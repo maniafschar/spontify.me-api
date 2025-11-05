@@ -25,17 +25,17 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 
 	@Override
 	public void prePersist(final Location location) {
-		location.setName(sanitizeName(location.getName()));
-		location.setUrl(sanitizeUrl(location.getUrl()));
+		location.setName(Strings.sanitize(location.getName(), 100));
+		location.setUrl(this.sanitizeUrl(location.getUrl()));
 		if (location.getLatitude() == null
 				|| Strings.isEmpty(location.getAddress())
 				|| Strings.isEmpty(location.getCountry())
 				|| Strings.isEmpty(location.getTown())
 				|| Strings.isEmpty(location.getZipCode())
 				|| Strings.isEmpty(location.getStreet()))
-			lookupAddress(location);
+			this.lookupAddress(location);
 		else
-			checkDuplicateLatLon(location);
+			this.checkDuplicateLatLon(location);
 		final QueryParams params = new QueryParams(Query.location_list);
 		params.setUser(new Contact());
 		params.getUser().setId(BigInteger.ZERO);
@@ -48,20 +48,20 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 						+ (location.getNumber() == null ? ""
 								: location.getNumber().toLowerCase()).replace("'", "_")
 						+ "'");
-		final Result list = repository.list(params);
+		final Result list = this.repository.list(params);
 		for (int i = 0; i < list.size(); i++) {
-			if (isNameMatch((String) list.get(i).get("location.name"), location.getName(), true))
+			if (this.isNameMatch((String) list.get(i).get("location.name"), location.getName(), true))
 				throw new IllegalArgumentException("location exists: " + list.get(i).get("location.id"));
 		}
 	}
 
 	@Override
 	public void preUpdate(final Location location) {
-		location.setName(sanitizeName(location.getName()));
+		location.setName(Strings.sanitize(location.getName(), 100));
 		if (location.old("url") != null)
-			location.setUrl(sanitizeUrl(location.getUrl()));
+			location.setUrl(this.sanitizeUrl(location.getUrl()));
 		if (location.old("address") != null)
-			lookupAddress(location);
+			this.lookupAddress(location);
 	}
 
 	@Override
@@ -71,11 +71,11 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 			locationFavorite.setContactId(location.getContactId());
 			locationFavorite.setLocationId(location.getId());
 			locationFavorite.setFavorite(true);
-			repository.save(locationFavorite);
+			this.repository.save(locationFavorite);
 		}
 	}
 
-	private void checkDuplicateLatLon(Location location) {
+	private void checkDuplicateLatLon(final Location location) {
 		if (location.getLongitude() != null) {
 			final float roundingFactor = 0.0005f;
 			final QueryParams params = new QueryParams(Query.location_listId);
@@ -90,16 +90,16 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 					+ (location.getLatitude() + roundingFactor)
 					+ " and location.latitude>"
 					+ (location.getLatitude() - roundingFactor));
-			final Result list = repository.list(params);
+			final Result list = this.repository.list(params);
 			if (list.size() > 0)
 				throw new IllegalArgumentException("location exists: " + list.get(0).get("location.id"));
 		}
 	}
 
 	private void lookupAddress(final Location location) {
-		checkDuplicateLatLon(location);
+		this.checkDuplicateLatLon(location);
 		final JsonNode address = Json.toNode(
-				externalService.google("geocode/json?address="
+				this.externalService.google("geocode/json?address="
 						+ location.getAddress().replaceAll("\n", ", ")));
 		if (!"OK".equals(address.get("status").asText()))
 			throw new IllegalArgumentException(
@@ -107,7 +107,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 							+ Json.toPrettyString(address));
 		final JsonNode result = address.get("results").get(0);
 		JsonNode n = result.get("geometry").get("location");
-		final GeoLocation geoLocation = externalService.convertAddress(address).get(0);
+		final GeoLocation geoLocation = this.externalService.convertAddress(address).get(0);
 		location.setAddress(geoLocation.getFormatted());
 		location.setCountry(geoLocation.getCountry());
 		location.setTown(geoLocation.getTown());
@@ -125,7 +125,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 				|| location.getLatitude() == null || location.getLatitude() == 0) {
 			location.setLatitude(geoLocation.getLatitude());
 			location.setLongitude(geoLocation.getLongitude());
-			checkDuplicateLatLon(location);
+			this.checkDuplicateLatLon(location);
 		}
 		n = result.get("address_components");
 		String s = "";
@@ -137,8 +137,8 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 	}
 
 	private boolean isNameMatch(String name1, String name2, final boolean tryReverse) {
-		name1 = prepare(name1);
-		name2 = prepare(name2);
+		name1 = this.prepare(name1);
+		name2 = this.prepare(name2);
 		final String[] name1Splitted = name1.split(" ");
 		int letters = 0, words = 0;
 		for (int i = 0; i < name1Splitted.length; i++) {
@@ -150,17 +150,8 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		if (letters > name2.length() * 0.75 || name1Splitted.length > 2 && words > name1Splitted.length * 0.6)
 			return true;
 		if (tryReverse)
-			return isNameMatch(name2, name1, false);
+			return this.isNameMatch(name2, name1, false);
 		return false;
-	}
-
-	private String sanitizeName(String name) {
-		if (name != null) {
-			while (name.contains("  "))
-				name = name.replace("  ", " ");
-			name = name.replace('\t', ' ').replace('\r', ' ').replace('\n', ' ');
-		}
-		return name;
 	}
 
 	private String sanitizeUrl(String url) {
@@ -172,7 +163,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 							.retrieve()
 							.bodyToMono(String.class).block();
 					url = "https://" + url.trim();
-				} catch (Exception ex) {
+				} catch (final Exception ex) {
 					url = "http://" + url.trim();
 				}
 			} else
