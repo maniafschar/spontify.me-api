@@ -2,6 +2,8 @@ package com.jq.findapp.service;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -15,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.ImmutableList;
 import com.google.genai.Client;
@@ -31,6 +32,8 @@ import com.jq.findapp.entity.Ai;
 import com.jq.findapp.entity.Ai.AiType;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Event;
+import com.jq.findapp.entity.Event.EventType;
+import com.jq.findapp.entity.Event.Repetition;
 import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Ticket.TicketType;
@@ -102,25 +105,7 @@ public class AiService {
 	public List<Location> locations(final String question) {
 		Result result = this.exists(question, AiType.Location, 183);
 		if (result.size() == 0) {
-			final List<Location> locations = Arrays.asList(Json.toObject(
-					this.call(question, this.createSchemaLocation(false)), Location[].class));
-			for (final Location location : locations) {
-				final Ai ai = new Ai();
-				try {
-					location.setAddress(location.getStreet() + " " + location.getNumber() + "\n" + location.getZipCode()
-							+ " " + location.getTown() + "\n" + location.getCountry());
-					this.repository.save(location);
-					ai.setNote(location.getId().toString());
-				} catch (final IllegalArgumentException ex) {
-					if (ex.getMessage().startsWith("location exists: "))
-						ai.setNote(new BigInteger(ex.getMessage().substring(17)).toString());
-				}
-				if (!Strings.isEmpty(ai.getNote())) {
-					ai.setQuestion(question);
-					ai.setType(AiType.Location);
-					this.repository.save(ai);
-				}
-			}
+			this.importLocations(question, this.call(question, this.createSchemaLocation(false)));
 			result = this.exists(question, AiType.Location, 183);
 		}
 		final List<Location> locations = new ArrayList<>();
@@ -133,29 +118,63 @@ public class AiService {
 		return locations;
 	}
 
+	public List<BigInteger> importLocations(final String question, final String answer) {
+		final List<Location> locations = Arrays.asList(Json.toObject(answer, Location[].class));
+		final ArrayNode nodes = (ArrayNode) Json.toNode(answer);
+		final List<BigInteger> locationIds = new ArrayList<>();
+		for (int i = 0; i < locations.size(); i++) {
+			final Ai ai = new Ai();
+			try {
+				final Location location = locations.get(i);
+				if (nodes.get(i).has("location_name"))
+					location.setName(nodes.get(i).get("location_name").asText());
+				location.setAddress(location.getStreet() + " " + location.getNumber() + "\n" + location.getZipCode()
+						+ " " + location.getTown() + "\n" + location.getCountry());
+				this.repository.save(location);
+				ai.setNote(location.getId().toString());
+				locationIds.add(location.getId());
+			} catch (final IllegalArgumentException ex) {
+				if (ex.getMessage().startsWith("location exists: ")) {
+					final BigInteger id = new BigInteger(ex.getMessage().substring(17));
+					locationIds.add(id);
+					ai.setNote(id.toString());
+				} else
+					locationIds.add(null);
+			}
+			if (!Strings.isEmpty(ai.getNote())) {
+				ai.setQuestion(question);
+				ai.setType(AiType.Location);
+				this.repository.save(ai);
+			}
+		}
+		return locationIds;
+	}
+
 	public List<Event> events(final String question) {
-		if (true)
-			return new ArrayList<>();
-		Result result = this.exists(question, AiType.Event, 7);
+		final Result result = this.exists(question, AiType.Event, 7);
 		if (result.size() == 0) {
-			final ArrayNode eventNodes = (ArrayNode) Json.toNode(this.call(question, this.createSchemaLocation(true)));
-			for (final JsonNode eventNode : eventNodes) {
-				final Ai ai = new Ai();
-				try {
-					final Location location = new Location();
-					this.repository.save(location);
-					ai.setNote(location.getId().toString());
-				} catch (final IllegalArgumentException ex) {
-					if (ex.getMessage().startsWith("location exists: "))
-						ai.setNote(new BigInteger(ex.getMessage().substring(17)).toString());
-				}
-				if (!Strings.isEmpty(ai.getNote())) {
-					ai.setQuestion(question);
-					ai.setType(AiType.Location);
-					this.repository.save(ai);
+			final String answer = this.call(question, this.createSchemaLocation(true));
+			final List<BigInteger> locationIds = this.importLocations(question, answer);
+			final ArrayNode nodes = (ArrayNode) Json.toNode(answer);
+			final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			for (int i = 0; i < nodes.size(); i++) {
+				if (locationIds.get(i) != null) {
+					final Event event = new Event();
+					event.setContactId(null);
+					event.setDescription(nodes.get("description").asText());
+					event.setType(EventType.Location);
+					event.setRepetition(Repetition.Once);
+					event.setLocationId(locationIds.get(i));
+					try {
+						event.setStartDate(new Timestamp(df.parse(nodes.get("date").asText()).getTime()));
+						this.repository.save(event);
+					} catch (final ParseException ex) {
+						this.notificationService.createTicket(TicketType.ERROR, "AI event",
+								Strings.stackTraceToString(ex),
+								null);
+					}
 				}
 			}
-			result = this.exists(question, AiType.Event, 7);
 		}
 		final List<Event> events = new ArrayList<>();
 		for (int i = 0; i < result.size(); i++) {
