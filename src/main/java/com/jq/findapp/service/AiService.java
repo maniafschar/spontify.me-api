@@ -229,8 +229,7 @@ public class AiService {
 		location.put("town", Schema.builder().type(Type.Known.STRING).build());
 		location.put("url", Schema.builder().type(Type.Known.STRING).build());
 		location.put("zipCode", Schema.builder().type(Type.Known.STRING).build());
-		final List<String> required = Arrays.asList("description", "street", "number", "zipCode", "town",
-				"country", "url");
+		final List<String> required = new ArrayList<>();
 		if (event) {
 			location.put("date", Schema.builder().type(Type.Known.STRING).format("date-time").build());
 			location.put("location_name", Schema.builder().type(Type.Known.STRING).build());
@@ -240,6 +239,13 @@ public class AiService {
 			location.put("name", Schema.builder().type(Type.Known.STRING).build());
 			required.add("name");
 		}
+		required.add("description");
+		required.add("street");
+		required.add("number");
+		required.add("zipCode");
+		required.add("town");
+		required.add("country");
+		required.add("url");
 		return Schema.builder()
 				.type(Type.Known.ARRAY)
 				.items(Schema.builder()
