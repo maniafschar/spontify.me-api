@@ -211,6 +211,7 @@ public class AiService {
 				for (final Part part : parts)
 					s.append(part.text().orElse(""));
 			}
+			this.notificationService.createTicket(TicketType.ERROR, "AI", question + "\n" + s.toString(), null);
 			return s.toString();
 		}
 	}
