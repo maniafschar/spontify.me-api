@@ -88,8 +88,7 @@ public class AiService {
 			this.locations("Please suggest interesting restaurants and clubs in and arround "
 					+ geoLocation.getZipCode() + " " + geoLocation.getTown() + " " + geoLocation.getCountry());
 			this.events("Please suggest interesting events in the next 30 days in and arround " + geoLocation.getTown()
-					+ " "
-					+ geoLocation.getCountry(), contact);
+					+ " " + geoLocation.getCountry(), contact);
 		} else {
 			Arrays.asList(contact.getSkills().split("\\|"))
 					.stream().forEach(e -> {
