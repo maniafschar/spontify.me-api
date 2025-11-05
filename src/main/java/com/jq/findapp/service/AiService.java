@@ -87,7 +87,8 @@ public class AiService {
 		if (Strings.isEmpty(contact.getSkills())) {
 			this.locations("Please suggest interesting restaurants and clubs in and arround "
 					+ geoLocation.getZipCode() + " " + geoLocation.getTown() + " " + geoLocation.getCountry());
-			this.events("Please suggest interesting events in and arround " + geoLocation.getTown() + " "
+			this.events("Please suggest interesting events in the next 30 days in and arround " + geoLocation.getTown()
+					+ " "
 					+ geoLocation.getCountry(), contact);
 		} else {
 			Arrays.asList(contact.getSkills().split("\\|"))
@@ -96,8 +97,10 @@ public class AiService {
 						this.locations("Please suggest interesting locations for " + cat[0] + ", especially " + cat[1]
 								+ ", in and arround " + geoLocation.getZipCode() + " " + geoLocation.getTown() + " "
 								+ geoLocation.getCountry());
-						this.events("Please suggest interesting events for " + cat[0] + ", especially " + cat[1]
-								+ ", in and arround " + geoLocation.getTown() + " " + geoLocation.getCountry(),
+						this.events(
+								"Please suggest interesting events in the next 30 days for " + cat[0] + ", especially "
+										+ cat[1] + ", in and arround " + geoLocation.getTown() + " "
+										+ geoLocation.getCountry(),
 								contact);
 					});
 		}
@@ -168,7 +171,9 @@ public class AiService {
 					event.setRepetition(Repetition.Once);
 					event.setLocationId(locationIds.get(i));
 					try {
-						event.setStartDate(new Timestamp(df.parse(nodes.get(i).get("date").asText().replace('T', ' ')).getTime()));
+						event.setStartDate(new Timestamp(
+								df.parse(nodes.get(i).get("date").asText().replace('T', ' ').replace('_', ' '))
+										.getTime()));
 						this.repository.save(event);
 					} catch (final ParseException ex) {
 						this.notificationService.createTicket(TicketType.ERROR, "AI event",
