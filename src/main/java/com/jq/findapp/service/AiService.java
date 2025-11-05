@@ -168,7 +168,7 @@ public class AiService {
 					event.setRepetition(Repetition.Once);
 					event.setLocationId(locationIds.get(i));
 					try {
-						event.setStartDate(new Timestamp(df.parse(nodes.get(i).get("date").asText()).getTime()));
+						event.setStartDate(new Timestamp(df.parse(nodes.get(i).get("date").asText().replace('T', ' ')).getTime()));
 						this.repository.save(event);
 					} catch (final ParseException ex) {
 						this.notificationService.createTicket(TicketType.ERROR, "AI event",
