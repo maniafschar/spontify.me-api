@@ -190,40 +190,11 @@ public class ImportMunich {
 				location.setDescription(Strings.sanitize(getField(regexDesc, page, 1), 1000));
 			}
 		}
-		if (!Strings.isEmpty(location.getAddress())) {
-			final QueryParams params = new QueryParams(Query.location_listId);
-			params.setSearch("location.name like '" + location.getName().replace("'", "_")
-					+ "' and '" + location.getAddress().toLowerCase().replace('\n', ' ')
-					+ "' like concat('%',LOWER(location.zipCode),'%')");
-			final Result list = repository.list(params);
-			if (list.size() > 0)
-				return (BigInteger) list.get(0).get("location.id");
-			location.setContactId(client.getAdminId());
-			try {
-				repository.save(location);
-				String image = getField(externalPage ? regexImageExternal : regexImage, page, 2);
-				if (image.length() > 0) {
-					if (!image.startsWith("http"))
-						image = (externalPage ? externalUrl.substring(0, externalUrl.indexOf("/", 10)) : url) + image;
-					location.setImage(Entity.getImage(image, Entity.IMAGE_SIZE, 250));
-					if (location.getImage() != null) {
-						location.setImageList(
-								Entity.getImage(image, Entity.IMAGE_THUMB_SIZE, 0));
-						repository.save(location);
-					}
-				}
-				return location.getId();
-			} catch (final IllegalArgumentException ex) {
-				if (ex.getMessage().contains("location exists"))
-					return new BigInteger(
-							ex.getMessage().substring(ex.getMessage().indexOf(':') + 1).trim());
-				else
-					throw ex;
-			}
-		}
-		throw new RuntimeException(
-				"Name: " + location.getName() + " | URL: " + location.getUrl() + " | Address: " + location.getAddress()
-						+ " | Page: " + externalUrl);
+		location.setContactId(client.getAdminId());
+		String image = getField(externalPage ? regexImageExternal : regexImage, page, 2);
+		if (image.length() > 0 && !image.startsWith("http"))
+			image = (externalPage ? externalUrl.substring(0, externalUrl.indexOf("/", 10)) : url) + image;
+		return this.eventService.importLocation(location, image);
 	}
 
 	private String getField(final Pattern pattern, final String text, final int group) {
