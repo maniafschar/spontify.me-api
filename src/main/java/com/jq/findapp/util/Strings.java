@@ -40,35 +40,40 @@ public class Strings {
 				}
 
 				@Override
-				public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType)
+				public void checkServerTrusted(final java.security.cert.X509Certificate[] chain, final String authType)
 						throws CertificateException {
 				}
 
 				@Override
-				public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-				}
-
-				@Override
-				public void checkClientTrusted(X509Certificate[] chain, String authType, Socket socket)
+				public void checkClientTrusted(final X509Certificate[] chain, final String authType)
 						throws CertificateException {
 				}
 
 				@Override
-				public void checkServerTrusted(X509Certificate[] chain, String authType, Socket socket)
+				public void checkClientTrusted(final X509Certificate[] chain, final String authType,
+						final Socket socket)
 						throws CertificateException {
 				}
 
 				@Override
-				public void checkClientTrusted(X509Certificate[] chain, String authType, SSLEngine engine)
+				public void checkServerTrusted(final X509Certificate[] chain, final String authType,
+						final Socket socket)
 						throws CertificateException {
 				}
 
 				@Override
-				public void checkServerTrusted(X509Certificate[] chain, String authType, SSLEngine engine)
+				public void checkClientTrusted(final X509Certificate[] chain, final String authType,
+						final SSLEngine engine)
+						throws CertificateException {
+				}
+
+				@Override
+				public void checkServerTrusted(final X509Certificate[] chain, final String authType,
+						final SSLEngine engine)
 						throws CertificateException {
 				}
 			} }, new SecureRandom());
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw new RuntimeException(ex);
 		}
 	}
@@ -155,12 +160,12 @@ public class Strings {
 		return s.toString();
 	}
 
-	public static String urlContent(String url) {
+	public static String urlContent(final String url) {
 		try {
-			return (String) HttpClient.newBuilder().sslContext(sslContext).build()
-					.send(HttpRequest.newBuilder()
+			return (String) HttpClient.newBuilder().sslContext(sslContext).connectTimeout(Duration.ofSeconds(10))
+					.build().send(HttpRequest.newBuilder()
 							.uri(URI.create(url))
-							.timeout(Duration.ofMinutes(1))
+							.timeout(Duration.ofSeconds(15))
 							.header("Content-Type", "application/json")
 							.header("accept",
 									"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
@@ -168,7 +173,7 @@ public class Strings {
 							.GET()
 							.build(), BodyHandlers.ofString())
 					.body();
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw new RuntimeException(ex);
 		}
 	}

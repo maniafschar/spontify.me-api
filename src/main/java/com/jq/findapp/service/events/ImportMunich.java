@@ -22,7 +22,6 @@ import com.jq.findapp.entity.Event.EventType;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
-import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.EventService;
@@ -64,25 +63,25 @@ public class ImportMunich {
 	public int run(final EventService eventService, final BigInteger clientId) throws Exception {
 		final String path = "/veranstaltungen/event";
 		this.eventService = eventService;
-		this.client = repository.one(Client.class, clientId);
-		String page = eventService.get(url + path);
-		int count = page(page);
+		this.client = this.repository.one(Client.class, clientId);
+		String page = eventService.get(this.url + path);
+		int count = this.page(page);
 		while (true) {
-			final Matcher m = regexNextPage.matcher(page);
+			final Matcher m = this.regexNextPage.matcher(page);
 			if (m.find()) {
-				page = eventService.get(url + path + m.group(3).replace("&amp;", "&"));
+				page = eventService.get(this.url + path + m.group(3).replace("&amp;", "&"));
 				try {
-					count += page(page);
-				} catch (SAXParseException ex) {
-					notificationService.createTicket(TicketType.ERROR, "import munich events",
+					count += this.page(page);
+				} catch (final SAXParseException ex) {
+					this.notificationService.createTicket(TicketType.ERROR, "import munich events",
 							page + "\n\n#################\n\n" + Strings.stackTraceToString(ex), clientId);
 				}
 			} else
 				break;
 		}
-		if (failed.size() > 0)
-			notificationService.createTicket(TicketType.ERROR, "ImportEventMunich",
-					failed.size() + " errors:\n" + failed.stream().sorted().collect(Collectors.joining("\n")),
+		if (this.failed.size() > 0)
+			this.notificationService.createTicket(TicketType.ERROR, "ImportEventMunich",
+					this.failed.size() + " errors:\n" + this.failed.stream().sorted().collect(Collectors.joining("\n")),
 					clientId);
 		return count;
 	}
@@ -93,12 +92,12 @@ public class ImportMunich {
 		if (page.contains(tag))
 			page = page.substring(page.indexOf(tag));
 		while (page.contains(tag)) {
-			String li = page.substring(0, page.indexOf("</li>"));
+			final String li = page.substring(0, page.indexOf("</li>"));
 			try {
-				if (importNode(li))
+				if (this.importNode(li))
 					count++;
 			} catch (final Exception ex) {
-				notificationService.createTicket(TicketType.ERROR, "eventImport",
+				this.notificationService.createTicket(TicketType.ERROR, "eventImport",
 						Strings.stackTraceToString(ex) + "\n\n" + li, null);
 			}
 			page = page.substring(page.indexOf("</li>") + 5);
@@ -108,18 +107,18 @@ public class ImportMunich {
 
 	private boolean importNode(final String li) throws Exception {
 		final Event event = new Event();
-		Matcher m = regexLink.matcher(li);
+		Matcher m = this.regexLink.matcher(li);
 		if (m.find()) {
 			final String link = m.group(2);
-			event.setUrl((link.startsWith("https://") ? "" : url) + link);
+			event.setUrl((link.startsWith("https://") ? "" : this.url) + link);
 		} else
 			return false;
 		final boolean externalPage = event.getUrl().startsWith("https://www.muenchenticket.de/");
-		if (event.getUrl().startsWith(url) || externalPage) {
+		if (event.getUrl().startsWith(this.url) || externalPage) {
 			try {
-				final String page = eventService.get(event.getUrl());
-				event.setLocationId(importLocation(page, externalPage, event.getUrl()));
-				m = regexDatetime.matcher(li);
+				final String page = this.eventService.get(event.getUrl());
+				event.setLocationId(this.importLocation(page, externalPage, event.getUrl()));
+				m = this.regexDatetime.matcher(li);
 				for (int i = 0; i < 3; i++)
 					m.find();
 				final Date date = new SimpleDateFormat("dd.MM.yyyy' - 'HH:mm").parse(m.group(2));
@@ -129,40 +128,40 @@ public class ImportMunich {
 				params.setSearch("event.startDate=cast('"
 						+ event.getStartDate().toInstant().toString().substring(0, 19)
 						+ "' as timestamp) and event.locationId=" + event.getLocationId() + " and event.contactId="
-						+ client.getAdminId());
-				if (repository.list(params).size() == 0) {
+						+ this.client.getAdminId());
+				if (this.repository.list(params).size() == 0) {
 					if (externalPage) {
-						m = regexPrice.matcher(page);
+						m = this.regexPrice.matcher(page);
 						if (m.find())
 							event.setPrice(Double.valueOf(m.group(1).replace(".", "").replace(",", "")) / 100);
 					} else {
-						final String image = getField(regexImage, page, 2);
+						final String image = this.getField(this.regexImage, page, 2);
 						if (image.length() > 0) {
-							event.setImage(Entity.getImage(url + image, Entity.IMAGE_SIZE, 300));
+							event.setImage(Entity.getImage(this.url + image, Entity.IMAGE_SIZE, 300));
 							if (event.getImage() != null)
 								event.setImageList(
-										Entity.getImage(url + image, Entity.IMAGE_THUMB_SIZE, 0));
+										Entity.getImage(this.url + image, Entity.IMAGE_THUMB_SIZE, 0));
 						}
 					}
-					event.setDescription(getField(regexDesc, page, 1));
-					m = regexTitle.matcher(li);
+					event.setDescription(this.getField(this.regexDesc, page, 1));
+					m = this.regexTitle.matcher(li);
 					if (m.find())
 						event.setDescription(m.group(3) + "\n" + event.getDescription());
 					event.setDescription(Strings.sanitize(event.getDescription(), 1000));
-					event.setContactId(client.getAdminId());
+					event.setContactId(this.client.getAdminId());
 					event.setType(EventType.Location);
-					repository.save(event);
+					this.repository.save(event);
 					return true;
 				}
 			} catch (final RuntimeException ex) {
 				// if unable to access event, then ignore and continue, otherwise re-throw
 				if (ex instanceof IllegalArgumentException)
-					failed.add(ex.getMessage().replace("\n", "\n  "));
+					this.failed.add(ex.getMessage().replace("\n", "\n  "));
 				else if (!ex.getMessage().contains(event.getUrl()))
-					failed.add(ex.getClass().getName() + ": " + ex.getMessage().replace("\n", "\n  "));
+					this.failed.add(ex.getClass().getName() + ": " + ex.getMessage().replace("\n", "\n  "));
 			}
 		} else
-			failed.add("event: " + event.getUrl());
+			this.failed.add("event: " + event.getUrl());
 		return false;
 	}
 
@@ -170,35 +169,36 @@ public class ImportMunich {
 			throws Exception {
 		final Location location = new Location();
 		if (externalPage) {
-			location.setUrl(getField(regexAddressRefExternal, page, 2));
+			location.setUrl(this.getField(this.regexAddressRefExternal, page, 2));
 			if (!location.getUrl().startsWith("https://"))
 				location.setUrl(externalUrl + location.getUrl());
-			final String[] s = getField(regexAddressExternal, page, 2).split(",");
+			final String[] s = this.getField(this.regexAddressExternal, page, 2).split(",");
 			location.setAddress(
 					(s.length > 1 ? s[s.length - 2].trim() + "\n" : "") + s[s.length - 1].trim().replace('+', ' '));
 			location.setName(s[0].trim() + (s.length > 3 ? ", " + s[1].trim() : ""));
 		} else {
-			location.setName(getField(regexName, page, 2));
-			location.setUrl(getField(regexAddressRef, page, 2));
+			location.setName(this.getField(this.regexName, page, 2));
+			location.setUrl(this.getField(this.regexAddressRef, page, 2));
 			if (!Strings.isEmpty(location.getUrl())) {
 				if (!location.getUrl().startsWith("https://"))
-					location.setUrl(url + location.getUrl());
-				page = eventService.get(location.getUrl());
+					location.setUrl(this.url + location.getUrl());
+				page = this.eventService.get(location.getUrl());
 				location.setAddress(String.join("\n",
-						Arrays.asList(getField(regexAddress, page, 2)
+						Arrays.asList(this.getField(this.regexAddress, page, 2)
 								.split(",")).stream().map(e -> e.trim()).toList()));
-				location.setDescription(Strings.sanitize(getField(regexDesc, page, 1), 1000));
+				location.setDescription(Strings.sanitize(this.getField(this.regexDesc, page, 1), 1000));
 			}
 		}
-		location.setContactId(client.getAdminId());
-		String image = getField(externalPage ? regexImageExternal : regexImage, page, 2);
+		location.setContactId(this.client.getAdminId());
+		String image = this.getField(externalPage ? this.regexImageExternal : this.regexImage, page, 2);
 		if (image.length() > 0 && !image.startsWith("http"))
-			image = (externalPage ? externalUrl.substring(0, externalUrl.indexOf("/", 10)) : url) + image;
+			image = (externalPage ? externalUrl.substring(0, externalUrl.indexOf("/", 10)) : this.url) + image;
 		final BigInteger id = this.eventService.importLocation(location, image);
 		if (id == null)
 			throw new RuntimeException(
-				"Name: " + location.getName() + " | URL: " + location.getUrl() + " | Address: " + location.getAddress()
-						+ " | Page: " + externalUrl);
+					"Name: " + location.getName() + " | URL: " + location.getUrl() + " | Address: "
+							+ location.getAddress()
+							+ " | Page: " + externalUrl);
 		return id;
 	}
 
