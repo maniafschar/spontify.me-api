@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
@@ -162,7 +163,8 @@ public class Strings {
 
 	public static String urlContent(final String url) {
 		try {
-			return (String) HttpClient.newBuilder().sslContext(sslContext).connectTimeout(Duration.ofSeconds(10))
+			return (String) HttpClient.newBuilder().sslContext(sslContext).followRedirects(Redirect.ALWAYS)
+					.connectTimeout(Duration.ofSeconds(10))
 					.build().send(HttpRequest.newBuilder()
 							.uri(URI.create(url))
 							.timeout(Duration.ofSeconds(15))
