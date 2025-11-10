@@ -394,7 +394,7 @@ public class ImportLocationsService {
 	}
 
 	private void importEmailImage(final Location location) throws Exception {
-		String html = Strings.url2string(location.getUrl()).toLowerCase();
+		String html = Strings.urlContent(location.getUrl()).toLowerCase();
 		if (Strings.isEmpty(location.getImage())) {
 			findImage(html, "src=\"([^\"]*)\"", location);
 			if (Strings.isEmpty(location.getImage()))
@@ -414,7 +414,7 @@ public class ImportLocationsService {
 						baseUrl = baseUrl.substring(0, baseUrl.indexOf('/', 10));
 					html = baseUrl + html;
 				}
-				html = Strings.url2string(html).toLowerCase();
+				html = Strings.urlContent(html).toLowerCase();
 				final String[] replacement = new String[] { "@", "at", "*at*", "ät" };
 				for (String s : replacement) {
 					html = html
