@@ -421,7 +421,7 @@ public class EventService {
 	}
 
 	public String get(final String url) {
-		return Strings.url2string(url)
+		return Strings.fetchUrlContent(url)
 				.replace('\n', ' ')
 				.replace('\r', ' ')
 				.replace('\u0013', ' ')
