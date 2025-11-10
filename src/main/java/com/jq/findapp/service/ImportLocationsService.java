@@ -23,7 +23,6 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
-import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.util.Entity;
 import com.jq.findapp.util.Json;
@@ -179,32 +178,32 @@ public class ImportLocationsService {
 		final String s = lat + "\n" + lon;
 		params.setSearch("ticket.subject='import' and ticket.note like '" + s +
 				"%' and ticket.type='" + TicketType.LOCATION.name() + "'");
-		if (repository.list(params).size() == 0) {
+		if (this.repository.list(params).size() == 0) {
 			String importResult = null;
 			JsonNode json = Json
-					.toNode(externalService.google("place/nearbysearch/json?radius=600&sensor=false&location="
+					.toNode(this.externalService.google("place/nearbysearch/json?radius=600&sensor=false&location="
 							+ latitude + "," + longitude));
 			if ("OK".equals(json.get("status").asText())) {
-				importResult = importLocations(json.get("results").elements());
+				importResult = this.importLocations(json.get("results").elements());
 				while (json.has("next_page_token")) {
-					json = Json.toNode(externalService.google(
+					json = Json.toNode(this.externalService.google(
 							"place/nearbysearch/json?pagetoken=" + json.get("next_page_token").asText()));
 					if ("OK".equals(json.get("status").asText()))
-						importResult += "\n" + importLocations(json.get("results").elements());
+						importResult += "\n" + this.importLocations(json.get("results").elements());
 					else
 						break;
 				}
 			}
-			notificationService.createTicket(TicketType.LOCATION, "import",
+			this.notificationService.createTicket(TicketType.LOCATION, "import",
 					s + (importResult == null ? "" : "\n" + importResult), null);
 		}
 	}
 
 	public String importLocation(final BigInteger ticketId, final String category) throws Exception {
-		final Ticket ticket = repository.one(Ticket.class, ticketId);
+		final Ticket ticket = this.repository.one(Ticket.class, ticketId);
 		String result = null;
 		try {
-			importLocation(Json.toNode(Attachment.resolve(ticket.getNote())), category);
+			this.importLocation(Json.toNode(Attachment.resolve(ticket.getNote())), category);
 		} catch (final IllegalArgumentException ex) {
 			result = ex.getMessage();
 		} catch (final Exception ex) {
@@ -220,19 +219,19 @@ public class ImportLocationsService {
 		while (result.hasNext()) {
 			final JsonNode json = result.next();
 			total++;
-			location = json2location(json);
-			if (json.has("photos") && mapFirstRelevantType(json) != null &&
+			location = this.json2location(json);
+			if (json.has("photos") && this.mapFirstRelevantType(json) != null &&
 					(!json.has("permanently_closed") || !json.get("permanently_closed").asBoolean()) &&
 					json.has("rating") && json.get("rating").asDouble() > 3) {
 				try {
 					final String jsonLower = Json.toString(json).toLowerCase();
 					if (jsonLower.contains("sex") || jsonLower.contains("domina") || jsonLower.contains("bordel")) {
-						notificationService.createTicket(TicketType.LOCATION,
+						this.notificationService.createTicket(TicketType.LOCATION,
 								location.getCategory() + " " + location.getName(),
 								Json.toPrettyString(json), null);
 					} else {
 						try {
-							if ((location = importLocation(json, null)) != null) {
+							if ((location = this.importLocation(json, null)) != null) {
 								imported++;
 								if (town == null)
 									town = location.getCountry() + " " + location.getTown() + " "
@@ -245,7 +244,7 @@ public class ImportLocationsService {
 											&& !ex.getMessage().contains("location exists")
 											&& !Strings.stackTraceToString(ex).toLowerCase()
 													.contains("duplicate entry")))) {
-								notificationService.createTicket(TicketType.LOCATION,
+								this.notificationService.createTicket(TicketType.LOCATION,
 										location.getCategory() + " " + location.getName(),
 										Json.toPrettyString(json), null);
 							}
@@ -272,7 +271,7 @@ public class ImportLocationsService {
 		if (types != null && types.size() > 0) {
 			final Iterator<JsonNode> type = types.elements();
 			while (type.hasNext()) {
-				final LocationType t = mapType(type.next().asText());
+				final LocationType t = this.mapType(type.next().asText());
 				if (t != null && t.category != null)
 					return t;
 			}
@@ -285,14 +284,14 @@ public class ImportLocationsService {
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setSearch("location.image is null");
 		params.setLimit(5);
-		final Result list = repository.list(params);
+		final Result list = this.repository.list(params);
 		result.body = list.size() + " locations for update\n";
 		int updated = 0, exceptions = 0;
 		for (int i = 0; i < list.size(); i++) {
 			try {
-				if (importImage(repository.one(Location.class, (BigInteger) list.get(i).get("location.id"))))
+				if (this.importImage(this.repository.one(Location.class, (BigInteger) list.get(i).get("location.id"))))
 					updated++;
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				exceptions++;
 				result.exception = ex;
 			}
@@ -304,7 +303,7 @@ public class ImportLocationsService {
 	private boolean importImage(final Location location) throws Exception {
 		final String address = location.getAddress().replace("\n", ", ");
 		final JsonNode json = Json.toNode(
-				externalService.google("place/textsearch/json?query="
+				this.externalService.google("place/textsearch/json?query="
 						+ URLEncoder.encode(location.getName() + ", " + address, StandardCharsets.UTF_8)
 								.replace("+", "%20")));
 		if ("OK".equals(json.get("status").asText())) {
@@ -314,22 +313,22 @@ public class ImportLocationsService {
 					final JsonNode photos = results.get(i2).get("photos");
 					for (int i3 = 0; i3 < photos.size(); i3++) {
 						if (photos.get(i3).has("photo_reference")) {
-							final String html = externalService.google(
+							final String html = this.externalService.google(
 									"place/photo?maxheight=1200&photoreference="
 											+ photos.get(i3).get("photo_reference").asText())
 									.replace("<A HREF=", "<a href=");
-							final Matcher matcher = href.matcher(html);
+							final Matcher matcher = this.href.matcher(html);
 							if (matcher.find()) {
 								final String image = matcher.group(1);
 								try {
-									location.setImage(Entity.getImage(image, Entity.IMAGE_SIZE, minImageSize));
+									location.setImage(Entity.getImage(image, Entity.IMAGE_SIZE, this.minImageSize));
 									location.setImageList(
 											Entity.getImage(image, Entity.IMAGE_THUMB_SIZE, 0));
-									repository.save(location);
+									this.repository.save(location);
 									return true;
-								} catch (IllegalArgumentException ex) {
+								} catch (final IllegalArgumentException ex) {
 									if (!ex.getMessage().contains("IMAGE_TOO_SMALL"))
-										notificationService.createTicket(TicketType.ERROR, "importImage",
+										this.notificationService.createTicket(TicketType.ERROR, "importImage",
 												Strings.stackTraceToString(ex), null);
 								}
 							}
@@ -341,31 +340,30 @@ public class ImportLocationsService {
 			}
 		}
 		location.setImage("");
-		repository.save(location);
+		this.repository.save(location);
 		return false;
 	}
 
-	@Cron
 	public CronResult cron() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setSearch(
 				"length(location.url)>0 and (location.image is null or location.email is null) and (location.skills is null or location.skills<>'X')");
-		final Result list = repository.list(params);
+		final Result list = this.repository.list(params);
 		result.body = list.size() + " locations for update\n";
 		final StringBuilder errors = new StringBuilder();
 		int updatedEmail = 0, updatedImage = 0, updatedBoth = 0, exceptions = 0;
 		for (int i = 0; i < list.size(); i++) {
-			final Location location = repository.one(Location.class, (BigInteger) list.get(i).get("location.id"));
+			final Location location = this.repository.one(Location.class, (BigInteger) list.get(i).get("location.id"));
 			try {
-				importEmailImage(location);
+				this.importEmailImage(location);
 				if (Strings.isEmpty(location.getImage()) && Strings.isEmpty(location.getEmail()))
 					errors.append(location.getId() + " " + location.getUrl() + ": no image & email\n\n");
 				else if (Strings.isEmpty(location.getEmail()))
 					errors.append(location.getId() + " " + location.getUrl() + ": no email\n\n");
 				else if (Strings.isEmpty(location.getImage()))
 					errors.append(location.getId() + " " + location.getUrl() + ": no image\n\n");
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				exceptions++;
 				errors.append(
 						location.getId() + " " + location.getUrl() + "\n" + Strings.stackTraceToString(ex) + "\n\n");
@@ -382,23 +380,23 @@ public class ImportLocationsService {
 				location.setEmail("");
 			if (location.getImage() == null)
 				location.setImage("");
-			repository.save(location);
+			this.repository.save(location);
 		}
 		result.body += (updatedBoth > 0 ? updatedBoth + " updated image&email\n" : "")
 				+ (updatedImage > 0 ? updatedImage + " updated image\n" : "")
 				+ (updatedEmail > 0 ? updatedEmail + " updated email\n" : "")
 				+ (exceptions > 0 ? exceptions + " exceptions" : "");
 		if (errors.length() > 0)
-			notificationService.createTicket(TicketType.ERROR, "location image", errors.toString().trim(), null);
+			this.notificationService.createTicket(TicketType.ERROR, "location image", errors.toString().trim(), null);
 		return result;
 	}
 
 	private void importEmailImage(final Location location) throws Exception {
 		String html = Strings.urlContent(location.getUrl()).toLowerCase();
 		if (Strings.isEmpty(location.getImage())) {
-			findImage(html, "src=\"([^\"]*)\"", location);
+			this.findImage(html, "src=\"([^\"]*)\"", location);
 			if (Strings.isEmpty(location.getImage()))
-				findImage(html, "url([^)]*)", location);
+				this.findImage(html, "url([^)]*)", location);
 		}
 		if (Strings.isEmpty(location.getEmail()) && html.contains("impressum")) {
 			html = html.substring(0, html.lastIndexOf("impressum"));
@@ -416,7 +414,7 @@ public class ImportLocationsService {
 				}
 				html = Strings.urlContent(html).toLowerCase();
 				final String[] replacement = new String[] { "@", "at", "*at*", "ät" };
-				for (String s : replacement) {
+				for (final String s : replacement) {
 					html = html
 							.replace('[' + s + ']', "@")
 							.replace('{' + s + '}', "@")
@@ -447,7 +445,7 @@ public class ImportLocationsService {
 		}
 	}
 
-	private void findImage(String html, String pattern, Location location) {
+	private void findImage(final String html, final String pattern, final Location location) {
 		final Matcher matcher = Pattern.compile(pattern).matcher(html);
 		int size = 0, last = 0;
 		String urlImage = null;
@@ -459,23 +457,23 @@ public class ImportLocationsService {
 					if (!m.contains("://"))
 						m = location.getUrl() + (location.getUrl().endsWith("/") || m.startsWith("/") ? "" : "/") + m;
 					final BufferedImage img = ImageIO.read(new URI(m).toURL().openStream());
-					if (size < img.getWidth() * img.getHeight() && img.getWidth() > minImageSize
-							&& img.getHeight() > minImageSize) {
+					if (size < img.getWidth() * img.getHeight() && img.getWidth() > this.minImageSize
+							&& img.getHeight() > this.minImageSize) {
 						urlImage = m;
 						size = img.getWidth() * img.getHeight();
 					}
-				} catch (Exception ex) {
+				} catch (final Exception ex) {
 				}
 			}
 		}
 		if (urlImage != null && size > 150000) {
-			location.setImage(Entity.getImage(urlImage, Entity.IMAGE_SIZE, minImageSize));
+			location.setImage(Entity.getImage(urlImage, Entity.IMAGE_SIZE, this.minImageSize));
 			location.setImageList(Entity.getImage(urlImage, Entity.IMAGE_THUMB_SIZE, 0));
 		}
 	}
 
 	Location importLocation(final JsonNode json, final String category) throws Exception {
-		final Location location = json2location(json);
+		final Location location = this.json2location(json);
 		if (category != null)
 			location.setCategory(category);
 		else if (location.getCategory() == null)
@@ -486,21 +484,21 @@ public class ImportLocationsService {
 			String image;
 			if (!json.has("photos"))
 				throw new IllegalArgumentException("no image in json");
-			final String html = externalService.google(
+			final String html = this.externalService.google(
 					"place/photo?maxheight=1200&photoreference="
 							+ json.get("photos").get(0).get("photo_reference").asText())
 					.replace("<A HREF=", "<a href=");
-			final Matcher matcher = href.matcher(html);
+			final Matcher matcher = this.href.matcher(html);
 			if (!matcher.find())
 				throw new IllegalArgumentException("no image in html: " + html);
 			image = matcher.group(1);
-			location.setImage(Entity.getImage(image, Entity.IMAGE_SIZE, minImageSize));
+			location.setImage(Entity.getImage(image, Entity.IMAGE_SIZE, this.minImageSize));
 			if (location.getImage() != null)
 				location.setImageList(Entity.getImage(image, Entity.IMAGE_THUMB_SIZE, 0));
-			repository.save(location);
-		} catch (IllegalArgumentException ex) {
+			this.repository.save(location);
+		} catch (final IllegalArgumentException ex) {
 			if (ex.getMessage().startsWith("location exists: ")) {
-				final Location l = repository.one(Location.class, new BigInteger(ex.getMessage().substring(17)));
+				final Location l = this.repository.one(Location.class, new BigInteger(ex.getMessage().substring(17)));
 				if (!location.getGoogleRating().equals(l.getGoogleRating())
 						|| !location.getGoogleRatingTotal().equals(l.getGoogleRatingTotal())
 						|| !location.getCategory().equals(l.getCategory())
@@ -510,7 +508,7 @@ public class ImportLocationsService {
 					l.setGoogleRatingTotal(location.getGoogleRatingTotal());
 					l.setCategory(location.getCategory());
 					l.setSubcategories(location.getSubcategories());
-					repository.save(l);
+					this.repository.save(l);
 				}
 				throw new IllegalArgumentException("location exists");
 			} else
@@ -523,11 +521,11 @@ public class ImportLocationsService {
 		try {
 			final Location location = new Location();
 			String name = json.get("name").asText();
-			final LocationType type = mapFirstRelevantType(json);
+			final LocationType type = this.mapFirstRelevantType(json);
 			if (type != null) {
 				location.setCategory("" + type.category);
 				location.setSubcategories(
-						type.subCategory == null ? guessSubcategory(type.category, name) : "" + type.subCategory);
+						type.subCategory == null ? this.guessSubcategory(type.category, name) : "" + type.subCategory);
 			}
 			if (name.length() > 100) {
 				name = name.substring(0, 101);
