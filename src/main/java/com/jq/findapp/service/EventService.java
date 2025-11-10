@@ -496,7 +496,7 @@ public class EventService {
 		return 0;
 	}
 
-	private BigInteger importLocation(Location location, String image) throws Exception {
+	public BigInteger importLocation(Location location, String image) throws Exception {
 		if (!Strings.isEmpty(location.getAddress())) {
 			final QueryParams params = new QueryParams(Query.location_listId);
 			params.setSearch("location.name like '" + location.getName().replace("'", "_")
@@ -524,10 +524,6 @@ public class EventService {
 				}
 			}
 		}
-		if (location.getId() != null)
-			return location.getId();
-		throw new RuntimeException(
-				"Name: " + location.getName() + " | URL: " + location.getUrl() + " | Address: " + location.getAddress()
-						+ " | Page: " + externalUrl);
+		return location.getId();
 	}
 }
