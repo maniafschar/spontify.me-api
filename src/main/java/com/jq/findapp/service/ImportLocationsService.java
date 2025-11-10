@@ -358,6 +358,8 @@ public class ImportLocationsService {
 		for (int i = 0; i < list.size(); i++) {
 			final Location location = this.repository.one(Location.class, (BigInteger) list.get(i).get("location.id"));
 			try {
+				this.notificationService.createTicket(TicketType.ERROR, "importLocation",
+						location.getUrl(), null);
 				this.importEmailImage(location);
 				if (Strings.isEmpty(location.getImage()) && Strings.isEmpty(location.getEmail()))
 					errors.append(location.getId() + " " + location.getUrl() + ": no image & email\n\n");
