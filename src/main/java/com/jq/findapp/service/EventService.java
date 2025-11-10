@@ -268,7 +268,7 @@ public class EventService {
 		final CronResult result = new CronResult();
 		try {
 			final BigInteger clientId = BigInteger.ONE;
-			result.body = "Munich: " + this.importMunich.run(this, clientId);
+			result.body = "Munich: ";// + this.importMunich.run(this, clientId);
 		} catch (final Exception e) {
 			result.exception = e;
 		}
