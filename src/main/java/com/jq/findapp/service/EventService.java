@@ -495,4 +495,39 @@ public class EventService {
 		}
 		return 0;
 	}
+
+	private BigInteger importLocation(Location location, String image) throws Exception {
+		if (!Strings.isEmpty(location.getAddress())) {
+			final QueryParams params = new QueryParams(Query.location_listId);
+			params.setSearch("location.name like '" + location.getName().replace("'", "_")
+					+ "' and '" + location.getAddress().toLowerCase().replace('\n', ' ')
+					+ "' like concat('%',LOWER(location.zipCode),'%')");
+			final Result list = repository.list(params);
+			if (list.size() > 0)
+				location = this.repository.one(Location.class, (BigInteger) list.get(0).get("location.id"));
+			else {
+				try {
+					repository.save(location);
+				} catch (final IllegalArgumentException ex) {
+					if (ex.getMessage().contains("location exists"))
+						location = this.repository.one(Location.class, new BigInteger(
+								ex.getMessage().substring(ex.getMessage().indexOf(':') + 1).trim()));
+					else
+						throw ex;
+				}
+			}
+			if (!Strings.isEmpty(image) && Strings.isEmpty(location.getImage())) {
+				location.setImage(Entity.getImage(image, Entity.IMAGE_SIZE, 250));
+				if (location.getImage() != null) {
+					location.setImageList(Entity.getImage(image, Entity.IMAGE_THUMB_SIZE, 0));
+					repository.save(location);
+				}
+			}
+		}
+		if (location.getId() != null)
+			return location.getId();
+		throw new RuntimeException(
+				"Name: " + location.getName() + " | URL: " + location.getUrl() + " | Address: " + location.getAddress()
+						+ " | Page: " + externalUrl);
+	}
 }
