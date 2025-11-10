@@ -23,6 +23,7 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.util.Entity;
 import com.jq.findapp.util.Json;
@@ -344,6 +345,7 @@ public class ImportLocationsService {
 		return false;
 	}
 
+	@Cron
 	public CronResult cron() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
