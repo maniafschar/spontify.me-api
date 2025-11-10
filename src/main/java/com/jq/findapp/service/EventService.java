@@ -42,6 +42,7 @@ import com.jq.findapp.repository.listener.EventListener;
 import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.service.events.ImportMunich;
+import com.jq.findapp.util.Entity;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Score;
 import com.jq.findapp.util.Strings;
