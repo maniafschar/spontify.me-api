@@ -155,7 +155,7 @@ public class Strings {
 		return s.toString();
 	}
 
-	public static String fetchUrlContent(String url) {
+	public static String urlContent(String url) {
 		try {
 			return (String) HttpClient.newBuilder().sslContext(sslContext).build()
 					.send(HttpRequest.newBuilder()
