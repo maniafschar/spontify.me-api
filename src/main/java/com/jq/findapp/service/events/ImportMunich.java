@@ -194,7 +194,12 @@ public class ImportMunich {
 		String image = getField(externalPage ? regexImageExternal : regexImage, page, 2);
 		if (image.length() > 0 && !image.startsWith("http"))
 			image = (externalPage ? externalUrl.substring(0, externalUrl.indexOf("/", 10)) : url) + image;
-		return this.eventService.importLocation(location, image);
+		final BigInteger id = this.eventService.importLocation(location, image);
+		if (id == null)
+			throw new RuntimeException(
+				"Name: " + location.getName() + " | URL: " + location.getUrl() + " | Address: " + location.getAddress()
+						+ " | Page: " + externalUrl);
+		return id;
 	}
 
 	private String getField(final Pattern pattern, final String text, final int group) {
