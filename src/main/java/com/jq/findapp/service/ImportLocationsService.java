@@ -1,8 +1,10 @@
 package com.jq.findapp.service;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 import java.net.URI;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
@@ -11,6 +13,7 @@ import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -345,7 +348,7 @@ public class ImportLocationsService {
 		return false;
 	}
 
-	// @Cron
+	@Cron("50 7")
 	public CronResult cron() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
@@ -460,7 +463,11 @@ public class ImportLocationsService {
 				try {
 					if (!m.contains("://"))
 						m = location.getUrl() + (location.getUrl().endsWith("/") || m.startsWith("/") ? "" : "/") + m;
-					final BufferedImage img = ImageIO.read(new URI(m).toURL().openStream());
+					final URLConnection urlConnection = new URI(m).toURL().openConnection();
+					urlConnection.setReadTimeout(2000);
+					urlConnection.setConnectTimeout(1000);
+					final BufferedImage img = ImageIO
+							.read(new ByteArrayInputStream(IOUtils.toByteArray(urlConnection)));
 					if (size < img.getWidth() * img.getHeight() && img.getWidth() > this.minImageSize
 							&& img.getHeight() > this.minImageSize) {
 						urlImage = m;

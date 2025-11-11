@@ -47,12 +47,12 @@ public class ImportLocationsServiceTest {
 	@Test
 	public void importLocation() throws Exception {
 		// given
-		utils.createContact(BigInteger.ONE);
-		importLocationsService.lookup(48, 11);
+		this.utils.createContact(BigInteger.ONE);
+		this.importLocationsService.lookup(48, 11);
 		BigInteger ticketId = BigInteger.ZERO;
 		while (BigInteger.ZERO.equals(ticketId)) {
 			Thread.sleep(1000);
-			final Result result = repository.list(new QueryParams(Query.misc_listTicket));
+			final Result result = this.repository.list(new QueryParams(Query.misc_listTicket));
 			for (int i = 0; i < result.size(); i++) {
 				final Map<String, Object> m = result.get(i);
 				if (m.get("ticket.type") == TicketType.LOCATION && !"import".equals(m.get("ticket.subject"))
@@ -62,11 +62,11 @@ public class ImportLocationsServiceTest {
 		}
 
 		// when
-		importLocationsService.importLocation(ticketId, "3");
+		this.importLocationsService.importLocation(ticketId, "3");
 
 		// then
-		final Result result = repository.list(new QueryParams(Query.location_listId));
-		final Location location = repository.one(Location.class,
+		final Result result = this.repository.list(new QueryParams(Query.location_listId));
+		final Location location = this.repository.one(Location.class,
 				(BigInteger) result.get(result.size() - 1).get("location.id"));
 		assertNotNull(location.getName());
 		assertNotNull(location.getAddress());
@@ -80,12 +80,12 @@ public class ImportLocationsServiceTest {
 	@Test
 	public void importLocation_json() throws Exception {
 		// given
-		utils.createContact(BigInteger.ONE);
-		final String json = IOUtils.toString(getClass().getResourceAsStream("/json/googleNearByError.json"),
+		this.utils.createContact(BigInteger.ONE);
+		final String json = IOUtils.toString(this.getClass().getResourceAsStream("/json/googleNearByError.json"),
 				StandardCharsets.UTF_8);
 
 		// when
-		final Location location = importLocationsService.importLocation(Json.toNode(json), "2");
+		final Location location = this.importLocationsService.importLocation(Json.toNode(json), "2");
 
 		// then
 		assertNotNull(location);
@@ -94,28 +94,29 @@ public class ImportLocationsServiceTest {
 	@Test
 	public void cron() throws Exception {
 		// given
-		repository.executeUpdate("update Location set url=null");
+		this.repository.executeUpdate("update Location set url=null");
 		final String address = "Wilhelm-Leibl-Straße 22\n81479 München";
 		final Storage storage = new Storage();
 		storage.setLabel("google-address-" + ("geocode/json?address=" + address.replaceAll("\n", ", ")).hashCode());
 		storage.setStorage(
-				IOUtils.toString(getClass().getResourceAsStream("/json/googleResponse.json"), StandardCharsets.UTF_8)
+				IOUtils.toString(this.getClass().getResourceAsStream("/json/googleResponse.json"),
+						StandardCharsets.UTF_8)
 						.replace("Melchiorstraße", "Wilhelm-Leibl-Straße")
 						.replace("\"6\"", "\"22\""));
-		repository.save(storage);
+		this.repository.save(storage);
 		Location location = new Location();
 		location.setName("Teatro");
 		location.setAddress(address);
 		location.setUrl("https://teatro-solln.de/");
-		repository.save(location);
+		this.repository.save(location);
 
 		// when
-		final CronResult result = importLocationsService.cron();
+		final CronResult result = this.importLocationsService.cron();
 
 		// then
 		assertTrue(result.body.contains(" updated"));
 		assertNull(result.exception);
-		location = repository.one(Location.class, location.getId());
+		location = this.repository.one(Location.class, location.getId());
 		assertNotNull(location.getModifiedAt());
 		assertNotNull(location.getImage());
 		assertEquals("info@teatro-solln.de", location.getEmail());
