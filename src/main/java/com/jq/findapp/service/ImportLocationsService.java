@@ -332,7 +332,7 @@ public class ImportLocationsService {
 									return true;
 								} catch (final IllegalArgumentException ex) {
 									if (!ex.getMessage().contains("IMAGE_TOO_SMALL"))
-										this.notificationService.createTicket(TicketType.ERROR, "importImage",
+										this.notificationService.createTicket(TicketType.ERROR, "importLocation.image",
 												Strings.stackTraceToString(ex), null);
 								}
 							}
@@ -361,8 +361,6 @@ public class ImportLocationsService {
 		for (int i = 0; i < list.size(); i++) {
 			final Location location = this.repository.one(Location.class, (BigInteger) list.get(i).get("location.id"));
 			try {
-				this.notificationService.createTicket(TicketType.ERROR, "importLocation",
-						location.getUrl(), null);
 				this.importEmailImage(location);
 				if (Strings.isEmpty(location.getImage()) && Strings.isEmpty(location.getEmail()))
 					errors.append(location.getId() + " " + location.getUrl() + ": no image & email\n\n");
@@ -394,7 +392,7 @@ public class ImportLocationsService {
 				+ (updatedEmail > 0 ? updatedEmail + " updated email\n" : "")
 				+ (exceptions > 0 ? exceptions + " exceptions" : "");
 		if (errors.length() > 0)
-			this.notificationService.createTicket(TicketType.ERROR, "location image", errors.toString().trim(), null);
+			this.notificationService.createTicket(TicketType.ERROR, "importLocation", errors.toString().trim(), null);
 		return result;
 	}
 
