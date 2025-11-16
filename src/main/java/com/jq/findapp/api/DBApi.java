@@ -43,14 +43,14 @@ public class DBApi {
 
 	@GetMapping("one")
 	public Map<String, Object> get(final QueryParams params, @RequestHeader final BigInteger user) throws Exception {
-		params.setUser(repository.one(Contact.class, user));
-		return repository.one(params);
+		params.setUser(this.repository.one(Contact.class, user));
+		return this.repository.one(params);
 	}
 
 	@GetMapping("list")
 	public List<Object[]> list(final QueryParams params, @RequestHeader final BigInteger user) throws Exception {
-		params.setUser(repository.one(Contact.class, user));
-		return repository.list(params).getList();
+		params.setUser(this.repository.one(Contact.class, user));
+		return this.repository.list(params).getList();
 	}
 
 	// TODO rm
@@ -58,8 +58,8 @@ public class DBApi {
 	public void put(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger user) throws Exception {
 		if (entity.getValues().containsKey("contactId"))
 			return;
-		final BaseEntity e = repository.one(entity.getClazz(), entity.getId());
-		if (checkWriteAuthorisation(e, user) && checkClient(user, e)) {
+		final BaseEntity e = this.repository.one(entity.getClazz(), entity.getId());
+		if (this.checkWriteAuthorisation(e, user) && this.checkClient(user, e)) {
 			if (entity.getValues().containsKey("password")) {
 				final String pw = Encryption.decryptBrowser((String) entity.getValues().get("password"));
 				entity.getValues().put("password", Encryption.encryptDB(pw));
@@ -67,7 +67,7 @@ public class DBApi {
 			}
 			Entity.addImageList(entity);
 			e.populate(entity.getValues());
-			repository.save(e);
+			this.repository.save(e);
 		}
 	}
 
@@ -76,8 +76,8 @@ public class DBApi {
 			@RequestHeader final BigInteger user) throws Exception {
 		if (entity.getValues().containsKey("contactId"))
 			return;
-		final BaseEntity e = repository.one(entity.getClazz(), id);
-		if (checkWriteAuthorisation(e, user) && checkClient(user, e)) {
+		final BaseEntity e = this.repository.one(entity.getClazz(), id);
+		if (this.checkWriteAuthorisation(e, user) && this.checkClient(user, e)) {
 			if (entity.getValues().containsKey("password")) {
 				final String pw = Encryption.decryptBrowser((String) entity.getValues().get("password"));
 				entity.getValues().put("password", Encryption.encryptDB(pw));
@@ -85,17 +85,36 @@ public class DBApi {
 			}
 			Entity.addImageList(entity);
 			e.populate(entity.getValues());
-			repository.save(e);
+			this.repository.save(e);
 		}
 	}
 
 	@PostMapping("one")
 	public BigInteger post(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger user,
 			@RequestHeader final BigInteger clientId) throws Exception {
-		final Contact contact = repository.one(Contact.class, user);
+		final Contact contact = this.repository.one(Contact.class, user);
 		if (clientId.equals(contact.getClientId())) {
-			final BaseEntity e = Entity.createEntity(entity, contact);
-			repository.save(e);
+			BaseEntity e = Entity.createEntity(entity, contact);
+			try {
+				this.repository.save(e);
+			} catch (IllegalArgumentException ex) {
+				if (ex.getMessage().startsWith("IMAGE_")) {
+					entity.getValues().remove("image");
+					entity.getValues().remove("imageList");
+					e = Entity.createEntity(entity, contact);
+					try {
+						this.repository.save(e);
+					} catch (final IllegalArgumentException ex2) {
+						ex = ex2;
+					}
+				}
+				if (ex.getMessage().contains("exists")) {
+					final BigInteger id = new BigInteger(
+							ex.getMessage().substring(ex.getMessage().indexOf(':') + 1).trim());
+					this.patch(id, entity, user);
+					return id;
+				}
+			}
 			return e.getId();
 		}
 		throw new IllegalAccessError("clientId mismatch, should be " + contact.getClientId() + " but was " + clientId);
@@ -104,36 +123,36 @@ public class DBApi {
 	// TODO rm
 	@DeleteMapping("one")
 	public void delete(@RequestBody final WriteEntity entity, @RequestHeader final BigInteger user) throws Exception {
-		final BaseEntity e = repository.one(entity.getClazz(), entity.getId());
+		final BaseEntity e = this.repository.one(entity.getClazz(), entity.getId());
 		if (e instanceof Contact)
-			notificationService.createTicket(TicketType.ERROR, "Contact Deletion",
+			this.notificationService.createTicket(TicketType.ERROR, "Contact Deletion",
 					"tried to delete contact " + e.getId(), user);
-		else if (checkWriteAuthorisation(e, user) && checkClient(user, e))
-			repository.delete(e);
+		else if (this.checkWriteAuthorisation(e, user) && this.checkClient(user, e))
+			this.repository.delete(e);
 	}
 
 	@DeleteMapping("one/{id}")
 	public void delete(@PathVariable final BigInteger id, @RequestBody final WriteEntity entity,
 			@RequestHeader final BigInteger user) throws Exception {
-		final BaseEntity e = repository.one(entity.getClazz(), id);
+		final BaseEntity e = this.repository.one(entity.getClazz(), id);
 		if (e instanceof Contact)
-			notificationService.createTicket(TicketType.ERROR, "Contact Deletion",
+			this.notificationService.createTicket(TicketType.ERROR, "Contact Deletion",
 					"tried to delete contact " + e.getId(), user);
-		else if (checkWriteAuthorisation(e, user) && checkClient(user, e))
-			repository.delete(e);
+		else if (this.checkWriteAuthorisation(e, user) && this.checkClient(user, e))
+			this.repository.delete(e);
 	}
 
 	private boolean checkClient(final BigInteger user, final BaseEntity entity) {
 		if (entity instanceof Location)
 			return true;
-		final Contact contact = repository.one(Contact.class, user);
+		final Contact contact = this.repository.one(Contact.class, user);
 		try {
 			final Method clientId = entity.getClass().getMethod("getClientId");
 			return clientId.invoke(entity).equals(contact.getClientId());
 		} catch (final Exception ex) {
 			try {
 				final Method contactId = entity.getClass().getMethod("getContactId");
-				final Contact contact2 = repository.one(Contact.class, (BigInteger) contactId.invoke(entity));
+				final Contact contact2 = this.repository.one(Contact.class, (BigInteger) contactId.invoke(entity));
 				return contact.getClientId().equals(contact2.getClientId());
 			} catch (final Exception ex2) {
 				throw new RuntimeException(ex2);
@@ -144,11 +163,11 @@ public class DBApi {
 	private boolean checkWriteAuthorisation(final BaseEntity e, final BigInteger user) throws Exception {
 		if (e == null)
 			return false;
-		if (repository.one(Contact.class, user).getType() == ContactType.demo)
+		if (this.repository.one(Contact.class, user).getType() == ContactType.demo)
 			return false;
-		if (e.writeAccess(user, repository))
+		if (e.writeAccess(user, this.repository))
 			return true;
-		notificationService.createTicket(TicketType.ERROR, "writeAuthentication",
+		this.notificationService.createTicket(TicketType.ERROR, "writeAuthentication",
 				"Failed for " + user + " on " + e.getClass().getName() + ", id " + e.getId(), user);
 		return false;
 	}
