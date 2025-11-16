@@ -154,6 +154,8 @@ public class AiService {
 	}
 
 	private List<Event> events(final String question, final Contact contact) {
+		if (true)
+			return null;
 		final Result result = this.exists(question, AiType.Event, 7);
 		if (result.size() == 0) {
 			final String answer = this.call(question, this.createSchema(true));
