@@ -39,19 +39,25 @@ abstract class Import {
 	protected String url;
 	protected String urlExternal;
 	protected String path;
-	protected Pattern regexAddress;
-	protected Pattern regexAddressRef;
+
+	protected Pattern regexListStartTag;
+	protected Pattern regexListEndTag;
+	protected Pattern regexLink;
+	protected Pattern regexNextPage;
+
 	protected Pattern regexTitle;
 	protected Pattern regexDesc;
+	protected Pattern regexPrice;
 	protected Pattern regexImage;
+	protected Pattern regexDatetime;
+
+	protected Pattern regexName;
+	protected Pattern regexAddress;
+	protected Pattern regexAddressRef;
+
 	protected Pattern regexAddressExternal;
 	protected Pattern regexAddressRefExternal;
 	protected Pattern regexImageExternal;
-	protected Pattern regexName;
-	protected Pattern regexPrice;
-	protected Pattern regexNextPage;
-	protected Pattern regexLink;
-	protected Pattern regexDatetime;
 
 	private Client client;
 	private EventService eventService;
@@ -79,19 +85,22 @@ abstract class Import {
 
 	private int page(String page) throws Exception {
 		int count = 0;
-		final String tag = "<li class=\"m-listing__list-item\">";
-		if (page.contains(tag))
-			page = page.substring(page.indexOf(tag));
-		while (page.contains(tag)) {
-			final String li = page.substring(0, page.indexOf("</li>"));
-			try {
-				if (this.importNode(li))
-					count++;
-			} catch (final Exception ex) {
-				this.notificationService.createTicket(TicketType.ERROR, "eventImport",
-						Strings.stackTraceToString(ex) + "\n\n" + li, null);
+		Matcher matcher = this.regexListStartTag.matcher(page);
+		while (matcher.find()) {
+			page = page.substring(matcher.start());
+			matcher = this.regexListEndTag.matcher(page);
+			if (matcher.find()) {
+				final String li = page.substring(0, matcher.start());
+				try {
+					if (this.importNode(li))
+						count++;
+				} catch (final Exception ex) {
+					this.notificationService.createTicket(TicketType.ERROR, "eventImport",
+							Strings.stackTraceToString(ex) + "\n\n" + li, null);
+				}
+				page = page.substring(matcher.start() + this.regexListEndTag.pattern().length());
+				matcher = this.regexListStartTag.matcher(page);
 			}
-			page = page.substring(page.indexOf("</li>") + 5);
 		}
 		return count;
 	}
@@ -104,7 +113,7 @@ abstract class Import {
 			event.setUrl((link.startsWith("https://") ? "" : this.url) + link);
 		} else
 			return false;
-		final boolean externalPage = event.getUrl().startsWith(this.urlExternal);
+		final boolean externalPage = this.urlExternal != null && event.getUrl().startsWith(this.urlExternal);
 		if (event.getUrl().startsWith(this.url) || externalPage) {
 			try {
 				final String page = this.eventService.get(event.getUrl());

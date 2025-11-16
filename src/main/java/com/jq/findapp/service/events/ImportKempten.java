@@ -6,14 +6,13 @@ import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ImportMunich extends Import {
-	ImportMunich() {
+public class ImportKempten extends Import {
+	ImportKempten() {
 		this.clientId = BigInteger.ONE;
-		this.url = "https://www.muenchen.de";
-		this.urlExternal = "https://www.muenchenticket.de/";
-		this.path = "/veranstaltungen/event";
+		this.url = "https://www.allgaeu.de";
+		this.path = "/kultur/veranstaltungen";
 
-		this.regexListStartTag = Pattern.compile("<li class=\"m-listing__list-item\">");
+		this.regexListStartTag = Pattern.compile("<li class=\".?listItem");
 		this.regexListEndTag = Pattern.compile("</li>");
 		this.regexLink = Pattern.compile("<a (.*?)href=\"(.*?)\"");
 		this.regexNextPage = Pattern.compile("<li(.*?)m-pagination__item--next-page(.*?)href=\"(.*?)\"");
@@ -27,9 +26,5 @@ public class ImportMunich extends Import {
 		this.regexName = Pattern.compile("itemprop=\"location\"(.*?)</svg>(.*?)</");
 		this.regexAddress = Pattern.compile("itemprop=\"address\"(.*?)</svg>(.*?)</a>");
 		this.regexAddressRef = Pattern.compile("itemprop=\"location\"(.*?)href=\"(.*?)\"");
-
-		this.regexAddressExternal = Pattern.compile("class=\"anfahrt\"(.*?)data-venue=\"(.*?)\"");
-		this.regexAddressRefExternal = Pattern.compile("itemprop=\"location\"(.*?)href=\"(.*?)\"");
-		this.regexImageExternal = Pattern.compile("class=\"show_detail_images\"(.*?) src=\"(.*?)\"");
 	}
 }
