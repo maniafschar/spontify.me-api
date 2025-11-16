@@ -51,7 +51,8 @@ public class ImportSportsBarService {
 		try {
 			final String zipCodePrefix = "" + (LocalDateTime.now().getDayOfYear() % 10);
 			final JsonNode zip = Json
-					.toNode(IOUtils.toString(this.getClass().getResourceAsStream("/json/zip.json"), StandardCharsets.UTF_8));
+					.toNode(IOUtils.toString(this.getClass().getResourceAsStream("/json/zip.json"),
+							StandardCharsets.UTF_8));
 			for (int i = 0; i < zip.size(); i++) {
 				final String s = zip.get(i).get("zip").asText();
 				if (s.startsWith("" + zipCodePrefix)) {
@@ -165,9 +166,9 @@ public class ImportSportsBarService {
 							this.repository.save(location);
 							count++;
 						} catch (final IllegalArgumentException ex) {
-							if (ex.getMessage().startsWith("location exists: ")) {
+							if (ex.getMessage().startsWith("exists:")) {
 								final Location loc = this.repository.one(Location.class,
-										new BigInteger(ex.getMessage().substring(17)));
+										new BigInteger(ex.getMessage().substring(ex.getMessage().indexOf(':') + 1)));
 								if (Strings.isEmpty(loc.getSkills()) || !loc.getSkills().contains("x.1")) {
 									loc.setSkills(Strings.isEmpty(loc.getSkills()) ? "x.1" : loc.getSkills() + "|x.1");
 									this.repository.save(loc);
@@ -262,9 +263,9 @@ public class ImportSportsBarService {
 							imported.add(data.get("number").asText());
 							result.imported++;
 						} catch (final IllegalArgumentException ex) {
-							if (ex.getMessage().startsWith("location exists: ")) {
+							if (ex.getMessage().startsWith("exists:")) {
 								location = this.repository.one(Location.class,
-										new BigInteger(ex.getMessage().substring(17)));
+										new BigInteger(ex.getMessage().substring(ex.getMessage().indexOf(':') + 1)));
 								if (this.updateFields(location, data)) {
 									this.repository.save(location);
 									result.updated++;

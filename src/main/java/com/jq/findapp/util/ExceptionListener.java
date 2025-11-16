@@ -45,8 +45,8 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 	public ResponseEntity<Object> handle(final Exception ex, final WebRequest request) {
 		final HttpStatus statusCode = ex instanceof AuthenticationException ? HttpStatus.UNAUTHORIZED
 				: HttpStatus.INTERNAL_SERVER_ERROR;
-		report(((ServletWebRequest) request).getRequest(), ex, statusCode);
-		return createResponseEntity(
+		this.report(((ServletWebRequest) request).getRequest(), ex, statusCode);
+		return this.createResponseEntity(
 				"{\"msg\":\"" + ex.getMessage().replace("\"", "'").replace("\n", "\\n").replace("\r", "")
 						+ "\",\"class\":\"" + ex.getClass().getSimpleName() + "\",\"time\":\""
 						+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "\"}",
@@ -60,10 +60,10 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 			return;
 		String msg = status + "\n\n" + request.getMethod() + " "
 				+ (request.getHeader("user") == null ? "" : request.getHeader("user") + "@")
-				+ SUBSTITUTE + ":" + request.getRequestURI() + getQueryString(request) + SUBSTITUTE
+				+ SUBSTITUTE + ":" + request.getRequestURI() + this.getQueryString(request) + SUBSTITUTE
 				+ Strings.stackTraceToString(ex);
 		if (msg.indexOf("500 INTERNAL_SERVER_ERROR") == 0 && msg.indexOf(":/support/import/location/") > 0
-				&& (msg.indexOf("ConstraintViolationException") > 0 || msg.indexOf("location exists") > 0))
+				&& (msg.indexOf("ConstraintViolationException") > 0 || msg.startsWith("exists:")))
 			return;
 		final Integer hash = msg.hashCode();
 		synchronized (SENT_ERRORS) {
@@ -75,7 +75,7 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 				new SimpleDateFormat("\n\ndd.MM.yyyy HH:mm:ss\n").format(new Date()));
 		BigInteger userId = null;
 		if (request.getHeader("user") != null && !"0".equals(request.getHeader("user"))) {
-			final Contact user = repository.one(Contact.class, new BigInteger(request.getHeader("user")));
+			final Contact user = this.repository.one(Contact.class, new BigInteger(request.getHeader("user")));
 			if (user == null)
 				s.append("\nUSER\nid: " + request.getHeader("user") + " NOT FOUND");
 			else {
@@ -113,9 +113,9 @@ public class ExceptionListener extends ResponseEntityExceptionHandler {
 			return;
 		msg = msg.replaceFirst(SUBSTITUTE, "" + request.getServerPort()).replaceFirst(SUBSTITUTE, s.toString());
 		try {
-			notificationService.createTicket(TicketType.ERROR, "uncaught exception", msg, userId);
+			this.notificationService.createTicket(TicketType.ERROR, "uncaught exception", msg, userId);
 		} catch (final Exception e1) {
-			notificationService.createTicket(TicketType.ERROR, "uncaught exception, error on creating report",
+			this.notificationService.createTicket(TicketType.ERROR, "uncaught exception, error on creating report",
 					msg + "\n\n\n" + Strings.stackTraceToString(e1), userId);
 		}
 	}

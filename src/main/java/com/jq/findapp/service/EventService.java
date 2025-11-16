@@ -514,7 +514,7 @@ public class EventService {
 				try {
 					this.repository.save(location);
 				} catch (final IllegalArgumentException ex) {
-					if (ex.getMessage().contains("location exists"))
+					if (ex.getMessage().startsWith("exists:"))
 						location = this.repository.one(Location.class, new BigInteger(
 								ex.getMessage().substring(ex.getMessage().indexOf(':') + 1).trim()));
 					else

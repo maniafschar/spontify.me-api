@@ -88,8 +88,10 @@ public class AppTest {
 			this.addLocation("location 1", "Melchiorstr. 9\n81479 München", false);
 			this.addEvent();
 			this.addRating();
-			this.addLocation("location 1", "Melchiorstr. 9\n81479 München", true);
 			this.addFriend();
+			this.logoff();
+			this.register("testabcd2", "test2@jq-consulting.de");
+			this.addLocation("location 1", "Melchiorstr. 9\n81479 München", true);
 		} catch (final Exception ex) {
 			ex.printStackTrace();
 			Util.sleep(600000000);
@@ -130,12 +132,19 @@ public class AppTest {
 		Util.click("dialog-popup button-text");
 	}
 
+	private void logoff() {
+		Util.click("dialog-navigation item.home");
+		Util.click("buttonicon.right");
+		Util.click("tab[onclick*=\"2\"]");
+		Util.click("button-text[onclick*=\"logoff\"]");
+	}
+
 	private void addLocation(final String name, final String address, final boolean duplicate) {
 		Util.click("dialog-navigation item.events");
 		Util.click("dialog-menu a[onclick*=\"pageEvent.edit\"]");
 		Util.sleep(600);
 		Util.click("dialog-popup button-text[onclick*=\"pageLocation.edit\"]");
-		Util.sendKeys("dialog-popup input[name=\"name\"]", name);
+		Util.sendKeys("dialog-popup input[name=\"name\"]", name + (duplicate ? "_2" : ""));
 		Util.get("dialog-popup textarea[name=\"address\"]").clear();
 		Util.sendKeys("dialog-popup textarea[name=\"address\"]", address);
 		Util.click("dialog-popup dialogButtons button-text[onclick*=\"pageLocation.save\"]");

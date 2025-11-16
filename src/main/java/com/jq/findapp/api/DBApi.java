@@ -108,7 +108,7 @@ public class DBApi {
 						ex = ex2;
 					}
 				}
-				if (ex.getMessage().contains("exists")) {
+				if (ex.getMessage().startsWith("exists:")) {
 					final BigInteger id = new BigInteger(
 							ex.getMessage().substring(ex.getMessage().indexOf(':') + 1).trim());
 					this.patch(id, entity, user);
@@ -169,6 +169,6 @@ public class DBApi {
 			return true;
 		this.notificationService.createTicket(TicketType.ERROR, "writeAuthentication",
 				"Failed for " + user + " on " + e.getClass().getName() + ", id " + e.getId(), user);
-		return false;
+		throw new IllegalAccessException("no write access");
 	}
 }

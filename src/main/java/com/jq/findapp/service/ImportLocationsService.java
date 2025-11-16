@@ -243,7 +243,7 @@ public class ImportLocationsService {
 							if (location != null && (ex.getMessage() == null
 									|| (!ex.getMessage().contains("NO_IMAGE")
 											&& !ex.getMessage().contains("invalid address")
-											&& !ex.getMessage().contains("location exists")
+											&& !ex.getMessage().startsWith("exists:")
 											&& !Strings.stackTraceToString(ex).toLowerCase()
 													.contains("duplicate entry")))) {
 								this.notificationService.createTicket(TicketType.LOCATION,
@@ -498,8 +498,9 @@ public class ImportLocationsService {
 			Entity.addImage(location, image);
 			this.repository.save(location);
 		} catch (final IllegalArgumentException ex) {
-			if (ex.getMessage().startsWith("location exists: ")) {
-				final Location l = this.repository.one(Location.class, new BigInteger(ex.getMessage().substring(17)));
+			if (ex.getMessage().startsWith("exists:")) {
+				final Location l = this.repository.one(Location.class,
+						new BigInteger(ex.getMessage().substring(ex.getMessage().indexOf(':') + 1)));
 				if (!location.getGoogleRating().equals(l.getGoogleRating())
 						|| !location.getGoogleRatingTotal().equals(l.getGoogleRatingTotal())
 						|| !location.getCategory().equals(l.getCategory())
@@ -511,7 +512,7 @@ public class ImportLocationsService {
 					l.setSubcategories(location.getSubcategories());
 					this.repository.save(l);
 				}
-				throw new IllegalArgumentException("location exists");
+				throw new IllegalArgumentException("exists");
 			} else
 				throw ex;
 		}

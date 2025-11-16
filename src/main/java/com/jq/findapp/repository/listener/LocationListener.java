@@ -51,7 +51,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		final Result list = this.repository.list(params);
 		for (int i = 0; i < list.size(); i++) {
 			if (this.isNameMatch((String) list.get(i).get("location.name"), location.getName(), true))
-				throw new IllegalArgumentException("location exists: " + list.get(i).get("location.id"));
+				throw new IllegalArgumentException("exists:" + list.get(i).get("location.id"));
 		}
 	}
 
@@ -92,7 +92,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 					+ (location.getLatitude() - roundingFactor));
 			final Result list = this.repository.list(params);
 			if (list.size() > 0)
-				throw new IllegalArgumentException("location exists: " + list.get(0).get("location.id"));
+				throw new IllegalArgumentException("exists:" + list.get(0).get("location.id"));
 		}
 	}
 

@@ -28,23 +28,23 @@ public class LocationListenerTest {
 	@Test
 	public void save_errorDuplicateLatLng() throws Exception {
 		// given
-		utils.createContact(BigInteger.ONE);
+		this.utils.createContact(BigInteger.ONE);
 		try {
-			repository.save(createLocation());
-		} catch (IllegalArgumentException ex) {
+			this.repository.save(this.createLocation());
+		} catch (final IllegalArgumentException ex) {
 		}
-		final Location location = createLocation();
+		final Location location = this.createLocation();
 		location.setLongitude(location.getLongitude() + 0.0001f);
 		location.setLatitude(location.getLatitude() + 0.0002f);
 
 		// when
 		try {
-			repository.save(location);
+			this.repository.save(location);
 			throw new RuntimeException("IllegalArgumentException expected");
-		} catch (IllegalArgumentException ex) {
+		} catch (final IllegalArgumentException ex) {
 
 			// then exact exception
-			if (!ex.getMessage().startsWith("location exists: "))
+			if (!ex.getMessage().startsWith("exists:"))
 				throw new RuntimeException("wrong exception message: " + ex.getMessage());
 		}
 	}
@@ -52,24 +52,24 @@ public class LocationListenerTest {
 	@Test
 	public void save_errorDuplicateNameLongVersion() throws Exception {
 		// given
-		utils.createContact(BigInteger.ONE);
+		this.utils.createContact(BigInteger.ONE);
 		try {
-			repository.save(createLocation());
-		} catch (IllegalArgumentException ex) {
+			this.repository.save(this.createLocation());
+		} catch (final IllegalArgumentException ex) {
 		}
-		final Location location = createLocation();
+		final Location location = this.createLocation();
 		location.setName(location.getName().substring(0, location.getName().lastIndexOf(" ")));
 		location.setLongitude(location.getLongitude() + 12f);
 		location.setLatitude(location.getLatitude() + 5f);
 
 		// when
 		try {
-			repository.save(location);
+			this.repository.save(location);
 			throw new RuntimeException("IllegalArgumentException expected");
-		} catch (IllegalArgumentException ex) {
+		} catch (final IllegalArgumentException ex) {
 
 			// then exact exception
-			if (!ex.getMessage().startsWith("location exists: "))
+			if (!ex.getMessage().startsWith("exists:"))
 				throw new RuntimeException("wrong exception message: " + ex.getMessage());
 		}
 	}
@@ -77,24 +77,24 @@ public class LocationListenerTest {
 	@Test
 	public void save_errorDuplicateNameShortVersion() throws Exception {
 		// given
-		utils.createContact(BigInteger.ONE);
+		this.utils.createContact(BigInteger.ONE);
 		try {
-			repository.save(createLocation());
-		} catch (IllegalArgumentException ex) {
+			this.repository.save(this.createLocation());
+		} catch (final IllegalArgumentException ex) {
 		}
-		final Location location = createLocation();
+		final Location location = this.createLocation();
 		location.setName("Insert");
 		location.setLongitude(location.getLongitude() + 12f);
 		location.setLatitude(location.getLatitude() + 5f);
 
 		// when
 		try {
-			repository.save(location);
+			this.repository.save(location);
 			throw new RuntimeException("IllegalArgumentException expected");
-		} catch (IllegalArgumentException ex) {
+		} catch (final IllegalArgumentException ex) {
 
 			// then exact exception
-			if (!ex.getMessage().startsWith("location exists: "))
+			if (!ex.getMessage().startsWith("exists:"))
 				throw new RuntimeException("wrong exception message: " + ex.getMessage());
 		}
 	}
@@ -102,24 +102,24 @@ public class LocationListenerTest {
 	@Test
 	public void save_errorDuplicateNameDifferentOrder() throws Exception {
 		// given
-		utils.createContact(BigInteger.ONE);
+		this.utils.createContact(BigInteger.ONE);
 		try {
-			repository.save(createLocation());
-		} catch (IllegalArgumentException ex) {
+			this.repository.save(this.createLocation());
+		} catch (final IllegalArgumentException ex) {
 		}
-		final Location location = createLocation();
+		final Location location = this.createLocation();
 		location.setName("Update Inser th");
 		location.setLongitude(location.getLongitude() + 12f);
 		location.setLatitude(location.getLatitude() + 5f);
 
 		// when
 		try {
-			repository.save(location);
+			this.repository.save(location);
 			throw new RuntimeException("IllegalArgumentException expected");
-		} catch (IllegalArgumentException ex) {
+		} catch (final IllegalArgumentException ex) {
 
 			// then exact exception
-			if (!ex.getMessage().startsWith("location exists: "))
+			if (!ex.getMessage().startsWith("exists:"))
 				throw new RuntimeException("wrong exception message: " + ex.getMessage());
 		}
 	}
@@ -127,18 +127,18 @@ public class LocationListenerTest {
 	@Test
 	public void save_almostDuplicateNameShortVersion() throws Exception {
 		// given
-		utils.createContact(BigInteger.ONE);
+		this.utils.createContact(BigInteger.ONE);
 		try {
-			repository.save(createLocation());
-		} catch (IllegalArgumentException ex) {
+			this.repository.save(this.createLocation());
+		} catch (final IllegalArgumentException ex) {
 		}
-		final Location location = createLocation();
+		final Location location = this.createLocation();
 		location.setName("Inser");
 		location.setLongitude(location.getLongitude() + 12f);
 		location.setLatitude(location.getLatitude() + 5f);
 
 		// when
-		repository.save(location);
+		this.repository.save(location);
 
 		// then no exception
 	}
@@ -146,18 +146,18 @@ public class LocationListenerTest {
 	@Test
 	public void save_nearby() throws Exception {
 		// given
-		utils.createContact(BigInteger.ONE);
+		this.utils.createContact(BigInteger.ONE);
 		try {
-			repository.save(createLocation());
-		} catch (IllegalArgumentException ex) {
+			this.repository.save(this.createLocation());
+		} catch (final IllegalArgumentException ex) {
 		}
-		final Location location = createLocation();
+		final Location location = this.createLocation();
 		location.setName("abc");
 		location.setLongitude(location.getLongitude() + 0.01f);
 		location.setLatitude(location.getLatitude() - 0.01f);
 
 		// when
-		repository.save(location);
+		this.repository.save(location);
 
 		// then no exception
 	}

@@ -42,14 +42,14 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	public void prePersist(final Event event) {
 		if (event.getRepetition() == null)
 			event.setRepetition(Repetition.Once);
-		preUpdate(event);
+		this.preUpdate(event);
 		if (event.getRepetition() == Repetition.Games && !Strings.isEmpty(event.getSkills())) {
 			final QueryParams params = new QueryParams(Query.event_listId);
 			params.setSearch("event.contactId=" + event.getContactId()
 					+ " and event.skills='" + event.getSkills()
 					+ "' and event.repetition='" + Repetition.Games.name()
 					+ "' and event.startDate>cast('" + Instant.now() + "' as timestamp)");
-			final Result events = repository.list(params);
+			final Result events = this.repository.list(params);
 			if (events.size() > 0) {
 				long max = Long.MAX_VALUE;
 				Object id = null;
@@ -59,9 +59,9 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 						id = events.get(i).get("event.id");
 					}
 				}
-				throw new IllegalArgumentException("event series exists: " + id);
+				throw new IllegalArgumentException("exists:" + id);
 			}
-			final List<FutureEvent> futureEvents = matchDayService
+			final List<FutureEvent> futureEvents = this.matchDayService
 					.futureEvents(Integer.valueOf(event.getSkills().substring(2)));
 			if (!futureEvents.isEmpty()) {
 				final FutureEvent futureEvent = futureEvents.get(0);
@@ -75,25 +75,26 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	@Override
 	public void preUpdate(final Event event) {
 		if (event.getRepetition() == Repetition.Once)
-			event.setEndDate(getDate(event.getStartDate()));
+			event.setEndDate(this.getDate(event.getStartDate()));
 	}
 
 	@Override
 	public void postPersist(final Event event) {
 		if (event.getType() != EventType.Poll &&
-				!repository.one(Client.class, repository.one(Contact.class, event.getContactId()).getClientId())
+				!this.repository
+						.one(Client.class, this.repository.one(Contact.class, event.getContactId()).getClientId())
 						.getAdminId().equals(event.getContactId())) {
 			final EventParticipate eventParticipate = new EventParticipate();
 			eventParticipate.setState(1);
 			eventParticipate.setContactId(event.getContactId());
 			eventParticipate.setEventId(event.getId());
-			eventParticipate.setEventDate(getDate(event.getStartDate()));
-			repository.save(eventParticipate);
+			eventParticipate.setEventDate(this.getDate(event.getStartDate()));
+			this.repository.save(eventParticipate);
 		}
-		eventService.updateSeries(event);
+		this.eventService.updateSeries(event);
 	}
 
-	private Date getDate(Timestamp timestamp) {
+	private Date getDate(final Timestamp timestamp) {
 		if (timestamp == null)
 			return null;
 		final Instant instant = timestamp.toInstant();
@@ -107,9 +108,9 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 			params.setSearch(
 					"eventParticipate.eventId=" + event.getId() + " and eventParticipate.eventDate>=cast('"
 							+ Instant.now().minus((Duration.ofDays(1))) + "' as timestamp)");
-			final Result result = repository.list(params);
+			final Result result = this.repository.list(params);
 			for (int i = 0; i < result.size(); i++) {
-				final EventParticipate eventParticipate = repository.one(EventParticipate.class,
+				final EventParticipate eventParticipate = this.repository.one(EventParticipate.class,
 						(BigInteger) result.get(i).get("eventParticipate.id"));
 				if (event.old("startDate") != null) {
 					if (event.getRepetition() == Repetition.Once || event.getRepetition() == Repetition.Games)
@@ -118,16 +119,16 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 					else
 						eventParticipate
 								.setEventDate(new java.sql.Date(
-										eventService.getRealDate(event).toEpochMilli()));
-					repository.save(eventParticipate);
+										this.eventService.getRealDate(event).toEpochMilli()));
+					this.repository.save(eventParticipate);
 				}
 				if (eventParticipate.getState() == 1 && !eventParticipate.getContactId().equals(event.getContactId())) {
 					final Instant time = new Timestamp(eventParticipate.getEventDate().getTime()).toInstant();
 					if (time.isAfter(Instant.now())) {
 						final ZonedDateTime t = event.getStartDate().toInstant().atZone(ZoneOffset.UTC);
-						final Contact contactTo = repository.one(Contact.class, eventParticipate.getContactId());
-						final Contact contactFrom = repository.one(Contact.class, event.getContactId());
-						notificationService.sendNotification(contactFrom, contactTo,
+						final Contact contactTo = this.repository.one(Contact.class, eventParticipate.getContactId());
+						final Contact contactFrom = this.repository.one(Contact.class, event.getContactId());
+						this.notificationService.sendNotification(contactFrom, contactTo,
 								TextId.notification_eventChanged,
 								Strings.encodeParam("e=" + event.getId() + "_" + eventParticipate.getEventDate()),
 								Strings.formatDate(null,
@@ -135,14 +136,14 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 												.toEpochMilli()),
 										contactTo.getTimezone()),
 								event.getDescription(),
-								repository.one(Location.class, event.getLocationId()).getName());
+								this.repository.one(Location.class, event.getLocationId()).getName());
 					}
 				}
 			}
 		}
 		if (event.getRepetition() == Repetition.Games && !Strings.isEmpty(event.getSkills())
 				&& event.getSkills().startsWith("9.") && event.getSkills().contains("X"))
-			repository.executeUpdate("update Event event set event.skills='" + event.getSkills()
+			this.repository.executeUpdate("update Event event set event.skills='" + event.getSkills()
 					+ "' where event.locationId=" + event.getLocationId()
 					+ " and event.contactId=" + event.getContactId()
 					+ " and event.skills='" + event.getSkills().replace("X", "").replace("|", "") + "'");
@@ -152,29 +153,29 @@ public class EventListener extends AbstractRepositoryListener<Event> {
 	public void postRemove(final Event event) {
 		final QueryParams params = new QueryParams(Query.event_listParticipateRaw);
 		params.setSearch("eventParticipate.eventId=" + event.getId());
-		final Result result = repository.list(params);
+		final Result result = this.repository.list(params);
 		if (result.size() > 0 && event.getPrice() != null && event.getPrice() > 0)
 			throw new RuntimeException("Paid events with participants cannot be deleted");
 		for (int i = 0; i < result.size(); i++) {
-			final EventParticipate eventParticipate = repository.one(EventParticipate.class,
+			final EventParticipate eventParticipate = this.repository.one(EventParticipate.class,
 					(BigInteger) result.get(i).get("eventParticipate.id"));
 			if (eventParticipate.getState() == 1 && !eventParticipate.getContactId().equals(event.getContactId())) {
 				final Instant time = new Timestamp(eventParticipate.getEventDate().getTime()).toInstant();
 				if (time.isAfter(Instant.now())) {
 					final ZonedDateTime t = event.getStartDate().toInstant().atZone(ZoneOffset.UTC);
-					final Contact contactTo = repository.one(Contact.class, eventParticipate.getContactId());
-					final Contact contactFrom = repository.one(Contact.class, eventParticipate.getContactId());
-					notificationService.sendNotification(contactFrom, contactTo,
+					final Contact contactTo = this.repository.one(Contact.class, eventParticipate.getContactId());
+					final Contact contactFrom = this.repository.one(Contact.class, eventParticipate.getContactId());
+					this.notificationService.sendNotification(contactFrom, contactTo,
 							TextId.notification_eventDelete,
 							Strings.encodeParam("p=" + contactFrom.getId()),
 							Strings.formatDate(null,
 									new Date(time.plusSeconds((t.getHour() * 60 + t.getMinute()) * 60).toEpochMilli()),
 									contactTo.getTimezone()),
 							event.getDescription(),
-							repository.one(Location.class, event.getLocationId()).getName());
+							this.repository.one(Location.class, event.getLocationId()).getName());
 				}
 			}
-			repository.delete(eventParticipate);
+			this.repository.delete(eventParticipate);
 		}
 	}
 }

@@ -121,7 +121,7 @@ public class EventListenerTest {
 		} catch (final IllegalArgumentException ex) {
 
 			// then exact exception
-			if (!ex.getMessage().startsWith("event series exists: "))
+			if (!ex.getMessage().startsWith("exists:"))
 				throw new RuntimeException("wrong exception message: " + ex.getMessage());
 		}
 	}

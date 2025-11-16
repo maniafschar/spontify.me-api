@@ -137,8 +137,8 @@ public class AiService {
 				ai.setNote(location.getId().toString());
 				locationIds.add(location.getId());
 			} catch (final IllegalArgumentException ex) {
-				if (ex.getMessage().startsWith("location exists: ")) {
-					final BigInteger id = new BigInteger(ex.getMessage().substring(17));
+				if (ex.getMessage().startsWith("exists:")) {
+					final BigInteger id = new BigInteger(ex.getMessage().substring(ex.getMessage().indexOf(":") + 1));
 					locationIds.add(id);
 					ai.setNote(id.toString());
 				} else
