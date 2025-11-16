@@ -55,7 +55,7 @@ public class EventServiceTest {
 		params.setSearch("event.startDate=cast('2024-06-28 09:00:00' as timestamp)");
 
 		// when
-		final int result = this.importMunich.run(this.eventService, BigInteger.ONE);
+		final int result = this.importMunich.run(this.eventService);
 
 		// then
 		assertEquals(27, result);

@@ -20,7 +20,7 @@ import com.jq.findapp.repository.Repository.Attachment;
 
 public class Entity {
 	public static final int IMAGE_SIZE = 800;
-	public static final int IMAGE_THUMB_SIZE = 100;
+	public static final int IMAGE_THUMB_SIZE = 180;
 
 	public static void addImageList(final WriteEntity entity) throws IOException {
 		if (entity.getValues() != null && entity.getValues().containsKey("image")) {
@@ -33,6 +33,17 @@ public class Entity {
 			} catch (final NoSuchMethodException e) {
 				// entity does not have imageList, no need to add it
 			}
+		}
+	}
+
+	public static void addImage(final BaseEntity entity, final String url) {
+		try {
+			entity.getClass().getDeclaredMethod("setImage", String.class)
+					.invoke(entity, Entity.getImage(url, Entity.IMAGE_SIZE, 0));
+			entity.getClass().getDeclaredMethod("setImageList", String.class).invoke(entity,
+					Entity.getImage(url, Entity.IMAGE_THUMB_SIZE, 0));
+		} catch (final Exception e) {
+			throw new IllegalArgumentException(e);
 		}
 	}
 
@@ -88,7 +99,7 @@ public class Entity {
 					"IMAGE_CONVERT_NULL " + data.length + " bytes: " + url);
 		if (minimum == 0)
 			minimum = Math.min(400, size);
-		if (img.getWidth() > minimum && img.getHeight() > minimum) {
+		if (img.getWidth() > minimum || img.getHeight() > minimum) {
 			byte[] b = null;
 			try {
 				b = scaleImage(data, size);

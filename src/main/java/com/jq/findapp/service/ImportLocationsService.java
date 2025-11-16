@@ -45,8 +45,6 @@ public class ImportLocationsService {
 	@Autowired
 	private Repository repository;
 
-	private final int minImageSize = 350;
-
 	/*
 	 * 0 shopping
 	 * 1 culture
@@ -325,9 +323,7 @@ public class ImportLocationsService {
 							if (matcher.find()) {
 								final String image = matcher.group(1);
 								try {
-									location.setImage(Entity.getImage(image, Entity.IMAGE_SIZE, this.minImageSize));
-									location.setImageList(
-											Entity.getImage(image, Entity.IMAGE_THUMB_SIZE, 0));
+									Entity.addImage(location, image);
 									this.repository.save(location);
 									return true;
 								} catch (final IllegalArgumentException ex) {
@@ -466,8 +462,8 @@ public class ImportLocationsService {
 					urlConnection.setConnectTimeout(1000);
 					final BufferedImage img = ImageIO
 							.read(new ByteArrayInputStream(IOUtils.toByteArray(urlConnection)));
-					if (size < img.getWidth() * img.getHeight() && img.getWidth() > this.minImageSize
-							&& img.getHeight() > this.minImageSize) {
+					if (size < img.getWidth() * img.getHeight() && (img.getWidth() >= Entity.IMAGE_SIZE
+							|| img.getHeight() > Entity.IMAGE_SIZE)) {
 						urlImage = m;
 						size = img.getWidth() * img.getHeight();
 					}
@@ -475,10 +471,8 @@ public class ImportLocationsService {
 				}
 			}
 		}
-		if (urlImage != null && size > 150000) {
-			location.setImage(Entity.getImage(urlImage, Entity.IMAGE_SIZE, this.minImageSize));
-			location.setImageList(Entity.getImage(urlImage, Entity.IMAGE_THUMB_SIZE, 0));
-		}
+		if (urlImage != null && size > 150000)
+			Entity.addImage(location, urlImage);
 	}
 
 	Location importLocation(final JsonNode json, final String category) throws Exception {
@@ -501,9 +495,7 @@ public class ImportLocationsService {
 			if (!matcher.find())
 				throw new IllegalArgumentException("no image in html: " + html);
 			image = matcher.group(1);
-			location.setImage(Entity.getImage(image, Entity.IMAGE_SIZE, this.minImageSize));
-			if (location.getImage() != null)
-				location.setImageList(Entity.getImage(image, Entity.IMAGE_THUMB_SIZE, 0));
+			Entity.addImage(location, image);
 			this.repository.save(location);
 		} catch (final IllegalArgumentException ex) {
 			if (ex.getMessage().startsWith("location exists: ")) {

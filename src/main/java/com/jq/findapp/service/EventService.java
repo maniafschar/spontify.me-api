@@ -267,8 +267,7 @@ public class EventService {
 	public CronResult cronImport() {
 		final CronResult result = new CronResult();
 		try {
-			final BigInteger clientId = BigInteger.ONE;
-			result.body = "Munich: ";// + this.importMunich.run(this, clientId);
+			result.body = "Munich: " + this.importMunich.run(this);
 		} catch (final Exception e) {
 			result.exception = e;
 		}
@@ -497,18 +496,18 @@ public class EventService {
 		return 0;
 	}
 
-	public BigInteger importLocation(Location location, String image) throws Exception {
+	public BigInteger importLocation(Location location, final String image) throws Exception {
 		if (!Strings.isEmpty(location.getAddress())) {
 			final QueryParams params = new QueryParams(Query.location_listId);
 			params.setSearch("location.name like '" + location.getName().replace("'", "_")
 					+ "' and '" + location.getAddress().toLowerCase().replace('\n', ' ')
 					+ "' like concat('%',LOWER(location.zipCode),'%')");
-			final Result list = repository.list(params);
+			final Result list = this.repository.list(params);
 			if (list.size() > 0)
 				location = this.repository.one(Location.class, (BigInteger) list.get(0).get("location.id"));
 			else {
 				try {
-					repository.save(location);
+					this.repository.save(location);
 				} catch (final IllegalArgumentException ex) {
 					if (ex.getMessage().contains("location exists"))
 						location = this.repository.one(Location.class, new BigInteger(
@@ -518,10 +517,11 @@ public class EventService {
 				}
 			}
 			if (!Strings.isEmpty(image) && Strings.isEmpty(location.getImage())) {
-				location.setImage(Entity.getImage(image, Entity.IMAGE_SIZE, 250));
-				if (location.getImage() != null) {
-					location.setImageList(Entity.getImage(image, Entity.IMAGE_THUMB_SIZE, 0));
-					repository.save(location);
+				try {
+					Entity.addImage(location, image);
+					this.repository.save(location);
+				} catch (final IllegalArgumentException ex) {
+					// save location wihtout image
 				}
 			}
 		}

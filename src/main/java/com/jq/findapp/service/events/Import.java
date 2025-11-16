@@ -1,0 +1,196 @@
+package com.jq.findapp.service.events;
+
+import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.jq.findapp.entity.Client;
+import com.jq.findapp.entity.Event;
+import com.jq.findapp.entity.Event.EventType;
+import com.jq.findapp.entity.Location;
+import com.jq.findapp.entity.Ticket.TicketType;
+import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.QueryParams;
+import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.EventService;
+import com.jq.findapp.service.NotificationService;
+import com.jq.findapp.util.Entity;
+import com.jq.findapp.util.Strings;
+
+@Component
+abstract class Import {
+	@Autowired
+	private Repository repository;
+
+	@Autowired
+	private NotificationService notificationService;
+
+	protected BigInteger clientId;
+	protected String url;
+	protected String urlExternal;
+	protected String path;
+	protected Pattern regexAddress;
+	protected Pattern regexAddressRef;
+	protected Pattern regexTitle;
+	protected Pattern regexDesc;
+	protected Pattern regexImage;
+	protected Pattern regexAddressExternal;
+	protected Pattern regexAddressRefExternal;
+	protected Pattern regexImageExternal;
+	protected Pattern regexName;
+	protected Pattern regexPrice;
+	protected Pattern regexNextPage;
+	protected Pattern regexLink;
+	protected Pattern regexDatetime;
+
+	private Client client;
+	private EventService eventService;
+	private final Set<String> failed = new HashSet<>();
+
+	public int run(final EventService eventService) throws Exception {
+		this.eventService = eventService;
+		this.client = this.repository.one(Client.class, this.clientId);
+		String page = eventService.get(this.url + this.path);
+		int count = this.page(page);
+		while (true) {
+			final Matcher m = this.regexNextPage.matcher(page);
+			if (m.find()) {
+				page = eventService.get(this.url + this.path + m.group(3).replace("&amp;", "&"));
+				count += this.page(page);
+			} else
+				break;
+		}
+		if (this.failed.size() > 0)
+			this.notificationService.createTicket(TicketType.ERROR, "ImportEventMunich",
+					this.failed.size() + " errors:\n" + this.failed.stream().sorted().collect(Collectors.joining("\n")),
+					this.clientId);
+		return count;
+	}
+
+	private int page(String page) throws Exception {
+		int count = 0;
+		final String tag = "<li class=\"m-listing__list-item\">";
+		if (page.contains(tag))
+			page = page.substring(page.indexOf(tag));
+		while (page.contains(tag)) {
+			final String li = page.substring(0, page.indexOf("</li>"));
+			try {
+				if (this.importNode(li))
+					count++;
+			} catch (final Exception ex) {
+				this.notificationService.createTicket(TicketType.ERROR, "eventImport",
+						Strings.stackTraceToString(ex) + "\n\n" + li, null);
+			}
+			page = page.substring(page.indexOf("</li>") + 5);
+		}
+		return count;
+	}
+
+	private boolean importNode(final String li) throws Exception {
+		final Event event = new Event();
+		Matcher m = this.regexLink.matcher(li);
+		if (m.find()) {
+			final String link = m.group(2);
+			event.setUrl((link.startsWith("https://") ? "" : this.url) + link);
+		} else
+			return false;
+		final boolean externalPage = event.getUrl().startsWith(this.urlExternal);
+		if (event.getUrl().startsWith(this.url) || externalPage) {
+			try {
+				final String page = this.eventService.get(event.getUrl());
+				event.setLocationId(this.importLocation(page, externalPage, event.getUrl()));
+				m = this.regexDatetime.matcher(li);
+				for (int i = 0; i < 3; i++)
+					m.find();
+				final Date date = new SimpleDateFormat("dd.MM.yyyy' - 'HH:mm").parse(m.group(2));
+				event.setStartDate(new Timestamp(date.getTime()));
+				event.setEndDate(new java.sql.Date(date.getTime()));
+				final QueryParams params = new QueryParams(Query.event_listId);
+				params.setSearch("event.startDate=cast('"
+						+ event.getStartDate().toInstant().toString().substring(0, 19)
+						+ "' as timestamp) and event.locationId=" + event.getLocationId() + " and event.contactId="
+						+ this.client.getAdminId());
+				if (this.repository.list(params).size() == 0) {
+					if (externalPage) {
+						m = this.regexPrice.matcher(page);
+						if (m.find())
+							event.setPrice(Double.valueOf(m.group(1).replace(".", "").replace(",", "")) / 100);
+					} else {
+						final String image = this.getField(this.regexImage, page, 2);
+						if (image.length() > 0)
+							Entity.addImage(event, this.url + image);
+					}
+					event.setDescription(this.getField(this.regexDesc, page, 1));
+					m = this.regexTitle.matcher(li);
+					if (m.find())
+						event.setDescription(m.group(3) + "\n" + event.getDescription());
+					event.setDescription(Strings.sanitize(event.getDescription(), 1000));
+					event.setContactId(this.client.getAdminId());
+					event.setType(EventType.Location);
+					this.repository.save(event);
+					return true;
+				}
+			} catch (final RuntimeException ex) {
+				// if unable to access event, then ignore and continue, otherwise re-throw
+				if (ex instanceof IllegalArgumentException)
+					this.failed.add(ex.getMessage().replace("\n", "\n  "));
+				else if (!ex.getMessage().contains(event.getUrl()))
+					this.failed.add(ex.getClass().getName() + ": " + ex.getMessage().replace("\n", "\n  "));
+			}
+		} else
+			this.failed.add("event: " + event.getUrl());
+		return false;
+	}
+
+	private BigInteger importLocation(String page, final boolean externalPage, final String externalUrl)
+			throws Exception {
+		final Location location = new Location();
+		if (externalPage) {
+			location.setUrl(this.getField(this.regexAddressRefExternal, page, 2));
+			if (!location.getUrl().startsWith("https://"))
+				location.setUrl(externalUrl + location.getUrl());
+			final String[] s = this.getField(this.regexAddressExternal, page, 2).split(",");
+			location.setAddress(
+					(s.length > 1 ? s[s.length - 2].trim() + "\n" : "") + s[s.length - 1].trim().replace('+', ' '));
+			location.setName(s[0].trim() + (s.length > 3 ? ", " + s[1].trim() : ""));
+		} else {
+			location.setName(this.getField(this.regexName, page, 2));
+			location.setUrl(this.getField(this.regexAddressRef, page, 2));
+			if (!Strings.isEmpty(location.getUrl())) {
+				if (!location.getUrl().startsWith("https://"))
+					location.setUrl(this.url + location.getUrl());
+				page = this.eventService.get(location.getUrl());
+				location.setAddress(String.join("\n",
+						Arrays.asList(this.getField(this.regexAddress, page, 2)
+								.split(",")).stream().map(e -> e.trim()).toList()));
+				location.setDescription(Strings.sanitize(this.getField(this.regexDesc, page, 1), 1000));
+			}
+		}
+		location.setContactId(this.client.getAdminId());
+		String image = this.getField(externalPage ? this.regexImageExternal : this.regexImage, page, 2);
+		if (image.length() > 0 && !image.startsWith("http"))
+			image = (externalPage ? externalUrl.substring(0, externalUrl.indexOf("/", 10)) : this.url) + image;
+		final BigInteger id = this.eventService.importLocation(location, image);
+		if (id == null)
+			throw new RuntimeException(
+					"Name: " + location.getName() + " | URL: " + location.getUrl() + " | Address: "
+							+ location.getAddress()
+							+ " | Page: " + externalUrl);
+		return id;
+	}
+
+	private String getField(final Pattern pattern, final String text, final int group) {
+		final Matcher m = pattern.matcher(text);
+		return m.find() ? m.group(group).trim() : "";
+	}
+}

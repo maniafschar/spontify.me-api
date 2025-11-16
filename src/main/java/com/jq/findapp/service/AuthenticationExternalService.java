@@ -31,22 +31,22 @@ public class AuthenticationExternalService {
 	}
 
 	public Contact register(final ExternalRegistration registration) throws Exception {
-		Contact contact = findById(registration);
+		Contact contact = this.findById(registration);
 		if (contact == null)
-			contact = findByEmail(registration);
-		return contact == null ? registerInternal(registration) : contact;
+			contact = this.findByEmail(registration);
+		return contact == null ? this.registerInternal(registration) : contact;
 	}
 
 	private Contact findById(final ExternalRegistration registration) throws Exception {
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact." + registration.getFrom().name().toLowerCase() + "Id='"
 				+ registration.getUser().get("id") + "' and contact.clientId=" + registration.getClientId());
-		final Map<String, Object> contact = repository.one(params);
+		final Map<String, Object> contact = this.repository.one(params);
 		if (contact != null) {
-			final Contact c = repository.one(Contact.class, new BigInteger(contact.get("contact.id").toString()));
+			final Contact c = this.repository.one(Contact.class, new BigInteger(contact.get("contact.id").toString()));
 			if (registration.getFrom() == From.Facebook) {
-				fillFacebookData(registration.getUser(), c);
-				repository.save(c);
+				this.fillFacebookData(registration.getUser(), c);
+				this.repository.save(c);
 			}
 			return c;
 		}
@@ -57,7 +57,7 @@ public class AuthenticationExternalService {
 		if (registration.getUser().get("email") != null)
 			registration.getUser().put("email", Encryption.decryptBrowser(registration.getUser().get("email")));
 		if (registration.getUser().get("email") == null || !registration.getUser().get("email").contains("@")) {
-			final Client client = repository.one(Client.class, registration.getClientId());
+			final Client client = this.repository.one(Client.class, registration.getClientId());
 			registration.getUser().put("email",
 					registration.getUser().get("id") + '.' + registration.getFrom().name().toLowerCase()
 							+ client.getEmail().substring(client.getEmail().indexOf('@')));
@@ -65,14 +65,14 @@ public class AuthenticationExternalService {
 		final QueryParams params = new QueryParams(Query.contact_listId);
 		params.setSearch("contact.email='" + registration.getUser().get("email") + "' and contact.clientId="
 				+ registration.getClientId());
-		final Map<String, Object> contact = repository.one(params);
+		final Map<String, Object> contact = this.repository.one(params);
 		if (contact != null) {
-			final Contact c = repository.one(Contact.class, new BigInteger(contact.get("contact.id").toString()));
+			final Contact c = this.repository.one(Contact.class, new BigInteger(contact.get("contact.id").toString()));
 			if (registration.getFrom() == From.Facebook)
-				fillFacebookData(registration.getUser(), c);
+				this.fillFacebookData(registration.getUser(), c);
 			else
 				c.setAppleId(registration.getUser().get("id"));
-			repository.save(c);
+			this.repository.save(c);
 			return c;
 		}
 		return null;
@@ -88,10 +88,10 @@ public class AuthenticationExternalService {
 		if ("".equals(c.getPseudonym()))
 			c.setPseudonym("Lucky Luke");
 		if (registration.getFrom() == From.Facebook)
-			fillFacebookData(registration.getUser(), c);
+			this.fillFacebookData(registration.getUser(), c);
 		else
 			c.setAppleId(registration.getUser().get("id"));
-		authenticationService.saveRegistration(c, registration);
+		this.authenticationService.saveRegistration(c, registration);
 		return c;
 	}
 
@@ -103,10 +103,7 @@ public class AuthenticationExternalService {
 		if (contact.getImage() == null && facebookData.containsKey("picture")
 				&& facebookData.get("picture") != null && facebookData.get("picture").startsWith("http")) {
 			try {
-				contact.setImage(Entity.getImage(facebookData.get("picture"), Entity.IMAGE_SIZE, 0));
-				if (contact.getImage() != null)
-					contact.setImageList(
-							Entity.getImage(facebookData.get("picture"), Entity.IMAGE_THUMB_SIZE, 0));
+				Entity.addImage(contact, facebookData.get("picture"));
 			} catch (final Exception ex) {
 				// no pic for now, continue registration/login
 			}
