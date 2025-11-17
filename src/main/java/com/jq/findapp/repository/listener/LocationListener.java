@@ -50,7 +50,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 						+ "'");
 		final Result list = this.repository.list(params);
 		for (int i = 0; i < list.size(); i++) {
-			if (this.isNameMatch((String) list.get(i).get("location.name"), location.getName(), true))
+			if (this.isNameMatch((String) list.get(i).get("location.name"), location.getName()))
 				throw new IllegalArgumentException("exists:" + list.get(i).get("location.id"));
 		}
 	}
@@ -80,9 +80,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 			final float roundingFactor = 0.0005f;
 			final QueryParams params = new QueryParams(Query.location_listId);
 			params.setSearch((location.getId() == null ? "" : "location.id<>" + location.getId() + " and ") +
-					"LOWER(location.name) like '%"
-					+ location.getName().toLowerCase().replace("'", "_").replace(" ", "%")
-					+ "%' and location.longitude<"
+					+ "location.longitude<"
 					+ (location.getLongitude() + roundingFactor)
 					+ " and location.longitude>"
 					+ (location.getLongitude() - roundingFactor)
@@ -91,8 +89,10 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 					+ " and location.latitude>"
 					+ (location.getLatitude() - roundingFactor));
 			final Result list = this.repository.list(params);
-			if (list.size() > 0)
-				throw new IllegalArgumentException("exists:" + list.get(0).get("location.id"));
+			for (int i = 0; i < list.size(); i++) {
+				if (isNameMatch((String) list.get(i).get("location.name"), location.getName()))
+					throw new IllegalArgumentException("exists:" + list.get(i).get("location.id"));
+			}
 		}
 	}
 
@@ -134,6 +134,10 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 				s += '\n' + n.get(i).get("long_name").asText();
 		}
 		location.setAddress2(s.trim());
+	}
+
+	private boolean isNameMatch(final String name1, final String name2) {
+		return isNameMatch(name1, name2, true);
 	}
 
 	private boolean isNameMatch(String name1, String name2, final boolean tryReverse) {
