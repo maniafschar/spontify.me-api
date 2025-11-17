@@ -1,5 +1,6 @@
 package com.jq.findapp.entity;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -105,6 +106,8 @@ public abstract class BaseEntity {
 				values.put("imageList", Attachment.createImage(".jpg", b));
 			} catch (final NoSuchMethodException e) {
 				// entity does not have imageList, no need to add it
+			} catch (final IOException e) {
+				throw new RuntimeException(e);
 			}
 		}
 		final BaseEntity ref = Json.toObject(values, this.getClass());
