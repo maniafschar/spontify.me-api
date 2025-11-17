@@ -94,6 +94,17 @@ public abstract class BaseEntity {
 
 	@Transient
 	public void populate(final Map<String, Object> values) {
+		if (values != null && values.containsKey("image")) {
+			try {
+				this.getClass().getDeclaredMethod("getImageList");
+				final String data = (String) values.get("image");
+				final byte[] b = Entity.scaleImage(Base64.getDecoder().decode(
+						data.substring(data.indexOf('\u0015') + 1)), Entity.IMAGE_THUMB_SIZE);
+				values.put("imageList", Attachment.createImage(".jpg", b));
+			} catch (final NoSuchMethodException e) {
+				// entity does not have imageList, no need to add it
+			}
+		}
 		final BaseEntity ref = Json.toObject(values, this.getClass());
 		values.forEach((name, value) -> {
 			if (!"id".equals(name) && !"createdAt".equals(name) && !"modifiedAt".equals(name)) {
