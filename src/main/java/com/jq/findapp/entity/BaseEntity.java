@@ -59,7 +59,7 @@ public abstract class BaseEntity {
 	}
 
 	@Transient
-	public boolean modified() {
+	public final boolean modified() {
 		if (this.old == null)
 			return true;
 		for (final Field field : this.getClass().getDeclaredFields()) {
@@ -78,7 +78,7 @@ public abstract class BaseEntity {
 	}
 
 	@Transient
-	public void historize() {
+	public final void historize() {
 		if (this.id == null)
 			return;
 		if (this.old == null)
@@ -96,7 +96,7 @@ public abstract class BaseEntity {
 	}
 
 	@Transient
-	public void populate(final Map<String, Object> values) {
+	public final void populate(final Map<String, Object> values) {
 		if (values.containsKey("image")) {
 			try {
 				this.getClass().getDeclaredMethod("getImageList");
@@ -128,7 +128,7 @@ public abstract class BaseEntity {
 	}
 
 	@Transient
-	public Object old(final String name) {
+	public final Object old(final String name) {
 		if (this.old == null)
 			return null;
 		final Object valueOld = this.old.get(name);
