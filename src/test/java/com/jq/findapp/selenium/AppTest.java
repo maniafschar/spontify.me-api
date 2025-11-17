@@ -91,7 +91,7 @@ public class AppTest {
 			this.addFriend();
 			this.logoff();
 			this.register("testabcd2", "test2@jq-consulting.de");
-			this.addLocation("location 1", "Melchiorstr. 9\n81479 München", true);
+			this.addLocation("location 2", "Melchiorstr. 9\n81479 München", true);
 		} catch (final Exception ex) {
 			ex.printStackTrace();
 			Util.sleep(600000000);
@@ -144,7 +144,7 @@ public class AppTest {
 		Util.click("dialog-menu a[onclick*=\"pageEvent.edit\"]");
 		Util.sleep(600);
 		Util.click("dialog-popup button-text[onclick*=\"pageLocation.edit\"]");
-		Util.sendKeys("dialog-popup input[name=\"name\"]", name + (duplicate ? "_2" : ""));
+		Util.sendKeys("dialog-popup input[name=\"name\"]", name);
 		Util.get("dialog-popup textarea[name=\"address\"]").clear();
 		Util.sendKeys("dialog-popup textarea[name=\"address\"]", address);
 		Util.click("dialog-popup dialogButtons button-text[onclick*=\"pageLocation.save\"]");
