@@ -43,7 +43,7 @@ public class Location extends BaseEntity {
 	private Timestamp updatedAt;
 
 	public BigInteger getContactId() {
-		return contactId;
+		return this.contactId;
 	}
 
 	public void setContactId(final BigInteger contactId) {
@@ -51,7 +51,7 @@ public class Location extends BaseEntity {
 	}
 
 	public String getCategory() {
-		return category;
+		return this.category;
 	}
 
 	public void setCategory(final String category) {
@@ -59,7 +59,7 @@ public class Location extends BaseEntity {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(final String name) {
@@ -67,7 +67,7 @@ public class Location extends BaseEntity {
 	}
 
 	public String getAddress() {
-		return address;
+		return this.address;
 	}
 
 	public void setAddress(final String address) {
@@ -75,7 +75,7 @@ public class Location extends BaseEntity {
 	}
 
 	public String getAddress2() {
-		return address2;
+		return this.address2;
 	}
 
 	public void setAddress2(final String address2) {
@@ -83,7 +83,7 @@ public class Location extends BaseEntity {
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public void setDescription(final String description) {
@@ -91,7 +91,7 @@ public class Location extends BaseEntity {
 	}
 
 	public String getImage() {
-		return image;
+		return this.image;
 	}
 
 	public void setImage(final String image) {
@@ -99,7 +99,7 @@ public class Location extends BaseEntity {
 	}
 
 	public String getImageList() {
-		return imageList;
+		return this.imageList;
 	}
 
 	public void setImageList(final String imageList) {
@@ -107,7 +107,7 @@ public class Location extends BaseEntity {
 	}
 
 	public String getUrl() {
-		return url;
+		return this.url;
 	}
 
 	public void setUrl(final String url) {
@@ -115,7 +115,7 @@ public class Location extends BaseEntity {
 	}
 
 	public String getZipCode() {
-		return zipCode;
+		return this.zipCode;
 	}
 
 	public void setZipCode(final String zipCode) {
@@ -123,7 +123,7 @@ public class Location extends BaseEntity {
 	}
 
 	public String getTown() {
-		return town;
+		return this.town;
 	}
 
 	public void setTown(final String town) {
@@ -131,7 +131,7 @@ public class Location extends BaseEntity {
 	}
 
 	public String getSecret() {
-		return secret;
+		return this.secret;
 	}
 
 	public void setSecret(final String secret) {
@@ -139,7 +139,7 @@ public class Location extends BaseEntity {
 	}
 
 	public String getStreet() {
-		return street;
+		return this.street;
 	}
 
 	public void setStreet(final String street) {
@@ -147,7 +147,7 @@ public class Location extends BaseEntity {
 	}
 
 	public String getNumber() {
-		return number;
+		return this.number;
 	}
 
 	public void setNumber(final String number) {
@@ -155,7 +155,7 @@ public class Location extends BaseEntity {
 	}
 
 	public String getCountry() {
-		return country;
+		return this.country;
 	}
 
 	public void setCountry(final String country) {
@@ -163,7 +163,7 @@ public class Location extends BaseEntity {
 	}
 
 	public String getEmail() {
-		return email;
+		return this.email;
 	}
 
 	public void setEmail(final String email) {
@@ -171,7 +171,7 @@ public class Location extends BaseEntity {
 	}
 
 	public String getMarketingMail() {
-		return marketingMail;
+		return this.marketingMail;
 	}
 
 	public void setMarketingMail(final String marketingMail) {
@@ -179,7 +179,7 @@ public class Location extends BaseEntity {
 	}
 
 	public String getTelephone() {
-		return telephone;
+		return this.telephone;
 	}
 
 	public void setTelephone(final String telephone) {
@@ -187,7 +187,7 @@ public class Location extends BaseEntity {
 	}
 
 	public Short getRating() {
-		return rating;
+		return this.rating;
 	}
 
 	public void setRating(final Short rating) {
@@ -195,7 +195,7 @@ public class Location extends BaseEntity {
 	}
 
 	public String getSubcategories() {
-		return subcategories;
+		return this.subcategories;
 	}
 
 	public void setSubcategories(final String subcategories) {
@@ -203,7 +203,7 @@ public class Location extends BaseEntity {
 	}
 
 	public String getSkills() {
-		return skills;
+		return this.skills;
 	}
 
 	public void setSkills(final String skills) {
@@ -211,7 +211,7 @@ public class Location extends BaseEntity {
 	}
 
 	public String getSkillsText() {
-		return skillsText;
+		return this.skillsText;
 	}
 
 	public void setSkillsText(final String skillsText) {
@@ -227,15 +227,15 @@ public class Location extends BaseEntity {
 	}
 
 	public Float getLatitude() {
-		return latitude;
+		return this.latitude;
 	}
 
 	public Float getLongitude() {
-		return longitude;
+		return this.longitude;
 	}
 
 	public Float getGoogleRating() {
-		return googleRating;
+		return this.googleRating;
 	}
 
 	public void setGoogleRating(final Float googleRating) {
@@ -243,7 +243,7 @@ public class Location extends BaseEntity {
 	}
 
 	public Integer getGoogleRatingTotal() {
-		return googleRatingTotal;
+		return this.googleRatingTotal;
 	}
 
 	public void setGoogleRatingTotal(final Integer googleRatingTotal) {
@@ -251,7 +251,7 @@ public class Location extends BaseEntity {
 	}
 
 	public Timestamp getUpdatedAt() {
-		return updatedAt;
+		return this.updatedAt;
 	}
 
 	public void setUpdatedAt(final Timestamp updatedAt) {
@@ -261,7 +261,7 @@ public class Location extends BaseEntity {
 	@Transient
 	@Override
 	public boolean writeAccess(final BigInteger user, final Repository repository) {
-		if (user.equals(getContactId()))
+		if (user.equals(this.getContactId()))
 			return true;
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setSearch("location.contactId=" + user);

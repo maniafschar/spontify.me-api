@@ -109,8 +109,13 @@ public class DBApi {
 				if (ex.getMessage().startsWith("exists:")) {
 					final BigInteger id = new BigInteger(
 							ex.getMessage().substring(ex.getMessage().indexOf(':') + 1).trim());
-					this.patch(id, entity, user);
-					return id;
+					entity.getValues().remove("contactId");
+					try {
+						this.patch(id, entity, user);
+						return id;
+					} catch (final IllegalAccessException ex2) {
+						throw ex;
+					}
 				}
 			}
 			return e.getId();
@@ -166,7 +171,8 @@ public class DBApi {
 		if (e.writeAccess(user, this.repository))
 			return true;
 		this.notificationService.createTicket(TicketType.ERROR, "writeAuthentication",
-				"Failed for " + user + " on " + e.getClass().getName() + ", id " + e.getId(), user);
-		throw new IllegalAccessException("no write access");
+				"Failed on " + e.getClass().getName() + ", id " + e.getId(), user);
+		throw new IllegalAccessException(
+				"no write access for " + e.getClass().getSimpleName() + ", id " + e.getId() + ", user " + user);
 	}
 }
