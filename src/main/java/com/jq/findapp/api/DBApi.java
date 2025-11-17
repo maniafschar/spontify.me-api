@@ -65,7 +65,6 @@ public class DBApi {
 				entity.getValues().put("password", Encryption.encryptDB(pw));
 				entity.getValues().put("passwordReset", BigInteger.valueOf(System.currentTimeMillis()));
 			}
-			Entity.addImageList(entity);
 			e.populate(entity.getValues());
 			this.repository.save(e);
 		}
@@ -83,7 +82,6 @@ public class DBApi {
 				entity.getValues().put("password", Encryption.encryptDB(pw));
 				entity.getValues().put("passwordReset", BigInteger.valueOf(System.currentTimeMillis()));
 			}
-			Entity.addImageList(entity);
 			e.populate(entity.getValues());
 			this.repository.save(e);
 		}
