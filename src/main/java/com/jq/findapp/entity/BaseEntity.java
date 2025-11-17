@@ -11,6 +11,7 @@ import java.util.Objects;
 
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.util.Entity;
 import com.jq.findapp.util.Json;
 
 import jakarta.persistence.GeneratedValue;
