@@ -36,10 +36,10 @@ public class ClientNewsListenerTest {
 	@Test
 	public void save() throws Exception {
 		// given
-		final Contact contact = utils.createContact(BigInteger.ONE);
+		final Contact contact = this.utils.createContact(BigInteger.ONE);
 		contact.setSkills("3.12|9.157|9.162");
 		contact.setNotification("news");
-		repository.save(contact);
+		this.repository.save(contact);
 		final ClientNews news = new ClientNews();
 		news.setClientId(contact.getClientId());
 		news.setDescription("abc");
@@ -47,7 +47,7 @@ public class ClientNewsListenerTest {
 		news.setPublish(new Timestamp(System.currentTimeMillis()));
 
 		// when
-		final boolean saved = repository.save(news);
+		final boolean saved = this.repository.save(news);
 
 		// then
 		assertTrue(saved);
@@ -55,7 +55,7 @@ public class ClientNewsListenerTest {
 		params.setUser(contact);
 		params.setSearch("contactNotification.contactId=" + contact.getId());
 		Result result;
-		while ((result = repository.list(params)).size() == 0)
+		while ((result = this.repository.list(params)).size() == 0)
 			Thread.sleep(500);
 		assertEquals(1, result.size());
 	}

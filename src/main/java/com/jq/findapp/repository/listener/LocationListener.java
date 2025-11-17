@@ -79,7 +79,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		if (location.getLongitude() != null) {
 			final float roundingFactor = 0.0005f;
 			final QueryParams params = new QueryParams(Query.location_listId);
-			params.setSearch((location.getId() == null ? "" : "location.id<>" + location.getId() + " and ") +
+			params.setSearch((location.getId() == null ? "" : "location.id<>" + location.getId() + " and ")
 					+ "location.longitude<"
 					+ (location.getLongitude() + roundingFactor)
 					+ " and location.longitude>"
@@ -90,7 +90,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 					+ (location.getLatitude() - roundingFactor));
 			final Result list = this.repository.list(params);
 			for (int i = 0; i < list.size(); i++) {
-				if (isNameMatch((String) list.get(i).get("location.name"), location.getName()))
+				if (this.isNameMatch((String) list.get(i).get("location.name"), location.getName()))
 					throw new IllegalArgumentException("exists:" + list.get(i).get("location.id"));
 			}
 		}
@@ -137,7 +137,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 	}
 
 	private boolean isNameMatch(final String name1, final String name2) {
-		return isNameMatch(name1, name2, true);
+		return this.isNameMatch(name1, name2, true);
 	}
 
 	private boolean isNameMatch(String name1, String name2, final boolean tryReverse) {

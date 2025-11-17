@@ -143,7 +143,7 @@ public class EventListenerTest {
 
 		// then
 		final JsonNode storage = Json
-				.toNode(Attachment.resolve(this.repository.one(Contact.class, BigInteger.ONE).getStorage()));
+				.toNode(Attachment.resolve(this.repository.one(Contact.class, event.getContactId()).getStorage()));
 		assertTrue(storage.has("eventSeries"), storage.toPrettyString());
 		assertEquals(3, storage.get("eventSeries").size());
 	}

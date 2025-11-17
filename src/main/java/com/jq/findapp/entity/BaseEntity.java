@@ -65,9 +65,9 @@ public abstract class BaseEntity {
 		for (final Field field : this.getClass().getDeclaredFields()) {
 			try {
 				final Field f = this.getClass().getDeclaredField(field.getName());
-				if ((f.getModifiers() & Modifier.TRANSIENT) != 0) {
+				if ((f.getModifiers() & Modifier.TRANSIENT) == 0) {
 					f.setAccessible(true);
-					if (!Objects.equals(this.old(field.getName()), f.get(this)))
+					if (!Objects.equals(this.old.get(field.getName()), f.get(this)))
 						return true;
 				}
 			} catch (final Exception e) {
@@ -85,7 +85,7 @@ public abstract class BaseEntity {
 			this.old = new HashMap<>();
 		for (final Field field : this.getClass().getDeclaredFields()) {
 			try {
-				if ((field.getModifiers() & Modifier.TRANSIENT) != 0) {
+				if ((field.getModifiers() & Modifier.TRANSIENT) == 0) {
 					field.setAccessible(true);
 					this.old.put(field.getName(), field.get(this));
 				}
