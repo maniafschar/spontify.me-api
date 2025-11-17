@@ -2,6 +2,7 @@ package com.jq.findapp.entity;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -60,12 +61,10 @@ public abstract class BaseEntity {
 			return true;
 		for (final Field field : this.getClass().getDeclaredFields()) {
 			try {
-				if (this.old(field.getName()) != null)
-					return true;
-				if (this.old.get(field.getName()) == null) {
-					final Field fieldActual = this.getClass().getDeclaredField(field.getName());
-					fieldActual.setAccessible(true);
-					if (fieldActual.get(this) != null)
+				final Field f = this.getClass().getDeclaredField(field.getName());
+				if ((f.getModifiers() & Modifier.TRANSIENT) != 0) {
+					f.setAccessible(true);
+					if (!Objects.equals(this.old(field.getName()), f.get(this)))
 						return true;
 				}
 			} catch (final Exception e) {
@@ -83,9 +82,10 @@ public abstract class BaseEntity {
 			this.old = new HashMap<>();
 		for (final Field field : this.getClass().getDeclaredFields()) {
 			try {
-				field.setAccessible(true);
-				if (!this.old.containsKey(field.getName()))
+				if ((field.getModifiers() & Modifier.TRANSIENT) != 0) {
+					field.setAccessible(true);
 					this.old.put(field.getName(), field.get(this));
+				}
 			} catch (final Exception e) {
 				throw new RuntimeException("Failed to historize on " + field.getName(), e);
 			}
@@ -94,7 +94,7 @@ public abstract class BaseEntity {
 
 	@Transient
 	public void populate(final Map<String, Object> values) {
-		if (values != null && values.containsKey("image")) {
+		if (values.containsKey("image")) {
 			try {
 				this.getClass().getDeclaredMethod("getImageList");
 				final String data = (String) values.get("image");
@@ -111,17 +111,10 @@ public abstract class BaseEntity {
 				try {
 					final Method m = this.getClass()
 							.getDeclaredMethod("get" + name.substring(0, 1).toUpperCase() + name.substring(1));
-					final Object valueOld = m.invoke(this), valueNew = m.invoke(ref);
-					if (!Objects.equals(valueOld, valueNew)) {
-						if (this.old != null)
-							this.old.put(name, valueOld);
-						if (value instanceof String && ((String) value).contains("<"))
-							value = ((String) value).replace("<", "&lt;");
-						this.getClass()
-								.getDeclaredMethod("set" + name.substring(0, 1).toUpperCase() + name.substring(1),
-										m.getReturnType())
-								.invoke(this, valueNew);
-					}
+					this.getClass()
+							.getDeclaredMethod("set" + name.substring(0, 1).toUpperCase() + name.substring(1),
+									m.getReturnType())
+							.invoke(this, m.invoke(ref));
 				} catch (final Exception ex) {
 					throw new RuntimeException("Failed on " + name + ", value " + value, ex);
 				}
@@ -133,15 +126,13 @@ public abstract class BaseEntity {
 	public Object old(final String name) {
 		if (this.old == null)
 			return null;
-		final Object value = this.old.get(name);
-		if (value == null)
+		final Object valueOld = this.old.get(name);
+		if (valueOld == null)
 			return null;
 		try {
 			final Field field = this.getClass().getDeclaredField(name);
 			field.setAccessible(true);
-			final Object compare = field.get(this);
-			return value.equals(compare)
-					|| value instanceof String && Attachment.resolve((String) value).equals(compare) ? null : value;
+			return Objects.equals(field.get(this), valueOld) ? null : valueOld;
 		} catch (final Exception ex) {
 			throw new RuntimeException("Failed to read " + name, ex);
 		}
