@@ -22,20 +22,6 @@ public class Entity {
 	public static final int IMAGE_SIZE = 800;
 	public static final int IMAGE_THUMB_SIZE = 180;
 
-	public static void addImageList(final WriteEntity entity) throws IOException {
-		if (entity.getValues() != null && entity.getValues().containsKey("image")) {
-			try {
-				entity.getClazz().getDeclaredMethod("getImageList");
-				final String data = (String) entity.getValues().get("image");
-				final byte[] b = scaleImage(Base64.getDecoder().decode(
-						data.substring(data.indexOf('\u0015') + 1)), IMAGE_THUMB_SIZE);
-				entity.getValues().put("imageList", Attachment.createImage(".jpg", b));
-			} catch (final NoSuchMethodException e) {
-				// entity does not have imageList, no need to add it
-			}
-		}
-	}
-
 	public static void addImage(final BaseEntity entity, final String url) {
 		try {
 			entity.getClass().getDeclaredMethod("setImage", String.class)
@@ -47,7 +33,7 @@ public class Entity {
 		}
 	}
 
-	private static byte[] scaleImage(final byte[] data, final int size) throws IOException {
+	public static byte[] scaleImage(final byte[] data, final int size) throws IOException {
 		final BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(data));
 		int width = originalImage.getWidth();
 		int height = originalImage.getHeight();
@@ -130,7 +116,6 @@ public class Entity {
 		} catch (final NoSuchMethodException ex) {
 			// no need to handle
 		}
-		addImageList(entity);
 		e.populate(entity.getValues());
 		return e;
 	}
