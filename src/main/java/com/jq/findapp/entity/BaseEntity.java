@@ -63,7 +63,7 @@ public abstract class BaseEntity {
 	public final boolean modified() {
 		if (this.old == null)
 			return true;
-		final Iterator i = this.old.keySet().iterator();
+		final Iterator<String> i = this.old.keySet().iterator();
 		while (i.hasNext()) {
 			if (this.old(i.next()) != null)
 				return true;
