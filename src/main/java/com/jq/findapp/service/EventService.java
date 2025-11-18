@@ -267,7 +267,7 @@ public class EventService {
 	public CronResult cron() {
 		final CronResult result = new CronResult();
 		try {
-			result.body = importService.run(this);
+			result.body = importService.run();
 		} catch (final Exception e) {
 			result.exception = e;
 		}
@@ -420,15 +420,6 @@ public class EventService {
 		return s.length();
 	}
 
-	public String get(final String url) {
-		return Strings.urlContent(url)
-				.replace('\n', ' ')
-				.replace('\r', ' ')
-				.replace('\u0013', ' ')
-				.replace('\u001c', ' ')
-				.replace('\u001e', ' ');
-	}
-
 	public int updateSeries(final Event event) {
 		if (event.getRepetition() == Repetition.Games && !Strings.isEmpty(event.getSkills())
 				&& event.getSkills().startsWith("9.") && event.getLocationId() != null
@@ -494,37 +485,5 @@ public class EventService {
 			return count;
 		}
 		return 0;
-	}
-
-	public BigInteger importLocation(Location location, final String image) throws Exception {
-		if (!Strings.isEmpty(location.getAddress())) {
-			final QueryParams params = new QueryParams(Query.location_listId);
-			params.setSearch("location.name like '" + location.getName().replace("'", "_")
-					+ "' and '" + location.getAddress().toLowerCase().replace('\n', ' ')
-					+ "' like concat('%',LOWER(location.zipCode),'%')");
-			final Result list = this.repository.list(params);
-			if (list.size() > 0)
-				location = this.repository.one(Location.class, (BigInteger) list.get(0).get("location.id"));
-			else {
-				try {
-					this.repository.save(location);
-				} catch (final IllegalArgumentException ex) {
-					if (ex.getMessage().startsWith("exists:"))
-						location = this.repository.one(Location.class, new BigInteger(
-								ex.getMessage().substring(ex.getMessage().indexOf(':') + 1).trim()));
-					else
-						throw ex;
-				}
-			}
-			if (!Strings.isEmpty(image) && Strings.isEmpty(location.getImage())) {
-				try {
-					Entity.addImage(location, image);
-					this.repository.save(location);
-				} catch (final IllegalArgumentException ex) {
-					// save location wihtout image
-				}
-			}
-		}
-		return location.getId();
 	}
 }
