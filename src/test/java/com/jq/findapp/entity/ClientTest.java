@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
@@ -42,6 +43,21 @@ public class ClientTest {
 		assertFalse(modified);
 		assertNull(client.old("email"));
 		assertNull(client.old("storage"));
+	}
+
+	@Test
+	public void modified_old() throws Exception {
+		// given
+		final Client client = create();
+		final Field field = client.getClass().getDeclaredField("old");
+		field.setAccessible(true);
+		final Map<String, Object> old = (Map<>) field.get(client);
+
+		// when
+		final boolean modified = old.containsKey("old");
+
+		// then
+		assertFalse(modified);
 	}
 
 	private Client create() {
