@@ -264,7 +264,7 @@ public class EventService {
 	}
 	
 	@Cron("40 5")
-	public CronResult cron() {
+	public CronResult cronImport() {
 		final CronResult result = new CronResult();
 		try {
 			result.body = importService.run();
