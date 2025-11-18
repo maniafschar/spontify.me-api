@@ -41,8 +41,7 @@ import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.repository.listener.EventListener;
 import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
-import com.jq.findapp.service.events.ImportKempten;
-import com.jq.findapp.service.events.ImportMunich;
+import com.jq.findapp.service.events.ImportService;
 import com.jq.findapp.util.Entity;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Score;
@@ -62,13 +61,10 @@ public class EventService {
 	private ExternalService externalService;
 
 	@Autowired
+	private ImportService importService;
+
+	@Autowired
 	private Text text;
-
-	@Autowired
-	private ImportMunich importMunich;
-
-	@Autowired
-	private ImportKempten importKempten;
 
 	@Autowired
 	private MatchDayService matchDayService;
@@ -266,13 +262,12 @@ public class EventService {
 				+ date + "' as date) and eventParticipate.state=1");
 		return this.repository.list(params).size() >= event.getMaxParticipants().intValue();
 	}
-
+	
 	@Cron("40 5")
-	public CronResult cronImport() {
+	public CronResult cron() {
 		final CronResult result = new CronResult();
 		try {
-			result.body = "M: " + this.importMunich.run(this);
-			result.body += "\nKE: " + this.importKempten.run(this);
+			result.body = importService.run();
 		} catch (final Exception e) {
 			result.exception = e;
 		}
