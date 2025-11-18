@@ -41,7 +41,7 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
-import com.jq.findapp.service.EventService;
+import com.jq.findapp.service.event.Import;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.MatchDayService;
 import com.jq.findapp.service.NotificationService.MailCreateor;
@@ -136,7 +136,7 @@ public class TestConfig {
 
 	@Service
 	@Primary
-	public class ImportMock extends ImportService {
+	public class ImportMock extends Import {
 		@Override
 		public String get(final String url) {
 			try {
