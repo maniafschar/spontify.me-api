@@ -27,7 +27,7 @@ import com.jq.findapp.TestConfig;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.events.ImportMunich;
+import com.jq.findapp.service.event.ImportService;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Utils;
 
@@ -39,7 +39,7 @@ public class EventServiceTest {
 	private EventService eventService;
 
 	@Autowired
-	private ImportMunich importMunich;
+	private ImportService importService;
 
 	@Autowired
 	private Repository repository;
@@ -55,7 +55,7 @@ public class EventServiceTest {
 		params.setSearch("event.startDate=cast('2024-06-28 09:00:00' as timestamp)");
 
 		// when
-		final int result = this.importMunich.run(this.eventService);
+		final String result = this.importService.run();
 
 		// then
 		assertEquals(27, result);
