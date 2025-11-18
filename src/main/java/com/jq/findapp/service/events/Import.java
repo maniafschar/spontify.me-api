@@ -208,4 +208,36 @@ abstract class Import {
 		final Matcher m = pattern.matcher(text);
 		return m.find() ? m.group(group).trim() : "";
 	}
+
+	public BigInteger importLocation(Location location, final String image) throws Exception {
+		if (!Strings.isEmpty(location.getAddress())) {
+			final QueryParams params = new QueryParams(Query.location_listId);
+			params.setSearch("location.name like '" + location.getName().replace("'", "_")
+					+ "' and '" + location.getAddress().toLowerCase().replace('\n', ' ')
+					+ "' like concat('%',LOWER(location.zipCode),'%')");
+			final Result list = this.repository.list(params);
+			if (list.size() > 0)
+				location = this.repository.one(Location.class, (BigInteger) list.get(0).get("location.id"));
+			else {
+				try {
+					this.repository.save(location);
+				} catch (final IllegalArgumentException ex) {
+					if (ex.getMessage().startsWith("exists:"))
+						location = this.repository.one(Location.class, new BigInteger(
+								ex.getMessage().substring(ex.getMessage().indexOf(':') + 1).trim()));
+					else
+						throw ex;
+				}
+			}
+			if (!Strings.isEmpty(image) && Strings.isEmpty(location.getImage())) {
+				try {
+					Entity.addImage(location, image);
+					this.repository.save(location);
+				} catch (final IllegalArgumentException ex) {
+					// save location wihtout image
+				}
+			}
+		}
+		return location.getId();
+	}
 }
