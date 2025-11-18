@@ -33,7 +33,7 @@ public abstract class BaseEntity {
 	private Timestamp modifiedAt;
 
 	@Transient
-	private Map<String, Object> old = null;
+	private transient Map<String, Object> old = null;
 
 	public BigInteger getId() {
 		return this.id;
