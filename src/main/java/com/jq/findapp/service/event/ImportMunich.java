@@ -1,4 +1,4 @@
-package com.jq.findapp.service.events;
+package com.jq.findapp.service.event;
 
 import java.math.BigInteger;
 import java.util.regex.Pattern;
