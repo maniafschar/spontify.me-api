@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ImportMunich extends Import {
+class ImportMunich extends Import {
 	ImportMunich() {
 		this.clientId = BigInteger.ONE;
 		this.url = "https://www.muenchen.de";
