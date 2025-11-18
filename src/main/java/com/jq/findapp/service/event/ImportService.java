@@ -1,4 +1,4 @@
-package com.jq.findapp.service.events;
+package com.jq.findapp.service.event;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
