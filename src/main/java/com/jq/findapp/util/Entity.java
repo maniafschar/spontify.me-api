@@ -22,8 +22,11 @@ public class Entity {
 	public static final int IMAGE_SIZE = 800;
 	public static final int IMAGE_THUMB_SIZE = 180;
 
-	public static void addImage(final BaseEntity entity, final String url) {
+	public static void addImage(final BaseEntity entity, String url) {
 		try {
+			if (!url.startsWith("data:"))
+				url = "data:image/png;base64," + Base64.getEncoder()
+						.encodeToString(IOUtils.toByteArray(URI.create(url)));
 			entity.getClass().getDeclaredMethod("setImage", String.class)
 					.invoke(entity, Entity.getImage(url, Entity.IMAGE_SIZE, 0));
 			entity.getClass().getDeclaredMethod("setImageList", String.class).invoke(entity,
