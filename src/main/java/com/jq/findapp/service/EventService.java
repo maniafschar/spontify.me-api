@@ -267,7 +267,7 @@ public class EventService {
 	public CronResult cron() {
 		final CronResult result = new CronResult();
 		try {
-			result.body = importService.run();
+			result.body = importService.run(this);
 		} catch (final Exception e) {
 			result.exception = e;
 		}
