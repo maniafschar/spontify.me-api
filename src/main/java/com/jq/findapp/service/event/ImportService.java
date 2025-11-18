@@ -14,7 +14,7 @@ public class ImportService {
 	@Autowired
 	private ImportKempten importKempten;
   
-	public String run() {
+	public String run() throws Exception {
 		return "M: " + this.importMunich.run()
 				+ "\nKE: " + this.importKempten.run();
 	}
