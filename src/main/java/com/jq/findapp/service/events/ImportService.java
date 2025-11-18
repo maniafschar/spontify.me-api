@@ -16,8 +16,8 @@ public class ImportService {
 	@Autowired
 	private ImportKempten importKempten;
   
-	public String run(final EventService eventService) {
-		return "M: " + this.importMunich.run(eventService)
-				+ "\nKE: " + this.importKempten.run(eventService);
+	public String run() {
+		return "M: " + this.importMunich.run()
+				+ "\nKE: " + this.importKempten.run();
 	}
 }
