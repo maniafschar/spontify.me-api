@@ -8,6 +8,7 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 
@@ -62,17 +63,10 @@ public abstract class BaseEntity {
 	public final boolean modified() {
 		if (this.old == null)
 			return true;
-		for (final Field field : this.getClass().getDeclaredFields()) {
-			try {
-				final Field f = this.getClass().getDeclaredField(field.getName());
-				if ((f.getModifiers() & Modifier.TRANSIENT) == 0) {
-					f.setAccessible(true);
-					if (!Objects.equals(this.old.get(field.getName()), f.get(this)))
-						return true;
-				}
-			} catch (final Exception e) {
-				throw new RuntimeException("Failed to check modified on " + field.getName(), e);
-			}
+		final Iterator i = this.old.keySet().iterator();
+		while (i.hasNext()) {
+			if (this.old(i.next()) != null)
+				return true;
 		}
 		return false;
 	}
