@@ -51,7 +51,7 @@ public class ClientTest {
 		final Client client = create();
 		final Field field = client.getClass().getDeclaredField("old");
 		field.setAccessible(true);
-		final Map<String, Object> old = (Map<>) field.get(client);
+		final Map<String, Object> old = (Map<String, Object>) field.get(client);
 
 		// when
 		final boolean modified = old.containsKey("old");
