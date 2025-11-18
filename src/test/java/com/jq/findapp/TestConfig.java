@@ -136,7 +136,7 @@ public class TestConfig {
 
 	@Service
 	@Primary
-	public class EventServiceMock extends EventService {
+	public class ImportMock extends ImportService {
 		@Override
 		public String get(final String url) {
 			try {
