@@ -28,7 +28,7 @@ import com.jq.findapp.util.Entity;
 import com.jq.findapp.util.Strings;
 
 @Component
-abstract class Import {
+public abstract class Import {
 	@Autowired
 	private Repository repository;
 
