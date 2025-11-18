@@ -22,7 +22,6 @@ import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
-import com.jq.findapp.service.EventService;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Entity;
 import com.jq.findapp.util.Strings;
@@ -60,18 +59,16 @@ abstract class Import {
 	protected Pattern regexImageExternal;
 
 	private Client client;
-	private EventService eventService;
 	private final Set<String> failed = new HashSet<>();
 
-	public int run(final EventService eventService) throws Exception {
-		this.eventService = eventService;
+	public int run() throws Exception {
 		this.client = this.repository.one(Client.class, this.clientId);
-		String page = eventService.get(this.url + this.path);
+		String page = this.get(this.url + this.path);
 		int count = this.page(page);
 		while (true) {
 			final Matcher m = this.regexNextPage.matcher(page);
 			if (m.find()) {
-				page = eventService.get(this.url + this.path + m.group(3).replace("&amp;", "&"));
+				page = this.get(this.url + this.path + m.group(3).replace("&amp;", "&"));
 				count += this.page(page);
 			} else
 				break;
@@ -81,6 +78,15 @@ abstract class Import {
 					this.failed.size() + " errors:\n" + this.failed.stream().sorted().collect(Collectors.joining("\n")),
 					this.clientId);
 		return count;
+	}
+
+	protected String get(final String url) {
+		return Strings.urlContent(url)
+				.replace('\n', ' ')
+				.replace('\r', ' ')
+				.replace('\u0013', ' ')
+				.replace('\u001c', ' ')
+				.replace('\u001e', ' ');
 	}
 
 	private int page(String page) throws Exception {
@@ -116,7 +122,7 @@ abstract class Import {
 		final boolean externalPage = this.urlExternal != null && event.getUrl().startsWith(this.urlExternal);
 		if (event.getUrl().startsWith(this.url) || externalPage) {
 			try {
-				final String page = this.eventService.get(event.getUrl());
+				final String page = this.get(event.getUrl());
 				event.setLocationId(this.importLocation(page, externalPage, event.getUrl()));
 				m = this.regexDatetime.matcher(li);
 				for (int i = 0; i < 3; i++)
@@ -178,7 +184,7 @@ abstract class Import {
 			if (!Strings.isEmpty(location.getUrl())) {
 				if (!location.getUrl().startsWith("https://"))
 					location.setUrl(this.url + location.getUrl());
-				page = this.eventService.get(location.getUrl());
+				page = this.get(location.getUrl());
 				location.setAddress(String.join("\n",
 						Arrays.asList(this.getField(this.regexAddress, page, 2)
 								.split(",")).stream().map(e -> e.trim()).toList()));
@@ -189,7 +195,7 @@ abstract class Import {
 		String image = this.getField(externalPage ? this.regexImageExternal : this.regexImage, page, 2);
 		if (image.length() > 0 && !image.startsWith("http"))
 			image = (externalPage ? externalUrl.substring(0, externalUrl.indexOf("/", 10)) : this.url) + image;
-		final BigInteger id = this.eventService.importLocation(location, image);
+		final BigInteger id = this.importLocation(location, image);
 		if (id == null)
 			throw new RuntimeException(
 					"Name: " + location.getName() + " | URL: " + location.getUrl() + " | Address: "
