@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -172,6 +173,7 @@ public class ImportLocationsService {
 		}
 	}
 
+	@Async
 	public void lookup(final float latitude, final float longitude) {
 		final float roundingFactor = 1000f;
 		final float lat = ((int) (latitude * roundingFactor) / roundingFactor);
