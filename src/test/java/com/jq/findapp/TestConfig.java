@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.genai.types.Schema;
 import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
@@ -131,6 +132,10 @@ public class TestConfig {
 			} catch (final IOException e) {
 				throw new RuntimeException(e);
 			}
+		}
+
+		@Override
+		public String gemini(final String question, final Schema schema) {
 		}
 	}
 
