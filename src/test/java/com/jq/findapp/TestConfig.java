@@ -136,6 +136,7 @@ public class TestConfig {
 
 		@Override
 		public String gemini(final String question, final Schema schema) {
+			return "";
 		}
 	}
 
