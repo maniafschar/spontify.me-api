@@ -36,9 +36,6 @@ import com.jq.findapp.util.Utils;
 @ActiveProfiles("test")
 public class EventServiceTest {
 	@Autowired
-	private EventService eventService;
-
-	@Autowired
 	private ImportService importService;
 
 	@Autowired
@@ -48,7 +45,7 @@ public class EventServiceTest {
 	private Utils utils;
 
 	@Test
-	public void importMunich() throws Exception {
+	public void importService() throws Exception {
 		// given
 		this.utils.createContact(BigInteger.ONE);
 		final QueryParams params = new QueryParams(Query.event_listId);
@@ -58,7 +55,7 @@ public class EventServiceTest {
 		final String result = this.importService.run();
 
 		// then
-		assertEquals(27, result);
+		assertEquals("M: 27", result);
 		assertEquals(1, this.repository.list(params).size());
 	}
 

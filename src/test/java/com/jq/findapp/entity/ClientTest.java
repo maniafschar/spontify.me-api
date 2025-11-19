@@ -18,7 +18,7 @@ public class ClientTest {
 	@Test
 	public void modified() throws Exception {
 		// given
-		final Client client = create();
+		final Client client = this.create();
 		final String emailOld = client.getEmail();
 		client.setEmail(client.getEmail() + "i");
 
@@ -34,7 +34,7 @@ public class ClientTest {
 	@Test
 	public void modified_false() throws Exception {
 		// given
-		final Client client = create();
+		final Client client = this.create();
 		client.setEmail(client.getEmail());
 
 		// when
@@ -49,16 +49,17 @@ public class ClientTest {
 	@Test
 	public void modified_old() throws Exception {
 		// given
-		final Client client = create();
-		final Field field = client.getClass().getDeclaredField("old");
+		final Client client = this.create();
+		final Field field = client.getClass().getSuperclass().getDeclaredField("old");
 		field.setAccessible(true);
-		final Map<String, Object> old = (Map<String, Object>) field.get(client);
+		final Map<String, Object> old = (Map) field.get(client);
 
 		// when
 		final boolean modified = old.containsKey("old");
 
 		// then
 		assertFalse(modified);
+		assertTrue(old.containsKey("email"));
 	}
 
 	private Client create() {
