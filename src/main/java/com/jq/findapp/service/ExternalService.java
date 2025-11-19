@@ -57,6 +57,9 @@ public class ExternalService {
 	@Value("${app.google.key}")
 	private String googleKey;
 
+	@Value("${app.google.gemini.apiKey}")
+	private String geminiKey;
+
 	@Value("${app.chatGPT.key}")
 	private String chatGpt;
 
