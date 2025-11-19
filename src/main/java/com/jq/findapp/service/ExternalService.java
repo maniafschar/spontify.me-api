@@ -23,6 +23,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.ImmutableList;
+import com.google.genai.ResponseStream;
+import com.google.genai.types.Content;
+import com.google.genai.types.GenerateContentConfig;
+import com.google.genai.types.GenerateContentResponse;
+import com.google.genai.types.Part;
+import com.google.genai.types.Schema;
+import com.google.genai.types.ThinkingConfig;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.GeoLocation;
@@ -240,5 +248,28 @@ public class ExternalService {
 				return Json.toNode(response).get("id").asText();
 		}
 		return null;
+	}
+
+	public String gemini(final String question, final Schema schema) {
+		final GenerateContentConfig.Builder config = GenerateContentConfig.builder()
+				.thinkingConfig(ThinkingConfig.builder().thinkingBudget(0).build());
+		if (schema != null)
+			config.responseMimeType("application/json").responseSchema(schema);
+		final List<Content> contents = ImmutableList.of(Content.builder().role("user")
+				.parts(ImmutableList.of(Part.fromText(question))).build());
+		try (final ResponseStream<GenerateContentResponse> responseStream = com.google.genai.Client.builder().apiKey(this.geminiKey)
+				.build().models.generateContentStream("gemini-2.5-flash-lite", contents, config.build())) {
+			final StringBuffer s = new StringBuffer();
+			for (final GenerateContentResponse res : responseStream) {
+				if (res.candidates().isEmpty() || res.candidates().get().get(0).content().isEmpty()
+						|| res.candidates().get().get(0).content().get().parts().isEmpty())
+					continue;
+				final List<Part> parts = res.candidates().get().get(0).content().get().parts().get();
+				for (final Part part : parts)
+					s.append(part.text().orElse(""));
+			}
+			this.notificationService.createTicket(TicketType.ERROR, "AI", question + "\n" + s.toString(), null);
+			return s.toString();
+		}
 	}
 }
