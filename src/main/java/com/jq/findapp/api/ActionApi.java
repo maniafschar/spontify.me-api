@@ -53,6 +53,7 @@ import com.jq.findapp.service.AuthenticationService;
 import com.jq.findapp.service.AuthenticationService.Unique;
 import com.jq.findapp.service.ChatService;
 import com.jq.findapp.service.ExternalService;
+import com.jq.findapp.service.ImportLocationsService;
 import com.jq.findapp.service.IpService;
 import com.jq.findapp.service.MatchDayService;
 import com.jq.findapp.service.NotificationService;
@@ -105,6 +106,9 @@ public class ActionApi {
 
 	@Autowired
 	private AiService aiService;
+
+	@Autowired
+	private ImportLocationsService importLocationsService;
 
 	@Autowired
 	private Text text;
@@ -412,6 +416,8 @@ public class ActionApi {
 		contact.setLatitude(position.getLatitude());
 		contact.setLongitude(position.getLongitude());
 		this.repository.save(contact);
+		this.importLocationsService.lookup(position.getLatitude(), position.getLongitude());
+		this.aiService.lookup(contact);
 		final QueryParams params = new QueryParams(Query.contact_listGeoLocationHistory);
 		params.setSearch("contactGeoLocationHistory.createdAt>cast('" + Instant.now().minus(Duration.ofSeconds(5))
 				+ "' as timestamp) and contactGeoLocationHistory.contactId=" + contact.getId());
@@ -419,7 +425,6 @@ public class ActionApi {
 			final GeoLocation geoLocation = this.externalService.getAddress(position.getLatitude(),
 					position.getLongitude(), false);
 			if (geoLocation != null) {
-				this.aiService.lookup(contact);
 				final Map<String, Object> result = new HashMap<>();
 				if (geoLocation.getStreet() != null && geoLocation.getNumber() != null)
 					result.put("street", geoLocation.getStreet() + ' ' + geoLocation.getNumber());
