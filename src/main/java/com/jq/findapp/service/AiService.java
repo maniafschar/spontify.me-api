@@ -66,7 +66,7 @@ public class AiService {
 		final Result result = this.exists(question, AiType.Text, 365);
 		if (result.size() > 0)
 			return this.repository.one(Ai.class, (BigInteger) result.get(0).get("ai.id"));
-		final String note = this.call(question, null);
+		final String note = this.externalService.gemini(question, null);
 		final Ai ai = new Ai();
 		ai.setQuestion(question);
 		ai.setNote(note);
@@ -108,7 +108,7 @@ public class AiService {
 	List<Location> locations(final String question) {
 		Result result = this.exists(question, AiType.Location, 183);
 		if (result.size() == 0) {
-			this.importLocations(question, this.call(question, this.createSchema(false)));
+			this.importLocations(question, this.externalService.gemini(question, this.createSchema(false)));
 			result = this.exists(question, AiType.Location, 183);
 		}
 		final List<Location> locations = new ArrayList<>();
@@ -158,7 +158,7 @@ public class AiService {
 			return null;
 		final Result result = this.exists(question, AiType.Event, 7);
 		if (result.size() == 0) {
-			final String answer = this.call(question, this.createSchema(true));
+			final String answer = this.externalService.gemini(question, this.createSchema(true));
 			final List<BigInteger> locationIds = this.importLocations(question, answer);
 			final ArrayNode nodes = (ArrayNode) Json.toNode(answer);
 			final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -199,29 +199,6 @@ public class AiService {
 		params.setSearch("ai.question='" + qustion.replace("'", "''") + "' and ai.type='" + type.name() +
 				"' and ai.createdAt>cast('" + Instant.now().minus(Duration.ofDays(daysBack)) + "' as timestamp)");
 		return this.repository.list(params);
-	}
-
-	private String call(final String question, final Schema schema) {
-		final GenerateContentConfig.Builder config = GenerateContentConfig.builder()
-				.thinkingConfig(ThinkingConfig.builder().thinkingBudget(0).build());
-		if (schema != null)
-			config.responseMimeType("application/json").responseSchema(schema);
-		final List<Content> contents = ImmutableList.of(Content.builder().role("user")
-				.parts(ImmutableList.of(Part.fromText(question))).build());
-		try (final ResponseStream<GenerateContentResponse> responseStream = Client.builder().apiKey(this.geminiKey)
-				.build().models.generateContentStream("gemini-2.5-flash-lite", contents, config.build())) {
-			final StringBuffer s = new StringBuffer();
-			for (final GenerateContentResponse res : responseStream) {
-				if (res.candidates().isEmpty() || res.candidates().get().get(0).content().isEmpty()
-						|| res.candidates().get().get(0).content().get().parts().isEmpty())
-					continue;
-				final List<Part> parts = res.candidates().get().get(0).content().get().parts().get();
-				for (final Part part : parts)
-					s.append(part.text().orElse(""));
-			}
-			this.notificationService.createTicket(TicketType.ERROR, "AI", question + "\n" + s.toString(), null);
-			return s.toString();
-		}
 	}
 
 	private Schema createSchema(final boolean event) {
