@@ -47,9 +47,6 @@ import com.jq.findapp.util.Text;
 
 @Service
 public class AiService {
-	@Value("${app.google.gemini.apiKey}")
-	private String geminiKey;
-
 	@Autowired
 	private Repository repository;
 
