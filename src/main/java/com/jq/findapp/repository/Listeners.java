@@ -65,8 +65,6 @@ class Listeners {
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(ContactBluetoothListener.class);
 		if (entity instanceof ContactChat)
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(ContactChatListener.class);
-		if (entity instanceof ContactGeoLocationHistory)
-			return (AbstractRepositoryListener<T>) applicationContext.getBean(ContactGeoLocationHistoryListener.class);
 		if (entity instanceof ContactLink)
 			return (AbstractRepositoryListener<T>) applicationContext.getBean(ContactLinkListener.class);
 		if (entity instanceof ContactMarketing)
