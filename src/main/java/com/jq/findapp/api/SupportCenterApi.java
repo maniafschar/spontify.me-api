@@ -265,7 +265,7 @@ public class SupportCenterApi {
 			pb.redirectErrorStream(true);
 			return IOUtils.toString(pb.start().getInputStream(), StandardCharsets.UTF_8);
 		}
-		if ("server".equals(type) || "sc".equals(type)) {
+		if ("server".equals(type) || "sc".equals(type) || "test".equals(type)) {
 			final ProcessBuilder pb = new ProcessBuilder(this.buildScript.replace("{type}", type).split(" "));
 			pb.redirectErrorStream(true);
 			return IOUtils.toString(pb.start().getInputStream(), StandardCharsets.UTF_8);
