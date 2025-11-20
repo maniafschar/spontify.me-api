@@ -136,7 +136,15 @@ public class TestConfig {
 
 		@Override
 		public String gemini(final String question, final Schema schema) {
-			return "";
+			try {
+				return IOUtils.toString(
+						this.getClass().getResourceAsStream(
+								schema == null ? "/json/geminiText.json"
+										: "/json/geminiLocations.json"),
+						StandardCharsets.UTF_8);
+			} catch (final IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 

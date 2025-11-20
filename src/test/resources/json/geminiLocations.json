@@ -1,0 +1,33 @@
+[
+	{
+		"description": "A traditional Bavarian beer hall with a wide selection of local beers and also offers a selection of single malt whiskies.",
+		"street": "Promenadeplatz",
+		"number": "1",
+		"zipCode": "80333",
+		"town": "Munich",
+		"country": "DE",
+		"url": "https://www.hotel-vierjahreszeiten.de/",
+		"telephone": "+49 89 21230",
+		"name": "Hotel Vier Jahreszeiten Kempinski München"
+	},
+	{
+		"description": "A historic pub known for its extensive beer list and a surprisingly good selection of whiskies, particularly Scotch.",
+		"street": "Tal",
+		"number": "44",
+		"zipCode": "80331",
+		"town": "Munich",
+		"country": "DE",
+		"url": "https://www.andechser-am-dom.de/",
+		"name": "Andechser am Dom"
+	},
+	{
+		"description": "A modern bar that specializes in craft beers and has a curated list of international whiskies.",
+		"street": "Geyerstraße",
+		"number": "17",
+		"zipCode": "80469",
+		"town": "Munich",
+		"country": "DE",
+		"url": "https://www.florian-muenchen.de/",
+		"name": "Florian"
+	}
+]
