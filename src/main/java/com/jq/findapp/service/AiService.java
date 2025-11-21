@@ -59,6 +59,11 @@ public class AiService {
 	@Autowired
 	private Text text;
 
+	public static class Attributes {
+		public String description;
+		public List<String> attributes;
+	}
+
 	public Ai text(final String question) {
 		final Result result = this.exists(question, AiType.Text, 365);
 		if (result.size() > 0)
@@ -104,7 +109,7 @@ public class AiService {
 
 	boolean locationAttributes(final String question) {
 		if (this.exists(question, AiType.LocationAttibutes, 365) == 0) {
-			final JsonNode attributes = Json.toNode(this.externalService.gemini(question, this.createSchemaLocationEvent(false)));
+			final Attributes attributes = Json.toObject(this.externalService.gemini(question, this.createSchemaLocationEvent(false)), Attributes.class);
 			return true;
 		}
 		return false;
