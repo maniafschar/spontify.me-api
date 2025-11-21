@@ -107,12 +107,14 @@ public class AiService {
 		}
 	}
 
-	boolean locationAttributes(final String question) {
-		if (this.exists(question, AiType.LocationAttibutes, 365) == 0) {
-			final Attributes attributes = Json.toObject(this.externalService.gemini(question, this.createSchemaLocationEvent(false)), Attributes.class);
-			return true;
-		}
-		return false;
+	Attributes attributes(final String question) {
+		final Result result = this.exists(question, AiType.Attibutes, 365);
+		String answer;
+		if (result.size() == 0)
+			answer = this.externalService.gemini(question, this.createSchemaLocationEvent(false));
+		else
+			answer = result.get(0).get("ai.note").toString();
+		return Json.toObject(answer, Attributes.class);
 	}
 
 	List<Location> locations(final String question) {
