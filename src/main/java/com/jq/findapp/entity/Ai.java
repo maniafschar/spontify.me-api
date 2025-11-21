@@ -14,7 +14,7 @@ public class Ai extends BaseEntity {
 	private AiType type;
 
 	public enum AiType {
-		Location, LocationAttibutes, Event, Text
+		Location, Event, Attibutes, Text
 	}
 
 	public String getQuestion() {
