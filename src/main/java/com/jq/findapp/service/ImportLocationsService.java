@@ -358,6 +358,8 @@ public class ImportLocationsService {
 		int updatedEmail = 0, updatedImage = 0, updatedBoth = 0, exceptions = 0;
 		for (int i = 0; i < list.size(); i++) {
 			final Location location = this.repository.one(Location.class, (BigInteger) list.get(i).get("location.id"));
+			final String oldEmail = location.getEmail();
+			final String oldImage = location.getImage();
 			try {
 				this.importEmailImage(location);
 				if (Strings.isEmpty(location.getImage()) && Strings.isEmpty(location.getEmail()))
@@ -371,8 +373,8 @@ public class ImportLocationsService {
 				errors.append(
 						location.getId() + " " + location.getUrl() + "\n" + Strings.stackTraceToString(ex) + "\n\n");
 			}
-			final boolean email = !Strings.isEmpty(location.getEmail()) && location.old("email") == null;
-			final boolean image = !Strings.isEmpty(location.getImage()) && location.old("image") == null;
+			final boolean email = oldEmail == null && location.getEmail() != null;
+			final boolean image = oldImage == null && location.getImage() != null;
 			if (image && email)
 				updatedBoth++;
 			else if (image)

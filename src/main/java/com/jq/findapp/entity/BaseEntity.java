@@ -65,8 +65,19 @@ public abstract class BaseEntity {
 			return true;
 		final Iterator<String> i = this.old.keySet().iterator();
 		while (i.hasNext()) {
-			if (this.old(i.next()) != null)
+			final String field = i.next();
+			if (this.old(field) != null)
 				return true;
+			if (this.old.get(field) == null) {
+				try {
+					final Field f = this.getClass().getDeclaredField(field);
+					f.setAccessible(true);
+					if (f.get(this) != null)
+						return true;
+				} catch (final Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
 		}
 		return false;
 	}
