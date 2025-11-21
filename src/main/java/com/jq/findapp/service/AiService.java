@@ -102,10 +102,18 @@ public class AiService {
 		}
 	}
 
+	boolean locationAttributes(final String question) {
+		if (this.exists(question, AiType.LocationAttibutes, 365) == 0) {
+			final JsonNode attributes = Json.toNode(this.externalService.gemini(question, this.createSchemaLocationEvent(false)));
+			return true;
+		}
+		return false;
+	}
+
 	List<Location> locations(final String question) {
 		Result result = this.exists(question, AiType.Location, 183);
 		if (result.size() == 0) {
-			this.importLocations(question, this.externalService.gemini(question, this.createSchema(false)));
+			this.importLocations(question, this.externalService.gemini(question, this.createSchemaLocationEvent(false)));
 			result = this.exists(question, AiType.Location, 183);
 		}
 		final List<Location> locations = new ArrayList<>();
@@ -155,7 +163,7 @@ public class AiService {
 			return null;
 		final Result result = this.exists(question, AiType.Event, 7);
 		if (result.size() == 0) {
-			final String answer = this.externalService.gemini(question, this.createSchema(true));
+			final String answer = this.externalService.gemini(question, this.createSchemaLocationEvent(true));
 			final List<BigInteger> locationIds = this.importLocations(question, answer);
 			final ArrayNode nodes = (ArrayNode) Json.toNode(answer);
 			final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -198,7 +206,7 @@ public class AiService {
 		return this.repository.list(params);
 	}
 
-	private Schema createSchema(final boolean event) {
+	private Schema createSchemaLocationEvent(final boolean event) {
 		final Map<String, Schema> location = new HashMap<>();
 		location.put("country", Schema.builder().type(Type.Known.STRING).description("ISO 3166 Alpha 2 code").build());
 		location.put("description", Schema.builder().type(Type.Known.STRING).build());
@@ -235,6 +243,19 @@ public class AiService {
 						.propertyOrdering(Arrays.asList("description", "street", "number", "zipCode",
 								"town", "country", "url", "email", "telephone"))
 						.build())
+				.build();
+	}
+
+	private Schema createSchemaLocationAttributes() {
+		final Map<String, Schema> location = new HashMap<>();
+		location.put("description", Schema.builder().type(Type.Known.STRING).build());
+		location.put("attributes", Schema.builder().type(Type.Known.ARRAY).items(Schema.builder()
+				.type(Type.Known.STRING).build()));
+		return Schema.builder()
+				.type(Type.Known.OBJECT)
+				.properties(location)
+				.required(Arrays.asList("description", "attributes"))
+				.propertyOrdering(Arrays.asList("description", "attributes"))
 				.build();
 	}
 }
