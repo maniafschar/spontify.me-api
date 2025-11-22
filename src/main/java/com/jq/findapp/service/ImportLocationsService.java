@@ -354,6 +354,31 @@ public class ImportLocationsService {
 		return false;
 	}
 
+	@Cron("20 4")
+	public CronResult cronAttributes() {
+		final CronResult result = new CronResult();
+		final QueryParams params = new QueryParams(Query.location_listId);
+		params.setSearch("location.skills is null or location.skillsText is null or location.description is null");
+		final Result list = this.repository.list(params);
+		int skills = 0, skillsText = 0, description = 0;
+		for (int i = 0; i < list.size(); i++) {
+			final Location location = this.repository.one(Location.class, (BigInteger) list.get(i).get("location.id"));
+			final boolean skillsEmpty = Strings.isEmpty(location.getSkills());
+			final boolean skillsTextEmpty = Strings.isEmpty(location.getSkillsText());
+			final boolean descriptionEmpty = Strings.isEmpty(location.getDescription());
+			this.addSkills(location);
+			this.repository.save(location);
+			if (skillsEmpty && !Strings.isEmpty(location.getSkills()))
+				skills++;
+			if (skillsTextEmpty && !Strings.isEmpty(location.getSkillsText()))
+				skillsText++;
+			if (descriptionEmpty && !Strings.isEmpty(location.getDescription()))
+				description++;
+		}
+		result.body = "skills: " + skills + "\nskillsText: " + skillsText + "\ndescription: " + description;
+		return result;
+	}
+
 	@Cron("50 7")
 	public CronResult cron() {
 		final CronResult result = new CronResult();
