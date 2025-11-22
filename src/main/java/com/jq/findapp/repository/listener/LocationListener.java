@@ -15,6 +15,7 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.service.ExternalService;
+import com.jq.findapp.service.ImportLocationsService;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
 
@@ -22,6 +23,9 @@ import com.jq.findapp.util.Strings;
 public class LocationListener extends AbstractRepositoryListener<Location> {
 	@Autowired
 	private ExternalService externalService;
+
+	@Autowired
+	private ImportLocationsService importLocationsService;
 
 	@Override
 	public void prePersist(final Location location) {
@@ -53,6 +57,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 			if (this.isNameMatch((String) list.get(i).get("location.name"), location.getName()))
 				throw new IllegalArgumentException("exists:" + list.get(i).get("location.id"));
 		}
+		this.importLocationsService.addSkills(location);
 	}
 
 	@Override

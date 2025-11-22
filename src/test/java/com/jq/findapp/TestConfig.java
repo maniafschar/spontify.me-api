@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.genai.types.Schema;
+import com.google.genai.types.Type;
 import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
@@ -140,7 +141,9 @@ public class TestConfig {
 				return IOUtils.toString(
 						this.getClass().getResourceAsStream(
 								schema == null ? "/json/geminiText.json"
-										: "/json/geminiLocations.json"),
+										: schema.type().get().knownEnum() == Type.Known.OBJECT
+												? "/json/geminiAttributes.json"
+												: "/json/geminiLocations.json"),
 						StandardCharsets.UTF_8);
 			} catch (final IOException e) {
 				throw new RuntimeException(e);

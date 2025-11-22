@@ -27,11 +27,13 @@ import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
+import com.jq.findapp.service.AiService.Attributes;
 import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.util.Entity;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
+import com.jq.findapp.util.Text;
 
 @Service
 public class ImportLocationsService {
@@ -42,6 +44,12 @@ public class ImportLocationsService {
 
 	@Autowired
 	private NotificationService notificationService;
+
+	@Autowired
+	private AiService aiService;
+
+	@Autowired
+	private Text text;
 
 	@Autowired
 	private Repository repository;
@@ -394,6 +402,25 @@ public class ImportLocationsService {
 		if (errors.length() > 0)
 			this.notificationService.createTicket(TicketType.ERROR, "importLocation", errors.toString().trim(), null);
 		return result;
+	}
+
+	public void addSkills(final Location location) {
+		final Attributes attributes = this.aiService
+				.attributes("Please give me 10 attributes and a description of the location '" + location.getName()
+						+ "' in " + location.getTown() + ", " + location.getStreet() + ", " + location.getCountry());
+		location.setDescription(attributes.description
+				+ (Strings.isEmpty(location.getDescription()) ? "" : "\n\n" + location.getDescription()));
+		String skills = "";
+		String skillsText = "";
+		for (final String attribute : attributes.values) {
+			final String id = this.text.getSkillId(attribute);
+			if (id == null)
+				skillsText += "|" + attribute;
+			else
+				skills += "|" + id;
+		}
+		location.setSkills(skills.length() > 0 ? skills.substring(1) : "");
+		location.setSkillsText(skillsText.length() > 0 ? skillsText.substring(1) : "");
 	}
 
 	private void importEmailImage(final Location location) throws Exception {

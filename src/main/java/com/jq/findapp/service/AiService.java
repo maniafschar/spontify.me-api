@@ -13,20 +13,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.google.common.collect.ImmutableList;
-import com.google.genai.Client;
-import com.google.genai.ResponseStream;
-import com.google.genai.types.Content;
-import com.google.genai.types.GenerateContentConfig;
-import com.google.genai.types.GenerateContentResponse;
-import com.google.genai.types.Part;
 import com.google.genai.types.Schema;
-import com.google.genai.types.ThinkingConfig;
 import com.google.genai.types.Type;
 import com.jq.findapp.entity.Ai;
 import com.jq.findapp.entity.Ai.AiType;
@@ -61,7 +52,7 @@ public class AiService {
 
 	public static class Attributes {
 		public String description;
-		public List<String> attributes;
+		public List<String> values;
 	}
 
 	public Ai text(final String question) {
@@ -94,24 +85,28 @@ public class AiService {
 		} else {
 			Arrays.asList(contact.getSkills().split("\\|"))
 					.stream().forEach(e -> {
-						final String[] cat = this.text.getCategory(e).split("\\.");
-						this.locations("Please suggest interesting locations for " + cat[0] + ", especially " + cat[1]
-								+ ", in and arround " + geoLocation.getZipCode() + " " + geoLocation.getTown() + " "
-								+ geoLocation.getCountry());
-						this.events(
-								"Please suggest interesting events in the next 30 days for " + cat[0] + ", especially "
-										+ cat[1] + ", in and arround " + geoLocation.getTown() + " "
-										+ geoLocation.getCountry(),
-								contact);
+						final String[] cat = this.text.getSkillText(e).split("\\.");
+						if (cat != null) {
+							this.locations("Please suggest interesting locations for " + cat[0] + ", especially "
+									+ cat[1]
+									+ ", in and arround " + geoLocation.getZipCode() + " " + geoLocation.getTown() + " "
+									+ geoLocation.getCountry());
+							this.events(
+									"Please suggest interesting events in the next 30 days for " + cat[0]
+											+ ", especially "
+											+ cat[1] + ", in and arround " + geoLocation.getTown() + " "
+											+ geoLocation.getCountry(),
+									contact);
+						}
 					});
 		}
 	}
 
-	Attributes attributes(final String question) {
+	public Attributes attributes(final String question) {
 		final Result result = this.exists(question, AiType.Attibutes, 365);
 		String answer;
 		if (result.size() == 0)
-			answer = this.externalService.gemini(question, this.createSchemaLocationEvent(false));
+			answer = this.externalService.gemini(question, this.createSchemaAttributes());
 		else
 			answer = result.get(0).get("ai.note").toString();
 		return Json.toObject(answer, Attributes.class);
@@ -120,7 +115,8 @@ public class AiService {
 	List<Location> locations(final String question) {
 		Result result = this.exists(question, AiType.Location, 183);
 		if (result.size() == 0) {
-			this.importLocations(question, this.externalService.gemini(question, this.createSchemaLocationEvent(false)));
+			this.importLocations(question,
+					this.externalService.gemini(question, this.createSchemaLocationEvent(false)));
 			result = this.exists(question, AiType.Location, 183);
 		}
 		final List<Location> locations = new ArrayList<>();
@@ -253,16 +249,16 @@ public class AiService {
 				.build();
 	}
 
-	private Schema createSchemaLocationAttributes() {
-		final Map<String, Schema> location = new HashMap<>();
-		location.put("description", Schema.builder().type(Type.Known.STRING).build());
-		location.put("attributes", Schema.builder().type(Type.Known.ARRAY).items(Schema.builder()
-				.type(Type.Known.STRING).build()));
+	private Schema createSchemaAttributes() {
+		final Map<String, Schema> attributes = new HashMap<>();
+		attributes.put("description", Schema.builder().type(Type.Known.STRING).build());
+		attributes.put("values", Schema.builder().type(Type.Known.ARRAY).items(Schema.builder()
+				.type(Type.Known.STRING).build()).build());
 		return Schema.builder()
 				.type(Type.Known.OBJECT)
-				.properties(location)
-				.required(Arrays.asList("description", "attributes"))
-				.propertyOrdering(Arrays.asList("description", "attributes"))
+				.properties(attributes)
+				.required(Arrays.asList("description", "values"))
+				.propertyOrdering(Arrays.asList("description", "values"))
 				.build();
 	}
 }

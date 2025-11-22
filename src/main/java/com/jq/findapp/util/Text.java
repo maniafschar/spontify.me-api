@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -13,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.repository.Repository;
@@ -102,11 +102,24 @@ public class Text {
 	@Autowired
 	private Repository repository;
 
-	private static ArrayNode categories;
+	private static Category[] categories;
 
 	private static Map<String, JsonNode> languages = new HashMap<>();
 
+	private static class Category {
+		public String label;
+		public String key;
+		public List<String> values;
+	}
+
 	static {
+		try {
+			categories = Json.toObject(
+					IOUtils.toString(Text.class.getResourceAsStream("/json/categories.json"), StandardCharsets.UTF_8),
+					Category[].class);
+		} catch (final Exception e) {
+			new RuntimeException(e);
+		}
 		final String src = Text.class.getProtectionDomain().getCodeSource().getLocation().getFile();
 		try (ZipFile zip = new ZipFile(src.substring(src.indexOf(':') + 1, src.indexOf('!')))) {
 			final Enumeration<? extends ZipEntry> e = zip.entries();
@@ -119,8 +132,6 @@ public class Text {
 							Json.toNode(IOUtils.toString(zip.getInputStream(entry), StandardCharsets.UTF_8)));
 				}
 			}
-			categories = (ArrayNode) Json.toNode(
-					IOUtils.toString(Text.class.getResourceAsStream("/json/categories.json"), StandardCharsets.UTF_8));
 		} catch (final Exception e) {
 			try (final InputStream in = Text.class.getResourceAsStream("/lang/DE.json")) {
 				// Test environment, only german is tested
@@ -132,19 +143,30 @@ public class Text {
 		}
 	}
 
-	public String getCategory(final String id) {
+	public String getSkillText(final String id) {
 		final String[] s = id.split("\\.");
-		for (int i = 0; i < categories.size(); i++) {
-			if (s[0].equals(categories.get(i).get("key").asText())) {
-				final ArrayNode values = (ArrayNode) categories.get(i).get("values");
-				for (int i2 = 0; i2 < values.size(); i2++) {
-					if (values.get(i2).asText().endsWith("|" + s[1]))
-						return categories.get(i).get("label") + "." +
-								values.get(i2).asText().replace("|" + s[1], "");
+		for (int i = 0; i < categories.length; i++) {
+			if (s[0].equals(categories[i].key)) {
+				for (int i2 = 0; i2 < categories[i].values.size(); i2++) {
+					if (categories[i].values.get(i2).endsWith("|" + s[1]))
+						return categories[i].label + "." +
+								categories[i].values.get(i2).replace("|" + s[1], "");
 				}
 			}
 		}
-		return id;
+		return null;
+	}
+
+	public String getSkillId(String text) {
+		text = text.toLowerCase();
+		for (int i = 0; i < categories.length; i++) {
+			for (int i2 = 0; i2 < categories[i].values.size(); i2++) {
+				if (categories[i].values.get(i2).toLowerCase().contains(text))
+					return categories[i].key + "." +
+							categories[i].values.get(i2).substring(categories[i].values.get(i2).lastIndexOf("|") + 1);
+			}
+		}
+		return null;
 	}
 
 	public String getText(final Contact contact, final TextId textId) {

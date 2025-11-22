@@ -1,5 +1,7 @@
 package com.jq.findapp.repository.listener;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.math.BigInteger;
 
 import org.junit.jupiter.api.Test;
@@ -159,7 +161,9 @@ public class LocationListenerTest {
 		// when
 		this.repository.save(location);
 
-		// then no exception
+		// then
+		assertEquals("0.04", location.getSkills());
+		assertEquals("Puberty", location.getSkillsText());
 	}
 
 	private Location createLocation() throws Exception {
