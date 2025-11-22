@@ -23,8 +23,8 @@ import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
+import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.NotificationService;
-import com.jq.findapp.service.event.ImportService.UrlFetcher;
 import com.jq.findapp.util.Entity;
 import com.jq.findapp.util.Strings;
 
@@ -32,6 +32,9 @@ import com.jq.findapp.util.Strings;
 public abstract class Import {
 	@Autowired
 	private Repository repository;
+
+	@Autowired
+	private ExternalService externalService;
 
 	@Autowired
 	private NotificationService notificationService;
@@ -62,17 +65,15 @@ public abstract class Import {
 
 	private Client client;
 	private final Set<String> failed = new HashSet<>();
-	private UrlFetcher urlFetcher;
 
-	public int run(final UrlFetcher urlFetcher) throws Exception {
-		this.urlFetcher = urlFetcher;
+	public int run() throws Exception {
 		this.client = this.repository.one(Client.class, this.clientId);
-		String page = this.urlFetcher.get(this.url + this.path);
+		String page = this.externalService.get(this.url + this.path);
 		int count = this.page(page);
 		while (true) {
 			final Matcher m = this.regexNextPage.matcher(page);
 			if (m.find()) {
-				page = this.urlFetcher.get(this.url + this.path + m.group(3).replace("&amp;", "&"));
+				page = this.externalService.get(this.url + this.path + m.group(3).replace("&amp;", "&"));
 				count += this.page(page);
 			} else
 				break;
@@ -117,7 +118,7 @@ public abstract class Import {
 		final boolean externalPage = this.urlExternal != null && event.getUrl().startsWith(this.urlExternal);
 		if (event.getUrl().startsWith(this.url) || externalPage) {
 			try {
-				final String page = this.urlFetcher.get(event.getUrl());
+				final String page = this.externalService.get(event.getUrl());
 				event.setLocationId(this.importLocation(page, externalPage, event.getUrl()));
 				m = this.regexDatetime.matcher(li);
 				for (int i = 0; i < 3; i++)
@@ -179,7 +180,7 @@ public abstract class Import {
 			if (!Strings.isEmpty(location.getUrl())) {
 				if (!location.getUrl().startsWith("https://"))
 					location.setUrl(this.url + location.getUrl());
-				page = this.urlFetcher.get(location.getUrl());
+				page = this.externalService.get(location.getUrl());
 				location.setAddress(String.join("\n",
 						Arrays.asList(this.getField(this.regexAddress, page, 2)
 								.split(",")).stream().map(e -> e.trim()).toList()));

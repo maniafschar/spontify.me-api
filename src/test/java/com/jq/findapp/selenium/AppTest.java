@@ -137,6 +137,7 @@ public class AppTest {
 		Util.click("buttonicon.right");
 		Util.click("tab[onclick*=\"2\"]");
 		Util.click("button-text[onclick*=\"logoff\"]");
+		Util.sleep(1000);
 	}
 
 	private void addLocation(final String name, final String address, final boolean duplicate) {

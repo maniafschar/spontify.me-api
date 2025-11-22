@@ -46,7 +46,6 @@ import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.ExternalService;
 import com.jq.findapp.service.MatchDayService;
 import com.jq.findapp.service.NotificationService.MailCreateor;
-import com.jq.findapp.service.event.ImportService;
 import com.jq.findapp.service.model.Match;
 import com.jq.findapp.service.model.Response;
 import com.jq.findapp.util.Json;
@@ -149,28 +148,20 @@ public class TestConfig {
 				throw new RuntimeException(e);
 			}
 		}
-	}
 
-	@Service
-	@Primary
-	public class ImportServiceMock extends ImportService {
-		public ImportServiceMock() {
-			this.setUrlFetcher(new UrlFetcher() {
-				@Override
-				public String get(final String url) {
-					try {
-						if (url.contains("search=1"))
-							return "";
-						return IOUtils.toString(
-								this.getClass().getResourceAsStream("/html/event" + (url.contains("/veranstaltungen/")
-										? (url.split("/").length == 5 ? "List" : "Detail")
-										: url.contains("muenchenticket.") ? "Ticket" : "Address") + ".html"),
-								StandardCharsets.UTF_8).replace('\n', ' ').replace('\r', ' ');
-					} catch (final IOException e) {
-						throw new RuntimeException(e);
-					}
-				}
-			});
+		@Override
+		public String get(final String url) {
+			try {
+				if (url.contains("search=1"))
+					return "";
+				return IOUtils.toString(
+						this.getClass().getResourceAsStream("/html/event" + (url.contains("/veranstaltungen/")
+								? (url.split("/").length == 5 ? "List" : "Detail")
+								: url.contains("muenchenticket.") ? "Ticket" : "Address") + ".html"),
+						StandardCharsets.UTF_8).replace('\n', ' ').replace('\r', ' ');
+			} catch (final IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
@@ -202,6 +193,7 @@ public class TestConfig {
 				throw new RuntimeException(ex);
 			}
 		}
+
 	}
 
 	public static int toDays(final Connection connection, final Timestamp timestamp)

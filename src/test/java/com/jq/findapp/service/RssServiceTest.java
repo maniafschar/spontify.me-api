@@ -1,7 +1,9 @@
 package com.jq.findapp.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
@@ -28,6 +30,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
+import com.jq.findapp.repository.Repository;
 import com.jq.findapp.repository.Repository.Attachment;
 import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.util.Entity;
@@ -40,6 +43,9 @@ import com.jq.findapp.util.Utils;
 public class RssServiceTest {
 	@Autowired
 	private RssService rssService;
+
+	@Autowired
+	private Repository repository;
 
 	@Autowired
 	private Utils utils;
@@ -206,12 +212,16 @@ public class RssServiceTest {
 	@Test
 	public void cron() throws Exception {
 		// given
-		utils.createContact(BigInteger.ONE);
+		final long id = this.repository.list("from Contact").stream()
+				.max((e1, e2) -> (int) (e1.getId().longValue() - e2.getId().longValue()))
+				.get().getId().longValue();
+		this.utils.createContact(new BigInteger("" + (id + 1)));
 
 		// when
-		final CronResult result = rssService.cron();
+		final CronResult result = this.rssService.cron();
 
 		// then
-		assertTrue(!Strings.isEmpty(result), result.body);
+		assertNull(result.exception);
+		assertFalse(Strings.isEmpty(result.body), result.body);
 	}
 }

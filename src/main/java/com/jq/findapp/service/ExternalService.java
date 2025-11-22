@@ -139,6 +139,15 @@ public class ExternalService {
 		return null;
 	}
 
+	public String get(final String url) {
+		return Strings.urlContent(url)
+				.replace('\n', ' ')
+				.replace('\r', ' ')
+				.replace('\u0013', ' ')
+				.replace('\u001c', ' ')
+				.replace('\u001e', ' ');
+	}
+
 	public List<GeoLocation> getLatLng(final String town) {
 		final QueryParams params = new QueryParams(Query.misc_geoLocation);
 		if (town.contains("\n")) {
@@ -260,7 +269,8 @@ public class ExternalService {
 			config.responseMimeType("application/json").responseSchema(schema);
 		final List<Content> contents = ImmutableList.of(Content.builder().role("user")
 				.parts(ImmutableList.of(Part.fromText(question))).build());
-		try (final ResponseStream<GenerateContentResponse> responseStream = com.google.genai.Client.builder().apiKey(this.geminiKey)
+		try (final ResponseStream<GenerateContentResponse> responseStream = com.google.genai.Client.builder()
+				.apiKey(this.geminiKey)
 				.build().models.generateContentStream("gemini-2.5-flash-lite", contents, config.build())) {
 			final StringBuffer s = new StringBuffer();
 			for (final GenerateContentResponse res : responseStream) {
