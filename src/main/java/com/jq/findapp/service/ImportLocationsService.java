@@ -354,7 +354,7 @@ public class ImportLocationsService {
 		return false;
 	}
 
-	@Cron("20 4")
+	@Cron("50 11")
 	public CronResult cronAttributes() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
