@@ -97,19 +97,15 @@ public class AuthenticationApi {
 				params.setQuery(Query.contact_token);
 				params.setSearch("contactToken.contactId=" + user.get("contact.id") + " and contactToken.token=''");
 				final Result u = this.repository.list(params);
-				final ContactToken t;
+				final ContactToken token;
 				if (u.size() < 1) {
-					t = new ContactToken();
-					t.setContactId((BigInteger) user.get("contact.id"));
-				} else {
-					t = this.repository.one(ContactToken.class, (BigInteger) u.get(0).get("contactToken.id"));
-					for (i = 1; i < u.size(); i++)
-						this.repository.delete(
-								this.repository.one(ContactToken.class, (BigInteger) u.get(i).get("contactToken.id")));
-				}
-				t.setToken(UUID.randomUUID().toString());
-				this.repository.save(t);
-				user.put("auto_login_token", Encryption.encrypt(t.getToken(), publicKey));
+					token = new ContactToken();
+					token.setContactId((BigInteger) user.get("contact.id"));
+				} else
+					token = this.repository.one(ContactToken.class, (BigInteger) u.get(0).get("contactToken.id"));
+				token.setToken(UUID.randomUUID().toString());
+				this.repository.save(token);
+				user.put("auto_login_token", Encryption.encrypt(token.getToken(), publicKey));
 			}
 		}
 		return user;
