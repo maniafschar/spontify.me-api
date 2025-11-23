@@ -182,15 +182,14 @@ public class CronService {
 
 	private void list(final Object service, final Map<Group, List<JobExecuter>> map) {
 		final ZonedDateTime now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
-		final Class<?> clazz;
-		if (service.getClass().getName().contains("$$"))
+		Class<?> clazz = service.getClass();
+		if (clazz.getName().contains("$")) {
 			try {
-				clazz = Class.forName(service.getClass().getName().split("\\$\\$")[0]);
+				clazz = Class.forName(clazz.getName().split("\\$")[0]);
 			} catch (final ClassNotFoundException e) {
 				throw new RuntimeException(e);
 			}
-		else
-			clazz = service.getClass();
+		}
 		for (final Method method : clazz.getDeclaredMethods()) {
 			if (method.isAnnotationPresent(Cron.class)) {
 				final Cron cron = method.getAnnotation(Cron.class);
@@ -201,7 +200,7 @@ public class CronService {
 						map.get(cron.group()).add(new JobExecuter(service, method));
 					} else
 						this.notificationService.createTicket(TicketType.ERROR, "CronDeclaration",
-								service.getClass().getName() + "." + method + " not eligable for @Cron annotation!",
+								method.toString() + "\nnot eligable for @Cron annotation",
 								null);
 				}
 			}
