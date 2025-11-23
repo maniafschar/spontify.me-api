@@ -116,8 +116,8 @@ public class CronService {
 
 		@Override
 		public String toString() {
-			return ((body == null ? "" : body)
-					+ (exception == null ? "" : "\n" + Strings.stackTraceToString(exception))).trim();
+			return ((this.body == null ? "" : this.body)
+					+ (this.exception == null ? "" : "\n" + Strings.stackTraceToString(this.exception))).trim();
 		}
 	}
 
@@ -135,38 +135,39 @@ public class CronService {
 				final Log log = new Log();
 				log.setContactId(BigInteger.ZERO);
 				log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
-				String name = service.getClass().getSimpleName();
+				String name = this.service.getClass().getSimpleName();
 				if (name.contains("$"))
 					name = name.substring(0, name.indexOf('$'));
-				log.setUri("/support/cron/" + name + "/" + method.getName());
+				log.setUri("/support/cron/" + name + "/" + this.method.getName());
 				try {
-					if (running.contains(name + '.' + method.getName()))
+					if (running.contains(name + '.' + this.method.getName()))
 						log.setStatus(LogStatus.ErrorServiceRunning);
 					else {
-						running.add(name + '.' + method.getName());
-						final CronResult result = (CronResult) method.invoke(service);
+						running.add(name + '.' + this.method.getName());
+						final CronResult result = (CronResult) this.method.invoke(this.service);
 						log.setStatus(Strings.isEmpty(result.exception) ? LogStatus.Ok : LogStatus.ErrorServer);
 						if (result.body != null)
 							log.setBody(result.body.trim());
 						if (result.exception != null) {
 							log.setBody((log.getBody() == null ? "" : log.getBody() + "\n")
 									+ result.exception.getClass().getName() + ": " + result.exception.getMessage());
-							notificationService.createTicket(TicketType.ERROR, "cron", result.toString(), null);
+							CronService.this.notificationService.createTicket(TicketType.ERROR, "cron",
+									result.toString(), null);
 						}
 					}
 				} catch (final Throwable ex) {
 					log.setStatus(LogStatus.ErrorRuntime);
 					log.setBody("uncaught exception " + ex.getClass().getName() + ": " + ex.getMessage() +
 							(Strings.isEmpty(log.getBody()) ? "" : "\n" + log.getBody()));
-					notificationService.createTicket(TicketType.ERROR, "cron",
+					CronService.this.notificationService.createTicket(TicketType.ERROR, "cron",
 							"uncaught exception:\n" + Strings.stackTraceToString(ex)
 									+ (Strings.isEmpty(log.getBody()) ? "" : "\n\n" + log.getBody()),
 							null);
 				} finally {
-					running.remove(name + '.' + method.getName());
+					running.remove(name + '.' + this.method.getName());
 					log.setTime((int) (System.currentTimeMillis() - log.getCreatedAt().getTime()));
 					try {
-						repository.save(log);
+						CronService.this.repository.save(log);
 					} catch (final Exception e2) {
 						throw new RuntimeException(e2);
 					}
@@ -181,14 +182,14 @@ public class CronService {
 		for (final Method method : service.getClass().getDeclaredMethods()) {
 			if (method.isAnnotationPresent(Cron.class)) {
 				final Cron cron = method.getAnnotation(Cron.class);
-				if (cron(cron.value(), now)) {
+				if (this.cron(cron.value(), now)) {
 					if (CronResult.class.equals(method.getReturnType()) && method.getParameterCount() == 0) {
 						if (!map.containsKey(cron.group()))
 							map.put(cron.group(), new ArrayList<>());
 						map.get(cron.group()).add(new JobExecuter(service, method));
 					} else
-						notificationService.createTicket(TicketType.ERROR, "CronDeclaration",
-								service.getClass().getName() + "." + method + " not eligable for @Job annotation!",
+						this.notificationService.createTicket(TicketType.ERROR, "CronDeclaration",
+								service.getClass().getName() + "." + method + " not eligable for @Cron annotation!",
 								null);
 				}
 			}
@@ -197,7 +198,7 @@ public class CronService {
 
 	public CronResult run(final String classname) throws Exception {
 		final String[] s = classname.split("\\.");
-		final Object clazz = getClass().getDeclaredField(s[0]).get(this);
+		final Object clazz = this.getClass().getDeclaredField(s[0]).get(this);
 		final Method method = clazz.getClass().getDeclaredMethod(s[1]);
 		if (!CronResult.class.equals(method.getReturnType()) || !method.isAnnotationPresent(Cron.class))
 			return null;
@@ -209,20 +210,20 @@ public class CronService {
 	@Async
 	public void run() {
 		final Map<Group, List<JobExecuter>> map = new HashMap<>();
-		list(chatService, map);
-		list(clientNewsService, map);
-		list(dbService, map);
-		list(engagementService, map);
-		list(eventService, map);
-		list(importLocationsService, map);
-		list(importLogService, map);
-		list(importSportsBarService, map);
-		list(ipService, map);
-		list(marketingLocationService, map);
-		list(marketingService, map);
-		list(matchDayService, map);
-		list(rssService, map);
-		list(sitemapService, map);
+		this.list(this.chatService, map);
+		this.list(this.clientNewsService, map);
+		this.list(this.dbService, map);
+		this.list(this.engagementService, map);
+		this.list(this.eventService, map);
+		this.list(this.importLocationsService, map);
+		this.list(this.importLogService, map);
+		this.list(this.importSportsBarService, map);
+		this.list(this.ipService, map);
+		this.list(this.marketingLocationService, map);
+		this.list(this.marketingService, map);
+		this.list(this.matchDayService, map);
+		this.list(this.rssService, map);
+		this.list(this.sitemapService, map);
 		Arrays.asList(Group.values()).forEach(e -> {
 			if (map.containsKey(e)) {
 				final List<CompletableFuture<Void>> list = new ArrayList<>();
@@ -237,11 +238,11 @@ public class CronService {
 		if (Strings.isEmpty(cron))
 			return true;
 		final String[] s = (cron.trim() + " * * * *").split(" ");
-		return match(s[0], now.getMinute())
-				&& match(s[1], now.getHour())
-				&& match(s[2], now.getDayOfMonth())
-				&& match(s[3], now.getMonth().getValue())
-				&& match(s[4], now.getDayOfWeek().getValue());
+		return this.match(s[0], now.getMinute())
+				&& this.match(s[1], now.getHour())
+				&& this.match(s[2], now.getDayOfMonth())
+				&& this.match(s[3], now.getMonth().getValue())
+				&& this.match(s[4], now.getDayOfWeek().getValue());
 	}
 
 	private boolean match(final String field, final int value) {
