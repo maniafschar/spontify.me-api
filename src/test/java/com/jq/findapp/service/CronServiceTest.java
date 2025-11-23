@@ -84,6 +84,18 @@ public class CronServiceTest {
 	}
 
 	@Test
+	public void cron_11_50() throws Exception {
+		// given
+		final ZonedDateTime now = Instant.ofEpochSecond(1763895030).atZone(ZoneId.of("Europe/Berlin"));
+
+		// when
+		final boolean value = this.cronService.cron("50 11", now);
+
+		// then
+		assertTrue(value);
+	}
+
+	@Test
 	public void cron_4oclockFail() throws Exception {
 		// given
 		final ZonedDateTime now = Instant.ofEpochSecond(50400).atZone(ZoneId.of("Europe/Berlin"));

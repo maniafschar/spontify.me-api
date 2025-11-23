@@ -354,8 +354,8 @@ public class ImportLocationsService {
 		return false;
 	}
 
-	@Cron("50 11")
-	public CronResult cronAttributes() {
+	@Cron()
+	public CronResult cronSkills() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
 		params.setSearch("location.skills is null or location.skillsText is null or location.description is null");
