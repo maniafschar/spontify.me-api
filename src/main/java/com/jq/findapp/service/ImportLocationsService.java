@@ -37,7 +37,7 @@ import com.jq.findapp.util.Text;
 
 @Service
 public class ImportLocationsService {
-	private final Pattern href = Pattern.compile("href=\"([^\"]*)\"");
+	private static final Pattern href = Pattern.compile("href=\"([^\"]*)\"");
 
 	@Autowired
 	private ExternalService externalService;
@@ -354,7 +354,7 @@ public class ImportLocationsService {
 		return false;
 	}
 
-	@Cron
+	@Cron("10 13")
 	public CronResult cronSkills() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
@@ -379,7 +379,7 @@ public class ImportLocationsService {
 		return result;
 	}
 
-	@Cron
+	@Cron("50 7")
 	public CronResult cron() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.location_listId);

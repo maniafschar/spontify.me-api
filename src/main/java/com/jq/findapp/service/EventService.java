@@ -42,7 +42,6 @@ import com.jq.findapp.repository.listener.EventListener;
 import com.jq.findapp.service.CronService.Cron;
 import com.jq.findapp.service.CronService.CronResult;
 import com.jq.findapp.service.event.ImportService;
-import com.jq.findapp.util.Entity;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Score;
 import com.jq.findapp.util.Strings;
@@ -262,12 +261,12 @@ public class EventService {
 				+ date + "' as date) and eventParticipate.state=1");
 		return this.repository.list(params).size() >= event.getMaxParticipants().intValue();
 	}
-	
+
 	@Cron("40 5")
 	public CronResult cronImport() {
 		final CronResult result = new CronResult();
 		try {
-			result.body = importService.run();
+			result.body = this.importService.run();
 		} catch (final Exception e) {
 			result.exception = e;
 		}

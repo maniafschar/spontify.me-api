@@ -39,6 +39,9 @@ public class CronService {
 	private NotificationService notificationService;
 
 	@Autowired
+	private AiService aiService;
+
+	@Autowired
 	private Repository repository;
 
 	// executable jobs
@@ -179,7 +182,16 @@ public class CronService {
 
 	private void list(final Object service, final Map<Group, List<JobExecuter>> map) {
 		final ZonedDateTime now = Instant.now().atZone(ZoneId.of("Europe/Berlin"));
-		for (final Method method : service.getClass().getDeclaredMethods()) {
+		final Class<?> clazz;
+		if (service.getClass().getName().contains("$$"))
+			try {
+				clazz = Class.forName(service.getClass().getName().split("\\$\\$")[0]);
+			} catch (final ClassNotFoundException e) {
+				throw new RuntimeException(e);
+			}
+		else
+			clazz = service.getClass();
+		for (final Method method : clazz.getDeclaredMethods()) {
 			if (method.isAnnotationPresent(Cron.class)) {
 				final Cron cron = method.getAnnotation(Cron.class);
 				if (this.cron(cron.value(), now)) {
