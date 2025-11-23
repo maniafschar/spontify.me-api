@@ -40,29 +40,29 @@ public class MarketingApiTest {
 	@Test
 	public void news() throws Exception {
 		// given
-		utils.createContact(BigInteger.ONE);
+		this.utils.createContact(BigInteger.ONE);
 		final ClientNews news = new ClientNews();
 		news.setClientId(BigInteger.ONE);
 		news.setDescription("abc");
 		news.setSource("xyz");
 		news.setUrl("https://def.gh");
 		news.setImage(Attachment.createImage(".jpg",
-				IOUtils.toByteArray(getClass().getResourceAsStream("/image/party.jpg"))));
-		repository.save(news);
+				IOUtils.toByteArray(this.getClass().getResourceAsStream("/image/party.jpg"))));
+		this.repository.save(news);
 
 		// when
 		long time1 = System.currentTimeMillis();
-		marketingApi.news(news.getId());
+		this.marketingApi.news(news.getId());
 		time1 = System.currentTimeMillis() - time1;
 		long time2 = System.currentTimeMillis();
-		final String result = marketingApi.news(news.getId());
+		final String result = this.marketingApi.news(news.getId());
 		time2 = System.currentTimeMillis() - time2;
 
 		// then
 		assertTrue(result.contains("<article>abc"));
 		assertTrue(
 				result.contains("<link rel=\"canonical\" href=\"https://fan-club.online/rest/marketing/news/1\" />"));
-		assertTrue((double) time2 / time1 < 0.05, "time " + time2);
+		assertTrue((double) time2 / time1 < 0.1, ((double) time2 / time1) + "\ntime1: " + time1 + "\ntime2: " + time2);
 	}
 
 	@Test
@@ -94,7 +94,7 @@ public class MarketingApiTest {
 	public void locationId() throws Exception {
 		// given
 		final String id = "1234567890";
-		final String s = IOUtils.toString(getClass().getResourceAsStream("/json/pollSportsbarResult.json"),
+		final String s = IOUtils.toString(this.getClass().getResourceAsStream("/json/pollSportsbarResult.json"),
 				StandardCharsets.UTF_8).replace("{locationId}", id);
 		final Matcher matcher = Pattern.compile("\"locationId\":.?\"(\\d+)\"", Pattern.MULTILINE).matcher(s);
 

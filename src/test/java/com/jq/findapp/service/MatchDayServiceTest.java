@@ -152,7 +152,7 @@ public class MatchDayServiceTest {
 		final String result = this.result(clientMarketingId);
 
 		// then
-		assertTrue(Integer.valueOf(result.split(" ")[0]) > 0);
+		assertTrue(Integer.valueOf(result.split(" ")[0]) > 0, result);
 	}
 
 	@Test

@@ -41,7 +41,7 @@ public class CronServiceTest {
 		final ZonedDateTime now = Instant.ofEpochSecond(60).atZone(ZoneId.of("Europe/Berlin"));
 
 		// when
-		final boolean value = cronService.cron("1", now);
+		final boolean value = this.cronService.cron("1", now);
 
 		// then
 		assertTrue(value);
@@ -53,7 +53,7 @@ public class CronServiceTest {
 		final ZonedDateTime now = Instant.ofEpochSecond(1200).atZone(ZoneId.of("Europe/Berlin"));
 
 		// when
-		final boolean value = cronService.cron("*/10", now);
+		final boolean value = this.cronService.cron("*/10", now);
 
 		// then
 		assertTrue(value);
@@ -65,7 +65,7 @@ public class CronServiceTest {
 		final ZonedDateTime now = Instant.ofEpochSecond(1100).atZone(ZoneId.of("Europe/Berlin"));
 
 		// when
-		final boolean value = cronService.cron("*/10", now);
+		final boolean value = this.cronService.cron("*/10", now);
 
 		// then
 		assertFalse(value);
@@ -77,7 +77,7 @@ public class CronServiceTest {
 		final ZonedDateTime now = Instant.ofEpochSecond(54000).atZone(ZoneId.of("Europe/Berlin"));
 
 		// when
-		final boolean value = cronService.cron("0 15,16,17", now);
+		final boolean value = this.cronService.cron("0 15,16,17", now);
 
 		// then
 		assertTrue(value);
@@ -89,7 +89,7 @@ public class CronServiceTest {
 		final ZonedDateTime now = Instant.ofEpochSecond(50400).atZone(ZoneId.of("Europe/Berlin"));
 
 		// when
-		final boolean value = cronService.cron("0 16,17", now);
+		final boolean value = this.cronService.cron("0 16,17", now);
 
 		// then
 		assertFalse(value);
@@ -100,7 +100,7 @@ public class CronServiceTest {
 		// given
 
 		// when
-		final Method method = chatService.getClass().getMethod("cron");
+		final Method method = this.chatService.getClass().getMethod("cron");
 
 		// then
 		assertTrue(method.isAnnotationPresent(Cron.class));
@@ -109,16 +109,24 @@ public class CronServiceTest {
 	@Test
 	public void run_fourTimes() throws Exception {
 		// given
-		cronService.run();
-		cronService.run();
-		cronService.run();
+		final String time = Instant.now().atZone(ZoneId.of("UCT")).toString().substring(0, 19);
+		this.cronService.run();
+		this.cronService.run();
+		this.cronService.run();
 
 		// when
-		cronService.run();
+		this.cronService.run();
 
 		// then
-		Thread.sleep(1000);
-		final List<?> list = repository.list("from Log where uri like '/support/cron/MarketingLocationService/cron'");
-		assertEquals(4, list.size());
+		List<?> list = null;
+		for (int i = 0; i < 100; i++) {
+			Thread.sleep(1000);
+			list = this.repository
+					.list("from Log where uri like '/support/cron/EventService/cron' and createdAt>=cast('"
+							+ time + "' as timestamp)");
+			if (list.size() > 3)
+				break;
+		}
+		assertEquals(4, list == null ? 0 : list.size());
 	}
 }

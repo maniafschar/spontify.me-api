@@ -193,7 +193,6 @@ public class TestConfig {
 				throw new RuntimeException(ex);
 			}
 		}
-
 	}
 
 	public static int toDays(final Connection connection, final Timestamp timestamp)

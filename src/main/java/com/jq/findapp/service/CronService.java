@@ -41,7 +41,7 @@ public class CronService {
 	@Autowired
 	private Repository repository;
 
-	// 14 executable jobs
+	// executable jobs
 	@Autowired
 	private ChatService chatService;
 
