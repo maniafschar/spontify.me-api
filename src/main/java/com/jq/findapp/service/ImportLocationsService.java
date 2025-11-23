@@ -354,7 +354,7 @@ public class ImportLocationsService {
 		return false;
 	}
 
-	@Cron("10 13")
+	@Cron("20 13")
 	public CronResult cronSkills() {
 		final CronResult result = new CronResult();
 		final QueryParams params = new QueryParams(Query.location_listId);
@@ -431,7 +431,8 @@ public class ImportLocationsService {
 
 	public void addSkills(final Location location) {
 		final Attributes attributes = this.aiService
-				.attributes("Please give me 10 attributes and a description of the location '" + location.getName()
+				.attributes("Please give 10 one word attributes and a description of the location '"
+						+ location.getName()
 						+ "' in " + location.getTown() + ", " + location.getStreet() + ", " + location.getCountry());
 		location.setDescription(attributes.description
 				+ (Strings.isEmpty(location.getDescription()) ? "" : "\n\n" + location.getDescription()));
