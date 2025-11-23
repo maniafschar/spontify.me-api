@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -121,10 +122,9 @@ public class AiService {
 		}
 		final List<Location> locations = new ArrayList<>();
 		if (result.size() > 0) {
-			for (int i = 0; i < result.size(); i++)
-				locations.add(
-						this.repository.one(Location.class, new BigInteger(result.get(i).get("ai.note").toString())));
-			return locations;
+			final String[] ids = result.get(0).get("ai.note").toString().split(",");
+			for (int i = 0; i < ids.length; i++)
+				locations.add(this.repository.one(Location.class, new BigInteger(ids[i])));
 		}
 		return locations;
 	}
@@ -134,7 +134,6 @@ public class AiService {
 		final ArrayNode nodes = (ArrayNode) Json.toNode(answer);
 		final List<BigInteger> locationIds = new ArrayList<>();
 		for (int i = 0; i < locations.size(); i++) {
-			final Ai ai = new Ai();
 			try {
 				final Location location = locations.get(i);
 				if (nodes.get(i).has("location_name"))
@@ -142,21 +141,22 @@ public class AiService {
 				location.setAddress(location.getStreet() + " " + location.getNumber() + "\n" + location.getZipCode()
 						+ " " + location.getTown() + "\n" + location.getCountry());
 				this.repository.save(location);
-				ai.setNote(location.getId().toString());
 				locationIds.add(location.getId());
 			} catch (final IllegalArgumentException ex) {
 				if (ex.getMessage().startsWith("exists:")) {
 					final BigInteger id = new BigInteger(ex.getMessage().substring(ex.getMessage().indexOf(":") + 1));
 					locationIds.add(id);
-					ai.setNote(id.toString());
 				} else
 					locationIds.add(null);
 			}
-			if (!Strings.isEmpty(ai.getNote())) {
-				ai.setQuestion(question);
-				ai.setType(AiType.Location);
-				this.repository.save(ai);
-			}
+		}
+		final Ai ai = new Ai();
+		ai.setNote(locationIds.stream().filter(e -> e != null).map(e -> e.toString())
+				.collect(Collectors.joining(",")));
+		if (!Strings.isEmpty(ai.getNote())) {
+			ai.setQuestion(question);
+			ai.setType(AiType.Location);
+			this.repository.save(ai);
 		}
 		return locationIds;
 	}
