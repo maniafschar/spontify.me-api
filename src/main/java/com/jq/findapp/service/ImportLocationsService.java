@@ -436,8 +436,8 @@ public class ImportLocationsService {
 						+ "' in " + location.getTown() + ", " + location.getStreet() + ", " + location.getCountry());
 		location.setDescription(attributes.description
 				+ (Strings.isEmpty(location.getDescription()) ? "" : "\n\n" + location.getDescription()));
-		String skills = "";
-		String skillsText = "";
+		String skills = Strings.isEmpty(location.getSkills()) ? "" : location.getSkills();
+		String skillsText = Strings.isEmpty(location.getSkillsText()) ? "" : location.getSkillsText();
 		for (final String attribute : attributes.values) {
 			final String id = this.text.getSkillId(attribute);
 			if (id == null)

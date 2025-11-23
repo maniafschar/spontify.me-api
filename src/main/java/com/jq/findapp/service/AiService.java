@@ -55,17 +55,17 @@ public class AiService {
 		public List<String> values;
 	}
 
-	public Ai text(final String question) {
+	public String text(final String question) {
 		final Result result = this.exists(question, AiType.Text, 365);
 		if (result.size() > 0)
-			return this.repository.one(Ai.class, (BigInteger) result.get(0).get("ai.id"));
+			return (String) result.get(0).get("ai.note");
 		final String note = this.externalService.gemini(question, null);
 		final Ai ai = new Ai();
 		ai.setQuestion(question);
 		ai.setNote(note);
 		ai.setType(AiType.Text);
 		this.repository.save(ai);
-		return ai;
+		return note;
 	}
 
 	@Async

@@ -15,7 +15,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jq.findapp.FindappApplication;
 import com.jq.findapp.TestConfig;
-import com.jq.findapp.entity.Ai;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.util.Json;
 
@@ -44,12 +43,12 @@ public class AiServiceTest {
 		// given
 
 		// when
-		final Ai ai = this.aiService.text(
+		final String text = this.aiService.text(
 				"Liste spannende Anekdoten zu den Begegnungen des FC Bayern München gegen 1. FC Nürnberg.");
 
 		// then
-		assertNotNull(ai);
-		assertTrue(ai.getNote().length() > 2);
+		assertNotNull(text);
+		assertTrue(text.length() > 2);
 	}
 
 	@Test

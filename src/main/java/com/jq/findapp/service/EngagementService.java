@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.jq.findapp.entity.Ai;
 import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.OS;
@@ -365,7 +364,7 @@ public class EngagementService {
 			final QueryParams params = new QueryParams(Query.contact_listId);
 			params.setSearch("contact.clientId=4 and contact.skills like '%9.%'");
 			final Result contacts = this.repository.list(params);
-			final Map<Integer, Ai> text = new HashMap<>();
+			final Map<Integer, String> text = new HashMap<>();
 			for (int i = 0; i < contacts.size(); i++) {
 				final Contact contact = this.repository.one(Contact.class,
 						(BigInteger) contacts.get(i).get("contact.id"));
@@ -386,8 +385,8 @@ public class EngagementService {
 						final ContactChat chat = new ContactChat();
 						chat.setContactId(this.repository.one(Client.class, contact.getClientId()).getAdminId());
 						chat.setContactId2(contact.getId());
-						chat.setAction("ai:" + text.get(teamIds.get(i2)).getId());
-						chat.setNote(text.get(teamIds.get(i2)).getNote());
+						chat.setAction("ai:");
+						chat.setNote(text.get(teamIds.get(i2)));
 						this.repository.save(chat);
 					}
 				}
