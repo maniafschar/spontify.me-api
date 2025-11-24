@@ -36,6 +36,7 @@ import com.jq.findapp.entity.ContactReferer;
 import com.jq.findapp.entity.ContactToken;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
+import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
 import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.AuthenticationService.AuthenticationException.AuthenticationExceptionType;
@@ -480,6 +481,13 @@ public class AuthenticationService {
 			}
 			return pw.password;
 		}
+	}
+
+	public BigInteger retrieveClientId(final String host) {
+		final QueryParams params = new QueryParams(Query.misc_listClient);
+		params.setSearch("client.url like '%" + host + "%'");
+		final Result result = this.repository.list(params);
+		return result.size() > 0 ? (BigInteger) result.get(0).get("client.id") : null;
 	}
 
 	public void deleteAccount(final Contact contact) {
