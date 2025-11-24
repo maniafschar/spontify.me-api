@@ -270,11 +270,14 @@ public class ActionApi {
 	}
 
 	@GetMapping("news")
-	public List<Object[]> news(@RequestHeader final BigInteger clientId,
+	public List<Object[]> news(@RequestHeader(required = false) BigInteger clientId,
 			@RequestParam(required = false) final BigInteger id,
 			@RequestParam(required = false) final Float latitude,
 			@RequestParam(required = false) final Float longitude,
-			@RequestHeader(required = false) final BigInteger user) throws Exception {
+			@RequestHeader(required = false) final BigInteger user,
+			@RequestHeader(required = false, name = "X-Forwarded-Host") final String host) throws Exception {
+		if (clientId == null)
+			clientId = this.authenticationService.retrieveClientId(host);
 		final QueryParams params = new QueryParams(Query.misc_listNews);
 		params.setUser(new Contact());
 		params.getUser().setClientId(clientId);
