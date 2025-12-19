@@ -270,8 +270,8 @@ public class ExternalService {
 		final List<Content> contents = ImmutableList.of(Content.builder().role("user")
 				.parts(ImmutableList.of(Part.fromText(question))).build());
 		try (final ResponseStream<GenerateContentResponse> responseStream = com.google.genai.Client.builder()
-				.apiKey(this.geminiKey)
-				.build().models.generateContentStream("gemini-2.5-flash-lite", contents, config.build())) {
+				.apiKey(this.geminiKey).build().models
+				.generateContentStream("gemini-2.5-flash-lite", contents, config.build())) {
 			final StringBuffer s = new StringBuffer();
 			for (final GenerateContentResponse res : responseStream) {
 				if (res.candidates().isEmpty() || res.candidates().get().get(0).content().isEmpty()
