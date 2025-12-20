@@ -24,6 +24,7 @@ import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.OS;
 import com.jq.findapp.entity.ContactChat;
 import com.jq.findapp.entity.Location;
+import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
 import com.jq.findapp.repository.Query.Result;
 import com.jq.findapp.repository.QueryParams;
@@ -53,6 +54,9 @@ public class EngagementService {
 
 	@Autowired
 	private MatchDayService matchDayService;
+
+	@Autowired
+	private NotificationService notificationService;
 
 	@Autowired
 	private Text text;
@@ -352,6 +356,7 @@ public class EngagementService {
 			}
 			result.body += "\ntemplate: " + count + ", time: " + (System.currentTimeMillis() - t);
 		} catch (final Exception e) {
+			this.notificationService.createTicket(TicketType.ERROR, "engage", Strings.stackTraceToString(e), null);
 			result.exception = e;
 		}
 		return result;
