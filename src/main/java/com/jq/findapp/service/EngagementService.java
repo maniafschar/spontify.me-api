@@ -203,7 +203,9 @@ public class EngagementService {
 				contact -> contact.getLatitude() != null
 						&& contact.getModifiedAt() != null
 						&& contact.getModifiedAt()
-								.after(new Date(Instant.now().minus(Duration.ofDays(1)).toEpochMilli()))));
+								.after(new Date(Instant.now().minus(Duration.ofDays(1)).toEpochMilli()))
+						&& this.externalService.getAddress(contact.getLatitude(), contact.getLongitude(),
+								false) != null));
 
 		this.chatTemplates.add(new ChatTemplate(TextId.engagement_allowLocation,
 				"",
