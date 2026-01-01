@@ -10,7 +10,7 @@ public class GeoLocationProcessorTest {
 		// given
 
 		// when
-		final double distance = GeoLocationProcessor.distance(51.116745, 9.528915, 51.116745,
+		final double distance = GeoLocationProcessor.distance(51.11674499511719, 9.528915234234, 51.116745,
 				9.528915);
 
 		// then

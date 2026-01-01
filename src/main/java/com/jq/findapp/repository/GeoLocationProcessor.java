@@ -33,50 +33,50 @@ public class GeoLocationProcessor {
 				params.setDistance(100);
 			else if (params.getDistance() == -1)
 				params.setDistance(100000);
-			table = params.getQuery().name().split("_")[0];
-			if ("event".equals(table))
-				table = "location";
-			else if ("misc".equals(table))
-				table = params.getQuery().getHeader()[0].split("\\.")[0];
-			roundToInteger = params.getQuery().name().startsWith("contact_");
-			sort = params.isSort();
-			radLat = Math.toRadians(params.getLatitude());
-			radLon = Math.toRadians(params.getLongitude());
-			checkBounds(radLat, radLon);
-			params.setSearchGeoLocation(getSearch(table, params.getDistance()));
-			if ("location".equals(table) && params.getQuery().getSql().contains("contact."))
+			this.table = params.getQuery().name().split("_")[0];
+			if ("event".equals(this.table))
+				this.table = "location";
+			else if ("misc".equals(this.table))
+				this.table = params.getQuery().getHeader()[0].split("\\.")[0];
+			this.roundToInteger = params.getQuery().name().startsWith("contact_");
+			this.sort = params.isSort();
+			this.radLat = Math.toRadians(params.getLatitude());
+			this.radLon = Math.toRadians(params.getLongitude());
+			this.checkBounds(this.radLat, this.radLon);
+			params.setSearchGeoLocation(this.getSearch(this.table, params.getDistance()));
+			if ("location".equals(this.table) && params.getQuery().getSql().contains("contact."))
 				params.setSearchGeoLocation("((location.latitude is not null and " + params.getSearchGeoLocation()
-						+ ") or (contact.latitude is not null and " + getSearch("contact", params.getDistance())
+						+ ") or (contact.latitude is not null and " + this.getSearch("contact", params.getDistance())
 						+ "))");
 			else if (params.getDistance() > 50000 || params.getDistance() < 1)
 				params.setSearchGeoLocation(
-						'(' + table + ".latitude is null or " + params.getSearchGeoLocation() + ')');
+						'(' + this.table + ".latitude is null or " + params.getSearchGeoLocation() + ')');
 		} else
 			params.setSearchGeoLocation(null);
 	}
 
 	private String getSearch(final String table, final int distance) {
-		final Point[] boundingCoordinates = computeBoundingCoordinates(distance);
+		final Point[] boundingCoordinates = this.computeBoundingCoordinates(distance);
 		final boolean meridian180WithinDistance = boundingCoordinates[0].getY() > boundingCoordinates[1].getY();
 		return "((" + table + ".latitude >= " + boundingCoordinates[0].getX() + " and " + table + ".latitude <= "
 				+ boundingCoordinates[1].getX() + ") and (" + table + ".longitude >= "
 				+ boundingCoordinates[0].getY() + ' ' + (meridian180WithinDistance ? "or" : "and") + ' '
 				+ table + ".longitude <= " + boundingCoordinates[1].getY() + ") and " + "acos(sin("
-				+ radLat + ") * sin(radians(" + table + ".latitude)) + cos(" + radLat
+				+ this.radLat + ") * sin(radians(" + table + ".latitude)) + cos(" + this.radLat
 				+ ") * cos(radians(" + table + ".latitude)) * cos(radians(" + table + ".longitude) - "
-				+ radLon + ")) <= " + (distance / radius) + ')';
+				+ this.radLon + ")) <= " + (distance / radius) + ')';
 	}
 
 	public List<Object[]> postProcessor(final List<Object[]> list) {
-		if (table != null && list.size() > 0) {
+		if (this.table != null && list.size() > 0) {
 			final String[] header = (String[]) list.get(0);
 			int distance = -1, latitude = -1, longitude = -1, latitudeContact = -1, longitudeContact = -1;
 			for (int i = 0; i < header.length; i++) {
 				if ("_geolocationDistance".equals(header[i]))
 					distance = i;
-				else if ((table + ".latitude").equals(header[i]))
+				else if ((this.table + ".latitude").equals(header[i]))
 					latitude = i;
-				else if ((table + ".longitude").equals(header[i]))
+				else if ((this.table + ".longitude").equals(header[i]))
 					longitude = i;
 				else if ("contact.longitude".equals(header[i]))
 					longitudeContact = i;
@@ -89,10 +89,10 @@ public class GeoLocationProcessor {
 				for (int i = 1; i < list.size(); i++) {
 					o2 = list.get(i);
 					if (o2[latitude] != null && o2[longitude] != null)
-						o2[distance] = Double.valueOf(distanceTo(((Number) o2[latitude]).doubleValue(),
+						o2[distance] = Double.valueOf(this.distanceTo(((Number) o2[latitude]).doubleValue(),
 								((Number) o2[longitude]).doubleValue()));
 					else if (latitudeContact > -1 && o2[latitudeContact] != null && o2[longitudeContact] != null) {
-						o2[distance] = Double.valueOf(distanceTo(((Number) o2[latitudeContact]).doubleValue(),
+						o2[distance] = Double.valueOf(this.distanceTo(((Number) o2[latitudeContact]).doubleValue(),
 								((Number) o2[longitudeContact]).doubleValue()));
 						if (((Number) o2[distance]).doubleValue() <= 1.5)
 							o2[distance] = 1;
@@ -101,7 +101,7 @@ public class GeoLocationProcessor {
 					} else
 						o2[distance] = max;
 				}
-				if (sort) {
+				if (this.sort) {
 					final int d = distance;
 					Collections.sort(list, new Comparator<Object>() {
 						@Override
@@ -118,7 +118,7 @@ public class GeoLocationProcessor {
 					final Object[] row = ((Object[]) list.get(i));
 					if (row[distance] == max)
 						row[distance] = null;
-					else if (roundToInteger) {
+					else if (this.roundToInteger) {
 						if (((Number) row[distance]).doubleValue() <= 1.5)
 							row[distance] = 1;
 						else
@@ -137,8 +137,9 @@ public class GeoLocationProcessor {
 
 	private double distanceTo(final double latitude, final double longitude) {
 		final double d = Math.toRadians(latitude);
-		return Math.acos(Math.sin(radLat) * Math.sin(d)
-				+ Math.cos(radLat) * Math.cos(d) * Math.cos(radLon - Math.toRadians(longitude))) * radius;
+		final double d2 = Math.sin(this.radLat) * Math.sin(d)
+				+ Math.cos(this.radLat) * Math.cos(d) * Math.cos(this.radLon - Math.toRadians(longitude));
+		return Math.acos(d2 > 1.0 ? 1.0 : d2 < -1.0 ? -1.0 : d2) * radius;
 	}
 
 	public static double distance(final double latitude1, final double longitude1, final double latitude2,
@@ -191,15 +192,15 @@ public class GeoLocationProcessor {
 
 		// angular distance in radians on a great circle
 		final double radDist = distance / radius;
-		double minLat = radLat - radDist;
-		double maxLat = radLat + radDist;
+		double minLat = this.radLat - radDist;
+		double maxLat = this.radLat + radDist;
 		double minLon, maxLon;
 		if (minLat > MIN_LAT && maxLat < MAX_LAT) {
-			final double deltaLon = Math.asin(Math.sin(radDist) / Math.cos(radLat));
-			minLon = radLon - deltaLon;
+			final double deltaLon = Math.asin(Math.sin(radDist) / Math.cos(this.radLat));
+			minLon = this.radLon - deltaLon;
 			if (minLon < MIN_LON)
 				minLon += 2d * Math.PI;
-			maxLon = radLon + deltaLon;
+			maxLon = this.radLon + deltaLon;
 			if (maxLon > MAX_LON)
 				maxLon -= 2d * Math.PI;
 		} else {
@@ -209,8 +210,8 @@ public class GeoLocationProcessor {
 			minLon = MIN_LON;
 			maxLon = MAX_LON;
 		}
-		checkBounds(minLat, minLon);
-		checkBounds(maxLat, maxLon);
+		this.checkBounds(minLat, minLon);
+		this.checkBounds(maxLat, maxLon);
 		return new Point[] { new Point(Math.toDegrees(minLat), Math.toDegrees(minLon)),
 				new Point(Math.toDegrees(maxLat), Math.toDegrees(maxLon)) };
 	}
