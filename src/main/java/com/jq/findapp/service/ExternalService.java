@@ -208,7 +208,9 @@ public class ExternalService {
 						latitude + "\n" + longitude + '\n' + persistedAddress.size() + '\n'
 								+ GeoLocationProcessor.distance(latitude, longitude,
 										(Float) persistedAddress.get(0).get("geoLocation.latitude"),
-										(Float) persistedAddress.get(0).get("geoLocation.longitude")),
+										(Float) persistedAddress.get(0).get("geoLocation.longitude"))
+								+ "\n" + persistedAddress.get(0).get("geoLocation.latitude") + "\n"
+								+ persistedAddress.get(0).get("geoLocation.longitude"),
 						null);
 			return this.repository.one(GeoLocation.class, id);
 		}
