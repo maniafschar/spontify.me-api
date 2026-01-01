@@ -175,9 +175,8 @@ public class EngagementService {
 		}
 
 		String replace(final String s, final Contact contact, final Location location,
-				final ExternalService externalService,
-				final Repository repository) {
-			return s.contains(this.name())
+				final ExternalService externalService, final Repository repository) {
+			return s != null && s.contains(this.name())
 					? s.replaceAll(this.name(), this.exec.replace(contact, location, externalService, repository))
 					: s;
 		}
@@ -350,9 +349,15 @@ public class EngagementService {
 			count = 0;
 			t = System.currentTimeMillis();
 			for (int i = 0; i < ids.size(); i++) {
-				final Contact contact = this.repository.one(Contact.class, (BigInteger) ids.get(i).get("contact.id"));
-				if (this.timeForNewChat(contact, params, false) && this.sendChatTemplate(contact))
-					count++;
+				try {
+					final Contact contact = this.repository.one(Contact.class,
+							(BigInteger) ids.get(i).get("contact.id"));
+					if (this.timeForNewChat(contact, params, false) && this.sendChatTemplate(contact))
+						count++;
+				} catch (final NullPointerException ex) {
+					this.notificationService.createTicket(TicketType.ERROR, "engage",
+							ids.get(i) + "\n" + Strings.stackTraceToString(ex), null);
+				}
 			}
 			result.body += "\ntemplate: " + count + ", time: " + (System.currentTimeMillis() - t);
 		} catch (final Exception e) {
@@ -564,8 +569,8 @@ public class EngagementService {
 		params.setSearch("contactChat.contactId=" + adminId + " and contactChat.contactId2=" + contact.getId()
 				+ " and cast(contactChat.textId as text)='" + textId.name() + '\'');
 		if (this.repository.list(params).size() == 0) {
-			String s = this.text.getText(contact, textId);
 			try {
+				String s = this.text.getText(contact, textId);
 				for (final REPLACMENT rep : REPLACMENT.values())
 					s = rep.replace(s, contact, location, this.externalService, this.repository);
 				final ContactChat contactChat = new ContactChat();
