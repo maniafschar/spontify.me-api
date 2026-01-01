@@ -203,6 +203,9 @@ public class ExternalService {
 					id = (BigInteger) persistedAddress.get(i).get("geoLocation.id");
 				}
 			}
+			if (id == null)
+				this.notificationService.createTicket(TicketType.ERROR, "No google address",
+						latitude + "\n" + longitude + '\n' + persistedAddress.size(), null);
 			return this.repository.one(GeoLocation.class, id);
 		}
 		final List<GeoLocation> geoLocations = this.convertAddress(
