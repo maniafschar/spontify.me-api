@@ -19,7 +19,7 @@
 		"guide": "Hey CONTACT_PSEUDONYM, you're a guide, would you like to invite your friends to help the community grow? EMOJI_DANCING",
 		"installCurrentVersion": "Hey CONTACT_PSEUDONYM, you are not using the current version VERSION of the app. Some new features have been added to the current version, do you want to update?",
 		"like": "Hello CONTACT_PSEUDONYM, what bothers you about APP_TITLE, what do you miss? 🤔\nTell us frankly what you think. EMOJI_WAVING",
-		"nearByContact": "Hallo CONTACT_PSEUDONYM, ${buddy} LOCATION_NAME matches excellent! Would you like to get in touch? Start a chat, maybe about things you have in common.",
+		"nearByContact": "Hallo CONTACT_PSEUDONYM, ${buddy} CONTACT_PSEUDONYM matches excellent! Would you like to get in touch? Start a chat, maybe about things you have in common.",
 		"nearByLocation": "Hello CONTACT_PSEUDONYM, you are near the location LOCATION_NAME and you might like it. Maybe you visit them and rate them?",
 		"newContacts": "Hello CONTACT_PSEUDONYM, since your last login on CONTACT_MODIFIED_AT, NEW_CONTACTS_COUNT new ${buddies} have registered in your area of NEW_CONTACTS_DISTANCE KM. Maybe one or the other ${buddy} suits you?",
 		"newLocations": "Hello CONTACT_PSEUDONYM, since your last login on CONTACT_MODIFIED_AT, NEW_LOCATIONS_COUNT new locations have been entered in your vicinity of NEW_LOCATIONS_DISTANCE KM. Maybe you like one or the other location?",
