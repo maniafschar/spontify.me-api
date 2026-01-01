@@ -196,22 +196,13 @@ public class ExternalService {
 			BigInteger id = null;
 			for (int i = 0; i < persistedAddress.size(); i++) {
 				d = GeoLocationProcessor.distance(latitude, longitude,
-						(Float) persistedAddress.get(i).get("geoLocation.latitude"),
-						(Float) persistedAddress.get(i).get("geoLocation.longitude"));
+						((Float) persistedAddress.get(i).get("geoLocation.latitude")).doubleValue(),
+						((Float) persistedAddress.get(i).get("geoLocation.longitude")).doubleValue());
 				if (d < distance) {
 					distance = d;
 					id = (BigInteger) persistedAddress.get(i).get("geoLocation.id");
 				}
 			}
-			if (id == null)
-				this.notificationService.createTicket(TicketType.ERROR, "No google address",
-						latitude + "\n" + longitude + '\n' + persistedAddress.size() + '\n'
-								+ GeoLocationProcessor.distance(latitude, longitude,
-										(Float) persistedAddress.get(0).get("geoLocation.latitude"),
-										(Float) persistedAddress.get(0).get("geoLocation.longitude"))
-								+ "\n" + persistedAddress.get(0).get("geoLocation.latitude") + "\n"
-								+ persistedAddress.get(0).get("geoLocation.longitude"),
-						null);
 			return this.repository.one(GeoLocation.class, id);
 		}
 		final List<GeoLocation> geoLocations = this.convertAddress(
