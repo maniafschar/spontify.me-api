@@ -195,7 +195,7 @@ public class ExternalService {
 			double distance = Double.MAX_VALUE, d;
 			BigInteger id = null;
 			for (int i = 0; i < persistedAddress.size(); i++) {
-				d = GeoLocationProcessor.distance(latitude, longitude,
+				d = GeoLocationProcessor.distance((double) latitude, (double) longitude,
 						((Float) persistedAddress.get(i).get("geoLocation.latitude")).doubleValue(),
 						((Float) persistedAddress.get(i).get("geoLocation.longitude")).doubleValue());
 				if (d < distance) {
