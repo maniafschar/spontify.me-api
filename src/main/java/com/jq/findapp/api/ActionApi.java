@@ -435,7 +435,7 @@ public class ActionApi {
 					result.put("street", geoLocation.getStreet());
 				result.put("town",
 						geoLocation.getTown() != null ? geoLocation.getTown() : geoLocation.getCountry());
-				if (!position.isManual()) {
+				if (!position.isManual() && geoLocation.getId() != null) {
 					final ContactGeoLocationHistory contactGeoLocationHistory = new ContactGeoLocationHistory();
 					contactGeoLocationHistory.setContactId(contact.getId());
 					contactGeoLocationHistory.setGeoLocationId(geoLocation.getId());

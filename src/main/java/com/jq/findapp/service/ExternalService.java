@@ -128,6 +128,8 @@ public class ExternalService {
 								try {
 									this.repository.save(geoLocation);
 								} catch (final Exception e) {
+									this.notificationService.createTicket(TicketType.ERROR, "geoLocation",
+											Strings.stackTraceToString(e), null);
 								}
 						}
 					}
