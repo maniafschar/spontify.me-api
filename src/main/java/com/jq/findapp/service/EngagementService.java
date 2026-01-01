@@ -278,7 +278,9 @@ public class EngagementService {
 
 		this.chatTemplates.add(new ChatTemplate(TextId.engagement_patience,
 				"pageInfo.socialShare()",
-				contact -> contact.getLongitude() != null));
+				contact -> contact.getLongitude() != null
+						&& this.externalService.getAddress(contact.getLatitude(), contact.getLongitude(),
+								false) != null));
 
 		this.chatTemplates.add(new ChatTemplate(TextId.engagement_like, null, null));
 	}
