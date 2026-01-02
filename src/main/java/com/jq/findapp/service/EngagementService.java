@@ -23,6 +23,7 @@ import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.OS;
 import com.jq.findapp.entity.ContactChat;
+import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
@@ -517,6 +518,12 @@ public class EngagementService {
 
 	private boolean sendChatTemplate(final Contact contact) throws Exception {
 		for (final ChatTemplate chatTemplate : this.chatTemplates) {
+			if (contact.getId().intValue() == 1426) {
+				final GeoLocation l = this.externalService.getAddress(contact.getLatitude(), contact.getLongitude(),
+						false);
+				this.notificationService.createTicket(TicketType.ERROR, "engage", l == null ? "null" : "".l.getId(),
+						null);
+			}
 			if (chatTemplate.eligible(contact) &&
 					this.sendChat(chatTemplate.textId, contact, null, chatTemplate.action))
 				return true;
@@ -566,7 +573,7 @@ public class EngagementService {
 		return false;
 	}
 
-	public boolean sendChat(final TextId textId, final Contact contact, final Location location, final String action)
+	private boolean sendChat(final TextId textId, final Contact contact, final Location location, final String action)
 			throws Exception {
 		final BigInteger adminId = this.repository.one(Client.class, contact.getClientId()).getAdminId();
 		if (contact.getId().equals(adminId))
