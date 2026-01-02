@@ -288,7 +288,10 @@ public class EngagementService {
 										(contact.getLatitude() != null
 												&& this.externalService.getAddress(contact.getLatitude(),
 														contact.getLongitude(),
-														false) != null),
+														false) != null)
+										+ this.externalService.getAddress(contact.getLatitude(),
+												contact.getLongitude(),
+												false),
 								null);
 					}
 					return contact.getLatitude() != null

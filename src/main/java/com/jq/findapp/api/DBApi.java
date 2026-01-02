@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.jq.findapp.api.model.WriteEntity;
 import com.jq.findapp.entity.BaseEntity;
 import com.jq.findapp.entity.Contact;
@@ -28,6 +30,7 @@ import com.jq.findapp.repository.Repository;
 import com.jq.findapp.service.NotificationService;
 import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Entity;
+import com.jq.findapp.util.Json;
 
 import jakarta.transaction.Transactional;
 
@@ -50,6 +53,11 @@ public class DBApi {
 	@GetMapping("list")
 	public List<Object[]> list(final QueryParams params, @RequestHeader final BigInteger user) throws Exception {
 		params.setUser(this.repository.one(Contact.class, user));
+		if (!Strings.isEmpty(params.getSearch()) && params.getSearch().startsWith("{")
+				&& params.getSearch().endsWith("}")) {
+			final JsonNode node = Json.toNode(params.getSearch());
+
+		}
 		return this.repository.list(params).getList();
 	}
 
