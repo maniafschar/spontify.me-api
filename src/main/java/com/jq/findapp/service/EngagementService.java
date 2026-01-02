@@ -284,7 +284,11 @@ public class EngagementService {
 								contact.getLongitude(),
 								false);
 						this.notificationService.createTicket(TicketType.ERROR, "engage",
-								(l == null ? "null" : "" + l.getId()),
+								(l == null ? "null" : "" + l.getId()) +
+										(contact.getLatitude() != null
+												&& this.externalService.getAddress(contact.getLatitude(),
+														contact.getLongitude(),
+														false) != null),
 								null);
 					}
 					return contact.getLatitude() != null
