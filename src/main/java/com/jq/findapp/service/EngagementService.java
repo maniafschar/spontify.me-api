@@ -521,7 +521,9 @@ public class EngagementService {
 			if (contact.getId().intValue() == 1426) {
 				final GeoLocation l = this.externalService.getAddress(contact.getLatitude(), contact.getLongitude(),
 						false);
-				this.notificationService.createTicket(TicketType.ERROR, "engage", l == null ? "null" : "" + l.getId(),
+				this.notificationService.createTicket(TicketType.ERROR, "engage",
+						(chatTemplate.textId.name() + chatTemplate.eligible(contact))
+								+ (l == null ? "null" : "" + l.getId()),
 						null);
 			}
 			if (chatTemplate.eligible(contact) &&
