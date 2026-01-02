@@ -278,9 +278,19 @@ public class EngagementService {
 
 		this.chatTemplates.add(new ChatTemplate(TextId.engagement_patience,
 				"pageInfo.socialShare()",
-				contact -> contact.getLatitude() != null
-						&& this.externalService.getAddress(contact.getLatitude(), contact.getLongitude(),
-								false) != null));
+				contact -> {
+					if (contact.getId().intValue() == 1426) {
+						final GeoLocation l = this.externalService.getAddress(contact.getLatitude(),
+								contact.getLongitude(),
+								false);
+						this.notificationService.createTicket(TicketType.ERROR, "engage",
+								(l == null ? "null" : "" + l.getId()),
+								null);
+					}
+					return contact.getLatitude() != null
+							&& this.externalService.getAddress(contact.getLatitude(), contact.getLongitude(),
+									false) != null;
+				}));
 
 		this.chatTemplates.add(new ChatTemplate(TextId.engagement_like, null, null));
 	}
@@ -518,14 +528,6 @@ public class EngagementService {
 
 	private boolean sendChatTemplate(final Contact contact) throws Exception {
 		for (final ChatTemplate chatTemplate : this.chatTemplates) {
-			if (contact.getId().intValue() == 1426) {
-				final GeoLocation l = this.externalService.getAddress(contact.getLatitude(), contact.getLongitude(),
-						false);
-				this.notificationService.createTicket(TicketType.ERROR, "engage",
-						(chatTemplate.textId.name() + chatTemplate.eligible(contact))
-								+ (l == null ? "null" : "" + l.getId()),
-						null);
-			}
 			if (chatTemplate.eligible(contact) &&
 					this.sendChat(chatTemplate.textId, contact, null, chatTemplate.action))
 				return true;
