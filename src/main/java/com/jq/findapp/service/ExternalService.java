@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -127,9 +128,10 @@ public class ExternalService {
 							if (geoLocation.getTown() != null)
 								try {
 									this.repository.save(geoLocation);
-								} catch (final Exception e) {
-									this.notificationService.createTicket(TicketType.ERROR, "geoLocation",
-											Strings.stackTraceToString(e), null);
+								} catch (final RuntimeException e) {
+									if (!(e.getCause() instanceof ConstraintViolationException))
+										this.notificationService.createTicket(TicketType.ERROR, "geoLocation",
+												Strings.stackTraceToString(e), null);
 								}
 						}
 					}
