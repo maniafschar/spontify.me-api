@@ -284,7 +284,7 @@ public class EngagementService {
 								contact.getLongitude(),
 								false);
 						this.notificationService.createTicket(TicketType.ERROR, "engage",
-								(l == null ? "null" : "" + l.getId()) +
+								(l == null ? "null object" : "" + l.getId()) +
 										(contact.getLatitude() != null
 												&& this.externalService.getAddress(contact.getLatitude(),
 														contact.getLongitude(),
