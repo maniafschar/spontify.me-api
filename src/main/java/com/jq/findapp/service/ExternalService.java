@@ -177,12 +177,9 @@ public class ExternalService {
 		final Map<String, Object> persistedAddress = this.repository.one(params);
 		if (persistedAddress.get("_id") != null)
 			return Arrays.asList(this.repository.one(GeoLocation.class, (BigInteger) persistedAddress.get("_id")));
-		final List<GeoLocation> geoLocations = this.convertAddress(
+		return this.convertAddress(
 				Json.toNode(this.google("geocode/json?components=administrative_area:"
 						+ URLEncoder.encode(town, StandardCharsets.UTF_8))));
-		if (geoLocations == null)
-			this.notificationService.createTicket(TicketType.ERROR, "No google address", town, null);
-		return geoLocations;
 	}
 
 	public GeoLocation getAddress(final float latitude, final float longitude, final boolean exact) {
@@ -209,10 +206,7 @@ public class ExternalService {
 		}
 		final List<GeoLocation> geoLocations = this.convertAddress(
 				Json.toNode(this.google("geocode/json?latlng=" + latitude + ',' + longitude)));
-		if (geoLocations != null)
-			return geoLocations.get(0);
-		this.notificationService.createTicket(TicketType.ERROR, "No google address", latitude + "\n" + longitude, null);
-		return null;
+		return geoLocations == null ? null : geoLocations.get(0);
 	}
 
 	public String map(final String source, final String destination, final Contact contact) {

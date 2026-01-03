@@ -23,7 +23,6 @@ import com.jq.findapp.entity.Client;
 import com.jq.findapp.entity.Contact;
 import com.jq.findapp.entity.Contact.OS;
 import com.jq.findapp.entity.ContactChat;
-import com.jq.findapp.entity.GeoLocation;
 import com.jq.findapp.entity.Location;
 import com.jq.findapp.entity.Ticket.TicketType;
 import com.jq.findapp.repository.Query;
@@ -278,26 +277,9 @@ public class EngagementService {
 
 		this.chatTemplates.add(new ChatTemplate(TextId.engagement_patience,
 				"pageInfo.socialShare()",
-				contact -> {
-					if (contact.getId().intValue() == 1426) {
-						final GeoLocation l = this.externalService.getAddress(contact.getLatitude(),
-								contact.getLongitude(),
-								false);
-						this.notificationService.createTicket(TicketType.ERROR, "engage",
-								(l == null ? "null object" : "" + l.getId()) +
-										(contact.getLatitude() != null
-												&& this.externalService.getAddress(contact.getLatitude(),
-														contact.getLongitude(),
-														false) != null)
-										+ this.externalService.getAddress(contact.getLatitude(),
-												contact.getLongitude(),
-												false).getId(),
-								null);
-					}
-					return contact.getLatitude() != null
-							&& this.externalService.getAddress(contact.getLatitude(), contact.getLongitude(),
-									false) != null;
-				}));
+				contact -> contact.getLatitude() != null
+						&& this.externalService.getAddress(contact.getLatitude(), contact.getLongitude(),
+								false) != null));
 
 		this.chatTemplates.add(new ChatTemplate(TextId.engagement_like, null, null));
 	}
@@ -373,15 +355,10 @@ public class EngagementService {
 			count = 0;
 			t = System.currentTimeMillis();
 			for (int i = 0; i < ids.size(); i++) {
-				try {
-					final Contact contact = this.repository.one(Contact.class,
-							(BigInteger) ids.get(i).get("contact.id"));
-					if (this.timeForNewChat(contact, params, false) && this.sendChatTemplate(contact))
-						count++;
-				} catch (final NullPointerException ex) {
-					this.notificationService.createTicket(TicketType.ERROR, "engage",
-							ids.get(i) + "\n" + Strings.stackTraceToString(ex), null);
-				}
+				final Contact contact = this.repository.one(Contact.class,
+						(BigInteger) ids.get(i).get("contact.id"));
+				if (this.timeForNewChat(contact, params, false) && this.sendChatTemplate(contact))
+					count++;
 			}
 			result.body += "\ntemplate: " + count + ", time: " + (System.currentTimeMillis() - t);
 		} catch (final Exception e) {
