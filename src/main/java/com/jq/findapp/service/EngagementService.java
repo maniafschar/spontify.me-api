@@ -176,9 +176,11 @@ public class EngagementService {
 
 		String replace(final String s, final Contact contact, final Location location,
 				final ExternalService externalService, final Repository repository) {
+			if (!s.contains(this.name()))
+				return s;
 			if (this.exec.replace(contact, location, externalService, repository) == null)
 				throw new RuntimeException("Replacement failed: " + this.name() + ", " + contact.getId() + ", " + s);
-			return s != null && s.contains(this.name())
+			return s != null
 					? s.replaceAll(this.name(), this.exec.replace(contact, location, externalService, repository))
 					: s;
 		}
