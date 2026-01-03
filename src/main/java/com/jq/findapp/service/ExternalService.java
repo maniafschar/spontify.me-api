@@ -128,6 +128,7 @@ public class ExternalService {
 							if (geoLocation.getTown() != null)
 								try {
 									this.repository.save(geoLocation);
+									list.add(geoLocation);
 								} catch (final RuntimeException e) {
 									if (!(e.getCause() instanceof ConstraintViolationException))
 										this.notificationService.createTicket(TicketType.ERROR, "geoLocation",
@@ -135,7 +136,6 @@ public class ExternalService {
 								}
 						}
 					}
-					list.add(geoLocation);
 				}
 			}
 			return list.size() == 0 ? null : list;
