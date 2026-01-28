@@ -153,7 +153,10 @@ public abstract class Import {
 				}
 			} catch (final RuntimeException ex) {
 				// if unable to access event, then ignore and continue, otherwise re-throw
-				if (ex instanceof IllegalArgumentException)
+				if (ex.getMessage() == null)
+					this.notificationService.createTicket(TicketType.ERROR, "eventImportInside",
+							Strings.stackTraceToString(ex) + "\n" + li, null);
+				else if (ex instanceof IllegalArgumentException)
 					this.failed.add(ex.getMessage().replace("\n", "\n  "));
 				else if (!ex.getMessage().contains(event.getUrl()))
 					this.failed.add(ex.getClass().getName() + ": " + ex.getMessage().replace("\n", "\n  "));
