@@ -114,7 +114,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 		final JsonNode result = address.get("results").get(0);
 		JsonNode n = result.get("geometry").get("location");
 		final List<GeoLocation> list = this.externalService.convertAddress(address);
-		if (list.size() == 0)
+		if (list == null || list.size() == 0)
 			throw new IllegalArgumentException("Failed to convert address:\n" + address.toPrettyString());
 		final GeoLocation geoLocation = list.get(0);
 		location.setAddress(geoLocation.getFormatted());
