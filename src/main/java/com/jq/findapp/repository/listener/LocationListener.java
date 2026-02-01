@@ -111,8 +111,6 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 			throw new IllegalArgumentException(
 					"invalid address:\n" + location.getName() + "\n" + location.getAddress() + "\n"
 							+ Json.toPrettyString(address));
-		final JsonNode result = address.get("results").get(0);
-		JsonNode n = result.get("geometry").get("location");
 		final List<GeoLocation> list = this.externalService.convertAddress(address);
 		if (list == null || list.size() == 0)
 			throw new IllegalArgumentException("Failed to convert address:\n" + address.toPrettyString());

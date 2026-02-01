@@ -125,15 +125,16 @@ public class ExternalService {
 						if (data != null) {
 							geoLocation.setLatitude((float) data.get("lat").asDouble());
 							geoLocation.setLongitude((float) data.get("lng").asDouble());
-							if (geoLocation.getTown() != null)
+							if (geoLocation.getTown() != null) {
 								try {
 									this.repository.save(geoLocation);
-									list.add(geoLocation);
 								} catch (final RuntimeException e) {
 									if (!(e.getCause() instanceof ConstraintViolationException))
 										this.notificationService.createTicket(TicketType.ERROR, "geoLocation",
 												Strings.stackTraceToString(e), null);
 								}
+								list.add(geoLocation);
+							}
 						}
 					}
 				}
