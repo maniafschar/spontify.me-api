@@ -134,7 +134,7 @@ public class LocationListener extends AbstractRepositoryListener<Location> {
 			location.setLongitude(geoLocation.getLongitude());
 			this.checkDuplicateLatLon(location);
 		}
-		n = result.get("address_components");
+		final JsonNode n = address.get("results").get("address_components");
 		String s = "";
 		for (int i = 0; i < n.size(); i++) {
 			if (!location.getAddress().contains(n.get(i).get("long_name").asText()))
