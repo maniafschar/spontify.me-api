@@ -226,7 +226,7 @@ public class DBApi {
 				if (Integer.parseInt(ageSplit[0]) > 18)
 					s2 = "contact.age>=" + ageSplit[0];
 				if (Integer.parseInt(ageSplit[1]) < 99)
-					s2 += (String.s.isEmpty(s2) ? "" : " and ") + "contact.age<=" + ageSplit[1];
+					s2 += (Strings.isEmpty(s2) ? "" : " and ") + "contact.age<=" + ageSplit[1];
 				return "contact.gender=" + i + (Strings.isEmpty(s2) ? "" : " and " + s2);
 			}
 			return "";
