@@ -216,7 +216,7 @@ public class DBApi {
 				search = (s.contains("contact.idDisplay") ? "" : "contact.id<>" + contact.getClientId() + " and ")
 						+ "contact.id<>" + contact.getId() + search + (Strings.isEmpty(s) ? "" : " and (" + s + ")");
 			}
-			return search;
+			return search.length() > 0 ? search.substring(5) : search;
 		}
 
 		private String gender(final String age, final int i) {
