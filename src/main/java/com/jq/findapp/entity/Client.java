@@ -13,9 +13,10 @@ public class Client extends BaseEntity {
 	private String url;
 	private String fbPageAccessToken;
 	private String fbPageId;
+	private String searchMandatory;
 
 	public BigInteger getAdminId() {
-		return adminId;
+		return this.adminId;
 	}
 
 	public void setAdminId(final BigInteger adminId) {
@@ -23,7 +24,7 @@ public class Client extends BaseEntity {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(final String name) {
@@ -31,7 +32,7 @@ public class Client extends BaseEntity {
 	}
 
 	public String getUrl() {
-		return url;
+		return this.url;
 	}
 
 	public void setUrl(final String url) {
@@ -39,7 +40,7 @@ public class Client extends BaseEntity {
 	}
 
 	public String getEmail() {
-		return email;
+		return this.email;
 	}
 
 	public void setEmail(final String email) {
@@ -47,7 +48,7 @@ public class Client extends BaseEntity {
 	}
 
 	public String getStorage() {
-		return storage;
+		return this.storage;
 	}
 
 	public void setStorage(final String storage) {
@@ -55,7 +56,7 @@ public class Client extends BaseEntity {
 	}
 
 	public String getFbPageAccessToken() {
-		return fbPageAccessToken;
+		return this.fbPageAccessToken;
 	}
 
 	public void setFbPageAccessToken(final String fbPageAccessToken) {
@@ -63,10 +64,18 @@ public class Client extends BaseEntity {
 	}
 
 	public String getFbPageId() {
-		return fbPageId;
+		return this.fbPageId;
 	}
 
 	public void setFbPageId(final String fbPageId) {
 		this.fbPageId = fbPageId;
+	}
+
+	public String getSearchMandatory() {
+		return this.searchMandatory;
+	}
+
+	public void setSearchMandatory(final String searchMandatory) {
+		this.searchMandatory = searchMandatory;
 	}
 }

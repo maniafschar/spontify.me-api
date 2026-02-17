@@ -85,6 +85,7 @@ public class AppTest {
 	public void run() throws Exception {
 		try {
 			this.register("testabcd", "test@jq-consulting.de");
+			this.addProfileData();
 			this.addLocation("location 1", "Melchiorstr. 9\n81479 München", false);
 			this.addEvent();
 			this.addRating();
@@ -130,6 +131,16 @@ public class AppTest {
 		new Actions(Util.driver).sendKeys("qwer1234").build().perform();
 		Util.sendKeys("dialog-popup input[name=\"passwd\"]", "qwer1234");
 		Util.click("dialog-popup button-text");
+	}
+
+	private void addProfileData() {
+		Util.click("buttonicon.right");
+		Util.click("input-date label");
+		Util.click("dialog-hint label[onclick]");
+		Util.click("input-checkbox[name=\"gender\"][value=\"1\"]");
+		Util.click("input-hashtags hashtagbutton");
+		Util.click("input-hashtags hashtags div label");
+		Util.click("dialog-navigation item.home");
 	}
 
 	private void logoff() {
