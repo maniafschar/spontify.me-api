@@ -361,7 +361,6 @@ public class AuthenticationService {
 			final ContactToken t = this.repository.one(ContactToken.class, (BigInteger) u.get("contactToken.id"));
 			t.setToken("");
 			this.repository.save(t);
-			this.notificationService.createTicket(TicketType.ERROR, "Token", "reseted\n" + token, null);
 		}
 	}
 
@@ -370,14 +369,11 @@ public class AuthenticationService {
 			final QueryParams params = new QueryParams(Query.contact_token);
 			params.setSearch("contactToken.token='" + token + "'");
 			final Map<String, Object> u = this.repository.one(params);
-			if (u == null) {
-				this.notificationService.createTicket(TicketType.ERROR, "Token", "not found\n" + token, null);
+			if (u == null)
 				return null;
-			}
 			final Contact c = this.repository.one(Contact.class, (BigInteger) u.get("contactToken.contactId"));
 			return Encryption.encrypt(c.getEmail() + "\u0015" + this.getPassword(c), publicKey);
 		} catch (final Exception ex) {
-			this.notificationService.createTicket(TicketType.ERROR, "Token", Strings.stackTraceToString(ex), null);
 			return null;
 		}
 	}
