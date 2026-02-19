@@ -163,8 +163,12 @@ public class DBApi {
 				"no write access for " + e.getClass().getSimpleName() + ", id " + e.getId() + ", user " + user);
 	}
 
-	private String getRegEx(final String field, final String value) {
+	private String token2regex(final String field, final String value) {
 		return Strings.isEmpty(value) ? "1=0" : "cast(REGEXP_LIKE(" + field + ",'" + value + "') as integer)=1";
+	}
+
+	private String sanitizeToken(final String token) {
+		return token.trim().toLowerCase().replace("'", "''");
 	}
 
 	private class SearchContact {
@@ -173,15 +177,16 @@ public class DBApi {
 			final Contact contact = DBApi.this.repository.one(Contact.class, contactId);
 			if (node.get("matches").asBoolean()) {
 				final Client client = DBApi.this.repository.one(Client.class, contact.getClientId());
-				search = " and (" + DBApi.this.getRegEx("contact.skills", contact.getSkills()) + " or " +
-						DBApi.this.getRegEx("contact.skillsText", contact.getSkillsText()) + ')';
+				search = " and (" + DBApi.this.token2regex("contact.skills", contact.getSkills()) + " or " +
+						DBApi.this.token2regex("contact.skillsText", DBApi.this.sanitizeToken(contact.getSkillsText()))
+						+ ')';
 				if (!Strings.isEmpty(client.getSearchMandatory()) && !Strings.isEmpty(contact.getSkills()) &&
 						contact.getSkillsText().contains(client.getSearchMandatory())) {
 					search += " and (";
 					final String[] s = contact.getSkills().split("|");
 					for (var i = 0; i < s.length; i++) {
 						if (s[i].indexOf(client.getSearchMandatory()) == 0)
-							search += DBApi.this.getRegEx("contact.skills", s[i]) + " or ";
+							search += DBApi.this.token2regex("contact.skills", s[i]) + " or ";
 					}
 					search = search.substring(0, search.length() - 4) + ')';
 				}
@@ -202,7 +207,7 @@ public class DBApi {
 			if (!Strings.isEmpty(node.get("tokens").asText())) {
 				for (final String token : node.get("tokens").asText().split("\\|")) {
 					if (!Strings.isEmpty(token)) {
-						final String s2 = token.trim().toLowerCase();
+						final String s2 = DBApi.this.sanitizeToken(token);
 						s += "contact.idDisplay='" + token.trim()
 								+ "' or (contact.search=true and (LOWER(contact.description) like '%" + s2
 								+ "%' or LOWER(contact.pseudonym) like '%" + s2
@@ -210,13 +215,12 @@ public class DBApi {
 					}
 					s = s.substring(0, s.length() - 4);
 				}
-				if (!Strings.isEmpty(node.get("ids").asText()))
-					s += (!Strings.isEmpty(s) ? " or " : "")
-							+ DBApi.this.getRegEx("contact.skills", node.get("ids").asText());
-				search = (s.contains("contact.idDisplay") ? "" : "contact.id<>" + contact.getClientId() + " and ")
-						+ "contact.id<>" + contact.getId() + search + (Strings.isEmpty(s) ? "" : " and (" + s + ")");
 			}
-			return search.length() > 0 ? search.substring(5) : search;
+			if (!Strings.isEmpty(node.get("ids").asText()))
+				s += (!Strings.isEmpty(s) ? " or " : "")
+						+ DBApi.this.token2regex("contact.skills", node.get("ids").asText());
+			return (s.contains("contact.idDisplay") ? "" : "contact.id<>" + contact.getClientId() + " and ")
+					+ "contact.id<>" + contact.getId() + search + (Strings.isEmpty(s) ? "" : " and (" + s + ")");
 		}
 
 		private String gender(final String age, final int i) {
@@ -239,7 +243,7 @@ public class DBApi {
 			if (!Strings.isEmpty(node.get("tokens").asText())) {
 				for (final String token : node.get("tokens").asText().split("\\|")) {
 					if (!Strings.isEmpty(token)) {
-						final String l = ") like '%" + token.trim().toLowerCase() + "%' or LOWER(";
+						final String l = ") like '%" + DBApi.this.sanitizeToken(token) + "%' or LOWER(";
 						s += "((contact.search=true or event.price>0) and LOWER(contact.pseudonym" + l
 								+ "contact.description" + l;
 						s = s.substring(0, s.lastIndexOf(" or LOWER(")) + ") or ";
@@ -252,7 +256,8 @@ public class DBApi {
 				s = s.substring(0, s.length() - 4);
 			}
 			if (!Strings.isEmpty(node.get("ids").asText()))
-				s += (Strings.isEmpty(s) ? "" : " or ") + DBApi.this.getRegEx("event.skills", node.get("ids").asText());
+				s += (Strings.isEmpty(s) ? "" : " or ")
+						+ DBApi.this.token2regex("event.skills", node.get("ids").asText());
 			if (node.has("bounds")) {
 				final double swlat = node.get("bounds").get("southWestLat").asDouble();
 				final double swlng = node.get("bounds").get("southWestLng").asDouble();
@@ -284,7 +289,7 @@ public class DBApi {
 			if (!Strings.isEmpty(node.get("tokens").asText())) {
 				for (final String token : node.get("tokens").asText().split("\\|")) {
 					if (!Strings.isEmpty(token)) {
-						final String l = ") like '%" + token.trim().toLowerCase() + "%' or LOWER(";
+						final String l = ") like '%" + DBApi.this.sanitizeToken(token) + "%' or LOWER(";
 						s += "(LOWER(location.name" + l + "location.description" + l + "location.address" + l
 								+ "location.address2" + l + "location.telephone" + l;
 						s = s.substring(0, s.lastIndexOf(" or LOWER")) + ") or ";
@@ -295,7 +300,7 @@ public class DBApi {
 			}
 			if (!Strings.isEmpty(node.get("ids").asText()))
 				s += (Strings.isEmpty(s) ? "" : " or ")
-						+ DBApi.this.getRegEx("location.skills", node.get("ids").asText());
+						+ DBApi.this.token2regex("location.skills", node.get("ids").asText());
 			if (node.get("favorites").asBoolean())
 				s += (Strings.isEmpty(s) ? "" : " and ") + "locationFavorite.favorite=true";
 			if (node.has("bounds")) {

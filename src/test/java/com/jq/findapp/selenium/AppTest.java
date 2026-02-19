@@ -187,7 +187,6 @@ public class AppTest {
 		Util.sleep(1000);
 		Util.click("dialog-popup eventLocationInputHelper ul li");
 		Util.sleep(500);
-		Util.click("dialog-popup dialogButtons button-text[onclick*=\"save\"]");
 		Util.sendKeys("dialog-popup input-date[name=\"startDate\"]", "");
 		Util.sendKeys("dialog-popup input-hashtags textarea", "textabc");
 		Util.sendKeys("dialog-popup textarea[name=\"description\"]", "mega sex");
