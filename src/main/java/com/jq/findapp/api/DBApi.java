@@ -316,8 +316,7 @@ public class DBApi {
 					}
 				}
 				if (!Strings.isEmpty(s))
-					s = (Strings.isEmpty(s) ? "" : " or ")
-							+ '(' + s.substring(0, s.length() - 4) + ')';
+					s = '(' + s.substring(0, s.length() - 4) + ')';
 			}
 			if (s.endsWith(" or "))
 				s = s.substring(0, s.length() - 4);
