@@ -185,6 +185,15 @@
 		]
 	},
 	{
+		"label": "X",
+		"key": "X",
+		"values": [
+			"Sportsbar|Sportsbar|1",
+			"Kino|Cinema|2",
+			"Museum|Museum|3"
+		]
+	},
+	{
 		"label": "Clubs",
 		"key": 9,
 		"values": [
