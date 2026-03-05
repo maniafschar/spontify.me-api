@@ -40,6 +40,7 @@
 			"Kino|Cinema|09",
 			"Klassik|Classic|10",
 			"Mainstream|Mainstream|11",
+			"Museum|Museum|22",
 			"Musical|Musicals|12",
 			"Oper|Opera|13",
 			"Pop Art|PopArt|14",
@@ -47,6 +48,7 @@
 			"Rock'n'Roll|Rock'n'Roll|16",
 			"Romantik|Romance|17",
 			"Schlager|Schlager|18",
+			"Sportsbar|Sportsbar|21",
 			"Theater|Theatre|19",
 			"Universität|University|20"
 		]
@@ -182,15 +184,6 @@
 			"Schreinern|Carpenting|23",
 			"Shopping|Shopping|24",
 			"Töpfern|Pottery|25"
-		]
-	},
-	{
-		"label": "X",
-		"key": "x",
-		"values": [
-			"Sportsbar|Sportsbar|1",
-			"Kino|Cinema|2",
-			"Museum|Museum|3"
 		]
 	},
 	{
