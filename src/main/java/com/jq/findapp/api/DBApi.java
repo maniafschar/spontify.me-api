@@ -33,6 +33,7 @@ import com.jq.findapp.util.Encryption;
 import com.jq.findapp.util.Entity;
 import com.jq.findapp.util.Json;
 import com.jq.findapp.util.Strings;
+import com.jq.findapp.util.Text;
 
 import jakarta.transaction.Transactional;
 
@@ -42,6 +43,9 @@ import jakarta.transaction.Transactional;
 public class DBApi {
 	@Autowired
 	private Repository repository;
+
+	@Autowired
+	private Text text;
 
 	@Autowired
 	private NotificationService notificationService;
@@ -203,9 +207,15 @@ public class DBApi {
 					search += " and (" + g.substring(4) + ')';
 			}
 
-			String s = "";
-			if (!Strings.isEmpty(node.get("tokens").asText())) {
-				for (final String token : node.get("tokens").asText().split("\\|")) {
+			String s = "", tokens = node.get("tokens").asText();
+			if (!Strings.isEmpty(node.get("ids").asText())) {
+				s = DBApi.this.token2regex("contact.skills", node.get("ids").asText()) + " or ";
+				for (final String token : node.get("ids").asText().split("\\|"))
+					tokens += "|" + DBApi.this.text.getSkillText(token);
+
+			}
+			if (!Strings.isEmpty(tokens)) {
+				for (final String token : tokens.split("\\|")) {
 					if (!Strings.isEmpty(token)) {
 						final String s2 = DBApi.this.sanitizeToken(token);
 						s += "contact.idDisplay='" + token.trim()
@@ -216,9 +226,8 @@ public class DBApi {
 					s = s.substring(0, s.length() - 4);
 				}
 			}
-			if (!Strings.isEmpty(node.get("ids").asText()))
-				s += (!Strings.isEmpty(s) ? " or " : "")
-						+ DBApi.this.token2regex("contact.skills", node.get("ids").asText());
+			if (s.endsWith(" or "))
+				s = s.substring(0, s.length() - 4);
 			return (s.contains("contact.idDisplay") ? "" : "contact.id<>" + contact.getClientId() + " and ")
 					+ "contact.id<>" + contact.getId() + search + (Strings.isEmpty(s) ? "" : " and (" + s + ")");
 		}
@@ -240,8 +249,14 @@ public class DBApi {
 	private class SearchEvent {
 		private String token2clause(final JsonNode node) {
 			String s = "";
-			if (!Strings.isEmpty(node.get("tokens").asText())) {
-				for (final String token : node.get("tokens").asText().split("\\|")) {
+			String tokens = node.get("tokens").asText();
+			if (!Strings.isEmpty(node.get("ids").asText())) {
+				s += DBApi.this.token2regex("event.skills", node.get("ids").asText()) + " or ";
+				for (final String token : node.get("ids").asText().split("\\|"))
+					tokens += "|" + DBApi.this.text.getSkillText(token);
+			}
+			if (!Strings.isEmpty(tokens)) {
+				for (final String token : tokens.split("\\|")) {
 					if (!Strings.isEmpty(token)) {
 						final String l = ") like '%" + DBApi.this.sanitizeToken(token) + "%' or LOWER(";
 						s += "((contact.search=true or event.price>0) and LOWER(contact.pseudonym" + l
@@ -255,9 +270,8 @@ public class DBApi {
 				}
 				s = s.substring(0, s.length() - 4);
 			}
-			if (!Strings.isEmpty(node.get("ids").asText()))
-				s += (Strings.isEmpty(s) ? "" : " or ")
-						+ DBApi.this.token2regex("event.skills", node.get("ids").asText());
+			if (s.endsWith(" or "))
+				s = s.substring(0, s.length() - 4);
 			if (node.has("bounds")) {
 				final double swlat = node.get("bounds").get("southWestLat").asDouble();
 				final double swlng = node.get("bounds").get("southWestLng").asDouble();
@@ -286,8 +300,14 @@ public class DBApi {
 	private class SearchLocation {
 		private String token2clause(final JsonNode node) {
 			String s = "";
-			if (!Strings.isEmpty(node.get("tokens").asText())) {
-				for (final String token : node.get("tokens").asText().split("\\|")) {
+			String tokens = node.get("tokens").asText();
+			if (!Strings.isEmpty(node.get("ids").asText())) {
+				s += DBApi.this.token2regex("location.skills", node.get("ids").asText()) + " or ";
+				for (final String token : node.get("ids").asText().split("\\|"))
+					tokens += "|" + DBApi.this.text.getSkillText(token);
+			}
+			if (!Strings.isEmpty(tokens)) {
+				for (final String token : tokens.split("\\|")) {
 					if (!Strings.isEmpty(token)) {
 						final String l = ") like '%" + DBApi.this.sanitizeToken(token) + "%' or LOWER(";
 						s += "(LOWER(location.name" + l + "location.description" + l + "location.address" + l
@@ -296,11 +316,11 @@ public class DBApi {
 					}
 				}
 				if (!Strings.isEmpty(s))
-					s = '(' + s.substring(0, s.length() - 4) + ')';
+					s = (Strings.isEmpty(s) ? "" : " or ")
+							+ '(' + s.substring(0, s.length() - 4) + ')';
 			}
-			if (!Strings.isEmpty(node.get("ids").asText()))
-				s += (Strings.isEmpty(s) ? "" : " or ")
-						+ DBApi.this.token2regex("location.skills", node.get("ids").asText());
+			if (s.endsWith(" or "))
+				s = s.substring(0, s.length() - 4);
 			if (node.get("favorites").asBoolean())
 				s += (Strings.isEmpty(s) ? "" : " and ") + "locationFavorite.favorite=true";
 			if (node.has("bounds")) {

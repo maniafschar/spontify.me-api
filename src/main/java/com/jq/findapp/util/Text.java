@@ -161,7 +161,7 @@ public class Text {
 		text = text.toLowerCase();
 		for (int i = 0; i < categories.length; i++) {
 			for (int i2 = 0; i2 < categories[i].values.size(); i2++) {
-				if (categories[i].values.get(i2).toLowerCase().contains(text))
+				if (("|" + categories[i].values.get(i2).toLowerCase()).contains("|" + text + "|"))
 					return categories[i].key + "." +
 							categories[i].values.get(i2).substring(categories[i].values.get(i2).lastIndexOf("|") + 1);
 			}
